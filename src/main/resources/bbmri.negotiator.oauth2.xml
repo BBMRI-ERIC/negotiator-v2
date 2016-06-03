@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oAuth2Client xmlns="http://schema.samply.de/config/OAuth2Client"
+		xmlns:xml="http://www.w3.org/XML/1998/namespace"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://schema.samply.de/config/OAuth2Client http://schema.samply.de/config/OAuth2Client.xsd">
+	
+	<host>https://auth.demo.osse-register.de</host>
+	<hostPublicKey>
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAoBDqAcCKQGEbxnsJrjKdumhMCPhpOktx
+VL2I/PzNjC6LjXontnsZKpETk9flcJ105Fuf3tf2tgVlJ8AxV2MavTVeaq1iXbiWs2XMnXMisfDs
+Jf7yutMqgriaE97X6GHYJ05oQxVP3/9rWxMztimsm1EZY8vH5lYwcCJWNKNA4EnvWP27Kvhu9DCy
+DNClw4DMOp28jy4YyGiVOzSSdZ7kd/73t21KI1mg/TeNenyQ6aFAK+UmgEK9TjSB1OV1vmBzbXar
+QwbvxSEbys2pfTu2BQ08i4TQK/vipZYLDx1BMjJqQfB+2uTrjgStc51Wiw3GMM8dshFr6ZZ76kyv
+xbw4uII/Azhsdc5EftG3o9tx4UHnyUrrqT2j9sNKQn7zTM6Xbj8C04YaaUovZj7cugCadm16WErY
+6ZbqdEhCqvC583e4cURf3grQSlMUqo7IA/cJ6wohAWUGo0nGrseLPwldR0lB7uvPHF3c2OdmE3wF
+diaKZlU1L6jC4hzZpcFzkVAA5DqjFZP7ksX3Q7E/BvoEe1RjMYqj5OLOl3QZbiysOaNXqSxzRe8j
+aqDh/w1pDH/eNAEL9n81/Y/fHs1VCY4RlwHYMzIeP2hQIDMoR/mBHzcCcgDiar6cIXHRc7tL2n4B
+AaYUSD2MwIu98XRQr+6G88APC9J7Q0D07LPLDpXhpPMCAwEAAQ==
+</hostPublicKey>
+	<clientId>tt31jr65fuab9uhs072tocmlevago67voss470n8le8kumq0ll28rn7d0i8otifgeth5vp7l6basr39f4r8s8h14a8bb0pe5b72vq5</clientId>
+	<clientSecret>27hsp1tj81jmvajs2dek03n8i9v8orrm6sabe6716t9ea22mckdv706s1sfej22arnpr1e2dpdbb5st81qtns6ddiuvim6ek93qhkv6</clientSecret>
+
+	<additionalHostnames>
+		<hostname>
+			<host>https://auth-test.ccp-it.dktk.dkfz.de</host>
+			<ifServernameEquals>mdr-test.ccp-it.dktk.dkfz.de</ifServernameEquals>
+		</hostname>
+		<hostname>
+			<host>https://auth-test.ccpit.dktk.dkfz.de</host>
+			<ifServernameEquals>mdr-test.ccpit.dktk.dkfz.de</ifServernameEquals>
+		</hostname>
+	</additionalHostnames>
+
+
+</oAuth2Client>

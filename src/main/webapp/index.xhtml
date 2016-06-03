@@ -1,11 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-<f:view>
-    <h:outputLabel value="Hello, world"/>
-</f:view>
-</html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+    template="components/default.xhtml">
+
+    <ui:param name="bodyClass" value="container" />
+
+    <ui:define name="body">
+
+        <h:panelGroup layout="block" styleClass="row">
+            <h:panelGroup layout="block" styleClass="col-md-2">
+                <a href="#" class="btn btn-danger btn-sm btn-block"
+                    role="button"><i
+                    class="glyphicon glyphicon-edit"></i> New query</a>
+
+                <p />
+            </h:panelGroup>
+        </h:panelGroup>
+
+        <ui:repeat var="item" value="#{sessionBean.queries}">
+
+            <h:panelGroup layout="block" styleClass="row">
+
+                <h:panelGroup layout="block"
+                    styleClass="panel panel-default">
+                    <h:panelGroup layout="block"
+                        styleClass="panel-heading">
+                        #{item.number} - #{item.title} <h:panelGroup
+                            styleClass="pull-right">
+                            <h:panelGroup
+                                rendered="#{item.numberResponses > 0}"
+                                styleClass="badge"
+                                style="padding-right:10px;">
+                                <h:outputText
+                                    title="#{item.numberResponses} biobanks contacted you"
+                                    value="#{item.numberResponses}" />
+                            </h:panelGroup>
+
+                            <h:outputText value="#{item.creationDate}"
+                                title="Date this query was created on">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+
+                        </h:panelGroup>
+                    </h:panelGroup>
+                    <h:panelGroup layout="block" styleClass="panel-body">
+                        <h:panelGroup layout="block" styleClass="row">
+                            <h:panelGroup layout="block"
+                                styleClass="col-md-10">
+                                #{item.text}</h:panelGroup>
+
+                        </h:panelGroup>
+
+                        <h:panelGroup layout="block" styleClass="row">
+                            <h:panelGroup layout="block"
+                                styleClass="col-md-12">
+                                <h:panelGroup styleClass="pull-right">
+
+                                    <h:outputText
+                                        value="#{item.lastContactDate}"
+                                        title="Date and time of last contact communication">
+                                        <f:convertDateTime
+                                            pattern="MM/dd/yyyy hh:mm:ss" />
+                                    </h:outputText>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:panelGroup>
+
+                </h:panelGroup>
+            </h:panelGroup>
+        </ui:repeat>
+    </ui:define>
+
+</ui:composition>
