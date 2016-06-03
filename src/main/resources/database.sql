@@ -70,25 +70,6 @@ COMMENT ON COLUMN flaggedQuery.ownerId IS 'This column along with the id column 
 
 COMMENT ON COLUMN flaggedQuery.flag IS 'The flag of the comment. One character letter. (A) archived, (I) ignored, (S) starred';
 
-/* 
---
--- Name: flaggedQuery_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE flaggedQuery_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
---
--- Name: flaggedQuery_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE flaggedQuery_id_seq OWNED BY flaggedQuery.queryId;
- */
-
 
 CREATE TABLE location (
     id bigint NOT NULL,
@@ -189,4 +170,25 @@ CREATE TABLE researcher (
 COMMENT ON TABLE researcher IS 'researcher table - one of the child''s of the person table ';
 
 COMMENT ON COLUMN researcher.id IS 'This id is the primary key of person table ';
+
+
+CREATE TABLE taggedQuery (
+    queryId bigint UNIQUE NOT NULL,
+    tagId bigint UNIQUE NOT NULL,
+    PRIMARY KEY(queryId, tagId),
+	FOREIGN KEY (tagId) REFERENCES "tag"(id) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (queryId) REFERENCES query(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+COMMENT ON TABLE taggedQuery IS 'Table for queries that are tagged by names e.g. colonCancer,SkinCancer etc. Tag names need to be decided .';
+
+
+COMMENT ON COLUMN taggedQuery.queryId IS 'This column along with tagId will make the primary key. Its also a foreign key here, taken from query table';
+
+
+COMMENT ON COLUMN taggedQuery.tagId IS 'This column along with the Queryid column will make the primary key. Its also a foreign key here, taken from "tag" table';
+
+
+COMMENT ON COLUMN taggedQuery.flag IS 'The flag of the comment. One character letter. (A) archived, (I) ignored, (S) starred';
+
 
