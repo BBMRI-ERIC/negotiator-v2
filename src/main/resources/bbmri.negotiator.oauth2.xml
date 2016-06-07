@@ -4,32 +4,21 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://schema.samply.de/config/OAuth2Client http://schema.samply.de/config/OAuth2Client.xsd">
 	
-	<host>https://auth.demo.osse-register.de</host>
+	<host>https://auth-dev.mitro.dkfz.de</host>
 	<hostPublicKey>
-MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAoBDqAcCKQGEbxnsJrjKdumhMCPhpOktx
-VL2I/PzNjC6LjXontnsZKpETk9flcJ105Fuf3tf2tgVlJ8AxV2MavTVeaq1iXbiWs2XMnXMisfDs
-Jf7yutMqgriaE97X6GHYJ05oQxVP3/9rWxMztimsm1EZY8vH5lYwcCJWNKNA4EnvWP27Kvhu9DCy
-DNClw4DMOp28jy4YyGiVOzSSdZ7kd/73t21KI1mg/TeNenyQ6aFAK+UmgEK9TjSB1OV1vmBzbXar
-QwbvxSEbys2pfTu2BQ08i4TQK/vipZYLDx1BMjJqQfB+2uTrjgStc51Wiw3GMM8dshFr6ZZ76kyv
-xbw4uII/Azhsdc5EftG3o9tx4UHnyUrrqT2j9sNKQn7zTM6Xbj8C04YaaUovZj7cugCadm16WErY
-6ZbqdEhCqvC583e4cURf3grQSlMUqo7IA/cJ6wohAWUGo0nGrseLPwldR0lB7uvPHF3c2OdmE3wF
-diaKZlU1L6jC4hzZpcFzkVAA5DqjFZP7ksX3Q7E/BvoEe1RjMYqj5OLOl3QZbiysOaNXqSxzRe8j
-aqDh/w1pDH/eNAEL9n81/Y/fHs1VCY4RlwHYMzIeP2hQIDMoR/mBHzcCcgDiar6cIXHRc7tL2n4B
-AaYUSD2MwIu98XRQr+6G88APC9J7Q0D07LPLDpXhpPMCAwEAAQ==
-</hostPublicKey>
-	<clientId>tt31jr65fuab9uhs072tocmlevago67voss470n8le8kumq0ll28rn7d0i8otifgeth5vp7l6basr39f4r8s8h14a8bb0pe5b72vq5</clientId>
-	<clientSecret>27hsp1tj81jmvajs2dek03n8i9v8orrm6sabe6716t9ea22mckdv706s1sfej22arnpr1e2dpdbb5st81qtns6ddiuvim6ek93qhkv6</clientSecret>
-
-	<additionalHostnames>
-		<hostname>
-			<host>https://auth-test.ccp-it.dktk.dkfz.de</host>
-			<ifServernameEquals>mdr-test.ccp-it.dktk.dkfz.de</ifServernameEquals>
-		</hostname>
-		<hostname>
-			<host>https://auth-test.ccpit.dktk.dkfz.de</host>
-			<ifServernameEquals>mdr-test.ccpit.dktk.dkfz.de</ifServernameEquals>
-		</hostname>
-	</additionalHostnames>
-
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxTXQnpVe5tqYre2xGOVQu5q1i
+5NOAYjff3Cx1U0a28M8+LQkgVZW6RGAhngPJWXISx4+4J+y7tn1s0T2W5Q51NlzJFkAdz
+3nZ4dYbW0zVo6GfFbi/5ccEIVbV7aF/gzKc6LDx9IPQW5USSVr0hKYHPPW8jsaQ+7og3W
+AnOCkvLoq4GESf60zhRZdY+T1QlCCEjY77VGFgHDAqV+D8FFoDTPFHWZ5ojWWYr2IUE+G
+SXW7ESFu1oVgWeetrKj0N8m+8oJH7IfLBa2vrFXrCIKA4PuHT9kj7Cmqp0RHDmPaLJk20
+HAFeubfMx25xC11dbcmYhny+D+C+FSJJuItthnMdj9dt09rvsamZT8fkOBXYs+gHp5M24
+Qs05G9602WplG6yXS63HKvNkr/GtDyjp8ZY/EC9Cf71Bx5W4aYCs9m7nAf9Q74uSYeRpr
+K4b3YNHD4yLlPMDwndVChcy4LmRdnfqA71mhlcWhO/nAQUXDiheedDUQbQ9fFPYs4X8aA
+h6yxHsC6b1IPOqS0BQW/inLdne7zSOjcfD/T79kDssc3xlS6NRJlP1S5VZyEp9a4f2igq
+QFWtsWh7Mzm464EsZ7RuesodoZWn5kazMPp7h9HU6COfUmDRA/sObHxLFcbMbuqOdUnhB
+OdDiQvhOSQ29YXrKbFEGXeDdEX5vyIKQyW1fUCAwEAAQ==
+	</hostPublicKey>
+	<clientId>localhost</clientId>
+	<clientSecret>37b19g249sintn82gv7fg67meoisebn9i0groukr15bl8ama5m6ci0nsor45ovv9hrsins74e58df8c454bm384g1vqdqfdjop61u2m</clientSecret>
 
 </oAuth2Client>
