@@ -97,6 +97,12 @@ hr {
     float: inherit;
 }
 
+.queryOwner {
+    padding-left: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
 .queryNumberResponsesBadge {
     margin-right:5px;
     float: left;

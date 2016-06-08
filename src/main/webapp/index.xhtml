@@ -80,28 +80,42 @@
                         </h:panelGroup>
                     
                     </h:panelGroup>
+                    
+                    
                     <h:panelGroup layout="block" styleClass="panel-body">
                         <h:panelGroup layout="block" styleClass="row">
-                            <h:panelGroup layout="block"
-                                styleClass="col-md-10">
-                                #{item.text}</h:panelGroup>
 
-                        </h:panelGroup>
-
-                        <h:panelGroup layout="block" styleClass="row">
-                            <h:panelGroup layout="block"
-                                styleClass="col-md-12">
-                                <h:panelGroup styleClass="pull-right">
-
-                                    <h:outputText
-                                        value="#{item.lastContactDate}"
-                                        title="Date and time of last contact communication">
-                                        <f:convertDateTime
-                                            pattern="MM/dd/yyyy hh:mm:ss" />
-                                    </h:outputText>
-                                </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="col-md-1" rendered="#{userBean.biobankOwner}">
+                                <h:graphicImage library="images" name="shodan_80_86.png" />
                             </h:panelGroup>
-                        </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="col-md-11">
+                                <h:panelGroup layout="block" styleClass="row queryOwner" rendered="#{userBean.biobankOwner}">
+                                    #{item.ownerName}
+                                </h:panelGroup>
+                            
+                                <h:panelGroup layout="block" styleClass="row">
+                                    <h:panelGroup layout="block"
+                                        styleClass="col-md-10">
+                                        #{item.text}</h:panelGroup>
+        
+                                </h:panelGroup>
+    
+                                <h:panelGroup layout="block" styleClass="row">
+                                    <h:panelGroup layout="block"
+                                        styleClass="col-md-12">
+                                        <h:panelGroup styleClass="pull-right">
+        
+                                            <h:outputText
+                                                value="#{item.lastContactDate}"
+                                                title="Date and time of last contact communication">
+                                                <f:convertDateTime
+                                                    pattern="MM/dd/yyyy hh:mm:ss" />
+                                            </h:outputText>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </h:panelGroup>                            
+                        </h:panelGroup> <!-- row -->
                     </h:panelGroup>
 
                 </h:panelGroup>

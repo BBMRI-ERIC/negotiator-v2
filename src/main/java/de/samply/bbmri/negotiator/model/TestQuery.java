@@ -10,12 +10,13 @@ public class TestQuery implements Serializable {
     private Integer number;
     private String title;
     private String text;
+    private String ownerName;
     private Integer numberResponses;
     private Date creationDate;
     private Date lastContactDate;
 
     public TestQuery(Integer number, String title, String text, Integer numberResponses, Date creationDate,
-            Date lastContactDate) {
+            Date lastContactDate, String ownerName) {
         super();
         this.number = number;
         this.title = title;
@@ -23,6 +24,7 @@ public class TestQuery implements Serializable {
         this.numberResponses = numberResponses;
         this.creationDate = creationDate;
         this.lastContactDate = lastContactDate;
+        this.ownerName = ownerName;
     }
 
     public Integer getId() {
@@ -79,6 +81,14 @@ public class TestQuery implements Serializable {
 
     public void setLastContactDate(Date lastContactDate) {
         this.lastContactDate = lastContactDate;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
 }
