@@ -1,8 +1,4 @@
 /**
- * 
- */
-/**
- * @author ataian
- *
+ * Package contains ManagedBeans
  */
 package de.samply.bbmri.negotiator.control;

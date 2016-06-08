@@ -11,9 +11,9 @@ import de.samply.bbmri.negotiator.listener.ServletListener;
 @ApplicationScoped
 public class ApplicationBean implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     public String getVersion() {
         return ServletListener.getVersion();
     }
-    
+
 }

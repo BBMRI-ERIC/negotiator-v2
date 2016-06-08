@@ -1,32 +1,8 @@
-/**
- * Copyright (C) 2015 Working Group on Joint Research, University Medical Center Mainz
- * Contact: info@osse-register.de
- *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Affero General Public License as published by the Free
- * Software Foundation; either version 3 of the License, or (at your option) any
- * later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program; if not, see <http://www.gnu.org/licenses>.
- *
- * Additional permission under GNU GPL version 3 section 7:
- *
- * If you modify this Program, or any covered work, by linking or combining it
- * with Jersey (https://jersey.java.net) (or a modified version of that
- * library), containing parts covered by the terms of the General Public
- * License, version 2.0, the licensors of this Program grant you additional
- * permission to convey the resulting work.
- */
 package de.samply.bbmri.negotiator.filter;
 
 import java.io.IOException;
 
+import javax.faces.application.ResourceHandler;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -41,43 +17,80 @@ import javax.servlet.http.HttpSession;
 import de.samply.bbmri.negotiator.control.UserBean;
 
 /**
- * Don't let the unauthorized user get the web pages in /user/*
- * @author paul
- *
+ * This filter checks if there is a user logged in or not. If no valid user is
+ * logged in, it redirects the user to login.xhtml If a valid user is logged in,
+ * the request is continued, unless he is on login.xhtml, then it redirects the
+ * user to index.xhtml
  */
-@WebFilter(filterName = "AuthorizationFilter")
+@WebFilter("/*")
 public class AuthorizationFilter implements Filter {
+
+    private static final String AJAX_REDIRECT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            + "<partial-response><redirect url=\"%s\"></redirect></partial-response>";
 
     @Override
     public void destroy() {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
-        HttpSession session = ((HttpServletRequest) request).getSession(false);
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
+            throws ServletException, IOException {
+        HttpServletRequest request = (HttpServletRequest) req;
+        HttpServletResponse response = (HttpServletResponse) res;
+        HttpSession session = request.getSession(false);
+        String loginURL = request.getContextPath() + "/login.xhtml";
+        String indexURL = request.getContextPath() + "/index.xhtml";
 
-        if(session == null) {
-            redirect((HttpServletResponse) response, (HttpServletRequest) request);
-            return;
+        boolean loggedIn = false;
+        if (session != null) {
+            UserBean userBean = (UserBean) session.getAttribute("userBean");
+            loggedIn = (userBean != null && userBean.getLoginValid());
         }
 
-        UserBean userBean = (UserBean) session.getAttribute("userBean");
+        // current page is the login page?
+        boolean loginRequest = request.getRequestURI().equals(loginURL);
 
-        if(userBean == null || !userBean.getLoginValid()) {
-            if(response instanceof HttpServletResponse && request instanceof HttpServletRequest) {
-                redirect((HttpServletResponse) response, (HttpServletRequest) request);
-                return;
-            } else {
-                return;
+        // requests on JSR resources are always allowed
+        boolean resourceRequest = request.getRequestURI()
+                .startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
+
+        // ajax requests need a special redirect answer
+        boolean ajaxRequest = "partial/ajax".equals(request.getHeader("Faces-Request"));
+
+        // If we're logged in and on the login page, directly redirect to the
+        // index page
+        if (loggedIn && loginRequest) {
+            response.sendRedirect(indexURL);
+        }
+
+        if (loggedIn || loginRequest || resourceRequest) {
+            if (!resourceRequest) {
+                // Prevent browser from caching restricted resources. See also
+                // http://stackoverflow.com/q/4194207/157882
+                response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP
+                                                                                            // 1.1.
+                response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+                response.setDateHeader("Expires", 0); // Proxies.
             }
-        } else {
-            chain.doFilter(request, response);
-        }
-    }
 
-    private void redirect(HttpServletResponse response, HttpServletRequest request) throws IOException {
-        response.sendRedirect(request.getContextPath() + "/index.xhtml");
+            chain.doFilter(request, response); // So, just continue request.
+        } else if (ajaxRequest) {
+            response.setContentType("text/xml");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().printf(AJAX_REDIRECT_XML, loginURL); // So,
+                                                                      // return
+                                                                      // special
+                                                                      // XML
+                                                                      // response
+                                                                      // instructing
+                                                                      // JSF
+                                                                      // ajax to
+                                                                      // send a
+                                                                      // redirect.
+        } else {
+            response.sendRedirect(loginURL); // So, just perform standard
+                                             // synchronous redirect.
+        }
     }
 
     @Override

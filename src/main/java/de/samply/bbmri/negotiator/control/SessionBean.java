@@ -28,6 +28,4 @@ public class SessionBean implements Serializable {
 //        queries.add(new Query(2, "This one does lie", new Date(), new Date(), 0, "Noch mehr Text"));
         
     }
-    
-    
 }

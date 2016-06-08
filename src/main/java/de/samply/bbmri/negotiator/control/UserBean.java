@@ -5,8 +5,10 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
@@ -50,13 +52,10 @@ public class UserBean implements Serializable {
      */
     private Boolean loginValid = false;
 
-    public Boolean getLoginValid() {
-        return loginValid;
-    }
-
-    public void setLoginValid(Boolean loginValid) {
-        this.loginValid = loginValid;
-    }
+    /**
+     * List of roles of the user
+     */
+    private List<String> roles = null;
 
     /**
      * The *mapped* user ID in the database.
@@ -157,6 +156,22 @@ public class UserBean implements Serializable {
         userIdentity = client.getIDToken().getSubject();
         realName = client.getIDToken().getName();
         username = client.getIDToken().getEmail();
+
+        roles = client.getIDToken().getRoles();
+    }
+
+    public void redirectToQueriesPage() {
+        if (!loginValid)
+            return;
+
+        FacesContext fc = FacesContext.getCurrentInstance();
+        ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
+
+        for (String moo : roles) {
+            System.out.println("ROLE " + moo);
+        }
+
+        nav.performNavigation("index");
     }
 
     public String getUsername() {
@@ -221,6 +236,22 @@ public class UserBean implements Serializable {
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public Boolean getLoginValid() {
+        return loginValid;
+    }
+
+    public void setLoginValid(Boolean loginValid) {
+        this.loginValid = loginValid;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 
 }
