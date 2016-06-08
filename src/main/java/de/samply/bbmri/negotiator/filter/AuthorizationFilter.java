@@ -19,8 +19,7 @@ import de.samply.bbmri.negotiator.control.UserBean;
 /**
  * This filter checks if there is a user logged in or not. If no valid user is
  * logged in, it redirects the user to login.xhtml If a valid user is logged in,
- * the request is continued, unless he is on login.xhtml, then it redirects the
- * user to index.xhtml
+ * the request is continued
  */
 @WebFilter("/*")
 public class AuthorizationFilter implements Filter {
@@ -39,7 +38,6 @@ public class AuthorizationFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpSession session = request.getSession(false);
         String loginURL = request.getContextPath() + "/login.xhtml";
-        String indexURL = request.getContextPath() + "/index.xhtml";
 
         boolean loggedIn = false;
         if (session != null) {
@@ -56,12 +54,6 @@ public class AuthorizationFilter implements Filter {
 
         // ajax requests need a special redirect answer
         boolean ajaxRequest = "partial/ajax".equals(request.getHeader("Faces-Request"));
-
-        // If we're logged in and on the login page, directly redirect to the
-        // index page
-        if (loggedIn && loginRequest) {
-            response.sendRedirect(indexURL);
-        }
 
         if (loggedIn || loginRequest || resourceRequest) {
             if (!resourceRequest) {

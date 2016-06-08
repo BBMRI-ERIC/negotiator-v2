@@ -8,7 +8,6 @@ import java.security.SecureRandom;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
@@ -163,20 +162,10 @@ public class UserBean implements Serializable {
         roles = client.getIDToken().getRoles();
     }
 
-    public void redirectToQueriesPage() {
-        if (!loginValid)
-            return;
-
-        FacesContext fc = FacesContext.getCurrentInstance();
-        ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
-
-        for (String moo : roles) {
-            System.out.println("ROLE " + moo);
-        }
-
-        nav.performNavigation("index");
+    public String profile() {
+        return null;
     }
-
+    
     public String getUsername() {
         return username;
     }
