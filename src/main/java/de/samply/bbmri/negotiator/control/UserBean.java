@@ -23,6 +23,7 @@ import de.samply.auth.client.jwt.JWTIDToken;
 import de.samply.auth.client.jwt.JWTRefreshToken;
 import de.samply.auth.rest.Scope;
 import de.samply.auth.utils.OAuth2ClientConfig;
+import de.samply.bbmri.negotiator.helper.MaxHelper;
 import de.samply.bbmri.negotiator.listener.ServletListener;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
@@ -157,6 +158,8 @@ public class UserBean implements Serializable {
         realName = client.getIDToken().getName();
         username = client.getIDToken().getEmail();
 
+        System.out.println(MaxHelper.showContent(client.getIDToken()));
+        
         roles = client.getIDToken().getRoles();
     }
 
