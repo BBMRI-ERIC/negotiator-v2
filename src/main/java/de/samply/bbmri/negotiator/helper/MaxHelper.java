@@ -13,10 +13,29 @@ public class MaxHelper {
         StringBuilder result = new StringBuilder();
         String newLine = System.getProperty("line.separator");
 
-        result.append("Classname: " + me.getClass().getName()+newLine);
+        result.append("Classname: " + me.getClass().getName() + newLine);
 
-        result.append("Fields:"+newLine);
-        result.append("-------"+newLine);
+        if (me instanceof List) {
+            result.append("[");
+            for (Object rV : (List) me) {
+                result.append(rV + ", ");
+            }
+            result.append("]");
+            return result.toString();
+        } else if (me instanceof Map) {
+            result.append("{");
+            for (Object key : ((Map) me).keySet()) {
+                result.append(key);
+                result.append(" : ");
+                result.append(((Map) me).get(key));
+                result.append(", ");
+            }
+            result.append("}");
+            return result.toString();
+        }
+
+        result.append("Fields:" + newLine);
+        result.append("-------" + newLine);
 
         Field[] fields = me.getClass().getDeclaredFields();
 
@@ -33,8 +52,8 @@ public class MaxHelper {
         }
 
         result.append(newLine);
-        result.append("Methods:"+newLine);
-        result.append("--------"+newLine);
+        result.append("Methods:" + newLine);
+        result.append("--------" + newLine);
         Method[] methods = me.getClass().getDeclaredMethods();
         for (Method method : methods) {
             result.append(" ");

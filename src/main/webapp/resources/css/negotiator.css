@@ -71,3 +71,19 @@ hr {
     font-size: 10.5pt;
     font-weight: bold;
 }
+
+#filterList a {
+    color: white;
+}
+
+#filterInputText {
+    margin-right: 5px;
+}
+
+.filterBadge {
+    margin-right: 5px;
+}
+
+.queriesTopLine {
+    margin-bottom: 5px;
+}

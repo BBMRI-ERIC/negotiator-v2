@@ -12,7 +12,8 @@
 
     <ui:define name="body">
 
-        <h:panelGroup layout="block" styleClass="row">
+        <h:panelGroup layout="block" styleClass="row queriesTopLine"
+            rendered="#{!userBean.biobankOwner}">
             <h:panelGroup layout="block" styleClass="col-md-2">
                 <a href="#" class="btn btn-danger btn-sm btn-block"
                     role="button"><i
@@ -21,7 +22,29 @@
                 <p />
             </h:panelGroup>
         </h:panelGroup>
-
+        
+        <h:panelGroup layout="block" styleClass="row queriesTopLine"
+            rendered="#{userBean.biobankOwner}">
+            <h:form prependId="false">
+                <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
+                    <h:inputText value="#{sessionBean.filterToAdd}"
+                        size="20" id="filterInputText" />
+                    <h:commandButton id="addFilterButton"
+                        action="#{sessionBean.addFilter()}" style="display: none;" />
+                
+                    <ui:repeat var="item" value="#{sessionBean.filters}">
+                        <h:panelGroup styleClass="badge filterBadge"><h:commandLink action="#{sessionBean.removeFilter(item)}">#{item}</h:commandLink></h:panelGroup>
+                    </ui:repeat>
+                </h:panelGroup>
+                <h:panelGroup layout="block" styleClass="pull-right">
+                    <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
+                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-inbox"></i></button>
+                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </h:panelGroup>
+        
         <ui:repeat var="item" value="#{sessionBean.queries}">
 
             <h:panelGroup layout="block" styleClass="row">

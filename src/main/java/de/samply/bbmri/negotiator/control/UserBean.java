@@ -22,10 +22,10 @@ import de.samply.auth.client.jwt.JWTIDToken;
 import de.samply.auth.client.jwt.JWTRefreshToken;
 import de.samply.auth.rest.Scope;
 import de.samply.auth.utils.OAuth2ClientConfig;
-import de.samply.bbmri.negotiator.helper.MaxHelper;
 import de.samply.bbmri.negotiator.listener.ServletListener;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
+import net.minidev.json.JSONObject;
 
 @ManagedBean
 @SessionScoped
@@ -53,9 +53,9 @@ public class UserBean implements Serializable {
     private Boolean loginValid = false;
 
     /**
-     * List of roles of the user
+     * If the user is a biobank owner or not.
      */
-    private List<String> roles = null;
+    private Boolean biobankOwner = false;
 
     /**
      * The *mapped* user ID in the database.
@@ -93,6 +93,7 @@ public class UserBean implements Serializable {
         username = null;
         realName = null;
         loginValid = false;
+        biobankOwner = false;
         userIdentity = null;
         userId = 0;
 
@@ -149,23 +150,39 @@ public class UserBean implements Serializable {
             accessToken = null;
             idToken = null;
             refreshToken = null;
+            biobankOwner = false;
             return;
         }
 
         loginValid = true;
-        userIdentity = client.getIDToken().getSubject();
-        realName = client.getIDToken().getName();
-        username = client.getIDToken().getEmail();
+        userIdentity = idToken.getSubject();
+        realName = idToken.getName();
+        username = idToken.getEmail();
+        createOrGetUser();
 
-        System.out.println(MaxHelper.showContent(client.getIDToken()));
-        
-        roles = client.getIDToken().getRoles();
+        // System.out.println(MaxHelper.showContent(client.getIDToken()));
+
+        List<String> roles = client.getIDToken().getRoles();
+        for (Object role : roles) {
+            JSONObject roleData = (JSONObject) role;
+            if (roleData.containsKey("roleIdentifier")) {
+                biobankOwner = "BBMRI_OWNER".equalsIgnoreCase((String) roleData.get("roleIdentifier"));
+            } else
+                biobankOwner = false;
+        }
+    }
+
+    /**
+     * If the "userIdentity" does not exist in the database, create it.
+     */
+    private void createOrGetUser() {
+        // to be filled
     }
 
     public String profile() {
         return null;
     }
-    
+
     public String getUsername() {
         return username;
     }
@@ -238,12 +255,12 @@ public class UserBean implements Serializable {
         this.loginValid = loginValid;
     }
 
-    public List<String> getRoles() {
-        return roles;
+    public Boolean getBiobankOwner() {
+        return biobankOwner;
     }
 
-    public void setRoles(List<String> roles) {
-        this.roles = roles;
+    public void setBiobankOwner(Boolean biobankOwner) {
+        this.biobankOwner = biobankOwner;
     }
 
 }
