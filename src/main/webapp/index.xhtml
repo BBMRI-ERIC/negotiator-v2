@@ -36,7 +36,7 @@
                         <h:panelGroup styleClass="badge filterBadge"><h:commandLink action="#{sessionBean.removeFilter(item)}">#{item}</h:commandLink></h:panelGroup>
                     </ui:repeat>
                 </h:panelGroup>
-                <h:panelGroup layout="block" styleClass="pull-right">
+                <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right">
                     <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
                       <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-inbox"></i></button>
                       <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
@@ -47,29 +47,38 @@
         
         <ui:repeat var="item" value="#{sessionBean.queries}">
 
-            <h:panelGroup layout="block" styleClass="row">
-
                 <h:panelGroup layout="block"
                     styleClass="panel panel-default">
-                    <h:panelGroup layout="block"
-                        styleClass="panel-heading">
-                        #{item.number} - #{item.title} <h:panelGroup
-                            styleClass="pull-right">
+                    <h:panelGroup layout="block" styleClass="panel-heading">
+                        
+                        
+                        #{item.number} - #{item.title} 
+                        
+                        <h:panelGroup styleClass="pull-right">
+                            
+                    <h:panelGroup layout="block" styleClass="btn-group queryActionButtons" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
+                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-folder-open"></i></button>
+                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-trash"></i></button>
+                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
+                      
+                      
+                    
+                </h:panelGroup>
                             <h:panelGroup
                                 rendered="#{item.numberResponses > 0}"
-                                styleClass="badge"
-                                style="padding-right:10px;">
+                                styleClass="badge queryNumberResponsesBadge">
                                 <h:outputText
                                     title="#{item.numberResponses} biobanks contacted you"
                                     value="#{item.numberResponses}" />
                             </h:panelGroup>
 
-                            <h:outputText value="#{item.creationDate}"
+                            <h:outputText value="#{item.creationDate}" styleClass="queryCreationDate"
                                 title="Date this query was created on">
                                 <f:convertDateTime pattern="MM/dd/yyyy" />
                             </h:outputText>
 
                         </h:panelGroup>
+                    
                     </h:panelGroup>
                     <h:panelGroup layout="block" styleClass="panel-body">
                         <h:panelGroup layout="block" styleClass="row">
@@ -96,7 +105,7 @@
                     </h:panelGroup>
 
                 </h:panelGroup>
-            </h:panelGroup>
+            
         </ui:repeat>
     </ui:define>
 

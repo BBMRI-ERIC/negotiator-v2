@@ -72,12 +72,34 @@ hr {
     font-weight: bold;
 }
 
+#filterList {
+    padding-left: 15px;
+}
+
 #filterList a {
     color: white;
 }
 
+#filterInputButtons {
+    padding-right: 15px;
+}
+
 #filterInputText {
     margin-right: 5px;
+}
+
+.queryActionButtons {
+    margin-right: 5px;
+    top: -5px;
+}
+
+.queryCreationDate {
+    float: inherit;
+}
+
+.queryNumberResponsesBadge {
+    margin-right:5px;
+    float: left;
 }
 
 .filterBadge {
@@ -86,4 +108,8 @@ hr {
 
 .queriesTopLine {
     margin-bottom: 5px;
+}
+
+.fiveRight {
+    margin-right: 5px;
 }
