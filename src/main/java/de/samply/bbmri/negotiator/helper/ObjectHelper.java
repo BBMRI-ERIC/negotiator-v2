@@ -7,7 +7,15 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
 
-public class MaxHelper {
+public class ObjectHelper {
+
+    /**
+     * Helper to show content of a given object Display fields, methods and
+     * their return values
+     * 
+     * @param me
+     * @return string stuff
+     */
     @SuppressWarnings("rawtypes")
     public static String showContent(Object me) {
         StringBuilder result = new StringBuilder();

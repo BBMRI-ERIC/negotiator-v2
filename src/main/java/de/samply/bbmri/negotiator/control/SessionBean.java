@@ -10,6 +10,12 @@ import javax.faces.bean.SessionScoped;
 
 import de.samply.bbmri.negotiator.model.TestQuery;
 
+/**
+ * Session scoped bean for general data of the session
+ * 
+ * User session data are stored in the UserBean!
+ *
+ */
 @ManagedBean
 @SessionScoped
 public class SessionBean implements Serializable {
@@ -23,7 +29,8 @@ public class SessionBean implements Serializable {
     public List<TestQuery> getQueries() {
         if (queries == null) {
             queries = new ArrayList<>();
-            queries.add(new TestQuery(1, "A query to find them all", "Bla bla blaaaaaa", 3, new Date(), new Date(), "Hans Meiser"));
+            queries.add(new TestQuery(1, "A query to find them all", "Bla bla blaaaaaa", 3, new Date(), new Date(),
+                    "Hans Meiser"));
             queries.add(new TestQuery(2, "Lorem ipsum?",
                     "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
                     0, new Date(), new Date(), "William Dafoe"));

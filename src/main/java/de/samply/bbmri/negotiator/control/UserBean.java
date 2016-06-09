@@ -27,6 +27,9 @@ import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
 import net.minidev.json.JSONObject;
 
+/**
+ * Sessionscoped bean for all data of the session about the user
+ */
 @ManagedBean
 @SessionScoped
 public class UserBean implements Serializable {
@@ -90,22 +93,21 @@ public class UserBean implements Serializable {
      * @throws IOException
      */
     public void logout() throws IOException {
-        username = null;
-        realName = null;
-        loginValid = false;
-        biobankOwner = false;
-        userIdentity = null;
-        userId = 0;
-
         OAuth2Client config = ServletListener.getOauth2();
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 
+        // invalidate session all session scoped beans are destroyed and a new
+        // login won't steal old values
+        context.invalidateSession();
+
+        // redirect user away
         context.redirect(OAuth2ClientConfig.getLogoutUrl(config, context.getRequestScheme(),
                 context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(), "/"));
     }
 
     @PostConstruct
     public void init() {
+        // create the session state
         state = new BigInteger(64, new SecureRandom()).toString(32);
     }
 
@@ -153,6 +155,8 @@ public class UserBean implements Serializable {
             biobankOwner = false;
             return;
         }
+
+        System.out.println("SESSION SAVED VALUE: user = " + username);
 
         loginValid = true;
         userIdentity = idToken.getSubject();
