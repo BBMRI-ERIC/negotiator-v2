@@ -14,7 +14,7 @@ import java.io.IOException;
  * user to a "maintenance" site. The admin user is redirected to a web page
  * where he can upgrade the database.
  */
-@WebFilter(urlPatterns = "/*", filterName = "MaintenanceFilter")
+@WebFilter(filterName = "MaintenanceFilter")
 public class MaintenanceFilter implements Filter {
 
     @Override

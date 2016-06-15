@@ -30,7 +30,7 @@ import java.nio.charset.StandardCharsets;
  * checks if there is a code query parameter and if there is, it tries to get an
  * access token using the given code.
  */
-@WebFilter(urlPatterns = "/*", filterName = "OAuth2Filter")
+@WebFilter(filterName = "OAuth2Filter")
 public class OAuth2Filter implements Filter {
 
     private static final Logger logger = LogManager.getLogger(OAuth2Filter.class);
