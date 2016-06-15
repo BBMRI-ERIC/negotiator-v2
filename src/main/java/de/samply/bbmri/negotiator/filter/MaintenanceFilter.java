@@ -1,19 +1,13 @@
 package de.samply.bbmri.negotiator.filter;
 
-import java.io.IOException;
+import de.samply.bbmri.negotiator.control.NegotiatorConfig;
 
 import javax.faces.application.ResourceHandler;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import de.samply.bbmri.negotiator.listener.ServletListener;
+import java.io.IOException;
 
 /**
  * If the application is in maintenance mode, this filter redirects a normal
@@ -31,7 +25,7 @@ public class MaintenanceFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        if (ServletListener.getMaintenanceMode()) {
+        if (NegotiatorConfig.get().isMaintenanceMode()) {
             String path = ((HttpServletRequest) request).getRequestURI();
 
             // JSF resources shall pass

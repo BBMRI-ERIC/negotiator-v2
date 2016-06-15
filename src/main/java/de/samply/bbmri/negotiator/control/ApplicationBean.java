@@ -1,21 +1,24 @@
 package de.samply.bbmri.negotiator.control;
 
-import java.io.Serializable;
-
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
-
-import de.samply.bbmri.negotiator.listener.ServletListener;
+import javax.servlet.ServletContext;
+import java.io.Serializable;
 
 @ManagedBean
 @ApplicationScoped
 public class ApplicationBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private ServletContext getFacesContext() {
+        return (ServletContext)
+                FacesContext.getCurrentInstance().getExternalContext().getContext();
+    }
+
     public String getVersion() {
-        return ServletListener.getVersion();
+        return ServletUtil.getVersion(getFacesContext());
     }
 
     public void redirectToIndexPage() {

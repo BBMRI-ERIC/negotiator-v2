@@ -1,19 +1,5 @@
 package de.samply.bbmri.negotiator.control;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-
 import de.samply.auth.client.AuthClient;
 import de.samply.auth.client.InvalidKeyException;
 import de.samply.auth.client.InvalidTokenException;
@@ -22,10 +8,22 @@ import de.samply.auth.client.jwt.JWTIDToken;
 import de.samply.auth.client.jwt.JWTRefreshToken;
 import de.samply.auth.rest.Scope;
 import de.samply.auth.utils.OAuth2ClientConfig;
-import de.samply.bbmri.negotiator.listener.ServletListener;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
 import net.minidev.json.JSONObject;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.List;
 
 /**
  * Sessionscoped bean for all data of the session about the user
@@ -93,7 +91,7 @@ public class UserBean implements Serializable {
      * @throws IOException
      */
     public void logout() throws IOException {
-        OAuth2Client config = ServletListener.getOauth2();
+        OAuth2Client config = NegotiatorConfig.get().getOauth2();
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 
         // invalidate session all session scoped beans are destroyed and a new
@@ -126,7 +124,7 @@ public class UserBean implements Serializable {
             requestURL.append("?").append(req.getQueryString());
         }
 
-        return OAuth2ClientConfig.getRedirectUrl(ServletListener.getOauth2(), context.getRequestScheme(),
+        return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), context.getRequestScheme(),
                 context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(),
                 requestURL.toString(), null, state, Scope.OPENID);
     }
@@ -134,8 +132,7 @@ public class UserBean implements Serializable {
     /**
      * Lets the user login and sets all necessary fields
      *
-     * @param accessToken
-     * @param idToken
+     * @param client
      * @throws InvalidKeyException
      * @throws InvalidTokenException
      */
