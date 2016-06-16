@@ -177,7 +177,7 @@ public class UserBean implements Serializable {
      * If the "userIdentity" does not exist in the database, create it.
      */
     private void createOrGetUser() {
-        // to be filled
+        //TODO: to be filled
     }
 
     public String profile() {
