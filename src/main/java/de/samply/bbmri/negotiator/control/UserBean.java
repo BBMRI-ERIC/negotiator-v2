@@ -31,11 +31,11 @@ import de.samply.auth.client.InvalidTokenException;
 import de.samply.auth.client.jwt.JWTAccessToken;
 import de.samply.auth.client.jwt.JWTIDToken;
 import de.samply.auth.client.jwt.JWTRefreshToken;
+import de.samply.auth.rest.RoleDTO;
 import de.samply.auth.rest.Scope;
 import de.samply.auth.utils.OAuth2ClientConfig;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
-import net.minidev.json.JSONObject;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -176,23 +176,23 @@ public class UserBean implements Serializable {
             return;
         }
 
-        System.out.println("SESSION SAVED VALUE: user = " + username);
-
         loginValid = true;
         userIdentity = idToken.getSubject();
         realName = idToken.getName();
         username = idToken.getEmail();
         createOrGetUser();
 
-        // System.out.println(MaxHelper.showContent(client.getIDToken()));
+        /**
+         * Check all roles. If the user is a biobank owner, set biobankOwner to true.
+         */
+        List<RoleDTO> roles = client.getIDToken().getRoles();
 
-        List<String> roles = client.getIDToken().getRoles();
-        for (Object role : roles) {
-            JSONObject roleData = (JSONObject) role;
-            if (roleData.containsKey("roleIdentifier")) {
-                biobankOwner = "BBMRI_OWNER".equalsIgnoreCase((String) roleData.get("roleIdentifier"));
-            } else
-                biobankOwner = false;
+        biobankOwner = false;
+
+        for (RoleDTO role : roles) {
+            if (Constants.OWNER_ROLE.equalsIgnoreCase(role.getIdentifier())) {
+                biobankOwner = true;
+            }
         }
     }
 
