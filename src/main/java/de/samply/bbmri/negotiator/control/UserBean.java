@@ -1,3 +1,28 @@
+/**
+ * Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+ * Deutsches Krebsforschungszentrum in Heidelberg
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU GPL version 3 section 7:
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with Jersey (https://jersey.java.net) (or a modified version of that
+ * library), containing parts covered by the terms of the General Public
+ * License, version 2.0, the licensors of this Program grant you additional
+ * permission to convey the resulting work.
+ */
 package de.samply.bbmri.negotiator.control;
 
 import de.samply.auth.client.AuthClient;
@@ -26,11 +51,13 @@ import java.security.SecureRandom;
 import java.util.List;
 
 /**
- * Sessionscoped bean for all data of the session about the user
+ * Sessionscoped bean for all data of the session about the user.
  */
 @ManagedBean
 @SessionScoped
 public class UserBean implements Serializable {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     /**
      * The current username (email). Null if the login is not valid
@@ -63,19 +90,13 @@ public class UserBean implements Serializable {
      */
     private int userId = 0;
 
-    /**
-     * The JWTs from OAuth2
-     */
+    /** The JWTs from OAuth2. */
     private JWTAccessToken accessToken;
 
-    /**
-     * The JWT Open ID token
-     */
+    /** The JWT Open ID token. */
     private JWTIDToken idToken;
 
-    /**
-     * The JWT refresh token
-     */
+    /** The JWT refresh token. */
     private JWTRefreshToken refreshToken;
 
     /**
@@ -85,10 +106,9 @@ public class UserBean implements Serializable {
     private String state;
 
     /**
-     * Executes a logout
-     * 
-     * @return
-     * @throws IOException
+     * Executes a logout.
+     *
+     * @throws IOException Signals that an I/O exception has occurred.
      */
     public void logout() throws IOException {
         OAuth2Client config = NegotiatorConfig.get().getOauth2();
@@ -103,6 +123,9 @@ public class UserBean implements Serializable {
                 context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(), "/"));
     }
 
+    /**
+     * Inits the.
+     */
     @PostConstruct
     public void init() {
         // create the session state
@@ -111,9 +134,9 @@ public class UserBean implements Serializable {
 
     /**
      * Returns the URL for Samply.Auth
-     * 
-     * @return
-     * @throws UnsupportedEncodingException
+     *
+     * @return the authentication url
+     * @throws UnsupportedEncodingException the unsupported encoding exception
      */
     public String getAuthenticationUrl() throws UnsupportedEncodingException {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
@@ -130,11 +153,11 @@ public class UserBean implements Serializable {
     }
 
     /**
-     * Lets the user login and sets all necessary fields
+     * Lets the user login and sets all necessary fields.
      *
-     * @param client
-     * @throws InvalidKeyException
-     * @throws InvalidTokenException
+     * @param client the client
+     * @throws InvalidTokenException the invalid token exception
+     * @throws InvalidKeyException the invalid key exception
      */
     public void login(AuthClient client) throws InvalidTokenException, InvalidKeyException {
         accessToken = client.getAccessToken();
@@ -180,86 +203,191 @@ public class UserBean implements Serializable {
         //TODO: to be filled
     }
 
+    /**
+     * Profile.
+     *
+     * @return the string
+     */
     public String profile() {
         return null;
     }
 
+    /**
+     * Gets the username.
+     *
+     * @return the username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Sets the username.
+     *
+     * @param username the new username
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
+    /**
+     * Gets the real name.
+     *
+     * @return the real name
+     */
     public String getRealName() {
         return realName;
     }
 
+    /**
+     * Sets the real name.
+     *
+     * @param realName the new real name
+     */
     public void setRealName(String realName) {
         this.realName = realName;
     }
 
+    /**
+     * Gets the user identity.
+     *
+     * @return the user identity
+     */
     public String getUserIdentity() {
         return userIdentity;
     }
 
+    /**
+     * Sets the user identity.
+     *
+     * @param userIdentity the new user identity
+     */
     public void setUserIdentity(String userIdentity) {
         this.userIdentity = userIdentity;
     }
 
+    /**
+     * Gets the user id.
+     *
+     * @return the user id
+     */
     public int getUserId() {
         return userId;
     }
 
+    /**
+     * Sets the user id.
+     *
+     * @param userId the new user id
+     */
     public void setUserId(int userId) {
         this.userId = userId;
     }
 
+    /**
+     * Gets the access token.
+     *
+     * @return the access token
+     */
     public JWTAccessToken getAccessToken() {
         return accessToken;
     }
 
+    /**
+     * Sets the access token.
+     *
+     * @param accessToken the new access token
+     */
     public void setAccessToken(JWTAccessToken accessToken) {
         this.accessToken = accessToken;
     }
 
+    /**
+     * Gets the id token.
+     *
+     * @return the id token
+     */
     public JWTIDToken getIdToken() {
         return idToken;
     }
 
+    /**
+     * Sets the id token.
+     *
+     * @param idToken the new id token
+     */
     public void setIdToken(JWTIDToken idToken) {
         this.idToken = idToken;
     }
 
+    /**
+     * Gets the refresh token.
+     *
+     * @return the refresh token
+     */
     public JWTRefreshToken getRefreshToken() {
         return refreshToken;
     }
 
+    /**
+     * Sets the refresh token.
+     *
+     * @param refreshToken the new refresh token
+     */
     public void setRefreshToken(JWTRefreshToken refreshToken) {
         this.refreshToken = refreshToken;
     }
 
+    /**
+     * Gets the state.
+     *
+     * @return the state
+     */
     public String getState() {
         return state;
     }
 
+    /**
+     * Sets the state.
+     *
+     * @param state the new state
+     */
     public void setState(String state) {
         this.state = state;
     }
 
+    /**
+     * Gets the login valid.
+     *
+     * @return the login valid
+     */
     public Boolean getLoginValid() {
         return loginValid;
     }
 
+    /**
+     * Sets the login valid.
+     *
+     * @param loginValid the new login valid
+     */
     public void setLoginValid(Boolean loginValid) {
         this.loginValid = loginValid;
     }
 
+    /**
+     * Gets the biobank owner.
+     *
+     * @return the biobank owner
+     */
     public Boolean getBiobankOwner() {
         return biobankOwner;
     }
 
+    /**
+     * Sets the biobank owner.
+     *
+     * @param biobankOwner the new biobank owner
+     */
     public void setBiobankOwner(Boolean biobankOwner) {
         this.biobankOwner = biobankOwner;
     }

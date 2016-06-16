@@ -43,14 +43,10 @@ import static de.samply.bbmri.negotiator.listener.ServletListener.FILE_OAUTH;
  */
 public class NegotiatorConfig {
 
-    /**
-     * The singleon instance
-     */
+    /** The singleon instance. */
     private static NegotiatorConfig instance = new NegotiatorConfig();
 
-    /**
-     * The oauth2 client configuration
-     */
+    /** The oauth2 client configuration. */
     private OAuth2Client oauth2 = new OAuth2Client();
 
     /**
@@ -63,9 +59,7 @@ public class NegotiatorConfig {
      */
     private String fallback;
 
-    /**
-     * JAXBContext used for JAXB
-     */
+    /** JAXBContext used for JAXB. */
     private static JAXBContext jaxbContext;
 
     /**
@@ -73,6 +67,9 @@ public class NegotiatorConfig {
      */
     private boolean maintenanceMode = false;
 
+    /**
+     * Instantiates a new negotiator config.
+     */
     private NegotiatorConfig() {
 
     }
@@ -81,8 +78,8 @@ public class NegotiatorConfig {
      * Returns the JAXBContext for Postgresql and OAuth2Client classes. Creates
      * a new one if necessary.
      *
-     * @return
-     * @throws JAXBException
+     * @return the JAXB context
+     * @throws JAXBException the JAXB exception
      */
     private static synchronized JAXBContext getJAXBContext() throws JAXBException {
         if (jaxbContext == null) {
@@ -91,6 +88,11 @@ public class NegotiatorConfig {
         return jaxbContext;
     }
 
+    /**
+     * Gets the.
+     *
+     * @return the negotiator config
+     */
     public static NegotiatorConfig get() {
         return instance;
     }
@@ -99,12 +101,12 @@ public class NegotiatorConfig {
      * Initializes the negotiator configuration. This method will load all configuration files and make the configuration
      * available in a singleton.
      *
-     * @param projectName
-     * @param fallback
-     * @throws JAXBException
-     * @throws FileNotFoundException
-     * @throws SAXException
-     * @throws ParserConfigurationException
+     * @param projectName the project name
+     * @param fallback the fallback
+     * @throws JAXBException the JAXB exception
+     * @throws FileNotFoundException the file not found exception
+     * @throws SAXException the SAX exception
+     * @throws ParserConfigurationException the parser configuration exception
      */
     public static void initialize(String projectName, String fallback) throws JAXBException, FileNotFoundException,
             SAXException, ParserConfigurationException {
@@ -116,16 +118,31 @@ public class NegotiatorConfig {
 
     /**
      * Reinitializes the configuration with the current project name and fallback folder.
+     *
+     * @throws JAXBException the JAXB exception
+     * @throws FileNotFoundException the file not found exception
+     * @throws SAXException the SAX exception
+     * @throws ParserConfigurationException the parser configuration exception
      */
     public static void reinitialize() throws JAXBException, FileNotFoundException, SAXException, ParserConfigurationException {
         instance.oauth2 = JAXBUtil.findUnmarshall(FILE_OAUTH, getJAXBContext(), OAuth2Client.class,
                 instance.projectName, instance.fallback);
     }
 
+    /**
+     * Gets the oauth2.
+     *
+     * @return the oauth2
+     */
     public OAuth2Client getOauth2() {
         return oauth2;
     }
 
+    /**
+     * Checks if is maintenance mode.
+     *
+     * @return true, if is maintenance mode
+     */
     public boolean isMaintenanceMode() {
         return maintenanceMode;
     }

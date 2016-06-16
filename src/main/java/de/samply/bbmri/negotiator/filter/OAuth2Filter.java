@@ -1,3 +1,28 @@
+/**
+ * Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+ * Deutsches Krebsforschungszentrum in Heidelberg
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU GPL version 3 section 7:
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with Jersey (https://jersey.java.net) (or a modified version of that
+ * library), containing parts covered by the terms of the General Public
+ * License, version 2.0, the licensors of this Program grant you additional
+ * permission to convey the resulting work.
+ */
 package de.samply.bbmri.negotiator.filter;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -33,12 +58,19 @@ import java.nio.charset.StandardCharsets;
 @WebFilter(filterName = "OAuth2Filter")
 public class OAuth2Filter implements Filter {
 
+    /** The Constant logger. */
     private static final Logger logger = LogManager.getLogger(OAuth2Filter.class);
 
+    /* (non-Javadoc)
+     * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
+     */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
+     */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -109,10 +141,18 @@ public class OAuth2Filter implements Filter {
         chain.doFilter(request, response);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.Filter#destroy()
+     */
     @Override
     public void destroy() {
     }
 
+    /**
+     * Gets the client config.
+     *
+     * @return the client config
+     */
     public ClientConfig getClientConfig() {
         JacksonJsonProvider provider = new JacksonJaxbJsonProvider();
         provider.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -121,8 +161,8 @@ public class OAuth2Filter implements Filter {
 
     /**
      * Returns a Client that ignores unknown properties.
-     * 
-     * @return
+     *
+     * @return the client
      */
     public Client getClient() {
         return ClientBuilder.newClient(getClientConfig());

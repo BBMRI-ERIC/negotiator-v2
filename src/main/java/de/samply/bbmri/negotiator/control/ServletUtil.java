@@ -45,14 +45,19 @@ import java.util.Properties;
  */
 public class ServletUtil {
 
+    /** The version. */
     private static String version = null;
 
+    /** The build timestamp. */
     private static String buildTimestamp = null;
 
+    /** The build commit id. */
     private static String buildCommitId = null;
 
+    /** The build commit branch. */
     private static String buildCommitBranch = null;
 
+    /** The synchronized object. */
     private static Object synchronizedObject = new Object();
 
     /**
@@ -93,8 +98,9 @@ public class ServletUtil {
 
     /**
      * Returns the complete request URL with request parameters.
-     * @param request
-     * @return
+     *
+     * @param request the request
+     * @return the request url
      */
     public static String getRequestUrl(HttpServletRequest request) {
         StringBuilder builder = new StringBuilder();
@@ -109,6 +115,7 @@ public class ServletUtil {
     /**
      * Returns the current version.
      *
+     * @param context the context
      * @return a {@link String} object.
      */
     public static String getVersion(ServletContext context) {
@@ -118,8 +125,9 @@ public class ServletUtil {
 
     /**
      * Returns the build timestamp of this package.
-     * @param context
-     * @return
+     *
+     * @param context the context
+     * @return the builds the timestamp
      */
     public static String getBuildTimestamp(ServletContext context) {
         loadProperties(context);
@@ -128,14 +136,21 @@ public class ServletUtil {
 
     /**
      * Returns the commit ID when this application was built.
-     * @param context
-     * @return
+     *
+     * @param context the context
+     * @return the builds the commit id
      */
     public static String getBuildCommitId(ServletContext context) {
         loadProperties(context);
         return buildCommitId;
     }
 
+    /**
+     * Gets the builds the commit branch.
+     *
+     * @param context the context
+     * @return the builds the commit branch
+     */
     public static String getBuildCommitBranch(ServletContext context) {
         loadProperties(context);
         return buildCommitBranch;
@@ -143,7 +158,8 @@ public class ServletUtil {
 
     /**
      * Executes a Shibboleth Logout and returns to the given URL.
-     * @param url
+     *
+     * @param url the url
      */
     public static void logoutShibboleth(String url) {
         try {
@@ -156,7 +172,8 @@ public class ServletUtil {
 
     /**
      * Loads the properties from the servlet context.
-     * @param context
+     *
+     * @param context the context
      */
     private static void loadProperties(ServletContext context) {
         synchronized (synchronizedObject) {
