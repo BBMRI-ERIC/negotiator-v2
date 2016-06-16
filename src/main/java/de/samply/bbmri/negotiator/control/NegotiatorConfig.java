@@ -36,12 +36,15 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileNotFoundException;
 
-import static de.samply.bbmri.negotiator.listener.ServletListener.FILE_OAUTH;
-
 /**
  * The negotiator configuration singleton.
  */
 public class NegotiatorConfig {
+
+    /**
+     * The configuration file for the OAuth2 configuration.
+     */
+    private static final String FILE_OAUTH = "bbmri.negotiator.oauth2.xml";
 
     /** The singleon instance. */
     private static NegotiatorConfig instance = new NegotiatorConfig();

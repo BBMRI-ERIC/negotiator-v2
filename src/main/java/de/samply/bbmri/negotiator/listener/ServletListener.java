@@ -26,9 +26,11 @@
 package de.samply.bbmri.negotiator.listener;
 
 import de.samply.bbmri.negotiator.control.NegotiatorConfig;
+import de.samply.config.util.FileFinderUtil;
 import de.samply.string.util.StringUtil;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.servlet.ServletContextEvent;
@@ -47,17 +49,13 @@ import java.util.Enumeration;
  * 
  * * loads the driver * loads all config files.
  *
- * @see ServletEvent
+ * @see ServletContextListener
  */
 @WebListener
 public class ServletListener implements ServletContextListener {
-    /**
-     * The configuration file for the OAuth2 configuration.
-     */
-    public static final String FILE_OAUTH = "bbmri.negotiator.oauth2.xml";
 
     /** The Constant logger. */
-    private static final Logger logger = LogManager.getLogger(ServletListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServletListener.class);
 
     /**
      * Context initialized.
@@ -68,12 +66,15 @@ public class ServletListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent event) {
         try {
+
             String projectName = event.getServletContext().getInitParameter("projectName");
             if (StringUtil.isEmpty(projectName)) {
                 projectName = "bbmri.negotiator";
             }
 
             String fallback = event.getServletContext().getRealPath("/WEB-INF");
+
+            Configurator.initialize(null, FileFinderUtil.findFile("log4j2.xml", projectName, fallback).getAbsolutePath());
 
             logger.info("Registering PostgreSQL driver");
             Class.forName("org.postgresql.Driver").newInstance();
