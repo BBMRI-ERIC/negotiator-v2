@@ -1,9 +1,10 @@
-﻿CREATE TABLE "person" (
+﻿
+CREATE TABLE "person" (
     "id" SERIAL NOT NULL,
-    "authData" character varying NOT NULL,
-    "personType" character(1) NOT NULL,
-    "personImage" bytea,
-	PRIMARY KEY ("id")	
+    "authData" TEXT NOT NULL,
+    "personType" CHARACTER(1) NOT NULL,
+    "personImage" BYTEA,
+    PRIMARY KEY ("id")
 );
 
 
@@ -24,8 +25,8 @@ COMMENT ON COLUMN "person"."personImage" IS 'image/avatar of the person';
 
 CREATE TABLE "researcher" (
     "id" SERIAL NOT NULL,
-	PRIMARy KEY("id"),
-	FOREIGN KEY ("id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    PRIMARY KEY("id"),
+    FOREIGN KEY ("id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "idIndexResearcher" ON "researcher" ("id");
 
@@ -38,9 +39,8 @@ COMMENT ON COLUMN "researcher"."id" IS 'This id is the primary key of person tab
 
 CREATE TABLE "location" (
     "id" SERIAL NOT NULL,
-    "name" character varying(255) NOT NULL,
-	PRIMARY KEY ("id")
-	
+    "name" CHARACTER VARYING(255) NOT NULL,
+    PRIMARY KEY ("id")
 );
 
 
@@ -55,12 +55,11 @@ COMMENT ON COLUMN "location"."name" IS 'location name';
 
 CREATE TABLE "owner" (
     "id" SERIAL NOT NULL,
-    "locationId" SERIAL NOT NULL,
-	PRIMARY KEY ("id"),
-	FOREIGN KEY ("id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY ("locationId") REFERENCES "location"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    "locationId" INTEGER NOT NULL,
+    PRIMARY KEY ("id"),
+    FOREIGN KEY ("id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY ("locationId") REFERENCES "location"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
-CREATE INDEX "IdIndexOwner" ON "owner" ("id");
 CREATE INDEX "locationIdIndexOwner" ON "owner" ("locationId");
 
 
@@ -75,12 +74,12 @@ COMMENT ON COLUMN "owner"."locationId" IS 'This foreign key is the primary key o
 
 CREATE TABLE "query" (
     "id" SERIAL NOT NULL,
-    "title" character varying(255) NOT NULL,
-    "text" character varying,
-    "dateTime" timestamp without time zone,
-    "researcherId" SERIAL UNIQUE NOT NULL,
-	PRIMARY KEY ("id"),
-	FOREIGN KEY ("researcherId") REFERENCES "researcher"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    "title" CHARACTER VARYING(255) NOT NULL,
+    "text" TEXT,
+    "dateTime" TIMESTAMP WITHOUT TIME ZONE,
+    "researcherId" INTEGER NOT NULL,
+    PRIMARY KEY ("id"),
+    FOREIGN KEY ("researcherId") REFERENCES "researcher"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "researcherIdIndexQuery" ON "query" ("researcherId");
 
@@ -105,11 +104,10 @@ COMMENT ON COLUMN "query"."researcherId" IS 'Foreign key. Exists as primary key 
 
 CREATE TABLE "tag" (
     "id" SERIAL NOT NULL,
-    "queryId" SERIAL NOT NULL,
-    "text" character varying(255) NOT NULL,
-	PRIMARY KEY("id"),
-	FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
-	
+    "queryId" INTEGER NOT NULL,
+    "text" CHARACTER VARYING(255) NOT NULL,
+    PRIMARY KEY("id"),
+    FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "queryIdIndexTag" ON "tag" ("queryId");
 
@@ -128,13 +126,13 @@ COMMENT ON COLUMN "tag"."text" IS 'Text for the given tag id';
 
 CREATE TABLE "comment" (
     "id" SERIAL NOT NULL,
-    "queryId" SERIAL NOT NULL,
-    "timeStamp" timestamp without time zone NOT NULL,
-    "personId" SERIAL NOT NULL,
-    "text" text NOT NULL,
-	PRIMARY KEY("id"),
-	FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY ("personId") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    "queryId" INTEGER NOT NULL,
+    "personId" INTEGER NOT NULL,
+    "timeStamp" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    "text" TEXT NOT NULL,
+    PRIMARY KEY("id"),
+    FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY ("personId") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "queryIdIndexComment" ON "comment" ("queryId");
 CREATE INDEX "personIdIndexComment" ON "comment" ("personId");
@@ -159,11 +157,11 @@ COMMENT ON COLUMN "comment"."text" IS 'Text of the comment.';
 
 
 CREATE TABLE "taggedQuery" (
-    "queryId" SERIAL UNIQUE NOT NULL,
-    "tagId" SERIAL UNIQUE NOT NULL,
+    "queryId" INTEGER NOT NULL,
+    "tagId" INTEGER NOT NULL,
     PRIMARY KEY("queryId", "tagId"),
-	FOREIGN KEY ("tagId") REFERENCES "tag"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY ("tagId") REFERENCES "tag"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "tagIdIndexTaggedQuery" ON "taggedQuery" ("tagId");
 CREATE INDEX "queryIdIndexTaggedQuery" ON "taggedQuery" ("queryId");
@@ -179,12 +177,12 @@ COMMENT ON COLUMN "taggedQuery"."tagId" IS 'This column along with the Queryid c
 
 
 CREATE TABLE "flaggedQuery" (
-    "queryId" SERIAL NOT NULL,
-    "ownerId" SERIAL NOT NULL,
-    "flag" character(1),	
-	PRIMARY KEY("queryId", "ownerId"),
-	FOREIGN KEY ("ownerId") REFERENCES "owner"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    "queryId" INTEGER NULL,
+    "ownerId" INTEGER NULL,
+    "flag" CHARACTER(1),
+    PRIMARY KEY("queryId", "ownerId"),
+    FOREIGN KEY ("ownerId") REFERENCES "owner"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "ownerIdIndexFlaggedQuery" ON "flaggedQuery" ("ownerId");
 CREATE INDEX "queryIdIndexFlaggedQuery" ON "flaggedQuery" ("queryId");
