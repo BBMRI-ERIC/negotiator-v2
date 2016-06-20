@@ -1,4 +1,4 @@
-﻿CREATE TYPE "personType" AS ENUM ('OWNER', 'RESEARCHER');
+CREATE TYPE "personType" AS ENUM ('OWNER', 'RESEARCHER');
 
 
 CREATE TABLE "location" (

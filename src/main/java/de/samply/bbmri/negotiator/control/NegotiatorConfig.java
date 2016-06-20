@@ -45,12 +45,12 @@ public class NegotiatorConfig {
     /**
      * The configuration file for the OAuth2 configuration.
      */
-    private static final String FILE_OAUTH = "bbmri.negotiator.oauth2.xml";
+	public static final String FILE_OAUTH = "bbmri.negotiator.oauth2.xml";
 
     /**
      * The configuration file for the postgresql configuration.
      */
-    private static final String FILE_POSTGRESQL = "bbmri.negotiator.postgres.xml";
+    public static final String FILE_POSTGRESQL = "bbmri.negotiator.postgres.xml";
 
     /** The singleon instance. */
     private static NegotiatorConfig instance = new NegotiatorConfig();

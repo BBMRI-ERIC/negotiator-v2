@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+    Deutsches Krebsforschungszentrum in Heidelberg
+
+-->
+<postgresql xmlns="http://schema.samply.de/common"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://schema.samply.de/common http://schema.samply.de/config/CommonConfigTypes.xsd">
+
+    <host>localhost</host>
+
+    <database>testDatabase</database>
+
+    <username>saher</username>
+
+    <password>saher</password>
+
+</postgresql>
