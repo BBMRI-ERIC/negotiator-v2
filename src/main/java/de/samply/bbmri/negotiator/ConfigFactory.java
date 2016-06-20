@@ -36,7 +36,7 @@ import java.sql.SQLException;
 /**
  * Creates a Config object based on the current NegotiatorConfig singleton.
  */
-public class ConfigurationFactory {
+public class ConfigFactory {
 
     public static Config get() throws SQLException {
         Postgresql postgresql = NegotiatorConfig.get().getPostgresql();

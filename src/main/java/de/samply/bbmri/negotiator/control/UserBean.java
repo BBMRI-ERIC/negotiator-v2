@@ -35,7 +35,7 @@ import de.samply.auth.rest.RoleDTO;
 import de.samply.auth.rest.Scope;
 import de.samply.auth.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigurationFactory;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.enums.Persontype;
 import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
@@ -207,7 +207,7 @@ public class UserBean implements Serializable {
      * If the "userIdentity" does not exist in the database, create it.
      */
     private void createOrGetUser() {
-        try (Config config = ConfigurationFactory.get()) {
+        try (Config config = ConfigFactory.get()) {
             PersonDao dao = new PersonDao(config);
 
             Person person = dao.fetchOneByAuthsubject(userIdentity);

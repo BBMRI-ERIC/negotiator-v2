@@ -25,7 +25,7 @@
  */
 
 import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigurationFactory;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.enums.Persontype;
 import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
@@ -45,7 +45,7 @@ public class DAOTest {
     public static void main(String[] args) throws FileNotFoundException, ParserConfigurationException, SAXException, JAXBException {
         NegotiatorConfig.initialize("samply", "not-available");
 
-        try(Config config = ConfigurationFactory.get()) {
+        try(Config config = ConfigFactory.get()) {
             PersonDao dao = new PersonDao(config);
 
             Person p = new Person();
