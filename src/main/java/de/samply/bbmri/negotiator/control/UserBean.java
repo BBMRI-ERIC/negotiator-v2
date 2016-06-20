@@ -34,6 +34,11 @@ import de.samply.auth.client.jwt.JWTRefreshToken;
 import de.samply.auth.rest.RoleDTO;
 import de.samply.auth.rest.Scope;
 import de.samply.auth.utils.OAuth2ClientConfig;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigurationFactory;
+import de.samply.bbmri.negotiator.jooq.enums.Persontype;
+import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
 
@@ -48,6 +53,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -60,14 +66,14 @@ public class UserBean implements Serializable {
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
     /**
-     * The current username (email). Null if the login is not valid
+     * The current userEmail (email). Null if the login is not valid
      */
-    private String username = null;
+    private String userEmail = null;
 
     /**
      * The current real name. Null if the login is not valid.
      */
-    private String realName = null;
+    private String userRealName = null;
 
     /**
      * The current user identity (usually a URL that identifies the user). Null
@@ -178,9 +184,8 @@ public class UserBean implements Serializable {
 
         loginValid = true;
         userIdentity = idToken.getSubject();
-        realName = idToken.getName();
-        username = idToken.getEmail();
-        createOrGetUser();
+        userRealName = idToken.getName();
+        userEmail = idToken.getEmail();
 
         /**
          * Check all roles. If the user is a biobank owner, set biobankOwner to true.
@@ -194,13 +199,54 @@ public class UserBean implements Serializable {
                 biobankOwner = true;
             }
         }
+
+        createOrGetUser();
     }
 
     /**
      * If the "userIdentity" does not exist in the database, create it.
      */
     private void createOrGetUser() {
-        //TODO: to be filled
+        try (Config config = ConfigurationFactory.get()) {
+            PersonDao dao = new PersonDao(config);
+
+            Person person = dao.fetchOneByAuthsubject(userIdentity);
+
+            /**
+             * If the user hasn't been to this negotiator before, store him in the database
+             */
+            if(person == null) {
+                person = new Person();
+                person.setAuthname(userRealName);
+                person.setAuthemail(userEmail);
+                person.setAuthsubject(userIdentity);
+
+                if(biobankOwner) {
+                    person.setPersontype(Persontype.OWNER);
+                } else {
+                    person.setPersontype(Persontype.RESEARCHER);
+                }
+                dao.insert(person);
+            } else {
+                /**
+                 * Otherwise just update some fields.
+                 */
+                person.setAuthname(userRealName);
+                person.setAuthemail(userEmail);
+
+                if(biobankOwner) {
+                    person.setPersontype(Persontype.OWNER);
+                } else {
+                    person.setPersontype(Persontype.RESEARCHER);
+                }
+                dao.update(person);
+            }
+
+            config.get().commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -213,21 +259,21 @@ public class UserBean implements Serializable {
     }
 
     /**
-     * Gets the username.
+     * Gets the userEmail.
      *
-     * @return the username
+     * @return the userEmail
      */
-    public String getUsername() {
-        return username;
+    public String getUserEmail() {
+        return userEmail;
     }
 
     /**
-     * Sets the username.
+     * Sets the userEmail.
      *
-     * @param username the new username
+     * @param userEmail the new userEmail
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
     /**
@@ -235,17 +281,17 @@ public class UserBean implements Serializable {
      *
      * @return the real name
      */
-    public String getRealName() {
-        return realName;
+    public String getUserRealName() {
+        return userRealName;
     }
 
     /**
      * Sets the real name.
      *
-     * @param realName the new real name
+     * @param userRealName the new real name
      */
-    public void setRealName(String realName) {
-        this.realName = realName;
+    public void setUserRealName(String userRealName) {
+        this.userRealName = userRealName;
     }
 
     /**

@@ -59,6 +59,7 @@ public class Keys {
 	public static final UniqueKey<FlaggedqueryRecord> FLAGGEDQUERY_PKEY = UniqueKeys0.FLAGGEDQUERY_PKEY;
 	public static final UniqueKey<LocationRecord> LOCATION_PKEY = UniqueKeys0.LOCATION_PKEY;
 	public static final UniqueKey<PersonRecord> PERSON_PKEY = UniqueKeys0.PERSON_PKEY;
+	public static final UniqueKey<PersonRecord> PERSON_AUTHSUBJECT_KEY = UniqueKeys0.PERSON_AUTHSUBJECT_KEY;
 	public static final UniqueKey<QueryRecord> QUERY_PKEY = UniqueKeys0.QUERY_PKEY;
 	public static final UniqueKey<TagRecord> TAG_PKEY = UniqueKeys0.TAG_PKEY;
 	public static final UniqueKey<TaggedqueryRecord> TAGGEDQUERY_PKEY = UniqueKeys0.TAGGEDQUERY_PKEY;
@@ -94,6 +95,7 @@ public class Keys {
 		public static final UniqueKey<FlaggedqueryRecord> FLAGGEDQUERY_PKEY = createUniqueKey(Flaggedquery.FLAGGEDQUERY, Flaggedquery.FLAGGEDQUERY.QUERYID, Flaggedquery.FLAGGEDQUERY.PERSONID);
 		public static final UniqueKey<LocationRecord> LOCATION_PKEY = createUniqueKey(Location.LOCATION, Location.LOCATION.ID);
 		public static final UniqueKey<PersonRecord> PERSON_PKEY = createUniqueKey(Person.PERSON, Person.PERSON.ID);
+		public static final UniqueKey<PersonRecord> PERSON_AUTHSUBJECT_KEY = createUniqueKey(Person.PERSON, Person.PERSON.AUTHSUBJECT);
 		public static final UniqueKey<QueryRecord> QUERY_PKEY = createUniqueKey(Query.QUERY, Query.QUERY.ID);
 		public static final UniqueKey<TagRecord> TAG_PKEY = createUniqueKey(Tag.TAG, Tag.TAG.ID);
 		public static final UniqueKey<TaggedqueryRecord> TAGGEDQUERY_PKEY = createUniqueKey(Taggedquery.TAGGEDQUERY, Taggedquery.TAGGEDQUERY.QUERYID, Taggedquery.TAGGEDQUERY.TAGID);

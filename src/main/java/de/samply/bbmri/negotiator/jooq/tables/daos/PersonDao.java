@@ -80,6 +80,13 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	}
 
 	/**
+	 * Fetch a unique record that has <code>authSubject = value</code>
+	 */
+	public de.samply.bbmri.negotiator.jooq.tables.pojos.Person fetchOneByAuthsubject(String value) {
+		return fetchOne(Person.PERSON.AUTHSUBJECT, value);
+	}
+
+	/**
 	 * Fetch records that have <code>authName IN (values)</code>
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthname(String... values) {

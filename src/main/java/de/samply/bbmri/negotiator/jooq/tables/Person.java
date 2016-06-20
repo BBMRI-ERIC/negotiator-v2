@@ -8,12 +8,19 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.enums.Persontype;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import org.jooq.*;
-import org.jooq.impl.TableImpl;
 
-import javax.annotation.Generated;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.Generated;
+
+import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Identity;
+import org.jooq.Table;
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
+import org.jooq.impl.TableImpl;
 
 
 /**
@@ -29,7 +36,7 @@ import java.util.List;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = 95420013;
+	private static final long serialVersionUID = -856191333;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -122,7 +129,7 @@ public class Person extends TableImpl<PersonRecord> {
 	 */
 	@Override
 	public List<UniqueKey<PersonRecord>> getKeys() {
-		return Arrays.<UniqueKey<PersonRecord>>asList(Keys.PERSON_PKEY);
+		return Arrays.<UniqueKey<PersonRecord>>asList(Keys.PERSON_PKEY, Keys.PERSON_AUTHSUBJECT_KEY);
 	}
 
 	/**
