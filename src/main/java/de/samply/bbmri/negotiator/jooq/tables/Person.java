@@ -8,19 +8,12 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.enums.Persontype;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-
-import java.util.Arrays;
-import java.util.List;
+import org.jooq.*;
+import org.jooq.impl.TableImpl;
 
 import javax.annotation.Generated;
-
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Identity;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
-import org.jooq.impl.TableImpl;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -36,7 +29,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = 1976814898;
+	private static final long serialVersionUID = 95420013;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -64,12 +57,12 @@ public class Person extends TableImpl<PersonRecord> {
 	/**
 	 * The column <code>public.person.authSubject</code>. authentication string that comes from the authentication service
 	 */
-	public final TableField<PersonRecord, String> AUTHSUBJECT = createField("authSubject", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "authentication string that comes from the authentication service");
+	public final TableField<PersonRecord, String> AUTHSUBJECT = createField("authSubject", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "authentication string that comes from the authentication service");
 
 	/**
 	 * The column <code>public.person.authName</code>. the real name of the user, value comes from the authentication service
 	 */
-	public final TableField<PersonRecord, String> AUTHNAME = createField("authName", org.jooq.impl.SQLDataType.VARCHAR.length(511).nullable(false), this, "the real name of the user, value comes from the authentication service");
+	public final TableField<PersonRecord, String> AUTHNAME = createField("authName", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "the real name of the user, value comes from the authentication service");
 
 	/**
 	 * The column <code>public.person.authEmail</code>. the email of the user, value comes from the authentication service

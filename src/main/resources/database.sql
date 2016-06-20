@@ -17,8 +17,8 @@ COMMENT ON COLUMN "location"."name" IS 'location name';
 CREATE TABLE "person" (
     "id" SERIAL NOT NULL,
     "personType" "personType" NOT NULL,
-    "authSubject" TEXT NOT NULL,
-    "authName" CHARACTER VARYING(511) NOT NULL,
+    "authSubject" CHARACTER VARYING(255) NOT NULL,
+    "authName" CHARACTER VARYING(255) NOT NULL,
     "authEmail" CHARACTER VARYING(255) NOT NULL,
     "personImage" BYTEA,
     "locationId" INTEGER,
