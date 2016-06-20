@@ -7,10 +7,8 @@ package de.samply.bbmri.negotiator.jooq;
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.Flaggedquery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
-import de.samply.bbmri.negotiator.jooq.tables.Owner;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
-import de.samply.bbmri.negotiator.jooq.tables.Researcher;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
 import de.samply.bbmri.negotiator.jooq.tables.Taggedquery;
 
@@ -46,11 +44,6 @@ public class Tables {
 	public static final Location LOCATION = de.samply.bbmri.negotiator.jooq.tables.Location.LOCATION;
 
 	/**
-	 * Owner table is one of the child of person table  
-	 */
-	public static final Owner OWNER = de.samply.bbmri.negotiator.jooq.tables.Owner.OWNER;
-
-	/**
 	 * person table which is parent of researcher and owner
 	 */
 	public static final Person PERSON = de.samply.bbmri.negotiator.jooq.tables.Person.PERSON;
@@ -59,11 +52,6 @@ public class Tables {
 	 * query table to contain all  queries
 	 */
 	public static final Query QUERY = de.samply.bbmri.negotiator.jooq.tables.Query.QUERY;
-
-	/**
-	 * researcher table - one of the child's of the person table 
-	 */
-	public static final Researcher RESEARCHER = de.samply.bbmri.negotiator.jooq.tables.Researcher.RESEARCHER;
 
 	/**
 	 * Table that contains tags for queries

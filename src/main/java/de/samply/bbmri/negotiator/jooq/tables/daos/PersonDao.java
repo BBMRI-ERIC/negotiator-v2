@@ -4,6 +4,7 @@
 package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 
+import de.samply.bbmri.negotiator.jooq.enums.Persontype;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 
@@ -65,17 +66,31 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	}
 
 	/**
-	 * Fetch records that have <code>authData IN (values)</code>
+	 * Fetch records that have <code>personType IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthdata(String... values) {
-		return fetch(Person.PERSON.AUTHDATA, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersontype(Persontype... values) {
+		return fetch(Person.PERSON.PERSONTYPE, values);
 	}
 
 	/**
-	 * Fetch records that have <code>personType IN (values)</code>
+	 * Fetch records that have <code>authSubject IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersontype(String... values) {
-		return fetch(Person.PERSON.PERSONTYPE, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthsubject(String... values) {
+		return fetch(Person.PERSON.AUTHSUBJECT, values);
+	}
+
+	/**
+	 * Fetch records that have <code>authName IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthname(String... values) {
+		return fetch(Person.PERSON.AUTHNAME, values);
+	}
+
+	/**
+	 * Fetch records that have <code>authEmail IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthemail(String... values) {
+		return fetch(Person.PERSON.AUTHEMAIL, values);
 	}
 
 	/**
@@ -83,5 +98,12 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersonimage(byte[]... values) {
 		return fetch(Person.PERSON.PERSONIMAGE, values);
+	}
+
+	/**
+	 * Fetch records that have <code>locationId IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByLocationid(Integer... values) {
+		return fetch(Person.PERSON.LOCATIONID, values);
 	}
 }

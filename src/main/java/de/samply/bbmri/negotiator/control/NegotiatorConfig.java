@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.control;
 
 import de.samply.common.config.OAuth2Client;
 import de.samply.common.config.ObjectFactory;
+import de.samply.common.config.Postgresql;
 import de.samply.config.util.JAXBUtil;
 import org.xml.sax.SAXException;
 
@@ -46,11 +47,19 @@ public class NegotiatorConfig {
      */
     private static final String FILE_OAUTH = "bbmri.negotiator.oauth2.xml";
 
+    /**
+     * The configuration file for the postgresql configuration.
+     */
+    private static final String FILE_POSTGRESQL = "bbmri.negotiator.postgres.xml";
+
     /** The singleon instance. */
     private static NegotiatorConfig instance = new NegotiatorConfig();
 
     /** The oauth2 client configuration. */
     private OAuth2Client oauth2 = new OAuth2Client();
+
+    /** The postgresql database attributes */
+    private Postgresql postgresql = new Postgresql();
 
     /**
      * The project name or prefix for the filefinderutil.
@@ -130,12 +139,15 @@ public class NegotiatorConfig {
     public static void reinitialize() throws JAXBException, FileNotFoundException, SAXException, ParserConfigurationException {
         instance.oauth2 = JAXBUtil.findUnmarshall(FILE_OAUTH, getJAXBContext(), OAuth2Client.class,
                 instance.projectName, instance.fallback);
+
+        instance.postgresql = JAXBUtil.findUnmarshall(FILE_POSTGRESQL, getJAXBContext(), Postgresql.class,
+                instance.projectName, instance.fallback);
     }
 
     /**
-     * Gets the oauth2.
+     * Gets the oauth2 client configuration
      *
-     * @return the oauth2
+     * @return the oauth2 client configuration
      */
     public OAuth2Client getOauth2() {
         return oauth2;
@@ -148,5 +160,13 @@ public class NegotiatorConfig {
      */
     public boolean isMaintenanceMode() {
         return maintenanceMode;
+    }
+
+    /**
+     * Gets the current postgresql database configuration
+     * @return
+     */
+    public Postgresql getPostgresql() {
+        return postgresql;
     }
 }

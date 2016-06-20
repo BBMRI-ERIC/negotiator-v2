@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Flaggedquery extends TableImpl<FlaggedqueryRecord> {
 
-	private static final long serialVersionUID = -1276068838;
+	private static final long serialVersionUID = -1040841110;
 
 	/**
 	 * The reference instance of <code>public.flaggedQuery</code>
@@ -56,9 +56,9 @@ public class Flaggedquery extends TableImpl<FlaggedqueryRecord> {
 	public final TableField<FlaggedqueryRecord, Integer> QUERYID = createField("queryId", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "This column along with ownerId will make the primary key. Its also a foreign key here, taken from query table");
 
 	/**
-	 * The column <code>public.flaggedQuery.ownerId</code>. This column along with the id column will make the primary key. Its also a foreign key here, taken from owner(which itself takes it from person) table
+	 * The column <code>public.flaggedQuery.personId</code>. This column along with the id column will make the primary key. Its also a foreign key here, taken from person table
 	 */
-	public final TableField<FlaggedqueryRecord, Integer> OWNERID = createField("ownerId", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "This column along with the id column will make the primary key. Its also a foreign key here, taken from owner(which itself takes it from person) table");
+	public final TableField<FlaggedqueryRecord, Integer> PERSONID = createField("personId", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "This column along with the id column will make the primary key. Its also a foreign key here, taken from person table");
 
 	/**
 	 * The column <code>public.flaggedQuery.flag</code>. The flag of the comment. One character letter. (A) archived, (I) ignored, (S) starred
@@ -108,7 +108,7 @@ public class Flaggedquery extends TableImpl<FlaggedqueryRecord> {
 	 */
 	@Override
 	public List<ForeignKey<FlaggedqueryRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<FlaggedqueryRecord, ?>>asList(Keys.FLAGGEDQUERY__FLAGGEDQUERY_QUERYID_FKEY, Keys.FLAGGEDQUERY__FLAGGEDQUERY_OWNERID_FKEY);
+		return Arrays.<ForeignKey<FlaggedqueryRecord, ?>>asList(Keys.FLAGGEDQUERY__FLAGGEDQUERY_QUERYID_FKEY, Keys.FLAGGEDQUERY__FLAGGEDQUERY_PERSONID_FKEY);
 	}
 
 	/**

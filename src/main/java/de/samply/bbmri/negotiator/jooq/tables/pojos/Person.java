@@ -4,6 +4,8 @@
 package de.samply.bbmri.negotiator.jooq.tables.pojos;
 
 
+import de.samply.bbmri.negotiator.jooq.enums.Persontype;
+
 import java.io.Serializable;
 
 import javax.annotation.Generated;
@@ -22,32 +24,44 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person implements Serializable {
 
-	private static final long serialVersionUID = -386000066;
+	private static final long serialVersionUID = -2047027032;
 
-	private Integer id;
-	private String  authdata;
-	private String  persontype;
-	private byte[]  personimage;
+	private Integer    id;
+	private Persontype persontype;
+	private String     authsubject;
+	private String     authname;
+	private String     authemail;
+	private byte[]     personimage;
+	private Integer    locationid;
 
 	public Person() {}
 
 	public Person(Person value) {
 		this.id = value.id;
-		this.authdata = value.authdata;
 		this.persontype = value.persontype;
+		this.authsubject = value.authsubject;
+		this.authname = value.authname;
+		this.authemail = value.authemail;
 		this.personimage = value.personimage;
+		this.locationid = value.locationid;
 	}
 
 	public Person(
-		Integer id,
-		String  authdata,
-		String  persontype,
-		byte[]  personimage
+		Integer    id,
+		Persontype persontype,
+		String     authsubject,
+		String     authname,
+		String     authemail,
+		byte[]     personimage,
+		Integer    locationid
 	) {
 		this.id = id;
-		this.authdata = authdata;
 		this.persontype = persontype;
+		this.authsubject = authsubject;
+		this.authname = authname;
+		this.authemail = authemail;
 		this.personimage = personimage;
+		this.locationid = locationid;
 	}
 
 	public Integer getId() {
@@ -58,20 +72,36 @@ public class Person implements Serializable {
 		this.id = id;
 	}
 
-	public String getAuthdata() {
-		return this.authdata;
-	}
-
-	public void setAuthdata(String authdata) {
-		this.authdata = authdata;
-	}
-
-	public String getPersontype() {
+	public Persontype getPersontype() {
 		return this.persontype;
 	}
 
-	public void setPersontype(String persontype) {
+	public void setPersontype(Persontype persontype) {
 		this.persontype = persontype;
+	}
+
+	public String getAuthsubject() {
+		return this.authsubject;
+	}
+
+	public void setAuthsubject(String authsubject) {
+		this.authsubject = authsubject;
+	}
+
+	public String getAuthname() {
+		return this.authname;
+	}
+
+	public void setAuthname(String authname) {
+		this.authname = authname;
+	}
+
+	public String getAuthemail() {
+		return this.authemail;
+	}
+
+	public void setAuthemail(String authemail) {
+		this.authemail = authemail;
 	}
 
 	public byte[] getPersonimage() {
@@ -80,5 +110,13 @@ public class Person implements Serializable {
 
 	public void setPersonimage(byte[] personimage) {
 		this.personimage = personimage;
+	}
+
+	public Integer getLocationid() {
+		return this.locationid;
+	}
+
+	public void setLocationid(Integer locationid) {
+		this.locationid = locationid;
 	}
 }
