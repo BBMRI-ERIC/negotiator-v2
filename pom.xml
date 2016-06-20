@@ -150,9 +150,9 @@
                     <!-- JDBC connection parameters -->
                     <jdbc>
                         <driver>org.postgresql.Driver</driver>
-                        <url>jdbc:postgresql://localhost:5432/negotiator</url>
-                        <user>paul</user>
-                        <password/>
+                        <url>jdbc:postgresql://localhost:5432/${negotiator.database}</url>
+                        <user>${negotiator.user}</user>
+                        <password>${negotiator.password}</password>
                     </jdbc>
 
                     <!-- Generator parameters -->
