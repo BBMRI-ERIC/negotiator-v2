@@ -7,10 +7,8 @@ package de.samply.bbmri.negotiator.jooq;
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.Flaggedquery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
-import de.samply.bbmri.negotiator.jooq.tables.Owner;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
-import de.samply.bbmri.negotiator.jooq.tables.Researcher;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
 import de.samply.bbmri.negotiator.jooq.tables.Taggedquery;
 
@@ -38,7 +36,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -1386338068;
+	private static final long serialVersionUID = -600198106;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -63,10 +61,8 @@ public class Public extends SchemaImpl {
 		return Arrays.<Sequence<?>>asList(
 			Sequences.COMMENT_ID_SEQ,
 			Sequences.LOCATION_ID_SEQ,
-			Sequences.OWNER_ID_SEQ,
 			Sequences.PERSON_ID_SEQ,
 			Sequences.QUERY_ID_SEQ,
-			Sequences.RESEARCHER_ID_SEQ,
 			Sequences.TAG_ID_SEQ);
 	}
 
@@ -82,10 +78,8 @@ public class Public extends SchemaImpl {
 			Comment.COMMENT,
 			Flaggedquery.FLAGGEDQUERY,
 			Location.LOCATION,
-			Owner.OWNER,
 			Person.PERSON,
 			Query.QUERY,
-			Researcher.RESEARCHER,
 			Tag.TAG,
 			Taggedquery.TAGGEDQUERY);
 	}

@@ -49,7 +49,7 @@ public class FlaggedqueryDao extends DAOImpl<FlaggedqueryRecord, de.samply.bbmri
 	 */
 	@Override
 	protected Record2<Integer, Integer> getId(de.samply.bbmri.negotiator.jooq.tables.pojos.Flaggedquery object) {
-		return compositeKeyRecord(object.getQueryid(), object.getOwnerid());
+		return compositeKeyRecord(object.getQueryid(), object.getPersonid());
 	}
 
 	/**
@@ -60,10 +60,10 @@ public class FlaggedqueryDao extends DAOImpl<FlaggedqueryRecord, de.samply.bbmri
 	}
 
 	/**
-	 * Fetch records that have <code>ownerId IN (values)</code>
+	 * Fetch records that have <code>personId IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Flaggedquery> fetchByOwnerid(Integer... values) {
-		return fetch(Flaggedquery.FLAGGEDQUERY.OWNERID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Flaggedquery> fetchByPersonid(Integer... values) {
+		return fetch(Flaggedquery.FLAGGEDQUERY.PERSONID, values);
 	}
 
 	/**

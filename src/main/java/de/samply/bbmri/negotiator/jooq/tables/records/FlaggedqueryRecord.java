@@ -29,7 +29,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class FlaggedqueryRecord extends UpdatableRecordImpl<FlaggedqueryRecord> implements Record3<Integer, Integer, String> {
 
-	private static final long serialVersionUID = -1877183211;
+	private static final long serialVersionUID = 635727335;
 
 	/**
 	 * Setter for <code>public.flaggedQuery.queryId</code>. This column along with ownerId will make the primary key. Its also a foreign key here, taken from query table
@@ -46,16 +46,16 @@ public class FlaggedqueryRecord extends UpdatableRecordImpl<FlaggedqueryRecord> 
 	}
 
 	/**
-	 * Setter for <code>public.flaggedQuery.ownerId</code>. This column along with the id column will make the primary key. Its also a foreign key here, taken from owner(which itself takes it from person) table
+	 * Setter for <code>public.flaggedQuery.personId</code>. This column along with the id column will make the primary key. Its also a foreign key here, taken from person table
 	 */
-	public void setOwnerid(Integer value) {
+	public void setPersonid(Integer value) {
 		setValue(1, value);
 	}
 
 	/**
-	 * Getter for <code>public.flaggedQuery.ownerId</code>. This column along with the id column will make the primary key. Its also a foreign key here, taken from owner(which itself takes it from person) table
+	 * Getter for <code>public.flaggedQuery.personId</code>. This column along with the id column will make the primary key. Its also a foreign key here, taken from person table
 	 */
-	public Integer getOwnerid() {
+	public Integer getPersonid() {
 		return (Integer) getValue(1);
 	}
 
@@ -118,7 +118,7 @@ public class FlaggedqueryRecord extends UpdatableRecordImpl<FlaggedqueryRecord> 
 	 */
 	@Override
 	public Field<Integer> field2() {
-		return Flaggedquery.FLAGGEDQUERY.OWNERID;
+		return Flaggedquery.FLAGGEDQUERY.PERSONID;
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class FlaggedqueryRecord extends UpdatableRecordImpl<FlaggedqueryRecord> 
 	 */
 	@Override
 	public Integer value2() {
-		return getOwnerid();
+		return getPersonid();
 	}
 
 	/**
@@ -167,7 +167,7 @@ public class FlaggedqueryRecord extends UpdatableRecordImpl<FlaggedqueryRecord> 
 	 */
 	@Override
 	public FlaggedqueryRecord value2(Integer value) {
-		setOwnerid(value);
+		setPersonid(value);
 		return this;
 	}
 
@@ -205,11 +205,11 @@ public class FlaggedqueryRecord extends UpdatableRecordImpl<FlaggedqueryRecord> 
 	/**
 	 * Create a detached, initialised FlaggedqueryRecord
 	 */
-	public FlaggedqueryRecord(Integer queryid, Integer ownerid, String flag) {
+	public FlaggedqueryRecord(Integer queryid, Integer personid, String flag) {
 		super(Flaggedquery.FLAGGEDQUERY);
 
 		setValue(0, queryid);
-		setValue(1, ownerid);
+		setValue(1, personid);
 		setValue(2, flag);
 	}
 }

@@ -34,11 +34,6 @@ public class Sequences {
 	public static final Sequence<Long> LOCATION_ID_SEQ = new SequenceImpl<Long>("location_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>public.owner_id_seq</code>
-	 */
-	public static final Sequence<Long> OWNER_ID_SEQ = new SequenceImpl<Long>("owner_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
 	 * The sequence <code>public.person_id_seq</code>
 	 */
 	public static final Sequence<Long> PERSON_ID_SEQ = new SequenceImpl<Long>("person_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -47,11 +42,6 @@ public class Sequences {
 	 * The sequence <code>public.query_id_seq</code>
 	 */
 	public static final Sequence<Long> QUERY_ID_SEQ = new SequenceImpl<Long>("query_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
-	 * The sequence <code>public.researcher_id_seq</code>
-	 */
-	public static final Sequence<Long> RESEARCHER_ID_SEQ = new SequenceImpl<Long>("researcher_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>public.tag_id_seq</code>

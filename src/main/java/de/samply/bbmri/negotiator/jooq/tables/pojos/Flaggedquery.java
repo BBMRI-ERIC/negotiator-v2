@@ -23,27 +23,27 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Flaggedquery implements Serializable {
 
-	private static final long serialVersionUID = -1837841587;
+	private static final long serialVersionUID = -412036429;
 
 	private Integer queryid;
-	private Integer ownerid;
+	private Integer personid;
 	private String  flag;
 
 	public Flaggedquery() {}
 
 	public Flaggedquery(Flaggedquery value) {
 		this.queryid = value.queryid;
-		this.ownerid = value.ownerid;
+		this.personid = value.personid;
 		this.flag = value.flag;
 	}
 
 	public Flaggedquery(
 		Integer queryid,
-		Integer ownerid,
+		Integer personid,
 		String  flag
 	) {
 		this.queryid = queryid;
-		this.ownerid = ownerid;
+		this.personid = personid;
 		this.flag = flag;
 	}
 
@@ -55,12 +55,12 @@ public class Flaggedquery implements Serializable {
 		this.queryid = queryid;
 	}
 
-	public Integer getOwnerid() {
-		return this.ownerid;
+	public Integer getPersonid() {
+		return this.personid;
 	}
 
-	public void setOwnerid(Integer ownerid) {
-		this.ownerid = ownerid;
+	public void setPersonid(Integer personid) {
+		this.personid = personid;
 	}
 
 	public String getFlag() {
