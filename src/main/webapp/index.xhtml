@@ -12,26 +12,23 @@
 
     <ui:define name="body">
 
-        <h:panelGroup layout="block" styleClass="row queriesTopLine"
-            rendered="#{!userBean.biobankOwner}">
+        <h:panelGroup layout="block" styleClass="row queriesTopLine" rendered="#{!userBean.biobankOwner}">
             <h:panelGroup layout="block" styleClass="col-md-2">
                 <a href="#" class="btn btn-danger btn-sm btn-block"
-                    role="button"><i
-                    class="glyphicon glyphicon-edit"></i> New query</a>
+                    role="button"><i class="glyphicon glyphicon-edit"></i> New query</a>
 
                 <p />
             </h:panelGroup>
         </h:panelGroup>
-        
-        <h:panelGroup layout="block" styleClass="row queriesTopLine"
-            rendered="#{userBean.biobankOwner}">
+
+        <h:panelGroup layout="block" styleClass="row queriesTopLine" rendered="#{userBean.biobankOwner}">
             <h:form prependId="false">
                 <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
                     <h:inputText value="#{sessionBean.filterToAdd}"
                         size="20" id="filterInputText" />
                     <h:commandButton id="addFilterButton"
                         action="#{sessionBean.addFilter()}" style="display: none;" />
-                
+
                     <ui:repeat var="item" value="#{sessionBean.filters}">
                         <h:panelGroup styleClass="badge filterBadge"><h:commandLink action="#{sessionBean.removeFilter(item)}">#{item}</h:commandLink></h:panelGroup>
                     </ui:repeat>
@@ -44,26 +41,23 @@
                 </h:panelGroup>
             </h:form>
         </h:panelGroup>
-        
+
         <ui:repeat var="item" value="#{sessionBean.queries}">
 
                 <h:panelGroup layout="block"
                     styleClass="panel panel-default">
                     <h:panelGroup layout="block" styleClass="panel-heading">
-                        
-                        
-                        #{item.number} - #{item.title} 
-                        
+
+                        #{item.number} - #{item.title}
+
                         <h:panelGroup styleClass="pull-right">
-                            
-                    <h:panelGroup layout="block" styleClass="btn-group queryActionButtons" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
-                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-folder-open"></i></button>
-                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-trash"></i></button>
-                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
-                      
-                      
-                    
-                </h:panelGroup>
+
+                            <h:panelGroup layout="block" styleClass="btn-group queryActionButtons" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
+                              <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-folder-open"></i></button>
+                              <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-trash"></i></button>
+                              <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
+                            </h:panelGroup>
+
                             <h:panelGroup
                                 rendered="#{item.numberResponses > 0}"
                                 styleClass="badge queryNumberResponsesBadge">
@@ -78,10 +72,10 @@
                             </h:outputText>
 
                         </h:panelGroup>
-                    
+
                     </h:panelGroup>
-                    
-                    
+
+
                     <h:panelGroup layout="block" styleClass="panel-body">
                         <h:panelGroup layout="block" styleClass="row">
 
@@ -92,19 +86,19 @@
                                 <h:panelGroup layout="block" styleClass="row queryOwner" rendered="#{userBean.biobankOwner}">
                                     #{item.ownerName}
                                 </h:panelGroup>
-                            
+
                                 <h:panelGroup layout="block" styleClass="row">
                                     <h:panelGroup layout="block"
                                         styleClass="col-md-10">
                                         #{item.text}</h:panelGroup>
-        
+
                                 </h:panelGroup>
-    
+
                                 <h:panelGroup layout="block" styleClass="row">
                                     <h:panelGroup layout="block"
                                         styleClass="col-md-12">
                                         <h:panelGroup styleClass="pull-right">
-        
+
                                             <h:outputText
                                                 value="#{item.lastContactDate}"
                                                 title="Date and time of last contact communication">
@@ -114,12 +108,12 @@
                                         </h:panelGroup>
                                     </h:panelGroup>
                                 </h:panelGroup>
-                            </h:panelGroup>                            
+                            </h:panelGroup>
                         </h:panelGroup> <!-- row -->
                     </h:panelGroup>
 
                 </h:panelGroup>
-            
+
         </ui:repeat>
     </ui:define>
 
