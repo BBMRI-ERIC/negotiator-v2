@@ -27,7 +27,7 @@ package de.samply.bbmri.negotiator.filter;
 
 import de.samply.auth.rest.Scope;
 import de.samply.auth.utils.OAuth2ClientConfig;
-import de.samply.bbmri.negotiator.control.NegotiatorConfig;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 
 import javax.servlet.*;
@@ -63,6 +63,16 @@ public class AuthorizationFilter implements Filter {
         HttpSession session = request.getSession(true);
 
         UserBean userBean = (UserBean) session.getAttribute("userBean");
+
+        /**
+         * Skip maintenance.xhtml
+         */
+        String path = ((HttpServletRequest) request).getRequestURI();
+
+        if(path.endsWith("maintenance.xhtml")) {
+            chain.doFilter(req, res);
+            return;
+        }
 
         /**
          * Create the userBean if necessary

@@ -24,7 +24,7 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.control;
+package de.samply.bbmri.negotiator;
 
 import de.samply.common.config.OAuth2Client;
 import de.samply.common.config.ObjectFactory;
@@ -74,9 +74,6 @@ public class NegotiatorConfig {
     /** JAXBContext used for JAXB. */
     private static JAXBContext jaxbContext;
 
-    /**
-     * If true, the maintenance filter will return 503 for every request.
-     */
     private boolean maintenanceMode = false;
 
     /**
@@ -154,6 +151,8 @@ public class NegotiatorConfig {
     }
 
     /**
+     * If true, the maintenance filter will return 503 for every request.
+     */ /**
      * Checks if is maintenance mode.
      *
      * @return true, if is maintenance mode
@@ -168,5 +167,9 @@ public class NegotiatorConfig {
      */
     public Postgresql getPostgresql() {
         return postgresql;
+    }
+
+    public void setMaintenanceMode(boolean maintenanceMode) {
+        this.maintenanceMode = maintenanceMode;
     }
 }

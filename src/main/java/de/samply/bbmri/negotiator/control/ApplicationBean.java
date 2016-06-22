@@ -25,6 +25,12 @@
  */
 package de.samply.bbmri.negotiator.control;
 
+import de.samply.bbmri.negotiator.*;
+import de.samply.common.upgrade.Upgrade;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
 import javax.faces.application.ConfigurableNavigationHandler;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
@@ -35,12 +41,14 @@ import java.io.Serializable;
 /**
  * The Class ApplicationBean.
  */
-@ManagedBean
+@ManagedBean(eager =  true)
 @ApplicationScoped
 public class ApplicationBean implements Serializable {
     
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+
+    private final static Logger logger = LoggerFactory.getLogger(ApplicationBean.class);
 
     /**
      * Gets the faces context.
@@ -50,6 +58,37 @@ public class ApplicationBean implements Serializable {
     private ServletContext getFacesContext() {
         return (ServletContext)
                 FacesContext.getCurrentInstance().getExternalContext().getContext();
+    }
+
+    /**
+     * Initializes the database version tables and checks for necessary upgrades.
+     */
+    @PostConstruct
+    public void initializeDbUpgrades() {
+        try (Config config = ConfigFactory.get()) {
+            Upgrade<Void> upgrade = new Upgrade<>(Constants.DB_REQUIRED_VERSION, Constants.DB_PACKAGE_NAME, config.get());
+
+            logger.info("Initiating database upgrades, current version: {}", upgrade.getCurrentVersionFromDb());
+
+            /**
+             * Execute all upgrades
+             */
+            if(!upgrade.executeUpgrades()) {
+                logger.error("Database upgrades not successful. Starting in maintenance mode.");
+                NegotiatorConfig.get().setMaintenanceMode(true);
+            } else {
+                logger.info("Database upgrades successful. Current version: {}", Constants.DB_REQUIRED_VERSION);
+                NegotiatorConfig.get().setMaintenanceMode(false);
+            }
+
+            /**
+             * And commit all changes
+             */
+            config.get().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            NegotiatorConfig.get().setMaintenanceMode(true);
+        }
     }
 
     /**

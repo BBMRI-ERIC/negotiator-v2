@@ -26,7 +26,6 @@
 
 package de.samply.bbmri.negotiator;
 
-import de.samply.bbmri.negotiator.control.NegotiatorConfig;
 import de.samply.common.config.Postgresql;
 
 import java.sql.Connection;
