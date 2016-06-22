@@ -26,28 +26,23 @@
 
 package de.samply.bbmri.negotiator.test;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import org.junit.runner.RunWith;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.common.config.Postgresql;
 import org.junit.BeforeClass;
+import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.xml.sax.SAXException;
 
-import de.samply.bbmri.negotiator.control.NegotiatorConfig;
-import de.samply.common.config.Postgresql;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 
 /**
@@ -86,8 +81,6 @@ public class TestSuite {
                 sb.append(s).append("\r\n");
             }
             br.close();
-
-            System.out.println(sb.toString());
             
             try (Statement st = connection.createStatement()) {
                 st.execute(sb.toString());
