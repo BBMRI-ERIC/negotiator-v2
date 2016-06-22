@@ -86,10 +86,11 @@ hr {
 
 #filterInputText {
     margin-right: 5px;
+    margin-left: 5px;
 }
 
 .queryActionButtons {
-    margin-right: 5px;
+    margin-left: 5px;
     top: -5px;
 }
 

@@ -24,6 +24,7 @@
         <h:panelGroup layout="block" styleClass="row queriesTopLine" rendered="#{userBean.biobankOwner}">
             <h:form prependId="false">
                 <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
+                    <h:outputLabel for="filterInputText" value="Search:" />
                     <h:inputText value="#{sessionBean.filterToAdd}"
                         size="20" id="filterInputText" />
                     <h:commandButton id="addFilterButton"
@@ -52,9 +53,9 @@
 
                         <h:panelGroup styleClass="pull-right">
 
-                            <h:panelGroup layout="block" styleClass="btn-group queryActionButtons" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
+                            <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
                               <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-folder-open"></i></button>
-                              <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-trash"></i></button>
+                              <button type="button" class="btn btn-default"><i class="fa fa-sign-out"></i></button>
                               <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
                             </h:panelGroup>
 
@@ -66,9 +67,9 @@
                                     value="#{item.numberResponses}" />
                             </h:panelGroup>
 
-                            <h:outputText value="#{item.creationDate}" styleClass="queryCreationDate"
-                                title="Date this query was created on">
-                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            <h:outputText value="#{item.lastContactDate}" styleClass="queryCreationDate"
+                                title="Date and time of last contact communication" rendered="#{item.numberResponses > 0}">
+                                <f:convertDateTime pattern="MM/dd/yyyy hh:mm" />
                             </h:outputText>
 
                         </h:panelGroup>
@@ -100,8 +101,8 @@
                                         <h:panelGroup styleClass="pull-right">
 
                                             <h:outputText
-                                                value="#{item.lastContactDate}"
-                                                title="Date and time of last contact communication">
+                                                value="#{item.creationDate}"
+                                                title="Date this query was created on">
                                                 <f:convertDateTime
                                                     pattern="MM/dd/yyyy hh:mm:ss" />
                                             </h:outputText>
