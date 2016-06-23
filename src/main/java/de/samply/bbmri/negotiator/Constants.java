@@ -44,6 +44,6 @@ public class Constants {
     /**
      * The required Database version for this application version.
      */
-    public final static int DB_REQUIRED_VERSION = 2;
+    public final static int DB_REQUIRED_VERSION = 1;
 
 }
