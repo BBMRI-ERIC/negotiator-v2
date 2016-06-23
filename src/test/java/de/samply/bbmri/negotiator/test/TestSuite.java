@@ -70,7 +70,7 @@ public class TestSuite {
             connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
             connection.commit();
             
-            InputStreamReader reader = new InputStreamReader(TestSuite.class.getClassLoader().getResourceAsStream("database.sql"), StandardCharsets.UTF_8);
+            InputStreamReader reader = new InputStreamReader(TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"), StandardCharsets.UTF_8);
 
             String s = null;
             StringBuffer sb = new StringBuffer();
