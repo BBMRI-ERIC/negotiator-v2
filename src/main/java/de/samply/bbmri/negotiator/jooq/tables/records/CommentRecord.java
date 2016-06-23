@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements Record5<Integer, Integer, Integer, Timestamp, String> {
 
-	private static final long serialVersionUID = -1959175764;
+	private static final long serialVersionUID = 996546990;
 
 	/**
 	 * Setter for <code>public.comment.id</code>. Primary key
@@ -75,16 +75,16 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	}
 
 	/**
-	 * Setter for <code>public.comment.timeStamp</code>. timestamp of when the comment was made.
+	 * Setter for <code>public.comment.commentTime</code>. timestamp of when the comment was made.
 	 */
-	public void setTimestamp(Timestamp value) {
+	public void setCommenttime(Timestamp value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>public.comment.timeStamp</code>. timestamp of when the comment was made.
+	 * Getter for <code>public.comment.commentTime</code>. timestamp of when the comment was made.
 	 */
-	public Timestamp getTimestamp() {
+	public Timestamp getCommenttime() {
 		return (Timestamp) getValue(3);
 	}
 
@@ -163,7 +163,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public Field<Timestamp> field4() {
-		return Comment.COMMENT.TIMESTAMP;
+		return Comment.COMMENT.COMMENTTIME;
 	}
 
 	/**
@@ -203,7 +203,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public Timestamp value4() {
-		return getTimestamp();
+		return getCommenttime();
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public CommentRecord value4(Timestamp value) {
-		setTimestamp(value);
+		setCommenttime(value);
 		return this;
 	}
 
@@ -286,13 +286,13 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	/**
 	 * Create a detached, initialised CommentRecord
 	 */
-	public CommentRecord(Integer id, Integer queryid, Integer personid, Timestamp timestamp, String text) {
+	public CommentRecord(Integer id, Integer queryid, Integer personid, Timestamp commenttime, String text) {
 		super(Comment.COMMENT);
 
 		setValue(0, id);
 		setValue(1, queryid);
 		setValue(2, personid);
-		setValue(3, timestamp);
+		setValue(3, commenttime);
 		setValue(4, text);
 	}
 }

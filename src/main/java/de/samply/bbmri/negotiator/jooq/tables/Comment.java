@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment extends TableImpl<CommentRecord> {
 
-	private static final long serialVersionUID = 1962776037;
+	private static final long serialVersionUID = 421014779;
 
 	/**
 	 * The reference instance of <code>public.comment</code>
@@ -67,9 +67,9 @@ public class Comment extends TableImpl<CommentRecord> {
 	public final TableField<CommentRecord, Integer> PERSONID = createField("personId", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists as primary key in the person table. describes the person who made the comment.");
 
 	/**
-	 * The column <code>public.comment.timeStamp</code>. timestamp of when the comment was made.
+	 * The column <code>public.comment.commentTime</code>. timestamp of when the comment was made.
 	 */
-	public final TableField<CommentRecord, Timestamp> TIMESTAMP = createField("timeStamp", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "timestamp of when the comment was made.");
+	public final TableField<CommentRecord, Timestamp> COMMENTTIME = createField("commentTime", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "timestamp of when the comment was made.");
 
 	/**
 	 * The column <code>public.comment.text</code>. Text of the comment.

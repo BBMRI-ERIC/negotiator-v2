@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = 1251171716;
+	private static final long serialVersionUID = -959271467;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -67,9 +67,9 @@ public class Query extends TableImpl<QueryRecord> {
 	public final TableField<QueryRecord, String> TEXT = createField("text", org.jooq.impl.SQLDataType.CLOB, this, "text of query");
 
 	/**
-	 * The column <code>public.query.dateTime</code>. date and time of query with out time zone
+	 * The column <code>public.query.queryCreationTime</code>. date and time of query with out time zone
 	 */
-	public final TableField<QueryRecord, Timestamp> DATETIME = createField("dateTime", org.jooq.impl.SQLDataType.TIMESTAMP, this, "date and time of query with out time zone");
+	public final TableField<QueryRecord, Timestamp> QUERYCREATIONTIME = createField("queryCreationTime", org.jooq.impl.SQLDataType.TIMESTAMP, this, "date and time of query with out time zone");
 
 	/**
 	 * The column <code>public.query.researcherId</code>. Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)

@@ -80,10 +80,10 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	}
 
 	/**
-	 * Fetch records that have <code>dateTime IN (values)</code>
+	 * Fetch records that have <code>queryCreationTime IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByDatetime(Timestamp... values) {
-		return fetch(Query.QUERY.DATETIME, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByQuerycreationtime(Timestamp... values) {
+		return fetch(Query.QUERY.QUERYCREATIONTIME, values);
 	}
 
 	/**

@@ -80,10 +80,10 @@ public class CommentDao extends DAOImpl<CommentRecord, de.samply.bbmri.negotiato
 	}
 
 	/**
-	 * Fetch records that have <code>timeStamp IN (values)</code>
+	 * Fetch records that have <code>commentTime IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByTimestamp(Timestamp... values) {
-		return fetch(Comment.COMMENT.TIMESTAMP, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByCommenttime(Timestamp... values) {
+		return fetch(Comment.COMMENT.COMMENTTIME, values);
 	}
 
 	/**

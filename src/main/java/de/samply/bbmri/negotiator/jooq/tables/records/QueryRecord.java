@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Record5<Integer, String, String, Timestamp, Integer> {
 
-	private static final long serialVersionUID = 797915069;
+	private static final long serialVersionUID = -170796464;
 
 	/**
 	 * Setter for <code>public.query.id</code>. primary key
@@ -75,16 +75,16 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	}
 
 	/**
-	 * Setter for <code>public.query.dateTime</code>. date and time of query with out time zone
+	 * Setter for <code>public.query.queryCreationTime</code>. date and time of query with out time zone
 	 */
-	public void setDatetime(Timestamp value) {
+	public void setQuerycreationtime(Timestamp value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>public.query.dateTime</code>. date and time of query with out time zone
+	 * Getter for <code>public.query.queryCreationTime</code>. date and time of query with out time zone
 	 */
-	public Timestamp getDatetime() {
+	public Timestamp getQuerycreationtime() {
 		return (Timestamp) getValue(3);
 	}
 
@@ -163,7 +163,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public Field<Timestamp> field4() {
-		return Query.QUERY.DATETIME;
+		return Query.QUERY.QUERYCREATIONTIME;
 	}
 
 	/**
@@ -203,7 +203,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public Timestamp value4() {
-		return getDatetime();
+		return getQuerycreationtime();
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public QueryRecord value4(Timestamp value) {
-		setDatetime(value);
+		setQuerycreationtime(value);
 		return this;
 	}
 
@@ -286,13 +286,13 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	/**
 	 * Create a detached, initialised QueryRecord
 	 */
-	public QueryRecord(Integer id, String title, String text, Timestamp datetime, Integer researcherid) {
+	public QueryRecord(Integer id, String title, String text, Timestamp querycreationtime, Integer researcherid) {
 		super(Query.QUERY);
 
 		setValue(0, id);
 		setValue(1, title);
 		setValue(2, text);
-		setValue(3, datetime);
+		setValue(3, querycreationtime);
 		setValue(4, researcherid);
 	}
 }
