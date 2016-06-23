@@ -43,7 +43,7 @@ CREATE TABLE "query" (
     "id" SERIAL NOT NULL,
     "title" CHARACTER VARYING(255) NOT NULL,
     "text" TEXT,
-    "dateTime" TIMESTAMP WITHOUT TIME ZONE,
+    "queryCreationTime" TIMESTAMP WITHOUT TIME ZONE,
     "researcherId" INTEGER NOT NULL,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("researcherId") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
@@ -55,7 +55,7 @@ COMMENT ON TABLE "query" IS 'query table to contain all  queries';
 COMMENT ON COLUMN "query"."id" IS 'primary key';
 COMMENT ON COLUMN "query"."title" IS 'title of query';
 COMMENT ON COLUMN "query"."text" IS 'text of query';
-COMMENT ON COLUMN "query"."dateTime" IS 'date and time of query with out time zone';
+COMMENT ON COLUMN "query"."queryCreationTime" IS 'date and time of query with out time zone';
 COMMENT ON COLUMN "query"."researcherId" IS 'Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)';
 
 
@@ -81,7 +81,7 @@ CREATE TABLE "comment" (
     "id" SERIAL NOT NULL,
     "queryId" INTEGER NOT NULL,
     "personId" INTEGER NOT NULL,
-    "timeStamp" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    "commentTime" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     "text" TEXT NOT NULL,
     PRIMARY KEY("id"),
     FOREIGN KEY ("queryId") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
@@ -94,7 +94,7 @@ CREATE INDEX "personIdIndexComment" ON "comment" ("personId");
 COMMENT ON TABLE "comment" IS 'table to store comments on a query';
 COMMENT ON COLUMN "comment"."id" IS 'Primary key';
 COMMENT ON COLUMN "comment"."queryId" IS 'Foreign key which exists as primary key in the query table. ';
-COMMENT ON COLUMN "comment"."timeStamp" IS 'timestamp of when the comment was made.';
+COMMENT ON COLUMN "comment"."commentTime" IS 'timestamp of when the comment was made.';
 COMMENT ON COLUMN "comment"."personId" IS 'Foreign key which exists as primary key in the person table. describes the person who made the comment.';
 COMMENT ON COLUMN "comment"."text" IS 'Text of the comment.';
 
