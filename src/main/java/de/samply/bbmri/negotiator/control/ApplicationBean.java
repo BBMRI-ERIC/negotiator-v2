@@ -73,8 +73,8 @@ public class ApplicationBean implements Serializable {
             /**
              * Check if there are any tables, if not, execute database.sql
              */
-            try (ResultSet set = config.get().getMetaData().getTables(null, null, null, new String[] { "TABLE" })) {
-                if(set.getFetchSize() == 0) {
+            try (ResultSet set = config.get().getMetaData().getTables(null, null, "", new String[] { "TABLE" })) {
+                if(!set.next()) {
                     logger.info("Database empty, creating tables");
 
                     SQLUtil.executeSQLFile(config.get(), getClass().getClassLoader(), "/sql/database.sql");
