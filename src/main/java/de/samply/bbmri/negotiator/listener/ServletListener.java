@@ -25,7 +25,7 @@
  */
 package de.samply.bbmri.negotiator.listener;
 
-import de.samply.bbmri.negotiator.control.NegotiatorConfig;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.config.util.FileFinderUtil;
 import de.samply.string.util.StringUtil;
 import org.apache.logging.log4j.core.config.Configurator;

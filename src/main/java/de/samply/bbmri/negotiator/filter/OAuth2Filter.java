@@ -32,7 +32,7 @@ import de.samply.auth.client.AuthClient;
 import de.samply.auth.client.InvalidKeyException;
 import de.samply.auth.client.InvalidTokenException;
 import de.samply.auth.client.jwt.KeyLoader;
-import de.samply.bbmri.negotiator.control.NegotiatorConfig;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.common.config.OAuth2Client;
 import org.apache.logging.log4j.LogManager;

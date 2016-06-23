@@ -24,13 +24,26 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.control;
+package de.samply.bbmri.negotiator;
 
 /**
  * Created by paul on 6/16/16.
  */
 public class Constants {
 
+    /**
+     * The role identifier, that identifies Biobank owners.
+     */
     public final static String OWNER_ROLE = "BBMRI_OWNER";
+
+    /**
+     * The package name of all database upgrade files.
+     */
+    public final static String DB_PACKAGE_NAME = "de.samply.bbmri.negotiator.db";
+
+    /**
+     * The required Database version for this application version.
+     */
+    public final static int DB_REQUIRED_VERSION = 1;
 
 }

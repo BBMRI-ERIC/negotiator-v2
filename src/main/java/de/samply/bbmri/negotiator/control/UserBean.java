@@ -36,6 +36,8 @@ import de.samply.auth.rest.Scope;
 import de.samply.auth.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.Constants;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.enums.Persontype;
 import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;

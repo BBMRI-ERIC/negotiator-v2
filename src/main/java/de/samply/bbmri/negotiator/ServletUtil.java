@@ -24,7 +24,7 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.control;
+package de.samply.bbmri.negotiator;
 
 import de.samply.string.util.StringUtil;
 

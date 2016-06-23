@@ -25,7 +25,7 @@
  */
 package de.samply.bbmri.negotiator.filter;
 
-import de.samply.bbmri.negotiator.control.NegotiatorConfig;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 
 import javax.faces.application.ResourceHandler;
 import javax.servlet.*;
