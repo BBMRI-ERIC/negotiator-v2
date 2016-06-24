@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+    template="../components/default.xhtml">
+
+    <!-- Queries page -->
+
+    <ui:param name="bodyClass" value="container" />
+
+    <ui:define name="body">
+
+        <h:panelGroup layout="block" styleClass="row queriesTopLine" rendered="#{!userBean.biobankOwner}">
+            <h:panelGroup layout="block" styleClass="col-md-2">
+                <a href="#" class="btn btn-danger btn-sm btn-block"
+                    role="button"><i class="glyphicon glyphicon-edit"></i> New query</a>
+            </h:panelGroup>
+        </h:panelGroup>
+
+        <h:panelGroup layout="block" styleClass="row queriesTopLine" rendered="#{userBean.biobankOwner}">
+            <h:form prependId="false">
+                <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
+                    <h:outputLabel for="filterInputText" value="Search:" />
+                    <h:inputText value="#{sessionBean.filterToAdd}"
+                        size="20" id="filterInputText" />
+                    <h:commandButton id="addFilterButton"
+                        action="#{sessionBean.addFilter()}" style="display: none;" />
+
+                    <ui:repeat var="item" value="#{sessionBean.filters}">
+                        <h:panelGroup styleClass="badge filterBadge"><h:commandLink action="#{sessionBean.removeFilter(item)}">#{item}</h:commandLink></h:panelGroup>
+                    </ui:repeat>
+                </h:panelGroup>
+                <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right">
+                    <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
+                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-inbox"></i></button>
+                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </h:panelGroup>
+
+        <ui:repeat var="item" value="#{sessionBean.queries}">
+
+                <h:panelGroup layout="block"
+                    styleClass="panel panel-default">
+                    <h:panelGroup layout="block" styleClass="panel-heading">
+
+                        #{item.number} - #{item.title}
+
+                        <h:panelGroup styleClass="pull-right">
+
+                            <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
+                              <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-folder-open"></i></button>
+                              <button type="button" class="btn btn-default"><i class="fa fa-sign-out"></i></button>
+                              <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
+                            </h:panelGroup>
+
+                            <h:panelGroup
+                                rendered="#{item.numberResponses > 0}"
+                                styleClass="badge queryNumberResponsesBadge">
+                                <h:outputText
+                                    title="#{item.numberResponses} biobanks contacted you"
+                                    value="#{item.numberResponses}" />
+                            </h:panelGroup>
+
+                            <h:outputText value="#{item.lastContactDate}" styleClass="queryCreationDate"
+                                title="Date and time of last contact communication" rendered="#{item.numberResponses > 0}">
+                                <f:convertDateTime pattern="MM/dd/yyyy hh:mm" />
+                            </h:outputText>
+
+                        </h:panelGroup>
+
+                    </h:panelGroup>
+
+
+                    <h:panelGroup layout="block" styleClass="panel-body">
+                        <h:panelGroup layout="block" styleClass="row">
+
+                            <h:panelGroup layout="block" styleClass="col-md-1" rendered="#{userBean.biobankOwner}">
+                                <h:graphicImage library="images" name="shodan_80_86.png" />
+                            </h:panelGroup>
+                            <h:panelGroup layout="block" styleClass="col-md-11">
+                                <h:panelGroup layout="block" styleClass="row queryOwner" rendered="#{userBean.biobankOwner}">
+                                    #{item.ownerName}
+                                </h:panelGroup>
+
+                                <h:panelGroup layout="block" styleClass="row">
+                                    <h:panelGroup layout="block"
+                                        styleClass="col-md-10">
+                                        #{item.text}</h:panelGroup>
+
+                                </h:panelGroup>
+
+                                <h:panelGroup layout="block" styleClass="row">
+                                    <h:panelGroup layout="block"
+                                        styleClass="col-md-12">
+                                        <h:panelGroup styleClass="pull-right">
+
+                                            <h:outputText
+                                                value="#{item.creationDate}"
+                                                title="Date this query was created on">
+                                                <f:convertDateTime
+                                                    pattern="MM/dd/yyyy hh:mm:ss" />
+                                            </h:outputText>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </h:panelGroup> <!-- row -->
+                    </h:panelGroup>
+
+                </h:panelGroup>
+
+        </ui:repeat>
+    </ui:define>
+
+</ui:composition>

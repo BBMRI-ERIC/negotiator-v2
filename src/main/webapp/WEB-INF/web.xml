@@ -30,6 +30,12 @@
         <filter-name>CacheFilter</filter-name>
         <url-pattern>*.xhtml</url-pattern>
     </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>ResearcherOwnerFilter</filter-name>
+        <url-pattern>/owner/*</url-pattern>
+        <url-pattern>/researcher/*</url-pattern>
+    </filter-mapping>
     <!-- / Filters -->
 
     <servlet-mapping>

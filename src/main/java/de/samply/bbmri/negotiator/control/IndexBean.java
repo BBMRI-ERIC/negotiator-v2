@@ -24,48 +24,35 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator;
+package de.samply.bbmri.negotiator.control;
 
-import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
-import org.jooq.impl.DefaultConfiguration;
-
-import java.sql.Connection;
-import java.sql.SQLException;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
 
 /**
- * The JOOQ Configuration wrapper with AutoClosable
+ * This method checks if the user is a researcher or owner and redirects him to the proper folder.
  */
-public class Config extends DefaultConfiguration implements AutoCloseable {
+@ManagedBean
+@ViewScoped
+public class IndexBean {
 
-    private DSLContext dsl;
+    @ManagedProperty(value = "#{userBean}")
+    private UserBean userBean;
 
-    Config(Connection connection) {
-        set(connection);
-        set(SQLDialect.POSTGRES);
-
-        dsl = DSL.using(this);
+    public String init() {
+        if(userBean.getBiobankOwner()) {
+            return "/owner/index";
+        } else {
+            return "/researcher/index";
+        }
     }
 
-    /**
-     * Returns the SQL connection.
-     * @return
-     */
-    public Connection get() {
-        return connectionProvider().acquire();
+    public UserBean getUserBean() {
+        return userBean;
     }
 
-    @Override
-    public void close() throws SQLException {
-        connectionProvider().acquire().close();
-    }
-
-    /**
-     * Returns the DSL context for jooq.
-     * @return
-     */
-    public DSLContext dsl() {
-        return dsl;
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
     }
 }

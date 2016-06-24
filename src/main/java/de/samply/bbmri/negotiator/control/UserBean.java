@@ -38,9 +38,9 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Persontype;
-import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
 
@@ -210,15 +210,16 @@ public class UserBean implements Serializable {
      */
     private void createOrGetUser() {
         try (Config config = ConfigFactory.get()) {
-            PersonDao dao = new PersonDao(config);
 
-            Person person = dao.fetchOneByAuthsubject(userIdentity);
+            PersonRecord person = config.dsl().selectFrom(Tables.PERSON)
+                    .where(Tables.PERSON.AUTHSUBJECT.eq(userIdentity)).fetchOne();
+
 
             /**
              * If the user hasn't been to this negotiator before, store him in the database
              */
             if(person == null) {
-                person = new Person();
+                person = config.dsl().newRecord(Tables.PERSON);
                 person.setAuthname(userRealName);
                 person.setAuthemail(userEmail);
                 person.setAuthsubject(userIdentity);
@@ -228,7 +229,7 @@ public class UserBean implements Serializable {
                 } else {
                     person.setPersontype(Persontype.RESEARCHER);
                 }
-                dao.insert(person);
+                person.store();
             } else {
                 /**
                  * Otherwise just update some fields.
@@ -241,8 +242,10 @@ public class UserBean implements Serializable {
                 } else {
                     person.setPersontype(Persontype.RESEARCHER);
                 }
-                dao.update(person);
+                person.update();
             }
+
+            userId = person.getId();
 
             config.get().commit();
 
