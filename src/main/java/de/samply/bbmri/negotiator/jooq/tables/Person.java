@@ -6,7 +6,7 @@ package de.samply.bbmri.negotiator.jooq.tables;
 
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
-import de.samply.bbmri.negotiator.jooq.enums.Persontype;
+import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 
 import java.util.Arrays;
@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = -856191333;
+	private static final long serialVersionUID = 226528807;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -57,34 +57,34 @@ public class Person extends TableImpl<PersonRecord> {
 	public final TableField<PersonRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "primary key");
 
 	/**
-	 * The column <code>public.person.personType</code>. describes wether the person is researcher or owner - one of the the two child classes. 
+	 * The column <code>public.person.person_type</code>. describes wether the person is researcher or owner - one of the the two child classes. 
 	 */
-	public final TableField<PersonRecord, Persontype> PERSONTYPE = createField("personType", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(de.samply.bbmri.negotiator.jooq.enums.Persontype.class), this, "describes wether the person is researcher or owner - one of the the two child classes. ");
+	public final TableField<PersonRecord, PersonType> PERSON_TYPE = createField("person_type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(de.samply.bbmri.negotiator.jooq.enums.PersonType.class), this, "describes wether the person is researcher or owner - one of the the two child classes. ");
 
 	/**
-	 * The column <code>public.person.authSubject</code>. authentication string that comes from the authentication service
+	 * The column <code>public.person.auth_subject</code>. authentication string that comes from the authentication service
 	 */
-	public final TableField<PersonRecord, String> AUTHSUBJECT = createField("authSubject", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "authentication string that comes from the authentication service");
+	public final TableField<PersonRecord, String> AUTH_SUBJECT = createField("auth_subject", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "authentication string that comes from the authentication service");
 
 	/**
-	 * The column <code>public.person.authName</code>. the real name of the user, value comes from the authentication service
+	 * The column <code>public.person.auth_name</code>. the real name of the user, value comes from the authentication service
 	 */
-	public final TableField<PersonRecord, String> AUTHNAME = createField("authName", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "the real name of the user, value comes from the authentication service");
+	public final TableField<PersonRecord, String> AUTH_NAME = createField("auth_name", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "the real name of the user, value comes from the authentication service");
 
 	/**
-	 * The column <code>public.person.authEmail</code>. the email of the user, value comes from the authentication service
+	 * The column <code>public.person.auth_email</code>. the email of the user, value comes from the authentication service
 	 */
-	public final TableField<PersonRecord, String> AUTHEMAIL = createField("authEmail", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "the email of the user, value comes from the authentication service");
+	public final TableField<PersonRecord, String> AUTH_EMAIL = createField("auth_email", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "the email of the user, value comes from the authentication service");
 
 	/**
-	 * The column <code>public.person.personImage</code>. image/avatar of the person
+	 * The column <code>public.person.person_image</code>. image/avatar of the person
 	 */
-	public final TableField<PersonRecord, byte[]> PERSONIMAGE = createField("personImage", org.jooq.impl.SQLDataType.BLOB, this, "image/avatar of the person");
+	public final TableField<PersonRecord, byte[]> PERSON_IMAGE = createField("person_image", org.jooq.impl.SQLDataType.BLOB, this, "image/avatar of the person");
 
 	/**
-	 * The column <code>public.person.locationId</code>. only valid for biobank owners, the ID of the location he belongs to
+	 * The column <code>public.person.location_id</code>. only valid for biobank owners, the ID of the location he belongs to
 	 */
-	public final TableField<PersonRecord, Integer> LOCATIONID = createField("locationId", org.jooq.impl.SQLDataType.INTEGER, this, "only valid for biobank owners, the ID of the location he belongs to");
+	public final TableField<PersonRecord, Integer> LOCATION_ID = createField("location_id", org.jooq.impl.SQLDataType.INTEGER, this, "only valid for biobank owners, the ID of the location he belongs to");
 
 	/**
 	 * Create a <code>public.person</code> table reference
@@ -129,7 +129,7 @@ public class Person extends TableImpl<PersonRecord> {
 	 */
 	@Override
 	public List<UniqueKey<PersonRecord>> getKeys() {
-		return Arrays.<UniqueKey<PersonRecord>>asList(Keys.PERSON_PKEY, Keys.PERSON_AUTHSUBJECT_KEY);
+		return Arrays.<UniqueKey<PersonRecord>>asList(Keys.PERSON_PKEY, Keys.PERSON_AUTH_SUBJECT_KEY);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class Person extends TableImpl<PersonRecord> {
 	 */
 	@Override
 	public List<ForeignKey<PersonRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<PersonRecord, ?>>asList(Keys.PERSON__PERSON_LOCATIONID_FKEY);
+		return Arrays.<ForeignKey<PersonRecord, ?>>asList(Keys.PERSON__PERSON_LOCATION_ID_FKEY);
 	}
 
 	/**

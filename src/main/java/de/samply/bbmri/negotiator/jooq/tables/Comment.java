@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment extends TableImpl<CommentRecord> {
 
-	private static final long serialVersionUID = 421014779;
+	private static final long serialVersionUID = -1305084478;
 
 	/**
 	 * The reference instance of <code>public.comment</code>
@@ -57,19 +57,19 @@ public class Comment extends TableImpl<CommentRecord> {
 	public final TableField<CommentRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "Primary key");
 
 	/**
-	 * The column <code>public.comment.queryId</code>. Foreign key which exists as primary key in the query table. 
+	 * The column <code>public.comment.query_id</code>. Foreign key which exists as primary key in the query table. 
 	 */
-	public final TableField<CommentRecord, Integer> QUERYID = createField("queryId", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists as primary key in the query table. ");
+	public final TableField<CommentRecord, Integer> QUERY_ID = createField("query_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists as primary key in the query table. ");
 
 	/**
-	 * The column <code>public.comment.personId</code>. Foreign key which exists as primary key in the person table. describes the person who made the comment.
+	 * The column <code>public.comment.person_id</code>. Foreign key which exists as primary key in the person table. describes the person who made the comment.
 	 */
-	public final TableField<CommentRecord, Integer> PERSONID = createField("personId", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists as primary key in the person table. describes the person who made the comment.");
+	public final TableField<CommentRecord, Integer> PERSON_ID = createField("person_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists as primary key in the person table. describes the person who made the comment.");
 
 	/**
-	 * The column <code>public.comment.commentTime</code>. timestamp of when the comment was made.
+	 * The column <code>public.comment.comment_time</code>. timestamp of when the comment was made.
 	 */
-	public final TableField<CommentRecord, Timestamp> COMMENTTIME = createField("commentTime", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "timestamp of when the comment was made.");
+	public final TableField<CommentRecord, Timestamp> COMMENT_TIME = createField("comment_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "timestamp of when the comment was made.");
 
 	/**
 	 * The column <code>public.comment.text</code>. Text of the comment.
@@ -127,7 +127,7 @@ public class Comment extends TableImpl<CommentRecord> {
 	 */
 	@Override
 	public List<ForeignKey<CommentRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<CommentRecord, ?>>asList(Keys.COMMENT__COMMENT_QUERYID_FKEY, Keys.COMMENT__COMMENT_PERSONID_FKEY);
+		return Arrays.<ForeignKey<CommentRecord, ?>>asList(Keys.COMMENT__COMMENT_QUERY_ID_FKEY, Keys.COMMENT__COMMENT_PERSON_ID_FKEY);
 	}
 
 	/**

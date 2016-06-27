@@ -5,12 +5,12 @@ package de.samply.bbmri.negotiator.jooq;
 
 
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.Flaggedquery;
+import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
-import de.samply.bbmri.negotiator.jooq.tables.Taggedquery;
+import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 
 import javax.annotation.Generated;
 
@@ -36,7 +36,7 @@ public class Tables {
 	/**
 	 * Table for queries that are flagged/bookmarked. bookmark options are starred, archived and ignored.
 	 */
-	public static final Flaggedquery FLAGGEDQUERY = de.samply.bbmri.negotiator.jooq.tables.Flaggedquery.FLAGGEDQUERY;
+	public static final FlaggedQuery FLAGGED_QUERY = de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery.FLAGGED_QUERY;
 
 	/**
 	 * Table to store locations of researchers
@@ -61,5 +61,5 @@ public class Tables {
 	/**
 	 * Table for queries that are tagged by names e.g. colonCancer,SkinCancer etc. Tag names need to be decided .
 	 */
-	public static final Taggedquery TAGGEDQUERY = de.samply.bbmri.negotiator.jooq.tables.Taggedquery.TAGGEDQUERY;
+	public static final TaggedQuery TAGGED_QUERY = de.samply.bbmri.negotiator.jooq.tables.TaggedQuery.TAGGED_QUERY;
 }

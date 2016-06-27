@@ -23,35 +23,35 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment implements Serializable {
 
-	private static final long serialVersionUID = 1487376690;
+	private static final long serialVersionUID = 779063730;
 
 	private Integer   id;
-	private Integer   queryid;
-	private Integer   personid;
-	private Timestamp commenttime;
+	private Integer   queryId;
+	private Integer   personId;
+	private Timestamp commentTime;
 	private String    text;
 
 	public Comment() {}
 
 	public Comment(Comment value) {
 		this.id = value.id;
-		this.queryid = value.queryid;
-		this.personid = value.personid;
-		this.commenttime = value.commenttime;
+		this.queryId = value.queryId;
+		this.personId = value.personId;
+		this.commentTime = value.commentTime;
 		this.text = value.text;
 	}
 
 	public Comment(
 		Integer   id,
-		Integer   queryid,
-		Integer   personid,
-		Timestamp commenttime,
+		Integer   queryId,
+		Integer   personId,
+		Timestamp commentTime,
 		String    text
 	) {
 		this.id = id;
-		this.queryid = queryid;
-		this.personid = personid;
-		this.commenttime = commenttime;
+		this.queryId = queryId;
+		this.personId = personId;
+		this.commentTime = commentTime;
 		this.text = text;
 	}
 
@@ -63,28 +63,28 @@ public class Comment implements Serializable {
 		this.id = id;
 	}
 
-	public Integer getQueryid() {
-		return this.queryid;
+	public Integer getQueryId() {
+		return this.queryId;
 	}
 
-	public void setQueryid(Integer queryid) {
-		this.queryid = queryid;
+	public void setQueryId(Integer queryId) {
+		this.queryId = queryId;
 	}
 
-	public Integer getPersonid() {
-		return this.personid;
+	public Integer getPersonId() {
+		return this.personId;
 	}
 
-	public void setPersonid(Integer personid) {
-		this.personid = personid;
+	public void setPersonId(Integer personId) {
+		this.personId = personId;
 	}
 
-	public Timestamp getCommenttime() {
-		return this.commenttime;
+	public Timestamp getCommentTime() {
+		return this.commentTime;
 	}
 
-	public void setCommenttime(Timestamp commenttime) {
-		this.commenttime = commenttime;
+	public void setCommentTime(Timestamp commentTime) {
+		this.commentTime = commentTime;
 	}
 
 	public String getText() {

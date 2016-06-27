@@ -24,43 +24,35 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.test;
+package de.samply.bbmri.negotiator.model;
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
-import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import org.junit.Test;
 
-import java.sql.SQLException;
+import java.io.Serializable;
 
 /**
- * 
+ * DTO for a comment and the person who made the comment.
  */
-public class DatabaseSetup {
+public class CommentPersonDTO implements Serializable {
 
-    @Test
-    public void test() throws SQLException {
-    	try(Config config = ConfigFactory.get()) {
-            PersonDao dao = new PersonDao(config);
+    private Comment comment;
 
-            Person p = new Person();
-            p.setAuthSubject("https://auth.samply.de/users/43");
-            p.setAuthEmail("test@test.org");
-            p.setAuthName("Testinator");
-            p.setPersonType(PersonType.OWNER);
-            p.setPersonImage(null);
+    private Person person;
 
-            dao.insert(p);
-            config.get().commit();
-        }        
+    public Comment getComment() {
+        return comment;
     }
 
-    public void testCommentStatsDTO() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
-            DbUtil.getQueryStatsDTOs(config, 1);
-        }
+    public void setComment(Comment comment) {
+        this.comment = comment;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }

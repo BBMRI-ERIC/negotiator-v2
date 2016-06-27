@@ -27,25 +27,47 @@
 package de.samply.bbmri.negotiator;
 
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
+import org.modelmapper.convention.NameTokenizers;
+import org.modelmapper.jooq.RecordValueReader;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The JOOQ Configuration wrapper with AutoClosable
  */
 public class Config extends DefaultConfiguration implements AutoCloseable {
 
-    private DSLContext dsl;
+    private final ModelMapper modelMapper;
+    private final DSLContext dsl;
 
     Config(Connection connection) {
         set(connection);
         set(SQLDialect.POSTGRES);
 
         dsl = DSL.using(this);
+
+        modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().addValueReader(new RecordValueReader());
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+        modelMapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
+
+//        PropertyMap<Record, QueryStatsDTO> commentsMap = new PropertyMap<Record, QueryStatsDTO>() {
+//            protected void configure() {
+//                map().setCommentCount(this.<Integer>source("count"));
+//                map().setLastCommentTime(this.<Timestamp>source("max"));
+//            }
+//        };
+//
+//        modelMapper.createTypeMap(Record.class, QueryStatsDTO.class).addMappings(commentsMap);
     }
 
     /**
@@ -67,5 +89,26 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
      */
     public DSLContext dsl() {
         return dsl;
+    }
+
+    /**
+     * Returns the modelmapper configured for JOOQ.
+     * @return
+     */
+    public ModelMapper mapper() {
+        return modelMapper;
+    }
+
+    public <T> T map(Record record, Class<? extends T> clazz) {
+        return mapper().map(record, clazz);
+    }
+
+    public <T> List<T> map(List<Record> records, Class<? extends T> clazz) {
+        List<T> target = new ArrayList<>();
+
+        for(Record r : records) {
+            target.add(map(r, clazz));
+        }
+        return target;
     }
 }

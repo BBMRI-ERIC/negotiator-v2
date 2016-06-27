@@ -5,19 +5,19 @@ package de.samply.bbmri.negotiator.jooq;
 
 
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.Flaggedquery;
+import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
-import de.samply.bbmri.negotiator.jooq.tables.Taggedquery;
+import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedqueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.TagRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.TaggedqueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.TaggedQueryRecord;
 
 import javax.annotation.Generated;
 
@@ -56,27 +56,27 @@ public class Keys {
 	// -------------------------------------------------------------------------
 
 	public static final UniqueKey<CommentRecord> COMMENT_PKEY = UniqueKeys0.COMMENT_PKEY;
-	public static final UniqueKey<FlaggedqueryRecord> FLAGGEDQUERY_PKEY = UniqueKeys0.FLAGGEDQUERY_PKEY;
+	public static final UniqueKey<FlaggedQueryRecord> FLAGGED_QUERY_PKEY = UniqueKeys0.FLAGGED_QUERY_PKEY;
 	public static final UniqueKey<LocationRecord> LOCATION_PKEY = UniqueKeys0.LOCATION_PKEY;
 	public static final UniqueKey<PersonRecord> PERSON_PKEY = UniqueKeys0.PERSON_PKEY;
-	public static final UniqueKey<PersonRecord> PERSON_AUTHSUBJECT_KEY = UniqueKeys0.PERSON_AUTHSUBJECT_KEY;
+	public static final UniqueKey<PersonRecord> PERSON_AUTH_SUBJECT_KEY = UniqueKeys0.PERSON_AUTH_SUBJECT_KEY;
 	public static final UniqueKey<QueryRecord> QUERY_PKEY = UniqueKeys0.QUERY_PKEY;
 	public static final UniqueKey<TagRecord> TAG_PKEY = UniqueKeys0.TAG_PKEY;
-	public static final UniqueKey<TaggedqueryRecord> TAGGEDQUERY_PKEY = UniqueKeys0.TAGGEDQUERY_PKEY;
+	public static final UniqueKey<TaggedQueryRecord> TAGGED_QUERY_PKEY = UniqueKeys0.TAGGED_QUERY_PKEY;
 
 	// -------------------------------------------------------------------------
 	// FOREIGN KEY definitions
 	// -------------------------------------------------------------------------
 
-	public static final ForeignKey<CommentRecord, QueryRecord> COMMENT__COMMENT_QUERYID_FKEY = ForeignKeys0.COMMENT__COMMENT_QUERYID_FKEY;
-	public static final ForeignKey<CommentRecord, PersonRecord> COMMENT__COMMENT_PERSONID_FKEY = ForeignKeys0.COMMENT__COMMENT_PERSONID_FKEY;
-	public static final ForeignKey<FlaggedqueryRecord, QueryRecord> FLAGGEDQUERY__FLAGGEDQUERY_QUERYID_FKEY = ForeignKeys0.FLAGGEDQUERY__FLAGGEDQUERY_QUERYID_FKEY;
-	public static final ForeignKey<FlaggedqueryRecord, PersonRecord> FLAGGEDQUERY__FLAGGEDQUERY_PERSONID_FKEY = ForeignKeys0.FLAGGEDQUERY__FLAGGEDQUERY_PERSONID_FKEY;
-	public static final ForeignKey<PersonRecord, LocationRecord> PERSON__PERSON_LOCATIONID_FKEY = ForeignKeys0.PERSON__PERSON_LOCATIONID_FKEY;
-	public static final ForeignKey<QueryRecord, PersonRecord> QUERY__QUERY_RESEARCHERID_FKEY = ForeignKeys0.QUERY__QUERY_RESEARCHERID_FKEY;
-	public static final ForeignKey<TagRecord, QueryRecord> TAG__TAG_QUERYID_FKEY = ForeignKeys0.TAG__TAG_QUERYID_FKEY;
-	public static final ForeignKey<TaggedqueryRecord, QueryRecord> TAGGEDQUERY__TAGGEDQUERY_QUERYID_FKEY = ForeignKeys0.TAGGEDQUERY__TAGGEDQUERY_QUERYID_FKEY;
-	public static final ForeignKey<TaggedqueryRecord, TagRecord> TAGGEDQUERY__TAGGEDQUERY_TAGID_FKEY = ForeignKeys0.TAGGEDQUERY__TAGGEDQUERY_TAGID_FKEY;
+	public static final ForeignKey<CommentRecord, QueryRecord> COMMENT__COMMENT_QUERY_ID_FKEY = ForeignKeys0.COMMENT__COMMENT_QUERY_ID_FKEY;
+	public static final ForeignKey<CommentRecord, PersonRecord> COMMENT__COMMENT_PERSON_ID_FKEY = ForeignKeys0.COMMENT__COMMENT_PERSON_ID_FKEY;
+	public static final ForeignKey<FlaggedQueryRecord, QueryRecord> FLAGGED_QUERY__FLAGGED_QUERY_QUERY_ID_FKEY = ForeignKeys0.FLAGGED_QUERY__FLAGGED_QUERY_QUERY_ID_FKEY;
+	public static final ForeignKey<FlaggedQueryRecord, PersonRecord> FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY = ForeignKeys0.FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY;
+	public static final ForeignKey<PersonRecord, LocationRecord> PERSON__PERSON_LOCATION_ID_FKEY = ForeignKeys0.PERSON__PERSON_LOCATION_ID_FKEY;
+	public static final ForeignKey<QueryRecord, PersonRecord> QUERY__QUERY_RESEARCHER_ID_FKEY = ForeignKeys0.QUERY__QUERY_RESEARCHER_ID_FKEY;
+	public static final ForeignKey<TagRecord, QueryRecord> TAG__TAG_QUERY_ID_FKEY = ForeignKeys0.TAG__TAG_QUERY_ID_FKEY;
+	public static final ForeignKey<TaggedQueryRecord, QueryRecord> TAGGED_QUERY__TAGGED_QUERY_QUERY_ID_FKEY = ForeignKeys0.TAGGED_QUERY__TAGGED_QUERY_QUERY_ID_FKEY;
+	public static final ForeignKey<TaggedQueryRecord, TagRecord> TAGGED_QUERY__TAGGED_QUERY_TAG_ID_FKEY = ForeignKeys0.TAGGED_QUERY__TAGGED_QUERY_TAG_ID_FKEY;
 
 	// -------------------------------------------------------------------------
 	// [#1459] distribute members to avoid static initialisers > 64kb
@@ -92,24 +92,24 @@ public class Keys {
 
 	private static class UniqueKeys0 extends AbstractKeys {
 		public static final UniqueKey<CommentRecord> COMMENT_PKEY = createUniqueKey(Comment.COMMENT, Comment.COMMENT.ID);
-		public static final UniqueKey<FlaggedqueryRecord> FLAGGEDQUERY_PKEY = createUniqueKey(Flaggedquery.FLAGGEDQUERY, Flaggedquery.FLAGGEDQUERY.QUERYID, Flaggedquery.FLAGGEDQUERY.PERSONID);
+		public static final UniqueKey<FlaggedQueryRecord> FLAGGED_QUERY_PKEY = createUniqueKey(FlaggedQuery.FLAGGED_QUERY, FlaggedQuery.FLAGGED_QUERY.QUERY_ID, FlaggedQuery.FLAGGED_QUERY.PERSON_ID);
 		public static final UniqueKey<LocationRecord> LOCATION_PKEY = createUniqueKey(Location.LOCATION, Location.LOCATION.ID);
 		public static final UniqueKey<PersonRecord> PERSON_PKEY = createUniqueKey(Person.PERSON, Person.PERSON.ID);
-		public static final UniqueKey<PersonRecord> PERSON_AUTHSUBJECT_KEY = createUniqueKey(Person.PERSON, Person.PERSON.AUTHSUBJECT);
+		public static final UniqueKey<PersonRecord> PERSON_AUTH_SUBJECT_KEY = createUniqueKey(Person.PERSON, Person.PERSON.AUTH_SUBJECT);
 		public static final UniqueKey<QueryRecord> QUERY_PKEY = createUniqueKey(Query.QUERY, Query.QUERY.ID);
 		public static final UniqueKey<TagRecord> TAG_PKEY = createUniqueKey(Tag.TAG, Tag.TAG.ID);
-		public static final UniqueKey<TaggedqueryRecord> TAGGEDQUERY_PKEY = createUniqueKey(Taggedquery.TAGGEDQUERY, Taggedquery.TAGGEDQUERY.QUERYID, Taggedquery.TAGGEDQUERY.TAGID);
+		public static final UniqueKey<TaggedQueryRecord> TAGGED_QUERY_PKEY = createUniqueKey(TaggedQuery.TAGGED_QUERY, TaggedQuery.TAGGED_QUERY.QUERY_ID, TaggedQuery.TAGGED_QUERY.TAG_ID);
 	}
 
 	private static class ForeignKeys0 extends AbstractKeys {
-		public static final ForeignKey<CommentRecord, QueryRecord> COMMENT__COMMENT_QUERYID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, Comment.COMMENT, Comment.COMMENT.QUERYID);
-		public static final ForeignKey<CommentRecord, PersonRecord> COMMENT__COMMENT_PERSONID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, Comment.COMMENT, Comment.COMMENT.PERSONID);
-		public static final ForeignKey<FlaggedqueryRecord, QueryRecord> FLAGGEDQUERY__FLAGGEDQUERY_QUERYID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, Flaggedquery.FLAGGEDQUERY, Flaggedquery.FLAGGEDQUERY.QUERYID);
-		public static final ForeignKey<FlaggedqueryRecord, PersonRecord> FLAGGEDQUERY__FLAGGEDQUERY_PERSONID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, Flaggedquery.FLAGGEDQUERY, Flaggedquery.FLAGGEDQUERY.PERSONID);
-		public static final ForeignKey<PersonRecord, LocationRecord> PERSON__PERSON_LOCATIONID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.LOCATION_PKEY, Person.PERSON, Person.PERSON.LOCATIONID);
-		public static final ForeignKey<QueryRecord, PersonRecord> QUERY__QUERY_RESEARCHERID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, Query.QUERY, Query.QUERY.RESEARCHERID);
-		public static final ForeignKey<TagRecord, QueryRecord> TAG__TAG_QUERYID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, Tag.TAG, Tag.TAG.QUERYID);
-		public static final ForeignKey<TaggedqueryRecord, QueryRecord> TAGGEDQUERY__TAGGEDQUERY_QUERYID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, Taggedquery.TAGGEDQUERY, Taggedquery.TAGGEDQUERY.QUERYID);
-		public static final ForeignKey<TaggedqueryRecord, TagRecord> TAGGEDQUERY__TAGGEDQUERY_TAGID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.TAG_PKEY, Taggedquery.TAGGEDQUERY, Taggedquery.TAGGEDQUERY.TAGID);
+		public static final ForeignKey<CommentRecord, QueryRecord> COMMENT__COMMENT_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, Comment.COMMENT, Comment.COMMENT.QUERY_ID);
+		public static final ForeignKey<CommentRecord, PersonRecord> COMMENT__COMMENT_PERSON_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, Comment.COMMENT, Comment.COMMENT.PERSON_ID);
+		public static final ForeignKey<FlaggedQueryRecord, QueryRecord> FLAGGED_QUERY__FLAGGED_QUERY_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, FlaggedQuery.FLAGGED_QUERY, FlaggedQuery.FLAGGED_QUERY.QUERY_ID);
+		public static final ForeignKey<FlaggedQueryRecord, PersonRecord> FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, FlaggedQuery.FLAGGED_QUERY, FlaggedQuery.FLAGGED_QUERY.PERSON_ID);
+		public static final ForeignKey<PersonRecord, LocationRecord> PERSON__PERSON_LOCATION_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.LOCATION_PKEY, Person.PERSON, Person.PERSON.LOCATION_ID);
+		public static final ForeignKey<QueryRecord, PersonRecord> QUERY__QUERY_RESEARCHER_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, Query.QUERY, Query.QUERY.RESEARCHER_ID);
+		public static final ForeignKey<TagRecord, QueryRecord> TAG__TAG_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, Tag.TAG, Tag.TAG.QUERY_ID);
+		public static final ForeignKey<TaggedQueryRecord, QueryRecord> TAGGED_QUERY__TAGGED_QUERY_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, TaggedQuery.TAGGED_QUERY, TaggedQuery.TAGGED_QUERY.QUERY_ID);
+		public static final ForeignKey<TaggedQueryRecord, TagRecord> TAGGED_QUERY__TAGGED_QUERY_TAG_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.TAG_PKEY, TaggedQuery.TAGGED_QUERY, TaggedQuery.TAGGED_QUERY.TAG_ID);
 	}
 }

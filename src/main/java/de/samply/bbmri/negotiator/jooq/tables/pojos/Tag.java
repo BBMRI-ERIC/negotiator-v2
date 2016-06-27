@@ -22,27 +22,27 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tag implements Serializable {
 
-	private static final long serialVersionUID = 100269643;
+	private static final long serialVersionUID = 142400267;
 
 	private Integer id;
-	private Integer queryid;
+	private Integer queryId;
 	private String  text;
 
 	public Tag() {}
 
 	public Tag(Tag value) {
 		this.id = value.id;
-		this.queryid = value.queryid;
+		this.queryId = value.queryId;
 		this.text = value.text;
 	}
 
 	public Tag(
 		Integer id,
-		Integer queryid,
+		Integer queryId,
 		String  text
 	) {
 		this.id = id;
-		this.queryid = queryid;
+		this.queryId = queryId;
 		this.text = text;
 	}
 
@@ -54,12 +54,12 @@ public class Tag implements Serializable {
 		this.id = id;
 	}
 
-	public Integer getQueryid() {
-		return this.queryid;
+	public Integer getQueryId() {
+		return this.queryId;
 	}
 
-	public void setQueryid(Integer queryid) {
-		this.queryid = queryid;
+	public void setQueryId(Integer queryId) {
+		this.queryId = queryId;
 	}
 
 	public String getText() {

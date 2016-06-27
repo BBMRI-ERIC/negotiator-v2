@@ -24,43 +24,32 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.test;
+package de.samply.bbmri.negotiator.db.util;
 
 import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
-import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import org.junit.Test;
+import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import org.jooq.JoinType;
+import org.jooq.Record;
+import org.jooq.Result;
 
-import java.sql.SQLException;
+import java.util.List;
 
 /**
- * 
+ * Created by paul on 6/27/16.
  */
-public class DatabaseSetup {
+public class DbUtil {
 
-    @Test
-    public void test() throws SQLException {
-    	try(Config config = ConfigFactory.get()) {
-            PersonDao dao = new PersonDao(config);
+    public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId) {
+        Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.count().as("comment_count"))
+                .from(Tables.QUERY)
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID))
+                .where(Tables.QUERY.RESEARCHER_ID.eq(userId))
+                .groupBy(Tables.QUERY.ID).fetch();
 
-            Person p = new Person();
-            p.setAuthSubject("https://auth.samply.de/users/43");
-            p.setAuthEmail("test@test.org");
-            p.setAuthName("Testinator");
-            p.setPersonType(PersonType.OWNER);
-            p.setPersonImage(null);
-
-            dao.insert(p);
-            config.get().commit();
-        }        
+        return config.map(fetch, QueryStatsDTO.class);
     }
 
-    public void testCommentStatsDTO() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
-            DbUtil.getQueryStatsDTOs(config, 1);
-        }
-    }
 }

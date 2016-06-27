@@ -23,13 +23,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = -1959184079;
+	private static final long serialVersionUID = 161976881;
 
 	private Integer   id;
 	private String    title;
 	private String    text;
-	private Timestamp querycreationtime;
-	private Integer   researcherid;
+	private Timestamp queryCreationTime;
+	private Integer   researcherId;
 
 	public Query() {}
 
@@ -37,22 +37,22 @@ public class Query implements Serializable {
 		this.id = value.id;
 		this.title = value.title;
 		this.text = value.text;
-		this.querycreationtime = value.querycreationtime;
-		this.researcherid = value.researcherid;
+		this.queryCreationTime = value.queryCreationTime;
+		this.researcherId = value.researcherId;
 	}
 
 	public Query(
 		Integer   id,
 		String    title,
 		String    text,
-		Timestamp querycreationtime,
-		Integer   researcherid
+		Timestamp queryCreationTime,
+		Integer   researcherId
 	) {
 		this.id = id;
 		this.title = title;
 		this.text = text;
-		this.querycreationtime = querycreationtime;
-		this.researcherid = researcherid;
+		this.queryCreationTime = queryCreationTime;
+		this.researcherId = researcherId;
 	}
 
 	public Integer getId() {
@@ -79,19 +79,19 @@ public class Query implements Serializable {
 		this.text = text;
 	}
 
-	public Timestamp getQuerycreationtime() {
-		return this.querycreationtime;
+	public Timestamp getQueryCreationTime() {
+		return this.queryCreationTime;
 	}
 
-	public void setQuerycreationtime(Timestamp querycreationtime) {
-		this.querycreationtime = querycreationtime;
+	public void setQueryCreationTime(Timestamp queryCreationTime) {
+		this.queryCreationTime = queryCreationTime;
 	}
 
-	public Integer getResearcherid() {
-		return this.researcherid;
+	public Integer getResearcherId() {
+		return this.researcherId;
 	}
 
-	public void setResearcherid(Integer researcherid) {
-		this.researcherid = researcherid;
+	public void setResearcherId(Integer researcherId) {
+		this.researcherId = researcherId;
 	}
 }

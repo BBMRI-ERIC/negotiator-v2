@@ -66,24 +66,24 @@ public class CommentDao extends DAOImpl<CommentRecord, de.samply.bbmri.negotiato
 	}
 
 	/**
-	 * Fetch records that have <code>queryId IN (values)</code>
+	 * Fetch records that have <code>query_id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByQueryid(Integer... values) {
-		return fetch(Comment.COMMENT.QUERYID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByQueryId(Integer... values) {
+		return fetch(Comment.COMMENT.QUERY_ID, values);
 	}
 
 	/**
-	 * Fetch records that have <code>personId IN (values)</code>
+	 * Fetch records that have <code>person_id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByPersonid(Integer... values) {
-		return fetch(Comment.COMMENT.PERSONID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByPersonId(Integer... values) {
+		return fetch(Comment.COMMENT.PERSON_ID, values);
 	}
 
 	/**
-	 * Fetch records that have <code>commentTime IN (values)</code>
+	 * Fetch records that have <code>comment_time IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByCommenttime(Timestamp... values) {
-		return fetch(Comment.COMMENT.COMMENTTIME, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByCommentTime(Timestamp... values) {
+		return fetch(Comment.COMMENT.COMMENT_TIME, values);
 	}
 
 	/**

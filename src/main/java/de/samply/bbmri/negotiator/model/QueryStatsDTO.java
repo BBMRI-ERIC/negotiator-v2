@@ -24,43 +24,45 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.test;
+package de.samply.bbmri.negotiator.model;
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
-import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import org.junit.Test;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
-import java.sql.SQLException;
+import java.sql.Timestamp;
 
 /**
- * 
+ * DTO that gives a small statistic for a query, with the amount of commentCount made for the query and
+ * the last time someone made a comment for this query.
  */
-public class DatabaseSetup {
+public class QueryStatsDTO {
 
-    @Test
-    public void test() throws SQLException {
-    	try(Config config = ConfigFactory.get()) {
-            PersonDao dao = new PersonDao(config);
+    private Query query;
 
-            Person p = new Person();
-            p.setAuthSubject("https://auth.samply.de/users/43");
-            p.setAuthEmail("test@test.org");
-            p.setAuthName("Testinator");
-            p.setPersonType(PersonType.OWNER);
-            p.setPersonImage(null);
+    private Timestamp lastCommentTime;
 
-            dao.insert(p);
-            config.get().commit();
-        }        
+    private int commentCount;
+
+    public Query getQuery() {
+        return query;
     }
 
-    public void testCommentStatsDTO() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
-            DbUtil.getQueryStatsDTOs(config, 1);
-        }
+    public void setQuery(Query query) {
+        this.query = query;
+    }
+
+    public Timestamp getLastCommentTime() {
+        return lastCommentTime;
+    }
+
+    public void setLastCommentTime(Timestamp lastCommentTime) {
+        this.lastCommentTime = lastCommentTime;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
     }
 }

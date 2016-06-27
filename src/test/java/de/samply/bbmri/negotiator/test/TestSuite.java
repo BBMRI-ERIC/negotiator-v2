@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.test;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.common.config.Postgresql;
+import de.samply.common.sql.SQLUtil;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -35,14 +36,10 @@ import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 
 /**
@@ -69,24 +66,9 @@ public class TestSuite {
             Connection connection = getConnection();
             connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
             connection.commit();
-            
-            InputStreamReader reader = new InputStreamReader(TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"), StandardCharsets.UTF_8);
 
-            String s = null;
-            StringBuffer sb = new StringBuffer();
+            SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
 
-            BufferedReader br = new BufferedReader(reader);
-
-            while ((s = br.readLine()) != null) {
-                sb.append(s).append("\r\n");
-            }
-            br.close();
-            
-            try (Statement st = connection.createStatement()) {
-                st.execute(sb.toString());
-                st.close();
-            }
-            
             connection.commit();
         } catch(Exception e) {
             e.printStackTrace();

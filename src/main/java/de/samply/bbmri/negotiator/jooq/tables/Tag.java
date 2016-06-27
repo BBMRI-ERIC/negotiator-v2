@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tag extends TableImpl<TagRecord> {
 
-	private static final long serialVersionUID = -1366751790;
+	private static final long serialVersionUID = 714519296;
 
 	/**
 	 * The reference instance of <code>public.tag</code>
@@ -56,9 +56,9 @@ public class Tag extends TableImpl<TagRecord> {
 	public final TableField<TagRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "Primary key");
 
 	/**
-	 * The column <code>public.tag.queryId</code>. Foreign key which exists in the query table as primary key
+	 * The column <code>public.tag.query_id</code>. Foreign key which exists in the query table as primary key
 	 */
-	public final TableField<TagRecord, Integer> QUERYID = createField("queryId", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists in the query table as primary key");
+	public final TableField<TagRecord, Integer> QUERY_ID = createField("query_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists in the query table as primary key");
 
 	/**
 	 * The column <code>public.tag.text</code>. Text for the given tag id
@@ -116,7 +116,7 @@ public class Tag extends TableImpl<TagRecord> {
 	 */
 	@Override
 	public List<ForeignKey<TagRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<TagRecord, ?>>asList(Keys.TAG__TAG_QUERYID_FKEY);
+		return Arrays.<ForeignKey<TagRecord, ?>>asList(Keys.TAG__TAG_QUERY_ID_FKEY);
 	}
 
 	/**

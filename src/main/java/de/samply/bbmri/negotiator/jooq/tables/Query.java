@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = -959271467;
+	private static final long serialVersionUID = 271542827;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -67,14 +67,14 @@ public class Query extends TableImpl<QueryRecord> {
 	public final TableField<QueryRecord, String> TEXT = createField("text", org.jooq.impl.SQLDataType.CLOB, this, "text of query");
 
 	/**
-	 * The column <code>public.query.queryCreationTime</code>. date and time of query with out time zone
+	 * The column <code>public.query.query_creation_time</code>. date and time of query with out time zone
 	 */
-	public final TableField<QueryRecord, Timestamp> QUERYCREATIONTIME = createField("queryCreationTime", org.jooq.impl.SQLDataType.TIMESTAMP, this, "date and time of query with out time zone");
+	public final TableField<QueryRecord, Timestamp> QUERY_CREATION_TIME = createField("query_creation_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "date and time of query with out time zone");
 
 	/**
-	 * The column <code>public.query.researcherId</code>. Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)
+	 * The column <code>public.query.researcher_id</code>. Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)
 	 */
-	public final TableField<QueryRecord, Integer> RESEARCHERID = createField("researcherId", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)");
+	public final TableField<QueryRecord, Integer> RESEARCHER_ID = createField("researcher_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)");
 
 	/**
 	 * Create a <code>public.query</code> table reference
@@ -127,7 +127,7 @@ public class Query extends TableImpl<QueryRecord> {
 	 */
 	@Override
 	public List<ForeignKey<QueryRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<QueryRecord, ?>>asList(Keys.QUERY__QUERY_RESEARCHERID_FKEY);
+		return Arrays.<ForeignKey<QueryRecord, ?>>asList(Keys.QUERY__QUERY_RESEARCHER_ID_FKEY);
 	}
 
 	/**

@@ -65,10 +65,10 @@ public class TagDao extends DAOImpl<TagRecord, de.samply.bbmri.negotiator.jooq.t
 	}
 
 	/**
-	 * Fetch records that have <code>queryId IN (values)</code>
+	 * Fetch records that have <code>query_id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Tag> fetchByQueryid(Integer... values) {
-		return fetch(Tag.TAG.QUERYID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Tag> fetchByQueryId(Integer... values) {
+		return fetch(Tag.TAG.QUERY_ID, values);
 	}
 
 	/**

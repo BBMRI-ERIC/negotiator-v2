@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Record5<Integer, String, String, Timestamp, Integer> {
 
-	private static final long serialVersionUID = -170796464;
+	private static final long serialVersionUID = 324060165;
 
 	/**
 	 * Setter for <code>public.query.id</code>. primary key
@@ -75,30 +75,30 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	}
 
 	/**
-	 * Setter for <code>public.query.queryCreationTime</code>. date and time of query with out time zone
+	 * Setter for <code>public.query.query_creation_time</code>. date and time of query with out time zone
 	 */
-	public void setQuerycreationtime(Timestamp value) {
+	public void setQueryCreationTime(Timestamp value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>public.query.queryCreationTime</code>. date and time of query with out time zone
+	 * Getter for <code>public.query.query_creation_time</code>. date and time of query with out time zone
 	 */
-	public Timestamp getQuerycreationtime() {
+	public Timestamp getQueryCreationTime() {
 		return (Timestamp) getValue(3);
 	}
 
 	/**
-	 * Setter for <code>public.query.researcherId</code>. Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)
+	 * Setter for <code>public.query.researcher_id</code>. Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)
 	 */
-	public void setResearcherid(Integer value) {
+	public void setResearcherId(Integer value) {
 		setValue(4, value);
 	}
 
 	/**
-	 * Getter for <code>public.query.researcherId</code>. Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)
+	 * Getter for <code>public.query.researcher_id</code>. Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)
 	 */
-	public Integer getResearcherid() {
+	public Integer getResearcherId() {
 		return (Integer) getValue(4);
 	}
 
@@ -163,7 +163,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public Field<Timestamp> field4() {
-		return Query.QUERY.QUERYCREATIONTIME;
+		return Query.QUERY.QUERY_CREATION_TIME;
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public Field<Integer> field5() {
-		return Query.QUERY.RESEARCHERID;
+		return Query.QUERY.RESEARCHER_ID;
 	}
 
 	/**
@@ -203,7 +203,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public Timestamp value4() {
-		return getQuerycreationtime();
+		return getQueryCreationTime();
 	}
 
 	/**
@@ -211,7 +211,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public Integer value5() {
-		return getResearcherid();
+		return getResearcherId();
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public QueryRecord value4(Timestamp value) {
-		setQuerycreationtime(value);
+		setQueryCreationTime(value);
 		return this;
 	}
 
@@ -255,7 +255,7 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	 */
 	@Override
 	public QueryRecord value5(Integer value) {
-		setResearcherid(value);
+		setResearcherId(value);
 		return this;
 	}
 
@@ -286,13 +286,13 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	/**
 	 * Create a detached, initialised QueryRecord
 	 */
-	public QueryRecord(Integer id, String title, String text, Timestamp querycreationtime, Integer researcherid) {
+	public QueryRecord(Integer id, String title, String text, Timestamp queryCreationTime, Integer researcherId) {
 		super(Query.QUERY);
 
 		setValue(0, id);
 		setValue(1, title);
 		setValue(2, text);
-		setValue(3, querycreationtime);
-		setValue(4, researcherid);
+		setValue(3, queryCreationTime);
+		setValue(4, researcherId);
 	}
 }

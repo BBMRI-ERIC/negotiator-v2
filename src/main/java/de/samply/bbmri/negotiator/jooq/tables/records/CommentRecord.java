@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements Record5<Integer, Integer, Integer, Timestamp, String> {
 
-	private static final long serialVersionUID = 996546990;
+	private static final long serialVersionUID = 1323342621;
 
 	/**
 	 * Setter for <code>public.comment.id</code>. Primary key
@@ -47,44 +47,44 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	}
 
 	/**
-	 * Setter for <code>public.comment.queryId</code>. Foreign key which exists as primary key in the query table. 
+	 * Setter for <code>public.comment.query_id</code>. Foreign key which exists as primary key in the query table. 
 	 */
-	public void setQueryid(Integer value) {
+	public void setQueryId(Integer value) {
 		setValue(1, value);
 	}
 
 	/**
-	 * Getter for <code>public.comment.queryId</code>. Foreign key which exists as primary key in the query table. 
+	 * Getter for <code>public.comment.query_id</code>. Foreign key which exists as primary key in the query table. 
 	 */
-	public Integer getQueryid() {
+	public Integer getQueryId() {
 		return (Integer) getValue(1);
 	}
 
 	/**
-	 * Setter for <code>public.comment.personId</code>. Foreign key which exists as primary key in the person table. describes the person who made the comment.
+	 * Setter for <code>public.comment.person_id</code>. Foreign key which exists as primary key in the person table. describes the person who made the comment.
 	 */
-	public void setPersonid(Integer value) {
+	public void setPersonId(Integer value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>public.comment.personId</code>. Foreign key which exists as primary key in the person table. describes the person who made the comment.
+	 * Getter for <code>public.comment.person_id</code>. Foreign key which exists as primary key in the person table. describes the person who made the comment.
 	 */
-	public Integer getPersonid() {
+	public Integer getPersonId() {
 		return (Integer) getValue(2);
 	}
 
 	/**
-	 * Setter for <code>public.comment.commentTime</code>. timestamp of when the comment was made.
+	 * Setter for <code>public.comment.comment_time</code>. timestamp of when the comment was made.
 	 */
-	public void setCommenttime(Timestamp value) {
+	public void setCommentTime(Timestamp value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>public.comment.commentTime</code>. timestamp of when the comment was made.
+	 * Getter for <code>public.comment.comment_time</code>. timestamp of when the comment was made.
 	 */
-	public Timestamp getCommenttime() {
+	public Timestamp getCommentTime() {
 		return (Timestamp) getValue(3);
 	}
 
@@ -147,7 +147,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public Field<Integer> field2() {
-		return Comment.COMMENT.QUERYID;
+		return Comment.COMMENT.QUERY_ID;
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public Field<Integer> field3() {
-		return Comment.COMMENT.PERSONID;
+		return Comment.COMMENT.PERSON_ID;
 	}
 
 	/**
@@ -163,7 +163,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public Field<Timestamp> field4() {
-		return Comment.COMMENT.COMMENTTIME;
+		return Comment.COMMENT.COMMENT_TIME;
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public Integer value2() {
-		return getQueryid();
+		return getQueryId();
 	}
 
 	/**
@@ -195,7 +195,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public Integer value3() {
-		return getPersonid();
+		return getPersonId();
 	}
 
 	/**
@@ -203,7 +203,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public Timestamp value4() {
-		return getCommenttime();
+		return getCommentTime();
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public CommentRecord value2(Integer value) {
-		setQueryid(value);
+		setQueryId(value);
 		return this;
 	}
 
@@ -237,7 +237,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public CommentRecord value3(Integer value) {
-		setPersonid(value);
+		setPersonId(value);
 		return this;
 	}
 
@@ -246,7 +246,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	 */
 	@Override
 	public CommentRecord value4(Timestamp value) {
-		setCommenttime(value);
+		setCommentTime(value);
 		return this;
 	}
 
@@ -286,13 +286,13 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	/**
 	 * Create a detached, initialised CommentRecord
 	 */
-	public CommentRecord(Integer id, Integer queryid, Integer personid, Timestamp commenttime, String text) {
+	public CommentRecord(Integer id, Integer queryId, Integer personId, Timestamp commentTime, String text) {
 		super(Comment.COMMENT);
 
 		setValue(0, id);
-		setValue(1, queryid);
-		setValue(2, personid);
-		setValue(3, commenttime);
+		setValue(1, queryId);
+		setValue(2, personId);
+		setValue(3, commentTime);
 		setValue(4, text);
 	}
 }

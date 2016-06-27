@@ -4,7 +4,7 @@
 package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 
-import de.samply.bbmri.negotiator.jooq.enums.Persontype;
+import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 
@@ -66,51 +66,51 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	}
 
 	/**
-	 * Fetch records that have <code>personType IN (values)</code>
+	 * Fetch records that have <code>person_type IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersontype(Persontype... values) {
-		return fetch(Person.PERSON.PERSONTYPE, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersonType(PersonType... values) {
+		return fetch(Person.PERSON.PERSON_TYPE, values);
 	}
 
 	/**
-	 * Fetch records that have <code>authSubject IN (values)</code>
+	 * Fetch records that have <code>auth_subject IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthsubject(String... values) {
-		return fetch(Person.PERSON.AUTHSUBJECT, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthSubject(String... values) {
+		return fetch(Person.PERSON.AUTH_SUBJECT, values);
 	}
 
 	/**
-	 * Fetch a unique record that has <code>authSubject = value</code>
+	 * Fetch a unique record that has <code>auth_subject = value</code>
 	 */
-	public de.samply.bbmri.negotiator.jooq.tables.pojos.Person fetchOneByAuthsubject(String value) {
-		return fetchOne(Person.PERSON.AUTHSUBJECT, value);
+	public de.samply.bbmri.negotiator.jooq.tables.pojos.Person fetchOneByAuthSubject(String value) {
+		return fetchOne(Person.PERSON.AUTH_SUBJECT, value);
 	}
 
 	/**
-	 * Fetch records that have <code>authName IN (values)</code>
+	 * Fetch records that have <code>auth_name IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthname(String... values) {
-		return fetch(Person.PERSON.AUTHNAME, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthName(String... values) {
+		return fetch(Person.PERSON.AUTH_NAME, values);
 	}
 
 	/**
-	 * Fetch records that have <code>authEmail IN (values)</code>
+	 * Fetch records that have <code>auth_email IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthemail(String... values) {
-		return fetch(Person.PERSON.AUTHEMAIL, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByAuthEmail(String... values) {
+		return fetch(Person.PERSON.AUTH_EMAIL, values);
 	}
 
 	/**
-	 * Fetch records that have <code>personImage IN (values)</code>
+	 * Fetch records that have <code>person_image IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersonimage(byte[]... values) {
-		return fetch(Person.PERSON.PERSONIMAGE, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersonImage(byte[]... values) {
+		return fetch(Person.PERSON.PERSON_IMAGE, values);
 	}
 
 	/**
-	 * Fetch records that have <code>locationId IN (values)</code>
+	 * Fetch records that have <code>location_id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByLocationid(Integer... values) {
-		return fetch(Person.PERSON.LOCATIONID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByLocationId(Integer... values) {
+		return fetch(Person.PERSON.LOCATION_ID, values);
 	}
 }

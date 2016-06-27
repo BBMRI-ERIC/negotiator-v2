@@ -24,43 +24,60 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.test;
+package de.samply.bbmri.negotiator.control.researcher;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
-import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import org.junit.Test;
+import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
- * 
+ * Manages the query view for researchers
  */
-public class DatabaseSetup {
+@ManagedBean
+@ViewScoped
+public class ResearcherQueriesBean implements Serializable {
 
-    @Test
-    public void test() throws SQLException {
-    	try(Config config = ConfigFactory.get()) {
-            PersonDao dao = new PersonDao(config);
+    private List<QueryStatsDTO> queries;
 
-            Person p = new Person();
-            p.setAuthSubject("https://auth.samply.de/users/43");
-            p.setAuthEmail("test@test.org");
-            p.setAuthName("Testinator");
-            p.setPersonType(PersonType.OWNER);
-            p.setPersonImage(null);
+    @ManagedProperty(value = "#{userBean}")
+    private UserBean userBean;
 
-            dao.insert(p);
-            config.get().commit();
-        }        
-    }
-
-    public void testCommentStatsDTO() throws SQLException {
+    /**
+     * Initializes this bean by loading all queries for the current researcher.
+     */
+    @PostConstruct
+    public void init() {
         try(Config config = ConfigFactory.get()) {
-            DbUtil.getQueryStatsDTOs(config, 1);
+            queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId());
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
+
+    public List<QueryStatsDTO> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(List<QueryStatsDTO> queries) {
+        this.queries = queries;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
+
 }

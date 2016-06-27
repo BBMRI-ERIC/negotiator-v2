@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class TagRecord extends UpdatableRecordImpl<TagRecord> implements Record3<Integer, Integer, String> {
 
-	private static final long serialVersionUID = -63740372;
+	private static final long serialVersionUID = 2058479969;
 
 	/**
 	 * Setter for <code>public.tag.id</code>. Primary key
@@ -45,16 +45,16 @@ public class TagRecord extends UpdatableRecordImpl<TagRecord> implements Record3
 	}
 
 	/**
-	 * Setter for <code>public.tag.queryId</code>. Foreign key which exists in the query table as primary key
+	 * Setter for <code>public.tag.query_id</code>. Foreign key which exists in the query table as primary key
 	 */
-	public void setQueryid(Integer value) {
+	public void setQueryId(Integer value) {
 		setValue(1, value);
 	}
 
 	/**
-	 * Getter for <code>public.tag.queryId</code>. Foreign key which exists in the query table as primary key
+	 * Getter for <code>public.tag.query_id</code>. Foreign key which exists in the query table as primary key
 	 */
-	public Integer getQueryid() {
+	public Integer getQueryId() {
 		return (Integer) getValue(1);
 	}
 
@@ -117,7 +117,7 @@ public class TagRecord extends UpdatableRecordImpl<TagRecord> implements Record3
 	 */
 	@Override
 	public Field<Integer> field2() {
-		return Tag.TAG.QUERYID;
+		return Tag.TAG.QUERY_ID;
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class TagRecord extends UpdatableRecordImpl<TagRecord> implements Record3
 	 */
 	@Override
 	public Integer value2() {
-		return getQueryid();
+		return getQueryId();
 	}
 
 	/**
@@ -166,7 +166,7 @@ public class TagRecord extends UpdatableRecordImpl<TagRecord> implements Record3
 	 */
 	@Override
 	public TagRecord value2(Integer value) {
-		setQueryid(value);
+		setQueryId(value);
 		return this;
 	}
 
@@ -204,11 +204,11 @@ public class TagRecord extends UpdatableRecordImpl<TagRecord> implements Record3
 	/**
 	 * Create a detached, initialised TagRecord
 	 */
-	public TagRecord(Integer id, Integer queryid, String text) {
+	public TagRecord(Integer id, Integer queryId, String text) {
 		super(Tag.TAG);
 
 		setValue(0, id);
-		setValue(1, queryid);
+		setValue(1, queryId);
 		setValue(2, text);
 	}
 }

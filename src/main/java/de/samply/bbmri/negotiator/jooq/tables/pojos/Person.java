@@ -4,7 +4,7 @@
 package de.samply.bbmri.negotiator.jooq.tables.pojos;
 
 
-import de.samply.bbmri.negotiator.jooq.enums.Persontype;
+import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 
 import java.io.Serializable;
 
@@ -24,44 +24,44 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person implements Serializable {
 
-	private static final long serialVersionUID = -2047027032;
+	private static final long serialVersionUID = -1825690680;
 
 	private Integer    id;
-	private Persontype persontype;
-	private String     authsubject;
-	private String     authname;
-	private String     authemail;
-	private byte[]     personimage;
-	private Integer    locationid;
+	private PersonType personType;
+	private String     authSubject;
+	private String     authName;
+	private String     authEmail;
+	private byte[]     personImage;
+	private Integer    locationId;
 
 	public Person() {}
 
 	public Person(Person value) {
 		this.id = value.id;
-		this.persontype = value.persontype;
-		this.authsubject = value.authsubject;
-		this.authname = value.authname;
-		this.authemail = value.authemail;
-		this.personimage = value.personimage;
-		this.locationid = value.locationid;
+		this.personType = value.personType;
+		this.authSubject = value.authSubject;
+		this.authName = value.authName;
+		this.authEmail = value.authEmail;
+		this.personImage = value.personImage;
+		this.locationId = value.locationId;
 	}
 
 	public Person(
 		Integer    id,
-		Persontype persontype,
-		String     authsubject,
-		String     authname,
-		String     authemail,
-		byte[]     personimage,
-		Integer    locationid
+		PersonType personType,
+		String     authSubject,
+		String     authName,
+		String     authEmail,
+		byte[]     personImage,
+		Integer    locationId
 	) {
 		this.id = id;
-		this.persontype = persontype;
-		this.authsubject = authsubject;
-		this.authname = authname;
-		this.authemail = authemail;
-		this.personimage = personimage;
-		this.locationid = locationid;
+		this.personType = personType;
+		this.authSubject = authSubject;
+		this.authName = authName;
+		this.authEmail = authEmail;
+		this.personImage = personImage;
+		this.locationId = locationId;
 	}
 
 	public Integer getId() {
@@ -72,51 +72,51 @@ public class Person implements Serializable {
 		this.id = id;
 	}
 
-	public Persontype getPersontype() {
-		return this.persontype;
+	public PersonType getPersonType() {
+		return this.personType;
 	}
 
-	public void setPersontype(Persontype persontype) {
-		this.persontype = persontype;
+	public void setPersonType(PersonType personType) {
+		this.personType = personType;
 	}
 
-	public String getAuthsubject() {
-		return this.authsubject;
+	public String getAuthSubject() {
+		return this.authSubject;
 	}
 
-	public void setAuthsubject(String authsubject) {
-		this.authsubject = authsubject;
+	public void setAuthSubject(String authSubject) {
+		this.authSubject = authSubject;
 	}
 
-	public String getAuthname() {
-		return this.authname;
+	public String getAuthName() {
+		return this.authName;
 	}
 
-	public void setAuthname(String authname) {
-		this.authname = authname;
+	public void setAuthName(String authName) {
+		this.authName = authName;
 	}
 
-	public String getAuthemail() {
-		return this.authemail;
+	public String getAuthEmail() {
+		return this.authEmail;
 	}
 
-	public void setAuthemail(String authemail) {
-		this.authemail = authemail;
+	public void setAuthEmail(String authEmail) {
+		this.authEmail = authEmail;
 	}
 
-	public byte[] getPersonimage() {
-		return this.personimage;
+	public byte[] getPersonImage() {
+		return this.personImage;
 	}
 
-	public void setPersonimage(byte[] personimage) {
-		this.personimage = personimage;
+	public void setPersonImage(byte[] personImage) {
+		this.personImage = personImage;
 	}
 
-	public Integer getLocationid() {
-		return this.locationid;
+	public Integer getLocationId() {
+		return this.locationId;
 	}
 
-	public void setLocationid(Integer locationid) {
-		this.locationid = locationid;
+	public void setLocationId(Integer locationId) {
+		this.locationId = locationId;
 	}
 }

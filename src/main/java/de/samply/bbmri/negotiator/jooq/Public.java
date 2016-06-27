@@ -5,12 +5,12 @@ package de.samply.bbmri.negotiator.jooq;
 
 
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.Flaggedquery;
+import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
-import de.samply.bbmri.negotiator.jooq.tables.Taggedquery;
+import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +36,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -600198106;
+	private static final long serialVersionUID = -1779217032;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -76,11 +76,11 @@ public class Public extends SchemaImpl {
 	private final List<Table<?>> getTables0() {
 		return Arrays.<Table<?>>asList(
 			Comment.COMMENT,
-			Flaggedquery.FLAGGEDQUERY,
+			FlaggedQuery.FLAGGED_QUERY,
 			Location.LOCATION,
 			Person.PERSON,
 			Query.QUERY,
 			Tag.TAG,
-			Taggedquery.TAGGEDQUERY);
+			TaggedQuery.TAGGED_QUERY);
 	}
 }

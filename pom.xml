@@ -87,6 +87,18 @@
             <version>3.6.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>0.7.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.modelmapper.extensions</groupId>
+            <artifactId>modelmapper-jooq</artifactId>
+            <version>0.7.5</version>
+        </dependency>
+
     </dependencies>
 
     <distributionManagement>
@@ -166,12 +178,11 @@
                         <database>
                             <name>org.jooq.util.postgres.PostgresDatabase</name>
                             <includes>.*</includes>
-                            <excludes/>
+                            <excludes>samplyDbVersion</excludes>
                             <inputSchema>public</inputSchema>
                         </database>
 
                         <generate>
-
                             <!-- Generation flags: See advanced configuration properties -->
 
 

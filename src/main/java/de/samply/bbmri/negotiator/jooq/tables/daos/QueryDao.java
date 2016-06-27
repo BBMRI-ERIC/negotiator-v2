@@ -80,16 +80,16 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	}
 
 	/**
-	 * Fetch records that have <code>queryCreationTime IN (values)</code>
+	 * Fetch records that have <code>query_creation_time IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByQuerycreationtime(Timestamp... values) {
-		return fetch(Query.QUERY.QUERYCREATIONTIME, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByQueryCreationTime(Timestamp... values) {
+		return fetch(Query.QUERY.QUERY_CREATION_TIME, values);
 	}
 
 	/**
-	 * Fetch records that have <code>researcherId IN (values)</code>
+	 * Fetch records that have <code>researcher_id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByResearcherid(Integer... values) {
-		return fetch(Query.QUERY.RESEARCHERID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByResearcherId(Integer... values) {
+		return fetch(Query.QUERY.RESEARCHER_ID, values);
 	}
 }

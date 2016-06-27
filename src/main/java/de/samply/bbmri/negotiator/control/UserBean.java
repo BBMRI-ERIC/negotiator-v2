@@ -39,7 +39,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Tables;
-import de.samply.bbmri.negotiator.jooq.enums.Persontype;
+import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
@@ -212,7 +212,7 @@ public class UserBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
 
             PersonRecord person = config.dsl().selectFrom(Tables.PERSON)
-                    .where(Tables.PERSON.AUTHSUBJECT.eq(userIdentity)).fetchOne();
+                    .where(Tables.PERSON.AUTH_SUBJECT.eq(userIdentity)).fetchOne();
 
 
             /**
@@ -220,27 +220,27 @@ public class UserBean implements Serializable {
              */
             if(person == null) {
                 person = config.dsl().newRecord(Tables.PERSON);
-                person.setAuthname(userRealName);
-                person.setAuthemail(userEmail);
-                person.setAuthsubject(userIdentity);
+                person.setAuthName(userRealName);
+                person.setAuthEmail(userEmail);
+                person.setAuthSubject(userIdentity);
 
                 if(biobankOwner) {
-                    person.setPersontype(Persontype.OWNER);
+                    person.setPersonType(PersonType.OWNER);
                 } else {
-                    person.setPersontype(Persontype.RESEARCHER);
+                    person.setPersonType(PersonType.RESEARCHER);
                 }
                 person.store();
             } else {
                 /**
                  * Otherwise just update some fields.
                  */
-                person.setAuthname(userRealName);
-                person.setAuthemail(userEmail);
+                person.setAuthName(userRealName);
+                person.setAuthEmail(userEmail);
 
                 if(biobankOwner) {
-                    person.setPersontype(Persontype.OWNER);
+                    person.setPersonType(PersonType.OWNER);
                 } else {
-                    person.setPersontype(Persontype.RESEARCHER);
+                    person.setPersonType(PersonType.RESEARCHER);
                 }
                 person.update();
             }
