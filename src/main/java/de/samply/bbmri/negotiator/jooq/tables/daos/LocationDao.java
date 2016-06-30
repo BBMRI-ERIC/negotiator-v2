@@ -16,7 +16,7 @@ import org.jooq.impl.DAOImpl;
 
 
 /**
- * Table to store locations of researchers
+ * Table to store locations of owner
  */
 @Generated(
 	value = {

@@ -18,7 +18,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * table to store comments on a query
+ * table to store commentCount on a query
  */
 @Generated(
 	value = {
@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements Record5<Integer, Integer, Integer, Timestamp, String> {
 
-	private static final long serialVersionUID = 1323342621;
+	private static final long serialVersionUID = 1697240985;
 
 	/**
 	 * Setter for <code>public.comment.id</code>. Primary key

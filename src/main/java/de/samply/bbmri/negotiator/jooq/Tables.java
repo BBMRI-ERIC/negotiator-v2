@@ -9,6 +9,7 @@ import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLocation;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
 import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 
@@ -29,7 +30,7 @@ import javax.annotation.Generated;
 public class Tables {
 
 	/**
-	 * table to store comments on a query
+	 * table to store commentCount on a query
 	 */
 	public static final Comment COMMENT = de.samply.bbmri.negotiator.jooq.tables.Comment.COMMENT;
 
@@ -39,7 +40,7 @@ public class Tables {
 	public static final FlaggedQuery FLAGGED_QUERY = de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery.FLAGGED_QUERY;
 
 	/**
-	 * Table to store locations of researchers
+	 * Table to store locations of owner
 	 */
 	public static final Location LOCATION = de.samply.bbmri.negotiator.jooq.tables.Location.LOCATION;
 
@@ -52,6 +53,11 @@ public class Tables {
 	 * query table to contain all  queries
 	 */
 	public static final Query QUERY = de.samply.bbmri.negotiator.jooq.tables.Query.QUERY;
+
+	/**
+	 * Table for all the locations that have replied to a query.
+	 */
+	public static final QueryLocation QUERY_LOCATION = de.samply.bbmri.negotiator.jooq.tables.QueryLocation.QUERY_LOCATION;
 
 	/**
 	 * Table that contains tags for queries

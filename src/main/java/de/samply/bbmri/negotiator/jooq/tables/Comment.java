@@ -24,7 +24,7 @@ import org.jooq.impl.TableImpl;
 
 
 /**
- * table to store comments on a query
+ * table to store commentCount on a query
  */
 @Generated(
 	value = {
@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment extends TableImpl<CommentRecord> {
 
-	private static final long serialVersionUID = -1305084478;
+	private static final long serialVersionUID = -1633233974;
 
 	/**
 	 * The reference instance of <code>public.comment</code>
@@ -95,7 +95,7 @@ public class Comment extends TableImpl<CommentRecord> {
 	}
 
 	private Comment(String alias, Table<CommentRecord> aliased, Field<?>[] parameters) {
-		super(alias, Public.PUBLIC, aliased, parameters, "table to store comments on a query");
+		super(alias, Public.PUBLIC, aliased, parameters, "table to store commentCount on a query");
 	}
 
 	/**

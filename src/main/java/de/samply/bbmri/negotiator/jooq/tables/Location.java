@@ -22,7 +22,7 @@ import org.jooq.impl.TableImpl;
 
 
 /**
- * Table to store locations of researchers
+ * Table to store locations of owner
  */
 @Generated(
 	value = {
@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Location extends TableImpl<LocationRecord> {
 
-	private static final long serialVersionUID = 148634194;
+	private static final long serialVersionUID = 129534818;
 
 	/**
 	 * The reference instance of <code>public.location</code>
@@ -78,7 +78,7 @@ public class Location extends TableImpl<LocationRecord> {
 	}
 
 	private Location(String alias, Table<LocationRecord> aliased, Field<?>[] parameters) {
-		super(alias, Public.PUBLIC, aliased, parameters, "Table to store locations of researchers");
+		super(alias, Public.PUBLIC, aliased, parameters, "Table to store locations of owner");
 	}
 
 	/**

@@ -17,7 +17,7 @@ import org.jooq.impl.DAOImpl;
 
 
 /**
- * table to store comments on a query
+ * table to store commentCount on a query
  */
 @Generated(
 	value = {

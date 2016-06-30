@@ -8,7 +8,7 @@ CREATE TABLE "location" (
 );
 
 
-COMMENT ON TABLE "location" IS 'Table to store locations of researchers';
+COMMENT ON TABLE "location" IS 'Table to store locations of owner';
 COMMENT ON COLUMN "location"."id" IS 'primary key';
 COMMENT ON COLUMN "location"."name" IS 'location name';
 
@@ -133,3 +133,19 @@ COMMENT ON TABLE "flagged_query" IS 'Table for queries that are flagged/bookmark
 COMMENT ON COLUMN "flagged_query".query_id IS 'This column along with ownerId will make the primary key. Its also a foreign key here, taken from query table';
 COMMENT ON COLUMN "flagged_query".person_id IS 'This column along with the id column will make the primary key. Its also a foreign key here, taken from person table';
 COMMENT ON COLUMN "flagged_query"."flag" IS 'The flag of the comment. One character letter. (A) archived, (I) ignored, (S) starred';
+
+
+CREATE TABLE "query_location" (
+    "query_id" INTEGER NOT NULL,
+    "location_id" INTEGER NOT NULL,
+    PRIMARY KEY("query_id", "location_id"),
+    FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY ("location_id") REFERENCES "location"("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE INDEX "queryIdIndexQueryLocation" ON "query_location" (query_id);
+CREATE INDEX "locationIdIndexQueryLocation" ON "query_location" (location_id);
+
+
+COMMENT ON TABLE "query_location" IS 'Table for all the locations that have replied to a query.';
+COMMENT ON COLUMN "query_location".query_id IS 'This column along with location_Id will make the primary key. Its also a foreign key here, taken from query table';
+COMMENT ON COLUMN "query_location".location_id IS 'This column along with the query_id column will make the primary key. Its also a foreign key here, taken from "location" table';

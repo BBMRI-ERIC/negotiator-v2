@@ -10,7 +10,7 @@ import javax.annotation.Generated;
 
 
 /**
- * Table to store locations of researchers
+ * Table to store locations of owner
  */
 @Generated(
 	value = {
@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Location implements Serializable {
 
-	private static final long serialVersionUID = -863266593;
+	private static final long serialVersionUID = 1186397927;
 
 	private Integer id;
 	private String  name;

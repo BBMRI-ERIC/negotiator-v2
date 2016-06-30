@@ -16,7 +16,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
- * Table to store locations of researchers
+ * Table to store locations of owner
  */
 @Generated(
 	value = {
@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class LocationRecord extends UpdatableRecordImpl<LocationRecord> implements Record2<Integer, String> {
 
-	private static final long serialVersionUID = 849453872;
+	private static final long serialVersionUID = 1091033704;
 
 	/**
 	 * Setter for <code>public.location.id</code>. primary key

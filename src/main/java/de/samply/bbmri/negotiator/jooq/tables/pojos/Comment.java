@@ -11,7 +11,7 @@ import javax.annotation.Generated;
 
 
 /**
- * table to store comments on a query
+ * table to store commentCount on a query
  */
 @Generated(
 	value = {
@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment implements Serializable {
 
-	private static final long serialVersionUID = 779063730;
+	private static final long serialVersionUID = -2105032786;
 
 	private Integer   id;
 	private Integer   queryId;

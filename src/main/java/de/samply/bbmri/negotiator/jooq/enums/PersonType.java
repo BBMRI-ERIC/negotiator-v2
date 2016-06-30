@@ -5,10 +5,11 @@ package de.samply.bbmri.negotiator.jooq.enums;
 
 
 import de.samply.bbmri.negotiator.jooq.Public;
-import org.jooq.EnumType;
-import org.jooq.Schema;
 
 import javax.annotation.Generated;
+
+import org.jooq.EnumType;
+import org.jooq.Schema;
 
 
 /**
