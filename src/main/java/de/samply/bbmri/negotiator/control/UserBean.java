@@ -25,6 +25,21 @@
  */
 package de.samply.bbmri.negotiator.control;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+
 import de.samply.auth.client.AuthClient;
 import de.samply.auth.client.InvalidKeyException;
 import de.samply.auth.client.InvalidTokenException;
@@ -40,23 +55,11 @@ import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Location;
+import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Sessionscoped bean for all data of the session about the user.
@@ -64,9 +67,18 @@ import java.util.List;
 @ManagedBean
 @SessionScoped
 public class UserBean implements Serializable {
-    
+
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * TODO: Hardcoded location ID and name to set to on new users, if he is a biobank owner, as that info will come
+     * from Perun and/or Directory and yet not from Samply.AUTH. So for now we simply put new biobank owners into that
+     * location, and use our own created locationID as such.
+     */
+    private static final int TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS = 6;
+    private static final String TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS = "Enterprise";
+
     /**
      * The current userEmail (email). Null if the login is not valid
      */
@@ -78,8 +90,7 @@ public class UserBean implements Serializable {
     private String userRealName = null;
 
     /**
-     * The current user identity (usually a URL that identifies the user). Null
-     * if the login is not valid.
+     * The current user identity (usually a URL that identifies the user). Null if the login is not valid.
      */
     private String userIdentity = null;
 
@@ -92,6 +103,11 @@ public class UserBean implements Serializable {
      * If the user is a biobank owner or not.
      */
     private Boolean biobankOwner = false;
+
+    /**
+     * ID of the Location (only biobank owners)
+     */
+    private Location location = null;
 
     /**
      * The *mapped* user ID in the database.
@@ -108,15 +124,15 @@ public class UserBean implements Serializable {
     private JWTRefreshToken refreshToken;
 
     /**
-     * The state of this session. This is a random string for OAuth2 used to
-     * prevent cross site forgery attacks.
+     * The state of this session. This is a random string for OAuth2 used to prevent cross site forgery attacks.
      */
     private String state;
 
     /**
      * Executes a logout.
      *
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void logout() throws IOException {
         OAuth2Client config = NegotiatorConfig.get().getOauth2();
@@ -144,7 +160,8 @@ public class UserBean implements Serializable {
      * Returns the URL for Samply.Auth
      *
      * @return the authentication url
-     * @throws UnsupportedEncodingException the unsupported encoding exception
+     * @throws UnsupportedEncodingException
+     *             the unsupported encoding exception
      */
     public String getAuthenticationUrl() throws UnsupportedEncodingException {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
@@ -163,9 +180,12 @@ public class UserBean implements Serializable {
     /**
      * Lets the user login and sets all necessary fields.
      *
-     * @param client the client
-     * @throws InvalidTokenException the invalid token exception
-     * @throws InvalidKeyException the invalid key exception
+     * @param client
+     *            the client
+     * @throws InvalidTokenException
+     *             the invalid token exception
+     * @throws InvalidKeyException
+     *             the invalid key exception
      */
     public void login(AuthClient client) throws InvalidTokenException, InvalidKeyException {
         accessToken = client.getAccessToken();
@@ -173,8 +193,8 @@ public class UserBean implements Serializable {
         refreshToken = client.getRefreshToken();
 
         /**
-         * Make sure that if the access token contains a state parameter, that
-         * it matches the state variable. If it does not, abort.
+         * Make sure that if the access token contains a state parameter, that it matches the state variable. If it does
+         * not, abort.
          */
         if (!StringUtil.isEmpty(accessToken.getState()) && !state.equals(accessToken.getState())) {
             accessToken = null;
@@ -206,6 +226,60 @@ public class UserBean implements Serializable {
     }
 
     /**
+     * Creates a location
+     * 
+     * @param locationId
+     * @param locationName
+     * @return Location
+     */
+    private Location createLocation(Integer locationId, String locationName) {
+        Location location = null;
+
+        try (Config config = ConfigFactory.get()) {
+            LocationRecord locationRecord = config.dsl().newRecord(Tables.LOCATION);
+            locationRecord.setId(locationId);
+            locationRecord.setName(locationName);
+            locationRecord.store();
+
+            location = new Location();
+            location.setId(locationId);
+            location.setName(locationName);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return location;
+    }
+
+    /**
+     * Gets the location for a location ID
+     * 
+     * @param locationId
+     * @return Location
+     */
+    private Location getLocation(Integer locationId) {
+        Location location = null;
+
+        try (Config config = ConfigFactory.get()) {
+            LocationRecord locationRecord = config.dsl().selectFrom(Tables.LOCATION)
+                    .where(Tables.LOCATION.ID.eq(locationId)).fetchOne();
+
+            if (locationRecord == null) {
+                return null;
+            }
+
+            location = new Location();
+            location.setId(locationRecord.getId());
+            location.setName(locationRecord.getName());
+            return location;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return location;
+    }
+
+    /**
      * If the "userIdentity" does not exist in the database, create it.
      */
     private void createOrGetUser() {
@@ -214,18 +288,26 @@ public class UserBean implements Serializable {
             PersonRecord person = config.dsl().selectFrom(Tables.PERSON)
                     .where(Tables.PERSON.AUTH_SUBJECT.eq(userIdentity)).fetchOne();
 
-
             /**
              * If the user hasn't been to this negotiator before, store him in the database
              */
-            if(person == null) {
+            if (person == null) {
                 person = config.dsl().newRecord(Tables.PERSON);
                 person.setAuthName(userRealName);
                 person.setAuthEmail(userEmail);
                 person.setAuthSubject(userIdentity);
 
-                if(biobankOwner) {
+                if (biobankOwner) {
                     person.setPersonType(PersonType.OWNER);
+
+                    // TODO: Update this to Perun and/or Directory given
+                    // Location data
+                    location = getLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS);
+                    if (location == null)
+                        location = createLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS,
+                                TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS);
+
+                    person.setLocationId(location.getId());
                 } else {
                     person.setPersonType(PersonType.RESEARCHER);
                 }
@@ -237,8 +319,16 @@ public class UserBean implements Serializable {
                 person.setAuthName(userRealName);
                 person.setAuthEmail(userEmail);
 
-                if(biobankOwner) {
+                if (biobankOwner) {
                     person.setPersonType(PersonType.OWNER);
+                    location = getLocation(person.getLocationId());
+
+                    // TODO: Update this to Perun and/or Directory given
+                    // Location data
+                    if (location == null) {
+                        location = createLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS,
+                                TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS);
+                    }
                 } else {
                     person.setPersonType(PersonType.RESEARCHER);
                 }
@@ -275,7 +365,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the userEmail.
      *
-     * @param userEmail the new userEmail
+     * @param userEmail
+     *            the new userEmail
      */
     public void setUserEmail(String userEmail) {
         this.userEmail = userEmail;
@@ -293,7 +384,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the real name.
      *
-     * @param userRealName the new real name
+     * @param userRealName
+     *            the new real name
      */
     public void setUserRealName(String userRealName) {
         this.userRealName = userRealName;
@@ -311,7 +403,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the user identity.
      *
-     * @param userIdentity the new user identity
+     * @param userIdentity
+     *            the new user identity
      */
     public void setUserIdentity(String userIdentity) {
         this.userIdentity = userIdentity;
@@ -329,7 +422,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the user id.
      *
-     * @param userId the new user id
+     * @param userId
+     *            the new user id
      */
     public void setUserId(int userId) {
         this.userId = userId;
@@ -347,7 +441,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the access token.
      *
-     * @param accessToken the new access token
+     * @param accessToken
+     *            the new access token
      */
     public void setAccessToken(JWTAccessToken accessToken) {
         this.accessToken = accessToken;
@@ -365,7 +460,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the id token.
      *
-     * @param idToken the new id token
+     * @param idToken
+     *            the new id token
      */
     public void setIdToken(JWTIDToken idToken) {
         this.idToken = idToken;
@@ -383,7 +479,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the refresh token.
      *
-     * @param refreshToken the new refresh token
+     * @param refreshToken
+     *            the new refresh token
      */
     public void setRefreshToken(JWTRefreshToken refreshToken) {
         this.refreshToken = refreshToken;
@@ -401,7 +498,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the state.
      *
-     * @param state the new state
+     * @param state
+     *            the new state
      */
     public void setState(String state) {
         this.state = state;
@@ -419,7 +517,8 @@ public class UserBean implements Serializable {
     /**
      * Sets the login valid.
      *
-     * @param loginValid the new login valid
+     * @param loginValid
+     *            the new login valid
      */
     public void setLoginValid(Boolean loginValid) {
         this.loginValid = loginValid;
@@ -437,10 +536,33 @@ public class UserBean implements Serializable {
     /**
      * Sets the biobank owner.
      *
-     * @param biobankOwner the new biobank owner
+     * @param biobankOwner
+     *            the new biobank owner
      */
     public void setBiobankOwner(Boolean biobankOwner) {
         this.biobankOwner = biobankOwner;
+    }
+
+    /**
+     * Gets the location ID the user belongs to (only biobank owners)
+     * 
+     * @return
+     */
+    public Integer getLocationId() {
+        if (location == null)
+            return null;
+        return location.getId();
+    }
+
+    /**
+     * Gets the location name the user belongs to (only biobank owners)
+     * 
+     * @return
+     */
+    public String getLocationName() {
+        if (location == null)
+            return null;
+        return location.getName();
     }
 
 }
