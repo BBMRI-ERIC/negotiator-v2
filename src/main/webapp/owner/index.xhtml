@@ -61,7 +61,7 @@
         </h:panelGroup>
 
         <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0}" layout="block">
-            <h3>You did not create any queries yet.</h3>
+            <h3>There are no queries to be listed.</h3>
         </h:panelGroup>
 
         <ui:repeat var="item" value="#{ownerQueriesBean.queries}">
@@ -76,12 +76,13 @@
                     </h:link>
 
                     <h:panelGroup styleClass="pull-right">
+                    <h:form>
                         <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
                               <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-folder-open"></i></button>
-                              <button type="button" class="btn btn-default"><i class="fa fa-sign-out"></i></button>
+                              <h:commandLink styleClass="btn btn-default" action="#{ownerQueriesBean.leaveQuery(item.query.id)}"><i class="fa fa-sign-out"></i></h:commandLink>
                               <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
                         </h:panelGroup>
-                            
+                    </h:form>
                         <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.commentCount > 0}">
                             <h:outputText title="#{item.commentCount} biobanks contacted you"
                                           value="#{item.commentCount}"/>
