@@ -23,37 +23,23 @@
  * License, version 2.0, the licensors of this Program grant you additional
  * permission to convey the resulting work.
  */
-
 package de.samply.bbmri.negotiator.model;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-
-import java.io.Serializable;
-
 /**
- * DTO for a comment and the person who made the comment.
+ * DTO that gives a small statistic for a query, with the amount of commentCount made for the query and
+ * the last time someone made a comment for this query, and the name of the query creator
  */
-public class CommentPersonDTO implements Serializable {
+public class OwnerQueryStatsDTO extends QueryStatsDTO {
     private static final long serialVersionUID = 1L;
 
-    private Comment comment;
+    private String auth_name;
 
-    private Person person;
-
-    public Comment getComment() {
-        return comment;
+    public String getAuth_name() {
+        return auth_name;
     }
 
-    public void setComment(Comment comment) {
-        this.comment = comment;
+    public void setAuth_name(String auth_name) {
+        this.auth_name = auth_name;
     }
 
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
-    }
 }

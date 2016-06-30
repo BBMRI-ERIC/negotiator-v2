@@ -23,37 +23,7 @@
  * License, version 2.0, the licensors of this Program grant you additional
  * permission to convey the resulting work.
  */
-
-package de.samply.bbmri.negotiator.model;
-
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-
-import java.io.Serializable;
-
 /**
- * DTO for a comment and the person who made the comment.
+ * Package contains control classes for biobank owners
  */
-public class CommentPersonDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
-
-    private Comment comment;
-
-    private Person person;
-
-    public Comment getComment() {
-        return comment;
-    }
-
-    public void setComment(Comment comment) {
-        this.comment = comment;
-    }
-
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
-    }
-}
+package de.samply.bbmri.negotiator.control.owner;

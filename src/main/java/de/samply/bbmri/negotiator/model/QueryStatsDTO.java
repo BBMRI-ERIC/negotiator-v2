@@ -28,13 +28,15 @@ package de.samply.bbmri.negotiator.model;
 
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 /**
  * DTO that gives a small statistic for a query, with the amount of commentCount made for the query and
  * the last time someone made a comment for this query.
  */
-public class QueryStatsDTO {
+public class QueryStatsDTO implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private Query query;
 
