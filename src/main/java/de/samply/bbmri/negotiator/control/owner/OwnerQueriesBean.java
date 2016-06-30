@@ -51,66 +51,80 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 @ManagedBean
 @ViewScoped
 public class OwnerQueriesBean implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private List<OwnerQueryStatsDTO> queries;
+	private List<OwnerQueryStatsDTO> queries;
 
-    @ManagedProperty(value = "#{userBean}")
-    private UserBean userBean;
+	@ManagedProperty(value = "#{userBean}")
+	private UserBean userBean;
 
-    /**
-     * Initializes this bean by loading all queries for the current researcher.
-     */
-    @PostConstruct
-    public void init() {
-        
-    }
+	/**
+	 * Initializes this bean by loading all queries for the current researcher.
+	 */
+	@PostConstruct
+	public void init() {
 
-    public String leaveQuery(Integer queryId) {
-        try(Config config = ConfigFactory.get()) {
-            config.dsl().delete(Tables.QUERY_LOCATION).where(Tables.QUERY_LOCATION.LOCATION_ID.eq(userBean.getLocationId())).and(Tables.QUERY_LOCATION.QUERY_ID.eq(queryId)).execute();
-            config.get().commit();
-            queries = null;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
-        return "";
-    }
-    
-    public List<OwnerQueryStatsDTO> getQueries() {
-        if(queries == null) {
-            try(Config config = ConfigFactory.get()) {
-                
-                Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
-                        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
-                        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-                        .select(Tables.COMMENT.ID.count().as("comment_count"))
-                        .from(Tables.QUERY)
-                        .join(Tables.QUERY_LOCATION, JoinType.LEFT_OUTER_JOIN).on(Tables.QUERY_LOCATION.QUERY_ID.eq(Tables.QUERY.ID))
-                        .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID))
-                        .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.QUERY.RESEARCHER_ID.eq(Tables.PERSON.ID))
-                        .where(Tables.QUERY_LOCATION.LOCATION_ID.eq(userBean.getLocationId()))
-                        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
-                
-                queries = config.map(fetch, OwnerQueryStatsDTO.class);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return queries;
-    }
+	}
 
-    public void setQueries(List<OwnerQueryStatsDTO> queries) {
-        this.queries = queries;
-    }
+	/**
+	 * Leave query as a bio bank owner
+	 * 
+	 * @param queryId
+	 * @return
+	 */
+	public String leaveQuery(Integer queryId) {
+		try (Config config = ConfigFactory.get()) {
+			config.dsl().delete(Tables.QUERY_LOCATION)
+			        .where(Tables.QUERY_LOCATION.LOCATION_ID.eq(userBean.getLocationId()))
+			        .and(Tables.QUERY_LOCATION.QUERY_ID.eq(queryId)).execute();
+			config.get().commit();
+			queries = null;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 
-    public UserBean getUserBean() {
-        return userBean;
-    }
+		return "";
+	}
 
-    public void setUserBean(UserBean userBean) {
-        this.userBean = userBean;
-    }
+	/**
+	 * Returns the list of queries in which the current biobank owner is a part of
+	 * 
+	 * @return
+	 */
+	public List<OwnerQueryStatsDTO> getQueries() {
+		if (queries == null) {
+			try (Config config = ConfigFactory.get()) {
+
+				Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
+				        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
+				        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+				        .select(Tables.COMMENT.ID.count().as("comment_count")).from(Tables.QUERY)
+				        .join(Tables.QUERY_LOCATION, JoinType.LEFT_OUTER_JOIN)
+				        .on(Tables.QUERY_LOCATION.QUERY_ID.eq(Tables.QUERY.ID))
+				        .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID))
+				        .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN)
+				        .on(Tables.QUERY.RESEARCHER_ID.eq(Tables.PERSON.ID))
+				        .where(Tables.QUERY_LOCATION.LOCATION_ID.eq(userBean.getLocationId()))
+				        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
+
+				queries = config.map(fetch, OwnerQueryStatsDTO.class);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return queries;
+	}
+
+	public void setQueries(List<OwnerQueryStatsDTO> queries) {
+		this.queries = queries;
+	}
+
+	public UserBean getUserBean() {
+		return userBean;
+	}
+
+	public void setUserBean(UserBean userBean) {
+		this.userBean = userBean;
+	}
 
 }
