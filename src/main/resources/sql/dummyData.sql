@@ -70,5 +70,20 @@ VALUES (2, 5, 'i');
 INSERT INTO "flagged_query"(query_id, person_id, "flag")
 VALUES (3, 5, 'a');
 
+INSERT INTO "query_location"(query_id, location_id) 
+VALUES (1, 2);
 
+INSERT INTO "query_location"(query_id, location_id) 
+VALUES (1, 3);
 
+INSERT INTO "query_location"(query_id, location_id) 
+VALUES (1, 6);
+
+INSERT INTO "query_location"(query_id, location_id) 
+VALUES (2, 3);
+
+INSERT INTO "query_location"(query_id, location_id) 
+VALUES (2, 6);
+
+INSERT INTO "query_location"(query_id, location_id) 
+VALUES (3, 1);
