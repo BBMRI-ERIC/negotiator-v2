@@ -59,6 +59,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
         modelMapper.getConfiguration().addValueReader(new RecordValueReader());
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
         modelMapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
 
 //        PropertyMap<Record, QueryStatsDTO> commentsMap = new PropertyMap<Record, QueryStatsDTO>() {
 //            protected void configure() {

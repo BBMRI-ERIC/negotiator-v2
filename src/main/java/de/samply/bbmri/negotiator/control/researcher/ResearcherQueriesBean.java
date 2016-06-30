@@ -30,6 +30,8 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 
 import javax.annotation.PostConstruct;
@@ -52,6 +54,10 @@ public class ResearcherQueriesBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
+    private Query selectedQuery;
+
+    private List<CommentPersonDTO> comments;
+
     /**
      * Initializes this bean by loading all queries for the current researcher.
      */
@@ -59,6 +65,16 @@ public class ResearcherQueriesBean implements Serializable {
     public void init() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void selectQuery(Query query) {
+        selectedQuery = query;
+
+        try(Config config = ConfigFactory.get()) {
+            comments = DbUtil.getComments(config, selectedQuery.getId());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -80,4 +96,19 @@ public class ResearcherQueriesBean implements Serializable {
         this.userBean = userBean;
     }
 
+    public Query getSelectedQuery() {
+        return selectedQuery;
+    }
+
+    public void setSelectedQuery(Query selectedQuery) {
+        this.selectedQuery = selectedQuery;
+    }
+
+    public List<CommentPersonDTO> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentPersonDTO> comments) {
+        this.comments = comments;
+    }
 }

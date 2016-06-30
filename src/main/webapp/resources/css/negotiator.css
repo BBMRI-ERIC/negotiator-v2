@@ -121,3 +121,30 @@ hr {
 .fiveRight {
     margin-right: 5px;
 }
+
+.queryTitle {
+    text-align: left;
+}
+
+.deco-none {
+    color: black;
+    text-decoration: none;
+}
+
+.deco-none:link {
+    color: black;
+    text-decoration: none;
+}
+
+.deco-none:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.deco-none:hover .panel-heading {
+    background-color: #ccc;
+}
+
+.deco-none:hover .panel-body {
+    background-color: #eee;
+}

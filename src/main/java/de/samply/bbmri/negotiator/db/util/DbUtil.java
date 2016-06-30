@@ -27,29 +27,86 @@
 package de.samply.bbmri.negotiator.db.util;
 
 import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.enums.PersonType;
+import de.samply.bbmri.negotiator.model.CommentPersonDTO;
+import de.samply.bbmri.negotiator.model.QueryLocationDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
-import org.jooq.JoinType;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * Created by paul on 6/27/16.
+ * The database util for basic queries.
  */
 public class DbUtil {
 
+    /**
+     * Returns a list of queries with the number of biobanks that commented on that query and the last
+     * time a comment was made
+     * @param config jooq configuration
+     * @param userId the researcher ID
+     * @return
+     */
     public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId) {
         Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
                 .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-                .select(Tables.COMMENT.ID.count().as("comment_count"))
+                .select(Tables.PERSON.ID.countDistinct().as("comment_count"))
                 .from(Tables.QUERY)
-                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID))
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(Tables.PERSON.ID))
                 .where(Tables.QUERY.RESEARCHER_ID.eq(userId))
-                .groupBy(Tables.QUERY.ID).fetch();
+                .and(Tables.PERSON.PERSON_TYPE.eq(PersonType.OWNER).or(Tables.PERSON.PERSON_TYPE.isNull()))
+                .groupBy(Tables.QUERY.ID)
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc()).fetch();
 
         return config.map(fetch, QueryStatsDTO.class);
+    }
+
+    /**
+     * Returns the overview for a specific query.
+     * @param config
+     * @param queryId
+     * @return
+     */
+    @Deprecated
+    public static List<QueryLocationDTO> getQueryLocationDTO(Config config, int queryId) {
+        Table<Record3<Integer, Integer, Timestamp>> subMax = config.dsl()
+                .select(Tables.QUERY_LOCATION.LOCATION_ID, Tables.QUERY.ID, Tables.COMMENT.COMMENT_TIME.max())
+                .from(Tables.COMMENT)
+                .join(Tables.QUERY).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
+                .join(Tables.QUERY_LOCATION).onKey(Keys.QUERY_LOCATION__QUERY_LOCATION_QUERY_ID_FKEY)
+                .join(Tables.PERSON).on(Tables.PERSON.ID.eq(Tables.COMMENT.PERSON_ID))
+                .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+                .and(Tables.PERSON.LOCATION_ID.eq(Tables.QUERY_LOCATION.LOCATION_ID))
+                .groupBy(Tables.QUERY_LOCATION.LOCATION_ID, Tables.QUERY.ID).asTable("nested");
+
+        Result<Record> result = config.dsl().select()
+                .from(Tables.QUERY)
+                .join(Tables.COMMENT).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
+                .join(Tables.PERSON).on(Tables.PERSON.ID.eq(Tables.COMMENT.PERSON_ID))
+                .join(Tables.LOCATION).on(Tables.LOCATION.ID.eq(Tables.PERSON.LOCATION_ID))
+                .join(subMax).on(Tables.LOCATION.ID.eq(subMax.field(Tables.QUERY_LOCATION.LOCATION_ID)))
+                .where(Tables.COMMENT.COMMENT_TIME.eq(subMax.field(Tables.COMMENT.COMMENT_TIME.max()))).fetch();
+
+        return config.map(result, QueryLocationDTO.class);
+    }
+
+    /**
+     * Returns a list of CommentPersonDTOs for a specific query.
+     * @param config
+     * @param queryId
+     * @return
+     */
+    public static List<CommentPersonDTO> getComments(Config config, int queryId) {
+        Result<Record> result = config.dsl().select().from(Tables.COMMENT)
+                .join(Tables.PERSON).onKey(Keys.COMMENT__COMMENT_PERSON_ID_FKEY)
+                .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+                .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
+
+        return config.map(result, CommentPersonDTO.class);
     }
 
 }

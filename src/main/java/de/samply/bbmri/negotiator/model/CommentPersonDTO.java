@@ -37,8 +37,14 @@ import java.io.Serializable;
 public class CommentPersonDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The comment itself
+     */
     private Comment comment;
 
+    /**
+     * The person who made the comment.
+     */
     private Person person;
 
     public Comment getComment() {

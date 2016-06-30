@@ -26,54 +26,45 @@
 
 package de.samply.bbmri.negotiator.model;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Location;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 /**
- * DTO that gives a small statistic for a query, with the amount of commentCount made for the query and
- * the last time someone made a comment for this query.
+ * Created by paul on 6/30/16.
  */
-public class QueryStatsDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+@Deprecated
+public class QueryLocationDTO implements Serializable {
 
-    /**
-     * The query itself
-     */
-    private Query query;
+    private Comment comment;
 
-    /**
-     * The last time someone commented on the query.
-     */
-    private Timestamp lastCommentTime;
+    private Location location;
 
-    /**
-     * The number of comments for this query.
-     */
-    private int commentCount;
+    private Person person;
 
-    public Query getQuery() {
-        return query;
+    public Comment getComment() {
+        return comment;
     }
 
-    public void setQuery(Query query) {
-        this.query = query;
+    public void setComment(Comment comment) {
+        this.comment = comment;
     }
 
-    public Timestamp getLastCommentTime() {
-        return lastCommentTime;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setLastCommentTime(Timestamp lastCommentTime) {
-        this.lastCommentTime = lastCommentTime;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
-    public int getCommentCount() {
-        return commentCount;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setCommentCount(int commentCount) {
-        this.commentCount = commentCount;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }
