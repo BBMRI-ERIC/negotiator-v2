@@ -54,9 +54,20 @@ public class ResearcherQueriesBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
+    /**
+     * The selected query, if there is one
+     */
     private Query selectedQuery;
 
+    /**
+     * The list of comments for the selected query
+     */
     private List<CommentPersonDTO> comments;
+
+    /**
+     * The input textarea for the user to make a comment.
+     */
+    private String commentText;
 
     /**
      * Initializes this bean by loading all queries for the current researcher.
@@ -70,6 +81,10 @@ public class ResearcherQueriesBean implements Serializable {
         }
     }
 
+    /**
+     * Selects the query
+     * @param query
+     */
     public void selectQuery(Query query) {
         selectedQuery = query;
 
@@ -78,6 +93,13 @@ public class ResearcherQueriesBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public String saveComment() {
+        /**
+         * Save the current comment
+         */
+        return null;
     }
 
     public List<QueryStatsDTO> getQueries() {
@@ -110,5 +132,13 @@ public class ResearcherQueriesBean implements Serializable {
 
     public void setComments(List<CommentPersonDTO> comments) {
         this.comments = comments;
+    }
+
+    public String getCommentText() {
+        return commentText;
+    }
+
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
     }
 }

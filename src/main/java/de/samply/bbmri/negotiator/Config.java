@@ -72,6 +72,13 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
     }
 
     /**
+     * Executes an SQL-Commit.
+     */
+    public void commit() throws SQLException {
+        get().commit();
+    }
+
+    /**
      * Returns the SQL connection.
      * @return
      */
