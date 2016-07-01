@@ -13,6 +13,9 @@ VALUES ('Cloud 9');
 INSERT INTO "location"("name")
 VALUES ('Disney land');
 
+INSERT INTO "location"("name")
+VALUES ('Nirvana');
+
 INSERT INTO "person"(person_type, auth_subject, auth_name, auth_email, person_image)
 VALUES ('RESEARCHER', 'https://auth.samply.de/users/55', 'Terminator', 'test1@test1.org', null);
 		
