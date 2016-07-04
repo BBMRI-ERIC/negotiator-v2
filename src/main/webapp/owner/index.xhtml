@@ -100,17 +100,17 @@
 
                 <h:panelGroup layout="block" styleClass="panel-body">
                     <h:panelGroup layout="block" styleClass="row">
-                        <h:panelGroup layout="block" styleClass="col-md-1" rendered="#{userBean.biobankOwner}">
+                        <h:panelGroup layout="block" styleClass="col-md-1 avatar-pic-comment-column" rendered="#{userBean.biobankOwner}">
                                 <h:graphicImage library="images" name="shodan_80_86.png" />
                         </h:panelGroup>
-                        <h:panelGroup layout="block" styleClass="col-md-11" style="padding-left: 30px;">
+                        <h:panelGroup layout="block" styleClass="col-md-11 comment-text-column" style="padding-left: 30px;">
                             <h:panelGroup layout="block" styleClass="row queryOwner" rendered="#{userBean.biobankOwner}">
                                 #{item.auth_name}
                             </h:panelGroup>
 
                             <h:panelGroup layout="block" styleClass="row">
                                 <h:panelGroup layout="block"
-                                    styleClass="col-md-10">
+                                    styleClass="col-md-10 comment-text-content">
                                     #{item.query.text}
                                 </h:panelGroup>
                             </h:panelGroup>

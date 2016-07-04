@@ -148,3 +148,15 @@ hr {
 .deco-none:hover .panel-body {
     background-color: #eee;
 }
+
+.avatar-pic-comment-column {
+	width: 80px;
+}
+
+.comment-text-column {
+	width: calc(100% - 80px);
+}
+
+.comment-text-content {
+	margin-left: 1em;
+}
