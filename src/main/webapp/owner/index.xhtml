@@ -41,7 +41,7 @@
         <h:panelGroup layout="block" styleClass="row queriesTopLine">
             <h:form prependId="false">
                 <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
-                    <h:outputLabel for="filterInputText" value="Search:" />
+                    <h:outputLabel for="filterInputText" value="#{label['global.search']}" />
                     <h:inputText value="#{sessionBean.filterToAdd}"
                         size="20" id="filterInputText" />
                     <h:commandButton id="addFilterButton"

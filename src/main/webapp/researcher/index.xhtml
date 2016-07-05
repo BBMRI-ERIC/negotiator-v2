@@ -44,7 +44,7 @@
             <h:panelGroup layout="block" styleClass="row queriesTopLine">
                 <h:panelGroup layout="block" styleClass="col-md-6">
                     <a href="#" class="btn btn-danger btn-sm btn-block"
-                       role="button"><i class="glyphicon glyphicon-edit"></i> New query</a>
+                       role="button"><i class="glyphicon glyphicon-edit"></i> #{label['global.newQuery']}</a>
 
                     <p/>
                 </h:panelGroup>
@@ -124,8 +124,8 @@
 
             <h:panelGroup rendered="#{researcherQueriesBean.selectedQuery == null}" layout="block">
 
-                <h3 class="text-muted">Select a query on the left side of the view</h3>
-
+                <h3 class="text-muted">#{label['global.selectQuery']}</h3>
+                
             </h:panelGroup>
 
             <h:panelGroup rendered="#{researcherQueriesBean.selectedQuery != null}" layout="block">
