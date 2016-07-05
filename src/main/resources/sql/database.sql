@@ -43,7 +43,7 @@ CREATE TABLE "query" (
     "id" SERIAL NOT NULL,
     "title" CHARACTER VARYING(255) NOT NULL,
     "text" TEXT,
-    "query_creation_time" TIMESTAMP WITHOUT TIME ZONE,
+    "query_creation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "researcher_id" INTEGER NOT NULL,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("researcher_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
@@ -135,17 +135,19 @@ COMMENT ON COLUMN "flagged_query".person_id IS 'This column along with the id co
 COMMENT ON COLUMN "flagged_query"."flag" IS 'The flag of the comment. One character letter. (A) archived, (I) ignored, (S) starred';
 
 
-CREATE TABLE "query_location" (
+CREATE TABLE "query_person" (
     "query_id" INTEGER NOT NULL,
-    "location_id" INTEGER NOT NULL,
-    PRIMARY KEY("query_id", "location_id"),
+    "person_id" INTEGER NOT NULL,
+	"query_leaving_time" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY("query_id", "person_id"),
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY ("location_id") REFERENCES "location"("id") ON UPDATE CASCADE ON DELETE CASCADE
+	FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
-CREATE INDEX "queryIdIndexQueryLocation" ON "query_location" (query_id);
-CREATE INDEX "locationIdIndexQueryLocation" ON "query_location" (location_id);
+CREATE INDEX "queryIdIndexQueryPerson" ON "query_person" (query_id);
+CREATE INDEX "personIdIndexQueryPerson" ON "query_person" (person_id);
 
 
-COMMENT ON TABLE "query_location" IS 'Table for all the locations that have replied to a query.';
-COMMENT ON COLUMN "query_location".query_id IS 'This column along with location_Id will make the primary key. Its also a foreign key here, taken from query table';
-COMMENT ON COLUMN "query_location".location_id IS 'This column along with the query_id column will make the primary key. Its also a foreign key here, taken from "location" table';
+COMMENT ON TABLE "query_person" IS 'Table for the relationship between all the persons(owners) and the queries that they have replied to.';
+COMMENT ON COLUMN "query_person".query_id IS 'This column along with person_Id will make the primary key. Its also a foreign key here, taken from query table';
+COMMENT ON COLUMN "query_person".person_id IS 'This column along with the query_id column will make the primary key. Its also a foreign key here, taken from "person" table';
+COMMENT ON COLUMN "query_person".query_leaving_time IS 'The time when an owner leaves a query';

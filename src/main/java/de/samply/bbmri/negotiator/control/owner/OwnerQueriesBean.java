@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.control.owner;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -38,10 +39,14 @@ import javax.faces.bean.ViewScoped;
 import org.jooq.JoinType;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jooq.impl.DSL;
+import org.jvnet.hk2.internal.NarrowResults;
+import org.omg.CORBA.Current;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 
@@ -67,16 +72,21 @@ public class OwnerQueriesBean implements Serializable {
 	}
 
 	/**
-	 * Leave query as a bio bank owner
+	 * Leave query as a bio bank owner. Saves the timestamp of leaving a query.
 	 * 
 	 * @param queryId
 	 * @return
 	 */
 	public String leaveQuery(Integer queryId) {
 		try (Config config = ConfigFactory.get()) {
-			config.dsl().delete(Tables.QUERY_LOCATION)
-			        .where(Tables.QUERY_LOCATION.LOCATION_ID.eq(userBean.getLocationId()))
-			        .and(Tables.QUERY_LOCATION.QUERY_ID.eq(queryId)).execute();
+			java.util.Date date= new java.util.Date();	
+				
+			config.dsl().update(Tables.QUERY_PERSON)
+			            .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, new Timestamp(date.getTime()))
+			            .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryId))
+			            .and(Tables.QUERY_PERSON.PERSON_ID.eq(userBean.getUserId()))
+						.execute();
+			         
 			config.get().commit();
 			queries = null;
 		} catch (SQLException e) {
@@ -85,6 +95,8 @@ public class OwnerQueriesBean implements Serializable {
 
 		return "";
 	}
+	
+	
 
 	/**
 	 * Returns the list of queries in which the current biobank owner is a part of
@@ -98,12 +110,17 @@ public class OwnerQueriesBean implements Serializable {
 				Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
 				        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
 				        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-				        .select(Tables.COMMENT.ID.count().as("comment_count")).from(Tables.QUERY)
+				        .select(Tables.COMMENT.ID.count().as("comment_count"))
+				        .from(Tables.QUERY)
+				        
+				        
 				        .join(Tables.QUERY_LOCATION, JoinType.LEFT_OUTER_JOIN)
 				        .on(Tables.QUERY_LOCATION.QUERY_ID.eq(Tables.QUERY.ID))
 				        .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID))
-				        .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN)
+				        
+				        .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN)				        
 				        .on(Tables.QUERY.RESEARCHER_ID.eq(Tables.PERSON.ID))
+				        
 				        .where(Tables.QUERY_LOCATION.LOCATION_ID.eq(userBean.getLocationId()))
 				        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
 

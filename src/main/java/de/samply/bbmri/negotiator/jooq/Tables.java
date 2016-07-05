@@ -9,7 +9,7 @@ import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
-import de.samply.bbmri.negotiator.jooq.tables.QueryLocation;
+import de.samply.bbmri.negotiator.jooq.tables.QueryPerson;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
 import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 
@@ -55,9 +55,9 @@ public class Tables {
 	public static final Query QUERY = de.samply.bbmri.negotiator.jooq.tables.Query.QUERY;
 
 	/**
-	 * Table for all the locations that have replied to a query.
+	 * Table for the relationship between all the persons(owners) and the queries that they have replied to.
 	 */
-	public static final QueryLocation QUERY_LOCATION = de.samply.bbmri.negotiator.jooq.tables.QueryLocation.QUERY_LOCATION;
+	public static final QueryPerson QUERY_PERSON = de.samply.bbmri.negotiator.jooq.tables.QueryPerson.QUERY_PERSON;
 
 	/**
 	 * Table that contains tags for queries

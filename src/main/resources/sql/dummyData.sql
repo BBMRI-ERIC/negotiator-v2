@@ -19,8 +19,8 @@ VALUES ('Nirvana');
 INSERT INTO "person"(person_type, auth_subject, auth_name, auth_email, person_image)
 VALUES ('RESEARCHER', 'https://auth.samply.de/users/55', 'Terminator', 'test1@test1.org', null);
 		
-INSERT INTO "person"(person_type, auth_subject, auth_name, auth_email, person_image)
-VALUES ('RESEARCHER', 'https://auth.samply.de/users/17', 'The Joker', 'test2@test2.org', null);
+INSERT INTO "person"(person_type, auth_subject, auth_name, auth_email, person_image, location_id)
+VALUES ('OWNER', 'https://auth.samply.de/users/17', 'The Joker', 'test2@test2.org', null, 2);
 
 INSERT INTO "person"(person_type, auth_subject, auth_name, auth_email, person_image)
 VALUES ('RESEARCHER', 'https://auth.samply.de/users/007', 'James Bond', 'test3@test3.org', null);
@@ -59,7 +59,19 @@ INSERT INTO "comment"(query_id, person_id, comment_time, "text")
 VALUES (1, 5, '2016-01-01 00:00:00', 'I think the query is too general');
 
 INSERT INTO "comment"(query_id, person_id, comment_time, "text")
+VALUES (1, 2, '2016-01-01 00:00:00', 'I agree with you on that');
+
+INSERT INTO "comment"(query_id, person_id, comment_time, "text")
+VALUES (1, 2, '2016-01-01 00:00:00', 'Please explain more');
+
+INSERT INTO "comment"(query_id, person_id, comment_time, "text")
+VALUES (3, 2, '2015-05-01 00:00:00', 'What is your deal with lung cancer');
+
+INSERT INTO "comment"(query_id, person_id, comment_time, "text")
 VALUES (3, 6, '2015-05-01 00:00:00', 'They have been lying to you all the way. Smoking is actually good for your health');
+
+INSERT INTO "comment"(query_id, person_id, comment_time, "text")
+VALUES (3, 5, '2015-05-01 00:00:00', 'You talk like you represent the tobacco industry');
 
 INSERT INTO "comment"(query_id, person_id, comment_time, "text")
 VALUES (1, 5, '2016-02-02 00:00:00', 'I can share the data with you');
@@ -73,20 +85,15 @@ VALUES (2, 5, 'i');
 INSERT INTO "flagged_query"(query_id, person_id, "flag")
 VALUES (3, 5, 'a');
 
-INSERT INTO "query_location"(query_id, location_id) 
-VALUES (1, 2);
+INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
+VALUES (1, 2, '2016-07-01 00:00:00');
 
-INSERT INTO "query_location"(query_id, location_id) 
-VALUES (1, 3);
+INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
+VALUES (3, 2, '2016-07-02 00:00:00');
 
-INSERT INTO "query_location"(query_id, location_id) 
-VALUES (1, 6);
+INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
+VALUES (1, 5, '2016-07-01 00:00:00');
 
-INSERT INTO "query_location"(query_id, location_id) 
-VALUES (2, 3);
+INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
+VALUES (3, 5, '2016-07-01 00:00:00');
 
-INSERT INTO "query_location"(query_id, location_id) 
-VALUES (2, 6);
-
-INSERT INTO "query_location"(query_id, location_id) 
-VALUES (3, 1);

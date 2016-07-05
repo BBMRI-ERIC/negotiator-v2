@@ -9,7 +9,7 @@ import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
-import de.samply.bbmri.negotiator.jooq.tables.QueryLocation;
+import de.samply.bbmri.negotiator.jooq.tables.QueryPerson;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
 import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 
@@ -37,7 +37,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = 284222242;
+	private static final long serialVersionUID = -1115965182;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -81,7 +81,7 @@ public class Public extends SchemaImpl {
 			Location.LOCATION,
 			Person.PERSON,
 			Query.QUERY,
-			QueryLocation.QUERY_LOCATION,
+			QueryPerson.QUERY_PERSON,
 			Tag.TAG,
 			TaggedQuery.TAGGED_QUERY);
 	}
