@@ -20,7 +20,7 @@ INSERT INTO "person"(person_type, auth_subject, auth_name, auth_email, person_im
 VALUES ('RESEARCHER', 'https://auth.samply.de/users/55', 'Terminator', 'test1@test1.org', null);
 		
 INSERT INTO "person"(person_type, auth_subject, auth_name, auth_email, person_image, location_id)
-VALUES ('OWNER', 'https://auth.samply.de/users/17', 'The Joker', 'test2@test2.org', null, 2);
+VALUES ('OWNER', 'https://auth.samply.de/users/17', 'The Joker', 'test2@test2.org', null, 4);
 
 INSERT INTO "person"(person_type, auth_subject, auth_name, auth_email, person_image)
 VALUES ('RESEARCHER', 'https://auth.samply.de/users/007', 'James Bond', 'test3@test3.org', null);
@@ -41,7 +41,7 @@ INSERT INTO "query"("title", "text", query_creation_time, researcher_id)
 VALUES ('colon cancer','latest papers on colon cancer', '2015-01-01 00:00:00', 2);
 
 INSERT INTO "query"("title", "text", query_creation_time, researcher_id)
-VALUES ('lung cancer','NO smoking data', '2014-05-01 00:00:00', 6);
+VALUES ('lung cancer','No smoking data', '2014-05-01 00:00:00', 6);
 
 INSERT INTO "tag"(query_id, "text")
 VALUES (2,'Colon' );

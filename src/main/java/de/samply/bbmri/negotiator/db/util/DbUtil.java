@@ -36,6 +36,7 @@ import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -73,25 +74,29 @@ public class DbUtil {
      */
     @Deprecated
     public static List<QueryLocationDTO> getQueryLocationDTO(Config config, int queryId) {
-        Table<Record3<Integer, Integer, Timestamp>> subMax = config.dsl()
-                .select(Tables.QUERY_LOCATION.LOCATION_ID, Tables.QUERY.ID, Tables.COMMENT.COMMENT_TIME.max())
-                .from(Tables.COMMENT)
-                .join(Tables.QUERY).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
-                .join(Tables.QUERY_LOCATION).onKey(Keys.QUERY_LOCATION__QUERY_LOCATION_QUERY_ID_FKEY)
-                .join(Tables.PERSON).on(Tables.PERSON.ID.eq(Tables.COMMENT.PERSON_ID))
-                .where(Tables.COMMENT.QUERY_ID.eq(queryId))
-                .and(Tables.PERSON.LOCATION_ID.eq(Tables.QUERY_LOCATION.LOCATION_ID))
-                .groupBy(Tables.QUERY_LOCATION.LOCATION_ID, Tables.QUERY.ID).asTable("nested");
+//        Table<Record3<Integer, Integer, Timestamp>> subMax = config.dsl()
+//                .select(Tables.QUERY_LOCATION.LOCATION_ID, Tables.QUERY.ID, Tables.COMMENT.COMMENT_TIME.max())
+//                .from(Tables.COMMENT)
+//                .join(Tables.QUERY).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
+//                .join(Tables.QUERY_LOCATION).onKey(Keys.QUERY_LOCATION__QUERY_LOCATION_QUERY_ID_FKEY)
+//                .join(Tables.PERSON).on(Tables.PERSON.ID.eq(Tables.COMMENT.PERSON_ID))
+//                .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+//                .and(Tables.PERSON.LOCATION_ID.eq(Tables.QUERY_LOCATION.LOCATION_ID))
+//                .groupBy(Tables.QUERY_LOCATION.LOCATION_ID, Tables.QUERY.ID).asTable("nested");
+//
+//      		   Result<Record> result = config.dsl().select()
+//                .from(Tables.QUERY)
+//                .join(Tables.COMMENT).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
+//                .join(Tables.PERSON).on(Tables.PERSON.ID.eq(Tables.COMMENT.PERSON_ID))
+//                .join(Tables.LOCATION).on(Tables.LOCATION.ID.eq(Tables.PERSON.LOCATION_ID))
+//                .join(subMax).on(Tables.LOCATION.ID.eq(subMax.field(Tables.QUERY_LOCATION.LOCATION_ID)))
+//                .where(Tables.COMMENT.COMMENT_TIME.eq(subMax.field(Tables.COMMENT.COMMENT_TIME.max()))).fetch();
+//    	
+//    	return config.map(result, QueryLocationDTO.class);
+ 		 List<QueryLocationDTO> myList = new ArrayList<QueryLocationDTO>();
+ 		 return myList;
 
-        Result<Record> result = config.dsl().select()
-                .from(Tables.QUERY)
-                .join(Tables.COMMENT).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
-                .join(Tables.PERSON).on(Tables.PERSON.ID.eq(Tables.COMMENT.PERSON_ID))
-                .join(Tables.LOCATION).on(Tables.LOCATION.ID.eq(Tables.PERSON.LOCATION_ID))
-                .join(subMax).on(Tables.LOCATION.ID.eq(subMax.field(Tables.QUERY_LOCATION.LOCATION_ID)))
-                .where(Tables.COMMENT.COMMENT_TIME.eq(subMax.field(Tables.COMMENT.COMMENT_TIME.max()))).fetch();
-
-        return config.map(result, QueryLocationDTO.class);
+    
     }
 
     /**

@@ -99,7 +99,7 @@ public class OwnerQueriesBean implements Serializable {
 	
 
 	/**
-	 * Returns the list of queries in which the current biobank owner is a part of
+	 * Returns the list of queries in which the current biobank owner is a part of(all queries that on owner can see)
 	 * 
 	 * @return
 	 */
@@ -111,18 +111,16 @@ public class OwnerQueriesBean implements Serializable {
 				        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
 				        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
 				        .select(Tables.COMMENT.ID.count().as("comment_count"))
-				        .from(Tables.QUERY)
-				        
-				        
-				        .join(Tables.QUERY_LOCATION, JoinType.LEFT_OUTER_JOIN)
-				        .on(Tables.QUERY_LOCATION.QUERY_ID.eq(Tables.QUERY.ID))
-				        .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID))
-				        
-				        .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN)				        
-				        .on(Tables.QUERY.RESEARCHER_ID.eq(Tables.PERSON.ID))
-				        
-				        .where(Tables.QUERY_LOCATION.LOCATION_ID.eq(userBean.getLocationId()))
+				        .from(Tables.QUERY)        
+				        .join(Tables.QUERY_PERSON, JoinType.JOIN)
+				        .on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
+				        .join(Tables.PERSON, JoinType.JOIN)				        
+				        .on(Tables.QUERY_PERSON.PERSON_ID.eq(Tables.PERSON.ID))				        
+				        .join(Tables.COMMENT, JoinType.JOIN)
+				        .on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))			        
+				        .where(Tables.PERSON.LOCATION_ID.eq(userBean.getLocationId()))
 				        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
+				
 
 				queries = config.map(fetch, OwnerQueryStatsDTO.class);
 			} catch (SQLException e) {
