@@ -39,14 +39,10 @@ import javax.faces.bean.ViewScoped;
 import org.jooq.JoinType;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.jooq.impl.DSL;
-import org.jvnet.hk2.internal.NarrowResults;
-import org.omg.CORBA.Current;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 
