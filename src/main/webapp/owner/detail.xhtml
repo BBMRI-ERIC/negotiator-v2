@@ -33,7 +33,12 @@
 	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
 	template="../components/default.xhtml">
 
-	<!-- Queries page for the researcher -->
+	<!-- Queries page for the owner -->
+
+	<f:metadata>
+		<f:viewParam name="queryId" value="#{ownerQueriesDetailBean.queryId}" />
+		<f:viewAction action="#{ownerQueriesDetailBean.initialize}" />
+	</f:metadata>
 
 	<ui:param name="bodyClass" value="container-fluid" />
 
@@ -41,7 +46,8 @@
 
 		<h:panelGroup layout="block" styleClass="col-md-3">
 
-			<h:panelGroup layout="block" styleClass="row queriesTopLine">
+			<h:panelGroup layout="block" styleClass="row queriesTopLine"
+				style='visibility: hidden'>
 				<h:panelGroup layout="block" styleClass="col-md-6">
 					<a href="#" class="btn btn-danger btn-sm btn-block" role="button"><i
 						class="glyphicon glyphicon-edit"></i> #{label['global.newQuery']}</a>
@@ -50,21 +56,15 @@
 				</h:panelGroup>
 			</h:panelGroup>
 
-			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() == 0}"
-				layout="block">
-				<h3>You did not create any queries yet.</h3>
-			</h:panelGroup>
-
 			<h:form>
 
-				<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
+				<ui:repeat var="item" value="#{ownerQueriesDetailBean.queries}">
 
-					<h:commandLink
-						action="#{researcherQueriesBean.selectCommentsForQuery(item.query)}"
-						styleClass="deco-none">
-						<f:ajax render="right-panel" />
+					<h:link outcome="detail" styleClass="deco-none">
+						<f:param name="queryId" value="#{item.query.id}" />
 
-						<h:panelGroup layout="block" styleClass="panel panel-default">
+						<h:panelGroup layout="block"
+							styleClass="panel panel-default #{item.query.id == ownerQueriesDetailBean.queryId ? 'selected-query' : ''}">
 
 							<h:panelGroup layout="block" styleClass="panel-heading">
 
@@ -75,7 +75,7 @@
 
 									<h:panelGroup styleClass="badge queryNumberResponsesBadge">
 										<h:outputText
-											title="#{item.commentCount} biobanks contacted you"
+											title="#{item.commentCount} comments for this query"
 											value="#{item.commentCount}" />
 									</h:panelGroup>
 
@@ -118,7 +118,8 @@
 
 						</h:panelGroup>
 
-					</h:commandLink>
+
+					</h:link>
 
 				</ui:repeat>
 
@@ -126,35 +127,36 @@
 
 		</h:panelGroup>
 
+
+
+
+
 		<h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1"
 			id="right-panel">
 
-			<h:panelGroup
-				rendered="#{researcherQueriesBean.selectedQuery == null}"
-				layout="block">
 
-				<h3 class="text-muted">#{label['global.selectAQuery']}</h3>
+			<h:panelGroup layout="block">
 
-			</h:panelGroup>
+				<h:panelGroup layout="block">
 
-			<h:panelGroup
-				rendered="#{researcherQueriesBean.selectedQuery != null}"
-				layout="block">
+<!-- 					<h:outputText title="title of the selected query" -->
+<!-- 						value="#{ownerQueriesDetailBean.selectedQuery.title}" /> -->
+					<h3>#{ownerQueriesDetailBean.selectedQuery.title}</h3>
 
-				<h3>#{researcherQueriesBean.selectedQuery.title}</h3>
+					<p>#{ownerQueriesDetailBean.selectedQuery.text}</p>
 
-				<p>#{researcherQueriesBean.selectedQuery.text}</p>
+				</h:panelGroup>
 
 				<h:panelGroup layout="block" styleClass="col-md-12">
 					<p class="pull-right">
 						<h:outputText
-							value="#{researcherQueriesBean.selectedQuery.queryCreationTime}">
+							value="#{ownerQueriesDetailBean.selectedQuery.queryCreationTime}">
 							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 						</h:outputText>
 					</p>
 				</h:panelGroup>
 
-				<ui:fragment rendered="#{researcherQueriesBean.comments.size() > 0}">
+				<ui:fragment rendered="#{ownerQueriesDetailBean.comments.size() > 0}">
 
 					<div class="col-xs-12">
 						<hr></hr>
@@ -164,9 +166,10 @@
 
 				</ui:fragment>
 
-				<ui:repeat value="#{researcherQueriesBean.comments}" var="comment">
+				<ui:repeat value="#{ownerQueriesDetailBean.comments}" var="comment">
 
 					<h:panelGroup layout="block" styleClass="panel panel-default">
+
 						<h:panelGroup layout="block" styleClass="panel-heading">
 
                             #{comment.person.authName}
@@ -180,7 +183,6 @@
 							</h:panelGroup>
 
 						</h:panelGroup>
-
 
 						<h:panelGroup layout="block" styleClass="panel-body">
 
@@ -231,14 +233,14 @@
 
 							<div class="form-group">
 
-								<h:inputTextarea value="#{researcherQueriesBean.commentText}"
+								<h:inputTextarea value="#{ownerQueriesDetailBean.commentText}"
 									styleClass="form-control" rows="5" />
 
 							</div>
 
 							<h:panelGroup layout="block" styleClass="pull-right">
 
-								<h:commandButton action="#{researcherQueriesBean.saveComment}"
+								<h:commandButton action="#{ownerQueriesDetailBean.saveComment}"
 									value="Comment" styleClass="btn btn-primary" />
 
 							</h:panelGroup>

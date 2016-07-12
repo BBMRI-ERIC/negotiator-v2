@@ -38,7 +38,7 @@ INSERT INTO "query"("title", "text", query_creation_time, researcher_id)
 VALUES ('cancer','Data on all sorts of cancers', '2015-01-02 00:00:00', 1);
 
 INSERT INTO "query"("title", "text", query_creation_time, researcher_id)
-VALUES ('colon cancer','latest papers on colon cancer', '2015-01-01 00:00:00', 2);
+VALUES ('colon cancer','latest papers on colon cancer', '2015-01-01 00:00:00', 6);
 
 INSERT INTO "query"("title", "text", query_creation_time, researcher_id)
 VALUES ('lung cancer','No smoking data', '2014-05-01 00:00:00', 6);

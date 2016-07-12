@@ -36,7 +36,6 @@ import de.samply.bbmri.negotiator.model.QueryLocationDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.*;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -67,6 +66,37 @@ public class DbUtil {
 
         return config.map(fetch, QueryStatsDTO.class);
     }
+    
+    /**
+     * Returns an overview of all the queries a bio-bank owner can see when he/she logs in.
+     * @param config
+     * @param queryId
+     * @return
+     */
+     
+    public static List<OwnerQueryStatsDTO> getAllQueriesAsOwner(Config config, int locationId) {
+		Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
+				        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
+				        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+				        .select(Tables.COMMENT.ID.count().as("comment_count"))
+				        .from(Tables.QUERY)        
+				        .join(Tables.QUERY_PERSON, JoinType.JOIN)
+				        .on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
+				        .join(Tables.PERSON, JoinType.JOIN)				        
+				        .on(Tables.QUERY_PERSON.PERSON_ID.eq(Tables.PERSON.ID))				        
+				        .join(Tables.COMMENT, JoinType.JOIN)
+				        .on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))			        
+				        .where(Tables.PERSON.LOCATION_ID.eq(locationId))
+				        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
+				
+
+				return config.map(fetch, OwnerQueryStatsDTO.class);			
+	}
+    
+    
+    
+    
+    
 
 	
     /**

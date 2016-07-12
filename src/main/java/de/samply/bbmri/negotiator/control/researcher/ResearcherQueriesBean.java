@@ -49,7 +49,12 @@ import java.util.List;
 @ViewScoped
 public class ResearcherQueriesBean implements Serializable {
 
-    private List<QueryStatsDTO> queries;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private List<QueryStatsDTO> queries;
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -82,10 +87,10 @@ public class ResearcherQueriesBean implements Serializable {
     }
 
     /**
-     * Selects the query
+     * Selects all the comments made on a query
      * @param query
      */
-    public void selectQuery(Query query) {
+    public void selectCommentsForQuery(Query query) {
         selectedQuery = query;
 
         try(Config config = ConfigFactory.get()) {

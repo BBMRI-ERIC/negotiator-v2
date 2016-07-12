@@ -149,6 +149,14 @@ hr {
     background-color: #eee;
 }
 
+.selected-query .panel-heading {
+    background-color: #ccc;
+}
+
+.selected-query .panel-body {
+    background-color: #eee;
+}
+
 .avatar-pic-comment-column {
 	width: 80px;
 }

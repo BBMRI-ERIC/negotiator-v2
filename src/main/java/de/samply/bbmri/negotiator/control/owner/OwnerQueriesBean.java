@@ -53,10 +53,14 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 @ManagedBean
 @ViewScoped
 public class OwnerQueriesBean implements Serializable {
+
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
 
 	private List<OwnerQueryStatsDTO> queries;
-
+	 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
 	
@@ -73,7 +77,7 @@ public class OwnerQueriesBean implements Serializable {
 	}
 
 	/**
-	 * Leave query as a bio bank owner. Saves the timestamp of leaving a query.
+	 * Leave query as a bio bank owner. Saves the time stamp of leaving a query.
 	 * 
 	 * @param queryId
 	 * @return
@@ -97,10 +101,10 @@ public class OwnerQueriesBean implements Serializable {
 		return "";
 	}
 	
-	
 	/**
 	 * Returns the list of queries in which the current biobank owner is a part of,
 	 * filters by search terms if any are provided
+	 * 
 	 * @return
 	 */
 	public List<OwnerQueryStatsDTO> getQueries() {
@@ -149,6 +153,5 @@ public class OwnerQueriesBean implements Serializable {
 
 	public void setUserBean(UserBean userBean) {
 		this.userBean = userBean;
-	}
-
+	}	
 }
