@@ -42,7 +42,7 @@
             <h:form prependId="false">
                 <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
                     <h:outputLabel for="filterInputText" value="#{label['global.search']}" />
-                    <h:inputText value="#{sessionBean.filterToAdd}"
+                    <h:inputText value="#{sessionBean.filter}"
                         size="20" id="filterInputText" />
                     <h:commandButton id="addFilterButton"
                         action="#{sessionBean.addFilter()}" style="display: none;" />

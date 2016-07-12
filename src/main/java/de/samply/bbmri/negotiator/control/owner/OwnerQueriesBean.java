@@ -29,20 +29,21 @@ package de.samply.bbmri.negotiator.control.owner;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
-import org.jooq.JoinType;
-import org.jooq.Record;
-import org.jooq.Result;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 
@@ -58,6 +59,10 @@ public class OwnerQueriesBean implements Serializable {
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
+	
+	@ManagedProperty(value = "#{sessionBean}")
+    private SessionBean sessionBean;
+
 
 	/**
 	 * Initializes this bean by loading all queries for the current researcher.
@@ -93,37 +98,45 @@ public class OwnerQueriesBean implements Serializable {
 	}
 	
 	
-
 	/**
-	 * Returns the list of queries in which the current biobank owner is a part of(all queries that on owner can see)
-	 * 
+	 * Returns the list of queries in which the current biobank owner is a part of,
+	 * filters by search terms if any are provided
 	 * @return
 	 */
 	public List<OwnerQueryStatsDTO> getQueries() {
-		if (queries == null) {
-			try (Config config = ConfigFactory.get()) {
-
-				Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
-				        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
-				        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-				        .select(Tables.COMMENT.ID.count().as("comment_count"))
-				        .from(Tables.QUERY)        
-				        .join(Tables.QUERY_PERSON, JoinType.JOIN)
-				        .on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
-				        .join(Tables.PERSON, JoinType.JOIN)				        
-				        .on(Tables.QUERY_PERSON.PERSON_ID.eq(Tables.PERSON.ID))				        
-				        .join(Tables.COMMENT, JoinType.JOIN)
-				        .on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))			        
-				        .where(Tables.PERSON.LOCATION_ID.eq(userBean.getLocationId()))
-				        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
-				
-
-				queries = config.map(fetch, OwnerQueryStatsDTO.class);
+		//if (queries == null) {
+			try(Config config = ConfigFactory.get()) {
+				if(sessionBean.getFilters() == null || sessionBean.getFilters().isEmpty())
+					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), null);
+				else 
+					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms());
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-		}
 		return queries;
+	}
+	
+	/**
+	 * Split search terms by list of delimiters 
+	 * @return unique search terms
+	 */
+	private Set<String> getFilterTerms() {
+		Set<String> filterTerms = new HashSet<String>();
+		for(String filters : sessionBean.getFilters()) {
+			// split by 0 or more spaces, followed by either 'and','or', comma or more spaces
+			String[] filterTermsArray = filters.split("\\s*(and|or|,)\\s*");
+			Collections.addAll(filterTerms, filterTermsArray);
+		}
+		return filterTerms;
+	}
+	
+
+	public SessionBean getSessionBean() {
+		return sessionBean;
+	}
+
+	public void setSessionBean(SessionBean sessionBean) {
+		this.sessionBean = sessionBean;
 	}
 
 	public void setQueries(List<OwnerQueryStatsDTO> queries) {

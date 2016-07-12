@@ -31,6 +31,7 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
+import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryLocationDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.*;
@@ -38,6 +39,7 @@ import org.jooq.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The database util for basic queries.
@@ -66,6 +68,48 @@ public class DbUtil {
         return config.map(fetch, QueryStatsDTO.class);
     }
 
+	
+    /**
+     * Returns a list of queries for a particular owner, filtered by a search term if such is provided
+     * @param config jooq configuration
+     * @param locationId biobank id
+     * @param filters search term for title and text
+     * @return
+     */
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters) {
+    	Condition condition = Tables.PERSON.LOCATION_ID.eq(locationId);
+    	
+    	if(filters != null && filters.size() > 0) {
+    		Object[] filtersArray = filters.toArray();
+    		Condition titleCondition = Tables.QUERY.TITLE.contains(filtersArray[0].toString());
+    		Condition textCondition = Tables.QUERY.TEXT.contains(filtersArray[0].toString());
+    		
+    		for (int i = 1; i < filtersArray.length; i++) {
+    			titleCondition = titleCondition.and(Tables.QUERY.TITLE.contains(filtersArray[i].toString()));
+    			textCondition = textCondition.and(Tables.QUERY.TEXT.contains(filtersArray[i].toString()));
+    		}
+    		condition = condition.and(titleCondition.or(textCondition));
+    	}
+    	
+    	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
+		        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
+		        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+		        .select(Tables.COMMENT.ID.count().as("comment_count"))
+		        .from(Tables.QUERY)        
+		        .join(Tables.QUERY_PERSON, JoinType.JOIN)
+		        .on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
+		        .join(Tables.PERSON, JoinType.JOIN)				        
+		        .on(Tables.QUERY_PERSON.PERSON_ID.eq(Tables.PERSON.ID))				        
+		        .join(Tables.COMMENT, JoinType.JOIN)
+		        .on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))			        
+		        .where(condition)
+		        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
+		
+
+		return config.map(fetch, OwnerQueryStatsDTO.class);
+    }
+    
+    
     /**
      * Returns the overview for a specific query.
      * @param config

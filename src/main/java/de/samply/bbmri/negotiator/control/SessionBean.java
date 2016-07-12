@@ -54,7 +54,7 @@ public class SessionBean implements Serializable {
     private List<String> filters = null;
     
     /** The filter to add. */
-    private String filterToAdd = null;
+    private String filter = null;
 
     /**
      * Gets the queries.
@@ -81,16 +81,16 @@ public class SessionBean implements Serializable {
         if (filters == null)
             filters = new ArrayList<String>();
 
-        if (filterToAdd == null || "".equals(filterToAdd))
+        if (filter == null || "".equals(filter))
             return;
 
-        if (filters.contains(filterToAdd)) {
-            filterToAdd = "";
+        if (filters.contains(filter)) {
+            filter = "";
             return;
         }
 
-        filters.add(filterToAdd);
-        filterToAdd = "";
+        filters.add(filter);
+        filter= "";
     }
 
     /**
@@ -131,8 +131,8 @@ public class SessionBean implements Serializable {
      *
      * @return the filter to add
      */
-    public String getFilterToAdd() {
-        return filterToAdd;
+    public String getFilter() {
+        return filter;
     }
 
     /**
@@ -140,8 +140,8 @@ public class SessionBean implements Serializable {
      *
      * @param filterToAdd the new filter to add
      */
-    public void setFilterToAdd(String filterToAdd) {
-        this.filterToAdd = filterToAdd;
+    public void setFilter(String filter) {
+        this.filter = filter;
     }
 
 }
