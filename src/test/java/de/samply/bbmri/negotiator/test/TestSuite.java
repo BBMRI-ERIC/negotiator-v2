@@ -54,10 +54,9 @@ public class TestSuite {
 
 	@BeforeClass
     public static void start() throws FileNotFoundException, ParserConfigurationException, JAXBException, SAXException, SQLException {
-
         try {
         	NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
-        	
+
         	postgresql = NegotiatorConfig.get().getPostgresql();
         	
             /**
