@@ -43,7 +43,7 @@
                 <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
                     <h:outputLabel for="filterInputText" value="#{label['global.search']}" />
                     <h:inputText value="#{sessionBean.filter}"
-                        size="20" id="filterInputText" />
+                        size="20" id="filterInputText" pt:placeholder="search  with  keywords" title="Search with keywords"/>
                     <h:commandButton id="addFilterButton"
                         action="#{sessionBean.addFilter()}" style="display: none;" />
 
@@ -53,8 +53,8 @@
                 </h:panelGroup>
                 <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right">
                     <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
-                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-inbox"></i></button>
-                      <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
+                      <button type="button" class="btn btn-default" title="View all archived queries" ><i class="glyphicon glyphicon-inbox"></i></button>
+                      <button type="button" class="btn btn-default" title="View all favourite queries"><i class="glyphicon glyphicon-star"></i></button>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
@@ -70,7 +70,7 @@
                           styleClass="panel panel-default">
                 <h:panelGroup layout="block" styleClass="panel-heading">
 
-                    <h:link outcome="detail">
+                    <h:link outcome="detail" title="Click to see all comments for this query">
                         <f:param name="queryId" value="#{item.query.id}"/>
                         #{item.query.title}
                     </h:link>
@@ -78,18 +78,18 @@
                     <h:panelGroup styleClass="pull-right">
                     <h:form>
                         <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
-                              <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-folder-open"></i></button>
-                              <h:commandLink styleClass="btn btn-default" action="#{ownerQueriesBean.leaveQuery(item.query.id)}"><i class="fa fa-sign-out"></i></h:commandLink>
-                              <button type="button" class="btn btn-default"><i class="glyphicon glyphicon-star"></i></button>
+                              <button type="button" class="btn btn-default" title="Archive this query"><i class="glyphicon glyphicon-folder-open"></i></button>
+                              <h:commandLink styleClass="btn btn-default" action="#{ownerQueriesBean.leaveQuery(item.query.id)}" title="Ignore this query from the view"><i class="fa fa-sign-out"></i></h:commandLink>
+                              <button type="button" class="btn btn-default" title="Mark as favourite"><i class="glyphicon glyphicon-star"></i></button>
                         </h:panelGroup>
                     </h:form>
                         <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.commentCount > 0}">
-                            <h:outputText title="#{item.commentCount} biobanks contacted you"
+                            <h:outputText title="#{item.commentCount} comments on this query"
                                           value="#{item.commentCount}"/>
                         </h:panelGroup>
 
                         <h:outputText value="#{item.lastCommentTime}" styleClass="queryCreationDate"
-                                      title="Date and time of last contact communication" rendered="#{item.commentCount > 0}">
+                                      title="Date and time of last comment" rendered="#{item.commentCount > 0}">
                             <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
                         </h:outputText>
 
