@@ -30,6 +30,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryLocationDTO;
@@ -107,7 +108,9 @@ public class DbUtil {
      * @return
      */
     public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters) {
-    	Condition condition = Tables.PERSON.LOCATION_ID.eq(locationId);
+    	Condition condition = Tables.PERSON.LOCATION_ID.eq(locationId)
+    						.and((Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getArchiveflag())
+    						  .or(Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getIgnoreflag()))));
     	
     	if(filters != null && filters.size() > 0) {
     		Object[] filtersArray = filters.toArray();
@@ -147,6 +150,7 @@ public class DbUtil {
     	
 		return config.map(fetch, OwnerQueryStatsDTO.class);
     }
+    
     
     
     /**
