@@ -24,6 +24,9 @@ import javax.annotation.Generated;
 public class FlaggedQuery implements Serializable {
 
 	private static final long serialVersionUID = 1408236307;
+	private static final String starFlag="S";
+	private static final String archiveFlag="A";
+	private static final String ignoreFlag="I";
 
 	private Integer queryId;
 	private Integer personId;
@@ -69,5 +72,17 @@ public class FlaggedQuery implements Serializable {
 
 	public void setFlag(String flag) {
 		this.flag = flag;
+	}
+	
+	public static String getStarflag() {
+		return starFlag;
+	}
+
+	public static String getArchiveflag() {
+		return archiveFlag;
+	}
+
+	public static String getIgnoreflag() {
+		return ignoreFlag;
 	}
 }

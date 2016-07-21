@@ -25,6 +25,8 @@
  */
 package de.samply.bbmri.negotiator.model;
 
+import  de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
+
 /**
  * DTO that gives a small statistic for a query, with the amount of commentCount made for the query and
  * the last time someone made a comment for this query, and the name of the query creator
@@ -33,8 +35,35 @@ public class OwnerQueryStatsDTO extends QueryStatsDTO {
     private static final long serialVersionUID = 1L;
 
     private String auth_name;
+    
+    private String flag;
+  
+    
+    public boolean isFlagged() {
+    	return flag!=null;
+    }
+    
+    public boolean isStarred() {
+    	return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getStarflag());
+    }
 
-    public String getAuth_name() {
+    public boolean isArchived() {
+    	return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getArchiveflag());
+    }
+    
+    public boolean isIgnored() {
+    	return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getIgnoreflag());
+    }
+    
+	public String getFlag() {
+		return flag;
+	}
+
+	public void setFlag(String flag) {
+		this.flag = flag;
+	}
+
+	public String getAuth_name() {
         return auth_name;
     }
 

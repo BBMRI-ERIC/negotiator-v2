@@ -122,20 +122,29 @@ public class DbUtil {
     	}
     	
     	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
-		        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
-		        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-		        .select(Tables.COMMENT.ID.count().as("comment_count"))
-		        .from(Tables.QUERY)        
-		        .join(Tables.QUERY_PERSON, JoinType.JOIN)
-		        .on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
-		        .join(Tables.PERSON, JoinType.JOIN)				        
-		        .on(Tables.QUERY_PERSON.PERSON_ID.eq(Tables.PERSON.ID))				        
-		        .join(Tables.COMMENT, JoinType.JOIN)
-		        .on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))			        
-		        .where(condition)
-		        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
-		
-
+    			.select(Tables.PERSON.AUTH_NAME.as("auth_name"))
+    			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+    			.select(Tables.COMMENT.ID.count().as("comment_count"))
+    			.select(Tables.FLAGGED_QUERY.FLAG.as("flag"))
+    			.from(Tables.QUERY)  
+        
+    			.join(Tables.QUERY_PERSON, JoinType.JOIN)
+    			.on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
+        
+    			.join(Tables.PERSON, JoinType.JOIN)				        
+    			.on(Tables.QUERY_PERSON.PERSON_ID.eq(Tables.PERSON.ID))	
+        
+    			.join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
+    			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))		
+        
+    			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+    			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.FLAGGED_QUERY.QUERY_ID))	
+        
+    			.where(condition)
+    			.groupBy(Tables.PERSON.ID, Tables.QUERY.ID, Tables.FLAGGED_QUERY.FLAG)
+    			.orderBy(Tables.QUERY.ID).fetch();
+    	
+    	
 		return config.map(fetch, OwnerQueryStatsDTO.class);
     }
     

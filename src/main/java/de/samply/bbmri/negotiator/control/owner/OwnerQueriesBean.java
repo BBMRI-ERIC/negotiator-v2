@@ -1,4 +1,5 @@
 /**
+
  * Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
  * Deutsches Krebsforschungszentrum in Heidelberg
  *
@@ -39,6 +40,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
+import org.jooq.Query;
+
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
@@ -58,6 +61,10 @@ public class OwnerQueriesBean implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	private static final String starFlag="S";
+	private static final String archiveFlag="A";
+	private static final String ignoreFlag="I";
 
 	private List<OwnerQueryStatsDTO> queries;
 	 
@@ -82,7 +89,7 @@ public class OwnerQueriesBean implements Serializable {
 	 * @param queryId
 	 * @return
 	 */
-	public String leaveQuery(Integer queryId) {
+	public void ignoreQuery(Integer queryId, boolean on) {
 		try (Config config = ConfigFactory.get()) {
 			java.util.Date date= new java.util.Date();	
 				
@@ -94,13 +101,56 @@ public class OwnerQueriesBean implements Serializable {
 			         
 			config.get().commit();
 			queries = null;
+			
+			flagQuery(queryId, OwnerQueriesBean.ignoreFlag, on);
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
 
-		return "";
+	
+	/**
+	 * Mark query as starred
+	 * @param queryId
+	 */
+	public void starQuery(Integer queryId, boolean on){
+		flagQuery(queryId, OwnerQueriesBean.starFlag, on);
 	}
 	
+	/**
+	 */
+	public void archiveQuery(Integer queryId, boolean on){
+		flagQuery(queryId, OwnerQueriesBean.archiveFlag, on);
+	}
+	
+	/**
+	 * Mark query with flag
+	 * 
+	 * If Postgresql supported SQL standard Merge statement, the query look like this :
+	 * 		 config.dsl().insertInto(Tables.FLAGGED_QUERY, Tables.FLAGGED_QUERY.QUERY_ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.FLAG).
+	 *		 values(queryId, userBean.getUserId(), flag)
+	 *		.onDuplicateKeyUpdate()
+	 *		.set(Tables.FLAGGED_QUERY.QUERY_ID,queryId)
+	 *		.set(Tables.FLAGGED_QUERY.PERSON_ID,userBean.getUserId())
+	 *		.set(Tables.FLAGGED_QUERY.FLAG, flag).execute();
+	 * 
+	 * @param queryId
+	 * @param flag
+	 */
+	private void flagQuery(Integer queryId, String flag, boolean on) {
+		try (Config config = ConfigFactory.get()) {
+						
+			// above query written using Postgresql 9.5's ON CONFLICT clause
+			String flagValue=on ? null : flag;
+			config.dsl().query("insert into flagged_query (query_id, person_id, flag) values (?,?,?) ON CONFLICT (query_id,person_id) do update set flag=? where flagged_query.query_id = ? and flagged_query.person_id=?", queryId,userBean.getUserId(),flagValue, flagValue, queryId, userBean.getUserId()).execute();
+		 
+			config.get().commit();
+			queries = null;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	/**
 	 * Returns the list of queries in which the current biobank owner is a part of,
 	 * filters by search terms if any are provided

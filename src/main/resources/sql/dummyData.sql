@@ -43,6 +43,12 @@ VALUES ('colon cancer','latest papers on colon cancer', '2015-01-01 00:00:00', 6
 INSERT INTO "query"("title", "text", query_creation_time, researcher_id)
 VALUES ('lung cancer','No smoking data', '2014-05-01 00:00:00', 6);
 
+INSERT INTO "query"("title", "text", query_creation_time, researcher_id)
+VALUES ('lung cancer','Loads of smoking data', '2014-06-01 00:00:00', 6);
+
+INSERT INTO "query"("title", "text", query_creation_time, researcher_id)
+VALUES ('lung cancer','Second hand smoking data', '2015-06-01 00:00:00', 6);
+
 INSERT INTO "tag"(query_id, "text")
 VALUES (2,'Colon' );
 
@@ -92,8 +98,16 @@ INSERT INTO "query_person"(query_id, person_id, query_leaving_time)
 VALUES (3, 2, '2016-07-02 00:00:00');
 
 INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
+VALUES (2, 5, '2016-07-02 00:00:00');
+
+INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
 VALUES (1, 5, '2016-07-01 00:00:00');
 
 INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
 VALUES (3, 5, '2016-07-01 00:00:00');
 
+INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
+VALUES (4, 5, '2016-08-01 00:00:00');
+
+INSERT INTO "query_person"(query_id, person_id, query_leaving_time) 
+VALUES (5, 5, '2015-08-01 00:00:00');

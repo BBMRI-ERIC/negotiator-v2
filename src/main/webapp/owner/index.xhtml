@@ -35,7 +35,7 @@
     <!-- Queries page for the researcher -->
 
     <ui:param name="bodyClass" value="container"/>
-
+	
     <ui:define name="body">
 
         <h:panelGroup layout="block" styleClass="row queriesTopLine">
@@ -69,18 +69,20 @@
             <h:panelGroup layout="block"
                           styleClass="panel panel-default">
                 <h:panelGroup layout="block" styleClass="panel-heading">
-
+					
                     <h:link outcome="detail" title="Click to see all comments for this query">
                         <f:param name="queryId" value="#{item.query.id}"/>
                         #{item.query.title}
                     </h:link>
 
                     <h:panelGroup styleClass="pull-right">
-                    <h:form>
+                    <h:form prependId="false">
                         <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
-                              <button type="button" class="btn btn-default" title="Archive this query"><i class="glyphicon glyphicon-folder-open"></i></button>
-                              <h:commandLink styleClass="btn btn-default" action="#{ownerQueriesBean.leaveQuery(item.query.id)}" title="Ignore this query from the view"><i class="fa fa-sign-out"></i></h:commandLink>
-                              <button type="button" class="btn btn-default" title="Mark as favourite"><i class="glyphicon glyphicon-star"></i></button>
+                                          
+							<h:commandLink  styleClass="#{item.starred ? 'btn btn-success' : 'btn btn-default'}"  title="Mark as favourite" action="#{ownerQueriesBean.starQuery(item.query.id, item.starred)}"><i class="glyphicon glyphicon-star"></i></h:commandLink>
+							<h:commandLink  styleClass="btn btn-default" title="Archive this query"  action="#{ownerQueriesBean.archiveQuery(item.query.id, item.archived)}"><i class="glyphicon glyphicon-folder-open"></i></h:commandLink>
+						   	<h:commandLink styleClass="btn btn-default" title="Ignore this query from the view" action="#{ownerQueriesBean.leaveQuery(item.query.id, item.ignored)}"><i class="fa fa-sign-out"></i></h:commandLink>
+                              
                         </h:panelGroup>
                     </h:form>
                         <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.commentCount > 0}">
