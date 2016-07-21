@@ -69,34 +69,35 @@
             <h:panelGroup layout="block"
                           styleClass="panel panel-default">
                 <h:panelGroup layout="block" styleClass="panel-heading">
-					
-                    <h:link outcome="detail" title="Click to see all comments for this query">
-                        <f:param name="queryId" value="#{item.query.id}"/>
-                        #{item.query.title}
-                    </h:link>
+					<h:form prependId="false">
+	                    <h:commandLink  styleClass="#{item.starred ? 'btn btn-success' : 'btn btn-default'} btn-xs"  title="Mark as favourite" action="#{ownerQueriesBean.starQuery(item.query.id, item.starred)}"><i class="glyphicon glyphicon-star"></i></h:commandLink>
+	                    <h:link outcome="detail" title="Click to see all comments for this query">
+	                        <f:param name="queryId" value="#{item.query.id}"/>
+	                        <h:outputLabel value="#{item.query.title}" style="margin-left: 30px;" />
+	                    </h:link>
 
-                    <h:panelGroup styleClass="pull-right">
-                    <h:form prependId="false">
-                        <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
-                                          
-							<h:commandLink  styleClass="#{item.starred ? 'btn btn-success' : 'btn btn-default'}"  title="Mark as favourite" action="#{ownerQueriesBean.starQuery(item.query.id, item.starred)}"><i class="glyphicon glyphicon-star"></i></h:commandLink>
-							<h:commandLink  styleClass="btn btn-default" title="Archive this query"  action="#{ownerQueriesBean.archiveQuery(item.query.id, item.archived)}"><i class="glyphicon glyphicon-folder-open"></i></h:commandLink>
-						   	<h:commandLink styleClass="btn btn-default" title="Ignore this query from the view" action="#{ownerQueriesBean.leaveQuery(item.query.id, item.ignored)}"><i class="fa fa-sign-out"></i></h:commandLink>
-                              
-                        </h:panelGroup>
-                    </h:form>
-                        <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.commentCount > 0}">
-                            <h:outputText title="#{item.commentCount} comments on this query"
-                                          value="#{item.commentCount}"/>
-                        </h:panelGroup>
-
-                        <h:outputText value="#{item.lastCommentTime}" styleClass="queryCreationDate"
-                                      title="Date and time of last comment" rendered="#{item.commentCount > 0}">
-                            <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
-                        </h:outputText>
-
-                    </h:panelGroup>
-
+	                    <h:panelGroup styleClass="pull-right">
+	                    
+	                        <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
+	                                          
+								
+								<h:commandLink  styleClass="btn btn-default" title="Archive this query"  action="#{ownerQueriesBean.archiveQuery(item.query.id, item.archived)}"><i class="glyphicon glyphicon-folder-open"></i></h:commandLink>
+							   	<h:commandLink styleClass="btn btn-default" title="Ignore this query from the view" action="#{ownerQueriesBean.leaveQuery(item.query.id, item.ignored)}"><i class="fa fa-sign-out"></i></h:commandLink>
+	                              
+	                        </h:panelGroup>
+	                  
+	                        <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.commentCount > 0}">
+	                            <h:outputText title="#{item.commentCount} comments on this query"
+	                                          value="#{item.commentCount}"/>
+	                        </h:panelGroup>
+	
+	                        <h:outputText value="#{item.lastCommentTime}" styleClass="queryCreationDate"
+	                                      title="Date and time of last comment" rendered="#{item.commentCount > 0}">
+	                            <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
+	                        </h:outputText>
+	
+	                    </h:panelGroup>
+  					</h:form>
                 </h:panelGroup>
 
 
