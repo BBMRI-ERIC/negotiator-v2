@@ -40,14 +40,13 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
-import org.jooq.Query;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 
 /**
@@ -62,9 +61,7 @@ public class OwnerQueriesBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private static final String starFlag="S";
-	private static final String archiveFlag="A";
-	private static final String ignoreFlag="I";
+
 
 	private List<OwnerQueryStatsDTO> queries;
 	 
@@ -102,7 +99,7 @@ public class OwnerQueriesBean implements Serializable {
 			config.get().commit();
 			queries = null;
 			
-			flagQuery(queryId, OwnerQueriesBean.ignoreFlag, on);
+			flagQuery(queryId, FlaggedQuery.getIgnoreflag(), on);
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -115,13 +112,13 @@ public class OwnerQueriesBean implements Serializable {
 	 * @param queryId
 	 */
 	public void starQuery(Integer queryId, boolean on){
-		flagQuery(queryId, OwnerQueriesBean.starFlag, on);
+		flagQuery(queryId, FlaggedQuery.getStarflag(), on);
 	}
 	
 	/**
 	 */
 	public void archiveQuery(Integer queryId, boolean on){
-		flagQuery(queryId, OwnerQueriesBean.archiveFlag, on);
+		flagQuery(queryId, FlaggedQuery.getArchiveflag(), on);
 	}
 	
 	/**
