@@ -177,21 +177,7 @@ public class OwnerQueriesBean implements Serializable {
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				if ((sessionBean.getFilters() == null || sessionBean.getFilters().isEmpty())
-				        && (starredQueries == null || starredQueries.isEmpty()))
-					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), null, null);
-
-				else if ((sessionBean.getFilters() != null || sessionBean.getFilters().isEmpty() == false)
-				        && (starredQueries == null || starredQueries.isEmpty()))
-					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms(), null);
-
-				else if ((sessionBean.getFilters() == null || sessionBean.getFilters().isEmpty())
-				        && (starredQueries != null && starredQueries.isEmpty() == false))
-					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), null, getStarredQueries());
-
-				else if ((sessionBean.getFilters() != null || sessionBean.getFilters().isEmpty() == false)
-				        && (starredQueries != null && starredQueries.isEmpty() == false))
-					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms(),
+				queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms(),
 					        getStarredQueries());
 
 			} catch (SQLException e) {
