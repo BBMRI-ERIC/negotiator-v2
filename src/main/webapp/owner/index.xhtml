@@ -53,8 +53,15 @@
                 </h:panelGroup>
                 <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right">
                     <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
-                      <button type="button" class="btn btn-default" title="View all archived queries" ><i class="glyphicon glyphicon-inbox"></i></button>
-                      <h:commandLink   styleClass="#{ownerQueriesBean.getStarredState()}" 
+                      
+                      <h:commandLink   styleClass="#{ownerQueriesBean.getArchivedState()}" title="View all archived queries"
+							action="#{ownerQueriesBean.switchArchivedView()}">
+							<f:ajax render="allOwnerQueries filterInputButtons" />
+							
+							<i class="glyphicon glyphicon-folder-open"></i>
+					  </h:commandLink>
+                      
+                      <h:commandLink   styleClass="#{ownerQueriesBean.getStarredState()}" title="View all starred queries" 
 							action="#{ownerQueriesBean.switchStarredView()}">
 							<f:ajax render="allOwnerQueries filterInputButtons" />
 							

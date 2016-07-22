@@ -108,7 +108,7 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters, String starredQueries) {
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters, String starredQueries, String archivedQueries) {
     	Person queryOwner = Tables.PERSON.as("queryOwner");
     	Person commentPerson = Tables.PERSON.as("commentPerson");
     
@@ -129,6 +129,10 @@ public class DbUtil {
     	
     	if (starredQueries != null && starredQueries.isEmpty() == false) {
 			condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(starredQueries));
+    	}
+    	
+    	if (archivedQueries != null && archivedQueries.isEmpty() == false) {
+			condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(archivedQueries));
     	}
     	
     	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())

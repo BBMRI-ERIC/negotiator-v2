@@ -61,8 +61,8 @@ public class OwnerQueriesBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private List<OwnerQueryStatsDTO> queries;
-	
+	private List<OwnerQueryStatsDTO> queries;	
+
 	/**
 	 * variable to set the starred button switched on
 	 */
@@ -72,6 +72,16 @@ public class OwnerQueriesBean implements Serializable {
 	 * variable to set the starred button switched off
 	 */
 	private final String switchOff = "btn btn-default";
+	
+	/**
+	 * Queries archived by the user
+	 */
+	private String archivedState = switchOff;
+	
+	/**
+	 * Queries archived by the user
+	 */
+	private String archivedQueries;	
 
 	/**
 	 * state of starred button
@@ -81,8 +91,16 @@ public class OwnerQueriesBean implements Serializable {
 	/**
 	 * Queries starred by the user
 	 */
-	private String starredQueries;
-
+	private String starredQueries;	
+	
+	/**
+	 * Flag for archived queries in database
+	 */
+	private final String flagForArchivedQueries = new String("A");
+	
+	/**
+	 * Flag for starred queries in database
+	 */
 	private final String flagForStarredQueries = new String("S");
 	 
 	@ManagedProperty(value = "#{userBean}")
@@ -98,6 +116,23 @@ public class OwnerQueriesBean implements Serializable {
 	@PostConstruct
 	public void init() {
 
+	}
+	
+	/**
+	 * Switches the archivedQueries view On and off. Also makes 'queries' object null to re-load the queries.
+	 * 
+	 */
+	public void switchArchivedView() {
+		if (archivedQueries == null || archivedQueries.isEmpty()) {
+			setArchivedQueries(flagForArchivedQueries);
+			setArchivedState(switchOn);
+		}
+		else {
+			setArchivedQueries(null);
+			setArchivedState(switchOff);
+		}
+		
+		queries = null;		
 	}
 
 	/**
@@ -182,14 +217,14 @@ public class OwnerQueriesBean implements Serializable {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
 				queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms(),
-					        getStarredQueries());
+					        getStarredQueries(), getArchivedQueries());
 
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 		return queries;
-	}
+	}	
 	
 	/**
 	 * Add search filter
@@ -276,5 +311,21 @@ public class OwnerQueriesBean implements Serializable {
 
 	public void setStarredState(String starredState) {
 		this.starredState = starredState;
+	}
+	
+	public String getArchivedQueries() {
+		return archivedQueries;
+	}
+
+	public void setArchivedQueries(String archivedQueries) {
+		this.archivedQueries = archivedQueries;
+	}
+
+	public String getArchivedState() {
+		return archivedState;
+	}
+
+	public void setArchivedState(String archivedState) {
+		this.archivedState = archivedState;
 	}
 }
