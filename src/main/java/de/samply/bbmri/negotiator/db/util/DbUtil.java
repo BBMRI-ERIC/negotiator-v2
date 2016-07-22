@@ -112,7 +112,7 @@ public class DbUtil {
     	Person queryOwner = Tables.PERSON.as("queryOwner");
     	Person commentPerson = Tables.PERSON.as("commentPerson");
 
-    	Condition condition = Tables.PERSON.LOCATION_ID.eq(locationId)
+    	Condition condition = commentPerson.LOCATION_ID.eq(locationId)
     						.and((Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getArchiveflag())
     						  .or(Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getIgnoreflag()))));
     	
