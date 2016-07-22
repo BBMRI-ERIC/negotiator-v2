@@ -26,20 +26,23 @@
 
 package de.samply.bbmri.negotiator.test;
 
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.common.config.Postgresql;
-import de.samply.common.sql.SQLUtil;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.FileNotFoundException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.common.config.Postgresql;
+import de.samply.common.sql.SQLUtil;
+import de.samply.common.upgrade.SamplyUpgradeException;
 
 
 /**
@@ -53,25 +56,22 @@ public class TestSuite {
     private static Postgresql postgresql;
 
 	@BeforeClass
-    public static void start() throws FileNotFoundException, ParserConfigurationException, JAXBException, SAXException, SQLException {
-        try {
-        	NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
+    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, SamplyUpgradeException {
+        NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
 
-        	postgresql = NegotiatorConfig.get().getPostgresql();
-        	
-            /**
-             * Manually drop all tables in the database.
-             */
-            Connection connection = getConnection();
-            connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
-            connection.commit();
+        postgresql = NegotiatorConfig.get().getPostgresql();
 
-            SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
+        /**
+         * Manually drop all tables in the database.
+         */
+        Connection connection = getConnection();
+        connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
+        connection.commit();
 
-            connection.commit();
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
+        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
+        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData.sql"));
+
+        connection.commit();
     }
 
     public static Connection getConnection() throws SQLException {
