@@ -26,14 +26,21 @@
 
 package de.samply.bbmri.negotiator;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
@@ -44,31 +51,64 @@ import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
  */
 public class ImageServlet extends HttpServlet {
 
+    private static final LoadingCache<Integer, byte[]> avatars = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.HOURS)
+            .maximumSize(1000).build(
+                new CacheLoader<Integer, byte[]>() {
+                    @Override
+                    public byte[] load(Integer key) throws Exception {
+                        try (Config config = ConfigFactory.get()) {
+                            PersonRecord personRecord = config.dsl().selectFrom(Tables.PERSON).where(Tables.PERSON.ID.eq(key))
+                                    .fetchOneInto(Tables.PERSON);
+
+                            if (personRecord != null && personRecord.getPersonImage() != null) {
+                                return personRecord.getPersonImage();
+                            } else {
+                                /**
+                                 * At this point we didnt find any user. Return the default person image.
+                                 */
+                                InputStream resourceAsStream = ImageServlet.class.getClassLoader()
+                                        .getResourceAsStream("defaultImage.jpg");
+                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+                                byte[] buffer = new byte[1024];
+                                int len;
+
+                                while ((len = resourceAsStream.read(buffer)) != -1) {
+                                    stream.write(buffer, 0, len);
+                                }
+
+                                return stream.toByteArray();
+                            }
+                        }
+                    }
+                }
+            );
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String userId = req.getParameter("userId");
 
         ServletOutputStream out = resp.getOutputStream();
 
+        /**
+         * Cache images for 15 minutes.
+         */
+        resp.setHeader("Cache-Control", "max-age=900");
+
         if(userId != null) {
             try {
                 /**
-                 * So it is about a user, check if the user has an image, if so, write it to the output stream.
+                 * So it is about a user, use the guava cache to load the image from the DB.
                  */
                 int userIdInt = Integer.parseInt(userId);
 
-                try (Config config = ConfigFactory.get()) {
-                    PersonRecord personRecord = config.dsl().selectFrom(Tables.PERSON).where(Tables.PERSON.ID.eq(userIdInt)).fetchOneInto(Tables.PERSON);
+                byte[] image = avatars.get(userIdInt);
 
-                    if(personRecord != null && personRecord.getPersonImage() != null) {
-                        resp.setContentLength(personRecord.getPersonImage().length);
-                        out.write(personRecord.getPersonImage());
-                        return;
-                    }
-                }
-            } catch(Exception e) {
+                resp.setContentLength(image.length);
+                out.write(image);
+            } catch(NumberFormatException | ExecutionException e) {
                 /**
-                 * Ignore the exception, not useful in this case.
+                 * Ignore the exception, not useful in this case. Maybe the parameter is not a string or whatever, doesn't matter
                  */
             }
         }
