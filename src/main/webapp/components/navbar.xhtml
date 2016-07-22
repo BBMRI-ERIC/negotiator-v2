@@ -1,57 +1,110 @@
-<ui:composition
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:ui="http://java.sun.com/jsf/facelets">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <h:panelGroup styleClass="container" layout="block" id="navbar">
-            <div class="navbar-header">
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<h:panelGroup styleClass="container" layout="block" id="navbar">
+			<h:panelGroup layout="block" styleClass="navbar-header">
 
-                <button type="button" class="navbar-toggle collapsed"
-                    data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span> <span
-                        class="icon-bar"></span> <span class="icon-bar"></span> <span
-                        class="icon-bar"></span>
-                </button>
-                <h:link outcome="/index" styleClass="navbar-brand">
-                    <span class="projectName">BBMRI<span
-                    class="bbmriModule">.Negotiator</span></span>
-                </h:link>
-            </div>
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<h:link outcome="/index" styleClass="navbar-brand">
+					<span class="projectName">BBMRI<span class="bbmriModule">.Negotiator</span></span>
+				</h:link>
+			</h:panelGroup>
 
-            <h:form>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav navbar-right navbar-user">
-                        <ui:fragment rendered="#{! userBean.loginValid}">
-                            <li class="pull-right">
-                                <a href="#{userBean.authenticationUrl}">Login</a>
-                            </li>
-                        </ui:fragment>
 
-                        <ui:fragment rendered="#{userBean.loginValid}">
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                    <i class="fa fa-user fa-fw userIcon"/>
-                                    #{userBean.userRealName.trim().length() > 0 ? userBean.userRealName : userBean.userEmail} <span class="caret"></span>
-                                </a>
-                                <ul id="userPanel" class="dropdown-menu">
-                                    <li>
-                                        <h:commandLink action="#{userBean.profile}">
-                                            <i class="fa fa-book"/> Profile
-                                        </h:commandLink>
-                                    </li>
-                                    <li>
-                                        <h:commandLink action="#{userBean.logout}">
-                                            <i class="fa fa-sign-out"/> Logout
-                                        </h:commandLink>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ui:fragment>
-                    </ul>
-                </div>
-            </h:form>
-        </h:panelGroup>
-    </nav>
+			<h:form>
+				<h:panelGroup layout="block" styleClass="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<c:if test="#{userBean.biobankOwner}">
+						<li class="dropdown active"><a href="#" class="dropdown-toggle"
+							data-toggle="dropdown" role="button" aria-haspopup="true"
+							aria-expanded="false">My Biobank <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a class="active" href="panels-wells.html">All
+										Queries</a></li>
+								<li><a href="buttons.html">Starred Queries</a></li>
+								<li><a href="notifications.html">Archived Queries</a></li>
+								<li><a href="notifications.html">Ignored Queries</a></li>
+							</ul>
+						</li>
+						</c:if>
+						<li class="dropdown"><a href="#" class="dropdown-toggle"
+							data-toggle="dropdown" role="button" aria-haspopup="true"
+							aria-expanded="false">My Queries <span class="caret"></span></a>
+							<ul class="dropdown-menu">
+								<li><a class="active" href="panels-wells.html">All
+										Queries</a></li>
+								<li><a href="buttons.html">Starred Queries</a></li>
+								<li><a href="notifications.html">Archived Queries</a></li>
+								<li><a href="notifications.html">Ignored Queries</a></li>
+							</ul>
+						</li>
+					</ul>
+
+
+					<ul class="nav navbar-nav navbar-right navbar-user">
+						<ui:fragment rendered="#{! userBean.loginValid}">
+							<li class="pull-right"><a
+								href="#{userBean.authenticationUrl}">Login</a></li>
+						</ui:fragment>
+
+						<ui:fragment rendered="#{userBean.loginValid}">
+							<li class="dropdown"><a class="dropdown-toggle"
+								data-toggle="dropdown" href="#"> <i
+									class="fa fa-user fa-fw userIcon" />
+									#{userBean.userRealName.trim().length() > 0 ?
+									userBean.userRealName : userBean.userEmail} <span class="caret"></span>
+							</a>
+								<ul id="userPanel" class="dropdown-menu">
+									<li><h:commandLink action="#{userBean.profile}">
+											<i class="fa fa-book" /> Profile
+                                        </h:commandLink></li>
+									<li><h:commandLink action="#{userBean.logout}">
+											<i class="fa fa-sign-out" /> Logout
+                                        </h:commandLink></li>
+								</ul></li>
+						</ui:fragment>
+					</ul>
+				</h:panelGroup>
+			</h:form>
+		</h:panelGroup>
+
+		<h:panelGroup layout="block" styleClass="navbar-default sidebar"
+			role="navigation">
+			<h:panelGroup layout="block" styleClass="sidebar-nav navbar-collapse">
+				<ul class="nav" id="side-menu">
+					<c:if test="#{userBean.biobankOwner}">
+						<li class="active"><a href="#"><i
+								class="fa fa-bar-chart-o fa-fw"></i> My Biobank<span
+								class="fa arrow"></span></a>
+							<ul class="nav nav-second-level in">
+								<li><a class="active" href="panels-wells.html">All
+										Queries</a></li>
+								<li><a href="buttons.html">Starred Queries</a></li>
+								<li><a href="notifications.html">Archived Queries</a></li>
+								<li><a href="notifications.html">Ignored Queries</a></li>
+							</ul></li>
+					</c:if>
+
+					<li><a href="#"><i class="fa fa-wrench fa-fw"></i> My
+							Queries<span class="fa arrow"></span></a>
+						<ul class="nav nav-second-level">
+							<li><a href="panels-wells.html">All Queries</a></li>
+							<li><a href="buttons.html">Starred Queries</a></li>
+							<li><a href="notifications.html">Archived Queries</a></li>
+						</ul></li>
+				</ul>
+			</h:panelGroup>
+		</h:panelGroup>
+
+
+	</nav>
 </ui:composition>
