@@ -32,7 +32,6 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:composite="http://java.sun.com/jsf/composite"
       xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-      xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
       xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri">
 
 
@@ -50,7 +49,7 @@
 
             <h:panelGroup styleClass="pull-right">
                 <h:outputText value="#{cc.attrs.comment.commentTime}">
-                    <f:convertDateTime dateStyle="long" timeStyle="medium"/>
+                    <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>
                 </h:outputText>
             </h:panelGroup>
 
@@ -61,7 +60,9 @@
             <h:panelGroup layout="block" styleClass="row">
 
                 <h:panelGroup layout="block" styleClass="col-md-1 avatar-pic-comment-column">
-                    <img width="92" height="92" src="#{bbmri:userImage(cc.attrs.person.id)}" alt="#{cc.attrs.person.authName}"/>
+
+                    <bbmricc:avatar person="#{cc.attrs.person}"/>
+
                 </h:panelGroup>
 
                 <h:panelGroup layout="block" styleClass="col-md-11 comment-text-column">
