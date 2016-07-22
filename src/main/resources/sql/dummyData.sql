@@ -28,7 +28,7 @@ INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 5, 
 INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');
 SELECT pg_catalog.setval('tag_id_seq', 1, true);
 
-INSERT INTO tagged_query(query_id, tag_id) VALUES (1, 2);
+INSERT INTO tagged_query(query_id, tag_id) VALUES (1, 1);
 
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (1, 1, 5, '2016-01-01 00:00:00', 'I think the query is too general');
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (2, 1, 2, '2016-01-01 15:00:00', 'I agree with you on that');
