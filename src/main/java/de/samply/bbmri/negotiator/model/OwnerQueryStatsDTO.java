@@ -35,6 +35,7 @@ public class OwnerQueryStatsDTO extends QueryStatsDTO {
     private static final long serialVersionUID = 1L;
 
     private String auth_name;
+    private String researcherName;
     
     private String flag;
   
@@ -61,6 +62,14 @@ public class OwnerQueryStatsDTO extends QueryStatsDTO {
 
 	public void setFlag(String flag) {
 		this.flag = flag;
+	}
+
+	public String getResearcherName() {
+		return researcherName;
+	}
+
+	public void setResearcherName(String researcherName) {
+		this.researcherName = researcherName;
 	}
 
 	public String getAuth_name() {

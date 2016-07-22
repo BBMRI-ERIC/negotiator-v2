@@ -30,6 +30,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
+import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
@@ -108,6 +109,9 @@ public class DbUtil {
      * @return
      */
     public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters, String starredQueries) {
+    	Person queryOwner = Tables.PERSON.as("queryOwner");
+    	Person commentPerson = Tables.PERSON.as("commentPerson");
+
     	Condition condition = Tables.PERSON.LOCATION_ID.eq(locationId)
     						.and((Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getArchiveflag())
     						  .or(Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getIgnoreflag()))));
@@ -129,7 +133,8 @@ public class DbUtil {
     	}
     	
     	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
-    			.select(Tables.PERSON.AUTH_NAME.as("auth_name"))
+    			.select(commentPerson.AUTH_NAME.as("auth_name"))
+    			.select(queryOwner.AUTH_NAME.as("researcher_name"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.count().as("comment_count"))
     			.select(Tables.FLAGGED_QUERY.FLAG.as("flag"))
@@ -138,8 +143,11 @@ public class DbUtil {
     			.join(Tables.QUERY_PERSON, JoinType.JOIN)
     			.on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
         
-    			.join(Tables.PERSON, JoinType.JOIN)				        
-    			.on(Tables.QUERY_PERSON.PERSON_ID.eq(Tables.PERSON.ID))	
+    			.join(queryOwner, JoinType.LEFT_OUTER_JOIN)
+    			.on(Tables.QUERY.RESEARCHER_ID.eq(queryOwner.ID))
+    			
+    			.join(commentPerson, JoinType.JOIN)				        
+    			.on(Tables.QUERY_PERSON.PERSON_ID.eq(commentPerson.ID))	
         
     			.join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))		
@@ -148,7 +156,7 @@ public class DbUtil {
     			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.FLAGGED_QUERY.QUERY_ID))	
         
     			.where(condition)
-    			.groupBy(Tables.PERSON.ID, Tables.QUERY.ID, Tables.FLAGGED_QUERY.FLAG)
+    			.groupBy(commentPerson.AUTH_NAME, queryOwner.AUTH_NAME, Tables.QUERY.ID, Tables.FLAGGED_QUERY.FLAG)
     			.orderBy(Tables.QUERY.ID).fetch();
     	
     	
