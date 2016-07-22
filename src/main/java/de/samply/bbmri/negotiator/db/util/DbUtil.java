@@ -111,10 +111,9 @@ public class DbUtil {
     public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters, String starredQueries) {
     	Person queryOwner = Tables.PERSON.as("queryOwner");
     	Person commentPerson = Tables.PERSON.as("commentPerson");
-
+    
     	Condition condition = commentPerson.LOCATION_ID.eq(locationId)
-    						.and((Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getArchiveflag())
-    						  .or(Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getIgnoreflag()))));
+    						.and((Tables.FLAGGED_QUERY.FLAG.eq(FlaggedQuery.getStarflag()).or(Tables.FLAGGED_QUERY.FLAG.isNull())));
     	
     	if(filters != null && filters.size() > 0) {
     		Object[] filtersArray = filters.toArray();
