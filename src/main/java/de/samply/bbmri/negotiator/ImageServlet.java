@@ -26,16 +26,17 @@
 
 package de.samply.bbmri.negotiator;
 
-import de.samply.bbmri.negotiator.jooq.Tables;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
+
+import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 
 /**
  * This servlet handles the requests for images.
@@ -59,14 +60,16 @@ public class ImageServlet extends HttpServlet {
                 try (Config config = ConfigFactory.get()) {
                     PersonRecord personRecord = config.dsl().selectFrom(Tables.PERSON).where(Tables.PERSON.ID.eq(userIdInt)).fetchOneInto(Tables.PERSON);
 
-                    if(personRecord.getPersonImage() != null) {
+                    if(personRecord != null && personRecord.getPersonImage() != null) {
                         resp.setContentLength(personRecord.getPersonImage().length);
                         out.write(personRecord.getPersonImage());
                         return;
                     }
                 }
             } catch(Exception e) {
-                e.printStackTrace();
+                /**
+                 * Ignore the exception, not useful in this case.
+                 */
             }
         }
 

@@ -25,6 +25,8 @@
  */
 package de.samply.bbmri.negotiator.control;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -32,13 +34,17 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Random;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+
+import com.docuverse.identicon.NineBlockIdenticonRenderer2;
 
 import de.samply.auth.client.AuthClient;
 import de.samply.auth.client.InvalidKeyException;
@@ -297,6 +303,12 @@ public class UserBean implements Serializable {
                 person.setAuthEmail(userEmail);
                 person.setAuthSubject(userIdentity);
 
+                /**
+                 * Set the image as identicon. As long as the identity provider does not support
+                 * avatars, generate an identicon by default.
+                 */
+                person.setPersonImage(generateIdenticon());
+
                 if (biobankOwner) {
                     person.setPersonType(PersonType.OWNER);
 
@@ -318,6 +330,13 @@ public class UserBean implements Serializable {
                  */
                 person.setAuthName(userRealName);
                 person.setAuthEmail(userEmail);
+
+                /**
+                 * Set the identicon, if the identity provider does not support avatars. And only if it is still null
+                 */
+                if(person.getPersonImage() == null) {
+                    person.setPersonImage(generateIdenticon());
+                }
 
                 if (biobankOwner) {
                     person.setPersonType(PersonType.OWNER);
@@ -342,6 +361,31 @@ public class UserBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Generates a *random* identicon. Don't use any kind of hash of user input data like an email address.
+     *
+     * @return
+     */
+    private byte[] generateIdenticon() {
+        try {
+            NineBlockIdenticonRenderer2 renderer = new NineBlockIdenticonRenderer2();
+
+            BigInteger bigInt = new BigInteger(64, new Random());
+
+            BufferedImage renderedImage = renderer.render(bigInt, 256);
+            ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+            ImageIO.write(renderedImage, "png", byteStream);
+
+            return byteStream.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        /**
+         * If there has been an exception, which should not happen because MD5 is available everywhere, ignore it and return null.
+         */
+        return null;
     }
 
     /**
