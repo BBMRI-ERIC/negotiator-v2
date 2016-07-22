@@ -6,10 +6,10 @@ INSERT INTO location(id, name) VALUES (5, 'Biobank Mainz');
 INSERT INTO location(id, name) VALUES (6, 'Biobank Heidelberg');
 SELECT pg_catalog.setval('location_id_seq', 6, true);
 
-INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (1, 'RESEARCHER', 'https://auth.samply.de/users/55', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL, NULL);
-INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (2, 'OWNER', 'https://auth.samply.de/users/17', 'Goerge Biobanker, M.D.', 'test2@test2.org', NULL, 4);
-INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (3, 'RESEARCHER', 'https://auth.samply.de/users/007', 'Dr.med. Sean Researchington', 'test3@test3.org', NULL, NULL);
-INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (4, 'RESEARCHER', 'https://auth.samply.de/users/99', 'Travis Research, M.D.', 'test4@test4.org', NULL, NULL);
+INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (1, 'RESEARCHER', 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL, NULL);
+INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (2, 'OWNER', 'user2', 'Goerge Biobanker, M.D.', 'test2@test2.org', NULL, 4);
+INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (3, 'RESEARCHER', 'user3', 'Dr.med. Sean Researchington', 'test3@test3.org', NULL, NULL);
+INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (4, 'RESEARCHER', 'user4', 'Travis Research, M.D.', 'test4@test4.org', NULL, NULL);
 INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (5, 'OWNER', 'https://auth-dev.mitro.dkfz.de/users/7', 'BBMRI Biobank Owner', 'owner.bbmri@bbmri.org', NULL, 5);
 INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (6, 'RESEARCHER', 'https://auth-dev.mitro.dkfz.de/users/8', 'BBMRI Researcher', 'researcher.bbmri@bbmri.org', NULL, NULL);
 INSERT INTO person(id, person_type, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (7, 'OWNER', 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL, 6);
