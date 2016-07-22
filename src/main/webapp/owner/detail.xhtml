@@ -76,13 +76,13 @@
 
 									<h:panelGroup styleClass="badge queryNumberResponsesBadge">
 										<h:outputText
-											title="#{item.commentCount} comments for this query"
+											title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
 											value="#{item.commentCount}" />
 									</h:panelGroup>
 
 									<h:outputText value="#{item.lastCommentTime}"
 										styleClass="queryCreationDate"
-										title="Date and time of last contact communication">
+										title="#{label['queryview.queryitem.datetime.last.comment']}">
 										<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 									</h:outputText>
 
@@ -107,7 +107,7 @@
 												<h:panelGroup styleClass="pull-right">
 
 													<h:outputText value="#{item.query.queryCreationTime}"
-														title="Date this query was created on">
+														title="#{label['queryview.queryitem.datetime.creation']}">
 														<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 													</h:outputText>
 												</h:panelGroup>
@@ -150,7 +150,7 @@
 
 				<h:panelGroup layout="block" styleClass="col-md-12">
 					<p class="pull-right">
-						<h:outputText
+						<h:outputText title="#{label['queryview.queryitem.datetime.creation']}"
 							value="#{ownerQueriesDetailBean.selectedQuery.queryCreationTime}">
 							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 						</h:outputText>
@@ -163,7 +163,7 @@
 						<hr></hr>
 					</div>
 
-					<h3>Comments</h3>
+					<h3>#{label['querydetail.title.comments']}</h3>
 
 				</ui:fragment>
 
@@ -200,7 +200,7 @@
 							<h:panelGroup layout="block" styleClass="pull-right">
 
 								<h:commandButton action="#{ownerQueriesDetailBean.saveComment}"
-									value="Comment" title="Add a comment" styleClass="btn btn-primary" />
+									value="#{label['querydetail.action.addComment.buttontext']}" title="#{label['querydetail.action.addComment']}" styleClass="btn btn-primary" />
 
 							</h:panelGroup>
 

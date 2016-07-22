@@ -41,9 +41,9 @@
         <h:panelGroup layout="block" styleClass="row queriesTopLine">
             <h:form prependId="false">
                 <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
-                    <h:outputLabel for="filterInputText" value="#{label['global.search']}" />
+                    <h:outputLabel for="filterInputText" value="#{label['queryview.title.search']}" />
                     <h:inputText value="#{sessionBean.filter}"
-                        size="20" id="filterInputText" pt:placeholder="search  with  keywords" title="Search with keywords"/>
+                        size="20" id="filterInputText" pt:placeholder="search  with  keywords" title="#{label['queryview.tooltip.searchbox']}"/>
                     <h:commandButton id="addFilterButton"
                         action="#{ownerQueriesBean.addFilter()}" style="display: none;" />
 
@@ -54,14 +54,14 @@
                 <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right">
                     <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
                       
-                      <h:commandLink   styleClass="#{ownerQueriesBean.getArchivedState()}" title="View all archived queries"
+                      <h:commandLink   styleClass="#{ownerQueriesBean.getArchivedState()}" title="#{label['queryview.action.viewArchived']}"
 							action="#{ownerQueriesBean.switchArchivedView()}">
 							<f:ajax render="allOwnerQueries filterInputButtons" />
 							
 							<i class="glyphicon glyphicon-folder-open"></i>
 					  </h:commandLink>
                       
-                      <h:commandLink   styleClass="#{ownerQueriesBean.getStarredState()}" title="View all starred queries" 
+                      <h:commandLink   styleClass="#{ownerQueriesBean.getStarredState()}" title="#{label['queryview.action.viewStarred']}" 
 							action="#{ownerQueriesBean.switchStarredView()}">
 							<f:ajax render="allOwnerQueries filterInputButtons" />
 							
@@ -73,7 +73,7 @@
         </h:panelGroup>
 
         <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0}" layout="block">
-            <h3>There are no queries to be listed.</h3>
+            <h3>#{label['queryview.noQueries']}</h3>
         </h:panelGroup>
         
 		<h:panelGroup id="allOwnerQueries">
@@ -83,8 +83,8 @@
                           styleClass="panel panel-default">
                 <h:panelGroup layout="block" styleClass="panel-heading">
 					<h:form prependId="false">
-	                    <h:commandLink  styleClass="#{item.starred ? 'btn btn-success' : 'btn btn-default'} btn-xs"  title="Mark as favourite" action="#{ownerQueriesBean.starQuery(item.query.id, item.starred)}"><i class="glyphicon glyphicon-star"></i></h:commandLink>
-	                    <h:link outcome="detail" title="Click to see all comments for this query">
+	                    <h:commandLink styleClass="#{item.starred ? 'btn btn-success' : 'btn btn-default'} btn-xs"  title="#{item.starred ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}" action="#{ownerQueriesBean.starQuery(item.query.id, item.starred)}"><i class="glyphicon glyphicon-star"></i></h:commandLink>
+	                    <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}">
 	                        <f:param name="queryId" value="#{item.query.id}"/>
 	                        <h:outputLabel value="#{item.query.title}" style="margin-left: 30px;" />
 	                    </h:link>
@@ -94,18 +94,18 @@
 	                        <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
 	                                          
 								
-								<h:commandLink  styleClass="btn btn-default" title="Archive this query"  action="#{ownerQueriesBean.archiveQuery(item.query.id, item.archived)}"><i class="glyphicon glyphicon-folder-open"></i></h:commandLink>
-							   	<h:commandLink styleClass="btn btn-default" title="Ignore this query from the view" action="#{ownerQueriesBean.ignoreQuery(item.query.id, item.ignored)}"><i class="fa fa-sign-out"></i></h:commandLink>
+								<h:commandLink  styleClass="btn btn-default" title="#{label['queryview.queryitem.action.archiveme']}"  action="#{ownerQueriesBean.archiveQuery(item.query.id, item.archived)}"><i class="glyphicon glyphicon-folder-open"></i></h:commandLink>
+							   	<h:commandLink styleClass="btn btn-default" title="#{label['queryview.queryitem.action.ignoreme']}" action="#{ownerQueriesBean.ignoreQuery(item.query.id, item.ignored)}"><i class="fa fa-sign-out"></i></h:commandLink>
 	                              
 	                        </h:panelGroup>
 	                  
 	                        <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.commentCount > 0}">
-	                            <h:outputText title="#{item.commentCount} comments on this query"
+	                            <h:outputText title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
 	                                          value="#{item.commentCount}"/>
 	                        </h:panelGroup>
 	
 	                        <h:outputText value="#{item.lastCommentTime}" styleClass="queryCreationDate"
-	                                      title="Date and time of last comment" rendered="#{item.commentCount > 0}">
+	                                      title="#{label['queryview.queryitem.datetime.last.comment']}" rendered="#{item.commentCount > 0}">
 	                            <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
 	                        </h:outputText>
 	
@@ -137,7 +137,7 @@
 
                                         <h:outputText
                                             value="#{item.query.queryCreationTime}"
-                                            title="Date this query was created on">
+                                            title="#{label['queryview.queryitem.datetime.creation']}">
                                             <f:convertDateTime
                                                 pattern="dd/MM/yyyy hh:mm" />
                                         </h:outputText>

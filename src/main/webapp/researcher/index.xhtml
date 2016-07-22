@@ -43,8 +43,8 @@
 
 			<h:panelGroup layout="block" styleClass="row queriesTopLine">
 				<h:panelGroup layout="block" styleClass="col-md-6">
-					<a href="#" class="btn btn-danger btn-sm btn-block" role="button" title="Create a new query"><i
-						class="glyphicon glyphicon-edit"></i> #{label['global.newQuery']}</a>
+					<a href="#" class="btn btn-danger btn-sm btn-block" role="button" title="#{label['queryview.tooltip.newQuery']}"><i
+						class="glyphicon glyphicon-edit"></i> #{label['queryview.action.newQuery']}</a>
 
 					<p />
 				</h:panelGroup>
@@ -52,7 +52,7 @@
 
 			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() == 0}"
 				layout="block">
-				<h3>You did not create any queries yet.</h3>
+				<h3>#{label['queryview.noQueriesMade']}</h3>
 			</h:panelGroup>
 
 			<h:form>
@@ -75,13 +75,13 @@
 
 									<h:panelGroup styleClass="badge queryNumberResponsesBadge">
 										<h:outputText
-											title="#{item.commentCount} biobanks contacted you"
+											title="#{item.commentCount} #{label['queryview.queryitem.amount.biobanks.contacted.text']}"
 											value="#{item.commentCount}" />
 									</h:panelGroup>
 
 									<h:outputText value="#{item.lastCommentTime}"
 										styleClass="queryCreationDate"
-										title="Date and time of last contact communication">
+										title="#{label['queryview.queryitem.datetime.last.comment']}">
 										<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 									</h:outputText>
 
@@ -106,7 +106,7 @@
 												<h:panelGroup styleClass="pull-right">
 
 													<h:outputText value="#{item.query.queryCreationTime}"
-														title="Date this query was created on">
+														title="#{label['queryview.queryitem.datetime.creation']}">
 														<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 													</h:outputText>
 												</h:panelGroup>
@@ -133,7 +133,7 @@
 				rendered="#{researcherQueriesBean.selectedQuery == null}"
 				layout="block">
 
-				<h3 class="text-muted">#{label['global.selectAQuery']}</h3>
+				<h3 class="text-muted">#{label['queryview.selectAQuery']}</h3>
 
 			</h:panelGroup>
 
@@ -147,7 +147,7 @@
 
 				<h:panelGroup layout="block" styleClass="col-md-12">
 					<p class="pull-right">
-						<h:outputText
+						<h:outputText title="#{label['queryview.queryitem.datetime.creation']}"
 							value="#{researcherQueriesBean.selectedQuery.queryCreationTime}">
 							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 						</h:outputText>
@@ -160,7 +160,7 @@
 						<hr></hr>
 					</div>
 
-					<h3>Comments</h3>
+					<h3>#{label['querydetail.title.comments']}</h3>
 
 				</ui:fragment>
 
@@ -239,7 +239,7 @@
 							<h:panelGroup layout="block" styleClass="pull-right">
 
 								<h:commandButton action="#{researcherQueriesBean.saveComment}"
-									value="Comment" styleClass="btn btn-primary" title="Add a comment" />
+									value="#{label['querydetail.action.addComment.buttontext']}" styleClass="btn btn-primary" title="#{label['querydetail.action.addComment']}" />
 
 							</h:panelGroup>
 
