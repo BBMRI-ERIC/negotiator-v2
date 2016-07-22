@@ -110,7 +110,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
 				int locationId = userBean.getLocationId();
-				queries = DbUtil.getAllQueriesAsOwner(config, locationId);
+				queries = DbUtil.getOwnerQueries(config, locationId,null,null);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

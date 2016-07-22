@@ -45,16 +45,21 @@
                     <h:inputText value="#{sessionBean.filter}"
                         size="20" id="filterInputText" pt:placeholder="search  with  keywords" title="Search with keywords"/>
                     <h:commandButton id="addFilterButton"
-                        action="#{sessionBean.addFilter()}" style="display: none;" />
+                        action="#{ownerQueriesBean.addFilter()}" style="display: none;" />
 
                     <ui:repeat var="item" value="#{sessionBean.filters}">
-                        <h:panelGroup styleClass="badge filterBadge"><h:commandLink action="#{sessionBean.removeFilter(item)}">#{item}</h:commandLink></h:panelGroup>
+                        <h:panelGroup styleClass="badge filterBadge"><h:commandLink action="#{ownerQueriesBean.removeFilter(item)}">#{item}</h:commandLink></h:panelGroup>
                     </ui:repeat>
                 </h:panelGroup>
                 <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right">
                     <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
                       <button type="button" class="btn btn-default" title="View all archived queries" ><i class="glyphicon glyphicon-inbox"></i></button>
-                      <button type="button" class="btn btn-default" title="View all favourite queries"><i class="glyphicon glyphicon-star"></i></button>
+                      <h:commandLink   styleClass="#{ownerQueriesBean.getStarredState()}" 
+							action="#{ownerQueriesBean.switchStarredView()}">
+							<f:ajax render="allOwnerQueries filterInputButtons" />
+							
+							<i class="glyphicon glyphicon-star"></i>
+					  </h:commandLink>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
@@ -63,7 +68,8 @@
         <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0}" layout="block">
             <h3>There are no queries to be listed.</h3>
         </h:panelGroup>
-
+        
+		<h:panelGroup id="allOwnerQueries">
         <ui:repeat var="item" value="#{ownerQueriesBean.queries}">
 
             <h:panelGroup layout="block"
@@ -82,7 +88,7 @@
 	                                          
 								
 								<h:commandLink  styleClass="btn btn-default" title="Archive this query"  action="#{ownerQueriesBean.archiveQuery(item.query.id, item.archived)}"><i class="glyphicon glyphicon-folder-open"></i></h:commandLink>
-							   	<h:commandLink styleClass="btn btn-default" title="Ignore this query from the view" action="#{ownerQueriesBean.leaveQuery(item.query.id, item.ignored)}"><i class="fa fa-sign-out"></i></h:commandLink>
+							   	<h:commandLink styleClass="btn btn-default" title="Ignore this query from the view" action="#{ownerQueriesBean.ignoreQuery(item.query.id, item.ignored)}"><i class="fa fa-sign-out"></i></h:commandLink>
 	                              
 	                        </h:panelGroup>
 	                  
@@ -139,6 +145,7 @@
             </h:panelGroup>
 
         </ui:repeat>
+      </h:panelGroup>
     </ui:define>
 
 </ui:composition>

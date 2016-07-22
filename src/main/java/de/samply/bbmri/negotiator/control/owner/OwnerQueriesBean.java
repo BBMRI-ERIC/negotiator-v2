@@ -50,7 +50,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 
 /**
- * Manages the query view for researchers
+ * Manages the query view for owners
  */
 @ManagedBean
 @ViewScoped
@@ -60,10 +60,30 @@ public class OwnerQueriesBean implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-
 
 	private List<OwnerQueryStatsDTO> queries;
+	
+	/**
+	 * variable to set the starred button switched on
+	 */
+	private final String switchOn = "btn btn-success";
+
+	/**
+	 * variable to set the starred button switched off
+	 */
+	private final String switchOff = "btn btn-default";
+
+	/**
+	 * state of starred button
+	 */
+	private String starredState = switchOff;
+
+	/**
+	 * Queries starred by the user
+	 */
+	private String starredQueries;
+
+	private final String flagForStarredQueries = new String("S");
 	 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -155,16 +175,66 @@ public class OwnerQueriesBean implements Serializable {
 	 * @return
 	 */
 	public List<OwnerQueryStatsDTO> getQueries() {
-		//if (queries == null) {
-			try(Config config = ConfigFactory.get()) {
-				if(sessionBean.getFilters() == null || sessionBean.getFilters().isEmpty())
-					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), null);
-				else 
-					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms());
+		if (queries == null) {
+			try (Config config = ConfigFactory.get()) {
+				if ((sessionBean.getFilters() == null || sessionBean.getFilters().isEmpty())
+				        && (starredQueries == null || starredQueries.isEmpty()))
+					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), null, null);
+
+				else if ((sessionBean.getFilters() != null || sessionBean.getFilters().isEmpty() == false)
+				        && (starredQueries == null || starredQueries.isEmpty()))
+					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms(), null);
+
+				else if ((sessionBean.getFilters() == null || sessionBean.getFilters().isEmpty())
+				        && (starredQueries != null && starredQueries.isEmpty() == false))
+					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), null, getStarredQueries());
+
+				else if ((sessionBean.getFilters() != null || sessionBean.getFilters().isEmpty() == false)
+				        && (starredQueries != null && starredQueries.isEmpty() == false))
+					queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms(),
+					        getStarredQueries());
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
+		}
 		return queries;
+	}
+	
+	/**
+	 * Add search filter
+	 */
+	public void addFilter() {
+		queries = null;
+		sessionBean.addFilter();
+	}
+
+	/**
+	 * Removes the search filter.
+	 *
+	 * @param arg
+	 * 
+	 */
+	public void removeFilter(String arg) {
+		queries = null;
+		sessionBean.removeFilter(arg);
+	}
+
+	/**
+	 * Switches the starredQueries view On and off. Also makes 'queries' object null to re-load the queries.
+	 * 
+	 */
+	public void switchStarredView() {
+		if (starredQueries == null || starredQueries.isEmpty()) {
+			setStarredQueries(flagForStarredQueries);
+			setStarredState(switchOn);
+		}
+		else {
+			setStarredQueries(null);
+			setStarredState(switchOff);
+		}
+		
+		queries = null;		
 	}
 	
 	/**
@@ -201,4 +271,20 @@ public class OwnerQueriesBean implements Serializable {
 	public void setUserBean(UserBean userBean) {
 		this.userBean = userBean;
 	}	
+	
+	public String getStarredQueries() {
+		return starredQueries;
+	}
+
+	public void setStarredQueries(String starredQueries) {
+		this.starredQueries = starredQueries;
+	}
+
+	public String getStarredState() {
+		return starredState;
+	}
+
+	public void setStarredState(String starredState) {
+		this.starredState = starredState;
+	}
 }

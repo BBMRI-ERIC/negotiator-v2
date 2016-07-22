@@ -74,7 +74,7 @@ public class DbUtil {
      * @param queryId
      * @return
      */
-     
+    @Deprecated
     public static List<OwnerQueryStatsDTO> getAllQueriesAsOwner(Config config, int locationId) {
 		Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
 				        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
@@ -107,7 +107,7 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters) {
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters, String starredQueries) {
     	Condition condition = Tables.PERSON.LOCATION_ID.eq(locationId)
     						.and((Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getArchiveflag())
     						  .or(Tables.FLAGGED_QUERY.FLAG.ne(FlaggedQuery.getIgnoreflag()))));
@@ -122,6 +122,10 @@ public class DbUtil {
     			textCondition = textCondition.and(Tables.QUERY.TEXT.contains(filtersArray[i].toString()));
     		}
     		condition = condition.and(titleCondition.or(textCondition));
+    	}
+    	
+    	if (starredQueries != null && starredQueries.isEmpty() == false) {
+			condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(starredQueries));
     	}
     	
     	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
