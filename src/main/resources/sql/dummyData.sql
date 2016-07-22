@@ -23,7 +23,9 @@ SELECT pg_catalog.setval('query_id_seq', 3, true);
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (1, 2, '2016-07-01 00:00:00');
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 2, '2016-07-02 00:00:00');
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (1, 5, '2016-07-01 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 5, '2016-07-21 17:57:44.866');
+INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 5, '2016-07-02 00:00:00');
+INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 5, '2016-07-01 00:00:00');
+INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 2, '2016-07-02 00:00:00');
 
 INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');
 SELECT pg_catalog.setval('tag_id_seq', 1, true);
@@ -37,5 +39,5 @@ INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (5, 2, 6
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (6, 2, 5, '2015-05-01 01:00:00', 'We have about 400 samples on colorectal cancer as a primary diagnosis');
 SELECT pg_catalog.setval('comment_id_seq', 6, true);
 
-INSERT INTO flagged_query(query_id, person_id, flag) VALUES (1, 5, 's');
-INSERT INTO flagged_query(query_id, person_id, flag) VALUES (2, 5, 'a');
+INSERT INTO flagged_query(query_id, person_id, flag) VALUES (1, 5, 'S');
+INSERT INTO flagged_query(query_id, person_id, flag) VALUES (2, 5, 'A');
