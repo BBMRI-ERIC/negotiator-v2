@@ -76,8 +76,8 @@ public class UserBean implements Serializable {
      * from Perun and/or Directory and yet not from Samply.AUTH. So for now we simply put new biobank owners into that
      * location, and use our own created locationID as such.
      */
-    private static final int TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS = 6;
-    private static final String TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS = "Enterprise";
+    private static final int TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS = 1;
+    private static final String TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS = "Biobank Hamburg";
 
     /**
      * The current userEmail (email). Null if the login is not valid

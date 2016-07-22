@@ -27,13 +27,10 @@ package de.samply.bbmri.negotiator.control;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-
-import de.samply.bbmri.negotiator.model.TestQuery;
 
 /**
  * Session scoped bean for general data of the session
@@ -47,32 +44,11 @@ public class SessionBean implements Serializable {
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    /** The queries. */
-    private List<TestQuery> queries = null;
-    
     /** The filters. */
     private List<String> filters = null;
     
     /** The filter to add. */
     private String filter = null;
-
-    /**
-     * Gets the queries.
-     *
-     * @return the queries
-     */
-    public List<TestQuery> getQueries() {
-        if (queries == null) {
-            queries = new ArrayList<>();
-            queries.add(new TestQuery(1, "A query to find them all", "Bla bla blaaaaaa", 3, new Date(), new Date(),
-                    "Hans Meiser"));
-            queries.add(new TestQuery(2, "Lorem ipsum?",
-                    "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-                    0, new Date(), new Date(), "William Dafoe"));
-        }
-
-        return queries;
-    }
 
     /**
      * Adds the filter.
