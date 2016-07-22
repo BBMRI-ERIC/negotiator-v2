@@ -30,6 +30,7 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
 	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
 	template="../components/default.xhtml">
 
@@ -167,50 +168,8 @@
 				</ui:fragment>
 
 				<ui:repeat value="#{ownerQueriesDetailBean.comments}" var="comment">
-
-					<h:panelGroup layout="block" styleClass="panel panel-default">
-
-						<h:panelGroup layout="block" styleClass="panel-heading">
-
-                            #{comment.person.authName}
-                            
-                            <h:panelGroup styleClass="pull-right">
-
-
-								<h:outputText value="#{comment.comment.commentTime}">
-									<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-								</h:outputText>
-							</h:panelGroup>
-
-						</h:panelGroup>
-
-						<h:panelGroup layout="block" styleClass="panel-body">
-
-							<h:panelGroup layout="block" styleClass="row">
-
-								<h:panelGroup layout="block"
-									styleClass="col-md-1 avatar-pic-comment-column">
-									<h:graphicImage library="images" name="shodan_80_86.png" />
-								</h:panelGroup>
-
-								<h:panelGroup layout="block"
-									styleClass="col-md-11 comment-text-column">
-
-									<h:panelGroup layout="block" styleClass="row">
-										<h:panelGroup layout="block"
-											styleClass="col-md-10 comment-text-content">
-                                            #{comment.comment.text}
-                                        </h:panelGroup>
-
-									</h:panelGroup>
-
-								</h:panelGroup>
-
-							</h:panelGroup>
-
-						</h:panelGroup>
-
-					</h:panelGroup>
+					
+					<bbmricc:comment comment="#{comment.comment}" person="#{comment.person}"/>
 
 				</ui:repeat>
 
