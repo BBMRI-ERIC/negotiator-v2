@@ -158,9 +158,13 @@ public class OwnerQueriesBean implements Serializable {
 	private void flagQuery(Integer queryId, String flag, boolean on) {
 		try (Config config = ConfigFactory.get()) {
 						
-			// above query written using Postgresql 9.5's ON CONFLICT clause
-			String flagValue=on ? null : flag;
-			config.dsl().query("insert into flagged_query (query_id, person_id, flag) values (?,?,?) ON CONFLICT (query_id,person_id) do update set flag=? where flagged_query.query_id = ? and flagged_query.person_id=?", queryId,userBean.getUserId(),flagValue, flagValue, queryId, userBean.getUserId()).execute();
+			if(on) {
+				config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userBean.getUserId())).execute();
+			}
+			else {
+				// above query written using Postgresql 9.5's ON CONFLICT clause
+				config.dsl().query("insert into flagged_query (query_id, person_id, flag) values (?,?,?) ON CONFLICT (query_id,person_id) do update set flag=? where flagged_query.query_id = ? and flagged_query.person_id=?", queryId,userBean.getUserId(),flag, flag, queryId, userBean.getUserId()).execute();
+			}
 		 
 			config.get().commit();
 			queries = null;
