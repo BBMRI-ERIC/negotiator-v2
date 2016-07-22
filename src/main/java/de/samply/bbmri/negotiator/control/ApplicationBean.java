@@ -25,11 +25,8 @@
  */
 package de.samply.bbmri.negotiator.control;
 
-import de.samply.bbmri.negotiator.*;
-import de.samply.common.sql.SQLUtil;
-import de.samply.common.upgrade.Upgrade;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.Serializable;
+import java.sql.ResultSet;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.ConfigurableNavigationHandler;
@@ -37,8 +34,13 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
-import java.io.Serializable;
-import java.sql.ResultSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.samply.bbmri.negotiator.*;
+import de.samply.common.sql.SQLUtil;
+import de.samply.common.upgrade.Upgrade;
 
 /**
  * The Class ApplicationBean.
@@ -78,6 +80,14 @@ public class ApplicationBean implements Serializable {
                     logger.info("Database empty, creating tables");
 
                     SQLUtil.executeSQLFile(config.get(), getClass().getClassLoader(), "/sql/database.sql");
+
+                    /**
+                     * In case the application has been started in development mode, deploy the dummy data.
+                     */
+                    if(NegotiatorConfig.get().isDevelopMode()) {
+                        logger.info("Deploying dummy data");
+                        SQLUtil.executeSQLFile(config.get(), getClass().getClassLoader(), "/sql/dummyData.sql");
+                    }
                 }
             }
 

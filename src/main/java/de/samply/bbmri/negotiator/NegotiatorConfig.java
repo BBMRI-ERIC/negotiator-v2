@@ -26,16 +26,18 @@
 
 package de.samply.bbmri.negotiator;
 
-import de.samply.common.config.OAuth2Client;
-import de.samply.common.config.ObjectFactory;
-import de.samply.common.config.Postgresql;
-import de.samply.config.util.JAXBUtil;
-import org.xml.sax.SAXException;
+import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.FileNotFoundException;
+
+import org.xml.sax.SAXException;
+
+import de.samply.common.config.OAuth2Client;
+import de.samply.common.config.ObjectFactory;
+import de.samply.common.config.Postgresql;
+import de.samply.config.util.JAXBUtil;
 
 /**
  * The negotiator configuration singleton.
@@ -74,7 +76,15 @@ public class NegotiatorConfig {
     /** JAXBContext used for JAXB. */
     private static JAXBContext jaxbContext;
 
+    /**
+     * If true, the application has been started in maintenance mode.
+     */
     private boolean maintenanceMode = false;
+
+    /**
+     * If true, the application has been started in development mode.
+     */
+    private boolean developMode = false;
 
     /**
      * Instantiates a new negotiator config.
@@ -139,6 +149,8 @@ public class NegotiatorConfig {
 
         instance.postgresql = JAXBUtil.findUnmarshall(FILE_POSTGRESQL, getJAXBContext(), Postgresql.class,
                 instance.projectName, instance.fallback);
+
+        instance.developMode = "true".equals(System.getProperty("de.samply.development"));
     }
 
     /**
@@ -171,5 +183,13 @@ public class NegotiatorConfig {
 
     public void setMaintenanceMode(boolean maintenanceMode) {
         this.maintenanceMode = maintenanceMode;
+    }
+
+    /**
+     * If true, the application has been started in development mode
+     * @return
+     */
+    public boolean isDevelopMode() {
+        return developMode;
     }
 }
