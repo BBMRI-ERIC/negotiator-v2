@@ -26,7 +26,9 @@
 package de.samply.bbmri.negotiator.control;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.sql.ResultSet;
+import java.util.Random;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.ConfigurableNavigationHandler;
@@ -38,7 +40,11 @@ import javax.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.docuverse.identicon.IdenticonUtil;
+
 import de.samply.bbmri.negotiator.*;
+import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.sql.SQLUtil;
 import de.samply.common.upgrade.Upgrade;
 
@@ -87,6 +93,19 @@ public class ApplicationBean implements Serializable {
                     if(NegotiatorConfig.get().isDevelopMode()) {
                         logger.info("Deploying dummy data");
                         SQLUtil.executeSQLFile(config.get(), getClass().getClassLoader(), "/sql/dummyData.sql");
+
+                        Random random = new Random();
+
+                        /**
+                         * Generate identicons for every user in the dummy data and store them in the DB.
+                         */
+                        for(PersonRecord person : config.dsl().selectFrom(Tables.PERSON)) {
+                            if(person.getPersonImage() == null) {
+                                logger.info("Generating identicon for user {}", person.getAuthName());
+                                person.setPersonImage(IdenticonUtil.generateIdenticon(new BigInteger(64, random).intValue(), 256));
+                                person.update();
+                            }
+                        }
                     }
                 }
             }
