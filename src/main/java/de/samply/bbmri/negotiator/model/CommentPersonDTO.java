@@ -26,6 +26,7 @@
 
 package de.samply.bbmri.negotiator.model;
 
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Location;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 
@@ -35,31 +36,45 @@ import java.io.Serializable;
  * DTO for a comment and the person who made the comment.
  */
 public class CommentPersonDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * The comment itself
-     */
-    private Comment comment;
+	/**
+	 * The comment itself
+	 */
+	private Comment comment;
 
-    /**
-     * The person who made the comment.
-     */
-    private Person person;
+	/**
+	 * The person who made the comment.
+	 */
+	private Person person;
 
-    public Comment getComment() {
-        return comment;
-    }
+	/**
+	 * The location of the person who made the comment.
+	 */
+	private Location location;
 
-    public void setComment(Comment comment) {
-        this.comment = comment;
-    }
+	public Comment getComment() {
+		return comment;
+	}
 
-    public Person getPerson() {
-        return person;
-    }
+	public void setComment(Comment comment) {
+		this.comment = comment;
+	}
 
-    public void setPerson(Person person) {
-        this.person = person;
-    }
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		this.person = person;
+	}
+
+	public Location getLocation() {
+		return location;
+	}
+
+	public void setLocation(Location location) {
+		this.location = location;
+	}
+
 }

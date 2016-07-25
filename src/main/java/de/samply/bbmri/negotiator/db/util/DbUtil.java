@@ -208,8 +208,10 @@ public class DbUtil {
      * @return
      */
     public static List<CommentPersonDTO> getComments(Config config, int queryId) {
-        Result<Record> result = config.dsl().select().from(Tables.COMMENT)
+        Result<Record> result = config.dsl().select()
+        		.from(Tables.COMMENT)
                 .join(Tables.PERSON).onKey(Keys.COMMENT__COMMENT_PERSON_ID_FKEY)
+                .join(Tables.LOCATION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.LOCATION_ID.eq(Tables.LOCATION.ID))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 
