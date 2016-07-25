@@ -57,7 +57,9 @@ import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
+import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Location;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
@@ -129,6 +131,11 @@ public class UserBean implements Serializable {
      * The state of this session. This is a random string for OAuth2 used to prevent cross site forgery attacks.
      */
     private String state;
+
+    /**
+     * The Person from the database.
+     */
+    private Person person;
 
     /**
      * Executes a logout.
@@ -349,6 +356,9 @@ public class UserBean implements Serializable {
                 }
                 person.update();
             }
+
+            PersonDao dao = new PersonDao();
+            this.person = dao.mapper().map(person);
 
             userId = person.getId();
 
@@ -580,4 +590,11 @@ public class UserBean implements Serializable {
         return location.getName();
     }
 
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
 }

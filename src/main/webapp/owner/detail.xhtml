@@ -31,7 +31,6 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
 	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
-	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
 	template="../components/default.xhtml">
 
 	<!-- Queries page for the owner -->
@@ -183,8 +182,7 @@
 
 						<h:panelGroup layout="block" styleClass="col-md-3">
 
-							<img width="92" height="92"
-								src="#{bbmri:userImage(userBean.userId)}" />
+							<bbmricc:avatar person="#{userBean.person}"/>
 
 						</h:panelGroup>
 
