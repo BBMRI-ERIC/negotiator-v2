@@ -34,6 +34,7 @@
 	template="../components/default.xhtml">
 
 	<!-- Queries page for the researcher -->
+	
 
 	<ui:param name="bodyClass" value="container-fluid" />
 
@@ -58,11 +59,11 @@
 			<h:form>
 
 				<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
-
 					<h:commandLink
 						action="#{researcherQueriesBean.selectCommentsForQuery(item.query)}"
 						styleClass="deco-none">
-						<f:ajax render="right-panel" />
+						<f:ajax render="right-panel newComment"/>
+						
 
 						<h:panelGroup layout="block" styleClass="panel panel-default">
 
@@ -218,7 +219,7 @@
 
 				<h:panelGroup layout="block" styleClass="col-md-12">
 
-					<h:form>
+					<h:form id="newComment">
 
 						<h:panelGroup layout="block" styleClass="col-md-3">
 
@@ -231,14 +232,14 @@
 
 							<div class="form-group">
 
-								<h:inputTextarea value="#{researcherQueriesBean.commentText}"
+								<h:inputTextarea value="#{addCommentBean.comment}"
 									styleClass="form-control" rows="5" />
 
 							</div>
 
 							<h:panelGroup layout="block" styleClass="pull-right">
 
-								<h:commandButton action="#{researcherQueriesBean.saveComment}"
+								<h:commandButton action="#{addCommentBean.saveComment(researcherQueriesBean.selectedQuery)}"
 									value="#{label['querydetail.action.addComment.buttontext']}" styleClass="btn btn-primary" title="#{label['querydetail.action.addComment']}" />
 
 							</h:panelGroup>

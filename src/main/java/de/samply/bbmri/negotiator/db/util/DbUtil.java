@@ -27,6 +27,7 @@
 package de.samply.bbmri.negotiator.db.util;
 
 import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
@@ -38,6 +39,8 @@ import de.samply.bbmri.negotiator.model.QueryLocationDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.*;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -96,10 +99,6 @@ public class DbUtil {
 	}
     
     
-    
-    
-    
-
 	
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
@@ -216,6 +215,19 @@ public class DbUtil {
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 
         return config.map(result, CommentPersonDTO.class);
+    }
+	
+    
+    public static void addComment(int queryId, int personId, String comment) {
+    	 try(Config config = ConfigFactory.get()) {
+             config.dsl().insertInto(Tables.COMMENT, Tables.COMMENT.PERSON_ID, Tables.COMMENT.QUERY_ID, Tables.COMMENT.COMMENT_TIME, Tables.COMMENT.TEXT)
+             .values(personId, queryId, new Timestamp(new java.util.Date().getTime()), comment).execute();
+    		 
+           config.get().commit();
+    	 } 
+    	 catch (SQLException e) {
+             e.printStackTrace();
+         }
     }
 
 }

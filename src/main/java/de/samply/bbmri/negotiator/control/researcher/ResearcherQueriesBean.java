@@ -100,13 +100,6 @@ public class ResearcherQueriesBean implements Serializable {
         }
     }
 
-    public String saveComment() {
-        /**
-         * Save the current comment
-         */
-        return null;
-    }
-
     public List<QueryStatsDTO> getQueries() {
         return queries;
     }

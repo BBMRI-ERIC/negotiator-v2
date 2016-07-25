@@ -190,14 +190,14 @@
 
 							<div class="form-group">
 
-								<h:inputTextarea value="#{ownerQueriesDetailBean.commentText}"
+								<h:inputTextarea value="#{addCommentBean.comment}"
 									styleClass="form-control" rows="5" />
 
 							</div>
 
 							<h:panelGroup layout="block" styleClass="pull-right">
 
-								<h:commandButton action="#{ownerQueriesDetailBean.saveComment}"
+								<h:commandButton action="#{addCommentBean.saveComment(ownerQueriesDetailBean.selectedQuery)}"
 									value="#{label['querydetail.action.addComment.buttontext']}" title="#{label['querydetail.action.addComment']}" styleClass="btn btn-primary" />
 
 							</h:panelGroup>
