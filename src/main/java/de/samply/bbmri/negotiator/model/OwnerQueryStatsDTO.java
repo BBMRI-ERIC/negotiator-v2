@@ -25,37 +25,37 @@
  */
 package de.samply.bbmri.negotiator.model;
 
-import  de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
 
 /**
- * DTO that gives a small statistic for a query, with the amount of commentCount made for the query and
- * the last time someone made a comment for this query, and the name of the query creator
+ * DTO that gives a small statistic for a query, with the amount of commentCount
+ * made for the query and the last time someone made a comment for this query,
+ * and the name of the query creator
  */
 public class OwnerQueryStatsDTO extends QueryStatsDTO {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private String auth_name;
-    private String researcherName;
-    
-    private String flag;
-  
-    
-    public boolean isFlagged() {
-    	return flag!=null;
-    }
-    
-    public boolean isStarred() {
-    	return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getStarflag());
-    }
+	private String authName;
+	private String researcherName;
 
-    public boolean isArchived() {
-    	return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getArchiveflag());
-    }
-    
-    public boolean isIgnored() {
-    	return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getIgnoreflag());
-    }
-    
+	private String flag;
+
+	public boolean isFlagged() {
+		return flag != null;
+	}
+
+	public boolean isStarred() {
+		return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getStarflag());
+	}
+
+	public boolean isArchived() {
+		return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getArchiveflag());
+	}
+
+	public boolean isIgnored() {
+		return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getIgnoreflag());
+	}
+
 	public String getFlag() {
 		return flag;
 	}
@@ -72,12 +72,12 @@ public class OwnerQueryStatsDTO extends QueryStatsDTO {
 		this.researcherName = researcherName;
 	}
 
-	public String getAuth_name() {
-        return auth_name;
-    }
+	public String getAuthName() {
+		return authName;
+	}
 
-    public void setAuth_name(String auth_name) {
-        this.auth_name = auth_name;
-    }
+	public void setAuthName(String authName) {
+		this.authName = authName;
+	}
 
 }
