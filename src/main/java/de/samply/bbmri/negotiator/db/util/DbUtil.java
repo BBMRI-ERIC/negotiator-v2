@@ -117,12 +117,12 @@ public class DbUtil {
     	
     	if(filters != null && filters.size() > 0) {
     		Object[] filtersArray = filters.toArray();
-    		Condition titleCondition = Tables.QUERY.TITLE.contains(filtersArray[0].toString());
-    		Condition textCondition = Tables.QUERY.TEXT.contains(filtersArray[0].toString());
+    		Condition titleCondition = Tables.QUERY.TITLE.likeIgnoreCase("%"+filtersArray[0].toString().replace("%", "!%")+"%", '!');
+    		Condition textCondition = Tables.QUERY.TEXT.likeIgnoreCase("%"+filtersArray[0].toString().replace("%", "!%")+"%", '!');
     		
     		for (int i = 1; i < filtersArray.length; i++) {
-    			titleCondition = titleCondition.and(Tables.QUERY.TITLE.contains(filtersArray[i].toString()));
-    			textCondition = textCondition.and(Tables.QUERY.TEXT.contains(filtersArray[i].toString()));
+    			titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%"+filtersArray[i].toString().replace("%", "!%")+"%", '!'));
+    			textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%"+filtersArray[i].toString().replace("%", "!%")+"%", '!'));
     		}
     		condition = condition.and(titleCondition.or(textCondition));
     	}
