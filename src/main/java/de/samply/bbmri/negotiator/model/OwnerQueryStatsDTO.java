@@ -35,7 +35,6 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
 public class OwnerQueryStatsDTO extends QueryStatsDTO {
 	private static final long serialVersionUID = 1L;
 
-	private String authName;
 	private String researcherName;
 
 	private String flag;
@@ -71,13 +70,4 @@ public class OwnerQueryStatsDTO extends QueryStatsDTO {
 	public void setResearcherName(String researcherName) {
 		this.researcherName = researcherName;
 	}
-
-	public String getAuthName() {
-		return authName;
-	}
-
-	public void setAuthName(String authName) {
-		this.authName = authName;
-	}
-
 }

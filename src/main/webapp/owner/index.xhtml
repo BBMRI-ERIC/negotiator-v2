@@ -56,14 +56,14 @@
                       
                       <h:commandLink   styleClass="#{ownerQueriesBean.getArchivedState()}" title="#{label['queryview.action.viewArchived']}"
 							action="#{ownerQueriesBean.switchArchivedView()}">
-							<f:ajax render="allOwnerQueries filterInputButtons" />
+							<f:ajax render=":allOwnerQueries :queryItemActions @this" />
 							
 							<i class="glyphicon glyphicon-folder-open"></i>
 					  </h:commandLink>
                       
                       <h:commandLink   styleClass="#{ownerQueriesBean.getStarredState()}" title="#{label['queryview.action.viewStarred']}" 
 							action="#{ownerQueriesBean.switchStarredView()}">
-							<f:ajax render="allOwnerQueries filterInputButtons" />
+							<f:ajax render=":allOwnerQueries :queryItemActions @this" />
 							
 							<i class="glyphicon glyphicon-star"></i>
 					  </h:commandLink>
@@ -72,87 +72,93 @@
             </h:form>
         </h:panelGroup>
 
-        <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0}" layout="block">
-            <h3>#{label['queryview.noQueries']}</h3>
-        </h:panelGroup>
-        
-		<h:panelGroup id="allOwnerQueries">
-        <ui:repeat var="item" value="#{ownerQueriesBean.queries}">
-
-            <h:panelGroup layout="block"
-                          styleClass="panel panel-default">
-                <h:panelGroup layout="block" styleClass="panel-heading">
-					<h:form prependId="false">
-	                    <h:commandLink styleClass="#{item.starred ? 'btn btn-success' : 'btn btn-default'} btn-xs"  title="#{item.starred ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}" action="#{ownerQueriesBean.starQuery(item.query.id, item.starred)}"><i class="glyphicon glyphicon-star"></i></h:commandLink>
-	                    <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}">
-	                        <f:param name="queryId" value="#{item.query.id}"/>
-	                        <h:outputLabel value="#{item.query.title}" style="margin-left: 30px;" />
-	                    </h:link>
-
-	                    <h:panelGroup styleClass="pull-right">
-	                    
-	                        <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="..." rendered="#{userBean.biobankOwner}">
-	                                          
-								
-								<h:commandLink  styleClass="btn btn-default" title="#{label['queryview.queryitem.action.archiveme']}"  action="#{ownerQueriesBean.archiveQuery(item.query.id, item.archived)}"><i class="glyphicon glyphicon-folder-open"></i></h:commandLink>
-							   	<h:commandLink styleClass="btn btn-default" title="#{label['queryview.queryitem.action.ignoreme']}" action="#{ownerQueriesBean.ignoreQuery(item.query.id, item.ignored)}"><i class="fa fa-sign-out"></i></h:commandLink>
-	                              
-	                        </h:panelGroup>
-	                  
-	                        <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.commentCount > 0}">
-	                            <h:outputText title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-	                                          value="#{item.commentCount}"/>
-	                        </h:panelGroup>
-	
-	                        <h:outputText value="#{item.lastCommentTime}" styleClass="queryCreationDate"
-	                                      title="#{label['queryview.queryitem.datetime.last.comment']}" rendered="#{item.commentCount > 0}">
-	                            <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
-	                        </h:outputText>
-	
-	                    </h:panelGroup>
-  					</h:form>
-                </h:panelGroup>
-
-
-                <h:panelGroup layout="block" styleClass="panel-body">
-                    <h:panelGroup layout="block" styleClass="row">
-                        <h:panelGroup layout="block" styleClass="col-md-1 avatar-pic-comment-column" rendered="#{userBean.biobankOwner}">
-                                <h:graphicImage library="images" name="shodan_80_86.png" />
-                        </h:panelGroup>
-                        <h:panelGroup layout="block" styleClass="col-md-11 comment-text-column" style="padding-left: 30px;">
-                            <h:panelGroup layout="block" styleClass="row queryOwner" rendered="#{userBean.biobankOwner}">
-                                #{item.researcherName}
-                            </h:panelGroup>
-
-                            <h:panelGroup layout="block" styleClass="row">
-                                <h:panelGroup layout="block"
-                                    styleClass="col-md-10 comment-text-content">
-                                    #{item.query.text}
-                                </h:panelGroup>
-                            </h:panelGroup>
-
-                            <h:panelGroup layout="block" styleClass="row">
-                                <h:panelGroup layout="block" styleClass="col-md-12">
-                                    <h:panelGroup styleClass="pull-right">
-
-                                        <h:outputText
-                                            value="#{item.query.queryCreationTime}"
-                                            title="#{label['queryview.queryitem.datetime.creation']}">
-                                            <f:convertDateTime
-                                                pattern="dd/MM/yyyy hh:mm" />
-                                        </h:outputText>
-                                    </h:panelGroup>
-                                </h:panelGroup>
-                            </h:panelGroup>
-                        </h:panelGroup>
-                            
-                    </h:panelGroup>
-                </h:panelGroup>
-
+		<h:panelGroup id="allOwnerQueries" layout="block">
+            <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0}" layout="block">
+                <h3>#{label['queryview.noQueries']}</h3>
             </h:panelGroup>
 
-        </ui:repeat>
-      </h:panelGroup>
+            <h:form id="queryItemActions">
+                <ui:repeat var="queryDto" value="#{ownerQueriesBean.queries}">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
+                                           title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+                                           action="#{ownerQueriesBean.starQuery(queryDto.query.id, queryDto.starred)}">
+                                <i class="glyphicon glyphicon-star"></i>
+                            </h:commandLink>
+
+                            <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}">
+                                <f:param name="queryId" value="#{queryDto.query.id}"/>
+                                <h:outputLabel value="#{queryDto.query.title}" style="margin-left: 30px;" />
+                            </h:link>
+
+                            <h:panelGroup styleClass="pull-right">
+
+                                <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="...">
+
+                                    <h:commandLink  styleClass="btn btn-default" title="#{label['queryview.queryitem.action.archiveme']}"
+                                                    action="#{ownerQueriesBean.archiveQuery(queryDto.query.id, queryDto.archived)}">
+                                        <i class="glyphicon glyphicon-folder-open"></i>
+                                    </h:commandLink>
+
+                                    <h:commandLink styleClass="btn btn-default" title="#{label['queryview.queryitem.action.ignoreme']}"
+                                                   action="#{ownerQueriesBean.ignoreQuery(queryDto.query.id, queryDto.ignored)}">
+                                        <i class="fa fa-sign-out"></i>
+                                    </h:commandLink>
+
+                                </h:panelGroup>
+
+                                <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{queryDto.commentCount > 0}">
+                                    <h:outputText title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
+                                                  value="#{queryDto.commentCount}"/>
+                                </h:panelGroup>
+
+                                <h:outputText value="#{queryDto.lastCommentTime}" styleClass="queryCreationDate"
+                                              title="#{label['queryview.queryitem.datetime.last.comment']}" rendered="#{queryDto.commentCount > 0}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
+                                </h:outputText>
+
+                            </h:panelGroup>
+                        </div>
+
+                        <h:panelGroup layout="block" styleClass="panel-body">
+                            <h:panelGroup layout="block" styleClass="row">
+                                <h:panelGroup layout="block" styleClass="col-md-1 avatar-pic-comment-column">
+                                        <h:graphicImage library="images" name="shodan_80_86.png" />
+                                </h:panelGroup>
+                                <h:panelGroup layout="block" styleClass="col-md-11 comment-text-column" style="padding-left: 30px;">
+                                    <h:panelGroup layout="block" styleClass="row queryOwner">
+                                        #{queryDto.researcherName}
+                                    </h:panelGroup>
+
+                                    <h:panelGroup layout="block" styleClass="row">
+                                        <h:panelGroup layout="block" styleClass="col-md-10 comment-text-content">
+                                            #{queryDto.query.text}
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup layout="block" styleClass="row">
+                                        <h:panelGroup layout="block" styleClass="col-md-12">
+                                            <h:panelGroup styleClass="pull-right">
+
+                                                <h:outputText
+                                                    value="#{queryDto.query.queryCreationTime}"
+                                                    title="#{label['queryview.queryitem.datetime.creation']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+                                                </h:outputText>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </div>
+
+                </ui:repeat>
+            </h:form>
+        </h:panelGroup>
     </ui:define>
 
 </ui:composition>

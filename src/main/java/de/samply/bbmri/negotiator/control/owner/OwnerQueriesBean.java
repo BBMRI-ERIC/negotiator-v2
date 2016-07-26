@@ -216,7 +216,7 @@ public class OwnerQueriesBean implements Serializable {
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				queries = DbUtil.getOwnerQueries(config, userBean.getLocationId(), getFilterTerms(),
+				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
 					        getStarredQueries(), getArchivedQueries());
 
 			} catch (SQLException e) {

@@ -26,24 +26,29 @@
 
 package de.samply.bbmri.negotiator.db.util;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.jooq.Condition;
+import org.jooq.JoinType;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.impl.DSL;
+
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryLocationDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
-import org.jooq.*;
-
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import de.samply.string.util.StringUtil;
 
 /**
  * The database util for basic queries.
@@ -75,7 +80,7 @@ public class DbUtil {
     /**
      * Returns an overview of all the queries a bio-bank owner can see when he/she logs in.
      * @param config
-     * @param queryId
+     * @param locationId
      * @return
      */
     @Deprecated
@@ -103,62 +108,57 @@ public class DbUtil {
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
      * @param config jooq configuration
-     * @param locationId biobank id
+     * @param userId the user ID of the biobank owner
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int locationId, Set<String> filters, String starredQueries, String archivedQueries) {
-    	Person queryOwner = Tables.PERSON.as("queryOwner");
-    	Person commentPerson = Tables.PERSON.as("commentPerson");
-    
-    	Condition condition = commentPerson.LOCATION_ID.eq(locationId)
-    						.and((Tables.FLAGGED_QUERY.FLAG.eq(FlaggedQuery.getStarflag()).or(Tables.FLAGGED_QUERY.FLAG.isNull())));
-    	
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, String starredQueries, String archivedQueries) {
+    	Person queryAuthor = Tables.PERSON.as("queryAuthor");
+
+    	Condition condition = Tables.QUERY_PERSON.PERSON_ID.eq(userId).and(Tables.FLAGGED_QUERY.FLAG.ne("I").or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+
     	if(filters != null && filters.size() > 0) {
-    		Object[] filtersArray = filters.toArray();
-    		Condition titleCondition = Tables.QUERY.TITLE.likeIgnoreCase("%"+filtersArray[0].toString().replace("%", "!%")+"%", '!');
-    		Condition textCondition = Tables.QUERY.TEXT.likeIgnoreCase("%"+filtersArray[0].toString().replace("%", "!%")+"%", '!');
-    		
-    		for (int i = 1; i < filtersArray.length; i++) {
-    			titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%"+filtersArray[i].toString().replace("%", "!%")+"%", '!'));
-    			textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%"+filtersArray[i].toString().replace("%", "!%")+"%", '!'));
-    		}
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+    			textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+            }
+
     		condition = condition.and(titleCondition.or(textCondition));
     	}
     	
-    	if (starredQueries != null && starredQueries.isEmpty() == false) {
+    	if (! StringUtil.isEmpty(starredQueries)) {
 			condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(starredQueries));
     	}
     	
-    	if (archivedQueries != null && archivedQueries.isEmpty() == false) {
+    	if (! StringUtil.isEmpty(archivedQueries)) {
 			condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(archivedQueries));
     	}
     	
     	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
-    			.select(commentPerson.AUTH_NAME.as("auth_name"))
-    			.select(queryOwner.AUTH_NAME.as("researcher_name"))
+    			.select(queryAuthor.AUTH_NAME.as("researcher_name"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.count().as("comment_count"))
-    			.select(Tables.FLAGGED_QUERY.FLAG.as("flag"))
-    			.from(Tables.QUERY)  
-        
+                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), "U")
+                        .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
+    			.from(Tables.QUERY)
+
     			.join(Tables.QUERY_PERSON, JoinType.JOIN)
     			.on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
         
-    			.join(queryOwner, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY.RESEARCHER_ID.eq(queryOwner.ID))
-    			
-    			.join(commentPerson, JoinType.JOIN)				        
-    			.on(Tables.QUERY_PERSON.PERSON_ID.eq(commentPerson.ID))	
-        
+    			.join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+    			.on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
+
     			.join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))		
         
     			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.FLAGGED_QUERY.QUERY_ID))	
-        
+    			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.QUERY_PERSON.PERSON_ID)))
+
     			.where(condition)
-    			.groupBy(commentPerson.AUTH_NAME, queryOwner.AUTH_NAME, Tables.QUERY.ID, Tables.FLAGGED_QUERY.FLAG)
+    			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.ID).fetch();
     	
     	
