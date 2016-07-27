@@ -47,7 +47,6 @@ import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 
 /**
  * This servlet handles the requests for images.
- * TODO: Use guava to cache the images from the database.
  */
 public class ImageServlet extends HttpServlet {
 
