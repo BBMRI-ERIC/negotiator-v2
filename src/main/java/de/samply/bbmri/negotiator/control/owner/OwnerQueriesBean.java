@@ -46,7 +46,8 @@ import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 
 /**
@@ -64,44 +65,9 @@ public class OwnerQueriesBean implements Serializable {
 	private List<OwnerQueryStatsDTO> queries;	
 
 	/**
-	 * variable to set the starred button switched on
+	 * The currently active flag filter. Set this to whatever flag you want and you will see the flagged queries only.
 	 */
-	private final String switchOn = "btn btn-success";
-
-	/**
-	 * variable to set the starred button switched off
-	 */
-	private final String switchOff = "btn btn-default";
-	
-	/**
-	 * Queries archived by the user
-	 */
-	private String archivedState = switchOff;
-	
-	/**
-	 * Queries archived by the user
-	 */
-	private String archivedQueries;	
-
-	/**
-	 * state of starred button
-	 */
-	private String starredState = switchOff;
-
-	/**
-	 * Queries starred by the user
-	 */
-	private String starredQueries;	
-	
-	/**
-	 * Flag for archived queries in database
-	 */
-	private final String flagForArchivedQueries = new String("A");
-	
-	/**
-	 * Flag for starred queries in database
-	 */
-	private final String flagForStarredQueries = new String("S");
+	private Flag flagFilter = Flag.UNFLAGGED;
 	 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -123,38 +89,47 @@ public class OwnerQueriesBean implements Serializable {
 	 * 
 	 */
 	public void switchArchivedView() {
-		if (archivedQueries == null || archivedQueries.isEmpty()) {
-			setArchivedQueries(flagForArchivedQueries);
-			setArchivedState(switchOn);
+		if(flagFilter == Flag.ARCHIVED) {
+			flagFilter = null;
+		} else {
+			flagFilter = Flag.ARCHIVED;
 		}
-		else {
-			setArchivedQueries(null);
-			setArchivedState(switchOff);
-		}
-		
 		queries = null;		
+	}
+
+	/**
+	 * Switches the starredQueries view On and off. Also makes 'queries' object null to re-load the queries.
+	 *
+	 */
+	public void switchStarredView() {
+		if(flagFilter == Flag.STARRED) {
+			flagFilter = null;
+		} else {
+			flagFilter = Flag.STARRED;
+		}
+		queries = null;
 	}
 
 	/**
 	 * Leave query as a bio bank owner. Saves the time stamp of leaving a query.
 	 * 
-	 * @param queryId
+	 * @param queryDto
 	 * @return
 	 */
-	public void ignoreQuery(Integer queryId, boolean on) {
+	public void ignoreQuery(OwnerQueryStatsDTO queryDto) {
 		try (Config config = ConfigFactory.get()) {
 			java.util.Date date= new java.util.Date();	
 				
 			config.dsl().update(Tables.QUERY_PERSON)
 			            .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, new Timestamp(date.getTime()))
-			            .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryId))
+			            .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryDto.getQuery().getId()))
 			            .and(Tables.QUERY_PERSON.PERSON_ID.eq(userBean.getUserId()))
 						.execute();
 			         
 			config.get().commit();
 			queries = null;
 			
-			flagQuery(queryId, FlaggedQuery.getIgnoreflag(), on);
+			flagQuery(queryDto, Flag.IGNORED);
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -164,16 +139,16 @@ public class OwnerQueriesBean implements Serializable {
 	
 	/**
 	 * Mark query as starred
-	 * @param queryId
+	 * @param queryDto
 	 */
-	public void starQuery(Integer queryId, boolean on){
-		flagQuery(queryId, FlaggedQuery.getStarflag(), on);
+	public void starQuery(OwnerQueryStatsDTO queryDto){
+		flagQuery(queryDto, Flag.STARRED);
 	}
 	
 	/**
 	 */
-	public void archiveQuery(Integer queryId, boolean on){
-		flagQuery(queryId, FlaggedQuery.getArchiveflag(), on);
+	public void archiveQuery(OwnerQueryStatsDTO queryDto){
+		flagQuery(queryDto, Flag.ARCHIVED);
 	}
 	
 	/**
@@ -187,20 +162,40 @@ public class OwnerQueriesBean implements Serializable {
 	 *		.set(Tables.FLAGGED_QUERY.PERSON_ID,userBean.getUserId())
 	 *		.set(Tables.FLAGGED_QUERY.FLAG, flag).execute();
 	 * 
-	 * @param queryId
+	 * @param queryDto
 	 * @param flag
 	 */
-	private void flagQuery(Integer queryId, String flag, boolean on) {
+	private void flagQuery(OwnerQueryStatsDTO queryDto, Flag flag) {
 		try (Config config = ConfigFactory.get()) {
-						
-			if(on) {
-				config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userBean.getUserId())).execute();
+			/**
+			 * Do not hardcode SQL statements. They are hard to maintain.
+			 * Since jOOQ does not support the onDuplicateKeyUpdate method yet,
+			 * simplify the statements so that:
+			 *
+			 * 1. if the current flag is "UNFLAGGED", insert a flag, otherwise
+			 *
+			 * 1.
+			 *
+			 * Those are not processing heavy SQL statements, IMHO it's fine.
+			 */
+
+			if(queryDto.getFlag() == null || queryDto.getFlag() == Flag.UNFLAGGED) {
+				FlaggedQueryRecord newFlag = config.dsl().newRecord(Tables.FLAGGED_QUERY);
+				newFlag.setFlag(flag);
+				newFlag.setPersonId(userBean.getUserId());
+				newFlag.setQueryId(queryDto.getQuery().getId());
+
+				newFlag.store();
+			} else if(queryDto.getFlag() == flag) {
+				config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
+						.and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userBean.getUserId())).execute();
+			} else {
+				config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
+						.where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userBean.getUserId()))
+						.and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
+						.execute();
 			}
-			else {
-				// above query written using Postgresql 9.5's ON CONFLICT clause
-				config.dsl().query("insert into flagged_query (query_id, person_id, flag) values (?,?,?) ON CONFLICT (query_id,person_id) do update set flag=? where flagged_query.query_id = ? and flagged_query.person_id=?", queryId,userBean.getUserId(),flag, flag, queryId, userBean.getUserId()).execute();
-			}
-		 
+
 			config.get().commit();
 			queries = null;
 		} catch (SQLException e) {
@@ -217,7 +212,7 @@ public class OwnerQueriesBean implements Serializable {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
 				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
-					        getStarredQueries(), getArchivedQueries());
+					        flagFilter);
 
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -243,23 +238,6 @@ public class OwnerQueriesBean implements Serializable {
 	public void removeFilter(String arg) {
 		queries = null;
 		sessionBean.removeFilter(arg);
-	}
-
-	/**
-	 * Switches the starredQueries view On and off. Also makes 'queries' object null to re-load the queries.
-	 * 
-	 */
-	public void switchStarredView() {
-		if (starredQueries == null || starredQueries.isEmpty()) {
-			setStarredQueries(flagForStarredQueries);
-			setStarredState(switchOn);
-		}
-		else {
-			setStarredQueries(null);
-			setStarredState(switchOff);
-		}
-		
-		queries = null;		
 	}
 	
 	/**
@@ -296,36 +274,12 @@ public class OwnerQueriesBean implements Serializable {
 	public void setUserBean(UserBean userBean) {
 		this.userBean = userBean;
 	}	
-	
-	public String getStarredQueries() {
-		return starredQueries;
+
+	public Flag getFlagFilter() {
+		return flagFilter;
 	}
 
-	public void setStarredQueries(String starredQueries) {
-		this.starredQueries = starredQueries;
-	}
-
-	public String getStarredState() {
-		return starredState;
-	}
-
-	public void setStarredState(String starredState) {
-		this.starredState = starredState;
-	}
-	
-	public String getArchivedQueries() {
-		return archivedQueries;
-	}
-
-	public void setArchivedQueries(String archivedQueries) {
-		this.archivedQueries = archivedQueries;
-	}
-
-	public String getArchivedState() {
-		return archivedState;
-	}
-
-	public void setArchivedState(String archivedState) {
-		this.archivedState = archivedState;
+	public void setFlagFilter(Flag flagFilter) {
+		this.flagFilter = flagFilter;
 	}
 }

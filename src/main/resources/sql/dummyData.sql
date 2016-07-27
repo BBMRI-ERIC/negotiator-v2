@@ -39,5 +39,5 @@ INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (5, 2, 6
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (6, 2, 5, '2015-05-01 01:00:00', 'We have about 400 samples on colorectal cancer as a primary diagnosis');
 SELECT pg_catalog.setval('comment_id_seq', 6, true);
 
-INSERT INTO flagged_query(query_id, person_id, flag) VALUES (1, 5, 'S');
-INSERT INTO flagged_query(query_id, person_id, flag) VALUES (2, 5, 'A');
+INSERT INTO flagged_query(query_id, person_id, flag) VALUES (1, 5, 'STARRED');
+INSERT INTO flagged_query(query_id, person_id, flag) VALUES (2, 5, 'ARCHIVED');

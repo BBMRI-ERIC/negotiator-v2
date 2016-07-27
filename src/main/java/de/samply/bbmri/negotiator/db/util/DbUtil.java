@@ -42,13 +42,13 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryLocationDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
-import de.samply.string.util.StringUtil;
 
 /**
  * The database util for basic queries.
@@ -112,10 +112,11 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, String starredQueries, String archivedQueries) {
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
     	Person queryAuthor = Tables.PERSON.as("queryAuthor");
 
-    	Condition condition = Tables.QUERY_PERSON.PERSON_ID.eq(userId).and(Tables.FLAGGED_QUERY.FLAG.ne("I").or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+    	Condition condition = Tables.QUERY_PERSON.PERSON_ID.eq(userId)
+                .and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
 
     	if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
@@ -128,20 +129,16 @@ public class DbUtil {
 
     		condition = condition.and(titleCondition.or(textCondition));
     	}
-    	
-    	if (! StringUtil.isEmpty(starredQueries)) {
-			condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(starredQueries));
-    	}
-    	
-    	if (! StringUtil.isEmpty(archivedQueries)) {
-			condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(archivedQueries));
-    	}
-    	
+
+        if (flag != null && flag != Flag.UNFLAGGED) {
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
+        }
+
     	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
     			.select(queryAuthor.AUTH_NAME.as("researcher_name"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.count().as("comment_count"))
-                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), "U")
+                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
                         .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
     			.from(Tables.QUERY)
 

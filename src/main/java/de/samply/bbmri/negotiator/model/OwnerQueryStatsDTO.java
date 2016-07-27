@@ -25,7 +25,7 @@
  */
 package de.samply.bbmri.negotiator.model;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 
 /**
  * DTO that gives a small statistic for a query, with the amount of commentCount
@@ -37,29 +37,25 @@ public class OwnerQueryStatsDTO extends QueryStatsDTO {
 
 	private String researcherName;
 
-	private String flag;
+	private Flag flag;
 
-	public boolean isFlagged() {
-		return flag != null;
-	}
+    public boolean isStarred() {
+        return flag == Flag.STARRED;
+    }
 
-	public boolean isStarred() {
-		return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getStarflag());
-	}
+    public boolean isArchived() {
+        return flag == Flag.ARCHIVED;
+    }
 
-	public boolean isArchived() {
-		return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getArchiveflag());
-	}
+    public boolean isIgnored() {
+        return flag == Flag.IGNORED;
+    }
 
-	public boolean isIgnored() {
-		return flag != null && flag.equalsIgnoreCase(FlaggedQuery.getIgnoreflag());
-	}
-
-	public String getFlag() {
+	public Flag getFlag() {
 		return flag;
 	}
 
-	public void setFlag(String flag) {
+	public void setFlag(Flag flag) {
 		this.flag = flag;
 	}
 

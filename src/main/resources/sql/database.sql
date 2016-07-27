@@ -1,5 +1,5 @@
 CREATE TYPE "person_type" AS ENUM ('OWNER', 'RESEARCHER');
-
+CREATE TYPE "flag" AS ENUM ('UNFLAGGED', 'ARCHIVED', 'IGNORED', 'STARRED');
 
 CREATE TABLE "location" (
     "id" SERIAL NOT NULL,
@@ -120,7 +120,7 @@ COMMENT ON COLUMN "tagged_query".tag_id IS 'This column along with the Queryid c
 CREATE TABLE "flagged_query" (
     "query_id" INTEGER NULL,
     "person_id" INTEGER NULL,
-    "flag" CHARACTER(1),
+    "flag" "flag",
     PRIMARY KEY("query_id", "person_id"),
     FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
@@ -132,7 +132,7 @@ CREATE INDEX "queryIdIndexFlaggedQuery" ON "flagged_query" (query_id);
 COMMENT ON TABLE "flagged_query" IS 'Table for queries that are flagged/bookmarked. bookmark options are starred, archived and ignored.';
 COMMENT ON COLUMN "flagged_query".query_id IS 'This column along with ownerId will make the primary key. Its also a foreign key here, taken from query table';
 COMMENT ON COLUMN "flagged_query".person_id IS 'This column along with the id column will make the primary key. Its also a foreign key here, taken from person table';
-COMMENT ON COLUMN "flagged_query"."flag" IS 'The flag of the comment. One character letter. (A) archived, (I) ignored, (S) starred';
+COMMENT ON COLUMN "flagged_query"."flag" IS 'The flag of the comment. One of "ARCHIVED", "IGNORED" or "STARRED"';
 
 
 CREATE TABLE "query_person" (

@@ -4,6 +4,7 @@
 package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 
@@ -69,7 +70,7 @@ public class FlaggedQueryDao extends DAOImpl<FlaggedQueryRecord, de.samply.bbmri
 	/**
 	 * Fetch records that have <code>flag IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery> fetchByFlag(String... values) {
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.FlaggedQuery> fetchByFlag(Flag... values) {
 		return fetch(FlaggedQuery.FLAGGED_QUERY.FLAG, values);
 	}
 }

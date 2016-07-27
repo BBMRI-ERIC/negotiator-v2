@@ -54,16 +54,16 @@
                 <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right">
                     <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
                       
-                      <h:commandLink   styleClass="#{ownerQueriesBean.getArchivedState()}" title="#{label['queryview.action.viewArchived']}"
+                      <h:commandLink styleClass="btn #{ownerQueriesBean.flagFilter == 'ARCHIVED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewArchived']}"
 							action="#{ownerQueriesBean.switchArchivedView()}">
-							<f:ajax render=":allOwnerQueries :queryItemActions @this" />
+							<f:ajax render=":allOwnerQueries :queryItemActions @form" />
 							
 							<i class="glyphicon glyphicon-folder-open"></i>
 					  </h:commandLink>
                       
-                      <h:commandLink   styleClass="#{ownerQueriesBean.getStarredState()}" title="#{label['queryview.action.viewStarred']}" 
+                      <h:commandLink   styleClass="btn #{ownerQueriesBean.flagFilter == 'STARRED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewStarred']}"
 							action="#{ownerQueriesBean.switchStarredView()}">
-							<f:ajax render=":allOwnerQueries :queryItemActions @this" />
+							<f:ajax render=":allOwnerQueries :queryItemActions @form" />
 							
 							<i class="glyphicon glyphicon-star"></i>
 					  </h:commandLink>
@@ -84,7 +84,7 @@
                         <div class="panel-heading">
                             <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
                                            title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
-                                           action="#{ownerQueriesBean.starQuery(queryDto.query.id, queryDto.starred)}">
+                                           action="#{ownerQueriesBean.starQuery(queryDto)}">
                                 <i class="glyphicon glyphicon-star"></i>
                             </h:commandLink>
 
@@ -98,12 +98,12 @@
                                 <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="...">
 
                                     <h:commandLink  styleClass="btn btn-default" title="#{label['queryview.queryitem.action.archiveme']}"
-                                                    action="#{ownerQueriesBean.archiveQuery(queryDto.query.id, queryDto.archived)}">
+                                                    action="#{ownerQueriesBean.archiveQuery(queryDto)}">
                                         <i class="glyphicon glyphicon-folder-open"></i>
                                     </h:commandLink>
 
                                     <h:commandLink styleClass="btn btn-default" title="#{label['queryview.queryitem.action.ignoreme']}"
-                                                   action="#{ownerQueriesBean.ignoreQuery(queryDto.query.id, queryDto.ignored)}">
+                                                   action="#{ownerQueriesBean.ignoreQuery(queryDto)}">
                                         <i class="fa fa-sign-out"></i>
                                     </h:commandLink>
 

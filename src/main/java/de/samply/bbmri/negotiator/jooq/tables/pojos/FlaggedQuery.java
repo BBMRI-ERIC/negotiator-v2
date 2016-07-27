@@ -4,6 +4,8 @@
 package de.samply.bbmri.negotiator.jooq.tables.pojos;
 
 
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
+
 import java.io.Serializable;
 
 import javax.annotation.Generated;
@@ -23,14 +25,11 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class FlaggedQuery implements Serializable {
 
-	private static final long serialVersionUID = 1408236307;
-	private static final String starFlag="S";
-	private static final String archiveFlag="A";
-	private static final String ignoreFlag="I";
+	private static final long serialVersionUID = 2129048487;
 
 	private Integer queryId;
 	private Integer personId;
-	private String  flag;
+	private Flag    flag;
 
 	public FlaggedQuery() {}
 
@@ -43,7 +42,7 @@ public class FlaggedQuery implements Serializable {
 	public FlaggedQuery(
 		Integer queryId,
 		Integer personId,
-		String  flag
+		Flag    flag
 	) {
 		this.queryId = queryId;
 		this.personId = personId;
@@ -66,23 +65,11 @@ public class FlaggedQuery implements Serializable {
 		this.personId = personId;
 	}
 
-	public String getFlag() {
+	public Flag getFlag() {
 		return this.flag;
 	}
 
-	public void setFlag(String flag) {
+	public void setFlag(Flag flag) {
 		this.flag = flag;
-	}
-	
-	public static String getStarflag() {
-		return starFlag;
-	}
-
-	public static String getArchiveflag() {
-		return archiveFlag;
-	}
-
-	public static String getIgnoreflag() {
-		return ignoreFlag;
 	}
 }

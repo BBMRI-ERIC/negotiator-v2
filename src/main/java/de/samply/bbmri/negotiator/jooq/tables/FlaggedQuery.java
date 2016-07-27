@@ -6,6 +6,7 @@ package de.samply.bbmri.negotiator.jooq.tables;
 
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 
 import java.util.Arrays;
@@ -35,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class FlaggedQuery extends TableImpl<FlaggedQueryRecord> {
 
-	private static final long serialVersionUID = -1355570649;
+	private static final long serialVersionUID = 812210031;
 
 	/**
 	 * The reference instance of <code>public.flagged_query</code>
@@ -61,9 +62,9 @@ public class FlaggedQuery extends TableImpl<FlaggedQueryRecord> {
 	public final TableField<FlaggedQueryRecord, Integer> PERSON_ID = createField("person_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "This column along with the id column will make the primary key. Its also a foreign key here, taken from person table");
 
 	/**
-	 * The column <code>public.flagged_query.flag</code>. The flag of the comment. One character letter. (A) archived, (I) ignored, (S) starred
+	 * The column <code>public.flagged_query.flag</code>. The flag of the comment. One of "ARCHIVED", "IGNORED" or "STARRED"
 	 */
-	public final TableField<FlaggedQueryRecord, String> FLAG = createField("flag", org.jooq.impl.SQLDataType.CHAR.length(1), this, "The flag of the comment. One character letter. (A) archived, (I) ignored, (S) starred");
+	public final TableField<FlaggedQueryRecord, Flag> FLAG = createField("flag", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(de.samply.bbmri.negotiator.jooq.enums.Flag.class), this, "The flag of the comment. One of \"ARCHIVED\", \"IGNORED\" or \"STARRED\"");
 
 	/**
 	 * Create a <code>public.flagged_query</code> table reference
