@@ -32,27 +32,45 @@
                 xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
                 template="../components/default.xhtml">
 
-    <!-- Queries page for the researcher -->
+    <!-- Queries page for the owner -->
 
     <ui:param name="bodyClass" value="container"/>
 	
     <ui:define name="body">
-
         <h:panelGroup layout="block" styleClass="row queriesTopLine">
-            <h:form prependId="false">
-                <h:panelGroup id="filterList" layout="block" styleClass="pull-left">
-                    <h:outputLabel for="filterInputText" value="#{label['queryview.title.search']}" />
-                    <h:inputText value="#{sessionBean.filter}"
-                        size="20" id="filterInputText" pt:placeholder="search  with  keywords" title="#{label['queryview.tooltip.searchbox']}"/>
-                    <h:commandButton id="addFilterButton"
-                        action="#{ownerQueriesBean.addFilter()}" style="display: none;" />
-
-                    <ui:repeat var="item" value="#{sessionBean.filters}">
-                        <h:panelGroup styleClass="badge filterBadge"><h:commandLink action="#{ownerQueriesBean.removeFilter(item)}">#{item}</h:commandLink></h:panelGroup>
-                    </ui:repeat>
+            <h:form prependId="false" styleClass="form-horizontal">
+                <h:panelGroup id="filterList" layout="block" styleClass="pull-left col-md-10">
+                    <h:outputLabel for="filterInputText" value="#{label['queryview.title.search']}" styleClass="col-md-1 control-label" />
+                    <h:panelGroup class="col-md-3"> 
+                       <h:panelGroup class="input-group">
+                           <h:inputText value="#{sessionBean.filter}"
+                               size="20" id="filterInputText" pt:placeholder="search  with  keywords" title="#{label['queryview.tooltip.searchbox']}" styleClass="form-control"/>
+                            <h:panelGroup class="input-group-btn">                    
+                            <h:commandButton id="addFilterButton"
+                                action="#{ownerQueriesBean.addFilter()}" style="display: none;" />
+                        
+                            <h:commandLink styleClass="btn btn-default " title="Search" 
+                        				  action="#{ownerQueriesBean.addFilter()}" >
+                       	        <i class="fa fa-search" ></i>
+                            </h:commandLink>  
+                            </h:panelGroup>   
+	       				</h:panelGroup> 
+        			</h:panelGroup>                                       
+                                       
+				    <h:panelGroup styleClass="search-top-margin col-md-6"> 
+                        <ui:repeat var="item" value="#{sessionBean.filters}">
+                            <h:panelGroup styleClass="badge filterBadge">#{item}
+                                <h:commandLink action="#{ownerQueriesBean.removeFilter(item)}">  
+                                    <i class="fa fa-times" ></i>
+                                </h:commandLink>
+                            </h:panelGroup>
+                        </ui:repeat>
+                    </h:panelGroup>
+                
                 </h:panelGroup>
-                <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right">
-                    <h:panelGroup layout="block" class="btn-group" role="group" aria-label="...">
+                
+                <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right col-md-2">
+                    <h:panelGroup layout="block" class="btn-group pull-right" role="group" aria-label="...">
                       
                       <h:commandLink styleClass="btn #{ownerQueriesBean.flagFilter == 'ARCHIVED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewArchived']}"
 							action="#{ownerQueriesBean.switchArchivedView()}">

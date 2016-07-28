@@ -168,3 +168,15 @@ hr {
 .comment-text-content {
 	margin-left: 1em;
 }
+
+.search-box {
+   line-height: 25px;   
+}
+
+.search-top-margin {
+   margin-top: 6px;   
+}
+
+.badge i {
+	color: white;
+}
