@@ -29,13 +29,11 @@ package de.samply.bbmri.negotiator.db.util;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.jooq.Condition;
-import org.jooq.JoinType;
-import org.jooq.Record;
-import org.jooq.Result;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import de.samply.bbmri.negotiator.Config;
@@ -45,9 +43,9 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
+import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryLocationDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 
 /**
@@ -76,35 +74,7 @@ public class DbUtil {
 
         return config.map(fetch, QueryStatsDTO.class);
     }
-    
-    /**
-     * Returns an overview of all the queries a bio-bank owner can see when he/she logs in.
-     * @param config
-     * @param locationId
-     * @return
-     */
-    @Deprecated
-    public static List<OwnerQueryStatsDTO> getAllQueriesAsOwner(Config config, int locationId) {
-		Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
-				        .select(Tables.PERSON.AUTH_NAME.as("auth_name"))
-				        .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-				        .select(Tables.COMMENT.ID.count().as("comment_count"))
-				        .from(Tables.QUERY)        
-				        .join(Tables.QUERY_PERSON, JoinType.JOIN)
-				        .on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
-				        .join(Tables.PERSON, JoinType.JOIN)				        
-				        .on(Tables.QUERY_PERSON.PERSON_ID.eq(Tables.PERSON.ID))				        
-				        .join(Tables.COMMENT, JoinType.JOIN)
-				        .on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))			        
-				        .where(Tables.PERSON.LOCATION_ID.eq(locationId))
-				        .groupBy(Tables.PERSON.ID, Tables.QUERY.ID).fetch();
-				
 
-				return config.map(fetch, OwnerQueryStatsDTO.class);			
-	}
-    
-    
-	
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
      * @param config jooq configuration
@@ -113,7 +83,7 @@ public class DbUtil {
      * @return
      */
     public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
-    	Person queryAuthor = Tables.PERSON.as("queryAuthor");
+    	Person queryAuthor = Tables.PERSON.as("query_author");
 
     	Condition condition = Tables.QUERY_PERSON.PERSON_ID.eq(userId);
 
@@ -141,7 +111,9 @@ public class DbUtil {
     		condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
     	}
 
-    	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
+    	Result<Record> fetch = config.dsl()
+				.select(getFields(Tables.QUERY, "query"))
+				.select(getFields(queryAuthor, "query_author"))
     			.select(queryAuthor.AUTH_NAME.as("researcher_name"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.count().as("comment_count"))
@@ -150,7 +122,7 @@ public class DbUtil {
     			.from(Tables.QUERY)
 
     			.join(Tables.QUERY_PERSON, JoinType.JOIN)
-    			.on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID)) 
+    			.on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID))
         
     			.join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
@@ -169,40 +141,6 @@ public class DbUtil {
 		return config.map(fetch, OwnerQueryStatsDTO.class);
     }
     
-    
-    
-    /**
-     * Returns the overview for a specific query.
-     * @param config
-     * @param queryId
-     * @return
-     */
-    @Deprecated
-    public static List<QueryLocationDTO> getQueryLocationDTO(Config config, int queryId) {
-//        Table<Record3<Integer, Integer, Timestamp>> subMax = config.dsl()
-//                .select(Tables.QUERY_LOCATION.LOCATION_ID, Tables.QUERY.ID, Tables.COMMENT.COMMENT_TIME.max())
-//                .from(Tables.COMMENT)
-//                .join(Tables.QUERY).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
-//                .join(Tables.QUERY_LOCATION).onKey(Keys.QUERY_LOCATION__QUERY_LOCATION_QUERY_ID_FKEY)
-//                .join(Tables.PERSON).on(Tables.PERSON.ID.eq(Tables.COMMENT.PERSON_ID))
-//                .where(Tables.COMMENT.QUERY_ID.eq(queryId))
-//                .and(Tables.PERSON.LOCATION_ID.eq(Tables.QUERY_LOCATION.LOCATION_ID))
-//                .groupBy(Tables.QUERY_LOCATION.LOCATION_ID, Tables.QUERY.ID).asTable("nested");
-//
-//      		   Result<Record> result = config.dsl().select()
-//                .from(Tables.QUERY)
-//                .join(Tables.COMMENT).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
-//                .join(Tables.PERSON).on(Tables.PERSON.ID.eq(Tables.COMMENT.PERSON_ID))
-//                .join(Tables.LOCATION).on(Tables.LOCATION.ID.eq(Tables.PERSON.LOCATION_ID))
-//                .join(subMax).on(Tables.LOCATION.ID.eq(subMax.field(Tables.QUERY_LOCATION.LOCATION_ID)))
-//                .where(Tables.COMMENT.COMMENT_TIME.eq(subMax.field(Tables.COMMENT.COMMENT_TIME.max()))).fetch();
-//    	
-//    	return config.map(result, QueryLocationDTO.class);
- 		 List<QueryLocationDTO> myList = new ArrayList<QueryLocationDTO>();
- 		 return myList;
-
-    
-    }
 
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
@@ -211,7 +149,10 @@ public class DbUtil {
      * @return
      */
     public static List<CommentPersonDTO> getComments(Config config, int queryId) {
-        Result<Record> result = config.dsl().select()
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.COMMENT, "comment"))
+                .select(getFields(Tables.PERSON, "person"))
+                .select(getFields(Tables.LOCATION, "location"))
         		.from(Tables.COMMENT)
                 .join(Tables.PERSON).onKey(Keys.COMMENT__COMMENT_PERSON_ID_FKEY)
                 .join(Tables.LOCATION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.LOCATION_ID.eq(Tables.LOCATION.ID))
@@ -220,18 +161,45 @@ public class DbUtil {
 
         return config.map(result, CommentPersonDTO.class);
     }
-	
-    
+
+    /**
+     * Adds a comment for the given queryId and personId with the given text.
+     * @param queryId
+     * @param personId
+     * @param comment
+     */
     public static void addComment(int queryId, int personId, String comment) {
-    	 try(Config config = ConfigFactory.get()) {
-             config.dsl().insertInto(Tables.COMMENT, Tables.COMMENT.PERSON_ID, Tables.COMMENT.QUERY_ID, Tables.COMMENT.COMMENT_TIME, Tables.COMMENT.TEXT)
-             .values(personId, queryId, new Timestamp(new java.util.Date().getTime()), comment).execute();
-    		 
-           config.get().commit();
-    	 } 
-    	 catch (SQLException e) {
-             e.printStackTrace();
-         }
+        try(Config config = ConfigFactory.get()) {
+
+            CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
+            record.setQueryId(queryId);
+            record.setPersonId(personId);
+            record.setText(comment);
+            record.setCommentTime(new Timestamp(new Date().getTime()));
+            record.store();
+
+            config.get().commit();
+        }
+        catch (SQLException e) {
+         e.printStackTrace();
+        }
     }
 
+	/**
+	 * Returns a list of all fields for the given table with the given prefix. e.g.
+	 * "user"."name" with prefix "query_author" would result in "query_author_name", so that
+	 * modelmapper works properly.
+	 *
+	 * @param table
+	 * @param prefix
+     * @return
+     */
+	private static List<Field<?>> getFields(Table<?> table, String prefix) {
+		List<Field<?>> target = new ArrayList<>();
+		for(Field<?> f : table.fields()) {
+			target.add(f.as(prefix + "_" + f.getName()));
+		}
+
+		return target;
+	}
 }
