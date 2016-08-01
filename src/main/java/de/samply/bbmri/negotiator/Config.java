@@ -26,6 +26,11 @@
 
 package de.samply.bbmri.negotiator;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
@@ -36,17 +41,25 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.convention.NameTokenizers;
 import org.modelmapper.jooq.RecordValueReader;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * The JOOQ Configuration wrapper with AutoClosable
  */
 public class Config extends DefaultConfiguration implements AutoCloseable {
 
+    private static final long serialVersionUID = -915149314520303632L;
+
+    /**
+     * The modelMapper with the following configuration
+     * - Standard Matching Strategy
+     * - Underscore source tokenizer
+     * - CamelCase destrination tokenizer
+     * - ignore ambiguity
+     */
     private final ModelMapper modelMapper;
+
+    /**
+     * The jOOQ DSLContext, initialized in the constructor.
+     */
     private final DSLContext dsl;
 
     Config(Connection connection) {
@@ -57,18 +70,10 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
 
         modelMapper = new ModelMapper();
         modelMapper.getConfiguration().addValueReader(new RecordValueReader());
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.LOOSE);
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
         modelMapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
+        modelMapper.getConfiguration().setDestinationNameTokenizer(NameTokenizers.CAMEL_CASE);
         modelMapper.getConfiguration().setAmbiguityIgnored(true);
-
-//        PropertyMap<Record, QueryStatsDTO> commentsMap = new PropertyMap<Record, QueryStatsDTO>() {
-//            protected void configure() {
-//                map().setCommentCount(this.<Integer>source("count"));
-//                map().setLastCommentTime(this.<Timestamp>source("max"));
-//            }
-//        };
-//
-//        modelMapper.createTypeMap(Record.class, QueryStatsDTO.class).addMappings(commentsMap);
     }
 
     /**
@@ -107,10 +112,24 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
         return modelMapper;
     }
 
+    /**
+     * Uses the modelMapper to map one record to the given class.
+     * @param record the record from jooq
+     * @param clazz the destination clazz
+     * @param <T>
+     * @return
+     */
     public <T> T map(Record record, Class<? extends T> clazz) {
         return mapper().map(record, clazz);
     }
 
+    /**
+     * Uses the modelmapper to map the list of records to a list of the given class.
+     * @param records the list of records from jooq
+     * @param clazz the destination class
+     * @param <T>
+     * @return
+     */
     public <T> List<T> map(List<Record> records, Class<? extends T> clazz) {
         List<T> target = new ArrayList<>();
 
