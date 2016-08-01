@@ -106,13 +106,10 @@ public class DbUtil {
 
         if (flag != null && flag != Flag.UNFLAGGED) {     	        	
             condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
-        }
-        
-        /** Ignored queries are never selected unless the user is in the ignored folder
-         * 
-         */
-        else 
-    	{
+        } else {
+            /**
+             * Ignored queries are never selected unless the user is in the ignored folder
+             */
     		condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
     	}
 
