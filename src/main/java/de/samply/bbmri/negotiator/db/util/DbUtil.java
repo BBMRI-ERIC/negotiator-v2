@@ -61,15 +61,20 @@ public class DbUtil {
      * @return
      */
     public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId) {
-        Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
+        Person commentAuthor = Tables.PERSON.as("comment_author");
+
+        Result<Record> fetch = config.dsl()
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(Tables.PERSON, "query_author"))
                 .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-                .select(Tables.PERSON.ID.countDistinct().as("comment_count"))
+                .select(commentAuthor.ID.countDistinct().as("comment_count"))
                 .from(Tables.QUERY)
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
                 .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
-                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
                 .where(Tables.QUERY.RESEARCHER_ID.eq(userId))
-                .and(Tables.PERSON.PERSON_TYPE.eq(PersonType.OWNER).or(Tables.PERSON.PERSON_TYPE.isNull()))
-                .groupBy(Tables.QUERY.ID)
+                .and(commentAuthor.PERSON_TYPE.eq(PersonType.OWNER).or(commentAuthor.PERSON_TYPE.isNull()))
+                .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc()).fetch();
 
         return config.map(fetch, QueryStatsDTO.class);
@@ -114,7 +119,6 @@ public class DbUtil {
     	Result<Record> fetch = config.dsl()
 				.select(getFields(Tables.QUERY, "query"))
 				.select(getFields(queryAuthor, "query_author"))
-    			.select(queryAuthor.AUTH_NAME.as("researcher_name"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.count().as("comment_count"))
                 .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)

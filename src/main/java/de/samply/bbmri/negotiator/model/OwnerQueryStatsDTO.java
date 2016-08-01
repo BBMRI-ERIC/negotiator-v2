@@ -35,8 +35,6 @@ import de.samply.bbmri.negotiator.jooq.enums.Flag;
 public class OwnerQueryStatsDTO extends QueryStatsDTO {
 	private static final long serialVersionUID = 1L;
 
-	private String researcherName;
-
 	private Flag flag;
 
     public boolean isStarred() {
@@ -57,13 +55,5 @@ public class OwnerQueryStatsDTO extends QueryStatsDTO {
 
 	public void setFlag(Flag flag) {
 		this.flag = flag;
-	}
-
-	public String getResearcherName() {
-		return researcherName;
-	}
-
-	public void setResearcherName(String researcherName) {
-		this.researcherName = researcherName;
 	}
 }

@@ -26,10 +26,11 @@
 
 package de.samply.bbmri.negotiator.model;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-
 import java.io.Serializable;
 import java.sql.Timestamp;
+
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 /**
  * DTO that gives a small statistic for a query, with the amount of commentCount made for the query and
@@ -42,6 +43,11 @@ public class QueryStatsDTO implements Serializable {
      * The query itself
      */
     private Query query;
+
+    /**
+     * The researcher / person, who created the query in the first place.
+     */
+    private Person queryAuthor;
 
     /**
      * The last time someone commented on the query.
@@ -75,5 +81,13 @@ public class QueryStatsDTO implements Serializable {
 
     public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
+    }
+
+    public Person getQueryAuthor() {
+        return queryAuthor;
+    }
+
+    public void setQueryAuthor(Person queryAuthor) {
+        this.queryAuthor = queryAuthor;
     }
 }
