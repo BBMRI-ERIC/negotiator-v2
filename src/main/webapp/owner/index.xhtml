@@ -80,20 +80,26 @@
                 
                 <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right col-md-2">
                     <h:panelGroup layout="block" class="btn-group pull-right" role="group" aria-label="...">
-                      
+                        <h:commandLink   styleClass="btn #{ownerQueriesBean.flagFilter == 'STARRED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewStarred']}"
+                                         action="#{ownerQueriesBean.switchStarredView()}">
+                            <f:ajax render=":allOwnerQueries @form" />
+
+                            <i class="fa fa-star"></i>
+                        </h:commandLink>
+
                       <h:commandLink styleClass="btn #{ownerQueriesBean.flagFilter == 'ARCHIVED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewArchived']}"
 							action="#{ownerQueriesBean.switchArchivedView()}">
 							<f:ajax render=":allOwnerQueries @form" />
 							
-							<i class="glyphicon glyphicon-folder-open"></i>
+							<i class="fa fa-folder-open"></i>
 					  </h:commandLink>
-                      
-                      <h:commandLink   styleClass="btn #{ownerQueriesBean.flagFilter == 'STARRED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewStarred']}"
-							action="#{ownerQueriesBean.switchStarredView()}">
-							<f:ajax render=":allOwnerQueries @form" />
-							
-							<i class="glyphicon glyphicon-star"></i>
-					  </h:commandLink>
+
+                        <h:commandLink styleClass="btn #{ownerQueriesBean.flagFilter == 'IGNORED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewIgnored']}"
+                                       action="#{ownerQueriesBean.switchIgnoredView()}">
+                            <f:ajax render=":allOwnerQueries @form" />
+
+                            <i class="fa fa-sign-out"></i>
+                        </h:commandLink>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
@@ -112,7 +118,7 @@
                             <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
                                            title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
                                            action="#{ownerQueriesBean.starQuery(queryDto)}">
-                                <i class="glyphicon glyphicon-star"></i>
+                                <i class="fa fa-star"></i>
                             </h:commandLink>
 
                             <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}">
@@ -127,7 +133,7 @@
                                     <h:commandLink  styleClass="#{queryDto.isArchived() ? 'btn btn-success' : 'btn btn-default'}" 
                                     title="#{queryDto.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
                                                     action="#{ownerQueriesBean.archiveQuery(queryDto)}">
-                                        <i class="glyphicon glyphicon-folder-open"></i>
+                                        <i class="fa fa-folder-open"></i>
                                     </h:commandLink>
 
                                     <h:commandLink styleClass="#{queryDto.isIgnored() ? 'btn btn-success' : 'btn btn-default'}"
