@@ -24,15 +24,34 @@
 				<h:panelGroup layout="block" styleClass="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
 						<c:if test="#{userBean.biobankOwner}">
-						<li class="dropdown active"><a href="#" class="dropdown-toggle"
+						<li class="dropdown"><a href="#" class="dropdown-toggle"
 							data-toggle="dropdown" role="button" aria-haspopup="true"
 							aria-expanded="false">My Biobank <span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a class="active" href="panels-wells.html">All
-										Queries</a></li>
-								<li><a href="buttons.html">Starred Queries</a></li>
-								<li><a href="notifications.html">Archived Queries</a></li>
-								<li><a href="notifications.html">Ignored Queries</a></li>
+								<li>
+								    <h:link value="All Queries" outcome="/owner/index">  																		 
+					  				</h:link>
+								
+								</li>
+								<li>
+								    <h:link outcome="/owner/index" value="Starred Queries" title="#{label['queryview.action.viewStarred']}" >
+								        <f:param name="flag" value="STARRED"/>  																		 
+					  				</h:link>
+								
+								</li>								
+								<li>
+								
+								    <h:link outcome="/owner/index" value="Archived Queries" title="#{label['queryview.action.viewArchived']}" >
+								        <f:param name="flag" value="ARCHIVED"/>  																		 
+					  				</h:link>
+								
+								</li>
+								<li>
+								
+								    <h:link outcome="/owner/index" value="Ignored Queries" title="#{label['queryview.action.viewIgnored']}" >
+								        <f:param name="flag" value="IGNORED"/>  																		 
+					  			    </h:link>
+								</li>
 							</ul>
 						</li>
 						</c:if>
@@ -40,11 +59,11 @@
 							data-toggle="dropdown" role="button" aria-haspopup="true"
 							aria-expanded="false">My Queries <span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a class="active" href="panels-wells.html">All
-										Queries</a></li>
-								<li><a href="buttons.html">Starred Queries</a></li>
-								<li><a href="notifications.html">Archived Queries</a></li>
-								<li><a href="notifications.html">Ignored Queries</a></li>
+								<li>
+								    <h:link value="My Created Queries" outcome="/index.xhtml"> 
+								    </h:link>
+								
+								</li>								
 							</ul>
 						</li>
 					</ul>
@@ -76,35 +95,6 @@
 				</h:panelGroup>
 			</h:form>
 		</h:panelGroup>
-
-		<h:panelGroup layout="block" styleClass="navbar-default sidebar"
-			role="navigation">
-			<h:panelGroup layout="block" styleClass="sidebar-nav navbar-collapse">
-				<ul class="nav" id="side-menu">
-					<c:if test="#{userBean.biobankOwner}">
-						<li class="active"><a href="#"><i
-								class="fa fa-bar-chart-o fa-fw"></i> My Biobank<span
-								class="fa arrow"></span></a>
-							<ul class="nav nav-second-level in">
-								<li><a class="active" href="panels-wells.html">All
-										Queries</a></li>
-								<li><a href="buttons.html">Starred Queries</a></li>
-								<li><a href="notifications.html">Archived Queries</a></li>
-								<li><a href="notifications.html">Ignored Queries</a></li>
-							</ul></li>
-					</c:if>
-
-					<li><a href="#"><i class="fa fa-wrench fa-fw"></i> My
-							Queries<span class="fa arrow"></span></a>
-						<ul class="nav nav-second-level">
-							<li><a href="panels-wells.html">All Queries</a></li>
-							<li><a href="buttons.html">Starred Queries</a></li>
-							<li><a href="notifications.html">Archived Queries</a></li>
-						</ul></li>
-				</ul>
-			</h:panelGroup>
-		</h:panelGroup>
-
 
 	</nav>
 </ui:composition>

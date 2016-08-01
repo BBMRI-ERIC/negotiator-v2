@@ -1,13 +1,259 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-    template="components/default.xhtml">
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
 
-<f:metadata>
-    <f:viewAction action="#{indexBean.init}" />
-</f:metadata>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
+ 	template="/components/default.xhtml">
+
+	<!-- Queries page for the researcher -->
+	
+
+	<ui:param name="bodyClass" value="container-fluid" />
+
+	<ui:define name="body">
+
+		<h:panelGroup layout="block" styleClass="col-md-3">
+
+			<h:panelGroup layout="block" styleClass="row queriesTopLine">
+				<h:panelGroup layout="block" styleClass="col-md-6">
+					<a href="#" class="btn btn-danger btn-sm btn-block" role="button" title="#{label['queryview.tooltip.newQuery']}"><i
+						class="glyphicon glyphicon-edit"></i> #{label['queryview.action.newQuery']}</a>
+
+					<p />
+				</h:panelGroup>
+			</h:panelGroup>
+
+			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() == 0}"
+				layout="block">
+				<h3>#{label['queryview.noQueriesMade']}</h3>
+			</h:panelGroup>
+
+			<h:form>
+
+				<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
+					<h:commandLink
+						action="#{researcherQueriesBean.selectCommentsForQuery(item.query)}"
+						styleClass="deco-none">
+						<f:ajax render="right-panel newComment"/>
+						
+
+						<h:panelGroup layout="block" styleClass="panel panel-default">
+
+							<h:panelGroup layout="block" styleClass="panel-heading">
+
+                                #{item.query.title}
+
+                                <h:panelGroup styleClass="pull-right"
+									rendered="#{item.commentCount > 0}">
+
+									<h:panelGroup styleClass="badge queryNumberResponsesBadge">
+										<h:outputText
+											title="#{item.commentCount} #{label['queryview.queryitem.amount.biobanks.contacted.text']}"
+											value="#{item.commentCount}" />
+									</h:panelGroup>
+
+									<h:outputText value="#{item.lastCommentTime}"
+										styleClass="queryCreationDate"
+										title="#{label['queryview.queryitem.datetime.last.comment']}">
+										<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+									</h:outputText>
+
+								</h:panelGroup>
+
+							</h:panelGroup>
+
+
+							<h:panelGroup layout="block" styleClass="panel-body">
+								<h:panelGroup layout="block" styleClass="row">
+
+									<h:panelGroup layout="block" styleClass="col-md-11">
+										<h:panelGroup layout="block" styleClass="row">
+											<h:panelGroup layout="block" styleClass="col-md-10">
+                                                #{item.query.text}
+                                            </h:panelGroup>
+
+										</h:panelGroup>
+
+										<h:panelGroup layout="block" styleClass="row">
+											<h:panelGroup layout="block" styleClass="col-md-12">
+												<h:panelGroup styleClass="pull-right">
+
+													<h:outputText value="#{item.query.queryCreationTime}"
+														title="#{label['queryview.queryitem.datetime.creation']}">
+														<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+													</h:outputText>
+												</h:panelGroup>
+											</h:panelGroup>
+										</h:panelGroup>
+									</h:panelGroup>
+								</h:panelGroup>
+							</h:panelGroup>
+
+						</h:panelGroup>
+
+					</h:commandLink>
+
+				</ui:repeat>
+
+			</h:form>
+
+		</h:panelGroup>
+
+		<h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1"
+			id="right-panel">
+
+			<h:panelGroup
+				rendered="#{researcherQueriesBean.selectedQuery == null}"
+				layout="block">
+
+				<h3 class="text-muted">#{label['queryview.selectAQuery']}</h3>
+
+			</h:panelGroup>
+
+			<h:panelGroup
+				rendered="#{researcherQueriesBean.selectedQuery != null}"
+				layout="block">
+
+				<h3>#{researcherQueriesBean.selectedQuery.title}</h3>
+
+				<p>#{researcherQueriesBean.selectedQuery.text}</p>
+
+				<h:panelGroup layout="block" styleClass="col-md-12">
+					<p class="pull-right">
+						<h:outputText title="#{label['queryview.queryitem.datetime.creation']}"
+							value="#{researcherQueriesBean.selectedQuery.queryCreationTime}">
+							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+						</h:outputText>
+					</p>
+				</h:panelGroup>
+
+				<ui:fragment rendered="#{researcherQueriesBean.comments.size() > 0}">
+
+					<div class="col-xs-12">
+						<hr></hr>
+					</div>
+
+					<h3>#{label['querydetail.title.comments']}</h3>
+
+				</ui:fragment>
+
+				<ui:repeat value="#{researcherQueriesBean.comments}" var="comment">
+
+					<h:panelGroup layout="block" styleClass="panel panel-default">
+						<h:panelGroup layout="block" styleClass="panel-heading">
+
+                            #{comment.person.authName}
+                            
+                            <h:panelGroup styleClass="pull-right">
+
+
+								<h:outputText value="#{comment.comment.commentTime}">
+									<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+								</h:outputText>
+							</h:panelGroup>
+
+						</h:panelGroup>
+
+
+						<h:panelGroup layout="block" styleClass="panel-body">
+
+							<h:panelGroup layout="block" styleClass="row">
+
+								<h:panelGroup layout="block"
+									styleClass="col-md-1 avatar-pic-comment-column">
+									<h:graphicImage library="images" name="shodan_80_86.png" />
+								</h:panelGroup>
+
+								<h:panelGroup layout="block"
+									styleClass="col-md-11 comment-text-column">
+
+									<h:panelGroup layout="block" styleClass="row">
+										<h:panelGroup layout="block"
+											styleClass="col-md-10 comment-text-content">
+                                            #{comment.comment.text}
+                                        </h:panelGroup>
+
+									</h:panelGroup>
+
+								</h:panelGroup>
+
+							</h:panelGroup>
+
+						</h:panelGroup>
+
+					</h:panelGroup>
+
+				</ui:repeat>
+
+				<div class="col-xs-12">
+					<hr></hr>
+				</div>
+
+				<h:panelGroup layout="block" styleClass="col-md-12">
+
+					<h:form id="newComment">
+
+						<h:panelGroup layout="block" styleClass="col-md-3">
+
+							<img width="92" height="92"
+								src="#{bbmri:userImage(userBean.userId)}" />
+
+						</h:panelGroup>
+
+						<h:panelGroup layout="block" styleClass="col-md-9">
+
+							<div class="form-group">
+
+								<h:inputTextarea value="#{addCommentBean.comment}"
+									styleClass="form-control" rows="5" />
+
+							</div>
+
+							<h:panelGroup layout="block" styleClass="pull-right">
+
+								<h:commandButton action="#{addCommentBean.saveComment(researcherQueriesBean.selectedQuery)}"
+									value="#{label['querydetail.action.addComment.buttontext']}" styleClass="btn btn-primary" title="#{label['querydetail.action.addComment']}" />
+
+							</h:panelGroup>
+
+						</h:panelGroup>
+
+					</h:form>
+
+				</h:panelGroup>
+
+			</h:panelGroup>
+
+		</h:panelGroup>
+
+	</ui:define>
 
 </ui:composition>

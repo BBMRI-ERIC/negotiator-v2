@@ -33,6 +33,14 @@
                 template="../components/default.xhtml">
 
     <!-- Queries page for the owner -->
+    
+    
+    <f:metadata>
+		<f:viewParam name="flag" value="#{ownerQueriesBean.flagFilter}" />
+		<f:viewAction action="#{ownerQueriesBean.getQueries}" />
+	</f:metadata>
+		
+        
 
     <ui:param name="bodyClass" value="container"/>
 	
@@ -115,12 +123,15 @@
 
                                 <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="...">
 
-                                    <h:commandLink  styleClass="btn btn-default" title="#{label['queryview.queryitem.action.archiveme']}"
+                                    <h:commandLink  styleClass="#{queryDto.isArchived() ? 'btn btn-success' : 'btn btn-default'}" 
+                                    title="#{queryDto.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
                                                     action="#{ownerQueriesBean.archiveQuery(queryDto)}">
                                         <i class="glyphicon glyphicon-folder-open"></i>
                                     </h:commandLink>
 
-                                    <h:commandLink styleClass="btn btn-default" title="#{label['queryview.queryitem.action.ignoreme']}"
+                                    <h:commandLink styleClass="#{queryDto.isIgnored() ? 'btn btn-success' : 'btn btn-default'}"
+                                    
+                                    title="#{queryDto.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
                                                    action="#{ownerQueriesBean.ignoreQuery(queryDto)}">
                                         <i class="fa fa-sign-out"></i>
                                     </h:commandLink>

@@ -115,8 +115,7 @@ public class DbUtil {
     public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
     	Person queryAuthor = Tables.PERSON.as("queryAuthor");
 
-    	Condition condition = Tables.QUERY_PERSON.PERSON_ID.eq(userId)
-                .and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+    	Condition condition = Tables.QUERY_PERSON.PERSON_ID.eq(userId);
 
     	if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
@@ -130,9 +129,17 @@ public class DbUtil {
     		condition = condition.and(titleCondition.or(textCondition));
     	}
 
-        if (flag != null && flag != Flag.UNFLAGGED) {
+        if (flag != null && flag != Flag.UNFLAGGED) {     	        	
             condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
         }
+        
+        /** Ignored queries are never selected unless the user is in the ignored folder
+         * 
+         */
+        else 
+    	{
+    		condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+    	}
 
     	Result<Record> fetch = config.dsl().select(Tables.QUERY.fields())
     			.select(queryAuthor.AUTH_NAME.as("researcher_name"))
