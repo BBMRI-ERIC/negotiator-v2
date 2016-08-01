@@ -48,8 +48,11 @@
     <script type="text/javascript"
         src="#{resource['webjar:datatables/js/dataTables.bootstrap.min.js']}&amp;version=#{applicationBean.version}"></script>
 
+    <!-- Preload the JSF library, otherwise the negotiator.js will not work -->
+    <h:outputScript name="jsf.js" library="javax.faces"/>
+    <script type="text/javascript" src="#{resource['js/negotiator.js']}?version=#{applicationBean.version}"></script>
 
-<script type="text/javascript" src="#{resource['js/metisMenu.js']}?version=#{applicationBean.version}"></script>
-<script type="text/javascript" src="#{resource['js/sb-admin-2.js']}?version=#{applicationBean.version}"></script>
+    <script type="text/javascript" src="#{resource['js/metisMenu.js']}?version=#{applicationBean.version}"></script>
+    <script type="text/javascript" src="#{resource['js/sb-admin-2.js']}?version=#{applicationBean.version}"></script>
 
 </ui:composition>
