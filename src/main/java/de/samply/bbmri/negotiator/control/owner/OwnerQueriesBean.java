@@ -166,7 +166,7 @@ public class OwnerQueriesBean implements Serializable {
 	}
 	
 	/**
-	 * Mark query with flag
+	 * Mark the given query with the given flag.
 	 * 
 	 * If Postgresql supported SQL standard Merge statement, the query look like this :
 	 * 		 config.dsl().insertInto(Tables.FLAGGED_QUERY, Tables.FLAGGED_QUERY.QUERY_ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.FLAG).
@@ -175,6 +175,8 @@ public class OwnerQueriesBean implements Serializable {
 	 *		.set(Tables.FLAGGED_QUERY.QUERY_ID,queryId)
 	 *		.set(Tables.FLAGGED_QUERY.PERSON_ID,userBean.getUserId())
 	 *		.set(Tables.FLAGGED_QUERY.FLAG, flag).execute();
+	 *
+	 * But with the current jooq version this does not work, since there is no way to set the postgresql version to 9.5 (necessary for this to work).
 	 * 
 	 * @param queryDto
 	 * @param flag
@@ -186,9 +188,10 @@ public class OwnerQueriesBean implements Serializable {
 			 * Since jOOQ does not support the onDuplicateKeyUpdate method yet,
 			 * simplify the statements so that:
 			 *
-			 * 1. if the current flag is "UNFLAGGED", insert a flag, otherwise
+			 * 1. If there is no current flag, insert one using the FlaggedQueryRecord class.
+			 * 2. If the current flag is the same as the given flag, unflag the query, meaning remove the row from the DB
+			 * 3. Update the flag to the given flag.
 			 *
-			 * 1.
 			 *
 			 * Those are not processing heavy SQL statements, IMHO it's fine.
 			 */
