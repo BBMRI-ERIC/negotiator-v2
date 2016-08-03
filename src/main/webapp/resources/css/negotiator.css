@@ -180,3 +180,7 @@ hr {
 .badge i {
 	color: white;
 }
+
+.empty-queries {
+    margin-top: 100px;
+}
