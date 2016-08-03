@@ -36,92 +36,88 @@
 	<!-- Queries page for the researcher -->
 
 
-	<ui:param name="bodyClass" value="container-fluid" />
+	<ui:param name="bodyClass" value="container" />
 
 	<ui:define name="body">
 
-		<h:panelGroup layout="block" styleClass="row queriesTopLine">
+		<h:panelGroup layout="block" styleClass="col-md-12">
 			<h:panelGroup layout="block" styleClass="col-md-3">
+				<a href="#" class="btn btn-danger btn-sm btn-block" role="button"
+					title="#{label['queryview.tooltip.newQuery']}"> <i class="glyphicon glyphicon-edit"></i>
+					#{label['queryview.action.newQuery']}
+				</a>
+			</h:panelGroup>			
+			<h:panelGroup				
+			    rendered="#{researcherQueriesBean.queries.size() == 0}"
+				layout="block" styleClass="empty-queries col-md-12">
+				<h3>#{label['queryview.noQueriesMade']}</h3>
 			</h:panelGroup>
-			<h:panelGroup layout="block" styleClass="col-md-6">
-				<h:panelGroup layout="block" styleClass="col-md-3">
-					<a href="#" class="btn btn-danger btn-sm btn-block" role="button"
-						title="#{label['queryview.tooltip.newQuery']}"> <i class="glyphicon glyphicon-edit"></i>
-						#{label['queryview.action.newQuery']}
-					</a>
-				</h:panelGroup>
-				<h:panelGroup
-					rendered="#{researcherQueriesBean.queries.size() == 0}"
-					layout="block" styleClass="empty-queries">
-					<h3>#{label['queryview.noQueriesMade']}</h3>
-				</h:panelGroup>
 
-				<h:panelGroup layout="block" style="margin-top: 40px;">
-					<h:form>
-						<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
-							
+			<h:panelGroup layout="block" style="margin-top: 40px;" styleClass="col-md-12">
+				<h:form>
+					<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
+						
 
 
-								<h:panelGroup layout="block" styleClass="panel panel-default">
+							<h:panelGroup layout="block" styleClass="panel panel-default">
 
-									<h:panelGroup layout="block" styleClass="panel-heading">
-																
-								<h:link outcome="detail" value="#{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
-								    style="font-weight: bold;">								
-                                    <f:param name="queryId" value="#{item.query.id}"/>
-                                </h:link>
+								<h:panelGroup layout="block" styleClass="panel-heading">
+															
+							<h:link outcome="detail" value="#{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
+							    style="font-weight: bold;">								
+                                   <f:param name="queryId" value="#{item.query.id}"/>
+                               </h:link>
 
-                                <h:panelGroup styleClass="pull-right"
-											rendered="#{item.commentCount > 0}">
+                               <h:panelGroup styleClass="pull-right"
+										rendered="#{item.commentCount > 0}">
 
-											<h:panelGroup styleClass="badge queryNumberResponsesBadge">
-												<h:outputText
-													title="#{item.commentCount} #{label['queryview.queryitem.amount.biobanks.contacted.text']}"
-													value="#{item.commentCount}" />
-											</h:panelGroup>
-
-											<h:outputText value="#{item.lastCommentTime}"
-												styleClass="queryCreationDate"
-												title="#{label['queryview.queryitem.datetime.last.comment']}">
-												<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-											</h:outputText>
-
+										<h:panelGroup styleClass="badge queryNumberResponsesBadge">
+											<h:outputText
+												title="#{item.commentCount} #{label['queryview.queryitem.amount.biobanks.contacted.text']}"
+												value="#{item.commentCount}" />
 										</h:panelGroup>
+
+										<h:outputText value="#{item.lastCommentTime}"
+											styleClass="queryCreationDate"
+											title="#{label['queryview.queryitem.datetime.last.comment']}">
+											<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+										</h:outputText>
 
 									</h:panelGroup>
 
+								</h:panelGroup>
 
-									<h:panelGroup layout="block" styleClass="panel-body">
-										<h:panelGroup layout="block" styleClass="row">
 
-											<h:panelGroup layout="block" styleClass="col-md-11">
-												<h:panelGroup layout="block" styleClass="row">
-													<h:panelGroup layout="block" styleClass="col-md-10">
-                                                #{item.query.text}
-                                            </h:panelGroup>
+								<h:panelGroup layout="block" styleClass="panel-body">
+									<h:panelGroup layout="block" styleClass="row">
 
-												</h:panelGroup>
+										<h:panelGroup layout="block" styleClass="col-md-11">
+											<h:panelGroup layout="block" styleClass="row">
+												<h:panelGroup layout="block" styleClass="col-md-10">
+                                               #{item.query.text}
+                                           </h:panelGroup>
 
-												<h:panelGroup layout="block" styleClass="row">
-													<h:panelGroup layout="block" styleClass="col-md-12">
-														<h:panelGroup styleClass="pull-right">
+											</h:panelGroup>
 
-															<h:outputText value="#{item.query.queryCreationTime}"
-																title="#{label['queryview.queryitem.datetime.creation']}">
-																<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-															</h:outputText>
-														</h:panelGroup>
+											<h:panelGroup layout="block" styleClass="row">
+												<h:panelGroup layout="block" styleClass="col-md-12">
+													<h:panelGroup styleClass="pull-right">
+
+														<h:outputText value="#{item.query.queryCreationTime}"
+															title="#{label['queryview.queryitem.datetime.creation']}">
+															<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+														</h:outputText>
 													</h:panelGroup>
 												</h:panelGroup>
 											</h:panelGroup>
 										</h:panelGroup>
 									</h:panelGroup>
+								</h:panelGroup>
 
-								</h:panelGroup>					
-						</ui:repeat>
+							</h:panelGroup>					
+					</ui:repeat>
 
-					</h:form>
-				</h:panelGroup>
+				</h:form>
 			</h:panelGroup>
 		</h:panelGroup>
 	</ui:define>
