@@ -4,7 +4,6 @@
 package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 
@@ -63,13 +62,6 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	 */
 	public de.samply.bbmri.negotiator.jooq.tables.pojos.Person fetchOneById(Integer value) {
 		return fetchOne(Person.PERSON.ID, value);
-	}
-
-	/**
-	 * Fetch records that have <code>person_type IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersonType(PersonType... values) {
-		return fetch(Person.PERSON.PERSON_TYPE, values);
 	}
 
 	/**

@@ -4,8 +4,6 @@
 package de.samply.bbmri.negotiator.jooq.tables.pojos;
 
 
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
-
 import java.io.Serializable;
 
 import javax.annotation.Generated;
@@ -24,21 +22,19 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person implements Serializable {
 
-	private static final long serialVersionUID = -1825690680;
+	private static final long serialVersionUID = -1431240108;
 
-	private Integer    id;
-	private PersonType personType;
-	private String     authSubject;
-	private String     authName;
-	private String     authEmail;
-	private byte[]     personImage;
-	private Integer    locationId;
+	private Integer id;
+	private String  authSubject;
+	private String  authName;
+	private String  authEmail;
+	private byte[]  personImage;
+	private Integer locationId;
 
 	public Person() {}
 
 	public Person(Person value) {
 		this.id = value.id;
-		this.personType = value.personType;
 		this.authSubject = value.authSubject;
 		this.authName = value.authName;
 		this.authEmail = value.authEmail;
@@ -47,16 +43,14 @@ public class Person implements Serializable {
 	}
 
 	public Person(
-		Integer    id,
-		PersonType personType,
-		String     authSubject,
-		String     authName,
-		String     authEmail,
-		byte[]     personImage,
-		Integer    locationId
+		Integer id,
+		String  authSubject,
+		String  authName,
+		String  authEmail,
+		byte[]  personImage,
+		Integer locationId
 	) {
 		this.id = id;
-		this.personType = personType;
 		this.authSubject = authSubject;
 		this.authName = authName;
 		this.authEmail = authEmail;
@@ -70,14 +64,6 @@ public class Person implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
-	}
-
-	public PersonType getPersonType() {
-		return this.personType;
-	}
-
-	public void setPersonType(PersonType personType) {
-		this.personType = personType;
 	}
 
 	public String getAuthSubject() {

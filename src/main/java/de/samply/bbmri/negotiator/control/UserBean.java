@@ -56,7 +56,6 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Tables;
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Location;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
@@ -236,7 +235,7 @@ public class UserBean implements Serializable {
 
     /**
      * Creates a location
-     * 
+     *
      * @param locationId
      * @param locationName
      * @return Location
@@ -262,7 +261,7 @@ public class UserBean implements Serializable {
 
     /**
      * Gets the location for a location ID
-     * 
+     *
      * @param locationId
      * @return Location
      */
@@ -313,7 +312,6 @@ public class UserBean implements Serializable {
                 person.setPersonImage(IdenticonUtil.generateIdenticon(256));
 
                 if (biobankOwner) {
-                    person.setPersonType(PersonType.OWNER);
 
                     // TODO: Update this to Perun and/or Directory given
                     // Location data
@@ -323,8 +321,6 @@ public class UserBean implements Serializable {
                                 TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS);
 
                     person.setLocationId(location.getId());
-                } else {
-                    person.setPersonType(PersonType.RESEARCHER);
                 }
                 person.store();
             } else {
@@ -342,7 +338,6 @@ public class UserBean implements Serializable {
                 }
 
                 if (biobankOwner) {
-                    person.setPersonType(PersonType.OWNER);
                     location = getLocation(person.getLocationId());
 
                     // TODO: Update this to Perun and/or Directory given
@@ -351,8 +346,6 @@ public class UserBean implements Serializable {
                         location = createLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS,
                                 TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS);
                     }
-                } else {
-                    person.setPersonType(PersonType.RESEARCHER);
                 }
                 person.update();
             }
@@ -570,7 +563,7 @@ public class UserBean implements Serializable {
 
     /**
      * Gets the location ID the user belongs to (only biobank owners)
-     * 
+     *
      * @return
      */
     public Integer getLocationId() {
@@ -581,7 +574,7 @@ public class UserBean implements Serializable {
 
     /**
      * Gets the location name the user belongs to (only biobank owners)
-     * 
+     *
      * @return
      */
     public String getLocationName() {

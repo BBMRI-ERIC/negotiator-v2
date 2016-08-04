@@ -6,7 +6,6 @@ package de.samply.bbmri.negotiator.jooq.tables;
 
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 
 import java.util.Arrays;
@@ -36,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = 226528807;
+	private static final long serialVersionUID = 1966679830;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -55,11 +54,6 @@ public class Person extends TableImpl<PersonRecord> {
 	 * The column <code>public.person.id</code>. primary key
 	 */
 	public final TableField<PersonRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "primary key");
-
-	/**
-	 * The column <code>public.person.person_type</code>. describes wether the person is researcher or owner - one of the the two child classes. 
-	 */
-	public final TableField<PersonRecord, PersonType> PERSON_TYPE = createField("person_type", org.jooq.util.postgres.PostgresDataType.VARCHAR.asEnumDataType(de.samply.bbmri.negotiator.jooq.enums.PersonType.class), this, "describes wether the person is researcher or owner - one of the the two child classes. ");
 
 	/**
 	 * The column <code>public.person.auth_subject</code>. authentication string that comes from the authentication service

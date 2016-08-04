@@ -1,4 +1,3 @@
-CREATE TYPE "person_type" AS ENUM ('OWNER', 'RESEARCHER');
 CREATE TYPE "flag" AS ENUM ('UNFLAGGED', 'ARCHIVED', 'IGNORED', 'STARRED');
 
 CREATE TABLE "location" (
@@ -16,7 +15,6 @@ COMMENT ON COLUMN "location"."name" IS 'location name';
 
 CREATE TABLE "person" (
     "id" SERIAL NOT NULL,
-    "person_type" "person_type" NOT NULL,
     "auth_subject" CHARACTER VARYING(255) NOT NULL UNIQUE,
     "auth_name" CHARACTER VARYING(255) NOT NULL,
     "auth_email" CHARACTER VARYING(255) NOT NULL,
@@ -33,7 +31,6 @@ COMMENT ON COLUMN "person"."id" IS 'primary key';
 COMMENT ON COLUMN "person".auth_subject IS 'authentication string that comes from the authentication service';
 COMMENT ON COLUMN "person".auth_name IS 'the real name of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".auth_email IS 'the email of the user, value comes from the authentication service';
-COMMENT ON COLUMN "person".person_type IS 'describes wether the person is researcher or owner - one of the the two child classes. ';
 COMMENT ON COLUMN "person".person_image IS 'image/avatar of the person';
 COMMENT ON COLUMN "person".location_id IS 'only valid for biobank owners, the ID of the location he belongs to';
 

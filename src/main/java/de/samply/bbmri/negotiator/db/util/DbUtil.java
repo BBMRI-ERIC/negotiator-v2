@@ -33,7 +33,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.JoinType;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 
 import de.samply.bbmri.negotiator.Config;
@@ -41,7 +46,6 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
@@ -73,7 +77,6 @@ public class DbUtil {
                 .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
                 .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
                 .where(Tables.QUERY.RESEARCHER_ID.eq(userId))
-                .and(commentAuthor.PERSON_TYPE.eq(PersonType.OWNER).or(commentAuthor.PERSON_TYPE.isNull()))
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc()).fetch();
 
@@ -104,7 +107,7 @@ public class DbUtil {
     		condition = condition.and(titleCondition.or(textCondition));
     	}
 
-        if (flag != null && flag != Flag.UNFLAGGED) {     	        	
+        if (flag != null && flag != Flag.UNFLAGGED) {
             condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
         } else {
             /**
@@ -124,24 +127,24 @@ public class DbUtil {
 
     			.join(Tables.QUERY_PERSON, JoinType.JOIN)
     			.on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID))
-        
+
     			.join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
 
     			.join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))		
-        
+    			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))
+
     			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.QUERY_PERSON.PERSON_ID)))
 
     			.where(condition)
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.ID).fetch();
-    	
-    	
+
+
 		return config.map(fetch, OwnerQueryStatsDTO.class);
     }
-    
+
 
     /**
      * Returns a list of CommentPersonDTOs for a specific query.

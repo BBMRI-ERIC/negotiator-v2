@@ -26,18 +26,18 @@
 
 package de.samply.bbmri.negotiator.test;
 
+import java.sql.SQLException;
+
+import org.junit.Test;
+
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.enums.PersonType;
 import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import org.junit.Test;
-
-import java.sql.SQLException;
 
 /**
- * 
+ *
  */
 public class DatabaseSetup {
 
@@ -50,12 +50,11 @@ public class DatabaseSetup {
             p.setAuthSubject("https://auth.samply.de/users/43");
             p.setAuthEmail("test@test.org");
             p.setAuthName("Testinator");
-            p.setPersonType(PersonType.OWNER);
             p.setPersonImage(null);
 
             dao.insert(p);
             config.get().commit();
-        }        
+        }
     }
 
     public void testCommentStatsDTO() throws SQLException {

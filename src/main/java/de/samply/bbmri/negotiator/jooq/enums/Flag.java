@@ -4,12 +4,12 @@
 package de.samply.bbmri.negotiator.jooq.enums;
 
 
+import de.samply.bbmri.negotiator.jooq.Public;
+
 import javax.annotation.Generated;
 
 import org.jooq.EnumType;
 import org.jooq.Schema;
-
-import de.samply.bbmri.negotiator.jooq.Public;
 
 
 /**
