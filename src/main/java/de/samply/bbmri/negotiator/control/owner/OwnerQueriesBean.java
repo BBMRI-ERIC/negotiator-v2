@@ -83,46 +83,6 @@ public class OwnerQueriesBean implements Serializable {
 	public void init() {
 
 	}
-	
-	
-	/**
-	 * Switches the ignore queries view On and off. Also makes 'queries' object null to re-load the queries.
-	 * 
-	 */
-	public void switchIgnoredView() {
-		if(flagFilter == Flag.IGNORED) {
-			flagFilter = null;
-		} else {
-			flagFilter = Flag.IGNORED;
-		}
-		queries = null;		
-	}
-	
-	/**
-	 * Switches the archived queries view On and off. Also makes 'queries' object null to re-load the queries.
-	 * 
-	 */
-	public void switchArchivedView() {
-		if(flagFilter == Flag.ARCHIVED) {
-			flagFilter = null;
-		} else {
-			flagFilter = Flag.ARCHIVED;
-		}
-		queries = null;		
-	}
-
-	/**
-	 * Switches the starred queries view On and off. Also makes 'queries' object null to re-load the queries.
-	 *
-	 */
-	public void switchStarredView() {
-		if(flagFilter == Flag.STARRED) {
-			flagFilter = null;
-		} else {
-			flagFilter = Flag.STARRED;
-		}
-		queries = null;
-	}
 
 	/**
 	 * Leave query as a bio bank owner. Saves the time stamp of leaving a query.

@@ -74,38 +74,12 @@
                                 </h:commandLink>
                             </h:panelGroup>
                         </ui:repeat>
-                    </h:panelGroup>
-                
-                </h:panelGroup>
-                
-                <h:panelGroup id="filterInputButtons" layout="block" styleClass="pull-right col-md-2">
-                    <h:panelGroup layout="block" class="btn-group pull-right" role="group" aria-label="...">
-                        <h:commandLink   styleClass="btn #{ownerQueriesBean.flagFilter == 'STARRED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewStarred']}"
-                                         action="#{ownerQueriesBean.switchStarredView()}">
-                            <f:ajax render=":allOwnerQueries @form" />
-
-                            <i class="fa fa-star"></i>
-                        </h:commandLink>
-
-                      <h:commandLink styleClass="btn #{ownerQueriesBean.flagFilter == 'ARCHIVED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewArchived']}"
-							action="#{ownerQueriesBean.switchArchivedView()}">
-							<f:ajax render=":allOwnerQueries @form" />
-							
-							<i class="fa fa-folder-open"></i>
-					  </h:commandLink>
-
-                        <h:commandLink styleClass="btn #{ownerQueriesBean.flagFilter == 'IGNORED' ? 'btn-success' : 'btn-default'}" title="#{label['queryview.action.viewIgnored']}"
-                                       action="#{ownerQueriesBean.switchIgnoredView()}">
-                            <f:ajax render=":allOwnerQueries @form" />
-
-                            <i class="fa fa-sign-out"></i>
-                        </h:commandLink>
-                    </h:panelGroup>
-                </h:panelGroup>
+                    </h:panelGroup>                
+                </h:panelGroup>              
             </h:form>
         </h:panelGroup>
 
-		<h:panelGroup id="allOwnerQueries" layout="block">
+		<h:panelGroup layout="block">
             <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0}" layout="block">
                 <h3>#{label['queryview.noQueries']}</h3>
             </h:panelGroup>
