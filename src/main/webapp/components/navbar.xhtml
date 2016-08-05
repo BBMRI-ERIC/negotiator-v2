@@ -15,7 +15,7 @@
 						class="icon-bar"></span>
 				</button>
 				<h:link outcome="/index" styleClass="navbar-brand">
-					<span class="projectName">BBMRI<span class="bbmriModule">.Negotiator</span></span>
+					<span class="projectName">#{label['queryview.bbmri']}<span class="bbmriModule">#{label['queryview.negotiator']}</span></span>
 				</h:link>
 			</h:panelGroup>
 
@@ -26,29 +26,29 @@
 						<c:if test="#{userBean.biobankOwner}">
 						<li class="dropdown"><a href="#" class="dropdown-toggle"
 							data-toggle="dropdown" role="button" aria-haspopup="true"
-							aria-expanded="false">My Biobank <span class="caret"></span></a>
+							aria-expanded="false">#{label['queryview.myBiobank']}<span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li>
-								    <h:link value="All Queries" outcome="/owner/index">  																		 
+								    <h:link value="#{label['queryview.allQueries']}" outcome="/owner/index">  																		 
 					  				</h:link>
 								
 								</li>
 								<li>
-								    <h:link outcome="/owner/index" value="Starred Queries" title="#{label['queryview.action.viewStarred']}" >
+								    <h:link outcome="/owner/index" value="#{label['queryview.starred']}" title="#{label['queryview.action.viewStarred']}" >
 								        <f:param name="flag" value="STARRED"/>  																		 
 					  				</h:link>
 								
 								</li>								
 								<li>
 								
-								    <h:link outcome="/owner/index" value="Archived Queries" title="#{label['queryview.action.viewArchived']}" >
+								    <h:link outcome="/owner/index" value="#{label['queryview.archived']}" title="#{label['queryview.action.viewArchived']}" >
 								        <f:param name="flag" value="ARCHIVED"/>  																		 
 					  				</h:link>
 								
 								</li>
 								<li>
 								
-								    <h:link outcome="/owner/index" value="Ignored Queries" title="#{label['queryview.action.viewIgnored']}" >
+								    <h:link outcome="/owner/index" value="#{label['queryview.ignored']}" title="#{label['queryview.action.viewIgnored']}" >
 								        <f:param name="flag" value="IGNORED"/>  																		 
 					  			    </h:link>
 								</li>
@@ -57,10 +57,10 @@
 						</c:if>
 						<li class="dropdown"><a href="#" class="dropdown-toggle"
 							data-toggle="dropdown" role="button" aria-haspopup="true"
-							aria-expanded="false">My Queries <span class="caret"></span></a>
+							aria-expanded="false">#{label['queryview.myQueries']} <span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li>
-								    <h:link value="My Created Queries" outcome="/index.xhtml"> 
+								    <h:link value="#{label['queryview.myCreatedQueries']}" outcome="/index.xhtml"> 
 								    </h:link>
 								
 								</li>								
@@ -72,7 +72,7 @@
 					<ul class="nav navbar-nav navbar-right navbar-user">
 						<ui:fragment rendered="#{! userBean.loginValid}">
 							<li class="pull-right"><a
-								href="#{userBean.authenticationUrl}">Login</a></li>
+								href="#{userBean.authenticationUrl}">#{label['queryview.login']}</a></li>
 						</ui:fragment>
 
 						<ui:fragment rendered="#{userBean.loginValid}">
@@ -84,10 +84,10 @@
 							</a>
 								<ul id="userPanel" class="dropdown-menu">
 									<li><h:commandLink action="#{userBean.profile}">
-											<i class="fa fa-book" /> Profile
+											<i class="fa fa-book" /> #{label['queryview.profile']}
                                         </h:commandLink></li>
 									<li><h:commandLink action="#{userBean.logout}">
-											<i class="fa fa-sign-out" /> Logout
+											<i class="fa fa-sign-out" /> #{label['queryview.logout']}
                                         </h:commandLink></li>
 								</ul></li>
 						</ui:fragment>

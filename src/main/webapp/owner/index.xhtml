@@ -53,7 +53,7 @@
                     <h:panelGroup class="col-md-3"> 
                        <h:panelGroup class="input-group">
                            <h:inputText value="#{sessionBean.filter}"
-                               size="20" id="filterInputText" pt:placeholder="search  with  keywords" title="#{label['queryview.tooltip.searchbox']}" styleClass="form-control"/>
+                               size="20" id="filterInputText" pt:placeholder="#{label['queryview.search']}" title="#{label['queryview.tooltip.searchbox']}" styleClass="form-control"/>
                             <h:panelGroup class="input-group-btn">                    
                             <h:commandButton id="addFilterButton"
                                 action="#{ownerQueriesBean.addFilter()}" style="display: none;" />
