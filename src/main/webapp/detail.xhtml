@@ -174,37 +174,7 @@
 					<hr></hr>
 				</div>
 
-				<h:panelGroup layout="block" styleClass="col-md-12">
-
-					<h:form>
-
-						<h:panelGroup layout="block" styleClass="col-md-3">
-
-							<bbmricc:avatar person="#{userBean.person}"/>
-
-						</h:panelGroup>
-
-						<h:panelGroup layout="block" styleClass="col-md-9">
-
-							<div class="form-group">
-
-								<h:inputTextarea value="#{addCommentBean.comment}"
-									styleClass="form-control" rows="5" />
-
-							</div>
-
-							<h:panelGroup layout="block" styleClass="pull-right">
-
-								<h:commandButton action="#{addCommentBean.saveComment(researcherQueriesDetailBean.selectedQuery)}"
-									value="#{label['querydetail.action.addComment.buttontext']}" title="#{label['querydetail.action.addComment']}" styleClass="btn btn-primary" />
-
-							</h:panelGroup>
-
-						</h:panelGroup>
-
-					</h:form>
-
-				</h:panelGroup>
+				<bbmricc:commentReply query="#{researcherQueriesDetailBean.selectedQuery}"/>
 
 			</h:panelGroup>
 

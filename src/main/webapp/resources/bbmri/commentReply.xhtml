@@ -36,51 +36,43 @@
 
 
 <composite:interface>
-    <composite:attribute name="comment" required="true"/>
-    <composite:attribute name="person" required="true"/>
-    <composite:attribute name="location" />
+    <composite:attribute name="query" required="true"/>
 </composite:interface>
 
 <composite:implementation>
-    <h:panelGroup layout="block" styleClass="panel panel-default">
 
-        <h:panelGroup layout="block" styleClass="panel-heading">
+    <h:panelGroup layout="block" styleClass="col-md-12">
 
-            #{cc.attrs.person.authName}<h:outputText value=", Location: #{cc.attrs.location.name}" rendered="#{cc.attrs.location != null}"/> 
-            <h:panelGroup styleClass="pull-right">
-                <h:outputText value="#{cc.attrs.comment.commentTime}">
-                    <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>
-                </h:outputText>
+        <h:form>
+
+            <h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
+
+                <bbmricc:avatar person="#{userBean.person}"/>
+
             </h:panelGroup>
 
-        </h:panelGroup>
+            <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
 
-        <h:panelGroup layout="block" styleClass="panel-body">
+                <div class="form-group">
 
-            <h:panelGroup layout="block" styleClass="row">
+                    <h:inputTextarea value="#{addCommentBean.comment}" styleClass="form-control" rows="5" />
 
-                <h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
+                </div>
 
-                    <bbmricc:avatar person="#{cc.attrs.person}"/>
+                <h:panelGroup layout="block" styleClass="pull-right">
 
-                </h:panelGroup>
-
-                <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
-
-                    <h:panelGroup layout="block" styleClass="row">
-                        <h:panelGroup layout="block" styleClass="col-md-10">
-                            #{cc.attrs.comment.text}
-                        </h:panelGroup>
-
-                    </h:panelGroup>
+                    <h:commandButton action="#{addCommentBean.saveComment(ownerQueriesDetailBean.selectedQuery)}"
+                                     value="#{label['querydetail.action.addComment.buttontext']}"
+                                     title="#{label['querydetail.action.addComment']}" styleClass="btn btn-primary" />
 
                 </h:panelGroup>
 
             </h:panelGroup>
 
-        </h:panelGroup>
+        </h:form>
 
     </h:panelGroup>
+
 </composite:implementation>
 
 </html>
