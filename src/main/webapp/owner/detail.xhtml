@@ -92,10 +92,16 @@
 
 							<h:panelGroup layout="block" styleClass="panel-body">
 								<h:panelGroup layout="block" styleClass="row">
+								    <h:panelGroup layout="block" styleClass="col-md-2">
+                                        <bbmricc:avatar person="#{item.queryAuthor}"/>
+                                    </h:panelGroup>
 
-									<h:panelGroup layout="block" styleClass="col-md-11">
+									<h:panelGroup styleClass="col-md-10">
+									    <h:panelGroup layout="block" styleClass="row queryOwner">
+                                            #{item.queryAuthor.authName}
+                                        </h:panelGroup>
 										<h:panelGroup layout="block" styleClass="row">
-											<h:panelGroup layout="block" styleClass="col-md-10">
+											<h:panelGroup layout="block" styleClass="col-md-12">
                                                 #{item.query.text}
                                             </h:panelGroup>
 
