@@ -25,21 +25,15 @@
  */
 package de.samply.bbmri.negotiator.filter;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import de.samply.auth.client.AuthClient;
-import de.samply.auth.client.InvalidKeyException;
-import de.samply.auth.client.InvalidTokenException;
-import de.samply.auth.client.jwt.KeyLoader;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.common.config.OAuth2Client;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.glassfish.jersey.client.ClientConfig;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,8 +41,22 @@ import javax.servlet.http.HttpSession;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.glassfish.jersey.client.ClientConfig;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+
+import de.samply.auth.client.AuthClient;
+import de.samply.auth.client.InvalidKeyException;
+import de.samply.auth.client.InvalidTokenException;
+import de.samply.auth.client.jwt.KeyLoader;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.common.config.OAuth2Client;
 
 /**
  * This web filter handles the code from the central authentication server. It
@@ -114,6 +122,11 @@ public class OAuth2Filter implements Filter {
                                 KeyLoader.loadKey(config.getHostPublicKey()), config.getClientId(),
                                 config.getClientSecret(), httpRequest.getParameter("code"), getClient());
                         userBean.login(client);
+
+                        if(userBean.getBiobankOwner()){
+                        	httpResponse.sendRedirect(httpRequest.getContextPath() + "/owner/index.xhtml");
+                            return;
+                        }
                     }
                 } catch (InvalidTokenException | InvalidKeyException e) {
                     logger.error("The token was invalid, aborting");

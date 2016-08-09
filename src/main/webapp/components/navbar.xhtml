@@ -24,48 +24,44 @@
 				<h:panelGroup layout="block" styleClass="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
 						<c:if test="#{userBean.biobankOwner}">
-						<li class="dropdown"><a href="#" class="dropdown-toggle"
-							data-toggle="dropdown" role="button" aria-haspopup="true"
-							aria-expanded="false">#{label['queryview.myBiobank']}<span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li>
-								    <h:link value="#{label['queryview.allQueries']}" outcome="/owner/index">  																		 
-					  				</h:link>
+						    <li class="dropdown"><a href="#" class="dropdown-toggle"
+							    data-toggle="dropdown" role="button" aria-haspopup="true"
+							    aria-expanded="false">#{label['queryview.myBiobank']}<span class="caret"></span></a>
+							    <ul class="dropdown-menu">
+								    <li>
+								        <h:link value="#{label['queryview.allQueries']}" outcome="/owner/index">  																		 
+					  				    </h:link>
 								
-								</li>
-								<li>
-								    <h:link outcome="/owner/index" value="#{label['queryview.starred']}" title="#{label['queryview.action.viewStarred']}" >
-								        <f:param name="flag" value="STARRED"/>  																		 
-					  				</h:link>
-								
-								</li>								
-								<li>
-								
-								    <h:link outcome="/owner/index" value="#{label['queryview.archived']}" title="#{label['queryview.action.viewArchived']}" >
-								        <f:param name="flag" value="ARCHIVED"/>  																		 
-					  				</h:link>
-								
-								</li>
-								<li>
-								
-								    <h:link outcome="/owner/index" value="#{label['queryview.ignored']}" title="#{label['queryview.action.viewIgnored']}" >
-								        <f:param name="flag" value="IGNORED"/>  																		 
-					  			    </h:link>
-								</li>
-							</ul>
-						</li>
+								    </li>
+								    <li>
+								        <h:link outcome="/owner/index" value="#{label['queryview.starred']}" title="#{label['queryview.action.viewStarred']}" >
+								            <f:param name="flag" value="STARRED"/>  																		 
+					  				    </h:link>								
+								    </li>								
+								    <li>								
+								        <h:link outcome="/owner/index" value="#{label['queryview.archived']}" title="#{label['queryview.action.viewArchived']}" >
+								            <f:param name="flag" value="ARCHIVED"/>  																		 
+					  				    </h:link>								
+								    </li>
+								    <li>								
+								        <h:link outcome="/owner/index" value="#{label['queryview.ignored']}" title="#{label['queryview.action.viewIgnored']}" >
+								            <f:param name="flag" value="IGNORED"/>  																		 
+					  			        </h:link>
+								    </li>
+							    </ul>
+						    </li>
 						</c:if>
-						<li class="dropdown"><a href="#" class="dropdown-toggle"
-							data-toggle="dropdown" role="button" aria-haspopup="true"
-							aria-expanded="false">#{label['queryview.myQueries']} <span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<li>
-								    <h:link value="#{label['queryview.myCreatedQueries']}" outcome="/index.xhtml"> 
-								    </h:link>
-								
-								</li>								
-							</ul>
-						</li>
+						<c:if test="#{!userBean.biobankOwner}">
+						    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+							    aria-expanded="false">#{label['queryview.myQueries']} <span class="caret"></span></a>
+							    <ul class="dropdown-menu">							
+								    <li>
+								        <h:link value="#{label['queryview.myCreatedQueries']}" outcome="/researcher/index.xhtml"> 
+								        </h:link>								
+								    </li>															
+							    </ul>
+						    </li>
+						</c:if>						
 					</ul>
 
 
