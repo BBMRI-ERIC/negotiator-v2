@@ -51,6 +51,14 @@ public class SessionBean implements Serializable {
     private String filter = null;
 
     /**
+     * Removes all the filters at once.
+     */
+    public void clearAllFilters() {
+        if (filters != null && filters.isEmpty() == false)
+        	filters.clear();
+    }
+
+    /**
      * Adds the filter.
      */
     public void addFilter() {

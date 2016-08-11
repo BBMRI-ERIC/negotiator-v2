@@ -84,6 +84,14 @@ public class OwnerQueriesBean implements Serializable {
 
 	}
 
+	 /**
+     * Removes all the filters at once.
+     */
+    public void clearAllFilters() {
+        sessionBean.clearAllFilters();
+        getQueries();
+    }
+
 	/**
 	 * Leave query as a bio bank owner. Saves the time stamp of leaving a query.
 	 * 

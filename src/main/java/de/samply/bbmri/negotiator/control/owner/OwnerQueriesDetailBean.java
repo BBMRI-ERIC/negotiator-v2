@@ -28,7 +28,10 @@ package de.samply.bbmri.negotiator.control.owner;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -36,8 +39,10 @@ import javax.faces.bean.ViewScoped;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
@@ -48,45 +53,53 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 @ManagedBean
 @ViewScoped
 public class OwnerQueriesDetailBean implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-		
+
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
-	
+
+	@ManagedProperty(value = "#{sessionBean}")
+    private SessionBean sessionBean;
+
 	/**
      * The OwnerQueryStatsDTO object used to get all the information for queries.
      */
 	private List<OwnerQueryStatsDTO> queries;
-	
+
+	/**
+	 * The currently active flag filter. Set this to whatever flag you want and you will see the flagged queries only.
+	 */
+	private Flag flagFilter = Flag.UNFLAGGED;
+
 	/**
      * The id of the query selected from owner.index.xhtml page, if there is one
      */
 	private int queryId;
-		
+
 	/**
      * The selected query, if there is one
      */
 	private Query selectedQuery = null;
-	
+
 
 	 /**
      * The input text box for the user to make a comment.
      */
     private String commentText;
-	
+
 	/**
      * The list of comments for the selected query
      */
     private List<CommentPersonDTO> comments;
-	
+
     /**
-     * initialises the page by getting all the comments for a selected(clicked on) query 
+     * initialises the page by getting all the comments for a selected(clicked on) query
      */
 	public void initialize() {
 		try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
-            
+
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
@@ -95,22 +108,55 @@ public class OwnerQueriesDetailBean implements Serializable {
             		selectedQuery = query.getQuery();
             	}
             }
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-	}	
-	
+	}
+
+	/**
+	 * Add search filter
+	 */
+	public void addFilter() {
+		queries = null;
+		sessionBean.addFilter();
+	}
+
+	/**
+	 * Removes the search filter.
+	 *
+	 * @param arg
+	 *
+	 */
+	public void removeFilter(String arg) {
+		queries = null;
+		sessionBean.removeFilter(arg);
+	}
+
+	/**
+	 * Split search terms by list of delimiters
+	 * @return unique search terms
+	 */
+	private Set<String> getFilterTerms() {
+		Set<String> filterTerms = new HashSet<String>();
+		for(String filters : sessionBean.getFilters()) {
+			// split by 0 or more spaces, followed by either 'and','or', comma or more spaces
+			String[] filterTermsArray = filters.split("\\s*(and|or|,)\\s*");
+			Collections.addAll(filterTerms, filterTermsArray);
+		}
+		return filterTerms;
+	}
+
 	/**
 	 * Returns the list of queries in which the current bio bank owner is a part of(all queries that on owner can see)
-	 * 
+	 *
 	 * @return queries
 	 */
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
 				int locationId = userBean.getLocationId();
-				queries = DbUtil.getOwnerQueries(config, locationId, null, null);
+				queries = DbUtil.getOwnerQueries(config, locationId, getFilterTerms(), flagFilter);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -121,7 +167,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void setQueries(List<OwnerQueryStatsDTO> queries) {
 		this.queries = queries;
 	}
-		
+
 	public int getQueryId() {
 		return queryId;
 	}
@@ -144,8 +190,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setComments(List<CommentPersonDTO> comments) {
 		this.comments = comments;
-	}		
-	
+	}
+
 	public UserBean getUserBean() {
 		return userBean;
 	}
@@ -153,12 +199,28 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void setUserBean(UserBean userBean) {
 		this.userBean = userBean;
 	}
-	
+
 	public String getCommentText() {
 		return commentText;
 	}
 
 	public void setCommentText(String commentText) {
 		this.commentText = commentText;
+	}
+
+	public SessionBean getSessionBean() {
+		return sessionBean;
+	}
+
+	public void setSessionBean(SessionBean sessionBean) {
+		this.sessionBean = sessionBean;
+	}
+
+	public Flag getFlagFilter() {
+		return flagFilter;
+	}
+
+	public void setFlagFilter(Flag flagFilter) {
+		this.flagFilter = flagFilter;
 	}
 }

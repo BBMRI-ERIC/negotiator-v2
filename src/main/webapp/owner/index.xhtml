@@ -38,7 +38,7 @@
     
     <f:metadata>
 		<f:viewParam name="flag" value="#{ownerQueriesBean.flagFilter}" />
-		<f:viewAction action="#{ownerQueriesBean.getQueries}" />
+		<f:viewAction action="#{ownerQueriesBean.clearAllFilters}" />
 	</f:metadata>
 		
         
@@ -97,6 +97,7 @@
 
                             <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}" style="margin-left: 30px;" >
                                 <f:param name="queryId" value="#{queryDto.query.id}"/>
+                                <f:param name="flag" value="#{ownerQueriesBean.flagFilter}"/>
                                 <h:outputLabel value="#{queryDto.query.title}"/>
                             </h:link>
 
