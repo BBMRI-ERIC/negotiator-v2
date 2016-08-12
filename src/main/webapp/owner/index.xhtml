@@ -86,7 +86,7 @@
 
             <ui:repeat var="queryDto" value="#{ownerQueriesBean.queries}">
 
-                <div class="panel panel-default">
+                <h:panelGroup layout="block" styleClass="panel panel-default #{queryDto.isArchived() ? 'selected-query' : ''} ">
                     <div class="panel-heading">
                         <h:form id="queryItemActions">
                             <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
@@ -167,7 +167,7 @@
 
                         </h:panelGroup>
                     </h:panelGroup>
-                </div>
+                </h:panelGroup>
 
             </ui:repeat>
         </h:panelGroup>
