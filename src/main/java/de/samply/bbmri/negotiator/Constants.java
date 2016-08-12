@@ -37,6 +37,11 @@ public class Constants {
     public final static String OWNER_ROLE = "BBMRI_OWNER";
 
     /**
+     * The role identifier, that identifies Biobank researcher.
+     */
+	public static final String RESEARCHER_ROLE = "BBMRI_RESEARCHER";
+
+    /**
      * The package name of all database upgrade files.
      */
     public final static String DB_PACKAGE_NAME = "de.samply.bbmri.negotiator.db";
@@ -45,5 +50,6 @@ public class Constants {
      * The required Database version for this application version.
      */
     public final static int DB_REQUIRED_VERSION = 1;
+
 
 }

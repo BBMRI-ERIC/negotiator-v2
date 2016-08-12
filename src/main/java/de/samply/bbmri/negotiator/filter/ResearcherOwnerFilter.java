@@ -26,14 +26,20 @@
 
 package de.samply.bbmri.negotiator.filter;
 
-import de.samply.bbmri.negotiator.control.UserBean;
+import java.io.IOException;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
+
+import de.samply.bbmri.negotiator.control.UserBean;
 
 /**
  * This filter checks if a researcher tries to access the UI for owners, and vice versa.
@@ -58,7 +64,7 @@ public class ResearcherOwnerFilter implements Filter {
          * Check for researchers
          */
         if(path.startsWith(req.getContextPath() + "/researcher/")) {
-            if(! userBean.getBiobankOwner()) {
+            if(userBean.getResearcher()) {
                 chain.doFilter(request, response);
                 return;
             } else {

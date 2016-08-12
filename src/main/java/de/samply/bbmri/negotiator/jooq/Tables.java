@@ -10,6 +10,7 @@ import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryPerson;
+import de.samply.bbmri.negotiator.jooq.tables.Role;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
 import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 
@@ -58,6 +59,11 @@ public class Tables {
 	 * Table for the relationship between all the persons(owners) and the queries that they have replied to.
 	 */
 	public static final QueryPerson QUERY_PERSON = de.samply.bbmri.negotiator.jooq.tables.QueryPerson.QUERY_PERSON;
+
+	/**
+	 * Table for different roles of a user.
+	 */
+	public static final Role ROLE = de.samply.bbmri.negotiator.jooq.tables.Role.ROLE;
 
 	/**
 	 * Table that contains tags for queries
