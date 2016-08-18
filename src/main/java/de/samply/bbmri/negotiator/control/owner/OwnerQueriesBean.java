@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,20 +59,20 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 public class OwnerQueriesBean implements Serializable {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private List<OwnerQueryStatsDTO> queries;	
+	private List<OwnerQueryStatsDTO> queries;
 
 	/**
 	 * The currently active flag filter. Set this to whatever flag you want and you will see the flagged queries only.
 	 */
 	private Flag flagFilter = Flag.UNFLAGGED;
-	 
+
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
-	
+
 	@ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
@@ -94,31 +95,31 @@ public class OwnerQueriesBean implements Serializable {
 
 	/**
 	 * Leave query as a bio bank owner. Saves the time stamp of leaving a query.
-	 * 
+	 *
 	 * @param queryDto
 	 * @return
 	 */
 	public void ignoreQuery(OwnerQueryStatsDTO queryDto) {
 		try (Config config = ConfigFactory.get()) {
-			java.util.Date date= new java.util.Date();	
-				
+			java.util.Date date= new java.util.Date();
+
 			config.dsl().update(Tables.QUERY_PERSON)
 			            .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, new Timestamp(date.getTime()))
 			            .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryDto.getQuery().getId()))
 			            .and(Tables.QUERY_PERSON.PERSON_ID.eq(userBean.getUserId()))
 						.execute();
-			         
+
 			config.get().commit();
 			queries = null;
-			
+
 			flagQuery(queryDto, Flag.IGNORED);
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	
+
 	/**
 	 * Mark query as starred
 	 * @param queryDto
@@ -126,16 +127,16 @@ public class OwnerQueriesBean implements Serializable {
 	public void starQuery(OwnerQueryStatsDTO queryDto){
 		flagQuery(queryDto, Flag.STARRED);
 	}
-	
+
 	/**
 	 */
 	public void archiveQuery(OwnerQueryStatsDTO queryDto){
 		flagQuery(queryDto, Flag.ARCHIVED);
 	}
-	
+
 	/**
 	 * Mark the given query with the given flag.
-	 * 
+	 *
 	 * If Postgresql supported SQL standard Merge statement, the query look like this :
 	 * 		 config.dsl().insertInto(Tables.FLAGGED_QUERY, Tables.FLAGGED_QUERY.QUERY_ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.FLAG).
 	 *		 values(queryId, userBean.getUserId(), flag)
@@ -145,7 +146,7 @@ public class OwnerQueriesBean implements Serializable {
 	 *		.set(Tables.FLAGGED_QUERY.FLAG, flag).execute();
 	 *
 	 * But with the current jooq version this does not work, since there is no way to set the postgresql version to 9.5 (necessary for this to work).
-	 * 
+	 *
 	 * @param queryDto
 	 * @param flag
 	 */
@@ -187,26 +188,55 @@ public class OwnerQueriesBean implements Serializable {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Sorts the queries such that the archived ones appear at the end.
+	 *
+	 * @return
+	 */
+	public void sortQueries(){
+		if (queries == null || queries.isEmpty()) {
+			return;
+		} else {
+		    Collections.sort(queries, new Comparator<OwnerQueryStatsDTO>() {
+                @Override
+                public int compare(OwnerQueryStatsDTO obj1, OwnerQueryStatsDTO obj2) {
+                    if(obj1.isArchived() && obj2.isArchived()) {
+                        return 0;
+                    } else if(obj1.isArchived()) {
+                        return 1;
+                    } else if(obj2.isArchived()) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            });
+
+	    }
+	}
+
 	/**
 	 * Returns the list of queries in which the current biobank owner is a part of,
 	 * filters by search terms if any are provided
-	 * 
+	 *
 	 * @return
 	 */
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				
+
 				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
 					        flagFilter);
-			
+				sortQueries();
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 		return queries;
-	}	
-	
+	}
+
 	/**
 	 * Add search filter
 	 */
@@ -219,15 +249,15 @@ public class OwnerQueriesBean implements Serializable {
 	 * Removes the search filter.
 	 *
 	 * @param arg
-	 * 
+	 *
 	 */
 	public void removeFilter(String arg) {
 		queries = null;
 		sessionBean.removeFilter(arg);
 	}
-	
+
 	/**
-	 * Split search terms by list of delimiters 
+	 * Split search terms by list of delimiters
 	 * @return unique search terms
 	 */
 	private Set<String> getFilterTerms() {
@@ -239,7 +269,7 @@ public class OwnerQueriesBean implements Serializable {
 		}
 		return filterTerms;
 	}
-	
+
 
 	public SessionBean getSessionBean() {
 		return sessionBean;
@@ -259,7 +289,7 @@ public class OwnerQueriesBean implements Serializable {
 
 	public void setUserBean(UserBean userBean) {
 		this.userBean = userBean;
-	}	
+	}
 
 	public Flag getFlagFilter() {
 		return flagFilter;

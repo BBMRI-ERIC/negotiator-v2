@@ -139,7 +139,7 @@ public class DbUtil {
 
     			.where(condition)
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
-    			.orderBy(Tables.QUERY.ID).fetch();
+    			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
 
 		return config.map(fetch, OwnerQueryStatsDTO.class);
