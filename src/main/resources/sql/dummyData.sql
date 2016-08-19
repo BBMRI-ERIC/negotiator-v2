@@ -14,7 +14,7 @@ INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, locati
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (6, 'https://auth-dev.mitro.dkfz.de/users/8', 'BBMRI Researcher', 'researcher.bbmri@bbmri.org', NULL, NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (7, 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL, 6);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (8, 'https://auth-dev.mitro.dkfz.de/users/19', 'Saher Maqsood', 's.maqsood@dkfz.de', NULL, 6);
-SELECT pg_catalog.setval('person_id_seq', 7, true);
+SELECT pg_catalog.setval('person_id_seq', 8, true);
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id) VALUES (1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1);
 INSERT INTO query(id, title, text, query_creation_time, researcher_id) VALUES (2, 'Colon cancer', 'Do you have 50 samples on samples of Colorectal cancer as a primary diagnosis (C18.1 to C18.7)?', '2014-05-01 00:00:00', 6);
