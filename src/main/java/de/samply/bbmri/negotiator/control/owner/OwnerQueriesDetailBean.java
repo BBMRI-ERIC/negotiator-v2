@@ -155,8 +155,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				int locationId = userBean.getLocationId();
-				queries = DbUtil.getOwnerQueries(config, locationId, getFilterTerms(), flagFilter);
+				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

@@ -87,7 +87,7 @@
             <ui:repeat var="queryDto" value="#{ownerQueriesBean.queries}">
 
                 <h:panelGroup layout="block" styleClass="panel panel-default #{queryDto.isArchived() ? 'selected-query' : ''} ">
-                    <div class="panel-heading">
+                    <h:panelGroup layout="block" styleClass="panel-heading">
                         <h:form id="queryItemActions">
                             <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
                                            title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
@@ -132,7 +132,7 @@
 
                             </h:panelGroup>
                         </h:form>
-                    </div>
+                    </h:panelGroup>
 
                     <h:panelGroup layout="block" styleClass="panel-body">
                         <h:panelGroup layout="block" styleClass="row">

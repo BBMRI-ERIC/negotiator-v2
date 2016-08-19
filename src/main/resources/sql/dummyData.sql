@@ -31,7 +31,8 @@ INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 2, 
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (1, 8, '2016-07-02 00:00:00');
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 8, '2016-07-01 00:00:00');
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 8, '2016-07-02 00:00:00');
-
+INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (4, 5, '2016-07-02 00:00:00');
+INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (4, 8, '2016-07-02 00:00:00');
 
 INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');
 SELECT pg_catalog.setval('tag_id_seq', 1, true);
@@ -48,5 +49,12 @@ SELECT pg_catalog.setval('comment_id_seq', 6, true);
 INSERT INTO flagged_query(query_id, person_id, flag) VALUES (1, 5, 'STARRED');
 INSERT INTO flagged_query(query_id, person_id, flag) VALUES (2, 5, 'ARCHIVED');
 
+INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 1);
+INSERT INTO role(role_type, person_id) VALUES ('OWNER', 2);
+INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 3);
+INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 4);
+INSERT INTO role(role_type, person_id) VALUES ('OWNER', 5);
+INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 6);
+INSERT INTO role(role_type, person_id) VALUES ('OWNER', 7);
 INSERT INTO role(role_type, person_id) VALUES ('OWNER', 8);
 INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 8);

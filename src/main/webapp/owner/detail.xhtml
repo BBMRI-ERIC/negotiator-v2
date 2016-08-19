@@ -91,14 +91,14 @@
 
 			<h:panelGroup id="test" layout="block">
 				<h:form>
-
 					<ui:repeat var="item" value="#{ownerQueriesDetailBean.queries}">
 
 						<h:link outcome="detail" styleClass="deco-none">
 							<f:param name="queryId" value="#{item.query.id}" />
 
 							<h:panelGroup layout="block"
-								styleClass="panel panel-default #{item.query.id == ownerQueriesDetailBean.queryId ? 'selected-query' : ''}">
+								styleClass="panel panel-default #{item.query.id == ownerQueriesDetailBean.queryId ? 'selected-query' : ''}
+								#{item.isArchived() ? 'selected-query' : ''} ">
 
 								<h:panelGroup layout="block" styleClass="panel-heading">
 
@@ -221,7 +221,7 @@
 				<bbmricc:commentReply
 					query="#{ownerQueriesDetailBean.selectedQuery}" />
 
-			</h:panelGroup>-->
+			</h:panelGroup>
 
  		</h:panelGroup>
 
