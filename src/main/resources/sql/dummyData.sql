@@ -31,7 +31,6 @@ INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 2, 
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (1, 8, '2016-07-02 00:00:00');
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 8, '2016-07-01 00:00:00');
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 8, '2016-07-02 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (4, 5, '2016-07-02 00:00:00');
 INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (4, 8, '2016-07-02 00:00:00');
 
 INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');

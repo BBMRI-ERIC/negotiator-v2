@@ -29,6 +29,7 @@ package de.samply.bbmri.negotiator.control.owner;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -115,6 +116,34 @@ public class OwnerQueriesDetailBean implements Serializable {
 	}
 
 	/**
+     * Sorts the queries such that the archived ones appear at the end.
+     *
+     * @return
+     */
+    public void sortQueries(){
+        if (queries == null || queries.isEmpty()) {
+            return;
+        } else {
+            Collections.sort(queries, new Comparator<OwnerQueryStatsDTO>() {
+                @Override
+                public int compare(OwnerQueryStatsDTO obj1, OwnerQueryStatsDTO obj2) {
+                    if(obj1.isArchived() && obj2.isArchived()) {
+                        return 0;
+                    } else if(obj1.isArchived()) {
+                        return 1;
+                    } else if(obj2.isArchived()) {
+                        return -1;
+                    } else {
+                        return 0;
+                    }
+                }
+            });
+
+        }
+    }
+
+
+	/**
 	 * Add search filter
 	 */
 	public void addFilter() {
@@ -156,6 +185,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
 				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter);
+				sortQueries();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
