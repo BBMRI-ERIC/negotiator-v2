@@ -22,16 +22,16 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id) VALUES (3
 INSERT INTO query(id, title, text, query_creation_time, researcher_id) VALUES (4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8);
 SELECT pg_catalog.setval('query_id_seq', 4, true);
 
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (1, 2, '2016-07-01 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 2, '2016-07-02 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (1, 5, '2016-07-01 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 5, '2016-07-02 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 5, '2016-07-01 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 2, '2016-07-02 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (1, 8, '2016-07-02 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (2, 8, '2016-07-01 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (3, 8, '2016-07-02 00:00:00');
-INSERT INTO query_person(query_id, person_id, query_leaving_time) VALUES (4, 8, '2016-07-02 00:00:00');
+INSERT INTO query_person(query_id, person_id) VALUES (1, 2);
+INSERT INTO query_person(query_id, person_id) VALUES (2, 2);
+INSERT INTO query_person(query_id, person_id) VALUES (1, 5);
+INSERT INTO query_person(query_id, person_id) VALUES (2, 5);
+INSERT INTO query_person(query_id, person_id) VALUES (3, 5);
+INSERT INTO query_person(query_id, person_id) VALUES (3, 2);
+INSERT INTO query_person(query_id, person_id) VALUES (1, 8);
+INSERT INTO query_person(query_id, person_id) VALUES (2, 8);
+INSERT INTO query_person(query_id, person_id) VALUES (3, 8);
+INSERT INTO query_person(query_id, person_id) VALUES (4, 8);
 
 INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');
 SELECT pg_catalog.setval('tag_id_seq', 1, true);

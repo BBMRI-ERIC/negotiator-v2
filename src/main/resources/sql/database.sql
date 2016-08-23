@@ -136,7 +136,7 @@ COMMENT ON COLUMN "flagged_query"."flag" IS 'The flag of the comment. One of "AR
 CREATE TABLE "query_person" (
     "query_id" INTEGER NOT NULL,
     "person_id" INTEGER NOT NULL,
-	"query_leaving_time" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+	"query_leaving_time" TIMESTAMP WITHOUT TIME ZONE,
     PRIMARY KEY("query_id", "person_id"),
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
 	FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
@@ -148,7 +148,7 @@ CREATE INDEX "personIdIndexQueryPerson" ON "query_person" (person_id);
 COMMENT ON TABLE "query_person" IS 'Table for the relationship between all the persons(owners) and the queries that they have replied to.';
 COMMENT ON COLUMN "query_person".query_id IS 'This column along with person_Id will make the primary key. Its also a foreign key here, taken from query table';
 COMMENT ON COLUMN "query_person".person_id IS 'This column along with the query_id column will make the primary key. Its also a foreign key here, taken from "person" table';
-COMMENT ON COLUMN "query_person".query_leaving_time IS 'The time when an owner leaves a query';
+COMMENT ON COLUMN "query_person".query_leaving_time IS 'The time when an owner leaves a query. This column is empty unless the query is ignored';
 
 
 CREATE TABLE "role" (

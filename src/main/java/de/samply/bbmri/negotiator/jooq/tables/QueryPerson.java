@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryPerson extends TableImpl<QueryPersonRecord> {
 
-	private static final long serialVersionUID = 2082484946;
+	private static final long serialVersionUID = 617608721;
 
 	/**
 	 * The reference instance of <code>public.query_person</code>
@@ -62,9 +62,9 @@ public class QueryPerson extends TableImpl<QueryPersonRecord> {
 	public final TableField<QueryPersonRecord, Integer> PERSON_ID = createField("person_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "This column along with the query_id column will make the primary key. Its also a foreign key here, taken from \"person\" table");
 
 	/**
-	 * The column <code>public.query_person.query_leaving_time</code>. The time when an owner leaves a query
+	 * The column <code>public.query_person.query_leaving_time</code>. The time when an owner leaves a query. This column is empty unless the query is ignored
 	 */
-	public final TableField<QueryPersonRecord, Timestamp> QUERY_LEAVING_TIME = createField("query_leaving_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "The time when an owner leaves a query");
+	public final TableField<QueryPersonRecord, Timestamp> QUERY_LEAVING_TIME = createField("query_leaving_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "The time when an owner leaves a query. This column is empty unless the query is ignored");
 
 	/**
 	 * Create a <code>public.query_person</code> table reference

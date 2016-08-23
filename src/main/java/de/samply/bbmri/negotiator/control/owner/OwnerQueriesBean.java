@@ -29,7 +29,6 @@ package de.samply.bbmri.negotiator.control.owner;
 
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -93,6 +92,20 @@ public class OwnerQueriesBean implements Serializable {
         getQueries();
     }
 
+    /**
+     * Un-Ignore a query as a biobank owner.
+     *
+     * @param queryDto
+     * @return
+     */
+    public void unIgnoreQuery(OwnerQueryStatsDTO queryDto){
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.UnIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 	/**
 	 * Leave query as a bio bank owner. Saves the time stamp of leaving a query.
 	 *
@@ -101,19 +114,14 @@ public class OwnerQueriesBean implements Serializable {
 	 */
 	public void ignoreQuery(OwnerQueryStatsDTO queryDto) {
 		try (Config config = ConfigFactory.get()) {
-			java.util.Date date= new java.util.Date();
-
-			config.dsl().update(Tables.QUERY_PERSON)
-			            .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, new Timestamp(date.getTime()))
-			            .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryDto.getQuery().getId()))
-			            .and(Tables.QUERY_PERSON.PERSON_ID.eq(userBean.getUserId()))
-						.execute();
-
-			config.get().commit();
+		    if(queryDto.getFlag() == Flag.IGNORED){
+		        unIgnoreQuery(queryDto);
+		    }
+		    else{
+		        DbUtil.ignoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
+		    }
 			queries = null;
-
 			flagQuery(queryDto, Flag.IGNORED);
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -174,7 +182,7 @@ public class OwnerQueriesBean implements Serializable {
 				newFlag.store();
 			} else if(queryDto.getFlag() == flag) {
 				config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-						.and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userBean.getUserId())).execute();
+						    .and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userBean.getUserId())).execute();
 			} else {
 				config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
 						.where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userBean.getUserId()))

@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryPersonRecord extends UpdatableRecordImpl<QueryPersonRecord> implements Record3<Integer, Integer, Timestamp> {
 
-	private static final long serialVersionUID = -1842871249;
+	private static final long serialVersionUID = -40823437;
 
 	/**
 	 * Setter for <code>public.query_person.query_id</code>. This column along with person_Id will make the primary key. Its also a foreign key here, taken from query table
@@ -62,14 +62,14 @@ public class QueryPersonRecord extends UpdatableRecordImpl<QueryPersonRecord> im
 	}
 
 	/**
-	 * Setter for <code>public.query_person.query_leaving_time</code>. The time when an owner leaves a query
+	 * Setter for <code>public.query_person.query_leaving_time</code>. The time when an owner leaves a query. This column is empty unless the query is ignored
 	 */
 	public void setQueryLeavingTime(Timestamp value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_person.query_leaving_time</code>. The time when an owner leaves a query
+	 * Getter for <code>public.query_person.query_leaving_time</code>. The time when an owner leaves a query. This column is empty unless the query is ignored
 	 */
 	public Timestamp getQueryLeavingTime() {
 		return (Timestamp) getValue(2);

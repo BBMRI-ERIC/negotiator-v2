@@ -57,6 +57,51 @@ import de.samply.bbmri.negotiator.model.QueryStatsDTO;
  */
 public class DbUtil {
 
+
+    /**
+     * Un-ignores a query. Clears the query leaving time from the database.
+     * @param config jooq configuration
+     * @param queryId the query ID
+     * @param userId the owner ID
+     */
+    public static void UnIgnoreQuery(Config config, Integer queryId, int userId) {
+        Timestamp nullObj = null;
+        config.dsl().update(Tables.QUERY_PERSON)
+                    .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, nullObj)
+                    .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryId))
+                    .and(Tables.QUERY_PERSON.PERSON_ID.eq(userId))
+                    .execute();
+
+        try {
+            config.get().commit();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Sets the query leaving time when a query is marked as ignored.
+     * @param config jooq configuration
+     * @param queryId the query ID
+     * @param userId the owner ID
+     */
+    public static void ignoreQuery(Config config, Integer queryId, int userId) {
+        java.util.Date date= new java.util.Date();
+        config.dsl().update(Tables.QUERY_PERSON)
+                              .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, new Timestamp(date.getTime()))
+                              .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryId))
+                              .and(Tables.QUERY_PERSON.PERSON_ID.eq(userId))
+                              .execute();
+
+        try {
+            config.get().commit();
+        } catch (SQLException e) {
+                        // TODO Auto-generated catch block
+        e.printStackTrace();
+        }
+    }
+
     /**
      * Returns a list of queries with the number of biobanks that commented on that query and the last
      * time a comment was made
