@@ -122,11 +122,6 @@ public class OAuth2Filter implements Filter {
                                 KeyLoader.loadKey(config.getHostPublicKey()), config.getClientId(),
                                 config.getClientSecret(), httpRequest.getParameter("code"), getClient());
                         userBean.login(client);
-
-                        if(userBean.getBiobankOwner()){
-                        	httpResponse.sendRedirect(httpRequest.getContextPath() + "/owner/index.xhtml");
-                            return;
-                        }
                     }
                 } catch (InvalidTokenException | InvalidKeyException e) {
                     logger.error("The token was invalid, aborting");

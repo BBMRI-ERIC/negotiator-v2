@@ -43,8 +43,10 @@ public class IndexBean {
     public String init() {
         if(userBean.getBiobankOwner()) {
             return "/owner/index";
-        } else {
+        } else if(userBean.getResearcher()) {
             return "/researcher/index";
+        } else{
+            return "/unauthorized/index";
         }
     }
 
