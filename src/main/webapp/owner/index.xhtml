@@ -124,12 +124,7 @@
                                     <h:outputText title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
                                                   value="#{queryDto.commentCount}"/>
                                 </h:panelGroup>
-
-                                <h:outputText value="#{queryDto.lastCommentTime}" styleClass="queryCreationDate"
-                                              title="#{label['queryview.queryitem.datetime.last.comment']}" rendered="#{queryDto.commentCount > 0}">
-                                    <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
-                                </h:outputText>
-
+                                
                             </h:panelGroup>
                         </h:form>
                     </h:panelGroup>

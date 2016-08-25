@@ -119,7 +119,6 @@ public class OwnerQueriesBean implements Serializable {
 		}
 	}
 
-
 	/**
 	 * Mark query as starred
 	 * @param queryDto
@@ -129,6 +128,8 @@ public class OwnerQueriesBean implements Serializable {
 	}
 
 	/**
+	 * Mark query as archived
+	 * @param queryDto
 	 */
 	public void archiveQuery(OwnerQueryStatsDTO queryDto){
 		flagQuery(queryDto, Flag.ARCHIVED);

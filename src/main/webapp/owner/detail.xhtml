@@ -56,9 +56,11 @@
 							styleClass="col-md-2 control-label pull-left" />
 						<h:panelGroup class="col-md-5 pull-left">
 							<h:panelGroup class="input-group">
-								<h:inputText value="#{sessionBean.filter}" size="20" id="filterInputText"
+								<h:inputText value="#{sessionBean.filter}" size="20"
+									id="filterInputText"
 									pt:placeholder="#{label['queryview.search']}"
-									title="#{label['queryview.tooltip.searchbox']}"	styleClass="form-control" />
+									title="#{label['queryview.tooltip.searchbox']}"
+									styleClass="form-control" />
 								<h:panelGroup class="input-group-btn">
 									<h:commandButton id="addFilterButton"
 										action="#{ownerQueriesDetailBean.addFilter()}"
@@ -91,34 +93,62 @@
 
 			<h:panelGroup id="test" layout="block">
 				<h:form>
-					<ui:repeat var="item" value="#{ownerQueriesDetailBean.queries}">
+					<ui:repeat var="queryDto"
+						value="#{ownerQueriesDetailBean.getQueries()}">
 
 						<h:link outcome="detail" styleClass="deco-none">
-							<f:param name="queryId" value="#{item.query.id}" />
+							<f:param name="queryId" value="#{queryDto.query.id}" />
 
 							<h:panelGroup layout="block"
-								styleClass="panel panel-default #{item.query.id == ownerQueriesDetailBean.queryId ? 'selected-query' : ''}
-								#{item.isArchived() ? 'selected-query' : ''} ">
+								styleClass="panel panel-default #{queryDto.query.id == ownerQueriesDetailBean.queryId ? 'selected-query' : ''}
+								#{queryDto.isArchived() ? 'selected-query' : ''} ">
 
 								<h:panelGroup layout="block" styleClass="panel-heading">
 
-                                #{item.query.title}
+									<h:commandLink
+										styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
+										title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+										action="#{ownerQueriesDetailBean.starQuery(queryDto)}">
+										<i class="fa fa-star"></i>
+									</h:commandLink>
 
-                                <h:panelGroup styleClass="pull-right"
-										rendered="#{item.commentCount > 0}">
+									<h:link outcome="detail"
+										title="#{label['queryview.queryitem.action.clickme']}"
+										style="margin-left: 30px;">
+										<f:param name="queryId" value="#{queryDto.query.id}" />
+										<f:param name="flag" value="#{ownerQueriesBean.flagFilter}" />
+										<h:outputLabel value="#{queryDto.query.title}" />
+									</h:link>
 
-										<h:panelGroup styleClass="badge queryNumberResponsesBadge">
-											<h:outputText
-												title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-												value="#{item.commentCount}" />
+									<h:panelGroup styleClass="pull-right">
+
+										<h:panelGroup layout="block"
+											styleClass="btn-group queryActionButtons pull-right"
+											role="group" aria-label="...">
+
+											<h:commandLink
+												styleClass="#{queryDto.isArchived() ? 'btn btn-success' : 'btn btn-default'}"
+												title="#{queryDto.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
+												action="#{ownerQueriesDetailBean.archiveQuery(queryDto)}">
+												<i class="fa fa-folder-open"></i>
+											</h:commandLink>
+
+											<h:commandLink
+												styleClass="#{queryDto.isIgnored() ? 'btn btn-success' : 'btn btn-default'}"
+												title="#{queryDto.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
+												action="#{ownerQueriesDetailBean.ignoreQuery(queryDto)}">
+												<i class="fa fa-sign-out"></i>
+											</h:commandLink>
+
 										</h:panelGroup>
 
-										<h:outputText value="#{item.lastCommentTime}"
-											styleClass="queryCreationDate"
-											title="#{label['queryview.queryitem.datetime.last.comment']}">
-											<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-										</h:outputText>
-
+										<h:panelGroup styleClass="badge queryNumberResponsesBadge"
+											rendered="#{queryDto.commentCount > 0}">
+											<h:outputText
+												title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
+												value="#{queryDto.commentCount}" />
+										</h:panelGroup>
+										
 									</h:panelGroup>
 
 								</h:panelGroup>
@@ -127,16 +157,16 @@
 								<h:panelGroup layout="block" styleClass="panel-body">
 									<h:panelGroup layout="block" styleClass="row">
 										<h:panelGroup layout="block" styleClass="col-md-2">
-											<bbmricc:avatar person="#{item.queryAuthor}" />
+											<bbmricc:avatar person="#{queryDto.queryAuthor}" />
 										</h:panelGroup>
 
 										<h:panelGroup styleClass="col-md-10">
 											<h:panelGroup layout="block" styleClass="row queryOwner">
-                                            #{item.queryAuthor.authName}
+                                            #{queryDto.queryAuthor.authName}
                                         </h:panelGroup>
 											<h:panelGroup layout="block" styleClass="row">
 												<h:panelGroup layout="block" styleClass="col-md-12">
-                                                #{item.query.text}
+                                                #{queryDto.query.text}
                                             </h:panelGroup>
 
 											</h:panelGroup>
@@ -145,7 +175,7 @@
 												<h:panelGroup layout="block" styleClass="col-md-12">
 													<h:panelGroup styleClass="pull-right">
 
-														<h:outputText value="#{item.query.queryCreationTime}"
+														<h:outputText value="#{queryDto.query.queryCreationTime}"
 															title="#{label['queryview.queryitem.datetime.creation']}">
 															<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 														</h:outputText>
@@ -223,7 +253,7 @@
 
 			</h:panelGroup>
 
- 		</h:panelGroup>
+		</h:panelGroup>
 
 	</ui:define>
 
