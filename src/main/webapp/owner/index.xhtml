@@ -38,7 +38,7 @@
     
     <f:metadata>
 		<f:viewParam name="flag" value="#{ownerQueriesBean.flagFilter}" />
-		<f:viewAction action="#{ownerQueriesBean.clearAllFilters}" />
+		<f:viewAction action="#{sessionBean.clearAllFilters()}" />
 	</f:metadata>
 		
         
@@ -84,7 +84,7 @@
                 <h3>#{label['queryview.noQueries']}</h3>
             </h:panelGroup>
 
-            <ui:repeat var="queryDto" value="#{ownerQueriesBean.queries}">
+            <ui:repeat var="queryDto" value="#{ownerQueriesBean.getQueries()}">
 
                 <h:panelGroup layout="block" styleClass="panel panel-default #{queryDto.isArchived() ? 'selected-query' : ''} ">
                     <h:panelGroup layout="block" styleClass="panel-heading">

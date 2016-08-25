@@ -84,14 +84,6 @@ public class OwnerQueriesBean implements Serializable {
 
 	}
 
-	 /**
-     * Removes all the filters at once.
-     */
-    public void clearAllFilters() {
-        sessionBean.clearAllFilters();
-        getQueries();
-    }
-
     /**
      * Un-Ignore a query as a biobank owner.
      *
