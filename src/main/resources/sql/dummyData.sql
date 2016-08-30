@@ -14,7 +14,8 @@ INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, locati
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (6, 'https://auth-dev.mitro.dkfz.de/users/8', 'BBMRI Researcher', 'researcher.bbmri@bbmri.org', NULL, NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (7, 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL, 6);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (8, 'https://auth-dev.mitro.dkfz.de/users/19', 'Saher Maqsood', 's.maqsood@dkfz.de', NULL, 6);
-SELECT pg_catalog.setval('person_id_seq', 8, true);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL, 6);
+SELECT pg_catalog.setval('person_id_seq', 9, true);
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id) VALUES (1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1);
 INSERT INTO query(id, title, text, query_creation_time, researcher_id) VALUES (2, 'Colon cancer', 'Do you have 50 samples on samples of Colorectal cancer as a primary diagnosis (C18.1 to C18.7)?', '2014-05-01 00:00:00', 6);
@@ -32,6 +33,10 @@ INSERT INTO query_person(query_id, person_id) VALUES (1, 8);
 INSERT INTO query_person(query_id, person_id) VALUES (2, 8);
 INSERT INTO query_person(query_id, person_id) VALUES (3, 8);
 INSERT INTO query_person(query_id, person_id) VALUES (4, 8);
+INSERT INTO query_person(query_id, person_id) VALUES (1, 9);
+INSERT INTO query_person(query_id, person_id) VALUES (2, 9);
+INSERT INTO query_person(query_id, person_id) VALUES (3, 9);
+INSERT INTO query_person(query_id, person_id) VALUES (4, 9);
 
 INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');
 SELECT pg_catalog.setval('tag_id_seq', 1, true);
@@ -57,3 +62,5 @@ INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 6);
 INSERT INTO role(role_type, person_id) VALUES ('OWNER', 7);
 INSERT INTO role(role_type, person_id) VALUES ('OWNER', 8);
 INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 8);
+INSERT INTO role(role_type, person_id) VALUES ('OWNER', 9);
+INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 9);

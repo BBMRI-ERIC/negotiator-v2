@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:mailSending
+    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+    xmlns:ns1="http://schema.samply.de/config/MailSending"
+    xsi:schemaLocation="http://schema.samply.de/config/MailSending http://schema.samply.de/config/MailSending.xsd">
+    <ns1:host>mailhost.dkfz-heidelberg.de</ns1:host>
+    <ns1:protocol>smtp</ns1:protocol>
+    <ns1:fromAddress>noreply@www12.inet.dkfz-heidelberg.de</ns1:fromAddress>
+    <ns1:fromName>bbmri.notification</ns1:fromName>
+    <ns1:user></ns1:user>
+    <ns1:password></ns1:password>
+    <ns1:port>25</ns1:port>
+    <ns1:templateFolder>resources/emailTemplates/</ns1:templateFolder>
+</ns1:mailSending>

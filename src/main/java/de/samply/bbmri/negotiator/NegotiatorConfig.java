@@ -37,6 +37,7 @@ import org.xml.sax.SAXException;
 import de.samply.common.config.OAuth2Client;
 import de.samply.common.config.ObjectFactory;
 import de.samply.common.config.Postgresql;
+import de.samply.common.mailing.MailSending;
 import de.samply.config.util.JAXBUtil;
 
 /**
@@ -45,14 +46,19 @@ import de.samply.config.util.JAXBUtil;
 public class NegotiatorConfig {
 
     /**
-     * The configuration file for the OAuth2 configuration.
+     * OAuth2 configuration file
      */
 	public static final String FILE_OAUTH = "bbmri.negotiator.oauth2.xml";
 
     /**
-     * The configuration file for the postgresql configuration.
+     * Postgresql configuration file
      */
     public static final String FILE_POSTGRESQL = "bbmri.negotiator.postgres.xml";
+    
+    /**
+     * Mail configuration file
+     */
+    public static final String FILE_MAIL = "bbmri.negotiator.mail.xml";
 
     /** The singleon instance. */
     private static NegotiatorConfig instance = new NegotiatorConfig();
@@ -87,6 +93,11 @@ public class NegotiatorConfig {
     private boolean developMode = false;
 
     /**
+     * Mail configuration
+     */
+	private MailSending mailConfig;
+
+    /**
      * Instantiates a new negotiator config.
      */
     private NegotiatorConfig() {
@@ -94,7 +105,7 @@ public class NegotiatorConfig {
     }
 
     /**
-     * Returns the JAXBContext for Postgresql and OAuth2Client classes. Creates
+     * Returns the JAXBContext for Postgresql, OAuth2Client and MailSending classes. Creates
      * a new one if necessary.
      *
      * @return the JAXB context
@@ -102,7 +113,7 @@ public class NegotiatorConfig {
      */
     private static synchronized JAXBContext getJAXBContext() throws JAXBException {
         if (jaxbContext == null) {
-            jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+            jaxbContext = JAXBContext.newInstance(ObjectFactory.class, de.samply.common.mailing.ObjectFactory.class);
         }
         return jaxbContext;
     }
@@ -149,10 +160,12 @@ public class NegotiatorConfig {
 
         instance.postgresql = JAXBUtil.findUnmarshall(FILE_POSTGRESQL, getJAXBContext(), Postgresql.class,
                 instance.projectName, instance.fallback);
+        
+        instance.mailConfig = JAXBUtil.findUnmarshall(FILE_MAIL, getJAXBContext(), MailSending.class,
+                instance.projectName, instance.fallback);
 
-        instance.developMode = "true".equals(System.getProperty("de.samply.development"));
     }
-
+  
     /**
      * Gets the oauth2 client configuration
      *
@@ -179,6 +192,14 @@ public class NegotiatorConfig {
      */
     public Postgresql getPostgresql() {
         return postgresql;
+    }
+    
+    /**
+     * Get current mail sender configuration
+     * @return
+     */
+    public MailSending getMailConfig() {
+    	return mailConfig;
     }
 
     public void setMaintenanceMode(boolean maintenanceMode) {
