@@ -178,8 +178,6 @@ public class NegotiatorConfig {
 
     /**
      * If true, the maintenance filter will return 503 for every request.
-     */ /**
-     * Checks if is maintenance mode.
      *
      * @return true, if is maintenance mode
      */
