@@ -54,10 +54,11 @@ public class AddCommentBean extends Observable {
 	 * @return
 	 */
 	public String saveComment(Query query) {
-    	DbUtil.addComment(query.getId(),  userBean.getUserId(), comment);
+		DbUtil.addComment(query.getId(),  userBean.getUserId(), comment);
     	setChanged();
     	notifyObservers(query);
-		return "";
+    	
+    	return FacesContext.getCurrentInstance().getViewRoot().getViewId() + "?includeViewParams=true&faces-redirect=true";
     }
 	
 	/**
@@ -73,5 +74,4 @@ public class AddCommentBean extends Observable {
 		
 		return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(),context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(), requestURL.toString());
 	}
-
 }
