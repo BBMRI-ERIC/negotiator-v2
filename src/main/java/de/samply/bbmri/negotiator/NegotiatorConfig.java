@@ -164,6 +164,7 @@ public class NegotiatorConfig {
         instance.mailConfig = JAXBUtil.findUnmarshall(FILE_MAIL, getJAXBContext(), MailSending.class,
                 instance.projectName, instance.fallback);
 
+        instance.developMode = "true".equals(System.getProperty("de.samply.development"));
     }
   
     /**
