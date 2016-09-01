@@ -61,7 +61,7 @@
 
                 <h:panelGroup layout="block" styleClass="pull-right">
 
-                    <h:commandButton action="#{addCommentBean.saveComment(ownerQueriesDetailBean.selectedQuery)}"
+                    <h:commandButton action="#{addCommentBean.saveComment(cc.attrs.query)}"
                                      value="#{label['querydetail.action.addComment.buttontext']}"
                                      title="#{label['querydetail.action.addComment']}" styleClass="btn btn-primary" />
 
