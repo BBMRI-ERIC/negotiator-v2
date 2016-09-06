@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.docuverse.identicon.IdenticonUtil;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -59,7 +60,16 @@ public class ImageServlet extends HttpServlet {
                             PersonRecord personRecord = config.dsl().selectFrom(Tables.PERSON).where(Tables.PERSON.ID.eq(key))
                                     .fetchOneInto(Tables.PERSON);
 
-                            if (personRecord != null && personRecord.getPersonImage() != null) {
+                            if (personRecord != null) {
+                                /**
+                                 * If the person doesn't have an image yet, generate one and store it in the database
+                                 */
+                                if(personRecord.getPersonImage() == null) {
+                                    personRecord.setPersonImage(IdenticonUtil.generateIdenticon(256));
+                                    personRecord.store();
+                                    config.get().commit();
+                                }
+
                                 return personRecord.getPersonImage();
                             } else {
                                 /**
