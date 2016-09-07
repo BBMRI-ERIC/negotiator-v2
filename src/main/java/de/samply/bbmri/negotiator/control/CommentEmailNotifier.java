@@ -16,7 +16,7 @@ public class CommentEmailNotifier implements Observer {
 
 	@Override
 	public void update(Observable addCommentBean, Object query) {
-		sendEmailNotification((AddCommentBean)addCommentBean, (Query) query);		
+		sendEmailNotification((CommentBean)addCommentBean, (Query) query);		
 	}
 	
 	/**
@@ -24,7 +24,7 @@ public class CommentEmailNotifier implements Observer {
 	 * @param commentBean
 	 * @param query
 	 */
-	private void sendEmailNotification(AddCommentBean commentBean, Query query) {
+	private void sendEmailNotification(CommentBean commentBean, Query query) {
 		
 		EmailBuilder builder = MailUtil.initializeBuilder();
 	    builder.addTemplateFile("NewCommentNotification.soy", "Notification");

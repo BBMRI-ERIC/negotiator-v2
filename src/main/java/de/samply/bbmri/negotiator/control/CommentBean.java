@@ -16,7 +16,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 @ManagedBean
 @ViewScoped
-public class AddCommentBean extends Observable {
+public class CommentBean extends Observable {
 	
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
