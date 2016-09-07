@@ -55,13 +55,13 @@
 
                 <div class="form-group">
 
-                    <h:inputTextarea value="#{addCommentBean.comment}" styleClass="form-control" rows="5" />
+                    <h:inputTextarea value="#{commentBean.comment}" styleClass="form-control" rows="5" />
 
                 </div>
 
                 <h:panelGroup layout="block" styleClass="pull-right">
 
-                    <h:commandButton action="#{addCommentBean.saveComment(cc.attrs.query)}"
+                    <h:commandButton action="#{commentBean.saveComment(cc.attrs.query)}"
                                      value="#{label['querydetail.action.addComment.buttontext']}"
                                      title="#{label['querydetail.action.addComment']}" styleClass="btn btn-primary" />
 
