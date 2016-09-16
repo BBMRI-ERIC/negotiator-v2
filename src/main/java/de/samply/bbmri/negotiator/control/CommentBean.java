@@ -42,6 +42,9 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 @ManagedBean
 @ViewScoped
 public class CommentBean extends Observable {
+    
+    
+    private static final long serialVersionUID = 1L;
 	
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
