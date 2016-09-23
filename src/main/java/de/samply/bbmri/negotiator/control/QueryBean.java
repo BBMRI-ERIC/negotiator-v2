@@ -26,7 +26,6 @@
 
 package de.samply.bbmri.negotiator.control;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,17 +40,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.pdfbox.preflight.Format;
-import org.apache.pdfbox.preflight.PreflightDocument;
-import org.apache.pdfbox.preflight.ValidationResult;
-import org.apache.pdfbox.preflight.ValidationResult.ValidationError;
-import org.apache.pdfbox.preflight.exception.SyntaxValidationException;
-import org.apache.pdfbox.preflight.parser.PreflightParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.MailUtil;
 
 @ManagedBean
@@ -122,45 +113,11 @@ public class QueryBean {
         if (!"application/pdf".equals(file.getContentType())) {  
             msgs.add(new FacesMessage("not a pdf file"));
         }
-        if(!validPDF(FileUtil.getUploadAsFile(file, FileUtil.getFileName(file)))) {
-            msgs.add(new FacesMessage("this pdf file has improper format or is corrupt"));
-        }
         if (!msgs.isEmpty()) {
             throw new ValidatorException(msgs);
         }
     }
     
-    
-    /**
-     * Validate PDF file against the PDF/A-1b standard
-     * @param file
-     * @return
-     * @throws IOException
-     */
-    private boolean validPDF(File file) throws IOException {
-      ValidationResult result = null;
-     
-      try {
-          PreflightParser parser = new PreflightParser(file);
-          parser.parse(Format.PDF_A1A);
-          PreflightDocument document = parser.getPreflightDocument();
-          document.validate();
-          result = document.getResult();
-          document.close();
-      } 
-      catch (SyntaxValidationException e) {
-          result = e.getResult();
-      }
-      
-      if(!result.isValid()) {
-          logger.error("The uploaded file is not valid, error(s) :");
-          for (ValidationError error : result.getErrorsList()) 
-              logger.error(error.getErrorCode() + " : " + error.getDetails());
-          return false;
-      }
-      
-      return true;
-  }
   
   //TODO
   public String saveQuery() {
