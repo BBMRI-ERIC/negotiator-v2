@@ -25,17 +25,18 @@
  */
 package de.samply.bbmri.negotiator.filter;
 
-import de.samply.auth.rest.Scope;
-import de.samply.auth.utils.OAuth2ClientConfig;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.control.UserBean;
+import java.io.IOException;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
+
+import de.samply.auth.rest.Scope;
+import de.samply.auth.utils.OAuth2ClientConfig;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.control.UserBean;
 
 /**
  * This filter checks if there is a user logged in or not. If no valid user is
@@ -60,6 +61,17 @@ public class AuthorizationFilter implements Filter {
             throws ServletException, IOException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
+
+        String path = request.getRequestURI();
+
+        /**
+         * Skip /api/.*
+         */
+        if(path.startsWith(((HttpServletRequest) req).getContextPath() + "/api/")) {
+            chain.doFilter(req, res);
+            return;
+        }
+
         HttpSession session = request.getSession(true);
 
         UserBean userBean = (UserBean) session.getAttribute("userBean");
@@ -67,7 +79,6 @@ public class AuthorizationFilter implements Filter {
         /**
          * Skip maintenance.xhtml
          */
-        String path = ((HttpServletRequest) request).getRequestURI();
 
         if(path.endsWith("maintenance.xhtml")) {
             chain.doFilter(req, res);
