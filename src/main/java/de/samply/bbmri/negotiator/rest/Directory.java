@@ -60,7 +60,7 @@ public class Directory {
     @Path("/create_query")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public CreateQueryResultDTO test(QueryDTO query, @Context HttpServletRequest request) {
+    public CreateQueryResultDTO createQuery(QueryDTO query, @Context HttpServletRequest request) {
         try {
             if(query.getFilter().size() < 1 || query.getSelection().size() < 1) {
                 throw new BadRequestException();
