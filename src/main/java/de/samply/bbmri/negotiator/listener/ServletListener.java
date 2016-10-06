@@ -25,24 +25,28 @@
  */
 package de.samply.bbmri.negotiator.listener;
 
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.config.util.FileFinderUtil;
-import de.samply.string.util.StringUtil;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
+import java.io.FileNotFoundException;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
+import java.util.Timer;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.FileNotFoundException;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Enumeration;
+
+import org.apache.logging.log4j.core.config.Configurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.config.util.FileFinderUtil;
+import de.samply.string.util.StringUtil;
 
 /**
  * Initializes the application:
@@ -56,6 +60,8 @@ public class ServletListener implements ServletContextListener {
 
     /** The Constant logger. */
     private static final Logger logger = LoggerFactory.getLogger(ServletListener.class);
+
+    private static Timer timer;
 
     /**
      * Context initialized.
@@ -84,6 +90,12 @@ public class ServletListener implements ServletContextListener {
              */
             NegotiatorConfig.initialize(projectName, fallback);
 
+
+            logger.info("Starting directory synchronize task timer");
+
+            timer = new Timer();
+            timer.schedule(new DirectorySynchronizeTask(), 10000, 1000 * 60 * 60);
+
             logger.info("Context initialized");
         } catch (FileNotFoundException | JAXBException | SAXException | ParserConfigurationException
                 | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
@@ -99,6 +111,12 @@ public class ServletListener implements ServletContextListener {
      */
     @Override
     public void contextDestroyed(ServletContextEvent event) {
+        logger.debug("Undeploying application");
+        if(timer != null) {
+            timer.cancel();
+            logger.debug("Canceling directory synchronize timer");
+        }
+
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
