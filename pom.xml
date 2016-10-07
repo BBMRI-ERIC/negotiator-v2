@@ -37,6 +37,12 @@
         </dependency>
 
         <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>directory-client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-servlet</artifactId>
         </dependency>

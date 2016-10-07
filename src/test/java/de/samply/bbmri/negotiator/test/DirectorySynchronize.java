@@ -24,47 +24,32 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator;
+package de.samply.bbmri.negotiator.test;
 
-import java.util.List;
-import java.util.TimerTask;
+import static org.junit.Assert.assertTrue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.sql.SQLException;
 
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.directory.client.DirectoryClient;
-import de.samply.directory.client.dto.BiobankDTO;
+import org.junit.Test;
+
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
+import de.samply.bbmri.negotiator.jooq.Tables;
 
 /**
- * Handles the perdiodical synchonization between the directory and our negotiator.
+ * Runs the synchronization ones and checks if there are more than 10 locations.
  */
-public class DirectorySynchronizeTask extends TimerTask {
+public class DirectorySynchronize {
 
-    private static final String BASE_URL = "https://directory-molgenis.bbmri-eric.eu";
+    @Test
+    public void trySynchronize() throws SQLException {
+        DirectorySynchronizeTask task = new DirectorySynchronizeTask();
+        task.run();
 
-    /**
-     *
-     */
-    private final static Logger logger = LoggerFactory.getLogger(DirectorySynchronizeTask.class);
-
-    @Override
-    public void run() {
         try(Config config = ConfigFactory.get()) {
-            DirectoryClient client = new DirectoryClient(BASE_URL);
-
-            logger.info("Starting synchronization with the directory");
-
-            List<BiobankDTO> allBiobanks = client.getAllBiobanks();
-
-            for(BiobankDTO dto : allBiobanks) {
-                DbUtil.synchronizeLocation(config, dto);
-            }
-
-            logger.info("Synchronization with the directory finished.");
-            config.commit();
-        } catch (Exception e) {
-            logger.error("Synchronization failed", e);
+            assertTrue(config.dsl().selectFrom(Tables.LOCATION).fetch().size() > 10);
         }
     }
+
 }

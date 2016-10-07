@@ -33,13 +33,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.jooq.Condition;
-import org.jooq.Field;
-import org.jooq.JoinType;
-import org.jooq.Record;
-import org.jooq.Result;
-import org.jooq.Table;
+import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
@@ -49,14 +46,18 @@ import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.directory.client.dto.BiobankDTO;
 
 /**
  * The database util for basic queries.
  */
 public class DbUtil {
+
+    private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
 
     /**
      * Get the JSON query from the database.
@@ -292,4 +293,38 @@ public class DbUtil {
 
 		return target;
 	}
+
+    /**
+     * Returns the location for the given directory ID.
+     * @param directoryId
+     */
+    public static LocationRecord getLocation(Config config, String directoryId) {
+        return config.dsl().selectFrom(Tables.LOCATION).where(
+                Tables.LOCATION.DIRECTORY_ID.eq(directoryId)
+            ).fetchOne();
+    }
+
+    /**
+     * Synchronizes the given Biobank with the Location in the database.
+     * @param config
+     * @param dto
+     */
+    public static void synchronizeLocation(Config config, BiobankDTO dto) {
+        LocationRecord record = DbUtil.getLocation(config, dto.getId());
+
+        if(record == null) {
+            /**
+             * Create the location, because it doesnt exist yet
+             */
+            logger.debug("Found new biobank, with id {}, adding it to the database" , dto.getId());
+            record = config.dsl().newRecord(Tables.LOCATION);
+            record.setDirectoryId(dto.getId());
+        } else {
+            logger.debug("Biobank {} already exists, updating fields");
+        }
+
+        record.setDescription(dto.getDescription());
+        record.setName(dto.getName());
+        record.store();
+    }
 }

@@ -50,7 +50,7 @@ import de.samply.common.upgrade.SamplyUpgradeException;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses(DatabaseSetup.class)
+@Suite.SuiteClasses({DatabaseSetup.class, DirectorySynchronize.class})
 public class TestSuite {
 
     private static Postgresql postgresql;
