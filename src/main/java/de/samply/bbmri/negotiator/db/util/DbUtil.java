@@ -320,7 +320,7 @@ public class DbUtil {
             record = config.dsl().newRecord(Tables.LOCATION);
             record.setDirectoryId(dto.getId());
         } else {
-            logger.debug("Biobank {} already exists, updating fields");
+            logger.debug("Biobank {} already exists, updating fields", dto.getId());
         }
 
         record.setDescription(dto.getDescription());
