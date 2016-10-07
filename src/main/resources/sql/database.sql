@@ -43,6 +43,7 @@ CREATE TABLE "query" (
     "text" TEXT,
     "query_creation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "researcher_id" INTEGER NOT NULL,
+    "json_text" JSONB,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("researcher_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -136,10 +137,10 @@ COMMENT ON COLUMN "flagged_query"."flag" IS 'The flag of the comment. One of "AR
 CREATE TABLE "query_person" (
     "query_id" INTEGER NOT NULL,
     "person_id" INTEGER NOT NULL,
-	"query_leaving_time" TIMESTAMP WITHOUT TIME ZONE,
+    "query_leaving_time" TIMESTAMP WITHOUT TIME ZONE,
     PRIMARY KEY("query_id", "person_id"),
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "queryIdIndexQueryPerson" ON "query_person" (query_id);
 CREATE INDEX "personIdIndexQueryPerson" ON "query_person" (person_id);
@@ -152,11 +153,27 @@ COMMENT ON COLUMN "query_person".query_leaving_time IS 'The time when an owner l
 
 
 CREATE TABLE "role" (
-	"role_type" "role_type" NOT NULL,
-	"person_id" INTEGER NOT NULL REFERENCES "person" ("id"),
-	PRIMARY KEY("role_type", "person_id"),
-	FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    "role_type" "role_type" NOT NULL,
+    "person_id" INTEGER NOT NULL REFERENCES "person" ("id"),
+    PRIMARY KEY("role_type", "person_id"),
+    FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
+CREATE INDEX "personIdIndexRole" ON "role" (person_id);
+
 COMMENT ON TABLE "role" IS 'Table for different roles of a user.';
 COMMENT ON COLUMN "role".role_type IS 'This column along with the person_id column will make the primary key. It describes the role a user can have. A user can have more than one role';
 COMMENT ON COLUMN "role".person_id IS 'This column along with role_type will make the primary key. Its also a foreign key here, taken from person table';
+
+
+CREATE TABLE "json_query" (
+    "id" SERIAL NOT NULL,
+    "json_text" TEXT NOT NULL,
+    PRIMARY KEY ("id")
+);
+
+COMMENT ON TABLE "json_query" IS 'query table to contain json text queries';
+COMMENT ON COLUMN "json_query"."id" IS 'primary key';
+COMMENT ON COLUMN "json_query"."json_text" IS 'text of query in json format';
+
+
+

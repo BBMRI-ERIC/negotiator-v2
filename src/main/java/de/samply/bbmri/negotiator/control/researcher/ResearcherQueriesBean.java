@@ -26,21 +26,27 @@
 
 package de.samply.bbmri.negotiator.control.researcher;
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.List;
+
+import org.jooq.Result;
+
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.model.CommentPersonDTO;
+import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.bbmri.negotiator.model.StructuredQueryDTO;
 
 /**
  * Manages the query view for researchers
@@ -50,11 +56,11 @@ import java.util.List;
 public class ResearcherQueriesBean implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	private List<QueryStatsDTO> queries;
+    private List<QueryStatsDTO> queries;
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -75,15 +81,38 @@ public class ResearcherQueriesBean implements Serializable {
     private String commentText;
 
     /**
+     * The input textarea for the user to make a comment.
+     */
+    private List<StructuredQueryDTO> structuredQuery;
+
+    /**
      * Initializes this bean by loading all queries for the current researcher.
      */
     @PostConstruct
     public void init() {
         try(Config config = ConfigFactory.get()) {
+            String jsonQuery = "Some json text received in proper format from paul";
             queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId());
+            createQuery(jsonQuery);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Creates a new structured query in Database
+     * @param jsonQuery - json text received from the directory
+     * @return The temporary Query id to be sent to perun.
+     */
+    public Integer createQuery(String jsonQuery) {
+        Integer temporaryQueryId = null;
+        try(Config config = ConfigFactory.get()) {
+            Result<JsonQueryRecord> id =  DbUtil.InsertQuery(config, jsonQuery);
+            temporaryQueryId = id.getValue(0, Tables.JSON_QUERY.ID);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return temporaryQueryId;
     }
 
     /**
@@ -138,5 +167,13 @@ public class ResearcherQueriesBean implements Serializable {
 
     public void setCommentText(String commentText) {
         this.commentText = commentText;
+    }
+
+    public List<StructuredQueryDTO> getStructuredQuery() {
+        return structuredQuery;
+    }
+
+    public void setStructuredQuery(List<StructuredQueryDTO> structuredQuery) {
+        this.structuredQuery = structuredQuery;
     }
 }

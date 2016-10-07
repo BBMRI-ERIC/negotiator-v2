@@ -48,6 +48,7 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
@@ -57,6 +58,46 @@ import de.samply.bbmri.negotiator.model.QueryStatsDTO;
  */
 public class DbUtil {
 
+    /**
+     * Get the JSON query from the database.
+     * @param config JOOQ configuration
+     * @param queryId the query ID
+     * @return JSON string
+     */
+    public static String getJsonQuery(Config config, Integer queryId) {
+        String jsonQuery = null;
+        try {
+            jsonQuery = config.dsl().selectFrom(Tables.QUERY)
+                    .where(Tables.QUERY.ID.eq(queryId))
+                    .fetchOne(Tables.QUERY.JSON_TEXT).toString();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return jsonQuery;
+    }
+
+    /**
+     * Insert JSON text the database.
+     * @param config JOOQ configuration
+     * @param jsonQuery the JSON query to be inserted
+     * @return the primary key/sequence of the inserted query. This will be sent to the perun.
+     */
+    public static Result<JsonQueryRecord> InsertQuery(Config config, String jsonQuery) {
+        Result<JsonQueryRecord> id = null;
+        try {
+        id = config.dsl().insertInto(Tables.JSON_QUERY)
+                    .set(Tables.JSON_QUERY.JSON_TEXT, jsonQuery)
+                    .returning(Tables.JSON_QUERY.ID)
+                    .fetch();
+        config.get().commit();
+
+        } catch (SQLException e){
+            // TODO AUTO-GENERATED CATCH BLOCK
+            e.printStackTrace();
+
+        }
+        return id;
+    }
 
     /**
      * Un-ignores a query. Clears the query leaving time from the database.

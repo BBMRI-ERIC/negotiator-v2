@@ -23,13 +23,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = 161976881;
+	private static final long serialVersionUID = -1057516756;
 
 	private Integer   id;
 	private String    title;
 	private String    text;
 	private Timestamp queryCreationTime;
 	private Integer   researcherId;
+	private Object    jsonText;
 
 	public Query() {}
 
@@ -39,6 +40,7 @@ public class Query implements Serializable {
 		this.text = value.text;
 		this.queryCreationTime = value.queryCreationTime;
 		this.researcherId = value.researcherId;
+		this.jsonText = value.jsonText;
 	}
 
 	public Query(
@@ -46,13 +48,15 @@ public class Query implements Serializable {
 		String    title,
 		String    text,
 		Timestamp queryCreationTime,
-		Integer   researcherId
+		Integer   researcherId,
+		Object    jsonText
 	) {
 		this.id = id;
 		this.title = title;
 		this.text = text;
 		this.queryCreationTime = queryCreationTime;
 		this.researcherId = researcherId;
+		this.jsonText = jsonText;
 	}
 
 	public Integer getId() {
@@ -93,5 +97,13 @@ public class Query implements Serializable {
 
 	public void setResearcherId(Integer researcherId) {
 		this.researcherId = researcherId;
+	}
+
+	public Object getJsonText() {
+		return this.jsonText;
+	}
+
+	public void setJsonText(Object jsonText) {
+		this.jsonText = jsonText;
 	}
 }

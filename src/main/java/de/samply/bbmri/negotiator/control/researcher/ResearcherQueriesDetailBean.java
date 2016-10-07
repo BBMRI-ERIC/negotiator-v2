@@ -34,14 +34,16 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
+import com.google.gson.Gson;
+
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.bbmri.negotiator.model.StructuredQueryDTO;
 
 /**
  * Manages the query detail view for owners
@@ -49,116 +51,143 @@ import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 @ManagedBean
 @ViewScoped
 public class ResearcherQueriesDetailBean implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
-		
-	@ManagedProperty(value = "#{userBean}")
-	private UserBean userBean;
-	
-	/**
+
+    private static final long serialVersionUID = 1L;
+
+    @ManagedProperty(value = "#{userBean}")
+    private UserBean userBean;
+
+    /**
      * The QueryStatsDTO object used to get all the information for queries.
-     */	
-	private List<QueryStatsDTO> queries;
-	
-	/**
+     */
+    private List<QueryStatsDTO> queries;
+
+    /**
      * The id of the query selected from owner.index.xhtml page, if there is one
      */
-	private int queryId;
-		
-	/**
+    private int queryId;
+
+    /**
      * The selected query, if there is one
      */
-	private Query selectedQuery = null;
-	
+    private Query selectedQuery = null;
 
-	 /**
+
+     /**
      * The input text box for the user to make a comment.
      */
     private String commentText;
-	
-	/**
+
+    /**
      * The list of comments for the selected query
      */
     private List<CommentPersonDTO> comments;
-	
+
     /**
-     * initialises the page by getting all the comments for a selected(clicked on) query 
+     * The structured query object
      */
-	public void initialize() {
-		try(Config config = ConfigFactory.get()) {
+    private StructuredQueryDTO structuredQuery = null;
+
+    /**
+     * initialises the page by getting all the comments for a selected(clicked on) query
+     */
+    public void initialize() {
+        try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
-            
+            setStructuredQuery();
+
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
             for(QueryStatsDTO query : getQueries()) {
-            	if(query.getQuery().getId() == queryId) {
-            		selectedQuery = query.getQuery();
-            	}
+                if(query.getQuery().getId() == queryId) {
+                    selectedQuery = query.getQuery();
+                }
             }
-            
         } catch (SQLException e) {
             e.printStackTrace();
         }
-	}	
-	
-	/**
-	 * Returns the list of queries in which the current bio bank owner is a part of(all queries that on owner can see)
-	 * 
-	 * @return queries
-	 */
-	public List<QueryStatsDTO> getQueries() {
-		if (queries == null) {
-			try (Config config = ConfigFactory.get()) {				
-				 queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId());				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return queries;
-	}
+    }
 
-	public void setQueries(List<QueryStatsDTO> queries) {
-		this.queries = queries;
-	}
-		
-	public int getQueryId() {
-		return queryId;
-	}
+    /**
+     * Read structured query from DataBase and make a static object. This function will be changed for dynamic objects that we will eventually use.
+     * @param 
+     */
+    public void setStructuredQuery() {
+        String jsonText = null;
+        try(Config config = ConfigFactory.get()) {
+            jsonText = DbUtil.getJsonQuery(config, queryId);
+            Gson gson = new Gson();
+            structuredQuery = gson.fromJson(jsonText, StructuredQueryDTO.class);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
-	public void setQueryId(int queryId) {
-		this.queryId = queryId;
-	}
+    }
 
-	public Query getSelectedQuery() {
-		return selectedQuery;
-	}
+    /**
+     * Returns the list of queries in which the current bio bank owner is a part of(all queries that on owner can see)
+     *
+     * @return queries
+     */
+    public List<QueryStatsDTO> getQueries() {
+        if (queries == null) {
+            try (Config config = ConfigFactory.get()) {
+                 queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return queries;
+    }
 
-	public void setSelectedQuery(Query selectedQuery) {
-		this.selectedQuery = selectedQuery;
-	}
+    public void setQueries(List<QueryStatsDTO> queries) {
+        this.queries = queries;
+    }
 
-	public List<CommentPersonDTO> getComments() {
-		return comments;
-	}
+    public int getQueryId() {
+        return queryId;
+    }
 
-	public void setComments(List<CommentPersonDTO> comments) {
-		this.comments = comments;
-	}		
-	
-	public UserBean getUserBean() {
-		return userBean;
-	}
+    public void setQueryId(int queryId) {
+        this.queryId = queryId;
+    }
 
-	public void setUserBean(UserBean userBean) {
-		this.userBean = userBean;
-	}
-	
-	public String getCommentText() {
-		return commentText;
-	}
+    public Query getSelectedQuery() {
+        return selectedQuery;
+    }
 
-	public void setCommentText(String commentText) {
-		this.commentText = commentText;
-	}
+    public void setSelectedQuery(Query selectedQuery) {
+        this.selectedQuery = selectedQuery;
+    }
+
+    public List<CommentPersonDTO> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<CommentPersonDTO> comments) {
+        this.comments = comments;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
+
+    public String getCommentText() {
+        return commentText;
+    }
+
+    public void setCommentText(String commentText) {
+        this.commentText = commentText;
+    }
+
+    public StructuredQueryDTO getStructuredQuery() {
+        return structuredQuery;
+    }
+
+
 }

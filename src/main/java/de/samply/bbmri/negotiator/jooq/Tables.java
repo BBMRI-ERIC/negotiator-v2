@@ -6,6 +6,7 @@ package de.samply.bbmri.negotiator.jooq;
 
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
+import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
@@ -39,6 +40,11 @@ public class Tables {
 	 * Table for queries that are flagged/bookmarked. bookmark options are starred, archived and ignored.
 	 */
 	public static final FlaggedQuery FLAGGED_QUERY = de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery.FLAGGED_QUERY;
+
+	/**
+	 * query table to contain json text queries
+	 */
+	public static final JsonQuery JSON_QUERY = de.samply.bbmri.negotiator.jooq.tables.JsonQuery.JSON_QUERY;
 
 	/**
 	 * Table to store locations of owner
