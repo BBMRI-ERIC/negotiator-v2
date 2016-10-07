@@ -1,9 +1,9 @@
-INSERT INTO location(id, name) VALUES (1, 'Biobank Hamburg');
-INSERT INTO location(id, name) VALUES (2, 'Biobank Berlin');
-INSERT INTO location(id, name) VALUES (3, 'Biobank München');
-INSERT INTO location(id, name) VALUES (4, 'Biobank Münster');
-INSERT INTO location(id, name) VALUES (5, 'Biobank Mainz');
-INSERT INTO location(id, name) VALUES (6, 'Biobank Heidelberg');
+INSERT INTO location(id, directory_id, name, description) VALUES (1, '1', 'Biobank Hamburg', 'The biobank for sample from the DKTK in Hamburg managed by the HU');
+INSERT INTO location(id, directory_id, name, description) VALUES (2, '2', 'Biobank Berlin', 'The biobank for tissue samples in Berlin managed by the Charite');
+INSERT INTO location(id, directory_id, name, description) VALUES (3, '3', 'Biobank München', 'The biobank for blood samples in München managed by the TU München');
+INSERT INTO location(id, directory_id, name, description) VALUES (4, '4', 'Biobank Münster', 'The C* biobank in Münstermanaged by the UKM Pathology');
+INSERT INTO location(id, directory_id, name, description) VALUES (5, '5', 'Biobank Mainz', 'The C40-49 biobank in Mainz managed by the JGU MedInfo');
+INSERT INTO location(id, directory_id, name, description) VALUES (6, '6', 'Biobank Heidelberg', 'The C95 biobank in Heidelberg managed by Zeis');
 SELECT pg_catalog.setval('location_id_seq', 6, true);
 
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (1, 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL, NULL);

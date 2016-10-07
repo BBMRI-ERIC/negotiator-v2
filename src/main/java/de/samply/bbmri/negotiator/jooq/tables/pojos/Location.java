@@ -22,24 +22,32 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Location implements Serializable {
 
-	private static final long serialVersionUID = 1186397927;
+	private static final long serialVersionUID = 613334169;
 
 	private Integer id;
 	private String  name;
+	private String  description;
+	private String  directoryId;
 
 	public Location() {}
 
 	public Location(Location value) {
 		this.id = value.id;
 		this.name = value.name;
+		this.description = value.description;
+		this.directoryId = value.directoryId;
 	}
 
 	public Location(
 		Integer id,
-		String  name
+		String  name,
+		String  description,
+		String  directoryId
 	) {
 		this.id = id;
 		this.name = name;
+		this.description = description;
+		this.directoryId = directoryId;
 	}
 
 	public Integer getId() {
@@ -56,5 +64,21 @@ public class Location implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getDirectoryId() {
+		return this.directoryId;
+	}
+
+	public void setDirectoryId(String directoryId) {
+		this.directoryId = directoryId;
 	}
 }

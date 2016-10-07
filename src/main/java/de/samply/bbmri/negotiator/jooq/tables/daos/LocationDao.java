@@ -4,15 +4,15 @@
 package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 
-import de.samply.bbmri.negotiator.jooq.tables.Location;
-import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
-
 import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
+
+import de.samply.bbmri.negotiator.jooq.tables.Location;
+import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 
 
 /**
@@ -69,5 +69,26 @@ public class LocationDao extends DAOImpl<LocationRecord, de.samply.bbmri.negotia
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Location> fetchByName(String... values) {
 		return fetch(Location.LOCATION.NAME, values);
+	}
+
+	/**
+	 * Fetch records that have <code>description IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Location> fetchByDescription(String... values) {
+		return fetch(Location.LOCATION.DESCRIPTION, values);
+	}
+
+	/**
+	 * Fetch records that have <code>directory_id IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Location> fetchByDirectoryId(String... values) {
+		return fetch(Location.LOCATION.DIRECTORY_ID, values);
+	}
+
+	/**
+	 * Fetch a unique record that has <code>directory_id = value</code>
+	 */
+	public de.samply.bbmri.negotiator.jooq.tables.pojos.Location fetchOneByDirectoryId(String value) {
+		return fetchOne(Location.LOCATION.DIRECTORY_ID, value);
 	}
 }
