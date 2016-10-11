@@ -33,36 +33,17 @@ import javax.xml.bind.annotation.XmlElement;
  */
 public class FilterDTO {
 
-    @XmlElement(name = "field")
-    private String field;
+    /**
+     * The human readable format.
+     */
+    @XmlElement(name = "humanReadable")
+    private String humanReadable;
 
-    @XmlElement(name = "operator")
-    private String operator;
-
-    @XmlElement(name = "value")
-    private String value;
-
-    public String getValue() {
-        return value;
+    public String getHumanReadable() {
+        return humanReadable;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public void setField(String field) {
-        this.field = field;
+    public void setHumanReadable(String humanReadable) {
+        this.humanReadable = humanReadable;
     }
 }

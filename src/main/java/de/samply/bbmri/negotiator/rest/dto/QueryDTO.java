@@ -32,20 +32,32 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Created by paul on 04.10.16.
+ * The Query object with the structured data as received from the directory.
  */
 @XmlRootElement
 public class QueryDTO {
 
+    /**
+     * Unknown
+     */
     @XmlElement(name = "href")
     private String href;
 
+    /**
+     * The filter object
+     */
     @XmlElement(name = "filters")
-    private Collection<FilterDTO> filter;
+    private FilterDTO filters;
 
-    @XmlElement(name = "selection")
-    private Collection<String> selection;
+    /**
+     * The collections that can participate in the negotiation
+     */
+    @XmlElement(name = "collections")
+    private Collection<CollectionDTO> collections;
 
+    /**
+     * Unknown
+     */
     @XmlElement(name = "NegotiatorToken")
     private String token;
 
@@ -57,27 +69,27 @@ public class QueryDTO {
         this.href = href;
     }
 
-    public Collection<FilterDTO> getFilter() {
-        return filter;
-    }
-
-    public void setFilter(Collection<FilterDTO> filter) {
-        this.filter = filter;
-    }
-
-    public Collection<String> getSelection() {
-        return selection;
-    }
-
-    public void setSelection(Collection<String> selection) {
-        this.selection = selection;
-    }
-
     public String getToken() {
         return token;
     }
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public FilterDTO getFilters() {
+        return filters;
+    }
+
+    public void setFilters(FilterDTO filters) {
+        this.filters = filters;
+    }
+
+    public Collection<CollectionDTO> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(Collection<CollectionDTO> collections) {
+        this.collections = collections;
     }
 }

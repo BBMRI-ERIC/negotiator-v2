@@ -27,16 +27,22 @@
 package de.samply.bbmri.negotiator.rest;
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.JsonSyntaxException;
 
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.rest.dto.CreateQueryResultDTO;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 
@@ -46,13 +52,19 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 @Path("/directory")
 public class Directory {
 
+    public static final String AUTHENTICATION_HEADER = "Authorization";
+
+    private static final String MOLGENIS_USERNAME = "molgenis";
+
+    private static final String MOLGENIS_PASSWORD = "gogogo";
+
     /**
      * Takes a JSON query object like, stores it in the database and returns a redirect URL, that allows
      * the directory to redirect the user to this redirect URL.
      *
      * TODO: Authenticate the directory. Otherwise all kinds of people will be able to create new queries.
      *
-     * @param query
+     * @param queryString
      * @param request
      * @return
      */
@@ -60,41 +72,52 @@ public class Directory {
     @Path("/create_query")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public CreateQueryResultDTO createQuery(QueryDTO query, @Context HttpServletRequest request) {
-        try {
-            if(query.getFilter().size() < 1 || query.getSelection().size() < 1) {
-                throw new BadRequestException();
+    public Response createQuery(String queryString, @Context HttpServletRequest request) {
+        try(Config config = ConfigFactory.get()) {
+            String authCredentials = request.getHeader(AUTHENTICATION_HEADER);
+
+            AuthenticationService authenticationService = new AuthenticationService();
+            authenticationService.authenticate(authCredentials);
+
+            if(!MOLGENIS_USERNAME.equals(authenticationService.getUsername()) ||
+                    !MOLGENIS_PASSWORD.equals(authenticationService.getPassword())) {
+                throw new ForbiddenException();
             }
 
-            /**
-             * Convert the object back to a string, so that we can store it in the database.
+            /*
+              Convert the string to an object, so that we can store it in the database.
              */
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-            StringWriter stringify = new StringWriter();
+            QueryDTO query = mapper.readValue(queryString, QueryDTO.class);
 
-            mapper.writeValue(stringify, query);
+            if(query == null || query.getFilters() == null || query.getCollections() == null) {
+                throw new BadRequestException();
+            }
 
-            /**
-             * TODO: Store the string in the database. and return the ID as redirect URL back to the directory.
-             */
-            System.out.println(stringify.toString());
+            if(query.getCollections().size() < 1) {
+                throw new BadRequestException();
+            }
 
+            JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
+            jsonQueryRecord.setJsonText(queryString);
+            jsonQueryRecord.store();
+            config.commit();
 
             CreateQueryResultDTO result = new CreateQueryResultDTO();
 
             String strPort = request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "";
             String builder = request.getScheme() + "://" + request.getServerName() + strPort +
-                    request.getContextPath() + "/createQuery.xhtml?id=5";
+                    request.getContextPath() + "/researcher/associate.xhtml?id=" + jsonQueryRecord.getId();
 
             result.setRedirectUri(builder);
 
-            return result;
-        } catch (JsonSyntaxException e) {
+            return Response.created(new URI(builder)).entity(result).build();
+        } catch (IOException | URISyntaxException e) {
             throw new BadRequestException();
-        } catch (IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            throw new BadRequestException();
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
 
