@@ -41,6 +41,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.Constants;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.rest.dto.CreateQueryResultDTO;
@@ -52,20 +54,14 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 @Path("/directory")
 public class Directory {
 
-    public static final String AUTHENTICATION_HEADER = "Authorization";
-
-    private static final String MOLGENIS_USERNAME = "molgenis";
-
-    private static final String MOLGENIS_PASSWORD = "gogogo";
-
     /**
      * Takes a JSON query object like, stores it in the database and returns a redirect URL, that allows
      * the directory to redirect the user to this redirect URL.
      *
      * TODO: Authenticate the directory. Otherwise all kinds of people will be able to create new queries.
      *
-     * @param queryString
-     * @param request
+     * @param queryString the query object as string
+     * @param request the HTTP Servlet Request used to get the authentication header
      * @return
      */
     @POST
@@ -74,18 +70,22 @@ public class Directory {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createQuery(String queryString, @Context HttpServletRequest request) {
         try(Config config = ConfigFactory.get()) {
-            String authCredentials = request.getHeader(AUTHENTICATION_HEADER);
+            /**
+             * Check authentication
+             */
+            String authCredentials = request.getHeader(Constants.HTTP_AUTHORIZATION_HEADER);
 
             AuthenticationService authenticationService = new AuthenticationService();
             authenticationService.authenticate(authCredentials);
 
-            if(!MOLGENIS_USERNAME.equals(authenticationService.getUsername()) ||
-                    !MOLGENIS_PASSWORD.equals(authenticationService.getPassword())) {
+            if(!NegotiatorConfig.get().getMolgenisUsername().equals(authenticationService.getUsername()) ||
+                    !NegotiatorConfig.get().getMolgenisPassword().equals(authenticationService.getPassword())) {
                 throw new ForbiddenException();
             }
 
-            /*
-              Convert the string to an object, so that we can store it in the database.
+            /**
+             * Convert the string to an object, so that we can check the filters and collections.
+             * They must not be empty!
              */
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
@@ -99,6 +99,9 @@ public class Directory {
                 throw new BadRequestException();
             }
 
+            /**
+             * Create the json_query object itself and store it in the database.
+             */
             JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
             jsonQueryRecord.setJsonText(queryString);
             jsonQueryRecord.store();

@@ -98,6 +98,12 @@ public class NegotiatorConfig {
 	private MailSending mailConfig;
 
     /**
+     * TODO: Move those values into a proper configuration file.
+     */
+    private String molgenisUsername = "molgenis";
+    private String molgenisPassword = "gogogo";
+
+    /**
      * Instantiates a new negotiator config.
      */
     private NegotiatorConfig() {
@@ -211,5 +217,21 @@ public class NegotiatorConfig {
      */
     public boolean isDevelopMode() {
         return developMode;
+    }
+
+    /**
+     * Returns the username that must be used for the REST endpoint for the directory
+     * @return molgenis username
+     */
+    public String getMolgenisUsername() {
+        return molgenisUsername;
+    }
+
+    /**
+     * Returns the password that must be used for the REST endpoint for the directory
+     * @return molgenis password
+     */
+    public String getMolgenisPassword() {
+        return molgenisPassword;
     }
 }

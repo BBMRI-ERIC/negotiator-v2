@@ -51,5 +51,8 @@ public class Constants {
      */
     public final static int DB_REQUIRED_VERSION = 1;
 
-
+    /**
+     * Authorization Header
+     */
+    public static final String HTTP_AUTHORIZATION_HEADER = "Authorization";
 }
