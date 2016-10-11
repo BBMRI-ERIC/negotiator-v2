@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -326,5 +327,31 @@ public class DbUtil {
         record.setDescription(dto.getDescription());
         record.setName(dto.getName());
         record.store();
+    }
+
+    /**
+     * Creates a new query from the given arguments.
+     * @param title title of the query
+     * @param text description of the query
+     * @param jsonText the structured data from the directory
+     * @param researcherId the researcher ID that created the query
+     * @return
+     * @throws SQLException
+     */
+    public static QueryRecord saveQuery(String title, String text, String jsonText, int researcherId) throws SQLException {
+        try(Config config = ConfigFactory.get()) {
+            QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
+
+            queryRecord.setJsonText(jsonText);
+            queryRecord.setQueryCreationTime(new Timestamp(new Date().getTime()));
+            queryRecord.setText(text);
+            queryRecord.setTitle(title);
+            queryRecord.setResearcherId(researcherId);
+            queryRecord.store();
+
+            config.commit();
+
+            return queryRecord;
+        }
     }
 }
