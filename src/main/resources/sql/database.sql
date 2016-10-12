@@ -46,6 +46,7 @@ CREATE TABLE "query" (
     "query_creation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "researcher_id" INTEGER NOT NULL,
     "json_text" TEXT NOT NULL,
+    "negotiator_token" CHARACTER VARYING(255) NOT NULL UNIQUE,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("researcher_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );

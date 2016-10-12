@@ -17,7 +17,7 @@ INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, locati
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL, 6);
 SELECT pg_catalog.setval('person_id_seq', 9, true);
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1, 
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
 '{
   "filters":{
     "humanReadable":"name: ‘WHATEVER’, materials: ‘DNA’ or ’Plasma’"
@@ -32,9 +32,9 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ]
-}');
+}', 'token-1');
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text) VALUES(2, 'Colon cancer', 'Do you have 50 samples on samples of Colorectal cancer as a primary diagnosis (C18.1 to C18.7)?', '2014-05-01 00:00:00', 6, 
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(2, 'Colon cancer', 'Do you have 50 samples on samples of Colorectal cancer as a primary diagnosis (C18.1 to C18.7)?', '2014-05-01 00:00:00', 6,
 '{
   "filters":{
     "humanReadable":"name: ‘Netherlands’, materials: ’Plasma’"
@@ -49,9 +49,9 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ]
-}');
+}', 'token-2');
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text) VALUES(3, 'Lung cancer', 'For my research, I need information on the response to therapy on patients with lung cancer.', '2016-07-21 17:55:52.70183', 6, 
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(3, 'Lung cancer', 'For my research, I need information on the response to therapy on patients with lung cancer.', '2016-07-21 17:55:52.70183', 6,
 '{
   "filters":{
     "humanReadable":"name: ‘Germany’, materials: ‘DNA’"
@@ -66,9 +66,9 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ]
-}');
+}', 'token-3');
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text) VALUES(4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8, 
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8,
 '{
   "filters":{
     "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’"
@@ -83,7 +83,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ]
-}');
+}', 'token-4');
 
 SELECT pg_catalog.setval('query_id_seq', 4, true);
 
