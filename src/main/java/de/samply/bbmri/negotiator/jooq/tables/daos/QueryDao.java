@@ -96,7 +96,7 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	/**
 	 * Fetch records that have <code>json_text IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByJsonText(Object... values) {
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByJsonText(String... values) {
 		return fetch(Query.QUERY.JSON_TEXT, values);
 	}
 }

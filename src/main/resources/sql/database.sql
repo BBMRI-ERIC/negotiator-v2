@@ -45,7 +45,7 @@ CREATE TABLE "query" (
     "text" TEXT,
     "query_creation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "researcher_id" INTEGER NOT NULL,
-    "json_text" JSONB,
+    "json_text" TEXT NOT NULL,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("researcher_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );

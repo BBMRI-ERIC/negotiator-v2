@@ -4,15 +4,15 @@
 package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 
+import de.samply.bbmri.negotiator.jooq.tables.Location;
+import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
+
 import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
-
-import de.samply.bbmri.negotiator.jooq.tables.Location;
-import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 
 
 /**

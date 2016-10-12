@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = -632978717;
+	private static final long serialVersionUID = 1746931239;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -79,7 +79,7 @@ public class Query extends TableImpl<QueryRecord> {
 	/**
 	 * The column <code>public.query.json_text</code>.
 	 */
-	public final TableField<QueryRecord, Object> JSON_TEXT = createField("json_text", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "");
+	public final TableField<QueryRecord, String> JSON_TEXT = createField("json_text", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
 
 	/**
 	 * Create a <code>public.query</code> table reference
