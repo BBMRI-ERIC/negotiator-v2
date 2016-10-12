@@ -116,13 +116,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public void setStructuredQuery() {
         String jsonText = null;
         try(Config config = ConfigFactory.get()) {
-            jsonText = DbUtil.getJsonQuery(config, queryId);
+            jsonText = DbUtil.getQuery(config, queryId);
             Gson gson = new Gson();
             structuredQuery = gson.fromJson(jsonText, StructuredQueryDTO.class);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     /**

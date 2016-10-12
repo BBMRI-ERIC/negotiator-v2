@@ -89,7 +89,7 @@ public class QueryBean {
 		   humanReadableFilters = Directory.getQueryDTO(jsonQuery).getFilters().getHumanReadable();
 	   } 
 	   catch (Exception e) {
-		   logger.error("Loading temp json query failed", e);
+		   logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
 	   }
    }
    
@@ -177,8 +177,11 @@ public class QueryBean {
 	}
 
 	public String saveQuery() throws SQLException {
-	   // TODO: verify user is indeed a researcher
-		DbUtil.saveQuery(queryTitle, queryText, jsonQuery, userBean.getUserId());
+	    // TODO: verify user is indeed a researcher
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
+            config.commit();
+        }
 		return "/researcher/index";
 	}
 }

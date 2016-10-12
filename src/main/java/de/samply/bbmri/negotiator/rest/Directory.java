@@ -113,7 +113,7 @@ public class Directory {
 
             String strPort = request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "";
             String builder = request.getScheme() + "://" + request.getServerName() + strPort +
-                    request.getContextPath() + "/researcher/newQuery.xhtml?queryId=" + jsonQueryRecord.getId();
+                    request.getContextPath() + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
 
             result.setRedirectUri(builder);
 

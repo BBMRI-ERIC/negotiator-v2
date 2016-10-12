@@ -69,9 +69,27 @@ public class DbUtil {
     public static String getJsonQuery(Config config, Integer queryId) {
         String jsonQuery = null;
         try {
+            jsonQuery = config.dsl().selectFrom(Tables.JSON_QUERY)
+                    .where(Tables.JSON_QUERY.ID.eq(queryId))
+                    .fetchOne(Tables.JSON_QUERY.JSON_TEXT);
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return jsonQuery;
+    }
+
+    /**
+     * Get the JSON query from the database.
+     * @param config JOOQ configuration
+     * @param queryId the query ID
+     * @return JSON string
+     */
+    public static String getQuery(Config config, Integer queryId) {
+        String jsonQuery = null;
+        try {
             jsonQuery = config.dsl().selectFrom(Tables.QUERY)
                     .where(Tables.QUERY.ID.eq(queryId))
-                    .fetchOne(Tables.QUERY.JSON_TEXT).toString();
+                    .fetchOne(Tables.QUERY.JSON_TEXT);
         } catch (Exception e) {
             // TODO: handle exception
         }
