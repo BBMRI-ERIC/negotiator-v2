@@ -120,11 +120,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public void displayHumanReadableQuery() {
         String jsonText = null;
         try(Config config = ConfigFactory.get()) {
-        	jsonText = DbUtil.getJsonQuery(config, queryId);
+        	jsonText = DbUtil.getQuery(config, queryId);
         	RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
             QueryDTO query = mapper.readValue(jsonText, QueryDTO.class);
-        	setHumanReadableQuery(query.getFilters().getHumanReadable());            
+        	setHumanReadableQuery(query.getHumanReadable());
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (JsonParseException e) {

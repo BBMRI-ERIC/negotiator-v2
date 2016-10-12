@@ -19,9 +19,7 @@ SELECT pg_catalog.setval('person_id_seq', 9, true);
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
 '{
-  "filters":{
-    "humanReadable":"name: ‘WHATEVER’, materials: ‘DNA’ or ’Plasma’"
-  },
+    "humanReadable":"name: ‘WHATEVER’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
     {
       "collectionID":"bbmri-eric:collectionID:BE_B0383_LTC",
@@ -36,9 +34,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(2, 'Colon cancer', 'Do you have 50 samples on samples of Colorectal cancer as a primary diagnosis (C18.1 to C18.7)?', '2014-05-01 00:00:00', 6,
 '{
-  "filters":{
-    "humanReadable":"name: ‘Netherlands’, materials: ’Plasma’"
-  },
+    "humanReadable":"name: ‘Netherlands’, materials: ’Plasma’",
   "collections":[
     {
       "collectionID":"bbmri-eric:collectionID:BE_B0383_LTCH",
@@ -53,9 +49,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(3, 'Lung cancer', 'For my research, I need information on the response to therapy on patients with lung cancer.', '2016-07-21 17:55:52.70183', 6,
 '{
-  "filters":{
-    "humanReadable":"name: ‘Germany’, materials: ‘DNA’"
-  },
+    "humanReadable":"name: ‘Germany’, materials: ‘DNA’",
   "collections":[
     {
       "collectionID":"bbmri-eric:collectionID:BE_B0383_LTC",
@@ -70,9 +64,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8,
 '{
-  "filters":{
-    "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’"
-  },
+    "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
     {
       "collectionID":"bbmri-eric:collectionID:BE_B0383_LTC",
@@ -132,9 +124,7 @@ INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 9);
 
 INSERT INTO json_query (json_text) VALUES (
 '{
-  "filters":{
-    "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’"
-  },
+    "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
     {
       "collectionID":"bbmri-eric:collectionID:BE_B0383_LTC",
@@ -150,9 +140,7 @@ INSERT INTO json_query (json_text) VALUES (
 
 INSERT INTO json_query (json_text) VALUES (
   '{
-    "filters":{
-      "humanReadable":"name: ‘Russia’"
-    },
+      "humanReadable":"name: ‘Russia’",
     "collections":[
       {
         "collectionID":"bbmri-eric:collectionID:BE_B0383_LTC",
