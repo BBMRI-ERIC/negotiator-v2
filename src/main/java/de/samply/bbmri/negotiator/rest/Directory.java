@@ -146,7 +146,7 @@ public class Directory {
 
                 result.setRedirectUri(builder);
 
-                return Response.created(new URI(builder)).entity(result).build();
+                return Response.accepted(result).location(new URI(builder)).build();
             }
         } catch (IOException | URISyntaxException e) {
             throw new BadRequestException();
