@@ -50,13 +50,14 @@
        <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
 			
            <div class="form-group">
-           		Title:
-				<h:inputText id="title" value="#{queryBean.queryTitle}" styleClass="form-control" required="true"/>
-               	Description:
+           		#{label['queryview.title.title']}  <i class="fa fa-pencil-square-o" />
+				<h:inputText id="title" value="#{queryBean.queryTitle}" styleClass="form-control" required="true"/><br></br>
+               	#{label['queryview.title.text']}  <i class="fa fa-pencil-square-o" /> 
                	<h:inputTextarea id="text" value="#{queryBean.queryText}" styleClass="form-control" rows="5" required="true" />
            </div> 
            <div class="form-group">
-                Filters:<br></br>
+                #{label['queryview.title.filters']} 
+                <br></br>
                 #{queryBean.humanReadableFilters}
            </div>
            
