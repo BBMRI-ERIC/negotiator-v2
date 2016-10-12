@@ -149,16 +149,21 @@
                     
                 </h:panelGroup>
 
-                <h:panelGroup layout="block" styleClass="col-md-12">
-                    <p class="pull-right">
-                        <h:outputText title="#{label['queryview.queryitem.datetime.creation']}"
-                            value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
-                            <f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-                        </h:outputText>
-                    </p>
-                </h:panelGroup>
+				<h:panelGroup layout="block" styleClass="col-md-12">
+					<h:outputLink value="https://molgenis52.gcc.rug.nl" styleClass="btn btn-default pull-right">
+						#{label['queryview.title.editQuery']}
+					</h:outputLink>
+					<h:panelGroup layout="block" class="pull-right">
+						<h:outputText
+							title="#{label['queryview.queryitem.datetime.creation']}"
+							value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
+							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+						</h:outputText>
+					</h:panelGroup>
+				
+				</h:panelGroup>
 
-                <ui:fragment rendered="#{researcherQueriesDetailBean.comments.size() > 0}">
+				<ui:fragment rendered="#{researcherQueriesDetailBean.comments.size() > 0}">
 
                     <div class="col-xs-12">
                         <hr></hr>

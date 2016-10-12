@@ -112,6 +112,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
             e.printStackTrace();
         }
     }
+    
+    /**
+     * initialises the page by getting all the comments for a selected(clicked on) query
+     */
+    public void editQuery() {
+        
+    }
 
     /**
      * Read structured query from DataBase and display in human readable form. 
@@ -137,8 +144,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
     }
 
     /**
