@@ -46,7 +46,6 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
-import de.samply.bbmri.negotiator.model.StructuredQueryDTO;
 
 /**
  * Manages the query view for researchers
@@ -79,11 +78,6 @@ public class ResearcherQueriesBean implements Serializable {
      * The input textarea for the user to make a comment.
      */
     private String commentText;
-
-    /**
-     * The input textarea for the user to make a comment.
-     */
-    private List<StructuredQueryDTO> structuredQuery;
 
     /**
      * Initializes this bean by loading all queries for the current researcher.
@@ -167,13 +161,5 @@ public class ResearcherQueriesBean implements Serializable {
 
     public void setCommentText(String commentText) {
         this.commentText = commentText;
-    }
-
-    public List<StructuredQueryDTO> getStructuredQuery() {
-        return structuredQuery;
-    }
-
-    public void setStructuredQuery(List<StructuredQueryDTO> structuredQuery) {
-        this.structuredQuery = structuredQuery;
     }
 }

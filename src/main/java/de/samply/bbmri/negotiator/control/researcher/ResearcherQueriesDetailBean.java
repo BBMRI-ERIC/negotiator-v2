@@ -26,6 +26,7 @@
 
 package de.samply.bbmri.negotiator.control.researcher;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
@@ -34,6 +35,9 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import de.samply.bbmri.negotiator.Config;
@@ -43,7 +47,8 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
-import de.samply.bbmri.negotiator.model.StructuredQueryDTO;
+import de.samply.bbmri.negotiator.rest.RestApplication;
+import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 
 /**
  * Manages the query detail view for owners
@@ -86,15 +91,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * The structured query object
      */
-    private StructuredQueryDTO structuredQuery = null;
-
+    private String humanReadableQuery = null;
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
-            setStructuredQuery();
+            displayHumanReadableQuery();
 
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
@@ -110,18 +114,31 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     /**
-     * Read structured query from DataBase and make a static object. This function will be changed for dynamic objects that we will eventually use.
-     * @param 
+     * Read structured query from DataBase and display in human readable form. 
+     *  
      */
-    public void setStructuredQuery() {
+    public void displayHumanReadableQuery() {
         String jsonText = null;
         try(Config config = ConfigFactory.get()) {
-            jsonText = DbUtil.getQuery(config, queryId);
-            Gson gson = new Gson();
-            structuredQuery = gson.fromJson(jsonText, StructuredQueryDTO.class);
+        	jsonText = DbUtil.getJsonQuery(config, queryId);
+        	RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+            QueryDTO query = mapper.readValue(jsonText, QueryDTO.class);
+        	setHumanReadableQuery(query.getFilters().getHumanReadable());            
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        } catch (JsonParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
     }
 
     /**
@@ -184,9 +201,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.commentText = commentText;
     }
 
-    public StructuredQueryDTO getStructuredQuery() {
-        return structuredQuery;
-    }
+	public String getHumanReadableQuery() {
+		return humanReadableQuery;
+	}
 
-
+	public void setHumanReadableQuery(String humanReadableQuery) {
+		this.humanReadableQuery = humanReadableQuery;
+	}
 }
