@@ -28,10 +28,7 @@ package de.samply.bbmri.negotiator.db.util;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import org.jooq.*;
@@ -365,6 +362,7 @@ public class DbUtil {
         queryRecord.setText(text);
         queryRecord.setTitle(title);
         queryRecord.setResearcherId(researcherId);
+        queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
         queryRecord.store();
 
         config.commit();
