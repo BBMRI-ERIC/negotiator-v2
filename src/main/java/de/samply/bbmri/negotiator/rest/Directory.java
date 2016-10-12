@@ -37,6 +37,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.samply.bbmri.negotiator.Config;
@@ -122,6 +124,18 @@ public class Directory {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
+        
     }
-
+    
+    /**
+     * Convert the string to an object, so that we can store it in the database.
+     * @throws IOException 
+     * @throws JsonMappingException 
+     * @throws JsonParseException 
+    */
+    public static QueryDTO getQueryDTO(String queryString) throws JsonParseException, JsonMappingException, IOException {
+    	RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+    	ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+    	return mapper.readValue(queryString, QueryDTO.class);
+    }
 }

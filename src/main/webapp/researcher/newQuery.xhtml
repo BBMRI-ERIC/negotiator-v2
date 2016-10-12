@@ -33,6 +33,11 @@
     xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
     template="../components/default.xhtml">
 
+    <f:metadata>
+		<f:viewParam name="jsonQueryId" value="#{queryBean.jsonQueryId}"/>
+		<f:viewAction action="#{queryBean.initialize}"/>
+	</f:metadata>
+    
     <!-- Queries page for the researcher -->
 
 
@@ -43,10 +48,12 @@
     <h:form id="form" enctype="multipart/form-data">
 
        <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
-
+			#{queryBean.humanReadableFilters}
            <div class="form-group">
-
-               <h:inputTextarea value="#{queryBean.queryText}" styleClass="form-control" rows="5" />
+           		Title:
+				<h:inputText id="title" value="#{queryBean.queryTitle}" styleClass="form-control" required="true"/>
+               	Text:
+               	<h:inputTextarea id="text" value="#{queryBean.queryText}" styleClass="form-control" rows="5" required="true" />
 
            </div>
    

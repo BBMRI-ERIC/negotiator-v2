@@ -27,10 +27,12 @@
 package de.samply.bbmri.negotiator.control;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -43,22 +45,53 @@ import javax.servlet.http.Part;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.samply.bbmri.negotiator.MailUtil;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.MailUtil;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.rest.Directory;
+
+
+/**
+ * This bean manages the creation of a real query and its association to the temporary one.
+ */
 @ManagedBean
 @ViewScoped
 public class QueryBean {
+	
+   private static final long serialVersionUID = -611428463046308071L;
+   private int jsonQueryId;
     
    private static Logger logger = LoggerFactory.getLogger(MailUtil.class);
    private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
    
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
-
+ 
+   private String fileContent;
    private Part file;
    private String queryText;
-   private String fileContent;
+   private String queryTitle;
+   private String jsonQuery;
+   private String humanReadableFilters;
    
+
+   /**
+	* Initializes this bean by registering email notification observer
+	*/
+   public void initialize() {
+	   try(Config config = ConfigFactory.get()) {
+		   jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+		   humanReadableFilters = Directory.getQueryDTO(jsonQuery).getFilters().getHumanReadable();
+	   } 
+	   catch (Exception e) {
+		   logger.error("Loading temp json query failed", e);
+	   }
+   }
    
    public UserBean getUserBean() {
        return userBean;
@@ -81,7 +114,7 @@ public class QueryBean {
    */
    public void upload() {
       try {
-          fileContent = new Scanner(file.getInputStream()).useDelimiter("\\A").next();
+    	  fileContent=new Scanner(file.getInputStream()).useDelimiter("\\A").next();
       } 
       catch (IOException e) {
           logger.error("Couldn't load file content " + e.getMessage());
@@ -106,22 +139,46 @@ public class QueryBean {
     public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
         List<FacesMessage> msgs = new ArrayList<FacesMessage>();
         Part file = (Part)value;
-       
-        if (file.getSize() > MAX_UPLOAD_SIZE) {
-            msgs.add(new FacesMessage("file too big"));
-        }
-        if (!"application/pdf".equals(file.getContentType())) {  
-            msgs.add(new FacesMessage("not a pdf file"));
-        }
-        if (!msgs.isEmpty()) {
-            throw new ValidatorException(msgs);
+        if(file != null) {
+	        if (file.getSize() > MAX_UPLOAD_SIZE) {
+	            msgs.add(new FacesMessage("file too big"));
+	        }
+	        if (!"application/pdf".equals(file.getContentType())) {  
+	            msgs.add(new FacesMessage("not a pdf file"));
+	        }
+	        if (!msgs.isEmpty()) {
+	            throw new ValidatorException(msgs);
+	        }
         }
     }
     
-  
-  //TODO
-  public String saveQuery() {
-      
-      return "/researcher/index";
-  }
+
+    public String getHumanReadableFilters() {
+	 	return humanReadableFilters;
+	}
+	
+	public void setHumanReadableFilters(String humanReadableFilters) {
+	 	this.humanReadableFilters = humanReadableFilters;
+	}
+	public int getJsonQueryId() {
+		return jsonQueryId;
+	}
+
+	public void setJsonQueryId(int jsonQueryId) {
+		this.jsonQueryId = jsonQueryId;
+	}
+	
+	public String getQueryTitle() {
+		return queryTitle;
+	}
+
+	public void setQueryTitle(String queryTitle) {
+		this.queryTitle = queryTitle;
+	}
+
+	public String saveQuery() throws SQLException {
+	   // TODO: verify user is indeed a researcher
+		DbUtil.saveQuery(queryTitle, queryText, jsonQuery, userBean.getUserId());
+		return "/researcher/index";
+	}
 }
