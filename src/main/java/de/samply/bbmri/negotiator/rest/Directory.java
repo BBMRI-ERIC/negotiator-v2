@@ -45,8 +45,10 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.rest.dto.CreateQueryResultDTO;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 
@@ -93,7 +95,8 @@ public class Directory {
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
             QueryDTO query = mapper.readValue(queryString, QueryDTO.class);
 
-            if(query == null || query.getFilters() == null || query.getCollections() == null) {
+            // TODO: check the URL to make sure it is really a URL pointing to the directory this negotiator uses.
+            if(query == null || query.getUrl() == null || query.getHumanReadable() == null || query.getCollections() == null) {
                 throw new BadRequestException();
             }
 
@@ -102,29 +105,55 @@ public class Directory {
             }
 
             /**
-             * Create the json_query object itself and store it in the database.
+             * At this point we need to decide on wether to update an existing query or
+             * create a new json query object. This decision is made based on the negotiator token from
+             * the query
              */
-            JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
-            jsonQueryRecord.setJsonText(queryString);
-            jsonQueryRecord.store();
-            config.commit();
+            if(query.getToken() == null) {
 
-            CreateQueryResultDTO result = new CreateQueryResultDTO();
+                /**
+                 * Create the json_query object itself and store it in the database.
+                 */
+                JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
+                jsonQueryRecord.setJsonText(queryString);
+                jsonQueryRecord.store();
+                config.commit();
 
-            String strPort = request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "";
-            String builder = request.getScheme() + "://" + request.getServerName() + strPort +
-                    request.getContextPath() + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
+                CreateQueryResultDTO result = new CreateQueryResultDTO();
 
-            result.setRedirectUri(builder);
+                String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
 
-            return Response.created(new URI(builder)).entity(result).build();
+                result.setRedirectUri(builder);
+
+                return Response.created(new URI(builder)).entity(result).build();
+            } else {
+                QueryRecord queryRecord = DbUtil.getQuery(config, query.getToken());
+
+                if(queryRecord == null) {
+                    throw new NotFoundException();
+                }
+
+                /**
+                 * Update the existing query and return the new URL back to the directory.
+                 */
+                queryRecord.setJsonText(queryString);
+                queryRecord.store();
+                config.commit();
+
+                CreateQueryResultDTO result = new CreateQueryResultDTO();
+
+                String builder = getLocalUrl(request) + "/researcher/detail.xhtml?queryId=" + queryRecord.getId();
+
+                result.setRedirectUri(builder);
+
+                return Response.created(new URI(builder)).entity(result).build();
+            }
         } catch (IOException | URISyntaxException e) {
             throw new BadRequestException();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        
     }
     
     /**
@@ -137,5 +166,11 @@ public class Directory {
     	RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
     	ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
     	return mapper.readValue(queryString, QueryDTO.class);
+    }
+
+    private static String getLocalUrl(HttpServletRequest request) {
+        String strPort = request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "";
+        return request.getScheme() + "://" + request.getServerName() + strPort +
+                request.getContextPath();
     }
 }

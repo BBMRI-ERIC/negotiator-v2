@@ -45,7 +45,7 @@ public class IndexBean {
             return "/owner/index";
         } else if(userBean.getResearcher()) {
             return "/researcher/index";
-        } else{
+        } else {
             return "/unauthorized/index";
         }
     }

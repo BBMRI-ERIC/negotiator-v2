@@ -40,14 +40,14 @@ public class QueryDTO {
     /**
      * Unknown
      */
-    @XmlElement(name = "href")
-    private String href;
+    @XmlElement(name = "url")
+    private String url;
 
     /**
      * The filter object
      */
-    @XmlElement(name = "filters")
-    private FilterDTO filters;
+    @XmlElement(name = "humanReadable")
+    private String humanReadable;
 
     /**
      * The collections that can participate in the negotiation
@@ -56,17 +56,17 @@ public class QueryDTO {
     private Collection<CollectionDTO> collections;
 
     /**
-     * Unknown
+     * The negotiator token. Only not null, if the user refines the query in the negotiator.
      */
-    @XmlElement(name = "NegotiatorToken")
+    @XmlElement(name = "nToken")
     private String token;
 
-    public String getHref() {
-        return href;
+    public String getUrl() {
+        return url;
     }
 
-    public void setHref(String href) {
-        this.href = href;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getToken() {
@@ -77,19 +77,19 @@ public class QueryDTO {
         this.token = token;
     }
 
-    public FilterDTO getFilters() {
-        return filters;
-    }
-
-    public void setFilters(FilterDTO filters) {
-        this.filters = filters;
-    }
-
     public Collection<CollectionDTO> getCollections() {
         return collections;
     }
 
     public void setCollections(Collection<CollectionDTO> collections) {
         this.collections = collections;
+    }
+
+    public String getHumanReadable() {
+        return humanReadable;
+    }
+
+    public void setHumanReadable(String humanReadable) {
+        this.humanReadable = humanReadable;
     }
 }

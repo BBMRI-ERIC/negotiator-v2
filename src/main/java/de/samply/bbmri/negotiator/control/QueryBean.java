@@ -86,7 +86,7 @@ public class QueryBean {
    public void initialize() {
 	   try(Config config = ConfigFactory.get()) {
 		   jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-		   humanReadableFilters = Directory.getQueryDTO(jsonQuery).getFilters().getHumanReadable();
+		   humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
 	   } 
 	   catch (Exception e) {
 		   logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);

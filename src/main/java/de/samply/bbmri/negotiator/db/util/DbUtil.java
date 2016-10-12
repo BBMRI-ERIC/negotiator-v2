@@ -94,6 +94,24 @@ public class DbUtil {
     }
 
     /**
+     * Get the JSON query from the database.
+     * @param config JOOQ configuration
+     * @param token the negotiator token that also identifies a query. Used for the interaction with the directory
+     * @return JSON string
+     */
+    public static QueryRecord getQuery(Config config, String token) {
+        QueryRecord jsonQuery = null;
+        try {
+            jsonQuery = config.dsl().selectFrom(Tables.QUERY)
+                    .where(Tables.QUERY.NEGOTIATOR_TOKEN.eq(token))
+                    .fetchOne();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return jsonQuery;
+    }
+
+    /**
      * Insert JSON text the database.
      * @param config JOOQ configuration
      * @param jsonQuery the JSON query to be inserted
