@@ -338,20 +338,19 @@ public class DbUtil {
      * @return
      * @throws SQLException
      */
-    public static QueryRecord saveQuery(String title, String text, String jsonText, int researcherId) throws SQLException {
-        try(Config config = ConfigFactory.get()) {
-            QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
+    public static QueryRecord saveQuery(Config config, String title,
+                                        String text, String jsonText, int researcherId) throws SQLException {
+        QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
-            queryRecord.setJsonText(jsonText);
-            queryRecord.setQueryCreationTime(new Timestamp(new Date().getTime()));
-            queryRecord.setText(text);
-            queryRecord.setTitle(title);
-            queryRecord.setResearcherId(researcherId);
-            queryRecord.store();
+        queryRecord.setJsonText(jsonText);
+        queryRecord.setQueryCreationTime(new Timestamp(new Date().getTime()));
+        queryRecord.setText(text);
+        queryRecord.setTitle(title);
+        queryRecord.setResearcherId(researcherId);
+        queryRecord.store();
 
-            config.commit();
+        config.commit();
 
-            return queryRecord;
-        }
+        return queryRecord;
     }
 }
