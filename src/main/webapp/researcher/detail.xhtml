@@ -145,23 +145,24 @@
                     
                     <h:outputLabel for="filterInputText" value="#{label['queryview.title.searchParameters']}" />
                     <h:outputText value="#{researcherQueriesDetailBean.humanReadableQuery}"  style="margin-left: 22px;">
-                    </h:outputText>            
+                    </h:outputText>                                       
+                    <br/>
+					<h:outputLink  value="https://molgenis52.gcc.rug.nl"	styleClass="btn btn-default"
+					title="#{label['queryview.tooltip.editQuery']}">
+                    #{label['queryview.title.editQuery']}
+                    </h:outputLink>
                     
-                </h:panelGroup>
-
-				<h:panelGroup layout="block" styleClass="col-md-12">
-					<h:outputLink value="https://molgenis52.gcc.rug.nl" styleClass="btn btn-default pull-right">
-						#{label['queryview.title.editQuery']}
-					</h:outputLink>
-					<h:panelGroup layout="block" class="pull-right">
-						<h:outputText
-							title="#{label['queryview.queryitem.datetime.creation']}"
-							value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
-							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-						</h:outputText>
-					</h:panelGroup>
-				
+				</h:panelGroup>               
+	
+				<h:panelGroup layout="block" class="pull-right">
+					<h:outputText
+						title="#{label['queryview.queryitem.datetime.creation']}"
+						value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
+						<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+					</h:outputText>
 				</h:panelGroup>
+				
+			
 
 				<ui:fragment rendered="#{researcherQueriesDetailBean.comments.size() > 0}">
 
