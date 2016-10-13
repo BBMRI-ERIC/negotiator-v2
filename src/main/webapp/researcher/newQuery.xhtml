@@ -67,9 +67,18 @@
            <h:panelGroup layout="block" styleClass="pull-left">
        
                 <h:commandButton id="uploadBtn" value="#{label['querydetail.action.addQuery.upload']}" 
-                                action="#{queryBean.upload}" styleClass="btn btn-info" style="display: none;"/>              
-       
+                                action="#{queryBean.upload}" styleClass="btn btn-info" style="display: none;"/>                        
+                
            </h:panelGroup>
+           
+           <h:panelGroup layout="block" styleClass="pull-left">
+       
+                <h:commandButton action="#{queryBean.editQuery()}"
+                                value="#{label['queryview.title.editQuery']}"
+                                title="#{label['queryview.tooltip.editQuery']}" styleClass="btn btn-primary" />                
+                
+           </h:panelGroup>
+                  
            <h:panelGroup layout="block" styleClass="pull-right">
                        
                <h:commandButton action="#{queryBean.saveQuery()}"

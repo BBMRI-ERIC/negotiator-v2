@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -45,14 +44,10 @@ import javax.servlet.http.Part;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.rest.Directory;
 
 
@@ -62,23 +57,23 @@ import de.samply.bbmri.negotiator.rest.Directory;
 @ManagedBean
 @ViewScoped
 public class QueryBean {
-	
+
    private static final long serialVersionUID = -611428463046308071L;
    private int jsonQueryId;
-    
+
    private static Logger logger = LoggerFactory.getLogger(MailUtil.class);
    private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
-   
+
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
- 
+
    private String fileContent;
    private Part file;
    private String queryText;
    private String queryTitle;
    private String jsonQuery;
    private String humanReadableFilters;
-   
+
 
    /**
 	* Initializes this bean by registering email notification observer
@@ -87,12 +82,12 @@ public class QueryBean {
 	   try(Config config = ConfigFactory.get()) {
 		   jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
 		   humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
-	   } 
+	   }
 	   catch (Exception e) {
 		   logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
 	   }
    }
-   
+
    public UserBean getUserBean() {
        return userBean;
    }
@@ -115,16 +110,16 @@ public class QueryBean {
    public void upload() {
       try {
     	  fileContent=new Scanner(file.getInputStream()).useDelimiter("\\A").next();
-      } 
+      }
       catch (IOException e) {
           logger.error("Couldn't load file content " + e.getMessage());
       }
     }
-   
+
     public Part getFile() {
         return file;
     }
-   
+
     public void setFile(Part file) {
         this.file = file;
     }
@@ -134,7 +129,7 @@ public class QueryBean {
      * @param ctx
      * @param comp
      * @param value
-     * @throws IOException 
+     * @throws IOException
      */
     public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
         List<FacesMessage> msgs = new ArrayList<FacesMessage>();
@@ -143,7 +138,7 @@ public class QueryBean {
 	        if (file.getSize() > MAX_UPLOAD_SIZE) {
 	            msgs.add(new FacesMessage("file too big"));
 	        }
-	        if (!"application/pdf".equals(file.getContentType())) {  
+	        if (!"application/pdf".equals(file.getContentType())) {
 	            msgs.add(new FacesMessage("not a pdf file"));
 	        }
 	        if (!msgs.isEmpty()) {
@@ -151,12 +146,12 @@ public class QueryBean {
 	        }
         }
     }
-    
+
 
     public String getHumanReadableFilters() {
 	 	return humanReadableFilters;
 	}
-	
+
 	public void setHumanReadableFilters(String humanReadableFilters) {
 	 	this.humanReadableFilters = humanReadableFilters;
 	}
@@ -167,7 +162,7 @@ public class QueryBean {
 	public void setJsonQueryId(int jsonQueryId) {
 		this.jsonQueryId = jsonQueryId;
 	}
-	
+
 	public String getQueryTitle() {
 		return queryTitle;
 	}
@@ -183,5 +178,9 @@ public class QueryBean {
             config.commit();
         }
 		return "/researcher/index";
+	}
+
+	public void editQuery() throws SQLException {
+
 	}
 }

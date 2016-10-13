@@ -38,7 +38,6 @@ import javax.faces.bean.ViewScoped;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
@@ -112,17 +111,17 @@ public class ResearcherQueriesDetailBean implements Serializable {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
     public void editQuery() {
-        
+
     }
 
     /**
-     * Read structured query from DataBase and display in human readable form. 
-     *  
+     * Read structured query from DataBase and display in human readable form.
+     *
      */
     public void displayHumanReadableQuery() {
         String jsonText = null;
