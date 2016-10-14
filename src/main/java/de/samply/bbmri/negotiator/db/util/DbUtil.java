@@ -28,10 +28,18 @@ package de.samply.bbmri.negotiator.db.util;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import org.jooq.*;
+import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.JoinType;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +53,7 @@ import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
@@ -56,6 +65,26 @@ import de.samply.directory.client.dto.BiobankDTO;
 public class DbUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
+
+    /**
+     * Edits/Updates title and description of a query.
+     * @param title title of the query
+     * @param text description of the query
+     * @param queryId the query id for which the editing started
+     * @throws SQLException
+     */
+    public static void editQuery(Config config, String title, String text, Integer queryId) throws SQLException {
+        try {
+            config.dsl().update(Tables.QUERY)
+                        .set(Tables.QUERY.TITLE, title)
+                        .set(Tables.QUERY.TEXT, text)
+                        .where(Tables.QUERY.ID.eq(queryId))
+                        .execute();
+            config.get().commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Get the JSON query from the database.
@@ -125,11 +154,8 @@ public class DbUtil {
                     .returning(Tables.JSON_QUERY.ID)
                     .fetch();
         config.get().commit();
-
         } catch (SQLException e){
-            // TODO AUTO-GENERATED CATCH BLOCK
             e.printStackTrace();
-
         }
         return id;
     }

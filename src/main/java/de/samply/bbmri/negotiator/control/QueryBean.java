@@ -67,6 +67,7 @@ public class QueryBean {
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
 
+   private Integer id;
    private String fileContent;
    private Part file;
    private String queryText;
@@ -88,20 +89,26 @@ public class QueryBean {
 	   }
    }
 
-   public UserBean getUserBean() {
-       return userBean;
+   /**
+    * Edit the un-structured query.
+    * @return String - Take the researcher to the default page.
+    */
+   public String editQuery() throws SQLException {
+       //TODO: The query id (or token) will come from the directory.
+       setId(2);
+       try (Config config = ConfigFactory.get()) {
+           DbUtil.editQuery(config, queryTitle, queryText, getId() );
+       }
+       return "/researcher/index";
    }
 
-   public void setUserBean(UserBean userBean) {
-       this.userBean = userBean;
-   }
-
-   public String getQueryText() {
-       return queryText;
-   }
-
-   public void setQueryText(String queryText) {
-       this.queryText = queryText;
+   public String saveQuery() throws SQLException {
+       // TODO: verify user is indeed a researcher
+       try (Config config = ConfigFactory.get()) {
+           DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
+           config.commit();
+       }
+       return "/researcher/index";
    }
 
   /**
@@ -114,14 +121,6 @@ public class QueryBean {
       catch (IOException e) {
           logger.error("Couldn't load file content " + e.getMessage());
       }
-    }
-
-    public Part getFile() {
-        return file;
-    }
-
-    public void setFile(Part file) {
-        this.file = file;
     }
 
     /**
@@ -147,6 +146,13 @@ public class QueryBean {
         }
     }
 
+    public Part getFile() {
+        return file;
+    }
+
+    public void setFile(Part file) {
+        this.file = file;
+    }
 
     public String getHumanReadableFilters() {
 	 	return humanReadableFilters;
@@ -171,16 +177,27 @@ public class QueryBean {
 		this.queryTitle = queryTitle;
 	}
 
-	public String saveQuery() throws SQLException {
-	    // TODO: verify user is indeed a researcher
-        try (Config config = ConfigFactory.get()) {
-            DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
-            config.commit();
-        }
-		return "/researcher/index";
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void editQuery() throws SQLException {
+    public void setId(Integer id) {
+        this.id =id;
+    }
 
-	}
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
+
+    public String getQueryText() {
+        return queryText;
+    }
+
+    public void setQueryText(String queryText) {
+        this.queryText = queryText;
+    }
 }
