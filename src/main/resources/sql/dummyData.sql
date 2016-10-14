@@ -29,7 +29,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "collectionID":"bbmri-eric:collectionID:BE_B03843_LTCD",
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
-  ]
+  ], "URL": "https://does-not-exist.com"
 }', 'token-1');
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(2, 'Colon cancer', 'Do you have 50 samples on samples of Colorectal cancer as a primary diagnosis (C18.1 to C18.7)?', '2014-05-01 00:00:00', 6,
@@ -44,7 +44,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "collectionID":"bbmri-eric:collectionID:BE_B03843_LTCD",
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
-  ]
+  ], "URL": "https://does-not-exist.com"
 }', 'token-2');
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(3, 'Lung cancer', 'For my research, I need information on the response to therapy on patients with lung cancer.', '2016-07-21 17:55:52.70183', 6,
@@ -59,7 +59,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "collectionID":"bbmri-eric:collectionID:BE_B03843_LTCD",
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
-  ]
+  ], "URL": "https://does-not-exist.com"
 }', 'token-3');
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8,
@@ -74,7 +74,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "collectionID":"bbmri-eric:collectionID:BE_B03843_LTCD",
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
-  ]
+  ], "URL": "https://does-not-exist.com"
 }', 'token-4');
 
 SELECT pg_catalog.setval('query_id_seq', 4, true);
@@ -134,7 +134,7 @@ INSERT INTO json_query (json_text) VALUES (
       "collectionID":"bbmri-eric:collectionID:BE_B03843_LTCD",
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
-  ]
+  ], "URL": "https://does-not-exist.com"
 }'
 );
 
@@ -150,6 +150,6 @@ INSERT INTO json_query (json_text) VALUES (
         "collectionID":"bbmri-eric:collectionID:BE_B03843_LTCD",
         "biobankID":"bbmri-eric:biobankID:BE_B0383"
       }
-    ]
+    ], "URL": "https://does-not-exist.com"
   }'
 );

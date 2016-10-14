@@ -34,8 +34,8 @@
 
     <database>negotiator</database>
 
-    <username>postgres</username>
+    <username>paul</username>
 
-    <password>test123</password>
+    <password></password>
 
 </postgresql>

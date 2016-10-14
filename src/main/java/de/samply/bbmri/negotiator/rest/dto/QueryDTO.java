@@ -40,7 +40,7 @@ public class QueryDTO {
     /**
      * Unknown
      */
-    @XmlElement(name = "url")
+    @XmlElement(name = "URL")
     private String url;
 
     /**

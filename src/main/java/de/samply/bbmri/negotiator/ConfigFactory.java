@@ -26,11 +26,11 @@
 
 package de.samply.bbmri.negotiator;
 
-import de.samply.common.config.Postgresql;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
+import de.samply.common.config.Postgresql;
 
 /**
  * Creates a Config object based on the current NegotiatorConfig singleton.
@@ -40,11 +40,9 @@ public class ConfigFactory {
     public static Config get() throws SQLException {
         Postgresql postgresql = NegotiatorConfig.get().getPostgresql();
         String url = "jdbc:postgresql://" + postgresql.getHost() + "/" +
-                postgresql.getDatabase() +
-                "?user=" + postgresql.getUsername() +
-                "&password=" + postgresql.getPassword();
+                postgresql.getDatabase();
 
-        Connection connection = DriverManager.getConnection(url);
+        Connection connection = DriverManager.getConnection(url, postgresql.getUsername(), postgresql.getPassword());
         connection.setAutoCommit(false);
 
         return new Config(connection);
