@@ -63,7 +63,7 @@ public class FileUtil {
             logger.error("Couldn't save attachment ", e);
         }
         return null;
-    }    
+    }
     
     /**
      * Retrieve the file name of a javax.servlet.http.Part
