@@ -28,11 +28,12 @@ package de.samply.bbmri.negotiator;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 
-import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,31 +41,29 @@ public class FileUtil {
 
 
     private static Logger logger = LoggerFactory.getLogger(MailUtil.class);
-    private static final String UPLOAD_DIR = "uploads";
     
     /**
-     * Copies the uploaded file to the UPLOAD_DIR directory, which is relative to the web application dir
-     * @param part
-     * @param fileName
-     * @return
+     * Copies file to query attachments directory
+     * @param uploaded file
+     * @return name of persisted file
      */
-    public static File getUploadAsFile(Part part, String fileName) {
-        String absoluteWebPath = FacesContext.getCurrentInstance().getExternalContext().getRealPath("/");
-        String uploadDirPath = absoluteWebPath + UPLOAD_DIR;
-        
-        File uploadDir = new File(uploadDirPath);
+    public static String saveQueryAttachment(Part file) {
+        String uploadPath = NegotiatorConfig.getConfig().getString("attachments.path");
+        File uploadDir = new File(uploadPath);
         uploadDir.mkdirs();
-         
-        try  {
-            File uploadedFile = new File(uploadDirPath + File.separator + fileName);
-            FileUtils.copyInputStreamToFile(part.getInputStream(), uploadedFile);
-            return uploadedFile;
-        } 
-        catch (IOException e) {
-            logger.error("Couldn't load file content " + e.getMessage());
-            return null;
+        
+        try (InputStream input = file.getInputStream()) {
+            String filename = getFileName(file);
+            
+            Files.copy(input, new File(uploadDir, filename).toPath());
+            return filename;
+            
         }
-    }
+        catch (IOException e) {
+            logger.error("Couldn't save attachment ", e);
+        }
+        return null;
+    }    
     
     /**
      * Retrieve the file name of a javax.servlet.http.Part
@@ -80,7 +79,4 @@ public class FileUtil {
         }
         return null;
     }
-    
-
-    
 }

@@ -61,16 +61,6 @@
                 #{queryBean.humanReadableFilters}
            </div>
            
-   
-           <h:inputFile id="file" value="#{queryBean.file}" validator="#{queryBean.validateFile}"  onchange="document.getElementById('form:uploadBtn').style.display = (!!value) ? 'block' : 'none'" />
-           <br></br>
-           <h:panelGroup layout="block" styleClass="pull-left">
-       
-                <h:commandButton id="uploadBtn" value="#{label['querydetail.action.addQuery.upload']}" 
-                                action="#{queryBean.upload}" styleClass="btn btn-info" style="display: none;"/>                        
-                
-           </h:panelGroup>
-           
            <h:panelGroup layout="block" styleClass="pull-left">
        
                 <h:commandButton action="#{queryBean.editQuery()}"

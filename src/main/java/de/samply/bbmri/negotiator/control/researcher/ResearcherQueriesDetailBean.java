@@ -29,11 +29,17 @@ package de.samply.bbmri.negotiator.control.researcher;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
+import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -41,6 +47,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -57,6 +64,7 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 public class ResearcherQueriesDetailBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -86,6 +94,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The list of comments for the selected query
      */
     private List<CommentPersonDTO> comments;
+    
+    /**
+     * Query attachment upload
+     */
+    private Part file;
 
     /**
      * The structured query object
@@ -161,6 +174,39 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return queries;
     }
 
+    /**
+     * Validates uploaded file to be of correct size, content type and format
+     * @param ctx
+     * @param comp
+     * @param value
+     * @throws IOException
+     */
+    public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
+        List<FacesMessage> msgs = new ArrayList<FacesMessage>();
+        Part file = (Part)value;
+        if(file != null) {
+            if (file.getSize() > MAX_UPLOAD_SIZE) {
+                msgs.add(new FacesMessage("file too big"));
+            }
+            if (!"application/pdf".equals(file.getContentType())) {
+                msgs.add(new FacesMessage("not a pdf file"));
+            }
+            if (!msgs.isEmpty()) {
+                throw new ValidatorException(msgs);
+            }
+        }
+    }
+    
+
+    /**
+     * Uploads and stores content of file from provided input stream
+     */
+    public void upload() {
+       //TODO - store file name in query attachments table
+       FileUtil.saveQueryAttachment(file);
+            
+    }
+    
     public void setQueries(List<QueryStatsDTO> queries) {
         this.queries = queries;
     }
@@ -212,4 +258,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
 	public void setHumanReadableQuery(String humanReadableQuery) {
 		this.humanReadableQuery = humanReadableQuery;
 	}
+	
+    public Part getFile() {
+        return file;
+    }
+
+    public void setFile(Part file) {
+        this.file = file;
+    }
 }

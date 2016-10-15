@@ -32,6 +32,10 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import de.samply.common.config.OAuth2Client;
@@ -44,6 +48,8 @@ import de.samply.config.util.JAXBUtil;
  * The negotiator configuration singleton.
  */
 public class NegotiatorConfig {
+    
+    private static Logger logger = LoggerFactory.getLogger(NegotiatorConfig.class);
 
     /**
      * OAuth2 configuration file
@@ -59,6 +65,8 @@ public class NegotiatorConfig {
      * Mail configuration file
      */
     public static final String FILE_MAIL = "bbmri.negotiator.mail.xml";
+    
+    public static final String FILE_CONFIG = "properties.xml";
 
     /** The singleon instance. */
     private static NegotiatorConfig instance = new NegotiatorConfig();
@@ -73,6 +81,8 @@ public class NegotiatorConfig {
      * The project name or prefix for the filefinderutil.
      */
     private String projectName;
+    
+    private static XMLConfiguration config;
 
     /**
      * The fallbackfolder for configuration files.
@@ -102,6 +112,8 @@ public class NegotiatorConfig {
      */
     private String molgenisUsername = "molgenis";
     private String molgenisPassword = "gogogo";
+    
+    
 
     /**
      * Instantiates a new negotiator config.
@@ -149,6 +161,12 @@ public class NegotiatorConfig {
         instance.projectName = projectName;
         instance.fallback = fallback;
 
+        try {
+            config = new XMLConfiguration(FILE_CONFIG);
+        } catch (ConfigurationException e) {
+            logger.error("Couldn't load " + FILE_CONFIG);
+            e.printStackTrace();
+        }
         reinitialize();
     }
 
@@ -233,5 +251,13 @@ public class NegotiatorConfig {
      */
     public String getMolgenisPassword() {
         return molgenisPassword;
+    }
+    
+    public static XMLConfiguration getConfig() {
+        return config;
+    }
+
+    public static void setConfig(XMLConfiguration config) {
+        NegotiatorConfig.config = config;
     }
 }

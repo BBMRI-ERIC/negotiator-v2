@@ -26,27 +26,16 @@
 
 package de.samply.bbmri.negotiator.control;
 
-import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.validator.ValidatorException;
-import javax.servlet.http.Part;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.rest.Directory;
 
@@ -61,15 +50,12 @@ public class QueryBean {
    private static final long serialVersionUID = -611428463046308071L;
    private int jsonQueryId;
 
-   private static Logger logger = LoggerFactory.getLogger(MailUtil.class);
-   private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
+   private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
 
    private Integer id;
-   private String fileContent;
-   private Part file;
    private String queryText;
    private String queryTitle;
    private String jsonQuery;
@@ -110,50 +96,7 @@ public class QueryBean {
        }
        return "/researcher/index";
    }
-
-  /**
-   * Uploads and stores content of file from provided input stream
-   */
-   public void upload() {
-      try {
-    	  fileContent=new Scanner(file.getInputStream()).useDelimiter("\\A").next();
-      }
-      catch (IOException e) {
-          logger.error("Couldn't load file content " + e.getMessage());
-      }
-    }
-
-    /**
-     * Validates uploaded file to be of correct size, content type and format
-     * @param ctx
-     * @param comp
-     * @param value
-     * @throws IOException
-     */
-    public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
-        List<FacesMessage> msgs = new ArrayList<FacesMessage>();
-        Part file = (Part)value;
-        if(file != null) {
-	        if (file.getSize() > MAX_UPLOAD_SIZE) {
-	            msgs.add(new FacesMessage("file too big"));
-	        }
-	        if (!"application/pdf".equals(file.getContentType())) {
-	            msgs.add(new FacesMessage("not a pdf file"));
-	        }
-	        if (!msgs.isEmpty()) {
-	            throw new ValidatorException(msgs);
-	        }
-        }
-    }
-
-    public Part getFile() {
-        return file;
-    }
-
-    public void setFile(Part file) {
-        this.file = file;
-    }
-
+   
     public String getHumanReadableFilters() {
 	 	return humanReadableFilters;
 	}

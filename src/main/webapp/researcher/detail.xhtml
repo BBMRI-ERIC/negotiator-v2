@@ -129,41 +129,40 @@
 
 
 
-
-
+        
         <h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1"
             id="right-panel">
 
-
+       
             <h:panelGroup layout="block">
+                
 
-                <h:panelGroup layout="block">
-
-                    <h3>#{researcherQueriesDetailBean.selectedQuery.title}</h3>
-
-                    <p>#{researcherQueriesDetailBean.selectedQuery.text}</p>
-                    
-                    <h:outputLabel for="filterInputText" value="#{label['queryview.title.searchParameters']}" />
-                    <h:outputText value="#{researcherQueriesDetailBean.humanReadableQuery}"  style="margin-left: 22px;">
-                    </h:outputText>                                       
-                    <br/>
-					<h:outputLink  value="https://molgenis52.gcc.rug.nl"	styleClass="btn btn-default"
-					title="#{label['queryview.tooltip.editQuery']}">
-                    #{label['queryview.title.editQuery']}
-                    </h:outputLink>
-                    
-				</h:panelGroup>               
-	
-				<h:panelGroup layout="block" class="pull-right">
-					<h:outputText
-						title="#{label['queryview.queryitem.datetime.creation']}"
-						value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
-						<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-					</h:outputText>
-				</h:panelGroup>
-				
-			
-
+                    <h:panelGroup layout="block">
+    
+                        <h3>#{researcherQueriesDetailBean.selectedQuery.title}</h3>
+    
+                        <p>#{researcherQueriesDetailBean.selectedQuery.text}</p>
+                        
+                        <h:outputLabel for="filterInputText" value="#{label['queryview.title.searchParameters']}" />
+                        <h:outputText value="#{researcherQueriesDetailBean.humanReadableQuery}"  style="margin-left: 22px;">
+                        </h:outputText>                                       
+                        <br/>
+    					<h:outputLink  value="https://molgenis52.gcc.rug.nl"	styleClass="btn btn-default"
+    					title="#{label['queryview.tooltip.editQuery']}">
+                        #{label['queryview.title.editQuery']}
+                        </h:outputLink>
+                        
+    				</h:panelGroup>               
+    	
+    				<h:panelGroup layout="block" class="pull-right">
+    					<h:outputText
+    						title="#{label['queryview.queryitem.datetime.creation']}"
+    						value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
+    						<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+    					</h:outputText>
+    				</h:panelGroup>
+    				
+    			 
 				<ui:fragment rendered="#{researcherQueriesDetailBean.comments.size() > 0}">
 
                     <div class="col-xs-12">
@@ -187,9 +186,26 @@
                 <bbmricc:commentReply query="#{researcherQueriesDetailBean.selectedQuery}"/>
 
             </h:panelGroup>
+            
+            <h:form id="uploadform" enctype="multipart/form-data">
+                <h3>#{label['querydetail.title.attachments']}</h3>
+                <h:panelGroup layout="block" styleClass="pull-left">
+               
+                <h:inputFile id="file" value="#{researcherQueriesDetailBean.file}" validator="#{researcherQueriesDetailBean.validateFile}"  onchange="document.getElementById('uploadform:uploadBtn').style.display = (!!value) ? 'block' : 'none'" />
+                
+                </h:panelGroup>
+                <h:panelGroup layout="block" styleClass="pull-right">
+               
+                    <h:commandButton id="uploadBtn" value="Upload" 
+                                        action="#{researcherQueriesDetailBean.upload}" styleClass="btn btn-info" style="display: none;"/>                        
+                        
+                </h:panelGroup>
+           <br></br>
+           
+            </h:form>
 
         </h:panelGroup>
-
+    
     </ui:define>
 
 </ui:composition>
