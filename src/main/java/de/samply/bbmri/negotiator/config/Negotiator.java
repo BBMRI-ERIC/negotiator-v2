@@ -47,6 +47,24 @@ public class Negotiator implements Serializable {
     private static final long serialVersionUID = 6899649893727493806L;
 
     /**
+     * The password that molgenis will use for the directory REST endpoint
+     */
+    @XmlElement
+    private String molgenisPassword;
+
+    /**
+     * The username that molgenis will use for the directory REST endpoint
+     */
+    @XmlElement
+    private String molgenisUsername;
+
+    /**
+     * The folder for attachments
+     */
+    @XmlElement
+    private String attachmentPath;
+
+    /**
      * The database configuration.
      */
     @XmlElement
@@ -86,5 +104,29 @@ public class Negotiator implements Serializable {
 
     public void setMailSending(MailSending mailSending) {
         this.mailSending = mailSending;
+    }
+
+    public String getMolgenisUsername() {
+        return molgenisUsername;
+    }
+
+    public void setMolgenisUsername(String molgenisUsername) {
+        this.molgenisUsername = molgenisUsername;
+    }
+
+    public String getMolgenisPassword() {
+        return molgenisPassword;
+    }
+
+    public void setMolgenisPassword(String molgenisPassword) {
+        this.molgenisPassword = molgenisPassword;
+    }
+
+    public String getAttachmentPath() {
+        return attachmentPath;
+    }
+
+    public void setAttachmentPath(String attachmentPath) {
+        this.attachmentPath = attachmentPath;
     }
 }

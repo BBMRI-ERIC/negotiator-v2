@@ -32,8 +32,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -51,11 +49,6 @@ import de.samply.config.util.JAXBUtil;
 public class NegotiatorConfig {
     
     private static Logger logger = LoggerFactory.getLogger(NegotiatorConfig.class);
-
-    /**
-     * The main negotiator configuration file.
-     */
-    public static final String FILE_CONFIG = "properties.xml";
 
     /**
      * The main negotiator configuration file.
@@ -80,8 +73,6 @@ public class NegotiatorConfig {
      * The project name or prefix for the filefinderutil.
      */
     private String projectName;
-    
-    private static XMLConfiguration config;
 
     /**
      * The fallbackfolder for configuration files.
@@ -100,14 +91,6 @@ public class NegotiatorConfig {
      * If true, the application has been started in development mode.
      */
     private boolean developMode = false;
-
-    /**
-     * TODO: Move those values into a proper configuration file.
-     */
-    private String molgenisUsername = "molgenis";
-    private String molgenisPassword = "gogogo";
-    
-    
 
     /**
      * The main negotiator configuration settings
@@ -160,13 +143,6 @@ public class NegotiatorConfig {
             SAXException, ParserConfigurationException {
         instance.projectName = projectName;
         instance.fallback = fallback;
-
-        try {
-            config = new XMLConfiguration(FILE_CONFIG);
-        } catch (ConfigurationException e) {
-            logger.error("Couldn't load " + FILE_CONFIG);
-            e.printStackTrace();
-        }
         reinitialize();
     }
 
@@ -188,7 +164,7 @@ public class NegotiatorConfig {
 
         instance.developMode = "true".equals(System.getProperty("de.samply.development"));
     }
-  
+
     /**
      * Gets the oauth2 client configuration
      *
@@ -223,6 +199,14 @@ public class NegotiatorConfig {
     	return mailConfig;
     }
 
+    /**
+     * Returns the negotiator configuration object.
+     * @return
+     */
+    public Negotiator getNegotiator() {
+        return instance.negotiator;
+    }
+
     public void setMaintenanceMode(boolean maintenanceMode) {
         this.maintenanceMode = maintenanceMode;
     }
@@ -235,27 +219,4 @@ public class NegotiatorConfig {
         return developMode;
     }
 
-    /**
-     * Returns the username that must be used for the REST endpoint for the directory
-     * @return molgenis username
-     */
-    public String getMolgenisUsername() {
-        return molgenisUsername;
-    }
-
-    /**
-     * Returns the password that must be used for the REST endpoint for the directory
-     * @return molgenis password
-     */
-    public String getMolgenisPassword() {
-        return molgenisPassword;
-    }
-    
-    public static XMLConfiguration getConfig() {
-        return config;
-    }
-
-    public static void setConfig(XMLConfiguration config) {
-        NegotiatorConfig.config = config;
-    }
 }
