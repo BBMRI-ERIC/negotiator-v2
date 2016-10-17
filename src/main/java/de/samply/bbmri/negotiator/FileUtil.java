@@ -39,29 +39,28 @@ import org.slf4j.LoggerFactory;
 public class FileUtil {
 
 
-    private static Logger logger = LoggerFactory.getLogger(MailUtil.class);
+    private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
     
     /**
      * Copies file to query attachments directory
      * @param uploaded file
      * @return name of persisted file
      */
-    public static String saveQueryAttachment(Part file) {
+    public static String saveQueryAttachment(Part file, String fileName) {
         String uploadPath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
         File uploadDir = new File(uploadPath);
         uploadDir.mkdirs();
         
         try (InputStream input = file.getInputStream()) {
-            String filename = getFileName(file);
             
-            Files.copy(input, new File(uploadDir, filename).toPath());
-            return filename;
+            Files.copy(input, new File(uploadDir, fileName).toPath());
+            return fileName;
             
         }
         catch (IOException e) {
             logger.error("Couldn't save attachment ", e);
+            return null;
         }
-        return null;
     }
     
     /**
@@ -69,11 +68,12 @@ public class FileUtil {
      * @param filePart
      * @return
      */
-    public static String getFileName(Part filePart) {
+    public static String getFileName(Part filePart, int queryId, int numAttachments) {
         String header = filePart.getHeader("content-disposition");
         for(String headerPart : header.split(";")) {
             if(headerPart.trim().startsWith("filename")){
-                return headerPart.substring(headerPart.indexOf('=') + 1).trim().replace("\"", "");
+                return "Query" + queryId + "-" + numAttachments + headerPart.substring(headerPart.indexOf('=') + 1).trim().replace("\"", "");
+              
             }
         }
         return null;

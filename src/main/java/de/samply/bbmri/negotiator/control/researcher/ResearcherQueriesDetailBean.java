@@ -202,11 +202,15 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * Uploads and stores content of file from provided input stream
      */
     public void upload() {
-       //TODO - store file name in query attachments table
-       FileUtil.saveQueryAttachment(file);
-            
+        //TODO - store file name in query attachments table
+        int numAttachments = selectedQuery.getNumAttachments();
+        String uploadName = FileUtil.getFileName(file, queryId, numAttachments);
+        
+        if(FileUtil.saveQueryAttachment(file, uploadName) != null)
+            DbUtil.updateNumQueryAttachments(selectedQuery.getId(), ++numAttachments);     
+        
     }
-    
+     
     public void setQueries(List<QueryStatsDTO> queries) {
         this.queries = queries;
     }

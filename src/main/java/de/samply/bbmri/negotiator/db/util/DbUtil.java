@@ -86,6 +86,26 @@ public class DbUtil {
         }
     }
 
+
+    /**
+     * Update number of attachments associated with this query
+     * @param numAttachments
+     * @param queryId
+     * @throws SQLException
+     */
+    public static void updateNumQueryAttachments(Integer queryId, Integer numAttachments) {
+        try(Config config = ConfigFactory.get()) {
+            config.dsl().update(Tables.QUERY)
+                        .set(Tables.QUERY.NUM_ATTACHMENTS, numAttachments)
+                        .where(Tables.QUERY.ID.eq(queryId))
+                        .execute();
+            config.get().commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
     /**
      * Get the JSON query from the database.
      * @param config JOOQ configuration
