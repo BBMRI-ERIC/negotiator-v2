@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = 1371962573;
+	private static final long serialVersionUID = 970373764;
 
 	private Integer   id;
 	private String    title;
@@ -31,6 +31,7 @@ public class Query implements Serializable {
 	private Timestamp queryCreationTime;
 	private Integer   researcherId;
 	private String    jsonText;
+	private Integer   numAttachments;
 	private String    negotiatorToken;
 
 	public Query() {}
@@ -42,6 +43,7 @@ public class Query implements Serializable {
 		this.queryCreationTime = value.queryCreationTime;
 		this.researcherId = value.researcherId;
 		this.jsonText = value.jsonText;
+		this.numAttachments = value.numAttachments;
 		this.negotiatorToken = value.negotiatorToken;
 	}
 
@@ -52,6 +54,7 @@ public class Query implements Serializable {
 		Timestamp queryCreationTime,
 		Integer   researcherId,
 		String    jsonText,
+		Integer   numAttachments,
 		String    negotiatorToken
 	) {
 		this.id = id;
@@ -60,6 +63,7 @@ public class Query implements Serializable {
 		this.queryCreationTime = queryCreationTime;
 		this.researcherId = researcherId;
 		this.jsonText = jsonText;
+		this.numAttachments = numAttachments;
 		this.negotiatorToken = negotiatorToken;
 	}
 
@@ -109,6 +113,14 @@ public class Query implements Serializable {
 
 	public void setJsonText(String jsonText) {
 		this.jsonText = jsonText;
+	}
+
+	public Integer getNumAttachments() {
+		return this.numAttachments;
+	}
+
+	public void setNumAttachments(Integer numAttachments) {
+		this.numAttachments = numAttachments;
 	}
 
 	public String getNegotiatorToken() {
