@@ -26,6 +26,12 @@
 
 <negotiator>
 
+    <molgenisUsername>molgenis</molgenisUsername>
+
+    <molgenisPassword>gogogo</molgenisPassword>
+
+    <attachmentPath>/home/paul/uploads/</attachmentPath>
+
     <postgresql xmlns:c="http://schema.samply.de/common">
 
         <c:host>localhost</c:host>
