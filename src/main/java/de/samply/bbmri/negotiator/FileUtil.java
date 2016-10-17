@@ -33,7 +33,6 @@ import java.nio.file.Files;
 
 import javax.servlet.http.Part;
 
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,7 @@ public class FileUtil {
      * @return name of persisted file
      */
     public static String saveQueryAttachment(Part file) {
-        String uploadPath = NegotiatorConfig.getConfig().getString("attachments.path");
+        String uploadPath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
         File uploadDir = new File(uploadPath);
         uploadDir.mkdirs();
         
@@ -63,7 +62,7 @@ public class FileUtil {
             logger.error("Couldn't save attachment ", e);
         }
         return null;
-    }    
+    }
     
     /**
      * Retrieve the file name of a javax.servlet.http.Part

@@ -32,12 +32,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.common.config.OAuth2Client;
 import de.samply.common.config.ObjectFactory;
 import de.samply.common.config.Postgresql;
@@ -52,37 +51,28 @@ public class NegotiatorConfig {
     private static Logger logger = LoggerFactory.getLogger(NegotiatorConfig.class);
 
     /**
-     * OAuth2 configuration file
+     * The main negotiator configuration file.
      */
-	public static final String FILE_OAUTH = "bbmri.negotiator.oauth2.xml";
-
-    /**
-     * Postgresql configuration file
-     */
-    public static final String FILE_POSTGRESQL = "bbmri.negotiator.postgres.xml";
-    
-    /**
-     * Mail configuration file
-     */
-    public static final String FILE_MAIL = "bbmri.negotiator.mail.xml";
-    
-    public static final String FILE_CONFIG = "properties.xml";
+    public static final String FILE_NEGOTIATOR = "bbmri.negotiator.xml";
 
     /** The singleon instance. */
     private static NegotiatorConfig instance = new NegotiatorConfig();
 
-    /** The oauth2 client configuration. */
+    /** The oauth2 client configuration, read from FILE_NEGOTIATOR. */
     private OAuth2Client oauth2 = new OAuth2Client();
 
-    /** The postgresql database attributes */
+    /** The postgresql database attributes, read from FILE_NEGOTIATOR. */
     private Postgresql postgresql = new Postgresql();
+
+    /**
+     * Mail configuration, read from FILE_NEGOTIATOR.
+     */
+    private MailSending mailConfig;
 
     /**
      * The project name or prefix for the filefinderutil.
      */
     private String projectName;
-    
-    private static XMLConfiguration config;
 
     /**
      * The fallbackfolder for configuration files.
@@ -103,17 +93,9 @@ public class NegotiatorConfig {
     private boolean developMode = false;
 
     /**
-     * Mail configuration
+     * The main negotiator configuration settings
      */
-	private MailSending mailConfig;
-
-    /**
-     * TODO: Move those values into a proper configuration file.
-     */
-    private String molgenisUsername = "molgenis";
-    private String molgenisPassword = "gogogo";
-    
-    
+    private Negotiator negotiator;
 
     /**
      * Instantiates a new negotiator config.
@@ -131,7 +113,8 @@ public class NegotiatorConfig {
      */
     private static synchronized JAXBContext getJAXBContext() throws JAXBException {
         if (jaxbContext == null) {
-            jaxbContext = JAXBContext.newInstance(ObjectFactory.class, de.samply.common.mailing.ObjectFactory.class);
+            jaxbContext = JAXBContext.newInstance(ObjectFactory.class, de.samply.common.mailing.ObjectFactory.class,
+                    Negotiator.class);
         }
         return jaxbContext;
     }
@@ -160,13 +143,6 @@ public class NegotiatorConfig {
             SAXException, ParserConfigurationException {
         instance.projectName = projectName;
         instance.fallback = fallback;
-
-        try {
-            config = new XMLConfiguration(FILE_CONFIG);
-        } catch (ConfigurationException e) {
-            logger.error("Couldn't load " + FILE_CONFIG);
-            e.printStackTrace();
-        }
         reinitialize();
     }
 
@@ -179,18 +155,16 @@ public class NegotiatorConfig {
      * @throws ParserConfigurationException the parser configuration exception
      */
     public static void reinitialize() throws JAXBException, FileNotFoundException, SAXException, ParserConfigurationException {
-        instance.oauth2 = JAXBUtil.findUnmarshall(FILE_OAUTH, getJAXBContext(), OAuth2Client.class,
+        instance.negotiator = JAXBUtil.findUnmarshall(FILE_NEGOTIATOR, getJAXBContext(), Negotiator.class,
                 instance.projectName, instance.fallback);
 
-        instance.postgresql = JAXBUtil.findUnmarshall(FILE_POSTGRESQL, getJAXBContext(), Postgresql.class,
-                instance.projectName, instance.fallback);
-        
-        instance.mailConfig = JAXBUtil.findUnmarshall(FILE_MAIL, getJAXBContext(), MailSending.class,
-                instance.projectName, instance.fallback);
+        instance.oauth2 = instance.negotiator.getoAuth2Client();
+        instance.postgresql = instance.negotiator.getPostgresql();
+        instance.mailConfig = instance.negotiator.getMailSending();
 
         instance.developMode = "true".equals(System.getProperty("de.samply.development"));
     }
-  
+
     /**
      * Gets the oauth2 client configuration
      *
@@ -225,6 +199,14 @@ public class NegotiatorConfig {
     	return mailConfig;
     }
 
+    /**
+     * Returns the negotiator configuration object.
+     * @return
+     */
+    public Negotiator getNegotiator() {
+        return instance.negotiator;
+    }
+
     public void setMaintenanceMode(boolean maintenanceMode) {
         this.maintenanceMode = maintenanceMode;
     }
@@ -237,27 +219,4 @@ public class NegotiatorConfig {
         return developMode;
     }
 
-    /**
-     * Returns the username that must be used for the REST endpoint for the directory
-     * @return molgenis username
-     */
-    public String getMolgenisUsername() {
-        return molgenisUsername;
-    }
-
-    /**
-     * Returns the password that must be used for the REST endpoint for the directory
-     * @return molgenis password
-     */
-    public String getMolgenisPassword() {
-        return molgenisPassword;
-    }
-    
-    public static XMLConfiguration getConfig() {
-        return config;
-    }
-
-    public static void setConfig(XMLConfiguration config) {
-        NegotiatorConfig.config = config;
-    }
 }

@@ -1,0 +1,79 @@
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<negotiator>
+
+    <molgenisUsername>molgenis</molgenisUsername>
+
+    <molgenisPassword>gogogo</molgenisPassword>
+
+    <attachmentPath>/home/paul/uploads/</attachmentPath>
+
+    <postgresql xmlns:c="http://schema.samply.de/common">
+
+        <c:host>localhost</c:host>
+
+        <c:database>negotiator</c:database>
+
+        <c:username>paul</c:username>
+
+        <c:password></c:password>
+
+    </postgresql>
+
+    <oAuth2Client xmlns:o2="http://schema.samply.de/config/OAuth2Client">
+
+        <o2:host>https://auth-dev.mitro.dkfz.de</o2:host>
+        <o2:hostPublicKey>
+            MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxTXQnpVe5tqYre2xGOVQu5q1i
+            5NOAYjff3Cx1U0a28M8+LQkgVZW6RGAhngPJWXISx4+4J+y7tn1s0T2W5Q51NlzJFkAdz
+            3nZ4dYbW0zVo6GfFbi/5ccEIVbV7aF/gzKc6LDx9IPQW5USSVr0hKYHPPW8jsaQ+7og3W
+            AnOCkvLoq4GESf60zhRZdY+T1QlCCEjY77VGFgHDAqV+D8FFoDTPFHWZ5ojWWYr2IUE+G
+            SXW7ESFu1oVgWeetrKj0N8m+8oJH7IfLBa2vrFXrCIKA4PuHT9kj7Cmqp0RHDmPaLJk20
+            HAFeubfMx25xC11dbcmYhny+D+C+FSJJuItthnMdj9dt09rvsamZT8fkOBXYs+gHp5M24
+            Qs05G9602WplG6yXS63HKvNkr/GtDyjp8ZY/EC9Cf71Bx5W4aYCs9m7nAf9Q74uSYeRpr
+            K4b3YNHD4yLlPMDwndVChcy4LmRdnfqA71mhlcWhO/nAQUXDiheedDUQbQ9fFPYs4X8aA
+            h6yxHsC6b1IPOqS0BQW/inLdne7zSOjcfD/T79kDssc3xlS6NRJlP1S5VZyEp9a4f2igq
+            QFWtsWh7Mzm464EsZ7RuesodoZWn5kazMPp7h9HU6COfUmDRA/sObHxLFcbMbuqOdUnhB
+            OdDiQvhOSQ29YXrKbFEGXeDdEX5vyIKQyW1fUCAwEAAQ==
+        </o2:hostPublicKey>
+        <o2:clientId>localhost</o2:clientId>
+        <o2:clientSecret>37b19g249sintn82gv7fg67meoisebn9i0groukr15bl8ama5m6ci0nsor45ovv9hrsins74e58df8c454bm384g1vqdqfdjop61u2m</o2:clientSecret>
+
+    </oAuth2Client>
+
+    <mailSending xmlns:ms="http://schema.samply.de/config/MailSending">
+        <ms:host>mailhost.dkfz-heidelberg.de</ms:host>
+        <ms:protocol>smtp</ms:protocol>
+        <ms:fromAddress>noreply@www12.inet.dkfz-heidelberg.de</ms:fromAddress>
+        <ms:fromName>bbmri.notification</ms:fromName>
+        <ms:user></ms:user>
+        <ms:password></ms:password>
+        <ms:port>25</ms:port>
+        <ms:templateFolder>resources/emailTemplates/</ms:templateFolder>
+    </mailSending>
+
+</negotiator>
