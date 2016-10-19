@@ -94,7 +94,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The list of comments for the selected query
      */
     private List<CommentPersonDTO> comments;
-    
+
     /**
      * Query attachment upload
      */
@@ -104,6 +104,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The structured query object
      */
     private String humanReadableQuery = null;
+
+    /**
+     * The query DTO object mapped to the JSON text received from the directory
+     */
+    QueryDTO queryDTO = null;
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
@@ -126,10 +131,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     /**
-     * initialises the page by getting all the comments for a selected(clicked on) query
+     * Redirects the user to directory for editing the query
      */
-    public void editQuery() {
-
+    public String editQuery() {
+        String url = queryDTO.getUrl();
+        return url;
     }
 
     /**
@@ -142,8 +148,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
         	jsonText = DbUtil.getQuery(config, queryId);
         	RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-            QueryDTO query = mapper.readValue(jsonText, QueryDTO.class);
-        	setHumanReadableQuery(query.getHumanReadable());
+            queryDTO = mapper.readValue(jsonText, QueryDTO.class);
+        	setHumanReadableQuery(queryDTO.getHumanReadable());
+
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (JsonParseException e) {
@@ -196,7 +203,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             }
         }
     }
-    
+
 
     /**
      * Uploads and stores content of file from provided input stream
@@ -205,12 +212,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
         //TODO - store file name in query attachments table
         int numAttachments = selectedQuery.getNumAttachments();
         String uploadName = FileUtil.getFileName(file, queryId, numAttachments);
-        
+
         if(FileUtil.saveQueryAttachment(file, uploadName) != null)
-            DbUtil.updateNumQueryAttachments(selectedQuery.getId(), ++numAttachments);     
-        
+            DbUtil.updateNumQueryAttachments(selectedQuery.getId(), ++numAttachments);
+
     }
-     
+
     public void setQueries(List<QueryStatsDTO> queries) {
         this.queries = queries;
     }
@@ -262,7 +269,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 	public void setHumanReadableQuery(String humanReadableQuery) {
 		this.humanReadableQuery = humanReadableQuery;
 	}
-	
+
     public Part getFile() {
         return file;
     }

@@ -147,7 +147,7 @@
                         <h:outputText value="#{researcherQueriesDetailBean.humanReadableQuery}"  style="margin-left: 22px;">
                         </h:outputText>                                       
                         <br/>
-    					<h:outputLink  value="https://molgenis52.gcc.rug.nl"	styleClass="btn btn-default"
+    					<h:outputLink  value="#{researcherQueriesDetailBean.editQuery()}" styleClass="btn btn-default"
     					title="#{label['queryview.tooltip.editQuery']}">
                         #{label['queryview.title.editQuery']}
                         </h:outputLink>
