@@ -4,21 +4,17 @@
 package de.samply.bbmri.negotiator.jooq.tables;
 
 
-import de.samply.bbmri.negotiator.jooq.Keys;
-import de.samply.bbmri.negotiator.jooq.Public;
-import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
-
 import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Generated;
 
-import org.jooq.Field;
-import org.jooq.Identity;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.TableImpl;
+
+import de.samply.bbmri.negotiator.jooq.Keys;
+import de.samply.bbmri.negotiator.jooq.Public;
+import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 
 
 /**
@@ -34,7 +30,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Location extends TableImpl<LocationRecord> {
 
-	private static final long serialVersionUID = -1125014163;
+	private static final long serialVersionUID = 2028380713;
 
 	/**
 	 * The reference instance of <code>public.location</code>
@@ -62,7 +58,7 @@ public class Location extends TableImpl<LocationRecord> {
 	/**
 	 * The column <code>public.location.description</code>.
 	 */
-	public final TableField<LocationRecord, String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.VARCHAR.length(1023), this, "");
+	public final TableField<LocationRecord, String> DESCRIPTION = createField("description", org.jooq.impl.SQLDataType.CLOB, this, "");
 
 	/**
 	 * The column <code>public.location.directory_id</code>.

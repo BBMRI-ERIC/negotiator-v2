@@ -4,23 +4,18 @@
 package de.samply.bbmri.negotiator.jooq.tables;
 
 
-import de.samply.bbmri.negotiator.jooq.Keys;
-import de.samply.bbmri.negotiator.jooq.Public;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Generated;
 
-import org.jooq.Field;
-import org.jooq.ForeignKey;
-import org.jooq.Identity;
-import org.jooq.Table;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
+import org.jooq.*;
 import org.jooq.impl.TableImpl;
+
+import de.samply.bbmri.negotiator.jooq.Keys;
+import de.samply.bbmri.negotiator.jooq.Public;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 
 
 /**
@@ -36,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = 1761805237;
+	private static final long serialVersionUID = 591943276;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -80,6 +75,11 @@ public class Query extends TableImpl<QueryRecord> {
 	 * The column <code>public.query.json_text</code>.
 	 */
 	public final TableField<QueryRecord, String> JSON_TEXT = createField("json_text", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+
+	/**
+	 * The column <code>public.query.num_attachments</code>.
+	 */
+	public final TableField<QueryRecord, Integer> NUM_ATTACHMENTS = createField("num_attachments", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>public.query.negotiator_token</code>.

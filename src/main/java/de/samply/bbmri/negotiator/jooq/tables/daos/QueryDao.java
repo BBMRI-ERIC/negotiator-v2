@@ -4,9 +4,6 @@
 package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 
-import de.samply.bbmri.negotiator.jooq.tables.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -14,6 +11,9 @@ import javax.annotation.Generated;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
+
+import de.samply.bbmri.negotiator.jooq.tables.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 
 
 /**
@@ -98,6 +98,13 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByJsonText(String... values) {
 		return fetch(Query.QUERY.JSON_TEXT, values);
+	}
+
+	/**
+	 * Fetch records that have <code>num_attachments IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByNumAttachments(Integer... values) {
+		return fetch(Query.QUERY.NUM_ATTACHMENTS, values);
 	}
 
 	/**

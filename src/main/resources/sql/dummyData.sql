@@ -62,7 +62,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
   ], "URL": "https://does-not-exist.com"
 }', 0, 'token-3');
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, negotiator_token) VALUES(4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8,
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8,
 '{
     "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
@@ -75,7 +75,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ], "URL": "https://does-not-exist.com"
-}', 'token-4');
+}', 0, 'token-4');
 
 SELECT pg_catalog.setval('query_id_seq', 4, true);
 

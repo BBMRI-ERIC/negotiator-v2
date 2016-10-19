@@ -4,7 +4,7 @@ CREATE TYPE "flag" AS ENUM ('UNFLAGGED', 'ARCHIVED', 'IGNORED', 'STARRED');
 CREATE TABLE "location" (
     "id" SERIAL NOT NULL,
     "name" CHARACTER VARYING(255) NOT NULL,
-    "description" CHARACTER VARYING(1023),
+    "description" TEXT,
     "directory_id" CHARACTER VARYING(255) NOT NULL UNIQUE,
     PRIMARY KEY ("id")
 );
