@@ -30,7 +30,13 @@
 
     <molgenisPassword>gogogo</molgenisPassword>
 
-    <attachmentPath>/home/paul/uploads/</attachmentPath>
+    <molgenisResourceBiobanks>eu_bbmri_eric_biobanks</molgenisResourceBiobanks>
+
+    <molgenisResourceCollections>eu_bbmri_eric_collections</molgenisResourceCollections>
+
+    <molgenisUrl>https://molgenis52.gcc.rug.nl</molgenisUrl>
+
+    <attachmentPath>/home/my-upload-folder/uploads/</attachmentPath>
 
     <postgresql xmlns:c="http://schema.samply.de/common">
 
@@ -75,5 +81,20 @@
         <ms:port>25</ms:port>
         <ms:templateFolder>resources/emailTemplates/</ms:templateFolder>
     </mailSending>
+
+    <proxy xmlns:c="http://schema.samply.de/common">
+        <c:HTTP>
+            <c:Url>www-int2.inet.dkfz-heidelberg.de:3128</c:Url>
+            <c:Username/>
+            <c:Password/>
+        </c:HTTP>
+        <c:HTTPS>
+            <c:Url>www-int2.inet.dkfz-heidelberg.de:3128</c:Url>
+            <c:Username/>
+            <c:Password/>
+        </c:HTTPS>
+        <c:Realm/>
+        <c:NoProxyHosts/>
+    </proxy>
 
 </negotiator>

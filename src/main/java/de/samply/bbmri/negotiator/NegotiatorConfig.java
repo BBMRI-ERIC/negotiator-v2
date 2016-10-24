@@ -26,22 +26,18 @@
 
 package de.samply.bbmri.negotiator;
 
-import java.io.FileNotFoundException;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-
+import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.common.config.*;
+import de.samply.common.mailing.MailSending;
+import de.samply.config.util.JAXBUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.common.config.OAuth2Client;
-import de.samply.common.config.ObjectFactory;
-import de.samply.common.config.Postgresql;
-import de.samply.common.mailing.MailSending;
-import de.samply.config.util.JAXBUtil;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.FileNotFoundException;
 
 /**
  * The negotiator configuration singleton.
@@ -163,6 +159,30 @@ public class NegotiatorConfig {
         instance.mailConfig = instance.negotiator.getMailSending();
 
         instance.developMode = "true".equals(System.getProperty("de.samply.development"));
+
+        /**
+         * Setting the proxy variables
+         */
+        if(instance.negotiator.getProxy() != null) {
+            Proxy proxy = instance.negotiator.getProxy();
+
+            setProxyVariables(proxy.getHTTP(), "http");
+            setProxyVariables(proxy.getHTTPS(), "https");
+        }
+
+        System.out.println(System.getProperty("http.proxyHost"));
+    }
+
+    private static void setProxyVariables(HostAuth hostAuth, String protocol) {
+        if(hostAuth != null) {
+            System.setProperty(protocol + ".proxyHost", hostAuth.getUrl().getHost());
+            System.setProperty(protocol + ".proxyPort", "" + hostAuth.getUrl().getPort());
+
+            if(hostAuth.getUsername() != null && hostAuth.getUsername().length() > 0) {
+                System.setProperty(protocol + ".proxyUser", hostAuth.getUsername());
+                System.setProperty(protocol + ".proxyPassword", hostAuth.getPassword());
+            }
+        }
     }
 
     /**
@@ -207,6 +227,10 @@ public class NegotiatorConfig {
         return instance.negotiator;
     }
 
+    /**
+     * Sets the maintenance mode to the given value. Basically disables the application, if the given value is true.
+     * @param maintenanceMode
+     */
     public void setMaintenanceMode(boolean maintenanceMode) {
         this.maintenanceMode = maintenanceMode;
     }

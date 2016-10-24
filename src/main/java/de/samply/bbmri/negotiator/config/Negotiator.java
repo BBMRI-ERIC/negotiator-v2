@@ -26,16 +26,18 @@
 
 package de.samply.bbmri.negotiator.config;
 
-import java.io.Serializable;
+import de.samply.common.config.OAuth2Client;
+import de.samply.common.config.Postgresql;
+import de.samply.common.config.Proxy;
+import de.samply.common.mailing.MailSending;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import de.samply.common.config.OAuth2Client;
-import de.samply.common.config.Postgresql;
-import de.samply.common.mailing.MailSending;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.Serializable;
 
 /**
  * The main configuration for the negotiator configuration.
@@ -45,6 +47,27 @@ import de.samply.common.mailing.MailSending;
 public class Negotiator implements Serializable {
 
     private static final long serialVersionUID = 6899649893727493806L;
+
+    /**
+     * The Molgenis resource name for the biobanks
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String molgenisResourceBiobanks;
+
+    /**
+     * The Molgenis resource name for the biobanks
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String molgenisResourceCollections;
+
+    /**
+     * The URL for the synchronization with the directory.
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String molgenisUrl;
 
     /**
      * The password that molgenis will use for the directory REST endpoint
@@ -75,6 +98,12 @@ public class Negotiator implements Serializable {
      */
     @XmlElement
     private OAuth2Client oAuth2Client;
+
+    /**
+     * The proxy configuration for outgoing HTTP/S connections
+     */
+    @XmlElement
+    private Proxy proxy;
 
     /**
      * The email configuration, including the SMTP settings.
@@ -128,5 +157,37 @@ public class Negotiator implements Serializable {
 
     public void setAttachmentPath(String attachmentPath) {
         this.attachmentPath = attachmentPath;
+    }
+
+    public String getMolgenisUrl() {
+        return molgenisUrl;
+    }
+
+    public void setMolgenisUrl(String molgenisUrl) {
+        this.molgenisUrl = molgenisUrl;
+    }
+
+    public String getMolgenisResourceBiobanks() {
+        return molgenisResourceBiobanks;
+    }
+
+    public void setMolgenisResourceBiobanks(String molgenisResourceBiobanks) {
+        this.molgenisResourceBiobanks = molgenisResourceBiobanks;
+    }
+
+    public String getMolgenisResourceCollections() {
+        return molgenisResourceCollections;
+    }
+
+    public void setMolgenisResourceCollections(String molgenisResourceCollections) {
+        this.molgenisResourceCollections = molgenisResourceCollections;
+    }
+
+    public Proxy getProxy() {
+        return proxy;
+    }
+
+    public void setProxy(Proxy proxy) {
+        this.proxy = proxy;
     }
 }

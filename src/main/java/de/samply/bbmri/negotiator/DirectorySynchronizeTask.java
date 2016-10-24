@@ -26,22 +26,20 @@
 
 package de.samply.bbmri.negotiator;
 
-import java.util.List;
-import java.util.TimerTask;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.directory.client.DirectoryClient;
 import de.samply.directory.client.dto.BiobankDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.TimerTask;
 
 /**
  * Handles the perdiodical synchonization between the directory and our negotiator.
  */
 public class DirectorySynchronizeTask extends TimerTask {
-
-    private static final String BASE_URL = "https://directory-molgenis.bbmri-eric.eu";
 
     /**
      *
@@ -51,7 +49,10 @@ public class DirectorySynchronizeTask extends TimerTask {
     @Override
     public void run() {
         try(Config config = ConfigFactory.get()) {
-            DirectoryClient client = new DirectoryClient(BASE_URL);
+            Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
+
+            DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisUrl(),
+                    negotiatorConfig.getMolgenisResourceBiobanks(), negotiatorConfig.getMolgenisResourceCollections());
 
             logger.info("Starting synchronization with the directory");
 
