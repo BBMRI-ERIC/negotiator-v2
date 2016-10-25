@@ -26,18 +26,6 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
@@ -49,6 +37,13 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * Manages the query detail view for owners
@@ -125,7 +120,7 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     public void unIgnoreQuery(OwnerQueryStatsDTO queryDto){
         try (Config config = ConfigFactory.get()) {
-            DbUtil.UnIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
+            DbUtil.unIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
         } catch (SQLException e) {
             e.printStackTrace();
         }

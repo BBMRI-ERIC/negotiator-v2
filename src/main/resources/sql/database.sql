@@ -94,7 +94,7 @@ CREATE INDEX "queryIdIndexQueryAttachment" ON "query_attachment" (query_id);
 
 COMMENT ON TABLE "query_attachment" IS 'Table for queries that have one or more attachments uploaded.';
 COMMENT ON COLUMN "query_attachment"."query_id" IS 'This column is a foreign key here, taken from query table';
-COMMENT ON COLUMN "query_attachment"."attachment" IS 'The name of the attached file stored in file system, not including the directory;
+COMMENT ON COLUMN "query_attachment"."attachment" IS 'The name of the attached file stored in file system, not including the directory';
 
 
 
