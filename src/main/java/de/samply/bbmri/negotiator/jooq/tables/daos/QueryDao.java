@@ -4,6 +4,9 @@
 package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 
+import de.samply.bbmri.negotiator.jooq.tables.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -11,9 +14,6 @@ import javax.annotation.Generated;
 
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
-
-import de.samply.bbmri.negotiator.jooq.tables.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 
 
 /**

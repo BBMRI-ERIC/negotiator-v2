@@ -92,7 +92,7 @@ public class OwnerQueriesBean implements Serializable {
      */
     public void unIgnoreQuery(OwnerQueryStatsDTO queryDto){
         try (Config config = ConfigFactory.get()) {
-            DbUtil.UnIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
+            DbUtil.unIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
         } catch (SQLException e) {
             e.printStackTrace();
         }

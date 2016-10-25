@@ -52,6 +52,7 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
+import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -94,6 +95,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The list of comments for the selected query
      */
     private List<CommentPersonDTO> comments;
+    
+    private List<QueryAttachmentDTO> attachments;
 
     /**
      * Query attachment upload
@@ -115,6 +118,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
+            setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
             displayHumanReadableQuery();
 
             /**
@@ -208,16 +212,26 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * Uploads and stores content of file from provided input stream
      */
-    public void upload() {
-        //TODO - store file name in query attachments table
-        int numAttachments = selectedQuery.getNumAttachments();
-        String uploadName = FileUtil.getFileName(file, queryId, numAttachments);
+    public String uploadAttachment() {
+        int attachmentIndex = selectedQuery.getNumAttachments();
+        String uploadName = FileUtil.getFileName(file, queryId, attachmentIndex);
 
-        if(FileUtil.saveQueryAttachment(file, uploadName) != null)
-            DbUtil.updateNumQueryAttachments(selectedQuery.getId(), ++numAttachments);
-
+        if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
+            DbUtil.updateNumQueryAttachments(selectedQuery.getId(), ++attachmentIndex);
+            DbUtil.insertQueryAttachmentRecord(selectedQuery.getId(), uploadName);
+        }
+        return "/researcher/detail?queryId="+selectedQuery.getId()+"&faces-redirect=true";
     }
 
+    /*
+     * Remove query attachment record
+     */
+    public String removeAttachment(String attachment) {
+        //TODO - remove physical file from file system
+        DbUtil.deleteQueryAttachmentRecord(selectedQuery.getId(), attachment);
+        return "/researcher/detail?queryId="+selectedQuery.getId()+"&faces-redirect=true";
+    }
+    
     public void setQueries(List<QueryStatsDTO> queries) {
         this.queries = queries;
     }
@@ -276,5 +290,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setFile(Part file) {
         this.file = file;
+    }
+
+    public void setAttachments(List<QueryAttachmentDTO> attachments) {
+        this.attachments = attachments;
+    }
+    
+    public List<QueryAttachmentDTO> getAttachments() {
+        return attachments;
     }
 }

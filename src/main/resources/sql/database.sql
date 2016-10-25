@@ -58,8 +58,24 @@ COMMENT ON TABLE "query" IS 'query table to contain all  queries';
 COMMENT ON COLUMN "query"."id" IS 'primary key';
 COMMENT ON COLUMN "query"."title" IS 'title of query';
 COMMENT ON COLUMN "query"."text" IS 'text of query';
-COMMENT ON COLUMN "query".query_creation_time IS 'date and time of query with out time zone';
-COMMENT ON COLUMN "query".researcher_id IS 'Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)';
+COMMENT ON COLUMN "query"."query_creation_time" IS 'date and time of query with out time zone';
+COMMENT ON COLUMN "query"."num_attachments" IS 'number of attachments ever associated with this query - both existing and deleted, used as an index for naming future attachments';
+COMMENT ON COLUMN "query"."researcher_id" IS 'Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)';
+
+
+CREATE TABLE "query_attachment" (
+    "id" SERIAL NOT NULL,
+    "query_id" INTEGER NOT NULL,
+    "attachment" TEXT NOT NULL,
+    PRIMARY KEY("id"),
+    FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE INDEX "queryIdIndexQueryAttachment" ON "query_attachment" (query_id);
+
+
+COMMENT ON TABLE "query_attachment" IS 'Table for queries that have one or more attachments uploaded.';
+COMMENT ON COLUMN "query_attachment"."query_id" IS 'This column is a foreign key here, taken from query table';
+COMMENT ON COLUMN "query_attachment"."attachment" IS 'The name of the attached file stored in file system, not including the directory;
 
 
 

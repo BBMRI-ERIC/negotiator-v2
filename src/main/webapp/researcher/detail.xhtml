@@ -146,9 +146,9 @@
                         <h:outputLabel for="filterInputText" value="#{label['queryview.title.searchParameters']}" />
                         <h:outputText value="#{researcherQueriesDetailBean.humanReadableQuery}"  style="margin-left: 22px;">
                         </h:outputText>                                       
-                        <br/>
-    					<h:outputLink  value="#{researcherQueriesDetailBean.editQuery()}" styleClass="btn btn-default"
-    					title="#{label['queryview.tooltip.editQuery']}">
+                        <br/><br></br>
+    					<h:outputLink  value="#{researcherQueriesDetailBean.editQuery()}" styleClass="btn btn-primary"
+    					title="#{label['queryview.tooltip.editQuery']}" >
                         #{label['queryview.title.editQuery']}
                         </h:outputLink>
                         
@@ -189,19 +189,18 @@
             
             <h:form id="uploadform" enctype="multipart/form-data">
                 <h3>#{label['querydetail.title.attachments']}</h3>
-                <h:panelGroup layout="block" styleClass="pull-left">
-               
-                <h:inputFile id="file" value="#{researcherQueriesDetailBean.file}" validator="#{researcherQueriesDetailBean.validateFile}"  onchange="document.getElementById('uploadform:uploadBtn').style.display = (!!value) ? 'block' : 'none'" />
-                
-                </h:panelGroup>
-                <h:panelGroup layout="block" styleClass="pull-right">
-               
-                    <h:commandButton id="uploadBtn" value="Upload" 
-                                        action="#{researcherQueriesDetailBean.upload}" styleClass="btn btn-info" style="display: none;"/>                        
                         
+                 <h:panelGroup layout="block" class="pull-left" styleClass="col-md-4">        
+                   <ui:repeat value="#{researcherQueriesDetailBean.attachments}" var="attachment" >
+                        <h:commandLink  action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}"><i class="fa fa-times" aria-hidden="true"/></h:commandLink><h:outputText value="#{attachment.attachment}"/><br></br>
+                   </ui:repeat>
                 </h:panelGroup>
-           <br></br>
-           
+                <br></br>
+                
+                <h:panelGroup layout="block" styleClass="pull-right">
+                    <h:inputFile id="file" value="#{researcherQueriesDetailBean.file}" validator="#{researcherQueriesDetailBean.validateFile}"  onchange="document.getElementById('uploadform:uploadBtn').style.display = (!!value) ? 'block' : 'none'" /><br></br>
+                    <h:commandButton id="uploadBtn" value="Upload" action="#{researcherQueriesDetailBean.uploadAttachment}" styleClass="btn btn-primary" style="display: none;" class="pull-right" />                         
+                </h:panelGroup>
             </h:form>
 
         </h:panelGroup>

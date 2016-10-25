@@ -10,6 +10,7 @@ import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Location;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryPerson;
 import de.samply.bbmri.negotiator.jooq.tables.Role;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
@@ -19,6 +20,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryPersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.RoleRecord;
@@ -56,6 +58,7 @@ public class Keys {
 	public static final Identity<LocationRecord, Integer> IDENTITY_LOCATION = Identities0.IDENTITY_LOCATION;
 	public static final Identity<PersonRecord, Integer> IDENTITY_PERSON = Identities0.IDENTITY_PERSON;
 	public static final Identity<QueryRecord, Integer> IDENTITY_QUERY = Identities0.IDENTITY_QUERY;
+	public static final Identity<QueryAttachmentRecord, Integer> IDENTITY_QUERY_ATTACHMENT = Identities0.IDENTITY_QUERY_ATTACHMENT;
 	public static final Identity<TagRecord, Integer> IDENTITY_TAG = Identities0.IDENTITY_TAG;
 
 	// -------------------------------------------------------------------------
@@ -71,6 +74,7 @@ public class Keys {
 	public static final UniqueKey<PersonRecord> PERSON_AUTH_SUBJECT_KEY = UniqueKeys0.PERSON_AUTH_SUBJECT_KEY;
 	public static final UniqueKey<QueryRecord> QUERY_PKEY = UniqueKeys0.QUERY_PKEY;
 	public static final UniqueKey<QueryRecord> QUERY_NEGOTIATOR_TOKEN_KEY = UniqueKeys0.QUERY_NEGOTIATOR_TOKEN_KEY;
+	public static final UniqueKey<QueryAttachmentRecord> QUERY_ATTACHMENT_PKEY = UniqueKeys0.QUERY_ATTACHMENT_PKEY;
 	public static final UniqueKey<QueryPersonRecord> QUERY_PERSON_PKEY = UniqueKeys0.QUERY_PERSON_PKEY;
 	public static final UniqueKey<RoleRecord> ROLE_PKEY = UniqueKeys0.ROLE_PKEY;
 	public static final UniqueKey<TagRecord> TAG_PKEY = UniqueKeys0.TAG_PKEY;
@@ -86,6 +90,7 @@ public class Keys {
 	public static final ForeignKey<FlaggedQueryRecord, PersonRecord> FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY = ForeignKeys0.FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY;
 	public static final ForeignKey<PersonRecord, LocationRecord> PERSON__PERSON_LOCATION_ID_FKEY = ForeignKeys0.PERSON__PERSON_LOCATION_ID_FKEY;
 	public static final ForeignKey<QueryRecord, PersonRecord> QUERY__QUERY_RESEARCHER_ID_FKEY = ForeignKeys0.QUERY__QUERY_RESEARCHER_ID_FKEY;
+	public static final ForeignKey<QueryAttachmentRecord, QueryRecord> QUERY_ATTACHMENT__QUERY_ATTACHMENT_QUERY_ID_FKEY = ForeignKeys0.QUERY_ATTACHMENT__QUERY_ATTACHMENT_QUERY_ID_FKEY;
 	public static final ForeignKey<QueryPersonRecord, QueryRecord> QUERY_PERSON__QUERY_PERSON_QUERY_ID_FKEY = ForeignKeys0.QUERY_PERSON__QUERY_PERSON_QUERY_ID_FKEY;
 	public static final ForeignKey<QueryPersonRecord, PersonRecord> QUERY_PERSON__QUERY_PERSON_PERSON_ID_FKEY = ForeignKeys0.QUERY_PERSON__QUERY_PERSON_PERSON_ID_FKEY;
 	public static final ForeignKey<RoleRecord, PersonRecord> ROLE__ROLE_PERSON_ID_FKEY = ForeignKeys0.ROLE__ROLE_PERSON_ID_FKEY;
@@ -104,6 +109,7 @@ public class Keys {
 		public static Identity<LocationRecord, Integer> IDENTITY_LOCATION = createIdentity(Location.LOCATION, Location.LOCATION.ID);
 		public static Identity<PersonRecord, Integer> IDENTITY_PERSON = createIdentity(Person.PERSON, Person.PERSON.ID);
 		public static Identity<QueryRecord, Integer> IDENTITY_QUERY = createIdentity(Query.QUERY, Query.QUERY.ID);
+		public static Identity<QueryAttachmentRecord, Integer> IDENTITY_QUERY_ATTACHMENT = createIdentity(QueryAttachment.QUERY_ATTACHMENT, QueryAttachment.QUERY_ATTACHMENT.ID);
 		public static Identity<TagRecord, Integer> IDENTITY_TAG = createIdentity(Tag.TAG, Tag.TAG.ID);
 	}
 
@@ -117,6 +123,7 @@ public class Keys {
 		public static final UniqueKey<PersonRecord> PERSON_AUTH_SUBJECT_KEY = createUniqueKey(Person.PERSON, Person.PERSON.AUTH_SUBJECT);
 		public static final UniqueKey<QueryRecord> QUERY_PKEY = createUniqueKey(Query.QUERY, Query.QUERY.ID);
 		public static final UniqueKey<QueryRecord> QUERY_NEGOTIATOR_TOKEN_KEY = createUniqueKey(Query.QUERY, Query.QUERY.NEGOTIATOR_TOKEN);
+		public static final UniqueKey<QueryAttachmentRecord> QUERY_ATTACHMENT_PKEY = createUniqueKey(QueryAttachment.QUERY_ATTACHMENT, QueryAttachment.QUERY_ATTACHMENT.ID);
 		public static final UniqueKey<QueryPersonRecord> QUERY_PERSON_PKEY = createUniqueKey(QueryPerson.QUERY_PERSON, QueryPerson.QUERY_PERSON.QUERY_ID, QueryPerson.QUERY_PERSON.PERSON_ID);
 		public static final UniqueKey<RoleRecord> ROLE_PKEY = createUniqueKey(Role.ROLE, Role.ROLE.ROLE_TYPE, Role.ROLE.PERSON_ID);
 		public static final UniqueKey<TagRecord> TAG_PKEY = createUniqueKey(Tag.TAG, Tag.TAG.ID);
@@ -130,6 +137,7 @@ public class Keys {
 		public static final ForeignKey<FlaggedQueryRecord, PersonRecord> FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, FlaggedQuery.FLAGGED_QUERY, FlaggedQuery.FLAGGED_QUERY.PERSON_ID);
 		public static final ForeignKey<PersonRecord, LocationRecord> PERSON__PERSON_LOCATION_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.LOCATION_PKEY, Person.PERSON, Person.PERSON.LOCATION_ID);
 		public static final ForeignKey<QueryRecord, PersonRecord> QUERY__QUERY_RESEARCHER_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, Query.QUERY, Query.QUERY.RESEARCHER_ID);
+		public static final ForeignKey<QueryAttachmentRecord, QueryRecord> QUERY_ATTACHMENT__QUERY_ATTACHMENT_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, QueryAttachment.QUERY_ATTACHMENT, QueryAttachment.QUERY_ATTACHMENT.QUERY_ID);
 		public static final ForeignKey<QueryPersonRecord, QueryRecord> QUERY_PERSON__QUERY_PERSON_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, QueryPerson.QUERY_PERSON, QueryPerson.QUERY_PERSON.QUERY_ID);
 		public static final ForeignKey<QueryPersonRecord, PersonRecord> QUERY_PERSON__QUERY_PERSON_PERSON_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, QueryPerson.QUERY_PERSON, QueryPerson.QUERY_PERSON.PERSON_ID);
 		public static final ForeignKey<RoleRecord, PersonRecord> ROLE__ROLE_PERSON_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, Role.ROLE, Role.ROLE.PERSON_ID);

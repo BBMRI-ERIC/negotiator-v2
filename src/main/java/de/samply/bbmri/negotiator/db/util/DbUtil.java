@@ -56,6 +56,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.directory.client.dto.BiobankDTO;
 
@@ -88,7 +89,40 @@ public class DbUtil {
 
 
     /**
-     * Update number of attachments associated with this query
+     * Insert query attachment name
+     * @param queryId
+     * @param attachment
+     * @throws SQLException
+     */
+    public static void insertQueryAttachmentRecord(Integer queryId, String attachment) {
+        try(Config config = ConfigFactory.get()) {
+           config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
+                    .set(Tables.QUERY_ATTACHMENT.ATTACHMENT, attachment)
+                    .set(Tables.QUERY_ATTACHMENT.QUERY_ID, queryId)
+                    .returning(Tables.QUERY_ATTACHMENT.ID)
+                    .fetch();
+           config.get().commit();
+        } 
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    
+    public static void deleteQueryAttachmentRecord(Integer queryId, String attachment) {
+        try(Config config = ConfigFactory.get()) {
+            config.dsl().delete(Tables.QUERY_ATTACHMENT)
+                .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
+                .and(Tables.QUERY_ATTACHMENT.ATTACHMENT.eq(attachment)).execute();
+            config.get().commit();
+        } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Update number of attachments associated with this query (existing and deleted)
      * @param numAttachments
      * @param queryId
      * @throws SQLException
@@ -100,7 +134,8 @@ public class DbUtil {
                         .where(Tables.QUERY.ID.eq(queryId))
                         .execute();
             config.get().commit();
-        } catch (SQLException e) {
+        } 
+        catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -166,7 +201,7 @@ public class DbUtil {
      * @param jsonQuery the JSON query to be inserted
      * @return the primary key/sequence of the inserted query. This will be sent to the perun.
      */
-    public static Result<JsonQueryRecord> InsertQuery(Config config, String jsonQuery) {
+    public static Result<JsonQueryRecord> insertQuery(Config config, String jsonQuery) {
         Result<JsonQueryRecord> id = null;
         try {
         id = config.dsl().insertInto(Tables.JSON_QUERY)
@@ -186,7 +221,7 @@ public class DbUtil {
      * @param queryId the query ID
      * @param userId the owner ID
      */
-    public static void UnIgnoreQuery(Config config, Integer queryId, int userId) {
+    public static void unIgnoreQuery(Config config, Integer queryId, int userId) {
         Timestamp nullObj = null;
         config.dsl().update(Tables.QUERY_PERSON)
                     .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, nullObj)
@@ -313,6 +348,22 @@ public class DbUtil {
     }
 
 
+    /**
+     * Returns a list of CommentPersonDTOs for a specific query.
+     * @param config
+     * @param queryId
+     * @return
+     */
+    public static List<QueryAttachmentDTO> getQueryAttachmentRecords(Config config, int queryId) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_ATTACHMENT, "attachment"))
+                .from(Tables.QUERY_ATTACHMENT)
+                .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
+                .orderBy(Tables.QUERY_ATTACHMENT.ID.asc()).fetch();
+
+        return config.map(result, QueryAttachmentDTO.class);
+    }
+    
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config

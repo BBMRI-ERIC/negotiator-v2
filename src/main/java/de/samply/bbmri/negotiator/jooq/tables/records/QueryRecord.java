@@ -4,6 +4,8 @@
 package de.samply.bbmri.negotiator.jooq.tables.records;
 
 
+import de.samply.bbmri.negotiator.jooq.tables.Query;
+
 import java.sql.Timestamp;
 
 import javax.annotation.Generated;
@@ -13,8 +15,6 @@ import org.jooq.Record1;
 import org.jooq.Record8;
 import org.jooq.Row8;
 import org.jooq.impl.UpdatableRecordImpl;
-
-import de.samply.bbmri.negotiator.jooq.tables.Query;
 
 
 /**
