@@ -362,10 +362,10 @@ public class DbUtil {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.COMMENT, "comment"))
                 .select(getFields(Tables.PERSON, "person"))
-                .select(getFields(Tables.BIOBANK, "biobank"))
+                .select(getFields(Tables.COLLECTION, "collection"))
         		.from(Tables.COMMENT)
                 .join(Tables.PERSON).onKey(Keys.COMMENT__COMMENT_PERSON_ID_FKEY)
-                .join(Tables.BIOBANK, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.BIOBANK_ID.eq(Tables.BIOBANK.ID))
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 

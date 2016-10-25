@@ -4,22 +4,30 @@ INSERT INTO biobank(id, directory_id, name, description) VALUES (3, '3', 'Bioban
 INSERT INTO biobank(id, directory_id, name, description) VALUES (4, '4', 'Biobank Münster', 'The C* biobank in Münstermanaged by the UKM Pathology');
 INSERT INTO biobank(id, directory_id, name, description) VALUES (5, '5', 'Biobank Mainz', 'The C40-49 biobank in Mainz managed by the JGU MedInfo');
 INSERT INTO biobank(id, directory_id, name, description) VALUES (6, '6', 'Biobank Heidelberg', 'The C95 biobank in Heidelberg managed by Zeis');
-SELECT pg_catalog.setval('biobank_id_seq', 6, true);
+ALTER SEQUENCE biobank_id_seq RESTART WITH 7;
 
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (1, 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL, NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (2, 'user2', 'Goerge Biobanker, M.D.', 'test2@test2.org', NULL, 4);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (3, 'user3', 'Dr.med. Sean Researchington', 'test3@test3.org', NULL, NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (4, 'user4', 'Travis Research, M.D.', 'test4@test4.org', NULL, NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (5, 'https://auth-dev.mitro.dkfz.de/users/7', 'BBMRI Biobank Owner', 'owner.bbmri@bbmri.org', NULL, 5);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (6, 'https://auth-dev.mitro.dkfz.de/users/8', 'BBMRI Researcher', 'researcher.bbmri@bbmri.org', NULL, NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (7, 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL, 6);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (8, 'https://auth-dev.mitro.dkfz.de/users/19', 'Saher Maqsood', 's.maqsood@dkfz.de', NULL, 6);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL, 6);
-SELECT pg_catalog.setval('person_id_seq', 9, true);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (1, '1', 'Hamburg Blood Samples', 1);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (2, '2', 'Berlin Blood Samples', 2);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (3, '3', 'München Blood Samples', 3);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (4, '4', 'Münster Blood Samples', 4);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (5, '5', 'Mainz Blood Samples', 5);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (6, '6', 'Heidelberg Blood Samples', 6);
+ALTER SEQUENCE collection_id_seq RESTART WITH 7;
+
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (1, 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL, NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (2, 'user2', 'Goerge Biobanker, M.D.', 'test2@test2.org', NULL, 4);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (3, 'user3', 'Dr.med. Sean Researchington', 'test3@test3.org', NULL, NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (4, 'user4', 'Travis Research, M.D.', 'test4@test4.org', NULL, NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (5, 'https://auth-dev.mitro.dkfz.de/users/7', 'BBMRI Biobank Owner', 'owner.bbmri@bbmri.org', NULL, 5);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (6, 'https://auth-dev.mitro.dkfz.de/users/8', 'BBMRI Researcher', 'researcher.bbmri@bbmri.org', NULL, NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (7, 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL, 6);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (8, 'https://auth-dev.mitro.dkfz.de/users/19', 'Saher Maqsood', 's.maqsood@dkfz.de', NULL, 6);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL, 6);
+ALTER SEQUENCE person_id_seq RESTART WITH 10;
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
 '{
-    "humanReadable":"name: ‘WHATEVER’, materials: ‘DNA’ or ’Plasma’",
+    "humanReadable":"name: ‘Germany’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
     {
       "collectionID":"bbmri-eric:collectionID:BE_B0383_LTC",
@@ -77,7 +85,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
   ], "URL": "https://does-not-exist.com"
 }', 0, 'token-4');
 
-SELECT pg_catalog.setval('query_id_seq', 4, true);
+ALTER SEQUENCE query_id_seq RESTART WITH 5;
 
 INSERT INTO query_person(query_id, person_id) VALUES (1, 2);
 INSERT INTO query_person(query_id, person_id) VALUES (2, 2);
@@ -95,7 +103,7 @@ INSERT INTO query_person(query_id, person_id) VALUES (3, 9);
 INSERT INTO query_person(query_id, person_id) VALUES (4, 9);
 
 INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');
-SELECT pg_catalog.setval('tag_id_seq', 1, true);
+ALTER SEQUENCE tag_id_seq RESTART WITH 2;
 
 INSERT INTO tagged_query(query_id, tag_id) VALUES (1, 1);
 
@@ -104,7 +112,7 @@ INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (2, 1, 2
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (3, 2, 2, '2015-05-01 00:00:00', 'Yes, we have it. Additionally I would recommend you to ask also for C19, C20 codes.');
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (4, 2, 6, '2015-05-01 01:11:00', 'Do you also have available FFPE – surgical material on those samples?');
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (5, 2, 5, '2015-05-01 01:00:00', 'We have about 400 samples on colorectal cancer as a primary diagnosis');
-SELECT pg_catalog.setval('comment_id_seq', 5, true);
+ALTER SEQUENCE comment_id_seq RESTART WITH 6;
 
 INSERT INTO flagged_query(query_id, person_id, flag) VALUES (1, 5, 'STARRED');
 INSERT INTO flagged_query(query_id, person_id, flag) VALUES (2, 5, 'ARCHIVED');

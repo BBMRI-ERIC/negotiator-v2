@@ -26,7 +26,7 @@
 
 package de.samply.bbmri.negotiator.model;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 
@@ -49,9 +49,9 @@ public class CommentPersonDTO implements Serializable {
 	private Person person;
 
 	/**
-	 * The biobank of the person who made the comment.
+	 * The collection of the person who made the comment.
 	 */
-	private Biobank biobank;
+	private Collection collection;
 
 	public Comment getComment() {
 		return comment;
@@ -69,12 +69,12 @@ public class CommentPersonDTO implements Serializable {
 		this.person = person;
 	}
 
-	public Biobank getBiobank() {
-		return biobank;
+	public Collection getCollection() {
+		return collection;
 	}
 
-	public void setBiobank(Biobank biobank) {
-		this.biobank = biobank;
+	public void setCollection(Collection collection) {
+		this.collection = collection;
 	}
 
 }

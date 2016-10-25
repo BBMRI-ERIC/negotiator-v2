@@ -296,14 +296,14 @@ public class UserBean implements Serializable {
 
 				if (biobankOwner) {
 
-					// TODO: Update this to Perun and/or Directory given
-					// Location data
-					biobank = getLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS);
-					if (biobank == null) {
-						throw new UnsupportedOperationException();
-					}
-
-					person.setBiobankId(biobank.getId());
+//					// TODO: Update this to Perun and/or Directory given
+//					// Location data
+//					biobank = getLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS);
+//					if (biobank == null) {
+//						throw new UnsupportedOperationException();
+//					}
+//
+//					person.setBiobankId(biobank.getId());
 				}
 				person.store();
 			} else {
@@ -321,13 +321,13 @@ public class UserBean implements Serializable {
 				}
 
 				if (biobankOwner) {
-					biobank = getLocation(person.getBiobankId());
-
-					// TODO: Update this to Perun and/or Directory given
-					// Location data
-					if (biobank == null) {
-						throw new UnsupportedOperationException();
-					}
+//					biobank = getLocation(person.getBiobankId());
+//
+//					// TODO: Update this to Perun and/or Directory given
+//					// Location data
+//					if (biobank == null) {
+//						throw new UnsupportedOperationException();
+//					}
 				}
 				person.update();
 			}

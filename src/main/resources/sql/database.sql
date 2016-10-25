@@ -41,11 +41,11 @@ CREATE TABLE "person" (
     "auth_name" CHARACTER VARYING(255) NOT NULL,
     "auth_email" CHARACTER VARYING(255) NOT NULL,
     "person_image" BYTEA,
-    "biobank_id" INTEGER,
+    "collection_id" INTEGER,
     PRIMARY KEY ("id"),
-    FOREIGN KEY ("biobank_id") REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY ("collection_id") REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
-CREATE INDEX "biobankIdIndexOwner" ON "person" (biobank_id);
+CREATE INDEX "biobankIdIndexOwner" ON "person" (collection_id);
 
 
 COMMENT ON TABLE "person" IS 'person table which is parent of researcher and owner';
@@ -54,7 +54,7 @@ COMMENT ON COLUMN "person".auth_subject IS 'authentication string that comes fro
 COMMENT ON COLUMN "person".auth_name IS 'the real name of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".auth_email IS 'the email of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".person_image IS 'image/avatar of the person';
-COMMENT ON COLUMN "person".biobank_id IS 'only valid for biobank owners, the ID of the biobank he belongs to';
+COMMENT ON COLUMN "person".collection_id IS 'only valid for biobank owners, the ID of the biobank he belongs to';
 
 
 

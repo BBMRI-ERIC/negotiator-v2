@@ -22,14 +22,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person implements Serializable {
 
-	private static final long serialVersionUID = 1509415562;
+	private static final long serialVersionUID = -656784158;
 
 	private Integer id;
 	private String  authSubject;
 	private String  authName;
 	private String  authEmail;
 	private byte[]  personImage;
-	private Integer biobankId;
+	private Integer collectionId;
 
 	public Person() {}
 
@@ -39,7 +39,7 @@ public class Person implements Serializable {
 		this.authName = value.authName;
 		this.authEmail = value.authEmail;
 		this.personImage = value.personImage;
-		this.biobankId = value.biobankId;
+		this.collectionId = value.collectionId;
 	}
 
 	public Person(
@@ -48,14 +48,14 @@ public class Person implements Serializable {
 		String  authName,
 		String  authEmail,
 		byte[]  personImage,
-		Integer biobankId
+		Integer collectionId
 	) {
 		this.id = id;
 		this.authSubject = authSubject;
 		this.authName = authName;
 		this.authEmail = authEmail;
 		this.personImage = personImage;
-		this.biobankId = biobankId;
+		this.collectionId = collectionId;
 	}
 
 	public Integer getId() {
@@ -98,11 +98,11 @@ public class Person implements Serializable {
 		this.personImage = personImage;
 	}
 
-	public Integer getBiobankId() {
-		return this.biobankId;
+	public Integer getCollectionId() {
+		return this.collectionId;
 	}
 
-	public void setBiobankId(Integer biobankId) {
-		this.biobankId = biobankId;
+	public void setCollectionId(Integer collectionId) {
+		this.collectionId = collectionId;
 	}
 }
