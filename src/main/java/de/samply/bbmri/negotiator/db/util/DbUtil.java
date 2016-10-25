@@ -32,15 +32,13 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.directory.client.dto.BiobankDTO;
+import de.samply.directory.client.dto.CollectionDTO;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -417,7 +415,8 @@ public class DbUtil {
 
     /**
      * Returns the location for the given directory ID.
-     * @param directoryId
+     * @param config database configuration
+     * @param directoryId directory biobank ID
      */
     public static BiobankRecord getBiobank(Config config, String directoryId) {
         return config.dsl().selectFrom(Tables.BIOBANK).where(
@@ -426,11 +425,22 @@ public class DbUtil {
     }
 
     /**
-     * Synchronizes the given Biobank with the Location in the database.
-     * @param config
-     * @param dto
+     * Returns the collection for the given directory ID.
+     * @param config database configuration
+     * @param id directory collection ID
+     * @return
      */
-    public static void synchronizeLocation(Config config, BiobankDTO dto) {
+    private static CollectionRecord getCollection(Config config, String id) {
+        return config.dsl().selectFrom(Tables.COLLECTION).where(
+                Tables.COLLECTION.DIRECTORY_ID.eq(id)).fetchOne();
+    }
+
+    /**
+     * Synchronizes the given Biobank from the directory with the Biobank in the database.
+     * @param config database configuration
+     * @param dto biobank from the directory
+     */
+    public static void synchronizeBiobank(Config config, BiobankDTO dto) {
         BiobankRecord record = DbUtil.getBiobank(config, dto.getId());
 
         if(record == null) {
@@ -448,6 +458,38 @@ public class DbUtil {
         record.setName(dto.getName());
         record.store();
     }
+
+    /**
+     * Synchronizes the given Collection from the directory with the Collection in the database.
+     * @param config database configuration
+     * @param dto collection from the directory
+     */
+    public static void synchronizeCollection(Config config, CollectionDTO dto) {
+        CollectionRecord record = DbUtil.getCollection(config, dto.getId());
+
+        if(record == null) {
+            /**
+             * Create the collection, because it doesnt exist yet
+             */
+            logger.debug("Found new collection, with id {}, adding it to the database" , dto.getId());
+            record = config.dsl().newRecord(Tables.COLLECTION);
+            record.setDirectoryId(dto.getId());
+        } else {
+            logger.debug("Biobank {} already exists, updating fields", dto.getId());
+        }
+
+        if(dto.getBiobank() == null) {
+            logger.debug("Biobank is null. A collection without a biobank?!");
+        } else {
+            BiobankRecord biobankRecord = getBiobank(config, dto.getBiobank().getId());
+
+            record.setBiobankId(biobankRecord.getId());
+        }
+
+        record.setName(dto.getName());
+        record.store();
+    }
+
 
     /**
      * Creates a new query from the given arguments.

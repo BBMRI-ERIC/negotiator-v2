@@ -21,9 +21,8 @@ COMMENT ON COLUMN biobank."directory_id" IS 'The directory ID, e.g. eu_bbmri_eri
 CREATE TABLE collection (
     "id" SERIAL NOT NULL,
     "name" CHARACTER VARYING(255) NOT NULL,
-    "description" TEXT,
     "directory_id" CHARACTER VARYING(255) NOT NULL UNIQUE,
-    "biobank_id" INTEGER NOT NULL REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE,
+    "biobank_id" INTEGER REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY ("id")
 );
 CREATE INDEX "biobankIdIndexCollection" ON "collection" ("biobank_id");
@@ -32,7 +31,6 @@ CREATE INDEX "biobankIdIndexCollection" ON "collection" ("biobank_id");
 COMMENT ON TABLE collection IS 'Table to store collections from the directory';
 COMMENT ON COLUMN collection."id" IS 'primary key';
 COMMENT ON COLUMN collection."name" IS 'The collection name';
-COMMENT ON COLUMN collection."description" IS 'The description for this collection';
 COMMENT ON COLUMN collection."directory_id" IS 'The directory ID, e.g. eu_bbmri_eric_collections:NL45:blood_collection';
 COMMENT ON COLUMN collection."biobank_id" IS 'The Biobank ID this collection belongs to';
 
