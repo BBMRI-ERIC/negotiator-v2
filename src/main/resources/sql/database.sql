@@ -1,7 +1,7 @@
 CREATE TYPE "role_type" AS ENUM ('OWNER', 'RESEARCHER');
 CREATE TYPE "flag" AS ENUM ('UNFLAGGED', 'ARCHIVED', 'IGNORED', 'STARRED');
 
-CREATE TABLE "location" (
+CREATE TABLE biobank (
     "id" SERIAL NOT NULL,
     "name" CHARACTER VARYING(255) NOT NULL,
     "description" TEXT,
@@ -10,10 +10,31 @@ CREATE TABLE "location" (
 );
 
 
-COMMENT ON TABLE "location" IS 'Table to store locations of owner';
-COMMENT ON COLUMN "location"."id" IS 'primary key';
-COMMENT ON COLUMN "location"."name" IS 'location name';
+COMMENT ON TABLE biobank IS 'Table to store biobanks from the directory';
+COMMENT ON COLUMN biobank."id" IS 'primary key';
+COMMENT ON COLUMN biobank."name" IS 'The biobank name';
+COMMENT ON COLUMN biobank."description" IS 'The description for this biobank';
+COMMENT ON COLUMN biobank."directory_id" IS 'The directory ID, e.g. eu_bbmri_eric_biobank:NL45';
 
+
+
+CREATE TABLE collection (
+    "id" SERIAL NOT NULL,
+    "name" CHARACTER VARYING(255) NOT NULL,
+    "description" TEXT,
+    "directory_id" CHARACTER VARYING(255) NOT NULL UNIQUE,
+    "biobank_id" INTEGER NOT NULL REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY ("id")
+);
+CREATE INDEX "biobankIdIndexCollection" ON "collection" ("biobank_id");
+
+
+COMMENT ON TABLE collection IS 'Table to store collections from the directory';
+COMMENT ON COLUMN collection."id" IS 'primary key';
+COMMENT ON COLUMN collection."name" IS 'The collection name';
+COMMENT ON COLUMN collection."description" IS 'The description for this collection';
+COMMENT ON COLUMN collection."directory_id" IS 'The directory ID, e.g. eu_bbmri_eric_collections:NL45:blood_collection';
+COMMENT ON COLUMN collection."biobank_id" IS 'The Biobank ID this collection belongs to';
 
 
 CREATE TABLE "person" (
@@ -22,11 +43,11 @@ CREATE TABLE "person" (
     "auth_name" CHARACTER VARYING(255) NOT NULL,
     "auth_email" CHARACTER VARYING(255) NOT NULL,
     "person_image" BYTEA,
-    "location_id" INTEGER,
+    "biobank_id" INTEGER,
     PRIMARY KEY ("id"),
-    FOREIGN KEY ("location_id") REFERENCES "location"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY ("biobank_id") REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
-CREATE INDEX "locationIdIndexOwner" ON "person" (location_id);
+CREATE INDEX "biobankIdIndexOwner" ON "person" (biobank_id);
 
 
 COMMENT ON TABLE "person" IS 'person table which is parent of researcher and owner';
@@ -35,7 +56,7 @@ COMMENT ON COLUMN "person".auth_subject IS 'authentication string that comes fro
 COMMENT ON COLUMN "person".auth_name IS 'the real name of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".auth_email IS 'the email of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".person_image IS 'image/avatar of the person';
-COMMENT ON COLUMN "person".location_id IS 'only valid for biobank owners, the ID of the location he belongs to';
+COMMENT ON COLUMN "person".biobank_id IS 'only valid for biobank owners, the ID of the biobank he belongs to';
 
 
 

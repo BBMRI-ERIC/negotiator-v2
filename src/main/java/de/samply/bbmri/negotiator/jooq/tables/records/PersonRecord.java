@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements Record6<Integer, String, String, String, byte[], Integer> {
 
-	private static final long serialVersionUID = -1959403904;
+	private static final long serialVersionUID = 79013813;
 
 	/**
 	 * Setter for <code>public.person.id</code>. primary key
@@ -101,16 +101,16 @@ public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements R
 	}
 
 	/**
-	 * Setter for <code>public.person.location_id</code>. only valid for biobank owners, the ID of the location he belongs to
+	 * Setter for <code>public.person.biobank_id</code>. only valid for biobank owners, the ID of the biobank he belongs to
 	 */
-	public void setLocationId(Integer value) {
+	public void setBiobankId(Integer value) {
 		setValue(5, value);
 	}
 
 	/**
-	 * Getter for <code>public.person.location_id</code>. only valid for biobank owners, the ID of the location he belongs to
+	 * Getter for <code>public.person.biobank_id</code>. only valid for biobank owners, the ID of the biobank he belongs to
 	 */
-	public Integer getLocationId() {
+	public Integer getBiobankId() {
 		return (Integer) getValue(5);
 	}
 
@@ -191,7 +191,7 @@ public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements R
 	 */
 	@Override
 	public Field<Integer> field6() {
-		return Person.PERSON.LOCATION_ID;
+		return Person.PERSON.BIOBANK_ID;
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements R
 	 */
 	@Override
 	public Integer value6() {
-		return getLocationId();
+		return getBiobankId();
 	}
 
 	/**
@@ -292,7 +292,7 @@ public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements R
 	 */
 	@Override
 	public PersonRecord value6(Integer value) {
-		setLocationId(value);
+		setBiobankId(value);
 		return this;
 	}
 
@@ -324,7 +324,7 @@ public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements R
 	/**
 	 * Create a detached, initialised PersonRecord
 	 */
-	public PersonRecord(Integer id, String authSubject, String authName, String authEmail, byte[] personImage, Integer locationId) {
+	public PersonRecord(Integer id, String authSubject, String authName, String authEmail, byte[] personImage, Integer biobankId) {
 		super(Person.PERSON);
 
 		setValue(0, id);
@@ -332,6 +332,6 @@ public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements R
 		setValue(2, authName);
 		setValue(3, authEmail);
 		setValue(4, personImage);
-		setValue(5, locationId);
+		setValue(5, biobankId);
 	}
 }

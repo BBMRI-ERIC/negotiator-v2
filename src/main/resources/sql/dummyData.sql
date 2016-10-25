@@ -1,20 +1,20 @@
-INSERT INTO location(id, directory_id, name, description) VALUES (1, '1', 'Biobank Hamburg', 'The biobank for sample from the DKTK in Hamburg managed by the HU');
-INSERT INTO location(id, directory_id, name, description) VALUES (2, '2', 'Biobank Berlin', 'The biobank for tissue samples in Berlin managed by the Charite');
-INSERT INTO location(id, directory_id, name, description) VALUES (3, '3', 'Biobank München', 'The biobank for blood samples in München managed by the TU München');
-INSERT INTO location(id, directory_id, name, description) VALUES (4, '4', 'Biobank Münster', 'The C* biobank in Münstermanaged by the UKM Pathology');
-INSERT INTO location(id, directory_id, name, description) VALUES (5, '5', 'Biobank Mainz', 'The C40-49 biobank in Mainz managed by the JGU MedInfo');
-INSERT INTO location(id, directory_id, name, description) VALUES (6, '6', 'Biobank Heidelberg', 'The C95 biobank in Heidelberg managed by Zeis');
-SELECT pg_catalog.setval('location_id_seq', 6, true);
+INSERT INTO biobank(id, directory_id, name, description) VALUES (1, '1', 'Biobank Hamburg', 'The biobank for sample from the DKTK in Hamburg managed by the HU');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (2, '2', 'Biobank Berlin', 'The biobank for tissue samples in Berlin managed by the Charite');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (3, '3', 'Biobank München', 'The biobank for blood samples in München managed by the TU München');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (4, '4', 'Biobank Münster', 'The C* biobank in Münstermanaged by the UKM Pathology');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (5, '5', 'Biobank Mainz', 'The C40-49 biobank in Mainz managed by the JGU MedInfo');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (6, '6', 'Biobank Heidelberg', 'The C95 biobank in Heidelberg managed by Zeis');
+SELECT pg_catalog.setval('biobank_id_seq', 6, true);
 
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (1, 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL, NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (2, 'user2', 'Goerge Biobanker, M.D.', 'test2@test2.org', NULL, 4);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (3, 'user3', 'Dr.med. Sean Researchington', 'test3@test3.org', NULL, NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (4, 'user4', 'Travis Research, M.D.', 'test4@test4.org', NULL, NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (5, 'https://auth-dev.mitro.dkfz.de/users/7', 'BBMRI Biobank Owner', 'owner.bbmri@bbmri.org', NULL, 5);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (6, 'https://auth-dev.mitro.dkfz.de/users/8', 'BBMRI Researcher', 'researcher.bbmri@bbmri.org', NULL, NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (7, 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL, 6);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (8, 'https://auth-dev.mitro.dkfz.de/users/19', 'Saher Maqsood', 's.maqsood@dkfz.de', NULL, 6);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, location_id) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL, 6);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (1, 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL, NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (2, 'user2', 'Goerge Biobanker, M.D.', 'test2@test2.org', NULL, 4);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (3, 'user3', 'Dr.med. Sean Researchington', 'test3@test3.org', NULL, NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (4, 'user4', 'Travis Research, M.D.', 'test4@test4.org', NULL, NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (5, 'https://auth-dev.mitro.dkfz.de/users/7', 'BBMRI Biobank Owner', 'owner.bbmri@bbmri.org', NULL, 5);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (6, 'https://auth-dev.mitro.dkfz.de/users/8', 'BBMRI Researcher', 'researcher.bbmri@bbmri.org', NULL, NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (7, 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL, 6);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (8, 'https://auth-dev.mitro.dkfz.de/users/19', 'Saher Maqsood', 's.maqsood@dkfz.de', NULL, 6);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, biobank_id) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL, 6);
 SELECT pg_catalog.setval('person_id_seq', 9, true);
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,

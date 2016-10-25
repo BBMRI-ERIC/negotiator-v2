@@ -100,9 +100,9 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	}
 
 	/**
-	 * Fetch records that have <code>location_id IN (values)</code>
+	 * Fetch records that have <code>biobank_id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByLocationId(Integer... values) {
-		return fetch(Person.PERSON.LOCATION_ID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByBiobankId(Integer... values) {
+		return fetch(Person.PERSON.BIOBANK_ID, values);
 	}
 }

@@ -26,8 +26,8 @@
 
 package de.samply.bbmri.negotiator.model;
 
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Location;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 
 import java.io.Serializable;
@@ -40,7 +40,7 @@ public class QueryLocationDTO implements Serializable {
 
     private Comment comment;
 
-    private Location location;
+    private Biobank biobank;
 
     private Person person;
 
@@ -52,12 +52,12 @@ public class QueryLocationDTO implements Serializable {
         this.comment = comment;
     }
 
-    public Location getLocation() {
-        return location;
+    public Biobank getBiobank() {
+        return biobank;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setBiobank(Biobank biobank) {
+        this.biobank = biobank;
     }
 
     public Person getPerson() {
