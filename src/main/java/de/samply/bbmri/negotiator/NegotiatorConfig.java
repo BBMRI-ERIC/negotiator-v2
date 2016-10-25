@@ -169,8 +169,6 @@ public class NegotiatorConfig {
             setProxyVariables(proxy.getHTTP(), "http");
             setProxyVariables(proxy.getHTTPS(), "https");
         }
-
-        System.out.println(System.getProperty("http.proxyHost"));
     }
 
     private static void setProxyVariables(HostAuth hostAuth, String protocol) {
