@@ -6,11 +6,13 @@ package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import org.jooq.Configuration;
-import org.jooq.impl.DAOImpl;
+
+import java.util.List;
 
 import javax.annotation.Generated;
-import java.util.List;
+
+import org.jooq.Configuration;
+import org.jooq.impl.DAOImpl;
 
 
 /**

@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Record8<Integer, String, String, Timestamp, Integer, String, Integer, String> {
 
-	private static final long serialVersionUID = -1224796823;
+	private static final long serialVersionUID = -322728089;
 
 	/**
 	 * Setter for <code>public.query.id</code>. primary key
@@ -117,14 +117,14 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	}
 
 	/**
-	 * Setter for <code>public.query.num_attachments</code>.
+	 * Setter for <code>public.query.num_attachments</code>. number of attachments ever associated with this query - both existing and deleted, used as an index for naming future attachments
 	 */
 	public void setNumAttachments(Integer value) {
 		setValue(6, value);
 	}
 
 	/**
-	 * Getter for <code>public.query.num_attachments</code>.
+	 * Getter for <code>public.query.num_attachments</code>. number of attachments ever associated with this query - both existing and deleted, used as an index for naming future attachments
 	 */
 	public Integer getNumAttachments() {
 		return (Integer) getValue(6);

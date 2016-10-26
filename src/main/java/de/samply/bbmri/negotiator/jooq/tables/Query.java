@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = 591943276;
+	private static final long serialVersionUID = -1169759626;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -82,9 +82,9 @@ public class Query extends TableImpl<QueryRecord> {
 	public final TableField<QueryRecord, String> JSON_TEXT = createField("json_text", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.query.num_attachments</code>.
+	 * The column <code>public.query.num_attachments</code>. number of attachments ever associated with this query - both existing and deleted, used as an index for naming future attachments
 	 */
-	public final TableField<QueryRecord, Integer> NUM_ATTACHMENTS = createField("num_attachments", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<QueryRecord, Integer> NUM_ATTACHMENTS = createField("num_attachments", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "number of attachments ever associated with this query - both existing and deleted, used as an index for naming future attachments");
 
 	/**
 	 * The column <code>public.query.negotiator_token</code>.

@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachmentRecord extends UpdatableRecordImpl<QueryAttachmentRecord> implements Record3<Integer, Integer, String> {
 
-	private static final long serialVersionUID = 893539221;
+	private static final long serialVersionUID = -196424731;
 
 	/**
 	 * Setter for <code>public.query_attachment.id</code>.
@@ -59,14 +59,14 @@ public class QueryAttachmentRecord extends UpdatableRecordImpl<QueryAttachmentRe
 	}
 
 	/**
-	 * Setter for <code>public.query_attachment.attachment</code>.
+	 * Setter for <code>public.query_attachment.attachment</code>. The name of the attached file stored in file system, not including the directory
 	 */
 	public void setAttachment(String value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_attachment.attachment</code>.
+	 * Getter for <code>public.query_attachment.attachment</code>. The name of the attached file stored in file system, not including the directory
 	 */
 	public String getAttachment() {
 		return (String) getValue(2);

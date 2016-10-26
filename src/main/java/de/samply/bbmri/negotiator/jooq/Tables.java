@@ -12,6 +12,7 @@ import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
 import de.samply.bbmri.negotiator.jooq.tables.QueryPerson;
 import de.samply.bbmri.negotiator.jooq.tables.Role;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
@@ -72,6 +73,11 @@ public class Tables {
 	 * Table for queries that have one or more attachments uploaded.
 	 */
 	public static final QueryAttachment QUERY_ATTACHMENT = de.samply.bbmri.negotiator.jooq.tables.QueryAttachment.QUERY_ATTACHMENT;
+
+	/**
+	 * Table for connecting queries with collections
+	 */
+	public static final QueryCollection QUERY_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.QueryCollection.QUERY_COLLECTION;
 
 	/**
 	 * Table for the relationship between all the persons(owners) and the queries that they have replied to.

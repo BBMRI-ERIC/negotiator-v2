@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachment extends TableImpl<QueryAttachmentRecord> {
 
-	private static final long serialVersionUID = -233341775;
+	private static final long serialVersionUID = 1170210394;
 
 	/**
 	 * The reference instance of <code>public.query_attachment</code>
@@ -58,12 +58,12 @@ public class QueryAttachment extends TableImpl<QueryAttachmentRecord> {
 	/**
 	 * The column <code>public.query_attachment.query_id</code>. This column is a foreign key here, taken from query table
 	 */
-	public final TableField<QueryAttachmentRecord, Integer> QUERY_ID = createField("query_id", org.jooq.impl.SQLDataType.INTEGER, this, "This column is a foreign key here, taken from query table");
+	public final TableField<QueryAttachmentRecord, Integer> QUERY_ID = createField("query_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "This column is a foreign key here, taken from query table");
 
 	/**
-	 * The column <code>public.query_attachment.attachment</code>.
+	 * The column <code>public.query_attachment.attachment</code>. The name of the attached file stored in file system, not including the directory
 	 */
-	public final TableField<QueryAttachmentRecord, String> ATTACHMENT = createField("attachment", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<QueryAttachmentRecord, String> ATTACHMENT = createField("attachment", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "The name of the attached file stored in file system, not including the directory");
 
 	/**
 	 * Create a <code>public.query_attachment</code> table reference

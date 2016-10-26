@@ -191,6 +191,20 @@ COMMENT ON COLUMN "query_person".person_id IS 'This column along with the query_
 COMMENT ON COLUMN "query_person".query_leaving_time IS 'The time when an owner leaves a query. This column is empty unless the query is ignored';
 
 
+CREATE TABLE "query_collection" (
+    "query_id" INTEGER NOT NULL,
+    "collection_id" INTEGER NOT NULL,
+    PRIMARY KEY("query_id", "collection_id"),
+    FOREIGN KEY ("collection_id") REFERENCES "collection"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE INDEX "collectionIdIndexQueryCollection" ON "query_collection" (collection_id);
+CREATE INDEX "queryIdIndexQueryCollection" ON "query_collection" (query_id);
+
+
+COMMENT ON TABLE "query_collection" IS 'Table for connecting queries with collections';
+
+
 CREATE TABLE "role" (
     "role_type" "role_type" NOT NULL,
     "person_id" INTEGER NOT NULL REFERENCES "person" ("id"),
