@@ -26,27 +26,45 @@
 
 package de.samply.bbmri.negotiator.db.util;
 
+import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import org.jooq.Condition;
+import org.jooq.Field;
+import org.jooq.JoinType;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.*;
+import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.bbmri.negotiator.rest.Directory;
+import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.directory.client.dto.BiobankDTO;
 import de.samply.directory.client.dto.CollectionDTO;
-import org.jooq.*;
-import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
 
 /**
  * The database util for basic queries.
@@ -501,7 +519,7 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord saveQuery(Config config, String title,
-                                        String text, String jsonText, int researcherId) throws SQLException {
+                                        String text, String jsonText, int researcherId) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
         queryRecord.setJsonText(jsonText);
@@ -511,6 +529,22 @@ public class DbUtil {
         queryRecord.setResearcherId(researcherId);
         queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
         queryRecord.store();
+
+        /**
+         * Add the relationship between query and collection.
+         */
+        QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
+
+        for(de.samply.bbmri.negotiator.rest.dto.CollectionDTO collection : queryDTO.getCollections()) {
+            CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
+
+            if(dbCollection != null) {
+                QueryCollectionRecord queryCollectionRecord = config.dsl().newRecord(Tables.QUERY_COLLECTION);
+                queryCollectionRecord.setQueryId(queryRecord.getId());
+                queryCollectionRecord.setCollectionId(dbCollection.getId());
+                queryCollectionRecord.store();
+            }
+        }
 
         config.commit();
 
