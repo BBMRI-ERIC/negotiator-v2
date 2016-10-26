@@ -25,23 +25,7 @@
  */
 package de.samply.bbmri.negotiator.control;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-
 import com.docuverse.identicon.IdenticonUtil;
-
 import de.samply.auth.client.AuthClient;
 import de.samply.auth.client.InvalidKeyException;
 import de.samply.auth.client.InvalidTokenException;
@@ -57,12 +41,26 @@ import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Location;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Sessionscoped bean for all data of the session about the user.
@@ -115,7 +113,7 @@ public class UserBean implements Serializable {
 	/**
 	 * ID of the Location (only biobank owners)
 	 */
-	private Location location = null;
+	private Biobank biobank = null;
 
 	/**
 	 * The *mapped* user ID in the database.
@@ -245,57 +243,31 @@ public class UserBean implements Serializable {
 	}
 
 	/**
-	 * Creates a location
-	 *
-	 * @param locationId
-	 * @param locationName
-	 * @return Location
-	 */
-	private Location createLocation(Integer locationId, String locationName) {
-		Location location = null;
-
-		try (Config config = ConfigFactory.get()) {
-			LocationRecord locationRecord = config.dsl().newRecord(Tables.LOCATION);
-			locationRecord.setId(locationId);
-			locationRecord.setName(locationName);
-			locationRecord.store();
-
-			location = new Location();
-			location.setId(locationId);
-			location.setName(locationName);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return location;
-	}
-
-	/**
 	 * Gets the location for a location ID
 	 *
 	 * @param locationId
 	 * @return Location
 	 */
-	private Location getLocation(Integer locationId) {
-		Location location = null;
+	private Biobank getLocation(Integer locationId) {
+		Biobank biobank = null;
 
 		try (Config config = ConfigFactory.get()) {
-			LocationRecord locationRecord = config.dsl().selectFrom(Tables.LOCATION)
-			        .where(Tables.LOCATION.ID.eq(locationId)).fetchOne();
+			BiobankRecord locationRecord = config.dsl().selectFrom(Tables.BIOBANK)
+			        .where(Tables.BIOBANK.ID.eq(locationId)).fetchOne();
 
 			if (locationRecord == null) {
 				return null;
 			}
 
-			location = new Location();
-			location.setId(locationRecord.getId());
-			location.setName(locationRecord.getName());
-			return location;
+			biobank = new Biobank();
+			biobank.setId(locationRecord.getId());
+			biobank.setName(locationRecord.getName());
+			return biobank;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return location;
+		return biobank;
 	}
 
 	/**
@@ -324,15 +296,14 @@ public class UserBean implements Serializable {
 
 				if (biobankOwner) {
 
-					// TODO: Update this to Perun and/or Directory given
-					// Location data
-					location = getLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS);
-					if (location == null) {
-						location = createLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS,
-						        TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS);
-					}
-
-					person.setLocationId(location.getId());
+//					// TODO: Update this to Perun and/or Directory given
+//					// Location data
+//					biobank = getLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS);
+//					if (biobank == null) {
+//						throw new UnsupportedOperationException();
+//					}
+//
+//					person.setBiobankId(biobank.getId());
 				}
 				person.store();
 			} else {
@@ -350,14 +321,13 @@ public class UserBean implements Serializable {
 				}
 
 				if (biobankOwner) {
-					location = getLocation(person.getLocationId());
-
-					// TODO: Update this to Perun and/or Directory given
-					// Location data
-					if (location == null) {
-						location = createLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS,
-						        TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS);
-					}
+//					biobank = getLocation(person.getBiobankId());
+//
+//					// TODO: Update this to Perun and/or Directory given
+//					// Location data
+//					if (biobank == null) {
+//						throw new UnsupportedOperationException();
+//					}
 				}
 				person.update();
 			}
@@ -579,9 +549,9 @@ public class UserBean implements Serializable {
 	 * @return
 	 */
 	public Integer getLocationId() {
-		if (location == null)
+		if (biobank == null)
 			return null;
-		return location.getId();
+		return biobank.getId();
 	}
 
 	/**
@@ -590,9 +560,9 @@ public class UserBean implements Serializable {
 	 * @return
 	 */
 	public String getLocationName() {
-		if (location == null)
+		if (biobank == null)
 			return null;
-		return location.getName();
+		return biobank.getName();
 	}
 
 	public Person getPerson() {

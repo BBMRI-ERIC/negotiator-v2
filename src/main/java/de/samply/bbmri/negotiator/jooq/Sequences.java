@@ -24,6 +24,16 @@ import org.jooq.impl.SequenceImpl;
 public class Sequences {
 
 	/**
+	 * The sequence <code>public.biobank_id_seq</code>
+	 */
+	public static final Sequence<Long> BIOBANK_ID_SEQ = new SequenceImpl<Long>("biobank_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>public.collection_id_seq</code>
+	 */
+	public static final Sequence<Long> COLLECTION_ID_SEQ = new SequenceImpl<Long>("collection_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>public.comment_id_seq</code>
 	 */
 	public static final Sequence<Long> COMMENT_ID_SEQ = new SequenceImpl<Long>("comment_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -32,11 +42,6 @@ public class Sequences {
 	 * The sequence <code>public.json_query_id_seq</code>
 	 */
 	public static final Sequence<Long> JSON_QUERY_ID_SEQ = new SequenceImpl<Long>("json_query_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
-	 * The sequence <code>public.location_id_seq</code>
-	 */
-	public static final Sequence<Long> LOCATION_ID_SEQ = new SequenceImpl<Long>("location_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>public.person_id_seq</code>

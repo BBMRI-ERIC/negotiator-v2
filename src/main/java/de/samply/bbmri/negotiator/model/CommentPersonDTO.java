@@ -26,7 +26,7 @@
 
 package de.samply.bbmri.negotiator.model;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Location;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 
@@ -49,9 +49,9 @@ public class CommentPersonDTO implements Serializable {
 	private Person person;
 
 	/**
-	 * The location of the person who made the comment.
+	 * The collection of the person who made the comment.
 	 */
-	private Location location;
+	private Collection collection;
 
 	public Comment getComment() {
 		return comment;
@@ -69,12 +69,12 @@ public class CommentPersonDTO implements Serializable {
 		this.person = person;
 	}
 
-	public Location getLocation() {
-		return location;
+	public Collection getCollection() {
+		return collection;
 	}
 
-	public void setLocation(Location location) {
-		this.location = location;
+	public void setCollection(Collection collection) {
+		this.collection = collection;
 	}
 
 }

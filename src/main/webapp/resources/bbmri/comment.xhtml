@@ -38,7 +38,7 @@
 <composite:interface>
     <composite:attribute name="comment" required="true"/>
     <composite:attribute name="person" required="true"/>
-    <composite:attribute name="location" />
+    <composite:attribute name="collection" />
 </composite:interface>
 
 <composite:implementation>
@@ -46,7 +46,7 @@
 
         <h:panelGroup layout="block" styleClass="panel-heading">
 
-            #{cc.attrs.person.authName}<h:outputText value=", Location: #{cc.attrs.location.name}" rendered="#{cc.attrs.location != null}"/> 
+            #{cc.attrs.person.authName}<h:outputText value=", Collection: #{cc.attrs.collection.name}" rendered="#{cc.attrs.collection != null}"/>
             <h:panelGroup styleClass="pull-right">
                 <h:outputText value="#{cc.attrs.comment.commentTime}">
                     <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>

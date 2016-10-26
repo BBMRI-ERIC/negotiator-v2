@@ -26,39 +26,27 @@
 
 package de.samply.bbmri.negotiator.db.util;
 
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import org.jooq.Condition;
-import org.jooq.Field;
-import org.jooq.JoinType;
-import org.jooq.Record;
-import org.jooq.Result;
-import org.jooq.Table;
-import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.LocationRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.directory.client.dto.BiobankDTO;
+import de.samply.directory.client.dto.CollectionDTO;
+import org.jooq.*;
+import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * The database util for basic queries.
@@ -374,10 +362,10 @@ public class DbUtil {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.COMMENT, "comment"))
                 .select(getFields(Tables.PERSON, "person"))
-                .select(getFields(Tables.LOCATION, "location"))
+                .select(getFields(Tables.COLLECTION, "collection"))
         		.from(Tables.COMMENT)
                 .join(Tables.PERSON).onKey(Keys.COMMENT__COMMENT_PERSON_ID_FKEY)
-                .join(Tables.LOCATION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.LOCATION_ID.eq(Tables.LOCATION.ID))
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 
@@ -427,28 +415,40 @@ public class DbUtil {
 
     /**
      * Returns the location for the given directory ID.
-     * @param directoryId
+     * @param config database configuration
+     * @param directoryId directory biobank ID
      */
-    public static LocationRecord getLocation(Config config, String directoryId) {
-        return config.dsl().selectFrom(Tables.LOCATION).where(
-                Tables.LOCATION.DIRECTORY_ID.eq(directoryId)
+    public static BiobankRecord getBiobank(Config config, String directoryId) {
+        return config.dsl().selectFrom(Tables.BIOBANK).where(
+                Tables.BIOBANK.DIRECTORY_ID.eq(directoryId)
             ).fetchOne();
     }
 
     /**
-     * Synchronizes the given Biobank with the Location in the database.
-     * @param config
-     * @param dto
+     * Returns the collection for the given directory ID.
+     * @param config database configuration
+     * @param id directory collection ID
+     * @return
      */
-    public static void synchronizeLocation(Config config, BiobankDTO dto) {
-        LocationRecord record = DbUtil.getLocation(config, dto.getId());
+    private static CollectionRecord getCollection(Config config, String id) {
+        return config.dsl().selectFrom(Tables.COLLECTION).where(
+                Tables.COLLECTION.DIRECTORY_ID.eq(id)).fetchOne();
+    }
+
+    /**
+     * Synchronizes the given Biobank from the directory with the Biobank in the database.
+     * @param config database configuration
+     * @param dto biobank from the directory
+     */
+    public static void synchronizeBiobank(Config config, BiobankDTO dto) {
+        BiobankRecord record = DbUtil.getBiobank(config, dto.getId());
 
         if(record == null) {
             /**
              * Create the location, because it doesnt exist yet
              */
             logger.debug("Found new biobank, with id {}, adding it to the database" , dto.getId());
-            record = config.dsl().newRecord(Tables.LOCATION);
+            record = config.dsl().newRecord(Tables.BIOBANK);
             record.setDirectoryId(dto.getId());
         } else {
             logger.debug("Biobank {} already exists, updating fields", dto.getId());
@@ -458,6 +458,38 @@ public class DbUtil {
         record.setName(dto.getName());
         record.store();
     }
+
+    /**
+     * Synchronizes the given Collection from the directory with the Collection in the database.
+     * @param config database configuration
+     * @param dto collection from the directory
+     */
+    public static void synchronizeCollection(Config config, CollectionDTO dto) {
+        CollectionRecord record = DbUtil.getCollection(config, dto.getId());
+
+        if(record == null) {
+            /**
+             * Create the collection, because it doesnt exist yet
+             */
+            logger.debug("Found new collection, with id {}, adding it to the database" , dto.getId());
+            record = config.dsl().newRecord(Tables.COLLECTION);
+            record.setDirectoryId(dto.getId());
+        } else {
+            logger.debug("Biobank {} already exists, updating fields", dto.getId());
+        }
+
+        if(dto.getBiobank() == null) {
+            logger.debug("Biobank is null. A collection without a biobank?!");
+        } else {
+            BiobankRecord biobankRecord = getBiobank(config, dto.getBiobank().getId());
+
+            record.setBiobankId(biobankRecord.getId());
+        }
+
+        record.setName(dto.getName());
+        record.store();
+    }
+
 
     /**
      * Creates a new query from the given arguments.

@@ -6,13 +6,11 @@ package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-
-import java.util.List;
-
-import javax.annotation.Generated;
-
 import org.jooq.Configuration;
 import org.jooq.impl.DAOImpl;
+
+import javax.annotation.Generated;
+import java.util.List;
 
 
 /**
@@ -100,9 +98,9 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	}
 
 	/**
-	 * Fetch records that have <code>location_id IN (values)</code>
+	 * Fetch records that have <code>collection_id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByLocationId(Integer... values) {
-		return fetch(Person.PERSON.LOCATION_ID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByCollectionId(Integer... values) {
+		return fetch(Person.PERSON.COLLECTION_ID, values);
 	}
 }

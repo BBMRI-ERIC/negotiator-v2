@@ -26,16 +26,15 @@
 
 package de.samply.bbmri.negotiator.test;
 
-import static org.junit.Assert.assertTrue;
-
-import java.sql.SQLException;
-
-import org.junit.Test;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
 import de.samply.bbmri.negotiator.jooq.Tables;
+import org.junit.Test;
+
+import java.sql.SQLException;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * Runs the synchronization ones and checks if there are more than 10 locations.
@@ -48,7 +47,7 @@ public class DirectorySynchronize {
         task.run();
 
         try(Config config = ConfigFactory.get()) {
-            assertTrue(config.dsl().selectFrom(Tables.LOCATION).fetch().size() > 10);
+            assertTrue(config.dsl().selectFrom(Tables.BIOBANK).fetch().size() > 10);
         }
     }
 

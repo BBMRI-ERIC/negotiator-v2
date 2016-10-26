@@ -30,6 +30,7 @@ import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.directory.client.DirectoryClient;
 import de.samply.directory.client.dto.BiobankDTO;
+import de.samply.directory.client.dto.CollectionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,14 @@ public class DirectorySynchronizeTask extends TimerTask {
             List<BiobankDTO> allBiobanks = client.getAllBiobanks();
 
             for(BiobankDTO dto : allBiobanks) {
-                DbUtil.synchronizeLocation(config, dto);
+                DbUtil.synchronizeBiobank(config, dto);
+            }
+
+
+            List<CollectionDTO> allCollections = client.getAllCollections();
+
+            for(CollectionDTO dto : allCollections) {
+                DbUtil.synchronizeCollection(config, dto);
             }
 
             logger.info("Synchronization with the directory finished.");
