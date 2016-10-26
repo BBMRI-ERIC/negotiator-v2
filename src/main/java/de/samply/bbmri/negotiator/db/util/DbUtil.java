@@ -528,6 +528,7 @@ public class DbUtil {
         queryRecord.setTitle(title);
         queryRecord.setResearcherId(researcherId);
         queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
+        queryRecord.setNumAttachments(0);
         queryRecord.store();
 
         /**

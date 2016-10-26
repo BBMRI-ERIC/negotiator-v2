@@ -135,11 +135,11 @@ INSERT INTO json_query (json_text) VALUES (
     "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
     {
-      "collectionID":"bbmri-eric:collectionID:BE_B0383_LTC",
+      "collectionID":"bbmri-eric:collectionID:BE_71024388",
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     },
     {
-      "collectionID":"bbmri-eric:collectionID:BE_B03843_LTCD",
+      "collectionID":"bbmri-eric:collectionID:BE_B0383_HBC",
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ], "URL": "https://does-not-exist.com"
@@ -151,11 +151,11 @@ INSERT INTO json_query (json_text) VALUES (
       "humanReadable":"name: ‘Russia’",
     "collections":[
       {
-        "collectionID":"bbmri-eric:collectionID:BE_B0383_LTC",
+        "collectionID":"bbmri-eric:collectionID:BE_LCHU1",
         "biobankID":"bbmri-eric:biobankID:BE_B0383"
       },
       {
-        "collectionID":"bbmri-eric:collectionID:BE_B03843_LTCD",
+        "collectionID":"bbmri-eric:collectionID:CZ_CUNI_HK:collection:all_samples",
         "biobankID":"bbmri-eric:biobankID:BE_B0383"
       }
     ], "URL": "https://does-not-exist.com"

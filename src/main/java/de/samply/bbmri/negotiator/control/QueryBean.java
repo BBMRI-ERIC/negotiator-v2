@@ -26,6 +26,7 @@
 
 package de.samply.bbmri.negotiator.control;
 
+import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.faces.bean.ManagedBean;
@@ -81,6 +82,8 @@ public class QueryBean {
        try (Config config = ConfigFactory.get()) {
            DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
            config.commit();
+       } catch (IOException e) {
+           e.printStackTrace();
        }
        return "/researcher/index";
    }
