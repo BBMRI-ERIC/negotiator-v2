@@ -27,14 +27,20 @@ package de.samply.bbmri.negotiator.filter;
 
 import java.io.IOException;
 
-import javax.servlet.*;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import de.samply.auth.rest.Scope;
-import de.samply.auth.utils.OAuth2ClientConfig;
+import de.samply.bbmri.auth.rest.Scope;
+import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 
@@ -103,8 +109,13 @@ public class AuthorizationFilter implements Filter {
 
             String url = OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
                     request.getServerName(), request.getServerPort(), request.getContextPath(),
-                    requestURL.toString(), null, userBean.getState(), Scope.OPENID);
+                    requestURL.toString(), null, userBean.getState(), Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
 
+            Cookie cookie = new Cookie("auth-redirect-uri", OAuth2ClientConfig.getLocalRedirectUrl(request.getScheme(),
+                    request.getServerName(), request.getServerPort(), request.getContextPath(),
+                    requestURL.toString()));
+
+            response.addCookie(cookie);
             response.sendRedirect(url);
         }
     }

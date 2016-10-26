@@ -35,6 +35,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -50,10 +51,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import de.samply.auth.client.AuthClient;
-import de.samply.auth.client.InvalidKeyException;
-import de.samply.auth.client.InvalidTokenException;
-import de.samply.auth.client.jwt.KeyLoader;
+import de.samply.bbmri.auth.client.AuthClient;
+import de.samply.bbmri.auth.client.InvalidKeyException;
+import de.samply.bbmri.auth.client.InvalidTokenException;
+import de.samply.bbmri.auth.client.jwt.KeyLoader;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.common.config.OAuth2Client;
@@ -118,9 +119,17 @@ public class OAuth2Filter implements Filter {
 
                         OAuth2Client config = NegotiatorConfig.get().getOauth2();
 
+                        String redirectUri = null;
+
+                        for(Cookie cookie : httpRequest.getCookies()) {
+                            if(cookie.getName().equals("auth-redirect-uri")) {
+                                redirectUri = cookie.getValue();
+                            }
+                        }
+
                         AuthClient client = new AuthClient(config.getHost(),
                                 KeyLoader.loadKey(config.getHostPublicKey()), config.getClientId(),
-                                config.getClientSecret(), httpRequest.getParameter("code"), getClient());
+                                config.getClientSecret(), httpRequest.getParameter("code"), redirectUri, getClient());
                         userBean.login(client);
                     }
                 } catch (InvalidTokenException | InvalidKeyException e) {

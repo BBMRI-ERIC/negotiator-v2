@@ -25,16 +25,32 @@
  */
 package de.samply.bbmri.negotiator.control;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+
 import com.docuverse.identicon.IdenticonUtil;
-import de.samply.auth.client.AuthClient;
-import de.samply.auth.client.InvalidKeyException;
-import de.samply.auth.client.InvalidTokenException;
-import de.samply.auth.client.jwt.JWTAccessToken;
-import de.samply.auth.client.jwt.JWTIDToken;
-import de.samply.auth.client.jwt.JWTRefreshToken;
-import de.samply.auth.rest.RoleDTO;
-import de.samply.auth.rest.Scope;
-import de.samply.auth.utils.OAuth2ClientConfig;
+
+import de.samply.bbmri.auth.client.AuthClient;
+import de.samply.bbmri.auth.client.InvalidKeyException;
+import de.samply.bbmri.auth.client.InvalidTokenException;
+import de.samply.bbmri.auth.client.jwt.JWTAccessToken;
+import de.samply.bbmri.auth.client.jwt.JWTIDToken;
+import de.samply.bbmri.auth.client.jwt.JWTRefreshToken;
+import de.samply.bbmri.auth.rest.RoleDTO;
+import de.samply.bbmri.auth.rest.Scope;
+import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.Constants;
@@ -47,20 +63,6 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Sessionscoped bean for all data of the session about the user.
@@ -201,7 +203,6 @@ public class UserBean implements Serializable {
 	public void login(AuthClient client) throws InvalidTokenException, InvalidKeyException {
 		accessToken = client.getAccessToken();
 		idToken = client.getIDToken();
-		refreshToken = client.getRefreshToken();
 
 		/**
 		 * Make sure that if the access token contains a state parameter, that it matches the state variable. If it does
@@ -218,8 +219,11 @@ public class UserBean implements Serializable {
 
 		loginValid = true;
 		userIdentity = idToken.getSubject();
-		userRealName = idToken.getName();
-		userEmail = idToken.getEmail();
+
+
+
+		userRealName = client.getUser().getName();
+		userEmail = client.getUser().getEmail();
 
 		/**
 		 * Check all roles. If the user is a biobank owner, set biobankOwner to true.
@@ -265,9 +269,8 @@ public class UserBean implements Serializable {
 			return biobank;
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return null;
 		}
-
-		return biobank;
 	}
 
 	/**
