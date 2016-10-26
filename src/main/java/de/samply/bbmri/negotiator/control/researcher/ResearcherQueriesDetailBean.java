@@ -95,7 +95,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The list of comments for the selected query
      */
     private List<CommentPersonDTO> comments;
-    
+
     private List<QueryAttachmentDTO> attachments;
 
     /**
@@ -132,6 +132,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Edit the un-structured query.
+     * @return String - Take the researcher to the default page.
+     */
+    public String editQueryDescription() throws SQLException {
+        return "/researcher/index";
     }
 
     /**
@@ -231,7 +239,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
         DbUtil.deleteQueryAttachmentRecord(selectedQuery.getId(), attachment);
         return "/researcher/detail?queryId="+selectedQuery.getId()+"&faces-redirect=true";
     }
-    
+
     public void setQueries(List<QueryStatsDTO> queries) {
         this.queries = queries;
     }
@@ -295,7 +303,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public void setAttachments(List<QueryAttachmentDTO> attachments) {
         this.attachments = attachments;
     }
-    
+
     public List<QueryAttachmentDTO> getAttachments() {
         return attachments;
     }

@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,19 +76,6 @@ public class QueryBean {
 	   }
    }
 
-   /**
-    * Edit the un-structured query.
-    * @return String - Take the researcher to the default page.
-    */
-   public String editQuery() throws SQLException {
-       //TODO: The query id (or token) will come from the directory.
-       setId(2);
-       try (Config config = ConfigFactory.get()) {
-           DbUtil.editQuery(config, queryTitle, queryText, getId() );
-       }
-       return "/researcher/index";
-   }
-
    public String saveQuery() throws SQLException {
        // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
@@ -96,7 +84,7 @@ public class QueryBean {
        }
        return "/researcher/index";
    }
-   
+
     public String getHumanReadableFilters() {
 	 	return humanReadableFilters;
 	}

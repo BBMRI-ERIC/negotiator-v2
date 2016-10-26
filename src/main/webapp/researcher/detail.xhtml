@@ -135,26 +135,48 @@
 
        
             <h:panelGroup layout="block">
-                
 
-                    <h:panelGroup layout="block">
-    
-                        <h3>#{researcherQueriesDetailBean.selectedQuery.title}</h3>
-    
-                        <p>#{researcherQueriesDetailBean.selectedQuery.text}</p>
-                        
-                        <h:outputLabel for="filterInputText" value="#{label['queryview.title.searchParameters']}" />
-                        <h:outputText value="#{researcherQueriesDetailBean.humanReadableQuery}"  style="margin-left: 22px;">
-                        </h:outputText>                                       
-                        <br/><br></br>
-    					<h:outputLink  value="#{researcherQueriesDetailBean.editQuery()}" styleClass="btn btn-primary"
-    					title="#{label['queryview.tooltip.editQuery']}" >
-                        #{label['queryview.title.editQuery']}
-                        </h:outputLink>
-                        
-    				</h:panelGroup>               
-    	
-    				<h:panelGroup layout="block" class="pull-right">
+
+				<h:panelGroup layout="block">
+
+					<h3>#{researcherQueriesDetailBean.selectedQuery.title}</h3>
+
+					<p>#{researcherQueriesDetailBean.selectedQuery.text}</p>
+
+					<h:outputLabel for="filterInputText"
+						value="#{label['queryview.title.searchParameters']}" />
+					<h:outputText
+						value="#{researcherQueriesDetailBean.humanReadableQuery}"
+						style="margin-left: 22px;">
+					</h:outputText>
+					<br/><br></br>
+
+					<h:panelGroup styleClass="col-md-12" style="padding-left: 0px;">
+
+						<h:panelGroup styleClass="col-md-1" style="padding-left: 0px;">
+							<h:outputLink value="#{researcherQueriesDetailBean.editQuery()}"
+								styleClass="btn btn-primary"
+								title="#{label['queryview.tooltip.editQuery']}">
+                                #{label['queryview.title.editQuery']}
+                            </h:outputLink>
+						</h:panelGroup>
+
+						<h:panelGroup styleClass="col-md-1" style="padding-left: 0px;">
+							<h:commandButton
+								action="#{researcherQueriesDetailBean.editQueryDescription()}"
+								value="#{label['queryview.title.editQueryDescription']}"
+								title="#{label['queryview.tooltip.editQueryDescription']}"
+								styleClass="btn btn-primary" />
+						</h:panelGroup>
+						
+						<h:panelGroup styleClass="col-md-10">
+						</h:panelGroup>
+					
+					</h:panelGroup>
+
+				</h:panelGroup>
+
+				<h:panelGroup layout="block" class="pull-right">
     					<h:outputText
     						title="#{label['queryview.queryitem.datetime.creation']}"
     						value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
