@@ -27,6 +27,7 @@ package de.samply.bbmri.negotiator.filter;
 
 import java.io.IOException;
 
+import javax.faces.application.ResourceHandler;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -38,6 +39,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.auth.rest.Scope;
 import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
@@ -51,6 +53,8 @@ import de.samply.bbmri.negotiator.control.UserBean;
  */
 @WebFilter(filterName = "AuthorizationFilter")
 public class AuthorizationFilter implements Filter {
+
+    public static final String COOKIE_AUTH_REDIRECT_URI = "auth-redirect-uri";
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()
@@ -102,18 +106,37 @@ public class AuthorizationFilter implements Filter {
         if(userBean.getLoginValid()) {
             chain.doFilter(request, response);
         } else {
-            StringBuffer requestURL = new StringBuffer(request.getServletPath());
+            StringBuilder requestURL = new StringBuilder(request.getServletPath());
+
+            /**
+             * If the request is a request to a resource, return FORBIDDEN, DO NOT RETURN A 302 REDIRECT
+             */
+            boolean resourceRequest = request.getRequestURI()
+                    .startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
+
+            if(resourceRequest) {
+                response.setStatus(Response.Status.FORBIDDEN.getStatusCode());
+                return;
+            }
+
+            /**
+             * Construct a redirect URL to the authentication system and back.
+             * Store the requested URL in a cookie, which will be deleted once the browser
+             * is closed (maxAge = -1, see documentation)
+             */
+
             if (request.getQueryString() != null) {
                 requestURL.append("?").append(request.getQueryString());
             }
 
             String url = OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
                     request.getServerName(), request.getServerPort(), request.getContextPath(),
-                    requestURL.toString(), null, userBean.getState(), Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+                    requestURL.toString(), userBean.getState(), Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
 
-            Cookie cookie = new Cookie("auth-redirect-uri", OAuth2ClientConfig.getLocalRedirectUrl(request.getScheme(),
+            Cookie cookie = new Cookie(COOKIE_AUTH_REDIRECT_URI, OAuth2ClientConfig.getLocalRedirectUrl(request.getScheme(),
                     request.getServerName(), request.getServerPort(), request.getContextPath(),
                     requestURL.toString()));
+            cookie.setMaxAge(-1);
 
             response.addCookie(cookie);
             response.sendRedirect(url);

@@ -27,6 +27,7 @@ package de.samply.bbmri.negotiator.filter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -115,6 +116,17 @@ public class OAuth2Filter implements Filter {
             if (!userBean.getLoginValid()) {
                 try {
                     if (httpRequest.getParameter("code") != null) {
+
+                        if(httpRequest.getParameter("state") != null) {
+                            logger.debug("checking if the parameter state is the same as the state in the userbean");
+
+                            if(!httpRequest.getParameter("state").equals(userBean.getState())) {
+                                logger.debug("State does not equal the state in the userbean. Abort.");
+                                throw new InvalidParameterException();
+                            }
+                        }
+
+
                         logger.debug("Code as parameter found, trying a login with the given code");
 
                         OAuth2Client config = NegotiatorConfig.get().getOauth2();
@@ -122,7 +134,7 @@ public class OAuth2Filter implements Filter {
                         String redirectUri = null;
 
                         for(Cookie cookie : httpRequest.getCookies()) {
-                            if(cookie.getName().equals("auth-redirect-uri")) {
+                            if(cookie.getName().equals(AuthorizationFilter.COOKIE_AUTH_REDIRECT_URI)) {
                                 redirectUri = cookie.getValue();
                             }
                         }
@@ -137,10 +149,9 @@ public class OAuth2Filter implements Filter {
                 } catch (NotFoundException e) {
                     /**
                      * In case the login was not valid, just ignore it and
-                     * reload the namespaces for the anonymous user
+                     * reload the userbean for the anonymous user
                      */
-                    logger.warn(
-                            "A code was received, but the central authentication returned with a 404. Ignoring the code and continuing");
+                    logger.warn("A code was received, but the central authentication returned with a 404. Ignoring the code and continuing");
                     userBean.init();
                 }
             }
