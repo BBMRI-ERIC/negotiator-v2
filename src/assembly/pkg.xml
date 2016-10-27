@@ -36,7 +36,7 @@
             <directory>${project.basedir}/src/main/resources</directory>
             <outputDirectory>${file.separator}conf</outputDirectory>
             <includes>
-                <include>*.xml</include>
+                <include>*.example</include>
             </includes>
         </fileSet>
         <fileSet>
