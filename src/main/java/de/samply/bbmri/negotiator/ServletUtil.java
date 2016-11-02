@@ -26,17 +26,19 @@
 
 package de.samply.bbmri.negotiator;
 
-import de.samply.string.util.StringUtil;
-
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Properties;
+
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
+import de.samply.string.util.StringUtil;
 
 /**
  * Some servlet utils used to get the server name or redirect URL.
@@ -154,6 +156,19 @@ public class ServletUtil {
     public static String getBuildCommitBranch(ServletContext context) {
         loadProperties(context);
         return buildCommitBranch;
+    }
+
+
+    public static Cookie getCookie(HttpServletRequest request, String name) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals(name)) {
+                    return cookie;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

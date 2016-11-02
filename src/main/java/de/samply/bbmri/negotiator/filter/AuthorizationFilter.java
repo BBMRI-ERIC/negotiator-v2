@@ -35,7 +35,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -53,8 +52,6 @@ import de.samply.bbmri.negotiator.control.UserBean;
  */
 @WebFilter(filterName = "AuthorizationFilter")
 public class AuthorizationFilter implements Filter {
-
-    public static final String COOKIE_AUTH_REDIRECT_URI = "auth-redirect-uri";
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()
@@ -133,12 +130,6 @@ public class AuthorizationFilter implements Filter {
                     request.getServerName(), request.getServerPort(), request.getContextPath(),
                     requestURL.toString(), userBean.getState(), Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
 
-            Cookie cookie = new Cookie(COOKIE_AUTH_REDIRECT_URI, OAuth2ClientConfig.getLocalRedirectUrl(request.getScheme(),
-                    request.getServerName(), request.getServerPort(), request.getContextPath(),
-                    requestURL.toString()));
-            cookie.setMaxAge(-1);
-
-            response.addCookie(cookie);
             response.sendRedirect(url);
         }
     }

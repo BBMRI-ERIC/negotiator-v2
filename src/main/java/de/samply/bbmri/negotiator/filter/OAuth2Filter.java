@@ -36,7 +36,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -130,18 +129,9 @@ public class OAuth2Filter implements Filter {
                         logger.debug("Code as parameter found, trying a login with the given code");
 
                         OAuth2Client config = NegotiatorConfig.get().getOauth2();
-
-                        String redirectUri = null;
-
-                        for(Cookie cookie : httpRequest.getCookies()) {
-                            if(cookie.getName().equals(AuthorizationFilter.COOKIE_AUTH_REDIRECT_URI)) {
-                                redirectUri = cookie.getValue();
-                            }
-                        }
-
                         AuthClient client = new AuthClient(config.getHost(),
                                 KeyLoader.loadKey(config.getHostPublicKey()), config.getClientId(),
-                                config.getClientSecret(), httpRequest.getParameter("code"), redirectUri, getClient());
+                                config.getClientSecret(), httpRequest.getParameter("code"), httpRequest.getRequestURL().toString(), getClient());
                         userBean.login(client);
                     }
                 } catch (InvalidTokenException | InvalidKeyException e) {
