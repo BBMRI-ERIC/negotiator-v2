@@ -38,9 +38,9 @@
 
     <attachmentPath>/home/my-upload-folder/uploads/</attachmentPath>
 
-    <postgresql xmlns:c="http://schema.samply.de/common">
-    
     <mailEnabled>true</mailEnabled>
+
+    <postgresql xmlns:c="http://schema.samply.de/common">
 
         <c:host>localhost</c:host>
 

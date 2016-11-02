@@ -14,10 +14,6 @@ INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (5, '5', 'Main
 INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (6, '6', 'Heidelberg Blood Samples', 6);
 ALTER SEQUENCE collection_id_seq RESTART WITH 7;
 
-INSERT INTO query_collection(query_id, collection_id) VALUES (3, 3);
-INSERT INTO query_collection(query_id, collection_id) VALUES (4, 3);
-INSERT INTO query_collection(query_id, collection_id) VALUES (5, 3);
-
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (1, 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL, NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (2, 'user2', 'Goerge Biobanker, M.D.', 'test2@test2.org', NULL, 4);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, collection_id) VALUES (3, 'user3', 'Dr.med. Sean Researchington', 'test3@test3.org', NULL, NULL);
@@ -90,6 +86,10 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
 }', 0, 'token-4');
 
 ALTER SEQUENCE query_id_seq RESTART WITH 5;
+
+INSERT INTO query_collection(query_id, collection_id) VALUES (1, 3);
+INSERT INTO query_collection(query_id, collection_id) VALUES (2, 3);
+INSERT INTO query_collection(query_id, collection_id) VALUES (3, 3);
 
 INSERT INTO query_person(query_id, person_id) VALUES (1, 2);
 INSERT INTO query_person(query_id, person_id) VALUES (2, 2);
