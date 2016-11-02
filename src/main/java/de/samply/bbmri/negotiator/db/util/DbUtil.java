@@ -58,6 +58,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
+import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
@@ -508,7 +509,25 @@ public class DbUtil {
         record.store();
     }
 
-
+    /*
+     * Return all people associated to this query
+     */
+    public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId) {
+       
+        Result<Record> record = config.dsl()
+              .select(getFields(Tables.PERSON, "person"))
+             
+              .from(Tables.PERSON)
+              
+              .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+              .on(Tables.PERSON.COLLECTION_ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+              
+              .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+              .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
+        return config.map(record, NegotiatorDTO.class);
+      
+    }
+   
     /**
      * Creates a new query from the given arguments.
      * @param title title of the query

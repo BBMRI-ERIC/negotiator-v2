@@ -1,0 +1,23 @@
+{delpackage Notification}
+{namespace samply.mailing}
+
+/**
+ * Main content for query added notification mail.
+ * @param? locale The locale of the mail
+ * @param? name The locale of the mail
+ * @param? queryName The name of the mail
+ * @param? url The url of the query
+ */
+{deltemplate maincontent}
+    {switch $locale}
+        {case 'de', 'de_DE'}
+           A new query has been added {$queryName}. To start negotiating, please use the following link: {\n}{\n}
+            {$url}
+
+
+        {default}
+            A new query has been added {$queryName}. To start negotiating, please use the following link: {\n}{\n}
+            {$url}
+
+    {/switch}
+{/deltemplate}

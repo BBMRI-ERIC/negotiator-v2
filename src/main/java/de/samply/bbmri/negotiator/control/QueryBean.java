@@ -28,17 +28,24 @@ package de.samply.bbmri.negotiator.control;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Observable;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
 
 
@@ -47,7 +54,7 @@ import de.samply.bbmri.negotiator.rest.Directory;
  */
 @ManagedBean
 @ViewScoped
-public class QueryBean {
+public class QueryBean extends Observable {
 
    private static final long serialVersionUID = -611428463046308071L;
    private int jsonQueryId;
@@ -71,21 +78,60 @@ public class QueryBean {
 	   try(Config config = ConfigFactory.get()) {
 		   jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
 		   humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
+		   
+		   // register email notification observer
+		   this.addObserver(new QueryEmailNotifier());
 	   }
 	   catch (Exception e) {
 		   logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
 	   }
    }
 
+   /**
+    * Edit the un-structured query.
+    * @return String - Take the researcher to the default page.
+    */
+   public String editQuery() throws SQLException {
+       //TODO: The query id (or token) will come from the directory.
+       setId(2);
+       try (Config config = ConfigFactory.get()) {
+           DbUtil.editQuery(config, queryTitle, queryText, getId() );
+       }
+       return "/researcher/index";
+   }
+
    public String saveQuery() throws SQLException {
        // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
-           DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
+           
+           QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
            config.commit();
+           setId(record.getId());
+           
+           List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId());
+           setChanged();
+           notifyObservers(negotiators);
+           
        } catch (IOException e) {
            e.printStackTrace();
        }
        return "/researcher/index";
+   }
+   
+   /**
+    * Build url to be able to navigate to the query with id=queryId
+    *
+    * @param queryId
+    * @return
+    */
+   public String getQueryUrl(Integer queryId) {
+       ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+       StringBuffer requestURL = new StringBuffer(context.getRequestServletPath());
+       requestURL.append("?queryId=").append(queryId);
+
+       return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+               context.getRequestServerPort(), context.getRequestContextPath(), "/researcher/detail.xhtml?queryId="+ getId());
    }
 
     public String getHumanReadableFilters() {

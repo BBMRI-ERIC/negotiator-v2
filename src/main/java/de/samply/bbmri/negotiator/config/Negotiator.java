@@ -104,6 +104,12 @@ public class Negotiator implements Serializable {
      */
     @XmlElement
     private Proxy proxy;
+    
+    /**
+     * Turns mailing on/off
+     */
+    @XmlElement
+    private boolean mailEnabled;
 
     /**
      * The email configuration, including the SMTP settings.
@@ -190,4 +196,13 @@ public class Negotiator implements Serializable {
     public void setProxy(Proxy proxy) {
         this.proxy = proxy;
     }
+    
+    public boolean getMailEnabled() {
+        return mailEnabled;
+    }
+
+    public void setMailEnabled(boolean mailEnabled) {
+        this.mailEnabled = mailEnabled;
+    }
+
 }

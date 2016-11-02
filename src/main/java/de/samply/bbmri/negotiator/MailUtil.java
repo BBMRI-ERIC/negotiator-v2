@@ -61,6 +61,8 @@ public class MailUtil {
      * @param email The outgoing email.
      */
     public static void sendEmail(OutgoingEmail email) {
+        if(!NegotiatorConfig.get().getNegotiator().getMailEnabled())
+            return;
         MailSender mailSender = new MailSender(NegotiatorConfig.get().getMailConfig());
         mailSender.send(email);
 
