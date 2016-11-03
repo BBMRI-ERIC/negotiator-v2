@@ -34,6 +34,7 @@
     template="../components/default.xhtml">
 
     <f:metadata>
+        <f:viewParam name="queryId" value="#{queryBean.id}" />
 		<f:viewParam name="jsonQueryId" value="#{queryBean.jsonQueryId}"/>
 		<f:viewAction action="#{queryBean.initialize}"/>
 	</f:metadata>
@@ -63,7 +64,7 @@
            <h:panelGroup layout="block" styleClass="pull-right">
                        
                <h:commandButton action="#{queryBean.saveQuery()}"
-                                value="#{label['querydetail.action.addQuery.buttontext']}"
+                                value="#{queryBean.getMode()=='edit' ? label['queryview.title.editQueryDescription'] : label['querydetail.action.addQuery.buttontext']}"
                                 title="#{label['querydetail.action.addQuery']}" styleClass="btn btn-primary" />
            </h:panelGroup>
        </h:panelGroup>

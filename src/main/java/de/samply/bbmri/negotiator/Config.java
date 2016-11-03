@@ -130,7 +130,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
      * @param <T>
      * @return
      */
-    public <T> List<T> map(List<Record> records, Class<? extends T> clazz) {
+    public <T> List<T> map(List<? extends Record> records, Class<? extends T> clazz) {
         List<T> target = new ArrayList<>();
 
         for(Record r : records) {

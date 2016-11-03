@@ -39,6 +39,7 @@ import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.JoinType;
 import org.jooq.Record;
+import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
@@ -75,13 +76,37 @@ public class DbUtil {
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
 
     /**
+     * Get title and text of a query.
+     * @param config JOOQ configuration
+     * @param Id the query id for which the edit description started
+     * @return QueryRecord object
+     * @throws SQLException
+     */
+    public static QueryRecord getQueryDescription(Config config, Integer id) {
+    QueryRecord queryRecord = null;
+    try {
+        Record2<String,String> result = config.dsl()
+                .select(Tables.QUERY.TITLE, Tables.QUERY.TEXT)
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.ID.eq(id))
+                .fetchOne();
+
+        return config.map(result, QueryRecord.class);
+    } catch (Exception e) {
+        // TODO: handle exception
+    }
+    return queryRecord;
+}
+
+
+    /**
      * Edits/Updates title and description of a query.
      * @param title title of the query
      * @param text description of the query
      * @param queryId the query id for which the editing started
      * @throws SQLException
      */
-    public static void editQuery(Config config, String title, String text, Integer queryId) throws SQLException {
+    public static void editQueryDescription(Config config, String title, String text, Integer queryId) throws SQLException {
         try {
             config.dsl().update(Tables.QUERY)
                         .set(Tables.QUERY.TITLE, title)
@@ -109,25 +134,25 @@ public class DbUtil {
                     .returning(Tables.QUERY_ATTACHMENT.ID)
                     .fetch();
            config.get().commit();
-        } 
+        }
         catch (SQLException e){
             e.printStackTrace();
         }
     }
 
-    
+
     public static void deleteQueryAttachmentRecord(Integer queryId, String attachment) {
         try(Config config = ConfigFactory.get()) {
             config.dsl().delete(Tables.QUERY_ATTACHMENT)
                 .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
                 .and(Tables.QUERY_ATTACHMENT.ATTACHMENT.eq(attachment)).execute();
             config.get().commit();
-        } 
+        }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Update number of attachments associated with this query (existing and deleted)
      * @param numAttachments
@@ -141,13 +166,13 @@ public class DbUtil {
                         .where(Tables.QUERY.ID.eq(queryId))
                         .execute();
             config.get().commit();
-        } 
+        }
         catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
-    
+
+
     /**
      * Get the JSON query from the database.
      * @param config JOOQ configuration
@@ -370,7 +395,7 @@ public class DbUtil {
 
         return config.map(result, QueryAttachmentDTO.class);
     }
-    
+
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config

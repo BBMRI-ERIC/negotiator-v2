@@ -36,7 +36,7 @@
     <!-- Queries detail page for the owner -->
 
     <f:metadata>
-        <f:viewParam name="queryId" value="#{researcherQueriesDetailBean .queryId}" />
+        <f:viewParam name="queryId" value="#{researcherQueriesDetailBean.queryId}" />
         <f:viewAction action="#{researcherQueriesDetailBean.initialize}" />
     </f:metadata>
 
@@ -126,10 +126,7 @@
             </h:form>
 
         </h:panelGroup>
-
-
-
-        
+       
         <h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1"
             id="right-panel">
 
@@ -162,11 +159,14 @@
 						</h:panelGroup>
 
 						<h:panelGroup styleClass="col-md-1" style="padding-left: 0px;">
-							<h:commandButton
-								action="#{researcherQueriesDetailBean.editQueryDescription()}"
+							<h:button outcome="newQuery"
 								value="#{label['queryview.title.editQueryDescription']}"
 								title="#{label['queryview.tooltip.editQueryDescription']}"
-								styleClass="btn btn-primary" />
+								styleClass="btn btn-primary" >
+								
+								<f:param name="queryId" value="#{researcherQueriesDetailBean.selectedQuery.id}"/>
+								
+								</h:button>
 						</h:panelGroup>
 						
 						<h:panelGroup styleClass="col-md-10">

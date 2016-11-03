@@ -64,11 +64,13 @@ public class QueryBean extends Observable {
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
 
-   private Integer id;
+   private Integer id = null;
    private String queryText;
    private String queryTitle;
    private String jsonQuery;
    private String humanReadableFilters;
+   private String mode = null;
+
 
 
    /**
@@ -76,48 +78,48 @@ public class QueryBean extends Observable {
 	*/
    public void initialize() {
 	   try(Config config = ConfigFactory.get()) {
-		   jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-		   humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
-		   
-		   // register email notification observer
-		   this.addObserver(new QueryEmailNotifier());
+	       /* If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited. */
+	       if(id != null)
+	       {
+	           setMode("edit");
+	           QueryRecord queryRecord= DbUtil.getQueryDescription(config, id);
+	           queryText = queryRecord.getText();
+	           queryTitle = queryRecord.getTitle();
+	       }
+	       else{
+	           jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+               humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
+               // register email notification observer
+               this.addObserver(new QueryEmailNotifier());
+	       }
 	   }
 	   catch (Exception e) {
 		   logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
 	   }
    }
 
-   /**
-    * Edit the un-structured query.
-    * @return String - Take the researcher to the default page.
-    */
-   public String editQuery() throws SQLException {
-       //TODO: The query id (or token) will come from the directory.
-       setId(2);
-       try (Config config = ConfigFactory.get()) {
-           DbUtil.editQuery(config, queryTitle, queryText, getId() );
-       }
-       return "/researcher/index";
-   }
-
    public String saveQuery() throws SQLException {
        // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
-           
-           QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
-           config.commit();
-           setId(record.getId());
-           
-           List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId());
-           setChanged();
-           notifyObservers(negotiators);
-           
+           /* If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited. */
+           if(id != null)
+           {
+               DbUtil.editQueryDescription(config, queryTitle, queryText, id);
+               return "/researcher/index";
+           }else{
+               QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
+               config.commit();
+               setId(record.getId());
+               List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId());
+               setChanged();
+               notifyObservers(negotiators);
+           }
        } catch (IOException e) {
            e.printStackTrace();
        }
        return "/researcher/index";
    }
-   
+
    /**
     * Build url to be able to navigate to the query with id=queryId
     *
@@ -179,5 +181,13 @@ public class QueryBean extends Observable {
 
     public void setQueryText(String queryText) {
         this.queryText = queryText;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 }
