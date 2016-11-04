@@ -105,7 +105,7 @@ public class QueryBean extends Observable {
            if(id != null)
            {
                DbUtil.editQueryDescription(config, queryTitle, queryText, id);
-               return "/researcher/index";
+               return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            }else{
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
                config.commit();
