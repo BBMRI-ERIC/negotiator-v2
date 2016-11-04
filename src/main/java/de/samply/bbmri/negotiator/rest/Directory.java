@@ -95,8 +95,11 @@ public class Directory {
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
             QueryDTO query = mapper.readValue(queryString, QueryDTO.class);
 
-            // TODO: check the URL to make sure it is really a URL pointing to the directory this negotiator uses.
             if(query == null || query.getUrl() == null || query.getHumanReadable() == null || query.getCollections() == null) {
+                throw new BadRequestException();
+            }
+
+            if(!query.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
                 throw new BadRequestException();
             }
 
