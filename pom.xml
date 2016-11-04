@@ -14,7 +14,7 @@
 
     <properties>
         <version.samply.webjar>1.6.0-SNAPSHOT</version.samply.webjar>
-        <version.samply.auth.client>1.3.0-SNAPSHOT</version.samply.auth.client>
+        <version.samply.auth.client>1.0.0-SNAPSHOT</version.samply.auth.client>
     </properties>
 
     <dependencies>
@@ -39,7 +39,19 @@
         <dependency>
             <groupId>de.samply</groupId>
             <artifactId>directory-client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply.webjar</groupId>
+            <artifactId>samply</artifactId>
+            <version>${version.samply.webjar}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>bbmri-auth-client</artifactId>
+            <version>${version.samply.auth.client}</version>
         </dependency>
 
         <dependency>
@@ -82,18 +94,6 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-web</artifactId>
             <scope>runtime</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>de.samply.webjar</groupId>
-            <artifactId>samply</artifactId>
-            <version>${version.samply.webjar}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>de.samply</groupId>
-            <artifactId>auth-client</artifactId>
-            <version>${version.samply.auth.client}</version>
         </dependency>
 
         <dependency>

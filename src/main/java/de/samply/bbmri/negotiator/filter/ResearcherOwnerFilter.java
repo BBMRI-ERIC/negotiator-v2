@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 
 /**
@@ -59,6 +60,12 @@ public class ResearcherOwnerFilter implements Filter {
 
         HttpSession session = req.getSession(false);
         UserBean userBean = (UserBean) session.getAttribute("userBean");
+
+        if(!userBean.getBiobankOwner() && !userBean.getResearcher() && NegotiatorConfig.get().isDevelopMode()) {
+            HttpServletResponse resp = (HttpServletResponse) response;
+            resp.sendRedirect(req.getContextPath() + "/dev/chose.xhtml");
+            return;
+        }
 
         /**
          * Check for researchers

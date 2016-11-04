@@ -56,7 +56,9 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryPersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
@@ -64,9 +66,10 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
+import de.samply.bbmri.negotiator.rest.dto.CollectionDTO;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
-import de.samply.directory.client.dto.BiobankDTO;
-import de.samply.directory.client.dto.CollectionDTO;
+import de.samply.directory.client.dto.DirectoryBiobank;
+import de.samply.directory.client.dto.DirectoryCollection;
 
 /**
  * The database util for basic queries.
@@ -484,7 +487,7 @@ public class DbUtil {
      * @param config database configuration
      * @param dto biobank from the directory
      */
-    public static void synchronizeBiobank(Config config, BiobankDTO dto) {
+    public static void synchronizeBiobank(Config config, DirectoryBiobank dto) {
         BiobankRecord record = DbUtil.getBiobank(config, dto.getId());
 
         if(record == null) {
@@ -508,7 +511,7 @@ public class DbUtil {
      * @param config database configuration
      * @param dto collection from the directory
      */
-    public static void synchronizeCollection(Config config, CollectionDTO dto) {
+    public static void synchronizeCollection(Config config, DirectoryCollection dto) {
         CollectionRecord record = DbUtil.getCollection(config, dto.getId());
 
         if(record == null) {
@@ -580,7 +583,7 @@ public class DbUtil {
          */
         QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
 
-        for(de.samply.bbmri.negotiator.rest.dto.CollectionDTO collection : queryDTO.getCollections()) {
+        for(CollectionDTO collection : queryDTO.getCollections()) {
             CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
 
             if(dbCollection != null) {
@@ -588,6 +591,16 @@ public class DbUtil {
                 queryCollectionRecord.setQueryId(queryRecord.getId());
                 queryCollectionRecord.setCollectionId(dbCollection.getId());
                 queryCollectionRecord.store();
+
+                Result<PersonRecord> fetch = config.dsl().selectFrom(Tables.PERSON)
+                        .where(Tables.PERSON.COLLECTION_ID.eq(dbCollection.getId())).fetch();
+
+                for(PersonRecord personRecord : fetch) {
+                    QueryPersonRecord newQueryPersonRecord = config.dsl().newRecord(Tables.QUERY_PERSON);
+                    newQueryPersonRecord.setPersonId(personRecord.getId());
+                    newQueryPersonRecord.setQueryId(queryRecord.getId());
+                    newQueryPersonRecord.store();
+                }
             }
         }
 

@@ -30,6 +30,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+
 /**
  * This method checks if the user is a researcher or owner and redirects him to the proper folder.
  */
@@ -45,6 +47,8 @@ public class IndexBean {
             return "/owner/index";
         } else if(userBean.getResearcher()) {
             return "/researcher/index";
+        } else if(NegotiatorConfig.get().isDevelopMode()) {
+            return "/dev/chose.xhtml";
         } else {
             return "/unauthorized/index";
         }

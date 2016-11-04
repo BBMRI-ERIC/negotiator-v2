@@ -27,6 +27,7 @@ package de.samply.bbmri.negotiator.filter;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidParameterException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -50,10 +51,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import de.samply.auth.client.AuthClient;
-import de.samply.auth.client.InvalidKeyException;
-import de.samply.auth.client.InvalidTokenException;
-import de.samply.auth.client.jwt.KeyLoader;
+import de.samply.bbmri.auth.client.AuthClient;
+import de.samply.bbmri.auth.client.InvalidKeyException;
+import de.samply.bbmri.auth.client.InvalidTokenException;
+import de.samply.bbmri.auth.client.jwt.KeyLoader;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.common.config.OAuth2Client;
@@ -114,13 +115,23 @@ public class OAuth2Filter implements Filter {
             if (!userBean.getLoginValid()) {
                 try {
                     if (httpRequest.getParameter("code") != null) {
+
+                        if(httpRequest.getParameter("state") != null) {
+                            logger.debug("checking if the parameter state is the same as the state in the userbean");
+
+                            if(!httpRequest.getParameter("state").equals(userBean.getState())) {
+                                logger.debug("State does not equal the state in the userbean. Abort.");
+                                throw new InvalidParameterException();
+                            }
+                        }
+
+
                         logger.debug("Code as parameter found, trying a login with the given code");
 
                         OAuth2Client config = NegotiatorConfig.get().getOauth2();
-
                         AuthClient client = new AuthClient(config.getHost(),
                                 KeyLoader.loadKey(config.getHostPublicKey()), config.getClientId(),
-                                config.getClientSecret(), httpRequest.getParameter("code"), getClient());
+                                config.getClientSecret(), httpRequest.getParameter("code"), httpRequest.getRequestURL().toString(), getClient());
                         userBean.login(client);
                     }
                 } catch (InvalidTokenException | InvalidKeyException e) {
@@ -128,10 +139,9 @@ public class OAuth2Filter implements Filter {
                 } catch (NotFoundException e) {
                     /**
                      * In case the login was not valid, just ignore it and
-                     * reload the namespaces for the anonymous user
+                     * reload the userbean for the anonymous user
                      */
-                    logger.warn(
-                            "A code was received, but the central authentication returned with a 404. Ignoring the code and continuing");
+                    logger.warn("A code was received, but the central authentication returned with a 404. Ignoring the code and continuing");
                     userBean.init();
                 }
             }

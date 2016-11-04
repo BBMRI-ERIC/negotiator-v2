@@ -26,16 +26,17 @@
 
 package de.samply.bbmri.negotiator;
 
-import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.directory.client.DirectoryClient;
-import de.samply.directory.client.dto.BiobankDTO;
-import de.samply.directory.client.dto.CollectionDTO;
+import java.util.List;
+import java.util.TimerTask;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.TimerTask;
+import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.directory.client.DirectoryClient;
+import de.samply.directory.client.dto.DirectoryBiobank;
+import de.samply.directory.client.dto.DirectoryCollection;
 
 /**
  * Handles the perdiodical synchonization between the directory and our negotiator.
@@ -57,16 +58,15 @@ public class DirectorySynchronizeTask extends TimerTask {
 
             logger.info("Starting synchronization with the directory");
 
-            List<BiobankDTO> allBiobanks = client.getAllBiobanks();
+            List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
 
-            for(BiobankDTO dto : allBiobanks) {
+            for(DirectoryBiobank dto : allBiobanks) {
                 DbUtil.synchronizeBiobank(config, dto);
             }
 
+            List<DirectoryCollection> allCollections = client.getAllCollections();
 
-            List<CollectionDTO> allCollections = client.getAllCollections();
-
-            for(CollectionDTO dto : allCollections) {
+            for(DirectoryCollection dto : allCollections) {
                 DbUtil.synchronizeCollection(config, dto);
             }
 

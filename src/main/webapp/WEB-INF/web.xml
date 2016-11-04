@@ -44,6 +44,11 @@
     </servlet-mapping>
 
     <servlet-mapping>
+        <servlet-name>Jersey REST Servlet</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
         <servlet-name>ImagesServlet</servlet-name>
         <url-pattern>/images</url-pattern>
     </servlet-mapping>
@@ -72,16 +77,6 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-
-    <servlet-mapping>
-        <servlet-name>Jersey REST Servlet</servlet-name>
-        <url-pattern>/api/*</url-pattern>
-    </servlet-mapping>
-    
-    <error-page>
-        <error-code>404</error-code>
-        <location>/index.xhtml</location>
-    </error-page>
 
     <context-param>
         <param-name>javax.faces.FACELETS_LIBRARIES</param-name>

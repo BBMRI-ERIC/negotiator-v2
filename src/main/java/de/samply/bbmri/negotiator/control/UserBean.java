@@ -25,16 +25,32 @@
  */
 package de.samply.bbmri.negotiator.control;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+
 import com.docuverse.identicon.IdenticonUtil;
-import de.samply.auth.client.AuthClient;
-import de.samply.auth.client.InvalidKeyException;
-import de.samply.auth.client.InvalidTokenException;
-import de.samply.auth.client.jwt.JWTAccessToken;
-import de.samply.auth.client.jwt.JWTIDToken;
-import de.samply.auth.client.jwt.JWTRefreshToken;
-import de.samply.auth.rest.RoleDTO;
-import de.samply.auth.rest.Scope;
-import de.samply.auth.utils.OAuth2ClientConfig;
+
+import de.samply.bbmri.auth.client.AuthClient;
+import de.samply.bbmri.auth.client.InvalidKeyException;
+import de.samply.bbmri.auth.client.InvalidTokenException;
+import de.samply.bbmri.auth.client.jwt.JWTAccessToken;
+import de.samply.bbmri.auth.client.jwt.JWTIDToken;
+import de.samply.bbmri.auth.client.jwt.JWTRefreshToken;
+import de.samply.bbmri.auth.rest.RoleDTO;
+import de.samply.bbmri.auth.rest.Scope;
+import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.Constants;
@@ -43,24 +59,9 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Sessionscoped bean for all data of the session about the user.
@@ -73,12 +74,10 @@ public class UserBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * TODO: Hardcoded location ID and name to set to on new users, if he is a biobank owner, as that info will come
-	 * from Perun and/or Directory and yet not from Samply.AUTH. So for now we simply put new biobank owners into that
-	 * location, and use our own created locationID as such.
+	 * The subjects from the dummy data.
 	 */
-	private static final int TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS = 1;
-	private static final String TEMP_LOCATION_NAME_FOR_ALL_BIO_OWNERS = "Biobank Hamburg";
+	public static final String DUMMY_DATA_SUBJECT_RESEARCHER = "https://auth-dev.mitro.dkfz.de/users/8";
+	public static final String DUMMY_DATA_SUBJECT_BIOBANK_OWNER = "https://auth-dev.mitro.dkfz.de/users/7";
 
 	/**
 	 * The current userEmail (email). Null if the login is not valid
@@ -140,6 +139,13 @@ public class UserBean implements Serializable {
 	private Person person;
 
 	/**
+	 * Basic Constructor for when the user bean is created without dependency injection.
+	 */
+	public UserBean() {
+		init();
+	}
+
+	/**
 	 * Executes a logout.
 	 *
 	 * @throws IOException
@@ -185,7 +191,7 @@ public class UserBean implements Serializable {
 
 		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), context.getRequestScheme(),
 		        context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(),
-		        requestURL.toString(), null, state, Scope.OPENID);
+		        requestURL.toString(), state, Scope.OPENID);
 	}
 
 	/**
@@ -201,7 +207,6 @@ public class UserBean implements Serializable {
 	public void login(AuthClient client) throws InvalidTokenException, InvalidKeyException {
 		accessToken = client.getAccessToken();
 		idToken = client.getIDToken();
-		refreshToken = client.getRefreshToken();
 
 		/**
 		 * Make sure that if the access token contains a state parameter, that it matches the state variable. If it does
@@ -218,8 +223,9 @@ public class UserBean implements Serializable {
 
 		loginValid = true;
 		userIdentity = idToken.getSubject();
-		userRealName = idToken.getName();
-		userEmail = idToken.getEmail();
+
+		userRealName = client.getUser().getName();
+		userEmail = client.getUser().getEmail();
 
 		/**
 		 * Check all roles. If the user is a biobank owner, set biobankOwner to true.
@@ -243,31 +249,38 @@ public class UserBean implements Serializable {
 	}
 
 	/**
-	 * Gets the location for a location ID
-	 *
-	 * @param locationId
-	 * @return Location
-	 */
-	private Biobank getLocation(Integer locationId) {
-		Biobank biobank = null;
+	 * Fakes the given user identity. Works only in development mode.
+	 * @param identity
+     */
+	public void fakeUser(String identity) {
+		if(NegotiatorConfig.get().isDevelopMode()) {
+			this.userIdentity = identity;
 
-		try (Config config = ConfigFactory.get()) {
-			BiobankRecord locationRecord = config.dsl().selectFrom(Tables.BIOBANK)
-			        .where(Tables.BIOBANK.ID.eq(locationId)).fetchOne();
+			try(Config config = ConfigFactory.get()) {
+				PersonRecord personRecord = config.dsl().selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(identity)).fetchOne();
 
-			if (locationRecord == null) {
-				return null;
+				if(personRecord != null) {
+					userRealName = personRecord.getAuthName();
+					userEmail = personRecord.getAuthEmail();
+					userId = personRecord.getId();
+				}
+
+				if(identity.equals(DUMMY_DATA_SUBJECT_BIOBANK_OWNER)) {
+					biobankOwner = true;
+					researcher = false;
+					loginValid = true;
+				}
+
+				if(identity.equals(DUMMY_DATA_SUBJECT_RESEARCHER)) {
+					biobankOwner = false;
+					researcher = true;
+					loginValid = true;
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
-
-			biobank = new Biobank();
-			biobank.setId(locationRecord.getId());
-			biobank.setName(locationRecord.getName());
-			return biobank;
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
-
-		return biobank;
 	}
 
 	/**

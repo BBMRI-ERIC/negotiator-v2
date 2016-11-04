@@ -139,7 +139,7 @@ INSERT INTO json_query (json_text) VALUES (
     "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
     {
-      "collectionID":"bbmri-eric:collectionID:BE_71024388",
+      "collectionID":"5",
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     },
     {
@@ -155,7 +155,7 @@ INSERT INTO json_query (json_text) VALUES (
       "humanReadable":"name: ‘Russia’",
     "collections":[
       {
-        "collectionID":"bbmri-eric:collectionID:BE_LCHU1",
+        "collectionID":"5",
         "biobankID":"bbmri-eric:biobankID:BE_B0383"
       },
       {

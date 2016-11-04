@@ -27,14 +27,20 @@ package de.samply.bbmri.negotiator.filter;
 
 import java.io.IOException;
 
-import javax.servlet.*;
+import javax.faces.application.ResourceHandler;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import de.samply.auth.rest.Scope;
-import de.samply.auth.utils.OAuth2ClientConfig;
+import de.samply.bbmri.auth.rest.Scope;
+import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 
@@ -76,10 +82,18 @@ public class AuthorizationFilter implements Filter {
 
         UserBean userBean = (UserBean) session.getAttribute("userBean");
 
+        // requests on JSR resources are always allowed
+        boolean resourceRequest = request.getRequestURI()
+                .startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
+
+        if(resourceRequest) {
+            chain.doFilter(req, res);
+            return;
+        }
+
         /**
          * Skip maintenance.xhtml
          */
-
         if(path.endsWith("maintenance.xhtml")) {
             chain.doFilter(req, res);
             return;
@@ -96,14 +110,33 @@ public class AuthorizationFilter implements Filter {
         if(userBean.getLoginValid()) {
             chain.doFilter(request, response);
         } else {
-            StringBuffer requestURL = new StringBuffer(request.getServletPath());
+            /**
+             * For development mode, skip the authentication
+             */
+            if(NegotiatorConfig.get().isDevelopMode()) {
+                if(path.endsWith("/dev/chose.xhtml")){
+                    chain.doFilter(req, res);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/dev/chose.xhtml");
+                }
+                return;
+            }
+
+            StringBuilder requestURL = new StringBuilder(request.getServletPath());
+
+            /**
+             * Construct a redirect URL to the authentication system and back.
+             * Store the requested URL in a cookie, which will be deleted once the browser
+             * is closed (maxAge = -1, see documentation)
+             */
+
             if (request.getQueryString() != null) {
                 requestURL.append("?").append(request.getQueryString());
             }
 
             String url = OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
                     request.getServerName(), request.getServerPort(), request.getContextPath(),
-                    requestURL.toString(), null, userBean.getState(), Scope.OPENID);
+                    requestURL.toString(), userBean.getState(), Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
 
             response.sendRedirect(url);
         }
