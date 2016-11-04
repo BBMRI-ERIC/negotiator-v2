@@ -102,11 +102,11 @@ public class QueryBean extends Observable {
        // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited. */
-           if(id != null)
-           {
+           if(id != null) {
                DbUtil.editQueryDescription(config, queryTitle, queryText, id);
+               config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
-           }else{
+           } else {
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
                config.commit();
                setId(record.getId());
@@ -143,6 +143,7 @@ public class QueryBean extends Observable {
 	public void setHumanReadableFilters(String humanReadableFilters) {
 	 	this.humanReadableFilters = humanReadableFilters;
 	}
+
 	public int getJsonQueryId() {
 		return jsonQueryId;
 	}

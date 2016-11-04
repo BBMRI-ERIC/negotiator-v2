@@ -135,14 +135,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     /**
-     * Edit the un-structured query.
-     * @return String - Take the researcher to the default page.
-     */
-    public String editQueryDescription() throws SQLException {
-        return "/researcher/index";
-    }
-
-    /**
      * Redirects the user to directory for editing the query
      */
     public String editQuery() {
@@ -225,8 +217,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         String uploadName = FileUtil.getFileName(file, queryId, attachmentIndex);
 
         if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
-            DbUtil.updateNumQueryAttachments(selectedQuery.getId(), ++attachmentIndex);
-            DbUtil.insertQueryAttachmentRecord(selectedQuery.getId(), uploadName);
+            try(Config config = ConfigFactory.get()) {
+                DbUtil.updateNumQueryAttachments(config, selectedQuery.getId(), ++attachmentIndex);
+                DbUtil.insertQueryAttachmentRecord(config, selectedQuery.getId(), uploadName);
+                config.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return "/researcher/detail?queryId="+selectedQuery.getId()+"&faces-redirect=true";
     }
@@ -236,7 +233,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     public String removeAttachment(String attachment) {
         //TODO - remove physical file from file system
-        DbUtil.deleteQueryAttachmentRecord(selectedQuery.getId(), attachment);
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.deleteQueryAttachmentRecord(config, selectedQuery.getId(), attachment);
+            config.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return "/researcher/detail?queryId="+selectedQuery.getId()+"&faces-redirect=true";
     }
 

@@ -47,7 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
@@ -55,6 +54,7 @@ import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
@@ -81,13 +81,11 @@ public class DbUtil {
     /**
      * Get title and text of a query.
      * @param config JOOQ configuration
-     * @param Id the query id for which the edit description started
+     * @param id the query id for which the edit description started
      * @return QueryRecord object
      * @throws SQLException
      */
     public static QueryRecord getQueryDescription(Config config, Integer id) {
-    QueryRecord queryRecord = null;
-    try {
         Record2<String,String> result = config.dsl()
                 .select(Tables.QUERY.TITLE, Tables.QUERY.TEXT)
                 .from(Tables.QUERY)
@@ -95,11 +93,7 @@ public class DbUtil {
                 .fetchOne();
 
         return config.map(result, QueryRecord.class);
-    } catch (Exception e) {
-        // TODO: handle exception
     }
-    return queryRecord;
-}
 
 
     /**
@@ -110,16 +104,11 @@ public class DbUtil {
      * @throws SQLException
      */
     public static void editQueryDescription(Config config, String title, String text, Integer queryId) throws SQLException {
-        try {
-            config.dsl().update(Tables.QUERY)
-                        .set(Tables.QUERY.TITLE, title)
-                        .set(Tables.QUERY.TEXT, text)
-                        .where(Tables.QUERY.ID.eq(queryId))
-                        .execute();
-            config.get().commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        config.dsl().update(Tables.QUERY)
+                    .set(Tables.QUERY.TITLE, title)
+                    .set(Tables.QUERY.TEXT, text)
+                    .where(Tables.QUERY.ID.eq(queryId))
+                    .execute();
     }
 
 
@@ -129,31 +118,19 @@ public class DbUtil {
      * @param attachment
      * @throws SQLException
      */
-    public static void insertQueryAttachmentRecord(Integer queryId, String attachment) {
-        try(Config config = ConfigFactory.get()) {
-           config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
-                    .set(Tables.QUERY_ATTACHMENT.ATTACHMENT, attachment)
-                    .set(Tables.QUERY_ATTACHMENT.QUERY_ID, queryId)
-                    .returning(Tables.QUERY_ATTACHMENT.ID)
-                    .fetch();
-           config.get().commit();
-        }
-        catch (SQLException e){
-            e.printStackTrace();
-        }
+    public static void insertQueryAttachmentRecord(Config config, Integer queryId, String attachment) {
+       config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
+                .set(Tables.QUERY_ATTACHMENT.ATTACHMENT, attachment)
+                .set(Tables.QUERY_ATTACHMENT.QUERY_ID, queryId)
+                .returning(Tables.QUERY_ATTACHMENT.ID)
+                .fetch();
     }
 
-
-    public static void deleteQueryAttachmentRecord(Integer queryId, String attachment) {
-        try(Config config = ConfigFactory.get()) {
-            config.dsl().delete(Tables.QUERY_ATTACHMENT)
-                .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
-                .and(Tables.QUERY_ATTACHMENT.ATTACHMENT.eq(attachment)).execute();
-            config.get().commit();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
+    
+    public static void deleteQueryAttachmentRecord(Config config, Integer queryId, String attachment) {
+        config.dsl().delete(Tables.QUERY_ATTACHMENT)
+            .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
+            .and(Tables.QUERY_ATTACHMENT.ATTACHMENT.eq(attachment)).execute();
     }
 
     /**
@@ -162,17 +139,11 @@ public class DbUtil {
      * @param queryId
      * @throws SQLException
      */
-    public static void updateNumQueryAttachments(Integer queryId, Integer numAttachments) {
-        try(Config config = ConfigFactory.get()) {
-            config.dsl().update(Tables.QUERY)
-                        .set(Tables.QUERY.NUM_ATTACHMENTS, numAttachments)
-                        .where(Tables.QUERY.ID.eq(queryId))
-                        .execute();
-            config.get().commit();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
+    public static void updateNumQueryAttachments(Config config, Integer queryId, Integer numAttachments) {
+        config.dsl().update(Tables.QUERY)
+                    .set(Tables.QUERY.NUM_ATTACHMENTS, numAttachments)
+                    .where(Tables.QUERY.ID.eq(queryId))
+                    .execute();
     }
 
 
@@ -183,15 +154,9 @@ public class DbUtil {
      * @return JSON string
      */
     public static String getJsonQuery(Config config, Integer queryId) {
-        String jsonQuery = null;
-        try {
-            jsonQuery = config.dsl().selectFrom(Tables.JSON_QUERY)
-                    .where(Tables.JSON_QUERY.ID.eq(queryId))
-                    .fetchOne(Tables.JSON_QUERY.JSON_TEXT);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return jsonQuery;
+        return config.dsl().selectFrom(Tables.JSON_QUERY)
+                .where(Tables.JSON_QUERY.ID.eq(queryId))
+                .fetchOne(Tables.JSON_QUERY.JSON_TEXT);
     }
 
     /**
@@ -201,15 +166,9 @@ public class DbUtil {
      * @return JSON string
      */
     public static String getQuery(Config config, Integer queryId) {
-        String jsonQuery = null;
-        try {
-            jsonQuery = config.dsl().selectFrom(Tables.QUERY)
+        return config.dsl().selectFrom(Tables.QUERY)
                     .where(Tables.QUERY.ID.eq(queryId))
                     .fetchOne(Tables.QUERY.JSON_TEXT);
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return jsonQuery;
     }
 
     /**
@@ -219,15 +178,9 @@ public class DbUtil {
      * @return JSON string
      */
     public static QueryRecord getQuery(Config config, String token) {
-        QueryRecord jsonQuery = null;
-        try {
-            jsonQuery = config.dsl().selectFrom(Tables.QUERY)
-                    .where(Tables.QUERY.NEGOTIATOR_TOKEN.eq(token))
-                    .fetchOne();
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        return jsonQuery;
+        return config.dsl().selectFrom(Tables.QUERY)
+                .where(Tables.QUERY.NEGOTIATOR_TOKEN.eq(token))
+                .fetchOne();
     }
 
     /**
@@ -237,17 +190,10 @@ public class DbUtil {
      * @return the primary key/sequence of the inserted query. This will be sent to the perun.
      */
     public static Result<JsonQueryRecord> insertQuery(Config config, String jsonQuery) {
-        Result<JsonQueryRecord> id = null;
-        try {
-        id = config.dsl().insertInto(Tables.JSON_QUERY)
+        return config.dsl().insertInto(Tables.JSON_QUERY)
                     .set(Tables.JSON_QUERY.JSON_TEXT, jsonQuery)
                     .returning(Tables.JSON_QUERY.ID)
                     .fetch();
-        config.get().commit();
-        } catch (SQLException e){
-            e.printStackTrace();
-        }
-        return id;
     }
 
     /**
@@ -263,13 +209,6 @@ public class DbUtil {
                     .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryId))
                     .and(Tables.QUERY_PERSON.PERSON_ID.eq(userId))
                     .execute();
-
-        try {
-            config.get().commit();
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -285,13 +224,6 @@ public class DbUtil {
                               .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryId))
                               .and(Tables.QUERY_PERSON.PERSON_ID.eq(userId))
                               .execute();
-
-        try {
-            config.get().commit();
-        } catch (SQLException e) {
-                        // TODO Auto-generated catch block
-        e.printStackTrace();
-        }
     }
 
     /**
@@ -425,21 +357,13 @@ public class DbUtil {
      * @param personId
      * @param comment
      */
-    public static void addComment(int queryId, int personId, String comment) {
-        try(Config config = ConfigFactory.get()) {
-
-            CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
-            record.setQueryId(queryId);
-            record.setPersonId(personId);
-            record.setText(comment);
-            record.setCommentTime(new Timestamp(new Date().getTime()));
-            record.store();
-
-            config.get().commit();
-        }
-        catch (SQLException e) {
-         e.printStackTrace();
-        }
+    public static void addComment(Config config, int queryId, int personId, String comment) throws SQLException {
+        CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
+        record.setQueryId(queryId);
+        record.setPersonId(personId);
+        record.setText(comment);
+        record.setCommentTime(new Timestamp(new Date().getTime()));
+        record.store();
     }
 
 	/**
@@ -466,9 +390,9 @@ public class DbUtil {
      * @param directoryId directory biobank ID
      */
     public static BiobankRecord getBiobank(Config config, String directoryId) {
-        return config.dsl().selectFrom(Tables.BIOBANK).where(
-                Tables.BIOBANK.DIRECTORY_ID.eq(directoryId)
-            ).fetchOne();
+        return config.dsl().selectFrom(Tables.BIOBANK)
+                .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryId))
+                .fetchOne();
     }
 
     /**
@@ -478,8 +402,9 @@ public class DbUtil {
      * @return
      */
     private static CollectionRecord getCollection(Config config, String id) {
-        return config.dsl().selectFrom(Tables.COLLECTION).where(
-                Tables.COLLECTION.DIRECTORY_ID.eq(id)).fetchOne();
+        return config.dsl().selectFrom(Tables.COLLECTION)
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(id))
+                .fetchOne();
     }
 
     /**
@@ -607,5 +532,44 @@ public class DbUtil {
         config.commit();
 
         return queryRecord;
+    }
+
+    /**
+     * Flags the given OwnerQuery object with the given flag for the given user.
+     * @param config current database connection
+     * @param queryDto the query object
+     * @param flag the flag that will be set
+     * @param userId the current user ID
+     */
+    public static void flagQuery(Config config, OwnerQueryStatsDTO queryDto, Flag flag, int userId) {
+        /**
+         * Do not hardcode SQL statements. They are hard to maintain.
+         * Since jOOQ does not support the onDuplicateKeyUpdate method yet,
+         * simplify the statements so that:
+         *
+         * 1. If there is no current flag, insert one using the FlaggedQueryRecord class.
+         * 2. If the current flag is the same as the given flag, unflag the query, meaning remove the row from the DB
+         * 3. Update the flag to the given flag.
+         *
+         *
+         * Those are not processing heavy SQL statements, IMHO it's fine.
+         */
+
+        if(queryDto.getFlag() == null || queryDto.getFlag() == Flag.UNFLAGGED) {
+            FlaggedQueryRecord newFlag = config.dsl().newRecord(Tables.FLAGGED_QUERY);
+            newFlag.setFlag(flag);
+            newFlag.setPersonId(userId);
+            newFlag.setQueryId(queryDto.getQuery().getId());
+
+            newFlag.store();
+        } else if(queryDto.getFlag() == flag) {
+            config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
+                    .and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userId)).execute();
+        } else {
+            config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
+                    .where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userId))
+                    .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
+                    .execute();
+        }
     }
 }

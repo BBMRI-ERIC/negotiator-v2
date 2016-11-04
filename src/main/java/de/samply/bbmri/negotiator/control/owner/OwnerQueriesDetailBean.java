@@ -26,24 +26,27 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.*;
 
 /**
  * Manages the query detail view for owners
@@ -112,20 +115,6 @@ public class OwnerQueriesDetailBean implements Serializable {
         }
 	}
 
-	/**
-     * Un-Ignore a query as a biobank owner.
-     *
-     * @param queryDto
-     * @return
-     */
-    public void unIgnoreQuery(OwnerQueryStatsDTO queryDto){
-        try (Config config = ConfigFactory.get()) {
-            DbUtil.unIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Leave query as a bio bank owner. Saves the time stamp of leaving a query.
      *
@@ -135,11 +124,11 @@ public class OwnerQueriesDetailBean implements Serializable {
     public void ignoreQuery(OwnerQueryStatsDTO queryDto) {
         try (Config config = ConfigFactory.get()) {
             if(queryDto.getFlag() == Flag.IGNORED){
-                unIgnoreQuery(queryDto);
-            }
-            else{
+				DbUtil.unIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
+            } else {
                 DbUtil.ignoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
             }
+			config.commit();
             queries = null;
             flagQuery(queryDto, Flag.IGNORED);
         } catch (SQLException e) {
@@ -170,23 +159,7 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     private void flagQuery(OwnerQueryStatsDTO queryDto, Flag flag) {
         try (Config config = ConfigFactory.get()) {
-            if(queryDto.getFlag() == null || queryDto.getFlag() == Flag.UNFLAGGED) {
-                FlaggedQueryRecord newFlag = config.dsl().newRecord(Tables.FLAGGED_QUERY);
-                newFlag.setFlag(flag);
-                newFlag.setPersonId(userBean.getUserId());
-                newFlag.setQueryId(queryDto.getQuery().getId());
-
-                newFlag.store();
-            } else if(queryDto.getFlag() == flag) {
-                config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-                            .and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userBean.getUserId())).execute();
-            } else {
-                config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
-                        .where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userBean.getUserId()))
-                        .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-                        .execute();
-            }
-
+			DbUtil.flagQuery(config, queryDto, flag, userBean.getUserId());
             config.get().commit();
             queries = null;
         } catch (SQLException e) {

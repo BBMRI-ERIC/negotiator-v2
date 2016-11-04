@@ -26,6 +26,7 @@
 
 package de.samply.bbmri.negotiator.control;
 
+import java.sql.SQLException;
 import java.util.Observable;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +36,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -65,9 +68,14 @@ public class CommentBean extends Observable {
      * @return
      */
     public String saveComment(Query query) {
-        DbUtil.addComment(query.getId(), userBean.getUserId(), comment);
-        setChanged();
-        notifyObservers(query);
+        try(Config config = ConfigFactory.get()) {
+            DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment);
+            config.commit();
+            setChanged();
+            notifyObservers(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";

@@ -45,9 +45,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 
 /**
@@ -84,20 +82,6 @@ public class OwnerQueriesBean implements Serializable {
 
 	}
 
-    /**
-     * Un-Ignore a query as a biobank owner.
-     *
-     * @param queryDto
-     * @return
-     */
-    public void unIgnoreQuery(OwnerQueryStatsDTO queryDto){
-        try (Config config = ConfigFactory.get()) {
-            DbUtil.unIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 	/**
 	 * Leave query as a bio bank owner. Saves the time stamp of leaving a query.
 	 *
@@ -107,11 +91,11 @@ public class OwnerQueriesBean implements Serializable {
 	public void ignoreQuery(OwnerQueryStatsDTO queryDto) {
 		try (Config config = ConfigFactory.get()) {
 		    if(queryDto.getFlag() == Flag.IGNORED){
-		        unIgnoreQuery(queryDto);
-		    }
-		    else{
+				DbUtil.unIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
+		    } else {
 		        DbUtil.ignoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
 		    }
+			config.get().commit();
 			queries = null;
 			flagQuery(queryDto, Flag.IGNORED);
 		} catch (SQLException e) {
@@ -153,36 +137,7 @@ public class OwnerQueriesBean implements Serializable {
 	 */
 	private void flagQuery(OwnerQueryStatsDTO queryDto, Flag flag) {
 		try (Config config = ConfigFactory.get()) {
-			/**
-			 * Do not hardcode SQL statements. They are hard to maintain.
-			 * Since jOOQ does not support the onDuplicateKeyUpdate method yet,
-			 * simplify the statements so that:
-			 *
-			 * 1. If there is no current flag, insert one using the FlaggedQueryRecord class.
-			 * 2. If the current flag is the same as the given flag, unflag the query, meaning remove the row from the DB
-			 * 3. Update the flag to the given flag.
-			 *
-			 *
-			 * Those are not processing heavy SQL statements, IMHO it's fine.
-			 */
-
-			if(queryDto.getFlag() == null || queryDto.getFlag() == Flag.UNFLAGGED) {
-				FlaggedQueryRecord newFlag = config.dsl().newRecord(Tables.FLAGGED_QUERY);
-				newFlag.setFlag(flag);
-				newFlag.setPersonId(userBean.getUserId());
-				newFlag.setQueryId(queryDto.getQuery().getId());
-
-				newFlag.store();
-			} else if(queryDto.getFlag() == flag) {
-				config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-						    .and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userBean.getUserId())).execute();
-			} else {
-				config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
-						.where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userBean.getUserId()))
-						.and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-						.execute();
-			}
-
+			DbUtil.flagQuery(config, queryDto, flag, userBean.getUserId());
 			config.get().commit();
 			queries = null;
 		} catch (SQLException e) {

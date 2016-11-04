@@ -103,6 +103,7 @@ public class ResearcherQueriesBean implements Serializable {
         try(Config config = ConfigFactory.get()) {
             Result<JsonQueryRecord> id =  DbUtil.insertQuery(config, jsonQuery);
             temporaryQueryId = id.getValue(0, Tables.JSON_QUERY.ID);
+            config.get().commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
