@@ -267,10 +267,14 @@ public class UserBean implements Serializable {
 
 				if(identity.equals(DUMMY_DATA_SUBJECT_BIOBANK_OWNER)) {
 					biobankOwner = true;
+					researcher = false;
+					loginValid = true;
 				}
 
 				if(identity.equals(DUMMY_DATA_SUBJECT_RESEARCHER)) {
+					biobankOwner = false;
 					researcher = true;
+					loginValid = true;
 				}
 
 			} catch (SQLException e) {

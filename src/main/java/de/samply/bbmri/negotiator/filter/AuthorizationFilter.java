@@ -38,7 +38,6 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.auth.rest.Scope;
 import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
@@ -83,10 +82,18 @@ public class AuthorizationFilter implements Filter {
 
         UserBean userBean = (UserBean) session.getAttribute("userBean");
 
+        // requests on JSR resources are always allowed
+        boolean resourceRequest = request.getRequestURI()
+                .startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
+
+        if(resourceRequest) {
+            chain.doFilter(req, res);
+            return;
+        }
+
         /**
          * Skip maintenance.xhtml
          */
-
         if(path.endsWith("maintenance.xhtml")) {
             chain.doFilter(req, res);
             return;
@@ -103,18 +110,19 @@ public class AuthorizationFilter implements Filter {
         if(userBean.getLoginValid()) {
             chain.doFilter(request, response);
         } else {
-            StringBuilder requestURL = new StringBuilder(request.getServletPath());
-
             /**
-             * If the request is a request to a resource, return FORBIDDEN, DO NOT RETURN A 302 REDIRECT
+             * For development mode, skip the authentication
              */
-            boolean resourceRequest = request.getRequestURI()
-                    .startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
-
-            if(resourceRequest) {
-                response.setStatus(Response.Status.FORBIDDEN.getStatusCode());
+            if(NegotiatorConfig.get().isDevelopMode()) {
+                if(path.endsWith("/dev/chose.xhtml")){
+                    chain.doFilter(req, res);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/dev/chose.xhtml");
+                }
                 return;
             }
+
+            StringBuilder requestURL = new StringBuilder(request.getServletPath());
 
             /**
              * Construct a redirect URL to the authentication system and back.
