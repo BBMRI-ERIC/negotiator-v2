@@ -121,19 +121,6 @@ ALTER SEQUENCE comment_id_seq RESTART WITH 6;
 INSERT INTO flagged_query(query_id, person_id, flag) VALUES (1, 5, 'STARRED');
 INSERT INTO flagged_query(query_id, person_id, flag) VALUES (2, 5, 'ARCHIVED');
 
-INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 1);
-INSERT INTO role(role_type, person_id) VALUES ('OWNER', 2);
-INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 3);
-INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 4);
-INSERT INTO role(role_type, person_id) VALUES ('OWNER', 5);
-INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 6);
-INSERT INTO role(role_type, person_id) VALUES ('OWNER', 7);
-INSERT INTO role(role_type, person_id) VALUES ('OWNER', 8);
-INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 8);
-INSERT INTO role(role_type, person_id) VALUES ('OWNER', 9);
-INSERT INTO role(role_type, person_id) VALUES ('RESEARCHER', 9);
-
-
 INSERT INTO json_query (json_text) VALUES (
 '{
     "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’",

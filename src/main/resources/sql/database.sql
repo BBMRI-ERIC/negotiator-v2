@@ -205,19 +205,6 @@ CREATE INDEX "queryIdIndexQueryCollection" ON "query_collection" (query_id);
 COMMENT ON TABLE "query_collection" IS 'Table for connecting queries with collections';
 
 
-CREATE TABLE "role" (
-    "role_type" "role_type" NOT NULL,
-    "person_id" INTEGER NOT NULL REFERENCES "person" ("id"),
-    PRIMARY KEY("role_type", "person_id"),
-    FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
-);
-CREATE INDEX "personIdIndexRole" ON "role" (person_id);
-
-COMMENT ON TABLE "role" IS 'Table for different roles of a user.';
-COMMENT ON COLUMN "role".role_type IS 'This column along with the person_id column will make the primary key. It describes the role a user can have. A user can have more than one role';
-COMMENT ON COLUMN "role".person_id IS 'This column along with role_type will make the primary key. Its also a foreign key here, taken from person table';
-
-
 CREATE TABLE "json_query" (
     "id" SERIAL NOT NULL,
     "json_text" TEXT NOT NULL,
