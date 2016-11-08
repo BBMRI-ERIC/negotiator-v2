@@ -43,8 +43,6 @@ CREATE TABLE "person" (
     "person_image" BYTEA,
     PRIMARY KEY ("id"),
 );
-CREATE INDEX "biobankIdIndexOwner" ON "person" (collection_id);
-
 
 COMMENT ON TABLE "person" IS 'person table which is parent of researcher and owner';
 COMMENT ON COLUMN "person"."id" IS 'primary key';
