@@ -45,6 +45,7 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 
@@ -93,6 +94,12 @@ public class OwnerQueriesDetailBean implements Serializable {
      * The list of comments for the selected query
      */
     private List<CommentPersonDTO> comments;
+    
+    
+    /**
+     * The list of biobanks this owner is associated with
+     */
+    private List<BiobankRecord> associatedBiobanks;
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -109,6 +116,8 @@ public class OwnerQueriesDetailBean implements Serializable {
             		selectedQuery = query.getQuery();
             	}
             }
+            
+           //associatedBiobanks = DbUtil.getAssociatedBiobanks(config, userBean.getUserId());
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -306,4 +315,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void setFlagFilter(Flag flagFilter) {
 		this.flagFilter = flagFilter;
 	}
+
+    public List<BiobankRecord> getAssociatedBiobanks() {
+        return associatedBiobanks;
+    }
+
+    public void setAssociatedBiobanks(List<BiobankRecord> associatedBiobanks) {
+        this.associatedBiobanks = associatedBiobanks;
+    }
+	
+	
 }
