@@ -10,6 +10,7 @@ import de.samply.bbmri.negotiator.jooq.tables.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
+import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
@@ -62,6 +63,11 @@ public class Tables {
 	 * person table which is parent of researcher and owner
 	 */
 	public static final Person PERSON = de.samply.bbmri.negotiator.jooq.tables.Person.PERSON;
+
+	/**
+	 * Table for connecting people with collections
+	 */
+	public static final PersonCollection PERSON_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.PersonCollection.PERSON_COLLECTION;
 
 	/**
 	 * query table to contain all  queries

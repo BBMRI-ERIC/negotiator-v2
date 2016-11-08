@@ -41,9 +41,7 @@ CREATE TABLE "person" (
     "auth_name" CHARACTER VARYING(255) NOT NULL,
     "auth_email" CHARACTER VARYING(255) NOT NULL,
     "person_image" BYTEA,
-    "collection_id" INTEGER,
     PRIMARY KEY ("id"),
-    FOREIGN KEY ("collection_id") REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "biobankIdIndexOwner" ON "person" (collection_id);
 
@@ -54,8 +52,6 @@ COMMENT ON COLUMN "person".auth_subject IS 'authentication string that comes fro
 COMMENT ON COLUMN "person".auth_name IS 'the real name of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".auth_email IS 'the email of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".person_image IS 'image/avatar of the person';
-COMMENT ON COLUMN "person".collection_id IS 'only valid for biobank owners, the ID of the biobank he belongs to';
-
 
 
 CREATE TABLE "query" (
@@ -203,6 +199,19 @@ CREATE INDEX "queryIdIndexQueryCollection" ON "query_collection" (query_id);
 
 
 COMMENT ON TABLE "query_collection" IS 'Table for connecting queries with collections';
+
+
+CREATE TABLE "person_collection" (
+    "person_id" INTEGER NOT NULL,
+    "collection_id" INTEGER NOT NULL,
+    PRIMARY KEY("person_id", "collection_id"),
+    FOREIGN KEY ("collection_id") REFERENCES "collection"("id") ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE INDEX "collectionIdIndexPersonCollection" ON "person_collection" (collection_id);
+CREATE INDEX "personIdIndexPersonCollection" ON "person_collection" (person_id);
+
+COMMENT ON TABLE "person_collection" IS 'Table for connecting people with collections';
 
 
 CREATE TABLE "json_query" (
