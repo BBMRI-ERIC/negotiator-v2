@@ -41,7 +41,7 @@ CREATE TABLE "person" (
     "auth_name" CHARACTER VARYING(255) NOT NULL,
     "auth_email" CHARACTER VARYING(255) NOT NULL,
     "person_image" BYTEA,
-    PRIMARY KEY ("id"),
+    PRIMARY KEY ("id")
 );
 
 COMMENT ON TABLE "person" IS 'person table which is parent of researcher and owner';
