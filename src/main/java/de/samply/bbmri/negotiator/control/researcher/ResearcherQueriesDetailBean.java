@@ -138,8 +138,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * Redirects the user to directory for editing the query
      */
     public String editQuery() {
-        String url = queryDTO.getUrl();
-        return url;
+        return queryDTO.getUrl() + "&nToken=" + selectedQuery.getNegotiatorToken();
     }
 
     /**
