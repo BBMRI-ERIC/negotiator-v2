@@ -277,6 +277,10 @@ public class UserBean implements Serializable {
 					loginValid = true;
 				}
 
+				if(loginValid) {
+					createOrGetUser();
+				}
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
