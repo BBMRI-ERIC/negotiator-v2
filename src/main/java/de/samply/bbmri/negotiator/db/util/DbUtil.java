@@ -56,9 +56,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryPersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
@@ -197,36 +195,6 @@ public class DbUtil {
     }
 
     /**
-     * Un-ignores a query. Clears the query leaving time from the database.
-     * @param config jooq configuration
-     * @param queryId the query ID
-     * @param userId the owner ID
-     */
-    public static void unIgnoreQuery(Config config, Integer queryId, int userId) {
-        Timestamp nullObj = null;
-        config.dsl().update(Tables.QUERY_PERSON)
-                    .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, nullObj)
-                    .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryId))
-                    .and(Tables.QUERY_PERSON.PERSON_ID.eq(userId))
-                    .execute();
-    }
-
-    /**
-     * Sets the query leaving time when a query is marked as ignored.
-     * @param config jooq configuration
-     * @param queryId the query ID
-     * @param userId the owner ID
-     */
-    public static void ignoreQuery(Config config, Integer queryId, int userId) {
-        java.util.Date date= new java.util.Date();
-        config.dsl().update(Tables.QUERY_PERSON)
-                              .set(Tables.QUERY_PERSON.QUERY_LEAVING_TIME, new Timestamp(date.getTime()))
-                              .where(Tables.QUERY_PERSON.QUERY_ID.eq(queryId))
-                              .and(Tables.QUERY_PERSON.PERSON_ID.eq(userId))
-                              .execute();
-    }
-
-    /**
      * Returns a list of queries with the number of biobanks that commented on that query and the last
      * time a comment was made
      * @param config jooq configuration
@@ -262,7 +230,7 @@ public class DbUtil {
     public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
     	Person queryAuthor = Tables.PERSON.as("query_author");
 
-    	Condition condition = Tables.QUERY_PERSON.PERSON_ID.eq(userId);
+    	Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
 
     	if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
@@ -294,17 +262,23 @@ public class DbUtil {
                         .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
     			.from(Tables.QUERY)
 
-    			.join(Tables.QUERY_PERSON, JoinType.JOIN)
-    			.on(Tables.QUERY.ID.eq(Tables.QUERY_PERSON.QUERY_ID))
+    			.join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+    			.on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
 
     			.join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
 
     			.join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY_PERSON.QUERY_ID.eq(Tables.COMMENT.QUERY_ID))
+    			.on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID))
 
     			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.QUERY_PERSON.PERSON_ID)))
+    			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
 
     			.where(condition)
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
@@ -343,8 +317,9 @@ public class DbUtil {
                 .select(getFields(Tables.PERSON, "person"))
                 .select(getFields(Tables.COLLECTION, "collection"))
         		.from(Tables.COMMENT)
-                .join(Tables.PERSON).onKey(Keys.COMMENT__COMMENT_PERSON_ID_FKEY)
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 
@@ -469,13 +444,15 @@ public class DbUtil {
        
         Result<Record> record = config.dsl()
               .select(getFields(Tables.PERSON, "person"))
-             
               .from(Tables.PERSON)
-              
-              .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
-              .on(Tables.PERSON.COLLECTION_ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
-              
-              .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+              .where(Tables.PERSON.ID.in(
+                      config.dsl().select(Tables.PERSON.ID)
+                        .from(Tables.PERSON)
+                        .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                        .join(Tables.COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                        .join(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                        .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+              ))
               .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
         return config.map(record, NegotiatorDTO.class);
       
@@ -516,16 +493,6 @@ public class DbUtil {
                 queryCollectionRecord.setQueryId(queryRecord.getId());
                 queryCollectionRecord.setCollectionId(dbCollection.getId());
                 queryCollectionRecord.store();
-
-                Result<PersonRecord> fetch = config.dsl().selectFrom(Tables.PERSON)
-                        .where(Tables.PERSON.COLLECTION_ID.eq(dbCollection.getId())).fetch();
-
-                for(PersonRecord personRecord : fetch) {
-                    QueryPersonRecord newQueryPersonRecord = config.dsl().newRecord(Tables.QUERY_PERSON);
-                    newQueryPersonRecord.setPersonId(personRecord.getId());
-                    newQueryPersonRecord.setQueryId(queryRecord.getId());
-                    newQueryPersonRecord.store();
-                }
             }
         }
 

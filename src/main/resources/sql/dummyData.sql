@@ -25,6 +25,12 @@ INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL);
 ALTER SEQUENCE person_id_seq RESTART WITH 10;
 
+INSERT INTO person_collection (person_id, collection_id) VALUES (1, 1);
+INSERT INTO person_collection (person_id, collection_id) VALUES (2, 2);
+INSERT INTO person_collection (person_id, collection_id) VALUES (3, 3);
+INSERT INTO person_collection (person_id, collection_id) VALUES (5, 5);
+
+
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
 '{
     "humanReadable":"name: ‘Germany’, materials: ‘DNA’ or ’Plasma’",
@@ -91,20 +97,9 @@ INSERT INTO query_collection(query_id, collection_id) VALUES (1, 3);
 INSERT INTO query_collection(query_id, collection_id) VALUES (2, 3);
 INSERT INTO query_collection(query_id, collection_id) VALUES (3, 3);
 
-INSERT INTO query_person(query_id, person_id) VALUES (1, 2);
-INSERT INTO query_person(query_id, person_id) VALUES (2, 2);
-INSERT INTO query_person(query_id, person_id) VALUES (1, 5);
-INSERT INTO query_person(query_id, person_id) VALUES (2, 5);
-INSERT INTO query_person(query_id, person_id) VALUES (3, 5);
-INSERT INTO query_person(query_id, person_id) VALUES (3, 2);
-INSERT INTO query_person(query_id, person_id) VALUES (1, 8);
-INSERT INTO query_person(query_id, person_id) VALUES (2, 8);
-INSERT INTO query_person(query_id, person_id) VALUES (3, 8);
-INSERT INTO query_person(query_id, person_id) VALUES (4, 8);
-INSERT INTO query_person(query_id, person_id) VALUES (1, 9);
-INSERT INTO query_person(query_id, person_id) VALUES (2, 9);
-INSERT INTO query_person(query_id, person_id) VALUES (3, 9);
-INSERT INTO query_person(query_id, person_id) VALUES (4, 9);
+INSERT INTO query_collection(query_id, collection_id) VALUES (1, 5);
+INSERT INTO query_collection(query_id, collection_id) VALUES (2, 5);
+INSERT INTO query_collection(query_id, collection_id) VALUES (3, 5);
 
 INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');
 ALTER SEQUENCE tag_id_seq RESTART WITH 2;

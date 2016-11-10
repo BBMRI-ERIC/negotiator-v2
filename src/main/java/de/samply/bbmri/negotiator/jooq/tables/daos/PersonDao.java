@@ -98,11 +98,4 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByPersonImage(byte[]... values) {
 		return fetch(Person.PERSON.PERSON_IMAGE, values);
 	}
-
-	/**
-	 * Fetch records that have <code>collection_id IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByCollectionId(Integer... values) {
-		return fetch(Person.PERSON.COLLECTION_ID, values);
-	}
 }
