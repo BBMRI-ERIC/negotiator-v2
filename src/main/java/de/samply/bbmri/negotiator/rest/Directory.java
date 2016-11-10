@@ -83,7 +83,7 @@ public class Directory {
             authenticationService.authenticate(authCredentials);
 
             if(!NegotiatorConfig.get().getNegotiator().getMolgenisUsername().equals(authenticationService.getUsername()) ||
-                    !NegotiatorConfig.get().getNegotiator().getMolgenisUsername().equals(authenticationService.getPassword())) {
+                    !NegotiatorConfig.get().getNegotiator().getMolgenisPassword().equals(authenticationService.getPassword())) {
                 throw new ForbiddenException();
             }
 
