@@ -4,22 +4,21 @@
 package de.samply.bbmri.negotiator.jooq.tables;
 
 
-import de.samply.bbmri.negotiator.jooq.Keys;
-import de.samply.bbmri.negotiator.jooq.Public;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-
 import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
+
+import de.samply.bbmri.negotiator.jooq.Keys;
+import de.samply.bbmri.negotiator.jooq.Public;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 
 
 /**
@@ -35,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = 1447943756;
+	private static final long serialVersionUID = 1514504739;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -74,11 +73,6 @@ public class Person extends TableImpl<PersonRecord> {
 	 * The column <code>public.person.person_image</code>. image/avatar of the person
 	 */
 	public final TableField<PersonRecord, byte[]> PERSON_IMAGE = createField("person_image", org.jooq.impl.SQLDataType.BLOB, this, "image/avatar of the person");
-
-	/**
-	 * The column <code>public.person.collection_id</code>. only valid for biobank owners, the ID of the biobank he belongs to
-	 */
-	public final TableField<PersonRecord, Integer> COLLECTION_ID = createField("collection_id", org.jooq.impl.SQLDataType.INTEGER, this, "only valid for biobank owners, the ID of the biobank he belongs to");
 
 	/**
 	 * Create a <code>public.person</code> table reference
@@ -124,14 +118,6 @@ public class Person extends TableImpl<PersonRecord> {
 	@Override
 	public List<UniqueKey<PersonRecord>> getKeys() {
 		return Arrays.<UniqueKey<PersonRecord>>asList(Keys.PERSON_PKEY, Keys.PERSON_AUTH_SUBJECT_KEY);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<ForeignKey<PersonRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<PersonRecord, ?>>asList(Keys.PERSON__PERSON_COLLECTION_ID_FKEY);
 	}
 
 	/**

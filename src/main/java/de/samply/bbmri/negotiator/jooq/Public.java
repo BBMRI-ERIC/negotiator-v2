@@ -14,7 +14,6 @@ import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
-import de.samply.bbmri.negotiator.jooq.tables.QueryPerson;
 import de.samply.bbmri.negotiator.jooq.tables.Tag;
 import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 
@@ -42,7 +41,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = 851855286;
+	private static final long serialVersionUID = -1470502652;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -94,7 +93,6 @@ public class Public extends SchemaImpl {
 			Query.QUERY,
 			QueryAttachment.QUERY_ATTACHMENT,
 			QueryCollection.QUERY_COLLECTION,
-			QueryPerson.QUERY_PERSON,
 			Tag.TAG,
 			TaggedQuery.TAGGED_QUERY);
 	}

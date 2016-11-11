@@ -125,18 +125,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 	}
 
     /**
-     * Leave query as a bio bank owner. Saves the time stamp of leaving a query.
+     * Leave query as a bio bank owner.
      *
      * @param queryDto
      * @return
      */
     public void ignoreQuery(OwnerQueryStatsDTO queryDto) {
         try (Config config = ConfigFactory.get()) {
-            if(queryDto.getFlag() == Flag.IGNORED){
-				DbUtil.unIgnoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
-            } else {
-                DbUtil.ignoreQuery(config, queryDto.getQuery().getId(), userBean.getUserId());
-            }
 			config.commit();
             queries = null;
             flagQuery(queryDto, Flag.IGNORED);
