@@ -196,10 +196,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
         Part file = (Part)value;
         if(file != null) {
             if (file.getSize() > MAX_UPLOAD_SIZE) {
-                msgs.add(new FacesMessage("file too big"));
+                msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The given file was too big.", "File too big."));
             }
             if (!"application/pdf".equals(file.getContentType())) {
-                msgs.add(new FacesMessage("not a pdf file"));
+                msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The uploaded file was not a PDF file.", "Not a PDF file"));
             }
             if (!msgs.isEmpty()) {
                 throw new ValidatorException(msgs);
