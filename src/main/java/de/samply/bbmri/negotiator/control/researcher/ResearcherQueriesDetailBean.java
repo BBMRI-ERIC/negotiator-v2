@@ -48,6 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -198,9 +199,16 @@ public class ResearcherQueriesDetailBean implements Serializable {
             if (file.getSize() > MAX_UPLOAD_SIZE) {
                 msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The given file was too big.", "File too big."));
             }
+
             if (!"application/pdf".equals(file.getContentType())) {
                 msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The uploaded file was not a PDF file.", "Not a PDF file"));
             }
+
+            if(FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
+                msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "The uploaded file contains malicious content and therefore has been rejected.", "Malicious content"));
+            }
+
             if (!msgs.isEmpty()) {
                 throw new ValidatorException(msgs);
             }

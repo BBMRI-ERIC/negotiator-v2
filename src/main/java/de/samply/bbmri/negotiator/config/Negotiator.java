@@ -26,10 +26,7 @@
 
 package de.samply.bbmri.negotiator.config;
 
-import de.samply.common.config.OAuth2Client;
-import de.samply.common.config.Postgresql;
-import de.samply.common.config.Proxy;
-import de.samply.common.mailing.MailSending;
+import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -37,7 +34,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.io.Serializable;
+
+import de.samply.common.config.OAuth2Client;
+import de.samply.common.config.Postgresql;
+import de.samply.common.config.Proxy;
+import de.samply.common.mailing.MailSending;
 
 /**
  * The main configuration for the negotiator configuration.
@@ -116,6 +117,18 @@ public class Negotiator implements Serializable {
      */
     @XmlElement
     private MailSending mailSending;
+
+    /**
+     * The host on which CLAMAV runs and listens on a TCP socket
+     */
+    @XmlElement
+    private String clamavHost;
+
+    /**
+     * The port on which CLAMAV listens on
+     */
+    @XmlElement
+    private int clamavPort;
 
     public Postgresql getPostgresql() {
         return postgresql;
@@ -205,4 +218,19 @@ public class Negotiator implements Serializable {
         this.mailEnabled = mailEnabled;
     }
 
+    public String getClamavHost() {
+        return clamavHost;
+    }
+
+    public void setClamavHost(String clamavHost) {
+        this.clamavHost = clamavHost;
+    }
+
+    public int getClamavPort() {
+        return clamavPort;
+    }
+
+    public void setClamavPort(int clamavPort) {
+        this.clamavPort = clamavPort;
+    }
 }

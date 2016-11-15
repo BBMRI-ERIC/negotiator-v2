@@ -40,6 +40,10 @@
 
     <mailEnabled>true</mailEnabled>
 
+    <clamavHost>localhost</clamavHost>
+
+    <clamavPort>3310</clamavPort>
+
     <postgresql xmlns:c="http://schema.samply.de/common">
 
         <c:host>localhost</c:host>

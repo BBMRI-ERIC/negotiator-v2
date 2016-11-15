@@ -36,6 +36,10 @@ import javax.servlet.http.Part;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.string.util.StringUtil;
+import fi.solita.clamav.ClamAVClient;
+
 public class FileUtil {
 
 
@@ -43,7 +47,7 @@ public class FileUtil {
     
     /**
      * Copies file to query attachments directory
-     * @param uploaded file
+     * @param file file
      * @return name of persisted file
      */
     public static String saveQueryAttachment(Part file, String fileName) {
@@ -77,5 +81,34 @@ public class FileUtil {
             }
         }
         return null;
+    }
+
+    /**
+     * Checks the given file for a virus using clamav. Returns
+     * @param config the negotiator configuration
+     * @param inputStream the fileinputstream that will be checked for viruses
+     * @return true, if a virus has been found. False otherwise
+     */
+    public static boolean checkVirusClamAV(Negotiator config, InputStream inputStream) {
+        /**
+         * If there is no clamav configured, return false and do not check for viruses
+         */
+        if(StringUtil.isEmpty(config.getClamavHost()) || config.getClamavPort() == 0) {
+            logger.warn("Negotiator not configured for ClamAV. Skipping the check for viruses. This is dangerous!");
+            return false;
+        }
+
+        ClamAVClient cl = new ClamAVClient(config.getClamavHost(), config.getClamavPort());
+
+        /**
+         * ClamAV has been configured, but once an error occurs, we assume
+         * something is very wrong and do not continue.
+         */
+        try {
+            return !ClamAVClient.isCleanReply(cl.scan(inputStream));
+        } catch (Exception e) {
+            logger.error("Error while scanning file: ", e);
+            return true;
+        }
     }
 }
