@@ -90,7 +90,7 @@ public class ApplicationBean implements Serializable {
                     /**
                      * In case the application has been started in development mode, deploy the dummy data.
                      */
-                    if(NegotiatorConfig.get().isDevelopMode()) {
+                    if(NegotiatorConfig.get().getNegotiator().deployDummyData()) {
                         logger.info("Deploying dummy data");
                         SQLUtil.executeSQLFile(config.get(), getClass().getClassLoader(), "/sql/dummyData.sql");
 

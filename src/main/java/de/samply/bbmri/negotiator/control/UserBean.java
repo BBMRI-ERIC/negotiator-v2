@@ -158,9 +158,16 @@ public class UserBean implements Serializable {
 		// login won't steal old values
 		context.invalidateSession();
 
-		// redirect user away
-		context.redirect(OAuth2ClientConfig.getLogoutUrl(config, context.getRequestScheme(),
-		        context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(), "/"));
+        if(NegotiatorConfig.get().getNegotiator().isAuthenticationDisabled()) {
+            /**
+             * If authentication is disabled, redirect the user back to the root folder of this application
+             */
+            context.redirect(context.getRequestContextPath());
+        } else {
+            // redirect user away
+            context.redirect(OAuth2ClientConfig.getLogoutUrl(config, context.getRequestScheme(),
+                    context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(), "/"));
+        }
 	}
 
 	/**
@@ -233,7 +240,7 @@ public class UserBean implements Serializable {
 	 * @param identity
      */
 	public void fakeUser(String identity) {
-		if(NegotiatorConfig.get().isDevelopMode()) {
+		if(NegotiatorConfig.get().getNegotiator().isAuthenticationDisabled()) {
 			this.userIdentity = identity;
 
 			try(Config config = ConfigFactory.get()) {

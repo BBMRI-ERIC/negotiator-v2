@@ -130,6 +130,12 @@ public class Negotiator implements Serializable {
     @XmlElement
     private int clamavPort;
 
+    /**
+     * The settings for development mode
+     */
+    @XmlElement
+    private Development development = new Development();
+
     public Postgresql getPostgresql() {
         return postgresql;
     }
@@ -232,5 +238,76 @@ public class Negotiator implements Serializable {
 
     public void setClamavPort(int clamavPort) {
         this.clamavPort = clamavPort;
+    }
+
+    public Development getDevelopment() {
+        return development;
+    }
+
+    public void setDevelopment(Development development) {
+        this.development = development;
+    }
+
+    public boolean fakeDirectoryCollections() {
+        return development != null && development.fakeDirectoryCollections;
+    }
+
+    public boolean isAuthenticationDisabled() {
+        return development != null && development.authenticationDisabled;
+    }
+
+    public boolean deployDummyData() {
+        return development != null && development.deployDummyData;
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class Development implements Serializable {
+
+        private static final long serialVersionUID = -4342761680099869982L;
+
+        /**
+         * If true, the authentication via Perun is disabled altogether. Instead it shows several users right from the start to pick.
+         */
+        @XmlElement
+        private boolean authenticationDisabled = false;
+
+        /**
+         * If true, the dummy data is deployed if the database does not exist yet.
+         */
+        @XmlElement
+        private boolean deployDummyData = false;
+
+        /**
+         * If true, the payload the REST endpoints accepts from the directory, will be modified, so that only a few
+         * collections are suitable for the query.
+         */
+        @XmlElement
+        private boolean fakeDirectoryCollections = false;
+
+
+        public boolean isFakeDirectoryCollections() {
+            return fakeDirectoryCollections;
+        }
+
+        public void setFakeDirectoryCollections(boolean fakeDirectoryCollections) {
+            this.fakeDirectoryCollections = fakeDirectoryCollections;
+        }
+
+        public boolean isDeployDummyData() {
+            return deployDummyData;
+        }
+
+        public void setDeployDummyData(boolean deployDummyData) {
+            this.deployDummyData = deployDummyData;
+        }
+
+        public boolean isAuthenticationDisabled() {
+            return authenticationDisabled;
+        }
+
+        public void setAuthenticationDisabled(boolean authenticationDisabled) {
+            this.authenticationDisabled = authenticationDisabled;
+        }
+
     }
 }

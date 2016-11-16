@@ -44,6 +44,16 @@
 
     <clamavPort>3310</clamavPort>
 
+    <development>
+
+        <authenticationDisabled>true</authenticationDisabled>
+
+        <deployDummyData>true</deployDummyData>
+
+        <fakeDirectoryCollections>true</fakeDirectoryCollections>
+
+    </development>
+
     <postgresql xmlns:c="http://schema.samply.de/common">
 
         <c:host>localhost</c:host>

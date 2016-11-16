@@ -26,18 +26,24 @@
 
 package de.samply.bbmri.negotiator;
 
-import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.common.config.*;
-import de.samply.common.mailing.MailSending;
-import de.samply.config.util.JAXBUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
+import java.io.FileNotFoundException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.FileNotFoundException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.common.config.HostAuth;
+import de.samply.common.config.OAuth2Client;
+import de.samply.common.config.ObjectFactory;
+import de.samply.common.config.Postgresql;
+import de.samply.common.config.Proxy;
+import de.samply.common.mailing.MailSending;
+import de.samply.config.util.JAXBUtil;
 
 /**
  * The negotiator configuration singleton.
@@ -82,11 +88,6 @@ public class NegotiatorConfig {
      * If true, the application has been started in maintenance mode.
      */
     private boolean maintenanceMode = false;
-
-    /**
-     * If true, the application has been started in development mode.
-     */
-    private boolean developMode = false;
 
     /**
      * The main negotiator configuration settings
@@ -157,8 +158,6 @@ public class NegotiatorConfig {
         instance.oauth2 = instance.negotiator.getoAuth2Client();
         instance.postgresql = instance.negotiator.getPostgresql();
         instance.mailConfig = instance.negotiator.getMailSending();
-
-        instance.developMode = "true".equals(System.getProperty("de.samply.development"));
 
         /**
          * Setting the proxy variables
@@ -231,14 +230,6 @@ public class NegotiatorConfig {
      */
     public void setMaintenanceMode(boolean maintenanceMode) {
         this.maintenanceMode = maintenanceMode;
-    }
-
-    /**
-     * If true, the application has been started in development mode
-     * @return
-     */
-    public boolean isDevelopMode() {
-        return developMode;
     }
 
 }

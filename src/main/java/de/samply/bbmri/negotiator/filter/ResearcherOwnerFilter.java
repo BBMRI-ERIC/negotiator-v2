@@ -61,7 +61,7 @@ public class ResearcherOwnerFilter implements Filter {
         HttpSession session = req.getSession(false);
         UserBean userBean = (UserBean) session.getAttribute("userBean");
 
-        if(!userBean.getBiobankOwner() && !userBean.getResearcher() && NegotiatorConfig.get().isDevelopMode()) {
+        if(!userBean.getBiobankOwner() && !userBean.getResearcher() && NegotiatorConfig.get().getNegotiator().isAuthenticationDisabled()) {
             HttpServletResponse resp = (HttpServletResponse) response;
             resp.sendRedirect(req.getContextPath() + "/dev/chose.xhtml");
             return;

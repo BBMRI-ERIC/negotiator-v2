@@ -47,7 +47,7 @@ public class IndexBean {
             return "/owner/index";
         } else if(userBean.getResearcher()) {
             return "/researcher/index";
-        } else if(NegotiatorConfig.get().isDevelopMode()) {
+        } else if(NegotiatorConfig.get().getNegotiator().isAuthenticationDisabled()) {
             return "/dev/chose.xhtml";
         } else {
             return "/unauthorized/index";
