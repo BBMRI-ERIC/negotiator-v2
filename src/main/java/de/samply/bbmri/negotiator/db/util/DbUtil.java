@@ -51,6 +51,7 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
@@ -360,6 +361,21 @@ public class DbUtil {
 	}
 
     /**
+     * Returns a list of all fields for the given table and no prefix.
+     *
+     * @param table
+     * @return
+     */
+    private static List<Field<?>> getFields(Table<?> table) {
+        List<Field<?>> target = new ArrayList<>();
+        for(Field<?> f : table.fields()) {
+            target.add(f);
+        }
+
+        return target;
+    }
+
+    /**
      * Returns the location for the given directory ID.
      * @param config database configuration
      * @param directoryId directory biobank ID
@@ -558,5 +574,22 @@ public class DbUtil {
                     .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
                     .execute();
         }
+    }
+
+    /**
+     * Returns the list of collections which the given user is responsible for.
+     * @param config the current configuration
+     * @param userId the person ID
+     * @return
+     */
+    public static List<Collection> getCollections(Config config, int userId) {
+        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
+                .where(Tables.COLLECTION.ID.in(
+                        config.dsl().select(Tables.COLLECTION.ID)
+                            .from(Tables.COLLECTION)
+                            .join(Tables.PERSON_COLLECTION)
+                                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                            .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
+                )).fetch(), Collection.class);
     }
 }

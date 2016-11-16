@@ -48,16 +48,15 @@ import de.samply.bbmri.auth.client.InvalidTokenException;
 import de.samply.bbmri.auth.client.jwt.JWTAccessToken;
 import de.samply.bbmri.auth.client.jwt.JWTIDToken;
 import de.samply.bbmri.auth.client.jwt.JWTRefreshToken;
-import de.samply.bbmri.auth.rest.RoleDTO;
 import de.samply.bbmri.auth.rest.Scope;
 import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
-import de.samply.bbmri.negotiator.jooq.tables.daos.PersonDao;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
@@ -221,29 +220,10 @@ public class UserBean implements Serializable {
 			return;
 		}
 
-		loginValid = true;
 		userIdentity = idToken.getSubject();
 
 		userRealName = client.getUser().getName();
 		userEmail = client.getUser().getEmail();
-
-		/**
-		 * Check all roles. If the user is a biobank owner, set biobankOwner to true.
-		 */
-		List<RoleDTO> roles = client.getIDToken().getRoles();
-
-		biobankOwner = false;
-		researcher = false;
-
-		for (RoleDTO role : roles) {
-			if (Constants.OWNER_ROLE.equalsIgnoreCase(role.getIdentifier())) {
-				biobankOwner = true;
-			}
-
-			if (Constants.RESEARCHER_ROLE.equalsIgnoreCase(role.getIdentifier())) {
-				researcher = true;
-			}
-		}
 
 		createOrGetUser();
 	}
@@ -263,24 +243,8 @@ public class UserBean implements Serializable {
 					userRealName = personRecord.getAuthName();
 					userEmail = personRecord.getAuthEmail();
 					userId = personRecord.getId();
-				}
-
-				if(identity.equals(DUMMY_DATA_SUBJECT_BIOBANK_OWNER)) {
-					biobankOwner = true;
-					researcher = false;
-					loginValid = true;
-				}
-
-				if(identity.equals(DUMMY_DATA_SUBJECT_RESEARCHER)) {
-					biobankOwner = false;
-					researcher = true;
-					loginValid = true;
-				}
-
-				if(loginValid) {
 					createOrGetUser();
 				}
-
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -310,18 +274,6 @@ public class UserBean implements Serializable {
 				 * identicon by default.
 				 */
 				person.setPersonImage(IdenticonUtil.generateIdenticon(256));
-
-				if (biobankOwner) {
-
-//					// TODO: Update this to Perun and/or Directory given
-//					// Location data
-//					biobank = getLocation(TEMP_LOCATION_ID_FOR_ALL_BIO_OWNERS);
-//					if (biobank == null) {
-//						throw new UnsupportedOperationException();
-//					}
-//
-//					person.setBiobankId(biobank.getId());
-				}
 				person.store();
 			} else {
 				/**
@@ -336,21 +288,24 @@ public class UserBean implements Serializable {
 				if (person.getPersonImage() == null) {
 					person.setPersonImage(IdenticonUtil.generateIdenticon(256));
 				}
-
-				if (biobankOwner) {
-//					biobank = getLocation(person.getBiobankId());
-//
-//					// TODO: Update this to Perun and/or Directory given
-//					// Location data
-//					if (biobank == null) {
-//						throw new UnsupportedOperationException();
-//					}
-				}
 				person.update();
 			}
 
-			PersonDao dao = new PersonDao();
-			this.person = dao.mapper().map(person);
+			loginValid = true;
+            researcher = true;
+
+			/**
+			 * Check if the user is a biobanker
+			 */
+            List<Collection> collections = DbUtil.getCollections(config, person.getId());
+
+            if(collections.size() > 0) {
+                biobankOwner = true;
+            } else {
+                biobankOwner = false;
+            }
+
+            this.person = config.map(person, Person.class);
 
 			userId = person.getId();
 
