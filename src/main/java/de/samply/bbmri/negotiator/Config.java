@@ -49,15 +49,6 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
     private static final long serialVersionUID = -915149314520303632L;
 
     /**
-     * The modelMapper with the following configuration
-     * - Standard Matching Strategy
-     * - Underscore source tokenizer
-     * - CamelCase destrination tokenizer
-     * - ignore ambiguity
-     */
-    private final ModelMapper modelMapper;
-
-    /**
      * The jOOQ DSLContext, initialized in the constructor.
      */
     private final DSLContext dsl;
@@ -67,13 +58,6 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
         set(SQLDialect.POSTGRES);
 
         dsl = DSL.using(this);
-
-        modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().addValueReader(new RecordValueReader());
-        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
-        modelMapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
-        modelMapper.getConfiguration().setDestinationNameTokenizer(NameTokenizers.CAMEL_CASE);
-        modelMapper.getConfiguration().setAmbiguityIgnored(true);
     }
 
     /**
@@ -105,11 +89,33 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
     }
 
     /**
-     * Returns the modelmapper configured for JOOQ.
+     * Returns the modelmapper configured for JOOQ with the following configuration
+     * - Standard Matching Strategy
+     * - Underscore source tokenizer
+     * - CamelCase destrination tokenizer
+     * - ignore ambiguity
      * @return
      */
     public ModelMapper mapper() {
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().addValueReader(new RecordValueReader());
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STANDARD);
+        modelMapper.getConfiguration().setSourceNameTokenizer(NameTokenizers.UNDERSCORE);
+        modelMapper.getConfiguration().setDestinationNameTokenizer(NameTokenizers.CAMEL_CASE);
+        modelMapper.getConfiguration().setAmbiguityIgnored(true);
         return modelMapper;
+    }
+
+    /**
+     * Uses the modelMapper to map one record to the given class.
+     * @param mapper
+     * @param record
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public <T> T map(ModelMapper mapper, Record record, Class<? extends T> clazz) {
+        return mapper.map(record, clazz);
     }
 
     /**
@@ -120,7 +126,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
      * @return
      */
     public <T> T map(Record record, Class<? extends T> clazz) {
-        return mapper().map(record, clazz);
+        return map(mapper(), record, clazz);
     }
 
     /**
@@ -131,10 +137,21 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
      * @return
      */
     public <T> List<T> map(List<? extends Record> records, Class<? extends T> clazz) {
+        return map(mapper(), records, clazz);
+    }
+
+    /**
+     * Uses the modelmapper to map the list of records to a list of the given class.
+     * @param records the list of records from jooq
+     * @param clazz the destination class
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> map(ModelMapper mapper, List<? extends Record> records, Class<? extends T> clazz) {
         List<T> target = new ArrayList<>();
 
         for(Record r : records) {
-            target.add(map(r, clazz));
+            target.add(map(mapper, r, clazz));
         }
         return target;
     }
