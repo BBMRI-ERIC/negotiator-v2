@@ -238,7 +238,7 @@
                 </ui:fragment>
 
                 <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}" var="biobank" varStatus="loop">
-                    #{biobank.name}"#{!loop.last ? ', ' : ''}
+                    #{biobank.name}#{!loop.last ? ', ' : ''}
                 </ui:repeat>
                 
            
