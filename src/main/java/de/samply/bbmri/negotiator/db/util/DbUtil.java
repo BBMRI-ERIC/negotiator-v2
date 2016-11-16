@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -258,7 +259,7 @@ public class DbUtil {
 				.select(getFields(Tables.QUERY, "query"))
 				.select(getFields(queryAuthor, "query_author"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-    			.select(Tables.COMMENT.ID.count().as("comment_count"))
+    			.select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
                         .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
     			.from(Tables.QUERY)
@@ -324,7 +325,28 @@ public class DbUtil {
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 
-        return config.map(result, CommentPersonDTO.class);
+        List<CommentPersonDTO> map = config.map(result, CommentPersonDTO.class);
+
+        List<CommentPersonDTO> target = new ArrayList<>();
+        /**
+         * Now we have to do weird things, grouping them together manually
+         */
+        HashMap<Integer, CommentPersonDTO> mapped = new HashMap<>();
+
+        for(CommentPersonDTO dto : map) {
+            if(!mapped.containsKey(dto.getComment().getId())) {
+                mapped.put(dto.getComment().getId(), dto);
+
+                if(dto.getCollection() != null) {
+                    dto.getCollections().add(dto.getCollection());
+                }
+                target.add(dto);
+            } else if(dto.getCollection() != null) {
+                    mapped.get(dto.getComment().getId()).getCollections().add(dto.getCollection());
+            }
+        }
+
+        return target;
     }
 
     /**
@@ -359,21 +381,6 @@ public class DbUtil {
 
 		return target;
 	}
-
-    /**
-     * Returns a list of all fields for the given table and no prefix.
-     *
-     * @param table
-     * @return
-     */
-    private static List<Field<?>> getFields(Table<?> table) {
-        List<Field<?>> target = new ArrayList<>();
-        for(Field<?> f : table.fields()) {
-            target.add(f);
-        }
-
-        return target;
-    }
 
     /**
      * Returns the location for the given directory ID.
@@ -586,10 +593,10 @@ public class DbUtil {
         return config.map(config.dsl().selectFrom(Tables.COLLECTION)
                 .where(Tables.COLLECTION.ID.in(
                         config.dsl().select(Tables.COLLECTION.ID)
-                            .from(Tables.COLLECTION)
-                            .join(Tables.PERSON_COLLECTION)
+                                .from(Tables.COLLECTION)
+                                .join(Tables.PERSON_COLLECTION)
                                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                            .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
+                                .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
                 )).fetch(), Collection.class);
     }
 }

@@ -38,7 +38,7 @@
 <composite:interface>
     <composite:attribute name="comment" required="true"/>
     <composite:attribute name="person" required="true"/>
-    <composite:attribute name="collection" />
+    <composite:attribute name="collections" />
 </composite:interface>
 
 <composite:implementation>
@@ -46,7 +46,13 @@
 
         <h:panelGroup layout="block" styleClass="panel-heading">
 
-            #{cc.attrs.person.authName}<h:outputText value=", Collection: #{cc.attrs.collection.name}" rendered="#{cc.attrs.collection != null}"/>
+            #{cc.attrs.person.authName}
+            <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
+                <h:outputText value=", Collection: "/>
+                <ui:repeat value="#{cc.attrs.collections}" var="collection" varStatus="loop">
+                    <h:outputText value="#{collection.name}"/> #{!loop.last ? ', ' : ''}
+                </ui:repeat>
+            </ui:fragment>
             <h:panelGroup styleClass="pull-right">
                 <h:outputText value="#{cc.attrs.comment.commentTime}">
                     <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>

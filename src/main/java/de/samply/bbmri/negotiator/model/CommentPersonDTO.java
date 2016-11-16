@@ -26,11 +26,13 @@
 
 package de.samply.bbmri.negotiator.model;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-
-import java.io.Serializable;
 
 /**
  * DTO for a comment and the person who made the comment.
@@ -52,6 +54,11 @@ public class CommentPersonDTO implements Serializable {
 	 * The collection of the person who made the comment.
 	 */
 	private Collection collection;
+
+	/**
+	 * The list of the collection the person is responsible for
+	 */
+	private List<Collection> collections = new ArrayList<>();
 
 	public Comment getComment() {
 		return comment;
@@ -77,4 +84,11 @@ public class CommentPersonDTO implements Serializable {
 		this.collection = collection;
 	}
 
+	public List<Collection> getCollections() {
+		return collections;
+	}
+
+	public void setCollections(List<Collection> collections) {
+		this.collections = collections;
+	}
 }
