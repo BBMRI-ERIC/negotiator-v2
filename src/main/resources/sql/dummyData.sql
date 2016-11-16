@@ -29,7 +29,8 @@ INSERT INTO person_collection (person_id, collection_id) VALUES (1, 1);
 INSERT INTO person_collection (person_id, collection_id) VALUES (2, 2);
 INSERT INTO person_collection (person_id, collection_id) VALUES (3, 3);
 INSERT INTO person_collection (person_id, collection_id) VALUES (5, 5);
-
+INSERT INTO person_collection (person_id, collection_id) VALUES (5, 2);
+INSERT INTO person_collection (person_id, collection_id) VALUES (5, 3);
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
 '{

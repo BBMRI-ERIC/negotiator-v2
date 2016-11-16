@@ -369,6 +369,26 @@ public class DbUtil {
                 .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryId))
                 .fetchOne();
     }
+    
+    /**
+     * Returns a list of all biobanks relevant to this query and this biobank owner
+     */
+    public static List<BiobankRecord> getAssociatedBiobanks(Config config, Integer queryId, Integer userId) {
+        Result<Record> record = 
+                
+                config.dsl().select(getFields(Tables.BIOBANK, "biobank"))
+                .from(Tables.BIOBANK)
+               
+                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
+                .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId)).and(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
+                .orderBy(Tables.BIOBANK.ID).fetch();
+                  
+          return config.map(record, BiobankRecord.class);
+           
+    }
 
     /**
      * Returns the collection for the given directory ID.

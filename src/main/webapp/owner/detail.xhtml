@@ -226,7 +226,23 @@
 					</p>
 				</h:panelGroup>
 
-				<ui:fragment
+                <ui:fragment
+                    rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
+
+                    <div class="col-xs-12">
+                        <hr></hr>
+                    </div>
+
+                    <b>#{label['querydetail.owner.associatedbiobanks']}</b>
+
+                </ui:fragment>
+
+                <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}" var="biobank" varStatus="loop">
+                    #{biobank.name}"#{!loop.last ? ', ' : ''}
+                </ui:repeat>
+                
+           
+                <ui:fragment
 					rendered="#{ownerQueriesDetailBean.comments.size() > 0}">
 
 					<div class="col-xs-12">

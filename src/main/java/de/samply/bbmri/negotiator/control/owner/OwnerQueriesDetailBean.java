@@ -117,7 +117,7 @@ public class OwnerQueriesDetailBean implements Serializable {
             	}
             }
             
-           //associatedBiobanks = DbUtil.getAssociatedBiobanks(config, userBean.getUserId());
+           associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
         } catch (SQLException e) {
             e.printStackTrace();
