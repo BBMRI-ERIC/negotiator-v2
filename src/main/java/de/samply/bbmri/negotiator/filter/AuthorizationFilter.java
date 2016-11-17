@@ -114,7 +114,7 @@ public class AuthorizationFilter implements Filter {
              * For development mode, skip the authentication
              */
             if(NegotiatorConfig.get().getNegotiator().isAuthenticationDisabled()) {
-                if(path.endsWith("/dev/chose.xhtml")){
+                if(path.startsWith(request.getContextPath() + "/dev/")){
                     chain.doFilter(req, res);
                 } else {
                     response.sendRedirect(request.getContextPath() + "/dev/chose.xhtml");
