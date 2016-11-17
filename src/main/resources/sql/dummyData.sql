@@ -4,7 +4,12 @@ INSERT INTO biobank(id, directory_id, name, description) VALUES (3, '3', 'Bioban
 INSERT INTO biobank(id, directory_id, name, description) VALUES (4, '4', 'Biobank Münster', 'The C* biobank in Münstermanaged by the UKM Pathology');
 INSERT INTO biobank(id, directory_id, name, description) VALUES (5, '5', 'Biobank Mainz', 'The C40-49 biobank in Mainz managed by the JGU MedInfo');
 INSERT INTO biobank(id, directory_id, name, description) VALUES (6, '6', 'Biobank Heidelberg', 'The C95 biobank in Heidelberg managed by Zeis');
-ALTER SEQUENCE biobank_id_seq RESTART WITH 7;
+INSERT INTO biobank(id, directory_id, name, description) VALUES (7, '7', 'Usertest Biobank 1', 'A biobank for testing only');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (8, '8', 'Usertest Biobank 2', 'A biobank for testing only');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (9, '9', 'Usertest Biobank 3', 'A biobank for testing only');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (10, '10', 'Usertest Biobank 4', 'A biobank for testing only');
+INSERT INTO biobank(id, directory_id, name, description) VALUES (11, '11', 'Usertest Biobank 5', 'A biobank for testing only');
+ALTER SEQUENCE biobank_id_seq RESTART WITH 12;
 
 INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (1, '1', 'Hamburg Blood Samples', 1);
 INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (2, '2', 'Berlin Blood Samples', 2);
@@ -12,7 +17,22 @@ INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (3, '3', 'Mün
 INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (4, '4', 'Münster Blood Samples', 4);
 INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (5, '5', 'Mainz Blood Samples', 5);
 INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (6, '6', 'Heidelberg Blood Samples', 6);
-ALTER SEQUENCE collection_id_seq RESTART WITH 7;
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (7, '7', 'Usertest Collection 1', 7);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (8, '8', 'Usertest Collection 2', 7);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (9, '9', 'Usertest Collection 3', 7);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (10, '10', 'Usertest Collection 4', 8);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (11, '11', 'Usertest Collection 5', 8);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (12, '12', 'Usertest Collection 6', 8);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (13, '13', 'Usertest Collection 7', 9);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (14, '14', 'Usertest Collection 8', 9);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (15, '15', 'Usertest Collection 9', 9);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (16, '16', 'Usertest Collection 10', 10);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (17, '17', 'Usertest Collection 11', 10);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (18, '18', 'Usertest Collection 12', 10);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (19, '19', 'Usertest Collection 13', 11);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (20, '20', 'Usertest Collection 14', 11);
+INSERT INTO collection(id, directory_id, name, biobank_id) VALUES (21, '21', 'Usertest Collection 15', 11);
+ALTER SEQUENCE collection_id_seq RESTART WITH 22;
 
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (1, 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (2, 'user2', 'Goerge Biobanker, M.D.', 'test2@test2.org', NULL);
@@ -23,7 +43,17 @@ INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (7, 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (8, 'https://auth-dev.mitro.dkfz.de/users/19', 'Saher Maqsood', 's.maqsood@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL);
-ALTER SEQUENCE person_id_seq RESTART WITH 10;
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (10, 'usertest-biobanker1', 'Biobank test user 1', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (11, 'usertest-biobanker2', 'Biobank test user 2', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (12, 'usertest-biobanker3', 'Biobank test user 3', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (13, 'usertest-biobanker4', 'Biobank test user 4', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (14, 'usertest-biobanker5', 'Biobank test user 5', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (15, 'usertest-owner1', 'Researcher test user 1', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (16, 'usertest-owner2', 'Researcher test user 2', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (17, 'usertest-owner3', 'Researcher test user 3', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (18, 'usertest-owner4', 'Researcher test user 4', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (19, 'usertest-owner5', 'Researcher test user 5', 'r.proynova@dkfz.de', NULL);
+ALTER SEQUENCE person_id_seq RESTART WITH 20;
 
 INSERT INTO person_collection (person_id, collection_id) VALUES (1, 1);
 INSERT INTO person_collection (person_id, collection_id) VALUES (2, 2);
@@ -31,6 +61,21 @@ INSERT INTO person_collection (person_id, collection_id) VALUES (3, 3);
 INSERT INTO person_collection (person_id, collection_id) VALUES (5, 5);
 INSERT INTO person_collection (person_id, collection_id) VALUES (5, 2);
 INSERT INTO person_collection (person_id, collection_id) VALUES (5, 3);
+INSERT INTO person_collection (person_id, collection_id) VALUES (10, 7);
+INSERT INTO person_collection (person_id, collection_id) VALUES (10, 8);
+INSERT INTO person_collection (person_id, collection_id) VALUES (10, 9);
+INSERT INTO person_collection (person_id, collection_id) VALUES (11, 10);
+INSERT INTO person_collection (person_id, collection_id) VALUES (11, 11);
+INSERT INTO person_collection (person_id, collection_id) VALUES (11, 12);
+INSERT INTO person_collection (person_id, collection_id) VALUES (12, 13);
+INSERT INTO person_collection (person_id, collection_id) VALUES (12, 14);
+INSERT INTO person_collection (person_id, collection_id) VALUES (12, 15);
+INSERT INTO person_collection (person_id, collection_id) VALUES (13, 16);
+INSERT INTO person_collection (person_id, collection_id) VALUES (13, 17);
+INSERT INTO person_collection (person_id, collection_id) VALUES (13, 18);
+INSERT INTO person_collection (person_id, collection_id) VALUES (14, 19);
+INSERT INTO person_collection (person_id, collection_id) VALUES (14, 20);
+INSERT INTO person_collection (person_id, collection_id) VALUES (14, 21);
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
 '{
