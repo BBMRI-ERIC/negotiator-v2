@@ -77,6 +77,16 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+        
+    <servlet>
+        <servlet-name>fileServlet</servlet-name>
+        <servlet-class>de.samply.bbmri.negotiator.FileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>fileServlet</servlet-name>
+        <url-pattern>/attachment/*</url-pattern>
+    </servlet-mapping>
+    
 
     <context-param>
         <param-name>javax.faces.FACELETS_LIBRARIES</param-name>

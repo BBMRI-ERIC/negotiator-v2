@@ -210,7 +210,15 @@
                         
                  <h:panelGroup layout="block" class="pull-left" styleClass="col-md-4">        
                    <ui:repeat value="#{researcherQueriesDetailBean.attachments}" var="attachment" >
-                        <h:commandLink  action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}"><i class="fa fa-times" aria-hidden="true"/></h:commandLink><h:outputText value="#{attachment.attachment}"/><br></br>
+                        
+                        <h:commandLink  action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}">
+                            <i class="fa fa-times" aria-hidden="true"/>
+                        </h:commandLink>
+                        <h:outputLink value="../attachment/#{attachment.attachment}">
+                            <h:outputText value="download #{attachment.attachment}"/>
+                        </h:outputLink>
+                        
+                        <br></br>
                    </ui:repeat>
                 </h:panelGroup>
                 <br></br>
