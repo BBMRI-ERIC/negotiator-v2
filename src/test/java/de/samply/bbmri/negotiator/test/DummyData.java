@@ -17,7 +17,7 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 /**
  * This class tests some methods in the DbUtil class.
  */
-public class DummyDataTest {
+public class DummyData {
 
     /**
      * Tests the comments for two queries
