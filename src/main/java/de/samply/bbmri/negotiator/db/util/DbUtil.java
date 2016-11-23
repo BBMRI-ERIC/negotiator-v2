@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
@@ -522,20 +523,41 @@ public class DbUtil {
          */
         QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
 
-        for(CollectionDTO collection : queryDTO.getCollections()) {
-            CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
+        if(NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
+                && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
+            for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
+                CollectionRecord dbCollection = getCollection(config, collection);
 
-            if(dbCollection != null) {
-                QueryCollectionRecord queryCollectionRecord = config.dsl().newRecord(Tables.QUERY_COLLECTION);
-                queryCollectionRecord.setQueryId(queryRecord.getId());
-                queryCollectionRecord.setCollectionId(dbCollection.getId());
-                queryCollectionRecord.store();
+                if (dbCollection != null) {
+                    addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
+                }
+            }
+        } else {
+            for (CollectionDTO collection : queryDTO.getCollections()) {
+                CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
+
+                if (dbCollection != null) {
+                    addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
+                }
             }
         }
 
         config.commit();
 
         return queryRecord;
+    }
+
+    /**
+     * Adds the given collectionId to the given queryId.
+     * @param config current config
+     * @param queryId the query id which will be associated with a collection
+     * @param collectionId the collection id which will be associated with the query
+     */
+    private static void addQueryToCollection(Config config, Integer queryId, Integer collectionId) {
+        QueryCollectionRecord queryCollectionRecord = config.dsl().newRecord(Tables.QUERY_COLLECTION);
+        queryCollectionRecord.setQueryId(queryId);
+        queryCollectionRecord.setCollectionId(collectionId);
+        queryCollectionRecord.store();
     }
 
     /**

@@ -27,10 +27,12 @@
 package de.samply.bbmri.negotiator.config;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -284,6 +286,12 @@ public class Negotiator implements Serializable {
         @XmlElement
         private boolean fakeDirectoryCollections = false;
 
+        /**
+         * The list of collections, that will be faked.
+         */
+        @XmlElementWrapper( name="fakeCollections" )
+        @XmlElement( name="collection" )
+        private List<String> collectionList;
 
         public boolean isFakeDirectoryCollections() {
             return fakeDirectoryCollections;
@@ -309,5 +317,12 @@ public class Negotiator implements Serializable {
             this.authenticationDisabled = authenticationDisabled;
         }
 
+        public List<String> getCollectionList() {
+            return collectionList;
+        }
+
+        public void setCollectionList(List<String> collectionList) {
+            this.collectionList = collectionList;
+        }
     }
 }

@@ -52,6 +52,11 @@
 
         <fakeDirectoryCollections>true</fakeDirectoryCollections>
 
+        <fakeCollections>
+            <collection>collection_1</collection>
+            <collection>collection_eu</collection>
+        </fakeCollections>
+
     </development>
 
     <postgresql xmlns:c="http://schema.samply.de/common">
