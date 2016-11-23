@@ -26,13 +26,19 @@
 
 package de.samply.bbmri.negotiator.control;
 
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import de.samply.common.mailing.EmailBuilder;
 import de.samply.common.mailing.OutgoingEmail;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.MailUtil;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 
 
 /**
@@ -55,15 +61,23 @@ public class CommentEmailNotifier implements Observer {
 		EmailBuilder builder = MailUtil.initializeBuilder();
 	    builder.addTemplateFile("NewCommentNotification.soy", "Notification");
         
-	  	OutgoingEmail email = new OutgoingEmail();
-	    email.addAddressee(commentBean.getUserBean().getUserEmail());
-	    email.setSubject("Subject: Test");
-	    email.putParameter("name", commentBean.getUserBean().getUserRealName());
-	    email.putParameter("queryName", query.getTitle());
-	    email.putParameter("url", commentBean.getQueryUrl(query.getId()));
-	    email.setLocale("de");
-	    email.setBuilder(builder);
-	
-	    MailUtil.sendEmail(email);
+	    try (Config config = ConfigFactory.get()) {
+	    
+	        List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, query.getId());
+	        
+	        for(NegotiatorDTO negotiator : negotiators) {
+	            OutgoingEmail email = new OutgoingEmail();
+	            email.addAddressee(negotiator.getPerson().getAuthEmail());
+    	        email.setSubject("Subject: Test");
+    	        email.putParameter("name", negotiator.getPerson().getAuthName());
+    	        email.putParameter("queryName", query.getTitle());
+    	        email.putParameter("url", commentBean.getQueryUrl(query.getId()));
+    	        email.setLocale("de");
+    	        email.setBuilder(builder);
+    	        MailUtil.sendEmail(email);
+	        }
+	    } catch (SQLException e) {
+            e.printStackTrace();
+        }
 	}
 }
