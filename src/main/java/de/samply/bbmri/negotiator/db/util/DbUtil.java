@@ -525,6 +525,7 @@ public class DbUtil {
 
         if(NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
                 && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
+            logger.info("Faking collections from the directory.");
             for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
                 CollectionRecord dbCollection = getCollection(config, collection);
 
