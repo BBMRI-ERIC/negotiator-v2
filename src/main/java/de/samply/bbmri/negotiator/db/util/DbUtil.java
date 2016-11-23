@@ -484,21 +484,15 @@ public class DbUtil {
      * Return all people associated to this query
      */
     public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId) {
-       
-        Result<Record> record = config.dsl()
-              .select(getFields(Tables.PERSON, "person"))
-              .from(Tables.PERSON)
-              .where(Tables.PERSON.ID.in(
-                      config.dsl().select(Tables.PERSON.ID)
-                        .from(Tables.PERSON)
-                        .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
-                        .join(Tables.COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                        .join(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                        .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-              ))
-              .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
-        return config.map(record, NegotiatorDTO.class);
-      
+  
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.QUERY_COLLECTION)
+                .join(Tables.COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
+          return config.map(record, NegotiatorDTO.class);
     }
    
     /**
