@@ -48,7 +48,12 @@
 				<h3>#{label['queryview.noQueriesMade']}</h3>
 			</h:panelGroup>
 
-			<h:panelGroup layout="block" style="margin-top: 40px;" styleClass="col-md-12">
+    		<h:outputLink	value="#{researcherQueriesBean.createQueryNegotiator()}"  styleClass="btn btn-primary"	
+    		                style=" margin-left: 15px; " title="#{label['queryview.tooltip.createNewQuery']}">
+                           #{label['queryview.title.createNewQuery']}
+            </h:outputLink>
+
+			<h:panelGroup layout="block" style="margin-top:20px" styleClass="col-md-12">
 				<h:form>
 					<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
 						

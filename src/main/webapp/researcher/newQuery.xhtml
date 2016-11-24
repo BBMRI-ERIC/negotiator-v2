@@ -56,15 +56,11 @@
                	#{label['queryview.title.text']}  <i class="fa fa-pencil-square-o" /> 
                	<h:inputTextarea id="text" value="#{queryBean.queryText}" styleClass="form-control" rows="5" required="true" />
            </div> 
-           <div class="form-group">
-                #{label['queryview.title.filters']} 
-                <br></br>
-                #{queryBean.humanReadableFilters}
-           </div>              
+                         
            <h:panelGroup layout="block" styleClass="pull-right">
                        
                <h:commandButton action="#{queryBean.saveQuery()}"
-                                value="#{queryBean.getMode()=='edit' ? label['queryview.title.editQueryDescription'] : label['querydetail.action.addQuery.buttontext']}"
+                                value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
                                 title="#{label['querydetail.action.addQuery']}" styleClass="btn btn-primary" />
            </h:panelGroup>
        </h:panelGroup>

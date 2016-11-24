@@ -39,6 +39,7 @@ import org.jooq.Result;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
@@ -92,6 +93,19 @@ public class ResearcherQueriesBean implements Serializable {
             e.printStackTrace();
         }
     }
+
+
+
+    /**
+     * Allows a researcher to initiate the process of creating a query from the negotiator. Redirects the user to directory in this case.
+     * @return String The directory URL
+     */
+    public String createQueryNegotiator() {
+        return NegotiatorConfig.get().getNegotiator().getMolgenisUrl();
+    }
+
+
+
 
     /**
      * Creates a new structured query in Database
