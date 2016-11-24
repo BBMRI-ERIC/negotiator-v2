@@ -85,6 +85,18 @@ public class Negotiator implements Serializable {
     private String molgenisUsername;
 
     /**
+     * The password that molgenis will use for the directory REST endpoint
+     */
+    @XmlElement
+    private String perunPassword;
+
+    /**
+     * The username that molgenis will use for the directory REST endpoint
+     */
+    @XmlElement
+    private String perunUsername;
+
+    /**
      * The folder for attachments
      */
     @XmlElement
@@ -260,6 +272,22 @@ public class Negotiator implements Serializable {
 
     public boolean deployDummyData() {
         return development != null && development.deployDummyData;
+    }
+
+    public String getPerunPassword() {
+        return perunPassword;
+    }
+
+    public void setPerunPassword(String perunPassword) {
+        this.perunPassword = perunPassword;
+    }
+
+    public String getPerunUsername() {
+        return perunUsername;
+    }
+
+    public void setPerunUsername(String perunUsername) {
+        this.perunUsername = perunUsername;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

@@ -26,6 +26,10 @@
 
 <negotiator>
 
+    <perunUsername>perun</perunUsername>
+
+    <perunPassword>gogogo</perunPassword>
+
     <molgenisUsername>molgenis</molgenisUsername>
 
     <molgenisPassword>gogogo</molgenisPassword>

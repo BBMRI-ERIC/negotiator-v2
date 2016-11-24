@@ -32,10 +32,19 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -43,8 +52,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.Constants;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
@@ -58,11 +67,11 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 @Path("/directory")
 public class Directory {
 
+    private static final Logger logger = LoggerFactory.getLogger(Directory.class);
+
     /**
      * Takes a JSON query object like, stores it in the database and returns a redirect URL, that allows
      * the directory to redirect the user to this redirect URL.
-     *
-     * TODO: Authenticate the directory. Otherwise all kinds of people will be able to create new queries.
      *
      * @param queryString the query object as string
      * @param request the HTTP Servlet Request used to get the authentication header
@@ -77,15 +86,8 @@ public class Directory {
             /**
              * Check authentication
              */
-            String authCredentials = request.getHeader(Constants.HTTP_AUTHORIZATION_HEADER);
-
-            AuthenticationService authenticationService = new AuthenticationService();
-            authenticationService.authenticate(authCredentials);
-
-            if(!NegotiatorConfig.get().getNegotiator().getMolgenisUsername().equals(authenticationService.getUsername()) ||
-                    !NegotiatorConfig.get().getNegotiator().getMolgenisPassword().equals(authenticationService.getPassword())) {
-                throw new ForbiddenException();
-            }
+            Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
+            AuthenticationService.authenticate(request, negotiator.getMolgenisUsername(), negotiator.getMolgenisPassword());
 
             /**
              * Convert the string to an object, so that we can check the filters and collections.
@@ -96,14 +98,17 @@ public class Directory {
             QueryDTO query = mapper.readValue(queryString, QueryDTO.class);
 
             if(query == null || query.getUrl() == null || query.getHumanReadable() == null || query.getCollections() == null) {
+                logger.error("Directory posted empty URL, no human readable text or no collections, aborting");
                 throw new BadRequestException();
             }
 
             if(!query.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
+                logger.error("Directory posted wrong redirect URL, aborting");
                 throw new BadRequestException();
             }
 
             if(query.getCollections().size() < 1) {
+                logger.error("Directory posted empty list of collections, aborting");
                 throw new BadRequestException();
             }
 

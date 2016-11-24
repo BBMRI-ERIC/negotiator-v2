@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.jooq.Condition;
+import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.JoinType;
 import org.jooq.Record;
@@ -59,6 +60,8 @@ import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
@@ -68,6 +71,8 @@ import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
 import de.samply.bbmri.negotiator.rest.dto.CollectionDTO;
+import de.samply.bbmri.negotiator.rest.dto.PerunMappingDTO;
+import de.samply.bbmri.negotiator.rest.dto.PerunPersonDTO;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.directory.client.dto.DirectoryBiobank;
 import de.samply.directory.client.dto.DirectoryCollection;
@@ -615,5 +620,54 @@ public class DbUtil {
                                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                                 .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
                 )).fetch(), Collection.class);
+    }
+
+    /**
+     * Saves the given Perun User into the database or updates the user, if he already exists
+     * @param config
+     * @param personDTO
+     */
+    public static void savePerunUser(Config config, PerunPersonDTO personDTO) {
+        DSLContext dsl = config.dsl();
+        PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(personDTO.getId())).fetchOne();
+
+        if (personRecord == null) {
+            personRecord = dsl.newRecord(Tables.PERSON);
+            personRecord.setAuthSubject(personDTO.getId());
+        }
+
+        personRecord.setAuthEmail(personDTO.getMail());
+        personRecord.setAuthName(personDTO.getDisplayName());
+        personRecord.store();
+    }
+
+    /**
+     * Saves the given perun mapping into the database.
+     * @param config
+     * @param mapping
+     */
+    public static void savePerunMapping(Config config, PerunMappingDTO mapping) {
+        DSLContext dsl = config.dsl();
+
+        String collectionId = mapping.getName().replaceAll(":Representatives$", "");
+
+        CollectionRecord collection = getCollection(config, collectionId);
+
+        if(collection != null) {
+            logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
+            dsl.deleteFrom(Tables.PERSON_COLLECTION).where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).execute();
+
+            for(PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
+
+                if(personRecord != null) {
+                    logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
+                    PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
+                    personCollectionRecord.setCollectionId(collection.getId());
+                    personCollectionRecord.setPersonId(personRecord.getId());
+                    personCollectionRecord.store();
+                }
+            }
+        }
     }
 }
