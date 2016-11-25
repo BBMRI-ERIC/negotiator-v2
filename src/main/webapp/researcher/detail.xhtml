@@ -152,38 +152,90 @@
 					</h:outputText>
 					<br />
 					<br></br>
+				</h:panelGroup>		
+				
+				<h:panelGroup layout="block" styleClass="pull-right">
+						<h:outputText
+							title="#{label['queryview.queryitem.datetime.creation']}"
+							value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
+							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+						</h:outputText>
+				</h:panelGroup>				
+			</h:panelGroup>
 
-					<h:panelGroup styleClass="col-md-12" layout="block">
+            <br></br>
 
-						<h:panelGroup styleClass="row btn-toolbar" layout="block">
-							<h:outputLink value="#{researcherQueriesDetailBean.editQuery()}"
-								styleClass="btn btn-primary" style= "margin-left: -8px;"
-								title="#{label['queryview.tooltip.editQuery']}">
+			<h:form id="uploadform" enctype="multipart/form-data">
+                 <h:outputText value="#{label['querydetail.title.attachments']}" title="#{label['attachmentview.tooltip.attachment']}" 
+                 styleClass="attachment-title"  rendered="#{researcherQueriesDetailBean.attachments.size() > 0}"/>
+
+				<h:panelGroup class="row">
+					<h:panelGroup styleClass="col-md-12">
+						<h:panelGroup layout="block" styleClass=" col-md-6 pull-left" >
+
+							<ui:repeat value="#{researcherQueriesDetailBean.attachments}"
+								var="attachment">
+								<h:panelGroup styleClass="col-md-12 attachment-style ">
+
+									<h:panelGroup class="pull-left" styleClass="col-md-11"
+										style=" overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+										<h:outputLink value="../attachment/#{attachment.attachment}">
+											<h:outputText value="#{attachment.attachment}"
+												title="#{label['attachmentview.tooltip.attachmentDownload']}"
+												style="color:#333" />
+										</h:outputLink>
+									</h:panelGroup>
+
+									<h:panelGroup styleClass="col-md-1">
+										<h:commandLink class="pull-right" style="color:#333;"
+											action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}"
+											title="#{label['attachmentview.tooltip.attachmentDelete']}">
+											<i class="fa fa-times" aria-hidden="true"
+												style="font-size: 13px;" />
+										</h:commandLink>
+									</h:panelGroup>
+								</h:panelGroup>
+							</ui:repeat>
+						</h:panelGroup>
+
+						<h:panelGroup layout="block" styleClass=" col-md-6 pull-right" >
+
+							<h:inputFile id="file" styleClass="pull-right"
+								value="#{researcherQueriesDetailBean.file}"
+								validator="#{researcherQueriesDetailBean.validateFile}"
+								onchange="document.getElementById('uploadform:uploadBtn').style.display = (!!value) ? 'block' : 'none'" />
+							<br></br>
+							<h:commandButton id="uploadBtn" value="Upload"
+								action="#{researcherQueriesDetailBean.uploadAttachment}"
+								styleClass="pull-right btn btn-primary" style="display: none;" />
+
+						</h:panelGroup>
+					</h:panelGroup>
+				</h:panelGroup>
+            </h:form>
+
+			<h:panelGroup styleClass="col-md-12" layout="block">
+
+				<h:panelGroup styleClass="row btn-toolbar" layout="block">
+					<h:outputLink value="#{researcherQueriesDetailBean.editQuery()}"
+						styleClass="btn btn-primary" style="margin-left: -8px;"
+						title="#{label['queryview.tooltip.editQuery']}">
                                 #{label['queryview.title.editQuery']}
                             </h:outputLink>
 
-							<h:button outcome="newQuery"
-								value="#{label['queryview.title.editQueryDescription']}"
-								title="#{label['queryview.tooltip.editQueryDescription']}"
-								styleClass="btn btn-primary">
+					<h:button outcome="newQuery"
+						value="#{label['queryview.title.editQueryDescription']}"
+						title="#{label['queryview.tooltip.editQueryDescription']}"
+						styleClass="btn btn-primary">
 
-								<f:param name="queryId"
-									value="#{researcherQueriesDetailBean.selectedQuery.id}" />
-							</h:button>
-						</h:panelGroup>
-
-					</h:panelGroup>
-
+						<f:param name="queryId"
+							value="#{researcherQueriesDetailBean.selectedQuery.id}" />
+					</h:button>
 				</h:panelGroup>
 
-				<h:panelGroup layout="block" class="pull-right">
-					<h:outputText
-						title="#{label['queryview.queryitem.datetime.creation']}"
-						value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
-						<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-					</h:outputText>
-				</h:panelGroup>
+			</h:panelGroup>
 
+			<h:panelGroup layout="block">
 
 				<ui:fragment
 					rendered="#{researcherQueriesDetailBean.comments.size() > 0}">
@@ -212,60 +264,8 @@
 					query="#{researcherQueriesDetailBean.selectedQuery}" />
 
 			</h:panelGroup>
-
-			<h:form id="uploadform" enctype="multipart/form-data">
-				 <h:outputText value="#{label['querydetail.title.attachments']}" title="#{label['attachmentview.tooltip.attachment']}" 
-				 styleClass="attachment-title" 
-                        rendered="#{researcherQueriesDetailBean.attachments.size() > 0}"/>
-				
-
-				<h:panelGroup class="container-fluid">
-					<h:panelGroup class="row">
-						<h:panelGroup styleClass="col-md-12">
-							<h:panelGroup layout="block" class="pull-left"
-								styleClass="col-md-6">
-
-								<ui:repeat value="#{researcherQueriesDetailBean.attachments}"
-									var="attachment">
-									<h:panelGroup styleClass="col-md-12 attachment-style ">
-
-										<h:panelGroup class="pull-left" styleClass="col-md-11"
-											style=" overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-											<h:outputLink value="../attachment/#{attachment.attachment}">
-												<h:outputText value="#{attachment.attachment}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
-													style="color:#333" />
-											</h:outputLink>
-										</h:panelGroup>
-
-										<h:panelGroup styleClass="col-md-1">
-											<h:commandLink class="pull-right" style="color:#333;"
-												           action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}" 
-												           title="#{label['attachmentview.tooltip.attachmentDelete']}">
-												           <i class="fa fa-times" aria-hidden="true" style="font-size: 13px;" />
-											</h:commandLink>
-										</h:panelGroup>
-									</h:panelGroup>
-								</ui:repeat>
-							</h:panelGroup>
-
-							<h:panelGroup styleClass="col-md-6">
-							</h:panelGroup>
-
-						</h:panelGroup>
-					</h:panelGroup>
-				</h:panelGroup>
-
-
-				<h:panelGroup layout="block" styleClass="pull-right" >
-                    <h:inputFile id="file" value="#{researcherQueriesDetailBean.file}" validator="#{researcherQueriesDetailBean.validateFile}"  
-                    onchange="document.getElementById('uploadform:uploadBtn').style.display = (!!value) ? 'block' : 'none'" />
-                    <br></br>
-                    <h:commandButton id="uploadBtn" value="Upload" action="#{researcherQueriesDetailBean.uploadAttachment}" styleClass="btn btn-primary" style="display: none;" class="pull-right" />                         
-                </h:panelGroup>
-            </h:form>
-
-        </h:panelGroup>
-    
+		</h:panelGroup>
+		    
     </ui:define>
 
 </ui:composition>
