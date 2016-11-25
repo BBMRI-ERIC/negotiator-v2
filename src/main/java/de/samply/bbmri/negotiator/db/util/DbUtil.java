@@ -132,7 +132,7 @@ public class DbUtil {
                 .fetch();
     }
 
-    
+
     public static void deleteQueryAttachmentRecord(Config config, Integer queryId, String attachment) {
         config.dsl().delete(Tables.QUERY_ATTACHMENT)
             .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
@@ -298,10 +298,10 @@ public class DbUtil {
 
 
     /**
-     * Returns a list of CommentPersonDTOs for a specific query.
+     * Returns a list of QueryAttachmentDTO for a specific query.
      * @param config
      * @param queryId
-     * @return
+     * @return List<QueryAttachmentDTO>
      */
     public static List<QueryAttachmentDTO> getQueryAttachmentRecords(Config config, int queryId) {
         Result<Record> result = config.dsl()
@@ -398,25 +398,25 @@ public class DbUtil {
                 .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryId))
                 .fetchOne();
     }
-    
+
     /**
      * Returns a list of all biobanks relevant to this query and this biobank owner
      */
     public static List<BiobankRecord> getAssociatedBiobanks(Config config, Integer queryId, Integer userId) {
-        Result<Record> record = 
-                
+        Result<Record> record =
+
                 config.dsl().select(getFields(Tables.BIOBANK, "biobank"))
                 .from(Tables.BIOBANK)
-               
+
                 .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
                 .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
                 .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                
+
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId)).and(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
                 .orderBy(Tables.BIOBANK.ID).fetch();
-                  
+
           return config.map(record, BiobankRecord.class);
-           
+
     }
 
     /**
@@ -490,7 +490,7 @@ public class DbUtil {
      * Return all people associated to this query
      */
     public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId) {
-  
+
         Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
                 .from(Tables.QUERY_COLLECTION)
                 .join(Tables.COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
@@ -500,7 +500,7 @@ public class DbUtil {
                 .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
           return config.map(record, NegotiatorDTO.class);
     }
-   
+
     /**
      * Creates a new query from the given arguments.
      * @param title title of the query

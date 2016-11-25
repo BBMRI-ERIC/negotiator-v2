@@ -192,5 +192,13 @@ hr {
     border-color: #CCC;
     margin-bottom:10px;    
     text-decoration: none;    
-    background-color: #FFF;
+    background-color: #FFF; 
+    margin-left: -30px;
 }
+
+.attachment-title {
+	font-weight:bold;	
+}
+
+
+

@@ -226,7 +226,44 @@
 					</p>
 				</h:panelGroup>
 
-                <ui:fragment
+				<h:outputText styleClass="attachment-title"
+					value="#{label['querydetail.title.attachments']}"
+					title="#{label['attachmentview.tooltip.attachment']}"
+					rendered="#{ownerQueriesDetailBean.attachments.size() > 0}" />
+
+				<h:panelGroup class="container-fluid">
+					<h:panelGroup class="row">
+						<h:panelGroup styleClass="col-md-12">
+							<h:panelGroup layout="block" class="pull-left"
+								styleClass="col-md-6">
+
+								<ui:repeat value="#{ownerQueriesDetailBean.attachments}"
+									var="attachment">
+
+
+									<h:panelGroup
+										styleClass=" pull-left col-md-12 attachment-style"
+										style=" overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+										<h:outputLink value="../attachment/#{attachment.attachment}">
+											<h:outputText value="#{attachment.attachment}"
+												title="#{label['attachmentview.tooltip.attachmentDownload']}"
+												style="color:#333" />
+										</h:outputLink>
+									</h:panelGroup>
+
+
+								</ui:repeat>
+							</h:panelGroup>
+
+							<h:panelGroup styleClass="col-md-6">
+							</h:panelGroup>
+
+						</h:panelGroup>
+					</h:panelGroup>
+				</h:panelGroup>
+
+
+				<ui:fragment
                     rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
                     <div class="col-xs-12">

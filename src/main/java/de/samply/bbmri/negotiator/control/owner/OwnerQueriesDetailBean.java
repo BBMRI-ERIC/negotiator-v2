@@ -48,6 +48,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 
 /**
  * Manages the query detail view for owners
@@ -94,12 +95,16 @@ public class OwnerQueriesDetailBean implements Serializable {
      * The list of comments for the selected query
      */
     private List<CommentPersonDTO> comments;
-    
-    
+
     /**
      * The list of biobanks this owner is associated with
      */
     private List<BiobankRecord> associatedBiobanks;
+
+    /**
+     * The list of attachments associated with a certain query.
+     */
+    private List<QueryAttachmentDTO> attachments;
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -107,6 +112,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void initialize() {
 		try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
+            /**
+             * Get all the attachments for selected query.
+             */
+            setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
+
 
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
@@ -116,7 +126,7 @@ public class OwnerQueriesDetailBean implements Serializable {
             		selectedQuery = query.getQuery();
             	}
             }
-            
+
            associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
         } catch (SQLException e) {
@@ -318,6 +328,14 @@ public class OwnerQueriesDetailBean implements Serializable {
     public void setAssociatedBiobanks(List<BiobankRecord> associatedBiobanks) {
         this.associatedBiobanks = associatedBiobanks;
     }
-	
-	
+
+    public List<QueryAttachmentDTO> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<QueryAttachmentDTO> attachments) {
+        this.attachments = attachments;
+    }
+
+
 }

@@ -214,7 +214,10 @@
 			</h:panelGroup>
 
 			<h:form id="uploadform" enctype="multipart/form-data">
-				<h3>#{label['querydetail.title.attachments']}</h3>
+				 <h:outputText value="#{label['querydetail.title.attachments']}" title="#{label['attachmentview.tooltip.attachment']}" 
+				 styleClass="attachment-title" 
+                        rendered="#{researcherQueriesDetailBean.attachments.size() > 0}"/>
+				
 
 				<h:panelGroup class="container-fluid">
 					<h:panelGroup class="row">
@@ -229,16 +232,16 @@
 										<h:panelGroup class="pull-left" styleClass="col-md-11"
 											style=" overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
 											<h:outputLink value="../attachment/#{attachment.attachment}">
-												<h:outputText value="#{attachment.attachment}"
+												<h:outputText value="#{attachment.attachment}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
 													style="color:#333" />
 											</h:outputLink>
 										</h:panelGroup>
 
 										<h:panelGroup styleClass="col-md-1">
 											<h:commandLink class="pull-right" style="color:#333;"
-												action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}">
-												<i class="fa fa-times" aria-hidden="true"
-													style="font-size: 13px;" />
+												           action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}" 
+												           title="#{label['attachmentview.tooltip.attachmentDelete']}">
+												           <i class="fa fa-times" aria-hidden="true" style="font-size: 13px;" />
 											</h:commandLink>
 										</h:panelGroup>
 									</h:panelGroup>
