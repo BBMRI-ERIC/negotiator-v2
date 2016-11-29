@@ -212,9 +212,9 @@ CREATE TABLE "offer" (
     "offer_from" INTEGER NOT NULL,
     "offer_comment_time" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     "text" TEXT NOT NULL,
-    PRIMARY KEY("query_id", "owner_id", "person_id"),
+    PRIMARY KEY("query_id", "offer_from", "person_id"),
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("offer_from") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
 CREATE INDEX "queryIdIndexOffer" ON "offer" (query_id);
