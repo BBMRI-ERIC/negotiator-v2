@@ -277,32 +277,54 @@
                 <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}" var="biobank" varStatus="loop">
                     #{biobank.name}#{!loop.last ? ', ' : ''}
                 </ui:repeat>
-                
-           
-                <ui:fragment
-					rendered="#{ownerQueriesDetailBean.comments.size() > 0}">
 
-					<div class="col-xs-12">
-						<hr></hr>
+				<ul class="nav nav-tabs">
+					<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+					</li>
+					<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
+					</li>
+				</ul>
+
+				<div class="tab-content">
+					<div id="comments" class="tab-pane fade in active">
+
+						<h3>#{label['querydetail.title.comments']}</h3>
+
+						<ui:repeat value="#{ownerQueriesDetailBean.comments}"
+							var="comment">
+
+							<bbmricc:comment comment="#{comment.comment}"
+								person="#{comment.person}" collections="#{comment.collections}" />
+
+						</ui:repeat>
+
+						<div class="col-xs-12">
+							<hr></hr>
+						</div>
+
+						<bbmricc:commentReply
+							query="#{ownerQueriesDetailBean.selectedQuery}" />
+
 					</div>
 
-					<h3>#{label['querydetail.title.comments']}</h3>
+					<div id="sampleAvailability" class="tab-pane fade">
 
-				</ui:fragment>
+						<h3>#{label['querydetail.title.sampleAvailability']}</h3>						
+						
+						<h:outputText value="#{label['message.offerSamples']}" />
+						
+						
+						<ui:repeat value="#{ownerQueriesDetailBean.comments}"
+                            var="comment">
 
-				<ui:repeat value="#{ownerQueriesDetailBean.comments}" var="comment">
+                            <bbmricc:comment comment="#{comment.comment}"
+                                person="#{comment.person}" collections="#{comment.collections}" />
 
-					<bbmricc:comment comment="#{comment.comment}"
-						person="#{comment.person}" collections="#{comment.collections}" />
+                        </ui:repeat>
+						
 
-				</ui:repeat>
-
-				<div class="col-xs-12">
-					<hr></hr>
+					</div>
 				</div>
-
-				<bbmricc:commentReply
-					query="#{ownerQueriesDetailBean.selectedQuery}" />
 
 			</h:panelGroup>
 

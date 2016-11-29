@@ -235,33 +235,42 @@
 
 			</h:panelGroup>
 
-			<h:panelGroup layout="block">
+			<h:panelGroup layout="block" style="margin-top:60px;">
 
-				<ui:fragment
-					rendered="#{researcherQueriesDetailBean.comments.size() > 0}">
+				<ul class="nav nav-tabs">
+					<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+					</li>
+					<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
+					</li>
+				</ul>
 
-					<div class="col-xs-12">
-						<hr></hr>
+				<div class="tab-content">
+					<div id="comments" class="tab-pane fade in active">
+
+						<h3>#{label['querydetail.title.comments']}</h3>
+
+						<ui:repeat value="#{researcherQueriesDetailBean.comments}"
+							var="comment">
+
+							<bbmricc:comment comment="#{comment.comment}"
+								person="#{comment.person}" collections="#{comment.collections}" />
+
+						</ui:repeat>
+
+						<div class="col-xs-12">
+							<hr></hr>
+						</div>
+
+						<bbmricc:commentReply
+							query="#{researcherQueriesDetailBean.selectedQuery}" />
 					</div>
 
-					<h3>#{label['querydetail.title.comments']}</h3>
+					<div id="sampleAvailability" class="tab-pane fade">
 
-				</ui:fragment>
+						<h3>#{label['querydetail.title.sampleAvailability']}</h3>
 
-				<ui:repeat value="#{researcherQueriesDetailBean.comments}"
-					var="comment">
-
-					<bbmricc:comment comment="#{comment.comment}"
-						person="#{comment.person}" collections="#{comment.collections}" />
-
-				</ui:repeat>
-
-				<div class="col-xs-12">
-					<hr></hr>
+					</div>
 				</div>
-
-				<bbmricc:commentReply
-					query="#{researcherQueriesDetailBean.selectedQuery}" />
 
 			</h:panelGroup>
 		</h:panelGroup>
