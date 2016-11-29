@@ -309,20 +309,8 @@
 
 					<div id="sampleAvailability" class="tab-pane fade">
 
-						<h3>#{label['querydetail.title.sampleAvailability']}</h3>						
-						
-						<h:outputText value="#{label['message.offerSamples']}" />
-						
-						
-						<ui:repeat value="#{ownerQueriesDetailBean.comments}"
-                            var="comment">
-
-                            <bbmricc:comment comment="#{comment.comment}"
-                                person="#{comment.person}" collections="#{comment.collections}" />
-
-                        </ui:repeat>
-						
-
+						<h3>#{label['querydetail.title.sampleAvailability']}</h3>			
+											
 					</div>
 				</div>
 
