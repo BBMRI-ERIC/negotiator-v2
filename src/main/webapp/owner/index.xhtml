@@ -61,10 +61,10 @@
                             <h:commandLink styleClass="btn btn-default" title="#{label['queryview.tooltip.searchIcon']}"
                         				  action="#{ownerQueriesBean.addFilter()}" >
                        	        <i class="fa fa-search" ></i>
-                            </h:commandLink>  
-                            </h:panelGroup>   
-	       				</h:panelGroup> 
-        			</h:panelGroup>                                       
+                            </h:commandLink>
+                            </h:panelGroup>
+	       				</h:panelGroup>
+        			</h:panelGroup>
                                        
 				    <h:panelGroup styleClass="search-top-margin col-md-6"> 
                         <ui:repeat var="item" value="#{sessionBean.filters}">
@@ -98,7 +98,7 @@
                             <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}" style="margin-left: 30px;" >
                                 <f:param name="queryId" value="#{queryDto.query.id}"/>
                                 <f:param name="flag" value="#{ownerQueriesBean.flagFilter}"/>
-                                <h:outputLabel value="#{queryDto.query.title}"/>
+                                <h:outputText value="#{queryDto.query.title}"/>
                             </h:link>
 
                             <h:panelGroup styleClass="pull-right">
