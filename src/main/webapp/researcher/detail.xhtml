@@ -167,48 +167,66 @@
 
 			<h:form id="uploadform" enctype="multipart/form-data">
                  <h:outputText value="#{label['querydetail.title.attachments']}" title="#{label['attachmentview.tooltip.attachment']}" 
-                 styleClass="attachment-title"  rendered="#{researcherQueriesDetailBean.attachments.size() > 0}"/>
+                 	styleClass="attachment-title"/>
 
-				<h:panelGroup class="row">
-					<h:panelGroup styleClass="col-md-12">
-						<h:panelGroup layout="block" styleClass=" col-md-6 pull-left" >
+				<h:panelGroup styleClass="row" layout="block">
+					<h:panelGroup styleClass="col-md-12" layout="block">
+						<h:panelGroup layout="block" styleClass="col-md-6" >
+							<ui:repeat value="#{researcherQueriesDetailBean.attachments}" var="attachment">
+								<h:panelGroup layout="block" styleClass="row">
+									<h:panelGroup layout="block" styleClass="form-group">
+										<h:panelGroup class="input-group" layout="block">
+											<h:outputLink value="../attachment/#{attachment.attachment}" styleClass="input-group-addon"
+													style="text-align: left;">
+												<h:outputText value="#{attachment.attachment}"
+															  title="#{label['attachmentview.tooltip.attachmentDownload']}"
+															  style="color:#333" />
+											</h:outputLink>
 
-							<ui:repeat value="#{researcherQueriesDetailBean.attachments}"
-								var="attachment">
-								<h:panelGroup styleClass="col-md-12 attachment-style ">
-
-									<h:panelGroup class="pull-left" styleClass="col-md-11"
-										style=" overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-										<h:outputLink value="../attachment/#{attachment.attachment}">
-											<h:outputText value="#{attachment.attachment}"
-												title="#{label['attachmentview.tooltip.attachmentDownload']}"
-												style="color:#333" />
-										</h:outputLink>
-									</h:panelGroup>
-
-									<h:panelGroup styleClass="col-md-1">
-										<h:commandLink class="pull-right" style="color:#333;"
-											action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}"
-											title="#{label['attachmentview.tooltip.attachmentDelete']}">
-											<i class="fa fa-times" aria-hidden="true"
-												style="font-size: 13px;" />
-										</h:commandLink>
+											<label class="input-group-btn">
+												<h:commandLink styleClass="btn btn-default" style="color:#333;"
+															   action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}"
+															   title="#{label['attachmentview.tooltip.attachmentDelete']}">
+													<i class="fa fa-times" aria-hidden="true"
+													   style="font-size: 13px;" />
+												</h:commandLink>
+											</label>
+										</h:panelGroup>
 									</h:panelGroup>
 								</h:panelGroup>
 							</ui:repeat>
+
+							<!-- Show that there are no uploads yet -->
+							<h:panelGroup layout="block" rendered="#{researcherQueriesDetailBean.attachments.size() == 0}" styleClass="row">
+								<h:panelGroup styleClass="form-group" layout="block">
+									<h:outputLabel value="#{label['attachmentview.text.noattachments']}" styleClass="form-control-static"/>
+								</h:panelGroup>
+							</h:panelGroup>
 						</h:panelGroup>
 
-						<h:panelGroup layout="block" styleClass=" col-md-6 pull-right" >
+						<h:panelGroup layout="block" styleClass="col-md-6" >
+							<h:panelGroup class="input-group" layout="block">
+								<input type="text" class="form-control" readonly="readonly"/>
 
-							<h:inputFile id="file" styleClass="pull-right"
-								value="#{researcherQueriesDetailBean.file}"
-								validator="#{researcherQueriesDetailBean.validateFile}"
-								onchange="document.getElementById('uploadform:uploadBtn').style.display = (!!value) ? 'block' : 'none'" />
-							<br></br>
-							<h:commandButton id="uploadBtn" value="Upload"
-								action="#{researcherQueriesDetailBean.uploadAttachment}"
-								styleClass="pull-right btn btn-primary" style="display: none;" />
+								<label class="input-group-btn">
+									<h:panelGroup class="btn btn-default">
+										<h:outputText value="#{label['querydetail.action.browse']}"/>
+										<h:inputFile id="file"
+													 value="#{researcherQueriesDetailBean.file}"
+													 validator="#{researcherQueriesDetailBean.validateFile}"
+													 onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');" style="display: none;"/>
+									</h:panelGroup>
+									<h:commandButton id="uploadBtn" value="Upload"
+													 action="#{researcherQueriesDetailBean.uploadAttachment}"
+													 styleClass="btn btn-primary disabled" />
+								</label>
+							</h:panelGroup>
 
+							<h:outputScript>
+								$(function() {
+									initializeFileUpload();
+								});
+							</h:outputScript>
 						</h:panelGroup>
 					</h:panelGroup>
 				</h:panelGroup>
