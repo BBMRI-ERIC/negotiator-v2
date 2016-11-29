@@ -75,7 +75,7 @@
 
     </postgresql>
 
-        <oAuth2Client xmlns:o2="http://schema.samply.de/config/OAuth2Client">
+    <oAuth2Client xmlns:o2="http://schema.samply.de/config/OAuth2Client">
 
             <o2:host>https://perun.bbmri-eric.eu</o2:host>
             <o2:hostPublicKey>
