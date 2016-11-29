@@ -57,8 +57,21 @@
         <fakeDirectoryCollections>true</fakeDirectoryCollections>
 
         <fakeCollections>
-            <collection>collection_1</collection>
-            <collection>collection_eu</collection>
+        	<collection>7</collection>
+        	<collection>8</collection>
+        	<collection>9</collection>
+        	<collection>10</collection>
+        	<collection>11</collection>
+        	<collection>12</collection>
+        	<collection>13</collection>
+        	<collection>14</collection>
+        	<collection>15</collection>
+        	<collection>16</collection>
+        	<collection>17</collection>
+        	<collection>18</collection>
+        	<collection>19</collection>
+        	<collection>20</collection>
+        	<collection>21</collection>
         </fakeCollections>
 
     </development>
