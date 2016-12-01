@@ -46,19 +46,21 @@ import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 /**
  * Sends a notification email when a comment gets added to a query, registered as an observer of the CommentBean class.
  */
-public class CommentEmailNotifier implements Observer {
+public class CommentEmailNotifier {
 
-	@Override
-	public void update(Observable addCommentBean, Object query) {
-		sendEmailNotification((CommentBean)addCommentBean, (Query) query);		
+	private final Query query;
+
+	private final String url;
+
+	public CommentEmailNotifier(Query query, String url) {
+		this.query = query;
+		this.url = url;
 	}
-	
+
 	/**
 	 * Sends notification email when a new comment gets added to a query
-	 * @param commentBean
-	 * @param query
 	 */
-	private void sendEmailNotification(CommentBean commentBean, Query query) {
+	public void sendEmailNotification() {
 		
 		EmailBuilder builder = MailUtil.initializeBuilder();
 	    builder.addTemplateFile("NewCommentNotification.soy", "Notification");
@@ -71,7 +73,7 @@ public class CommentEmailNotifier implements Observer {
 	        List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, query.getId());
 
 			notification.addParameter("queryName", query.getTitle());
-			notification.addParameter("url", commentBean.getQueryUrl(query.getId()));
+			notification.addParameter("url", url);
 			notification.setLocale("de");
 
 	        for(NegotiatorDTO negotiator : negotiators) {

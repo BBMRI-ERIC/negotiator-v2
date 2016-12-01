@@ -26,25 +26,23 @@
 
 package de.samply.bbmri.negotiator.control;
 
-import java.sql.SQLException;
-import java.util.Observable;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import java.io.Serializable;
+import java.sql.SQLException;
+
 @ManagedBean
 @ViewScoped
-public class CommentBean extends Observable {
+public class CommentBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,14 +50,6 @@ public class CommentBean extends Observable {
     private UserBean userBean;
 
     private String comment;
-
-    /**
-     * Initializes this bean by registering email notification observer
-     */
-    @PostConstruct
-    public void init() {
-        this.addObserver(new CommentEmailNotifier());
-    }
 
     /**
      * Persist comment and trigger an email notification
@@ -71,8 +61,9 @@ public class CommentBean extends Observable {
         try(Config config = ConfigFactory.get()) {
             DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment);
             config.commit();
-            setChanged();
-            notifyObservers(query);
+
+            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrl(query.getId()));
+            notifier.sendEmailNotification();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -90,11 +81,9 @@ public class CommentBean extends Observable {
     public String getQueryUrl(Integer queryId) {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 
-        StringBuffer requestURL = new StringBuffer(context.getRequestServletPath());
-        requestURL.append("?queryId=").append(queryId);
-
         return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
-                context.getRequestServerPort(), context.getRequestContextPath(), requestURL.toString());
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                context.getRequestServletPath() + "?queryId=" + queryId);
     }
 
     public UserBean getUserBean() {
