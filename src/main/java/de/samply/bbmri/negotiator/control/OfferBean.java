@@ -33,9 +33,12 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
@@ -78,9 +81,31 @@ public class OfferBean extends Observable {
 
             DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
+
+            /**
+             * Send notifications only, if a biobanker makes an offer
+             */
+            if (userBean.getBiobankOwner()) {
+                OfferEmailNotifier notifier = new OfferEmailNotifier(query, getQueryUrl(query.getId()));
+                notifier.sendEmailNotification();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Build url to be able to navigate to the query with id=queryId
+     *
+     * @param queryId
+     * @return
+     */
+    public String getQueryUrl(Integer queryId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/researcher/detail.xhtml?queryId=" + queryId);
     }
 
     public UserBean getUserBean() {
