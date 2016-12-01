@@ -165,6 +165,26 @@
 
             <br></br>
 
+			<h:panelGroup rendered="#{researcherQueriesDetailBean.collections.size() > 0}" layout="block">
+
+				<a href="#" data-toggle="collapse" data-target="#collection-list">
+					#{label['queryview.action.showcollections']}
+				</a>
+
+				<div id="collection-list" class="collapse">
+					<ul>
+						<ui:repeat value="#{researcherQueriesDetailBean.collections}" var="collection">
+							<li>#{collection.name}</li>
+						</ui:repeat>
+					</ul>
+				</div>
+
+			</h:panelGroup>
+
+			<h:panelGroup rendered="#{researcherQueriesDetailBean.collections.size() == 0}" layout="block">
+				<h:outputLabel value="#{label['queryview.title.nocollections']}" styleClass="form-control-static"/>
+			</h:panelGroup>
+
 			<h:form id="uploadform" enctype="multipart/form-data">
                  <h:outputText value="#{label['querydetail.title.attachments']}" title="#{label['attachmentview.tooltip.attachment']}" 
                  	styleClass="attachment-title"/>

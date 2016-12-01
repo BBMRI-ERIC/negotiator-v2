@@ -51,6 +51,7 @@ import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
@@ -113,6 +114,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The query DTO object mapped to the JSON text received from the directory
      */
     QueryDTO queryDTO = null;
+
+    private List<Collection> collections;
+
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
@@ -121,6 +125,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
             setComments(DbUtil.getComments(config, queryId));
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
             displayHumanReadableQuery();
+
+            collections = DbUtil.getCollectionsForQuery(config, queryId);
 
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
@@ -316,5 +322,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public List<QueryAttachmentDTO> getAttachments() {
         return attachments;
+    }
+
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
     }
 }

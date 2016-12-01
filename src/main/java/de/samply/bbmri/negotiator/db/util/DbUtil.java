@@ -739,4 +739,21 @@ public class DbUtil {
             }
         }
     }
+
+    /**
+     * Returns the list of suitable collections for the given query ID.
+     * @param config current connection
+     * @param queryId the query ID
+     * @return
+     */
+    public static List<Collection> getCollectionsForQuery(Config config, int queryId) {
+        Result<Record> fetch = config.dsl().select(Tables.COLLECTION.fields())
+                .from(Tables.COLLECTION)
+                .join(Tables.QUERY_COLLECTION)
+                .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .fetch();
+
+        return config.map(fetch, Collection.class);
+    }
 }
