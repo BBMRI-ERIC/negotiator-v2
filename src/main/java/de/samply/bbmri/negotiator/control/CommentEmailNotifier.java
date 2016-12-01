@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import de.samply.bbmri.negotiator.notification.Notification;
+import de.samply.bbmri.negotiator.notification.NotificationThread;
 import de.samply.common.mailing.EmailBuilder;
 import de.samply.common.mailing.OutgoingEmail;
 import de.samply.bbmri.negotiator.Config;
@@ -60,22 +62,24 @@ public class CommentEmailNotifier implements Observer {
 		
 		EmailBuilder builder = MailUtil.initializeBuilder();
 	    builder.addTemplateFile("NewCommentNotification.soy", "Notification");
-        
+
+		Notification notification = new Notification();
+		notification.setSubject("Nothing");
+
 	    try (Config config = ConfigFactory.get()) {
 	    
 	        List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, query.getId());
-	        
+
+			notification.addParameter("queryName", query.getTitle());
+			notification.addParameter("url", commentBean.getQueryUrl(query.getId()));
+			notification.setLocale("de");
+
 	        for(NegotiatorDTO negotiator : negotiators) {
-	            OutgoingEmail email = new OutgoingEmail();
-	            email.addAddressee(negotiator.getPerson().getAuthEmail());
-    	        email.setSubject("Subject: Test");
-    	        email.putParameter("name", negotiator.getPerson().getAuthName());
-    	        email.putParameter("queryName", query.getTitle());
-    	        email.putParameter("url", commentBean.getQueryUrl(query.getId()));
-    	        email.setLocale("de");
-    	        email.setBuilder(builder);
-    	        MailUtil.sendEmail(email);
+	        	notification.addAddressee(negotiator.getPerson());
 	        }
+
+			NotificationThread thread = new NotificationThread(builder, notification);
+	        thread.start();
 	    } catch (SQLException e) {
             e.printStackTrace();
         }
