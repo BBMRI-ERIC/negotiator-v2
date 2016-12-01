@@ -207,12 +207,13 @@ COMMENT ON COLUMN "json_query"."json_text" IS 'text of query in json format';
 
 
 CREATE TABLE "offer" (  
+    "id" SERIAL NOT NULL,
     "query_id" INTEGER NOT NULL,    
     "person_id" INTEGER NOT NULL,
     "offer_from" INTEGER NOT NULL,
-    "offer_comment_time" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    "comment_time" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     "text" TEXT NOT NULL,
-    PRIMARY KEY("query_id", "offer_from", "person_id"),
+    PRIMARY KEY("id"),
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("person_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("offer_from") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
@@ -224,8 +225,9 @@ CREATE INDEX "offerFromIndexOffer" ON "offer" (offer_from);
 
 COMMENT ON TABLE "offer" IS 'table to store private conversation made on a query between two people(owner and researcher)';
 
+COMMENT ON COLUMN "offer"."id" IS 'Primary key';
 COMMENT ON COLUMN "offer".query_id IS 'Foreign key which exists as primary key in the query table. ';
-COMMENT ON COLUMN "offer".offer_comment_time IS 'timestamp of when the comment was made on the offer.';
+COMMENT ON COLUMN "offer".comment_time IS 'timestamp of when the comment was made on the offer.';
 COMMENT ON COLUMN "offer".person_id IS 'Foreign key which exists as primary key in the person table. describes the person who made the comment.';
 COMMENT ON COLUMN "offer".offer_from IS 'Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.';
 COMMENT ON COLUMN "offer"."text" IS 'Text of the comment.';

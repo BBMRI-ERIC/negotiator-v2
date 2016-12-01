@@ -47,6 +47,7 @@ import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
+import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 
@@ -107,11 +108,19 @@ public class OwnerQueriesDetailBean implements Serializable {
     private List<QueryAttachmentDTO> attachments;
 
     /**
+     * The list of offers(private comments) for the selected query
+     */
+    private List<OfferPersonDTO> offers;
+
+
+    /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
 	public void initialize() {
 		try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
+            setOffers(DbUtil.getOffers(config, queryId));
+
             /**
              * Get all the attachments for selected query.
              */
@@ -209,7 +218,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 
         }
     }
-
 
 	/**
 	 * Add search filter
@@ -335,6 +343,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 
     public void setAttachments(List<QueryAttachmentDTO> attachments) {
         this.attachments = attachments;
+    }
+
+    public List<OfferPersonDTO> getOffers() {
+        return offers;
+    }
+
+    public void setOffers(List<OfferPersonDTO> offers) {
+        this.offers = offers;
     }
 
 

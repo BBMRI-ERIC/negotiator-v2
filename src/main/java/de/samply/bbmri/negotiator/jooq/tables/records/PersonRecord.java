@@ -4,6 +4,8 @@
 package de.samply.bbmri.negotiator.jooq.tables.records;
 
 
+import de.samply.bbmri.negotiator.jooq.tables.Person;
+
 import javax.annotation.Generated;
 
 import org.jooq.Field;
@@ -11,8 +13,6 @@ import org.jooq.Record1;
 import org.jooq.Record5;
 import org.jooq.Row5;
 import org.jooq.impl.UpdatableRecordImpl;
-
-import de.samply.bbmri.negotiator.jooq.tables.Person;
 
 
 /**

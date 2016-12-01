@@ -9,6 +9,7 @@ import de.samply.bbmri.negotiator.jooq.tables.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
+import de.samply.bbmri.negotiator.jooq.tables.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
@@ -57,6 +58,11 @@ public class Tables {
 	 * query table to contain json text queries
 	 */
 	public static final JsonQuery JSON_QUERY = de.samply.bbmri.negotiator.jooq.tables.JsonQuery.JSON_QUERY;
+
+	/**
+	 * table to store private conversation made on a query between two people(owner and researcher)
+	 */
+	public static final Offer OFFER = de.samply.bbmri.negotiator.jooq.tables.Offer.OFFER;
 
 	/**
 	 * person table which is parent of researcher and owner

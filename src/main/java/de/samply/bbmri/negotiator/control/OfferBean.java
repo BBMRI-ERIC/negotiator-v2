@@ -1,0 +1,110 @@
+/**
+ * Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+ * Deutsches Krebsforschungszentrum in Heidelberg
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU GPL version 3 section 7:
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with Jersey (https://jersey.java.net) (or a modified version of that
+ * library), containing parts covered by the terms of the General Public
+ * License, version 2.0, the licensors of this Program grant you additional
+ * permission to convey the resulting work.
+ */
+
+package de.samply.bbmri.negotiator.control;
+
+import java.sql.SQLException;
+import java.util.Observable;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+
+@ManagedBean
+@ViewScoped
+public class OfferBean extends Observable {
+
+    private static final long serialVersionUID = 1L;
+
+    @ManagedProperty(value = "#{userBean}")
+    private UserBean userBean;
+
+    private String offerComment;
+
+    private Integer offerFrom;
+
+
+    @PostConstruct
+    public void init() {
+
+    }
+
+    /**
+     * Persist offer comment
+     *
+     * @param query
+     * @return
+     */
+    public void saveOffer(Query query) {
+        try(Config config = ConfigFactory.get()) {
+
+            /**
+             * Will be improved while working on researcher view for offers.
+             *
+             */
+            if (userBean.getBiobankOwner() )
+            {
+                setOfferFrom(userBean.getUserId());
+            }
+
+            DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
+            config.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
+
+    public String getOfferComment() {
+        return offerComment;
+    }
+
+    public void setOfferComment(String offerComment) {
+        this.offerComment = offerComment;
+    }
+
+    public Integer getOfferFrom() {
+        return offerFrom;
+    }
+
+    public void setOfferFrom(Integer offerFrom) {
+        this.offerFrom = offerFrom;
+    }
+
+}

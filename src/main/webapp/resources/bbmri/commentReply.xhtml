@@ -37,6 +37,7 @@
 
 <composite:interface>
 	<composite:attribute name="query" required="true" />
+	<composite:attribute name="makeOffer" required="false" default="false"  />
 </composite:interface>
 
 <composite:implementation>
@@ -52,26 +53,48 @@
 			</h:panelGroup>
 
 			<h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
-
-				<div class="form-group">
-
+				<h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<h:inputTextarea id="commentText" value="#{commentBean.comment}"
 						styleClass="form-control" rows="5"
 						validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 500 characters ">
 						<f:validateLength for="commentText" minimum="1" maximum="500" />
 						<h:messages id="commentValidationMessage" for="commentText"
 							style="color:red" showSummary="true" showDetails="false" />
-					</h:inputTextarea>
+					</h:inputTextarea>					
+				</h:panelGroup>	
 
-				</div>
-
-				<h:panelGroup layout="block" styleClass="pull-right">
-
+				<h:panelGroup layout="block" styleClass="pull-right"  style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<h:commandButton
 						action="#{commentBean.saveComment(cc.attrs.query)}"
 						value="#{label['querydetail.action.addComment.buttontext']}"
 						title="#{label['querydetail.action.addComment']}"
 						styleClass="btn btn-primary" />
+				</h:panelGroup>				
+
+                <h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'true'}">
+                    <h:inputTextarea id="offerCommentText" value="#{offerBean.offerComment}"
+                        styleClass="form-control" rows="5"
+                        validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 500 characters ">
+                        <f:validateLength for="offerCommentText" minimum="1" maximum="500" />
+                        <h:messages id="offerCommentValidationMessage" for="offerCommentText"
+                            style="color:red" showSummary="true" showDetails="false" />
+                    </h:inputTextarea>
+				</h:panelGroup>
+
+				<h:panelGroup layout="block" style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'true'}">
+					<h:panelGroup styleClass="pull-left" >
+						<h:commandButton disabled="#{true}"
+							value="#{label['querydetail.action.privateDiscussion']}"
+							title="#{label['querydetail.action.addOffer']}"
+							styleClass="btn btn-primary" />
+					</h:panelGroup>
+
+					<h:panelGroup styleClass="pull-right">
+						<h:commandButton action="#{offerBean.saveOffer(cc.attrs.query)}"
+							value="#{label['querydetail.action.addOffer.buttontext']}"
+							title="#{label['querydetail.action.addOffer']}"
+							styleClass="btn btn-primary" />
+					</h:panelGroup>
 				</h:panelGroup>
 
 			</h:panelGroup>

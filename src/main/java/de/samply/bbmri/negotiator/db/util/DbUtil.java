@@ -60,12 +60,14 @@ import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
+import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
@@ -313,6 +315,54 @@ public class DbUtil {
         return config.map(result, QueryAttachmentDTO.class);
     }
 
+
+
+
+
+
+
+    /**
+     * Returns a list of OfferPersonDTOs for a specific query.
+     * @param config
+     * @param queryId
+     * @return
+     */
+    public static List<OfferPersonDTO> getOffers(Config config, int queryId) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.OFFER, "offer"))
+                .select(getFields(Tables.PERSON, "person"))
+                .select(getFields(Tables.COLLECTION, "collection"))
+                .from(Tables.OFFER)
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.OFFER.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
+
+        List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
+
+        List<OfferPersonDTO> target = new ArrayList<>();
+        /**
+         * Now we have to do weird things, grouping them together manually
+         */
+        HashMap<Integer, OfferPersonDTO> mapped = new HashMap<>();
+
+        for(OfferPersonDTO dto : map) {
+            if(!mapped.containsKey(dto.getOffer().getId())) {
+                mapped.put(dto.getOffer().getId(), dto);
+
+                if(dto.getCollection() != null) {
+                    dto.getCollections().add(dto.getCollection());
+                }
+                target.add(dto);
+            } else if(dto.getCollection() != null) {
+                    mapped.get(dto.getOffer().getId()).getCollections().add(dto.getCollection());
+            }
+        }
+
+        return target;
+    }
+
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config
@@ -354,6 +404,25 @@ public class DbUtil {
 
         return target;
     }
+
+    /**
+     * Adds an offer comment for the given queryId, personId, offerFrom with the given text.
+     * @param config
+     * @param queryId
+     * @param personId
+     * @param comment
+     * @param offerFrom
+     */
+    public static void addOfferComment(Config config, int queryId, int personId, String comment, Integer offerFrom) throws SQLException {
+        OfferRecord record = config.dsl().newRecord(Tables.OFFER);
+        record.setQueryId(queryId);
+        record.setPersonId(personId);
+        record.setOfferFrom(offerFrom);
+        record.setText(comment);
+        record.setCommentTime(new Timestamp(new Date().getTime()));
+        record.store();
+    }
+
 
     /**
      * Adds a comment for the given queryId and personId with the given text.
