@@ -44,6 +44,7 @@ import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
@@ -112,6 +113,11 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     private List<OfferPersonDTO> offers;
 
+    /**
+     * The selected offer, if there is one
+     */
+    private Offer selectedOffer = null;
+
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -120,6 +126,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 		try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
             setOffers(DbUtil.getOffers(config, queryId));
+
+            /**
+             * Code change required after collapse-offer implementation.
+             */
+            if(offers.size() > 0){
+                setSelectedOffer(offers.get(0).getOffer());
+            }
 
             /**
              * Get all the attachments for selected query.
@@ -351,6 +364,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 
     public void setOffers(List<OfferPersonDTO> offers) {
         this.offers = offers;
+    }
+
+    public Offer getSelectedOffer() {
+        return selectedOffer;
+    }
+
+    public void setSelectedOffer(Offer selectedOffer) {
+        this.selectedOffer = selectedOffer;
     }
 
 

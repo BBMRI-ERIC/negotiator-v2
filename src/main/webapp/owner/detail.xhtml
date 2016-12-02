@@ -306,7 +306,7 @@
 						<h3>#{label['querydetail.title.sampleAvailability']}</h3>				
                         
                         <p>
-                            <h:outputText value="#{label['message.offerSamples']}" />
+                            <b><h:outputText value="#{label['message.offerSamples']}" /></b>
                         </p> 
 						
 						<ui:repeat value="#{ownerQueriesDetailBean.offers}"
@@ -322,7 +322,7 @@
 						</div>
 
 						<bbmricc:commentReply makeOffer="true"
-							query="#{ownerQueriesDetailBean.selectedQuery}" />
+							query="#{ownerQueriesDetailBean.selectedQuery}" offer="#{ownerQueriesDetailBean.selectedOffer}"/>
 
 					</div>
 				</div>

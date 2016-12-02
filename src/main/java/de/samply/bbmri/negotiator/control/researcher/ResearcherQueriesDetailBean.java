@@ -52,8 +52,10 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
+import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
@@ -118,11 +120,33 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private List<Collection> collections;
 
     /**
+     * The list of offer comments for the selected query
+     */
+    private List<OfferPersonDTO> offers;
+
+
+    /**
+     * The selected offer, if there is one
+     */
+    private Offer selectedOffer = null;
+
+    /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
+
+            setOffers(DbUtil.getOffers(config, queryId));
+
+            /**
+             * Code change required after collapse-offer implementation.
+             */
+            if(offers.size() > 0)
+            {
+                setSelectedOffer(offers.get(0).getOffer());
+            }
+
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
             displayHumanReadableQuery();
 
@@ -140,6 +164,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             e.printStackTrace();
         }
     }
+
 
     /**
      * Redirects the user to directory for editing the query
@@ -330,5 +355,23 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setCollections(List<Collection> collections) {
         this.collections = collections;
+    }
+
+    public List<OfferPersonDTO> getOffers() {
+        return offers;
+    }
+
+
+    public void setOffers(List<OfferPersonDTO> offers) {
+        this.offers = offers;
+    }
+
+
+    public Offer getSelectedOffer() {
+        return selectedOffer;
+    }
+
+    public void setSelectedOffer(Offer selectedOffer) {
+        this.selectedOffer = selectedOffer;
     }
 }

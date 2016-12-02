@@ -304,12 +304,31 @@
 					</div>
 
 					<div id="sampleAvailability" class="tab-pane fade">
+					
+						<h3>#{label['querydetail.title.sampleAvailability']}</h3>
+					
+						<p>
+							<b> <h:outputText value="#{label['message.noOffers']}"
+									rendered="#{researcherQueriesDetailBean.offers.size() == 0}" />
+							</b>
+						</p>
 
-						<h3>#{label['querydetail.title.sampleAvailability']}</h3>	
-			            
-						<h:outputText value="#{label['message.offerSamples']}" />
-						
+						<ui:repeat value="#{researcherQueriesDetailBean.offers}"
+							var="offers">
 
+							<bbmricc:comment comment="#{offers.offer}"
+								person="#{offers.person}" collections="#{offers.collections}" />
+
+						</ui:repeat>
+
+						<div class="col-xs-12">
+							<hr></hr>
+						</div>
+
+						<bbmricc:commentReply makeOffer="true"
+							rendered="#{researcherQueriesDetailBean.offers.size() > 0}"
+							query="#{researcherQueriesDetailBean.selectedQuery}"
+							offer="#{researcherQueriesDetailBean.selectedOffer}" />
 					</div>
 				</div>
 

@@ -33,10 +33,12 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 @ManagedBean
@@ -64,23 +66,27 @@ public class OfferBean extends Observable {
      * @param query
      * @return
      */
-    public void saveOffer(Query query) {
-        try(Config config = ConfigFactory.get()) {
+    public String saveOffer(Query query, Offer selectedOffer ) {
+        try (Config config = ConfigFactory.get()) {
 
-            /**
-             * Will be improved while working on researcher view for offers.
-             *
-             */
-            if (userBean.getBiobankOwner() )
-            {
-                setOfferFrom(userBean.getUserId());
+            Integer offerFrom;
+            if(selectedOffer == null){
+                offerFrom = userBean.getUserId();
+            }
+            else{
+                offerFrom = selectedOffer.getOfferFrom();
             }
 
             DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
+
+            notifyObservers(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
     }
 
     public UserBean getUserBean() {
