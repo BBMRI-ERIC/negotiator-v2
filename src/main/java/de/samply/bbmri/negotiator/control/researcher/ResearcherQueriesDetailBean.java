@@ -52,7 +52,6 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
@@ -120,31 +119,27 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private List<Collection> collections;
 
     /**
-     * The list of offer comments for the selected query
+     * The list of biobanker owners who made a sample offer for a given query
      */
-    private List<OfferPersonDTO> offers;
-
+    private List<Integer> offerMakers;
 
     /**
-     * The selected offer, if there is one
+     * The list of offerPersonDTO's, hence it's a list of lists.
      */
-    private Offer selectedOffer = null;
+    private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<List<OfferPersonDTO>>();
 
     /**
-     * initialises the page by getting all the comments for a selected(clicked on) query
+     * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
+            setOfferMakers(DbUtil.getOfferMakers(config, queryId));
 
-            setOffers(DbUtil.getOffers(config, queryId));
-
-            /**
-             * Code change required after collapse-offer implementation.
-             */
-            if(offers.size() > 0)
-            {
-                setSelectedOffer(offers.get(0).getOffer());
+            for (int i = 0; i < offerMakers.size(); ++i) {
+                List<OfferPersonDTO> offerPersonDTO;
+                offerPersonDTO = DbUtil.getOffers(config, queryId, offerMakers.get(i));
+                listOfSampleOffers.add(offerPersonDTO);
             }
 
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
@@ -357,21 +352,20 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.collections = collections;
     }
 
-    public List<OfferPersonDTO> getOffers() {
-        return offers;
+    public List<Integer> getOfferMakers() {
+        return offerMakers;
     }
 
-
-    public void setOffers(List<OfferPersonDTO> offers) {
-        this.offers = offers;
+    public void setOfferMakers(List<Integer> offerMakers) {
+        this.offerMakers = offerMakers;
     }
 
-
-    public Offer getSelectedOffer() {
-        return selectedOffer;
+    public List<List<OfferPersonDTO>> getListOfSampleOffers() {
+        return listOfSampleOffers;
     }
 
-    public void setSelectedOffer(Offer selectedOffer) {
-        this.selectedOffer = selectedOffer;
+    public void setListOfSampleOffers(List<List<OfferPersonDTO>> listOfSampleOffers) {
+        this.listOfSampleOffers = listOfSampleOffers;
     }
+
 }

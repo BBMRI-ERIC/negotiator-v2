@@ -306,14 +306,16 @@
 						<h3>#{label['querydetail.title.sampleAvailability']}</h3>				
                         
                         <p>
-                            <b><h:outputText value="#{label['message.offerSamples']}" /></b>
+                            <b>
+                                <h:outputText value="#{label['message.offerSamples']}" rendered="#{ownerQueriesDetailBean.offerPersonDTO.size() == 0}"/>
+                            </b>
                         </p> 
 						
-						<ui:repeat value="#{ownerQueriesDetailBean.offers}"
-							var="offers">
+						<ui:repeat value="#{ownerQueriesDetailBean.offerPersonDTO}"
+							var="offerPersonDTO">
 
-							<bbmricc:comment comment="#{offers.offer}"
-								person="#{offers.person}" collections="#{offers.collections}" />
+							<bbmricc:comment comment="#{offerPersonDTO.offer}"
+								person="#{offerPersonDTO.person}" collections="#{offerPersonDTO.collections}" />
 
 						</ui:repeat>
 
@@ -322,7 +324,7 @@
 						</div>
 
 						<bbmricc:commentReply makeOffer="true"
-							query="#{ownerQueriesDetailBean.selectedQuery}" offer="#{ownerQueriesDetailBean.selectedOffer}"/>
+							query="#{ownerQueriesDetailBean.selectedQuery}" offer="#{ownerQueriesDetailBean.userBean.userId}"/>
 
 					</div>
 				</div>

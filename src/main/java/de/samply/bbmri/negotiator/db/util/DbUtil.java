@@ -314,55 +314,7 @@ public class DbUtil {
 
         return config.map(result, QueryAttachmentDTO.class);
     }
-
-
-
-
-
-
-
-    /**
-     * Returns a list of OfferPersonDTOs for a specific query.
-     * @param config
-     * @param queryId
-     * @return
-     */
-    public static List<OfferPersonDTO> getOffers(Config config, int queryId) {
-        Result<Record> result = config.dsl()
-                .select(getFields(Tables.OFFER, "offer"))
-                .select(getFields(Tables.PERSON, "person"))
-                .select(getFields(Tables.COLLECTION, "collection"))
-                .from(Tables.OFFER)
-                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.OFFER.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .where(Tables.OFFER.QUERY_ID.eq(queryId))
-                .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
-
-        List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
-
-        List<OfferPersonDTO> target = new ArrayList<>();
-        /**
-         * Now we have to do weird things, grouping them together manually
-         */
-        HashMap<Integer, OfferPersonDTO> mapped = new HashMap<>();
-
-        for(OfferPersonDTO dto : map) {
-            if(!mapped.containsKey(dto.getOffer().getId())) {
-                mapped.put(dto.getOffer().getId(), dto);
-
-                if(dto.getCollection() != null) {
-                    dto.getCollections().add(dto.getCollection());
-                }
-                target.add(dto);
-            } else if(dto.getCollection() != null) {
-                    mapped.get(dto.getOffer().getId()).getCollections().add(dto.getCollection());
-            }
-        }
-
-        return target;
-    }
-
+   
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config
@@ -756,4 +708,64 @@ public class DbUtil {
 
         return config.map(fetch, Collection.class);
     }
+
+    /**
+     * Returns a list of Biobanker's id's who made the sample offers for a given query.
+     * @param config
+     * @param queryId
+     * @return offerMakers 
+     */
+    public static List<Integer> getOfferMakers(Config config, int queryId) {
+        List<Integer> offerMakers = config.dsl()
+                .selectDistinct(Tables.OFFER.OFFER_FROM)
+                .from(Tables.OFFER)
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .fetch()
+                .getValues(Tables.OFFER.OFFER_FROM, Integer.class);
+
+        return offerMakers;
+    }
+
+    /**
+     * Returns a list of OfferPersonDTOs for a specific query.
+     * @param config
+     * @param queryId
+     * @return target
+     */
+    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer offerFrom) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.OFFER, "offer"))
+                .select(getFields(Tables.PERSON, "person"))
+                .select(getFields(Tables.COLLECTION, "collection"))
+                .from(Tables.OFFER)
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.OFFER.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .and(Tables.OFFER.OFFER_FROM.eq(offerFrom))
+                .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
+
+        List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
+
+        List<OfferPersonDTO> target = new ArrayList<>();
+        /**
+         * Now we have to do weird things, grouping them together manually
+         */
+        HashMap<Integer, OfferPersonDTO> mapped = new HashMap<>();
+
+        for(OfferPersonDTO dto : map) {
+            if(!mapped.containsKey(dto.getOffer().getId())) {
+                mapped.put(dto.getOffer().getId(), dto);
+
+                if(dto.getCollection() != null) {
+                    dto.getCollections().add(dto.getCollection());
+                }
+                target.add(dto);
+            } else if(dto.getCollection() != null) {
+                    mapped.get(dto.getOffer().getId()).getCollections().add(dto.getCollection());
+            }
+        }
+        return target;
+    }
+
 }

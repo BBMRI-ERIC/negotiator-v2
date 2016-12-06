@@ -44,7 +44,6 @@ import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
@@ -111,12 +110,7 @@ public class OwnerQueriesDetailBean implements Serializable {
     /**
      * The list of offers(private comments) for the selected query
      */
-    private List<OfferPersonDTO> offers;
-
-    /**
-     * The selected offer, if there is one
-     */
-    private Offer selectedOffer = null;
+    private List<OfferPersonDTO> offerPersonDTO;
 
 
     /**
@@ -125,14 +119,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void initialize() {
 		try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
-            setOffers(DbUtil.getOffers(config, queryId));
-
-            /**
-             * Code change required after collapse-offer implementation.
-             */
-            if(offers.size() > 0){
-                setSelectedOffer(offers.get(0).getOffer());
-            }
+            setOfferPersonDTO(DbUtil.getOffers(config, queryId, userBean.getUserId()));
 
             /**
              * Get all the attachments for selected query.
@@ -358,21 +345,12 @@ public class OwnerQueriesDetailBean implements Serializable {
         this.attachments = attachments;
     }
 
-    public List<OfferPersonDTO> getOffers() {
-        return offers;
+    public List<OfferPersonDTO> getOfferPersonDTO() {
+        return offerPersonDTO;
     }
 
-    public void setOffers(List<OfferPersonDTO> offers) {
-        this.offers = offers;
+    public void setOfferPersonDTO(List<OfferPersonDTO> offerPersonDTO) {
+        this.offerPersonDTO = offerPersonDTO;
     }
-
-    public Offer getSelectedOffer() {
-        return selectedOffer;
-    }
-
-    public void setSelectedOffer(Offer selectedOffer) {
-        this.selectedOffer = selectedOffer;
-    }
-
 
 }

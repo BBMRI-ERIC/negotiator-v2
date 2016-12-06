@@ -38,7 +38,6 @@ import javax.faces.context.FacesContext;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 @ManagedBean
@@ -66,20 +65,10 @@ public class OfferBean extends Observable {
      * @param query
      * @return
      */
-    public String saveOffer(Query query, Offer selectedOffer ) {
+    public String saveOffer(Query query, Integer offerFrom ) {
         try (Config config = ConfigFactory.get()) {
-
-            Integer offerFrom;
-            if(selectedOffer == null){
-                offerFrom = userBean.getUserId();
-            }
-            else{
-                offerFrom = selectedOffer.getOfferFrom();
-            }
-
             DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
-
             notifyObservers(query);
         } catch (SQLException e) {
             e.printStackTrace();
