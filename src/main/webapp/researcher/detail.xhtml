@@ -288,10 +288,10 @@
 
 			<h:panelGroup layout="block" style="margin-top:60px;">
 
-				<ul class="nav nav-tabs">
-					<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+				<ul class="nav nav-tabs"  id="myTab">
+					<li class="active" id="first"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
 					</li>
-					<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
+					<li id="second"><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
 					</li>
 				</ul>
 
@@ -371,6 +371,24 @@
 				</div>
 
 			</h:panelGroup>
+			
+			<h:outputScript>				
+				$(function() { 
+				   
+				    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+				   
+				        localStorage.setItem('lastTab', $(this).attr('href'));
+				    });
+								   
+				    var lastTab = localStorage.getItem('lastTab');
+				    if (lastTab) {
+				        $('[href="' + lastTab + '"]').tab('show');
+				    }
+				});
+		   </h:outputScript>
+			
+			
+			
 		</h:panelGroup>
 
 	</ui:define>
