@@ -237,7 +237,7 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag, Boolean biobankOwner) {
     	Person queryAuthor = Tables.PERSON.as("query_author");
 
     	Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
@@ -245,13 +245,20 @@ public class DbUtil {
     	if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
             Condition textCondition = DSL.trueCondition();
+            Condition biobankOwnerCondition = DSL.trueCondition();
 
             for(String filter : filters) {
                 titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
     			textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
-            }
+    			if(biobankOwner){
 
-    		condition = condition.and(titleCondition.or(textCondition));
+    			    biobankOwnerCondition = biobankOwnerCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+    			}
+    			else{
+
+    			}
+            }
+    		condition = condition.and(titleCondition.or(textCondition).or(biobankOwnerCondition));
     	}
 
         if (flag != null && flag != Flag.UNFLAGGED) {
@@ -314,7 +321,7 @@ public class DbUtil {
 
         return config.map(result, QueryAttachmentDTO.class);
     }
-   
+
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config
@@ -713,7 +720,7 @@ public class DbUtil {
      * Returns a list of Biobanker's id's who made the sample offers for a given query.
      * @param config
      * @param queryId
-     * @return offerMakers 
+     * @return offerMakers
      */
     public static List<Integer> getOfferMakers(Config config, int queryId) {
         List<Integer> offerMakers = config.dsl()
