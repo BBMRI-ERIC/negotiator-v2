@@ -31,40 +31,47 @@ import java.util.Observable;
 import java.util.Observer;
 
 import de.samply.bbmri.negotiator.MailUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
+import de.samply.bbmri.negotiator.notification.Notification;
+import de.samply.bbmri.negotiator.notification.NotificationThread;
 import de.samply.common.mailing.EmailBuilder;
 import de.samply.common.mailing.OutgoingEmail;
 
 
-public class QueryEmailNotifier implements Observer {
+public class QueryEmailNotifier {
 
-    
-    @Override
-    public void update(Observable queryBean, Object negotiators) {
-        sendEmailNotification((QueryBean) queryBean, (List<NegotiatorDTO>)negotiators);      
+    private List<NegotiatorDTO> negotiators;
+
+    private String url;
+
+    private Query query;
+
+    public QueryEmailNotifier(List<NegotiatorDTO> negotiators, String url, Query query) {
+        this.negotiators = negotiators;
+        this.url = url;
+        this.query = query;
     }
-    
+
     /**
      * Sends notification email after a query gets created and is ready to be negotiated on
-     * @param queryBean
-     * @param query
      */
-    private void sendEmailNotification(QueryBean queryBean, List<NegotiatorDTO> negotiators) {
-        
+    public void sendEmailNotification() {
         EmailBuilder builder = MailUtil.initializeBuilder();
         builder.addTemplateFile("NewQueryNotification.soy", "Notification");
+
+        Notification notification = new Notification();
+        notification.setSubject("Subject: " + query.getTitle()   + " negotiation has been added.");
+        notification.addParameter("queryName", query.getTitle());
+        notification.addParameter("url", url);
+        notification.setLocale("de");
+
         for(NegotiatorDTO negotiator : negotiators) {
-            OutgoingEmail email = new OutgoingEmail();
-            email.addAddressee(negotiator.getPerson().getAuthEmail());
-            email.setSubject("Subject: " + queryBean.getQueryText()   + " negotiation has been added.");
-            email.putParameter("name", negotiator.getPerson().getAuthName());
-            email.putParameter("queryName", queryBean.getQueryTitle());
-            email.putParameter("url", queryBean.getQueryUrl(queryBean.getId()));
-            email.setLocale("de");
-            email.setBuilder(builder);
-        
-            MailUtil.sendEmail(email);
+            notification.addAddressee(negotiator.getPerson());
         }
+
+        NotificationThread thread = new NotificationThread(builder, notification);
+        thread.start();
     }
 
 }

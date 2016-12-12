@@ -27,6 +27,7 @@
 package de.samply.bbmri.negotiator.control;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Observable;
@@ -37,6 +38,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +56,7 @@ import de.samply.bbmri.negotiator.rest.Directory;
  */
 @ManagedBean
 @ViewScoped
-public class QueryBean extends Observable {
+public class QueryBean implements Serializable {
 
    private static final long serialVersionUID = -611428463046308071L;
    private int jsonQueryId;
@@ -82,15 +84,13 @@ public class QueryBean extends Observable {
 	       if(id != null)
 	       {
 	           setMode("edit");
-	           QueryRecord queryRecord= DbUtil.getQueryDescription(config, id);
+	           QueryRecord queryRecord = DbUtil.getQueryDescription(config, id);
 	           queryText = queryRecord.getText();
 	           queryTitle = queryRecord.getTitle();
 	       }
 	       else{
 	           jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
                humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
-               // register email notification observer
-               this.addObserver(new QueryEmailNotifier());
 	       }
 	   }
 	   catch (Exception e) {
@@ -111,8 +111,10 @@ public class QueryBean extends Observable {
                config.commit();
                setId(record.getId());
                List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId());
-               setChanged();
-               notifyObservers(negotiators);
+
+               QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrl(record.getId()),
+                       config.map(record, Query.class));
+               notifier.sendEmailNotification();
            }
        } catch (IOException e) {
            e.printStackTrace();
@@ -129,11 +131,9 @@ public class QueryBean extends Observable {
    public String getQueryUrl(Integer queryId) {
        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 
-       StringBuffer requestURL = new StringBuffer(context.getRequestServletPath());
-       requestURL.append("?queryId=").append(queryId);
-
        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
-               context.getRequestServerPort(), context.getRequestContextPath(), "/researcher/detail.xhtml?queryId="+ getId());
+               context.getRequestServerPort(), context.getRequestContextPath(),
+               "/researcher/detail.xhtml?queryId=" + getId());
    }
 
     public String getHumanReadableFilters() {

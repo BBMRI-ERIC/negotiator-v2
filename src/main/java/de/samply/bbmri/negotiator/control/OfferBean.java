@@ -26,23 +26,25 @@
 
 package de.samply.bbmri.negotiator.control;
 
+import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Observable;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 @ManagedBean
 @ViewScoped
-public class OfferBean extends Observable {
+public class OfferBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -69,13 +71,34 @@ public class OfferBean extends Observable {
         try (Config config = ConfigFactory.get()) {
             DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
-            notifyObservers(query);
+
+            /**
+             * Send notifications only, if a biobanker makes an offer
+             */
+            if (userBean.getBiobankOwner()) {
+                OfferEmailNotifier notifier = new OfferEmailNotifier(query, getQueryUrl(query.getId()));
+                notifier.sendEmailNotification();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    /**
+     * Build url to be able to navigate to the query with id=queryId
+     *
+     * @param queryId
+     * @return
+     */
+    public String getQueryUrl(Integer queryId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/researcher/detail.xhtml?queryId=" + queryId);
     }
 
     public UserBean getUserBean() {
