@@ -258,75 +258,100 @@
 
 
 				<ui:fragment
-                    rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
+					rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
-                    <div class="col-xs-12">
-                        <hr></hr>
-                    </div>
+					<div class="col-xs-12">
+						<hr></hr>
+					</div>
 
-                    <b>#{label['querydetail.owner.associatedbiobanks']}</b>
+					<b>#{label['querydetail.owner.associatedbiobanks']}</b>
 
-                </ui:fragment>
+				</ui:fragment>
 
-                <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}" var="biobank" varStatus="loop">
+				<ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
+					var="biobank" varStatus="loop">
                     #{biobank.name}#{!loop.last ? ', ' : ''}
                 </ui:repeat>
 
-				<ul class="nav nav-tabs">
-					<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
-					</li>
-					<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
-					</li>
-				</ul>
+				<h:panelGroup layout="block" style="margin-top:60px;">
 
-				<div class="tab-content">
-					<div id="comments" class="tab-pane fade in active">
+					<ul class="nav nav-tabs">
+						<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+						</li>
+						<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
+						</li>
+					</ul>
 
-						<h3>#{label['querydetail.title.comments']}</h3>
+					<div class="tab-content">
+						<div id="comments" class="tab-pane fade in active">
 
-						<ui:repeat value="#{ownerQueriesDetailBean.comments}"
-							var="comment">
+							<h3>#{label['querydetail.title.comments']}</h3>
 
-							<bbmricc:comment comment="#{comment.comment}"
-								person="#{comment.person}" collections="#{comment.collections}" />
+							<ui:repeat value="#{ownerQueriesDetailBean.comments}"
+								var="comment">
 
-						</ui:repeat>
+								<bbmricc:comment comment="#{comment.comment}"
+									person="#{comment.person}" collections="#{comment.collections}" />
 
-						<div class="col-xs-12">
-							<hr></hr>
+							</ui:repeat>
+
+							<div class="col-xs-12">
+								<hr></hr>
+							</div>
+
+							<bbmricc:commentReply
+								query="#{ownerQueriesDetailBean.selectedQuery}" />
+
 						</div>
 
-						<bbmricc:commentReply
-							query="#{ownerQueriesDetailBean.selectedQuery}" />
+						<div id="sampleAvailability" class="tab-pane fade">
 
-					</div>
+							<h3>#{label['querydetail.title.sampleAvailability']}</h3>
 
-					<div id="sampleAvailability" class="tab-pane fade">
+							<p>
+								<b> <h:outputText value="#{label['message.offerSamples']}"
+										rendered="#{ownerQueriesDetailBean.offerPersonDTO.size() == 0}" />
+								</b>
+							</p>
 
-						<h3>#{label['querydetail.title.sampleAvailability']}</h3>				
-                        
-                        <p>
-                            <h:outputText value="#{label['message.offerSamples']}" />
-                        </p> 
-						
-						<ui:repeat value="#{ownerQueriesDetailBean.offers}"
-							var="offers">
+							<ui:repeat value="#{ownerQueriesDetailBean.offerPersonDTO}"
+								var="offerPersonDTO">
 
-							<bbmricc:comment comment="#{offers.offer}"
-								person="#{offers.person}" collections="#{offers.collections}" />
+								<bbmricc:comment comment="#{offerPersonDTO.offer}"
+									person="#{offerPersonDTO.person}"
+									collections="#{offerPersonDTO.collections}" />
 
-						</ui:repeat>
+							</ui:repeat>
 
-						<div class="col-xs-12">
-							<hr></hr>
+							<div class="col-xs-12">
+								<hr></hr>
+							</div>
+
+							<bbmricc:commentReply makeOffer="true"
+								query="#{ownerQueriesDetailBean.selectedQuery}"
+								offer="#{ownerQueriesDetailBean.userBean.userId}" />
+
 						</div>
-
-						<bbmricc:commentReply makeOffer="true"
-							query="#{ownerQueriesDetailBean.selectedQuery}" />
-
 					</div>
-				</div>
-
+				</h:panelGroup>
+				
+				<h:outputScript>                
+	                $(function() { 
+	                   
+	                    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+	                   
+	                        localStorage.setItem('lastTab', $(this).attr('href'));
+	                    });
+	                                   
+	                    var lastTab = localStorage.getItem('lastTab');
+	                    if (lastTab) {
+	                        $('[href="' + lastTab + '"]').tab('show');
+	                    }
+	                });
+              </h:outputScript>
+				
+				
+				
 			</h:panelGroup>
 
 		</h:panelGroup>

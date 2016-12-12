@@ -110,7 +110,7 @@ public class OwnerQueriesDetailBean implements Serializable {
     /**
      * The list of offers(private comments) for the selected query
      */
-    private List<OfferPersonDTO> offers;
+    private List<OfferPersonDTO> offerPersonDTO;
 
 
     /**
@@ -119,7 +119,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void initialize() {
 		try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
-            setOffers(DbUtil.getOffers(config, queryId));
+            setOfferPersonDTO(DbUtil.getOffers(config, queryId, userBean.getUserId()));
 
             /**
              * Get all the attachments for selected query.
@@ -260,7 +260,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter);
+				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, userBean.getBiobankOwner());
 				sortQueries();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -345,13 +345,12 @@ public class OwnerQueriesDetailBean implements Serializable {
         this.attachments = attachments;
     }
 
-    public List<OfferPersonDTO> getOffers() {
-        return offers;
+    public List<OfferPersonDTO> getOfferPersonDTO() {
+        return offerPersonDTO;
     }
 
-    public void setOffers(List<OfferPersonDTO> offers) {
-        this.offers = offers;
+    public void setOfferPersonDTO(List<OfferPersonDTO> offerPersonDTO) {
+        this.offerPersonDTO = offerPersonDTO;
     }
-
 
 }

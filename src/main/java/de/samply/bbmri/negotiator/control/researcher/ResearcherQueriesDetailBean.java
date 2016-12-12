@@ -51,8 +51,10 @@ import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
+import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
@@ -113,14 +115,37 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The query DTO object mapped to the JSON text received from the directory
      */
     QueryDTO queryDTO = null;
+
+    private List<Collection> collections;
+
     /**
-     * initialises the page by getting all the comments for a selected(clicked on) query
+     * The list of biobanker owners who made a sample offer for a given query
+     */
+    private List<Integer> offerMakers;
+
+    /**
+     * The list of offerPersonDTO's, hence it's a list of lists.
+     */
+    private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<List<OfferPersonDTO>>();
+
+    /**
+     * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
+            setOfferMakers(DbUtil.getOfferMakers(config, queryId));
+
+            for (int i = 0; i < offerMakers.size(); ++i) {
+                List<OfferPersonDTO> offerPersonDTO;
+                offerPersonDTO = DbUtil.getOffers(config, queryId, offerMakers.get(i));
+                listOfSampleOffers.add(offerPersonDTO);
+            }
+
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
             displayHumanReadableQuery();
+
+            collections = DbUtil.getCollectionsForQuery(config, queryId);
 
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
@@ -134,6 +159,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             e.printStackTrace();
         }
     }
+
 
     /**
      * Redirects the user to directory for editing the query
@@ -317,4 +343,29 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public List<QueryAttachmentDTO> getAttachments() {
         return attachments;
     }
+
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
+    }
+
+    public List<Integer> getOfferMakers() {
+        return offerMakers;
+    }
+
+    public void setOfferMakers(List<Integer> offerMakers) {
+        this.offerMakers = offerMakers;
+    }
+
+    public List<List<OfferPersonDTO>> getListOfSampleOffers() {
+        return listOfSampleOffers;
+    }
+
+    public void setListOfSampleOffers(List<List<OfferPersonDTO>> listOfSampleOffers) {
+        this.listOfSampleOffers = listOfSampleOffers;
+    }
+
 }

@@ -37,6 +37,7 @@
 
 <composite:interface>
 	<composite:attribute name="query" required="true" />
+	<composite:attribute name="offer" required="false" />
 	<composite:attribute name="makeOffer" required="false" default="false"  />
 </composite:interface>
 
@@ -90,7 +91,7 @@
 					</h:panelGroup>
 
 					<h:panelGroup styleClass="pull-right">
-						<h:commandButton action="#{offerBean.saveOffer(cc.attrs.query)}"
+						<h:commandButton action="#{offerBean.saveOffer(cc.attrs.query, cc.attrs.offer)}"
 							value="#{label['querydetail.action.addOffer.buttontext']}"
 							title="#{label['querydetail.action.addOffer']}"
 							styleClass="btn btn-primary" />

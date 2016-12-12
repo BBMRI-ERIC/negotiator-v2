@@ -26,106 +26,108 @@
   -->
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-    xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
-    template="../components/default.xhtml">
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
+	template="../components/default.xhtml">
 
-    <!-- Queries detail page for the owner -->
+	<!-- Queries detail page for the owner -->
 
-    <f:metadata>
-        <f:viewParam name="queryId" value="#{researcherQueriesDetailBean.queryId}" />
-        <f:viewAction action="#{researcherQueriesDetailBean.initialize}" />
-    </f:metadata>
+	<f:metadata>
+		<f:viewParam name="queryId"
+			value="#{researcherQueriesDetailBean.queryId}" />
+		<f:viewAction action="#{researcherQueriesDetailBean.initialize}" />
+	</f:metadata>
 
-<ui:param name="bodyClass" value="container-fluid" />
+	<ui:param name="bodyClass" value="container-fluid" />
 
-    <ui:define name="body">
+	<ui:define name="body">
 
-        <h:panelGroup layout="block" styleClass="col-md-3">
+		<h:panelGroup layout="block" styleClass="col-md-3">
 
-            <h:panelGroup layout="block" styleClass="row queriesTopLine"
-                style='visibility: hidden'>
-                <h:panelGroup layout="block" styleClass="col-md-6">
-                    <a href="#" class="btn btn-danger btn-sm btn-block" role="button"><i
-                        class="glyphicon glyphicon-edit"></i> #{label['global.newQuery']}</a>
+			<h:panelGroup layout="block" styleClass="row queriesTopLine"
+				style='visibility: hidden'>
+				<h:panelGroup layout="block" styleClass="col-md-6">
+					<a href="#" class="btn btn-danger btn-sm btn-block" role="button"><i
+						class="glyphicon glyphicon-edit"></i> #{label['global.newQuery']}</a>
 
-                    <p />
-                </h:panelGroup>
-            </h:panelGroup>
+					<p />
+				</h:panelGroup>
+			</h:panelGroup>
 
-            <h:form>
+			<h:form>
 
-                <ui:repeat var="item" value="#{researcherQueriesDetailBean.queries}">
+				<ui:repeat var="item" value="#{researcherQueriesDetailBean.queries}">
 
-                    <h:link outcome="detail" styleClass="deco-none">
-                        <f:param name="queryId" value="#{item.query.id}" />
+					<h:link outcome="detail" styleClass="deco-none">
+						<f:param name="queryId" value="#{item.query.id}" />
 
-                        <h:panelGroup layout="block"
-                            styleClass="panel panel-default #{item.query.id == researcherQueriesDetailBean.queryId ? 'selected-query' : ''}">
+						<h:panelGroup layout="block"
+							styleClass="panel panel-default #{item.query.id == researcherQueriesDetailBean.queryId ? 'selected-query' : ''}">
 
-                            <h:panelGroup layout="block" styleClass="panel-heading">
+							<h:panelGroup layout="block" styleClass="panel-heading">
 
                                 #{item.query.title}
 
                                 <h:panelGroup styleClass="pull-right"
-                                    rendered="#{item.commentCount > 0}">
+									rendered="#{item.commentCount > 0}">
 
-                                    <h:panelGroup styleClass="badge queryNumberResponsesBadge">
-                                        <h:outputText
-                                            title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-                                            value="#{item.commentCount}" />
-                                    </h:panelGroup>
+									<h:panelGroup styleClass="badge queryNumberResponsesBadge">
+										<h:outputText
+											title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
+											value="#{item.commentCount}" />
+									</h:panelGroup>
 
-                                    <h:outputText value="#{item.lastCommentTime}"
-                                        styleClass="queryCreationDate"
-                                        title="#{label['queryview.queryitem.datetime.last.comment']}">
-                                        <f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-                                    </h:outputText>
+									<h:outputText value="#{item.lastCommentTime}"
+										styleClass="queryCreationDate"
+										title="#{label['queryview.queryitem.datetime.last.comment']}">
+										<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+									</h:outputText>
 
-                                </h:panelGroup>
+								</h:panelGroup>
 
-                            </h:panelGroup>
+							</h:panelGroup>
 
 
-                            <h:panelGroup layout="block" styleClass="panel-body">
-                                <h:panelGroup layout="block" styleClass="row">
+							<h:panelGroup layout="block" styleClass="panel-body">
+								<h:panelGroup layout="block" styleClass="row">
 
-                                    <h:panelGroup layout="block" styleClass="col-md-11">
-                                        <h:panelGroup layout="block" styleClass="row">
-                                            <h:panelGroup layout="block" styleClass="col-md-10">
+									<h:panelGroup layout="block" styleClass="col-md-11">
+										<h:panelGroup layout="block" styleClass="row">
+											<h:panelGroup layout="block" styleClass="col-md-10">
                                                 #{item.query.text}
                                             </h:panelGroup>
 
-                                        </h:panelGroup>
+										</h:panelGroup>
 
-                                        <h:panelGroup layout="block" styleClass="row">
-                                            <h:panelGroup layout="block" styleClass="col-md-12">
-                                                <h:panelGroup styleClass="pull-right">
+										<h:panelGroup layout="block" styleClass="row">
+											<h:panelGroup layout="block" styleClass="col-md-12">
+												<h:panelGroup styleClass="pull-right">
 
-                                                    <h:outputText value="#{item.query.queryCreationTime}"
-                                                        title="#{label['queryview.queryitem.datetime.creation']}">
-                                                        <f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-                                                    </h:outputText>
-                                                </h:panelGroup>
-                                            </h:panelGroup>
-                                        </h:panelGroup>
-                                    </h:panelGroup>
-                                </h:panelGroup>
-                            </h:panelGroup>
+													<h:outputText value="#{item.query.queryCreationTime}"
+														title="#{label['queryview.queryitem.datetime.creation']}">
+														<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+													</h:outputText>
+												</h:panelGroup>
+											</h:panelGroup>
+										</h:panelGroup>
+									</h:panelGroup>
+								</h:panelGroup>
+							</h:panelGroup>
 
-                        </h:panelGroup>
+						</h:panelGroup>
 
 
-                    </h:link>
+					</h:link>
 
-                </ui:repeat>
+				</ui:repeat>
 
-            </h:form>
+			</h:form>
 
-        </h:panelGroup>
+		</h:panelGroup>
 
 		<h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1"
 			id="right-panel">
@@ -152,43 +154,70 @@
 					</h:outputText>
 					<br />
 					<br></br>
-				</h:panelGroup>		
-				
+				</h:panelGroup>
+
 				<h:panelGroup layout="block" styleClass="pull-right">
-						<h:outputText
-							title="#{label['queryview.queryitem.datetime.creation']}"
-							value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
-							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-						</h:outputText>
-				</h:panelGroup>				
+					<h:outputText
+						title="#{label['queryview.queryitem.datetime.creation']}"
+						value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
+						<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+					</h:outputText>
+				</h:panelGroup>
 			</h:panelGroup>
 
-            <br></br>
+			<br></br>
+
+			<h:panelGroup
+				rendered="#{researcherQueriesDetailBean.collections.size() > 0}"
+				layout="block">
+
+				<a href="#" data-toggle="collapse" data-target="#collection-list">
+					#{label['queryview.action.showcollections']} </a>
+
+				<div id="collection-list" class="collapse">
+					<ul>
+						<ui:repeat value="#{researcherQueriesDetailBean.collections}"
+							var="collection">
+							<li>#{collection.name}</li>
+						</ui:repeat>
+					</ul>
+				</div>
+
+			</h:panelGroup>
+
+			<h:panelGroup
+				rendered="#{researcherQueriesDetailBean.collections.size() == 0}"
+				layout="block">
+				<h:outputLabel value="#{label['queryview.title.nocollections']}"
+					styleClass="form-control-static" />
+			</h:panelGroup>
 
 			<h:form id="uploadform" enctype="multipart/form-data">
-                 <h:outputText value="#{label['querydetail.title.attachments']}" title="#{label['attachmentview.tooltip.attachment']}" 
-                 	styleClass="attachment-title"/>
+				<h:outputText value="#{label['querydetail.title.attachments']}"
+					title="#{label['attachmentview.tooltip.attachment']}"
+					styleClass="attachment-title" />
 
 				<h:panelGroup styleClass="row" layout="block">
 					<h:panelGroup styleClass="col-md-12" layout="block">
-						<h:panelGroup layout="block" styleClass="col-md-6" >
-							<ui:repeat value="#{researcherQueriesDetailBean.attachments}" var="attachment">
+						<h:panelGroup layout="block" styleClass="col-md-6">
+							<ui:repeat value="#{researcherQueriesDetailBean.attachments}"
+								var="attachment">
 								<h:panelGroup layout="block" styleClass="row">
 									<h:panelGroup layout="block" styleClass="form-group">
 										<h:panelGroup class="input-group" layout="block">
-											<h:outputLink value="../attachment/#{attachment.attachment}" styleClass="input-group-addon"
-													style="text-align: left;">
+											<h:outputLink value="../attachment/#{attachment.attachment}"
+												styleClass="input-group-addon" style="text-align: left;">
 												<h:outputText value="#{attachment.attachment}"
-															  title="#{label['attachmentview.tooltip.attachmentDownload']}"
-															  style="color:#333" />
+													title="#{label['attachmentview.tooltip.attachmentDownload']}"
+													style="color:#333" />
 											</h:outputLink>
 
-											<label class="input-group-btn">
-												<h:commandLink styleClass="btn btn-default" style="color:#333;"
-															   action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}"
-															   title="#{label['attachmentview.tooltip.attachmentDelete']}">
+											<label class="input-group-btn"> <h:commandLink
+													styleClass="btn btn-default" style="color:#333;"
+													action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}"
+													title="#{label['attachmentview.tooltip.attachmentDelete']}">
 													<i class="fa fa-times" aria-hidden="true"
-													   style="font-size: 13px;" />
+														style="font-size: 13px;" />
 												</h:commandLink>
 											</label>
 										</h:panelGroup>
@@ -197,28 +226,32 @@
 							</ui:repeat>
 
 							<!-- Show that there are no uploads yet -->
-							<h:panelGroup layout="block" rendered="#{researcherQueriesDetailBean.attachments.size() == 0}" styleClass="row">
+							<h:panelGroup layout="block"
+								rendered="#{researcherQueriesDetailBean.attachments.size() == 0}"
+								styleClass="row">
 								<h:panelGroup styleClass="form-group" layout="block">
-									<h:outputLabel value="#{label['attachmentview.text.noattachments']}" styleClass="form-control-static"/>
+									<h:outputLabel
+										value="#{label['attachmentview.text.noattachments']}"
+										styleClass="form-control-static" />
 								</h:panelGroup>
 							</h:panelGroup>
 						</h:panelGroup>
 
-						<h:panelGroup layout="block" styleClass="col-md-6" >
+						<h:panelGroup layout="block" styleClass="col-md-6">
 							<h:panelGroup class="input-group" layout="block">
-								<input type="text" class="form-control" readonly="readonly"/>
+								<input type="text" class="form-control" readonly="readonly" />
 
-								<label class="input-group-btn">
-									<h:panelGroup class="btn btn-default">
-										<h:outputText value="#{label['querydetail.action.browse']}"/>
+								<label class="input-group-btn"> <h:panelGroup
+										class="btn btn-default">
+										<h:outputText value="#{label['querydetail.action.browse']}" />
 										<h:inputFile id="file"
-													 value="#{researcherQueriesDetailBean.file}"
-													 validator="#{researcherQueriesDetailBean.validateFile}"
-													 onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');" style="display: none;"/>
-									</h:panelGroup>
-									<h:commandButton id="uploadBtn" value="Upload"
-													 action="#{researcherQueriesDetailBean.uploadAttachment}"
-													 styleClass="btn btn-primary disabled" />
+											value="#{researcherQueriesDetailBean.file}"
+											validator="#{researcherQueriesDetailBean.validateFile}"
+											onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
+											style="display: none;" />
+									</h:panelGroup> <h:commandButton id="uploadBtn" value="Upload"
+										action="#{researcherQueriesDetailBean.uploadAttachment}"
+										styleClass="btn btn-primary disabled" />
 								</label>
 							</h:panelGroup>
 
@@ -230,7 +263,7 @@
 						</h:panelGroup>
 					</h:panelGroup>
 				</h:panelGroup>
-            </h:form>
+			</h:form>
 
 			<h:panelGroup styleClass="col-md-12" layout="block">
 
@@ -255,10 +288,10 @@
 
 			<h:panelGroup layout="block" style="margin-top:60px;">
 
-				<ul class="nav nav-tabs">
-					<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+				<ul class="nav nav-tabs"  id="myTab">
+					<li class="active" id="first"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
 					</li>
-					<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
+					<li id="second"><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
 					</li>
 				</ul>
 
@@ -285,18 +318,79 @@
 
 					<div id="sampleAvailability" class="tab-pane fade">
 
-						<h3>#{label['querydetail.title.sampleAvailability']}</h3>	
-			            
-						<h:outputText value="#{label['message.offerSamples']}" />
-						
+						<h3>#{label['querydetail.title.sampleAvailability']}</h3>
 
+						<p>
+							<b> <h:outputText value="#{label['message.noOffers']}"
+									rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}" />
+							</b>
+						</p>
+
+						<c:forEach begin="1"
+							end="#{researcherQueriesDetailBean.offerMakers.size()}" var="i">
+							<div class="panel panel-default">
+								<div class="panel-heading" role="tab" id="heading#{i}">
+									<h4 class="panel-title">
+										<a 
+										    role="button" data-toggle="collapse"
+											data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
+											aria-controls="sample-list"> Biobanker #{i} 
+										</a>
+									</h4>
+								</div>
+								<div id="hh#{i}" class="panel-collapse collapse" role="tabpanel"
+									aria-labelledby="heading#{i}">
+
+
+
+									<div class="panel-body">										                                    
+										<ui:repeat
+											value="#{researcherQueriesDetailBean.listOfSampleOffers[i-1]}"
+											var="offers">
+
+											<bbmricc:comment comment="#{offers.offer}"
+												person="#{offers.person}"
+												collections="#{offers.collections}" />
+
+										</ui:repeat>
+
+										<div class="col-xs-12">
+											<hr></hr>
+										</div>
+										
+										<bbmricc:commentReply makeOffer="true"				                            
+				                            query="#{researcherQueriesDetailBean.selectedQuery}"
+				                            offer="#{researcherQueriesDetailBean.offerMakers[i-1]}" />
+									</div>
+								</div>
+							</div>
+						</c:forEach>
+
+						
 					</div>
 				</div>
 
 			</h:panelGroup>
+			
+			<h:outputScript>				
+				$(function() { 
+				   
+				    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+				   
+				        localStorage.setItem('lastTab', $(this).attr('href'));
+				    });
+								   
+				    var lastTab = localStorage.getItem('lastTab');
+				    if (lastTab) {
+				        $('[href="' + lastTab + '"]').tab('show');
+				    }
+				});
+		   </h:outputScript>
+			
+			
+			
 		</h:panelGroup>
-		    
-    </ui:define>
+
+	</ui:define>
 
 </ui:composition>
-    

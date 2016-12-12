@@ -67,18 +67,8 @@ public class OfferBean extends Observable {
      * @param query
      * @return
      */
-    public void saveOffer(Query query) {
-        try(Config config = ConfigFactory.get()) {
-
-            /**
-             * Will be improved while working on researcher view for offers.
-             *
-             */
-            if (userBean.getBiobankOwner() )
-            {
-                setOfferFrom(userBean.getUserId());
-            }
-
+    public String saveOffer(Query query, Integer offerFrom ) {
+        try (Config config = ConfigFactory.get()) {
             DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
 
@@ -92,6 +82,9 @@ public class OfferBean extends Observable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
     }
 
     /**

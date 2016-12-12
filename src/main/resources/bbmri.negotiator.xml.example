@@ -82,9 +82,9 @@
 
         <c:database>negotiator</c:database>
 
-        <c:username>paul</c:username>
+        <c:username>saher</c:username>
 
-        <c:password></c:password>
+        <c:password>saher</c:password>
 
     </postgresql>
 
