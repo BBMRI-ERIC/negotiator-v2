@@ -26,8 +26,8 @@
 
 package de.samply.bbmri.negotiator.control;
 
+import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Observable;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -44,7 +44,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 @ManagedBean
 @ViewScoped
-public class OfferBean extends Observable {
+public class OfferBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
