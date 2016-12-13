@@ -77,10 +77,6 @@ hr {
     padding-left: 15px;
 }
 
-#filterList a {
-    color: black;
-}
-
 #filterInputButtons {
     padding-right: 15px;
 }
@@ -149,14 +145,6 @@ hr {
     background-color: #eee;
 }
 
-.selected-query .panel-heading {
-    background-color: #ccc;
-}
-
-.selected-query .panel-body {
-    background-color: #eee;
-}
-
 .avatar-pic-comment-column {
 	width: 80px;
 }
@@ -204,4 +192,18 @@ a:hover {
  cursor:pointer;
 }
 
+.archived-query .panel-heading {
+    background-color: #ccc;
+}
 
+.archived-query .panel-body {
+    background-color: #eee;
+}
+
+/* Glowing */
+.panel.selected-query {
+    border-color: #004275;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
