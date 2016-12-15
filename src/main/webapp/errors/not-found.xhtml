@@ -31,34 +31,11 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
 	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
-	template="components/default.xhtml">
+	template="base.xhtml">
 
 
 	<ui:param name="bodyClass" value="container" />
 
-	<ui:define name="body">
-		<h1>#{label['error.title']}</h1>
-
-		<h3>
-			<h:outputText value="#{label['error.serverError']}"/>
-		</h3>
-
-		<h3>
-			<h:link outcome="index" value="#{label['error.action.startPage']}"/>
-		</h3>
-
-		<div style="text-align: center;">
-			<a href="#" data-toggle="collapse" data-target="#stacktrace">
-				#{label['error.action.showStackTrace']}
-			</a>
-		</div>
-
-		<div id="stacktrace" class="collapse">
-			<pre>
-				<h:outputText value="#{bbmri:getStackTrace(requestScope['javax.servlet.error.exception'])}" />
-			</pre>
-		</div>
-
-	</ui:define>
+	<ui:param name="errorLabel" value="#{label['error.not-found']}"/>
 
 </ui:composition>

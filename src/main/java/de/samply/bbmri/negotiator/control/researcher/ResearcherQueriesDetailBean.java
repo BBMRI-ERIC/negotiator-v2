@@ -41,8 +41,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.samply.bbmri.negotiator.Config;
@@ -131,7 +129,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
-    public void initialize() {
+    public String initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
             setOfferMakers(DbUtil.getOfferMakers(config, queryId));
@@ -143,7 +141,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
             }
 
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
-            displayHumanReadableQuery();
 
             collections = DbUtil.getCollectionsForQuery(config, queryId);
 
@@ -155,9 +152,29 @@ public class ResearcherQueriesDetailBean implements Serializable {
                     selectedQuery = query.getQuery();
                 }
             }
-        } catch (SQLException e) {
+
+            if(selectedQuery == null) {
+                /**
+                 * If it is null, it means that either the user can not access it due to insufficient privileges,
+                 * or that the query simply does not exist.
+                 */
+                return "/errors/not-found.xhtml";
+            } else {
+                /**
+                 * We already have the query and the JSON from the directory from the database in the selectedQuery attribute, no need
+                 * to get it from the database again.
+                 */
+                RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+                ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+                queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
+                setHumanReadableQuery(queryDTO.getHumanReadable());
+            }
+
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 
 
@@ -165,35 +182,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * Redirects the user to directory for editing the query
      */
     public String editQuery() {
-        return queryDTO.getUrl() + "&nToken=" + selectedQuery.getNegotiatorToken();
+        if(queryDTO != null && selectedQuery != null) {
+            return queryDTO.getUrl() + "&nToken=" + selectedQuery.getNegotiatorToken();
+        } else {
+            return "http://test.com";
+        }
     }
 
-    /**
-     * Read structured query from DataBase and display in human readable form.
-     *
-     */
-    public void displayHumanReadableQuery() {
-        String jsonText = null;
-        try(Config config = ConfigFactory.get()) {
-        	jsonText = DbUtil.getQuery(config, queryId);
-        	RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
-            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-            queryDTO = mapper.readValue(jsonText, QueryDTO.class);
-        	setHumanReadableQuery(queryDTO.getHumanReadable());
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    }
 
     /**
      * Returns the list of queries in which the current bio bank owner is a part of(all queries that on owner can see)
