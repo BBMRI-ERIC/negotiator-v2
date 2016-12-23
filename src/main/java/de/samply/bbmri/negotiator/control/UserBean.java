@@ -212,7 +212,6 @@ public class UserBean implements Serializable {
 	 */
 	public void login(AuthClient client) throws InvalidTokenException, InvalidKeyException {
 		accessToken = client.getAccessToken();
-		idToken = client.getIDToken();
 
 		/**
 		 * Make sure that if the access token contains a state parameter, that it matches the state variable. If it does
@@ -220,15 +219,13 @@ public class UserBean implements Serializable {
 		 */
 		if (!StringUtil.isEmpty(accessToken.getState()) && !state.equals(accessToken.getState())) {
 			accessToken = null;
-			idToken = null;
 			refreshToken = null;
 			biobankOwner = false;
 			researcher = false;
 			return;
 		}
 
-		userIdentity = idToken.getSubject();
-
+		userIdentity = client.getAccessToken().getSubject();
 		userRealName = client.getUser().getName();
 		userEmail = client.getUser().getEmail();
 
