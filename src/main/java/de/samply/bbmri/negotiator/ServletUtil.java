@@ -28,14 +28,10 @@ package de.samply.bbmri.negotiator;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Properties;
 
-import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import de.samply.string.util.StringUtil;
@@ -60,7 +56,7 @@ public class ServletUtil {
     private static String buildCommitBranch = null;
 
     /** The synchronized object. */
-    private static Object synchronizedObject = new Object();
+    private final static Object synchronizedObject = new Object();
 
     /**
      * Returns the *domain* without the last subdomain.
@@ -158,32 +154,6 @@ public class ServletUtil {
         return buildCommitBranch;
     }
 
-
-    public static Cookie getCookie(HttpServletRequest request, String name) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals(name)) {
-                    return cookie;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Executes a Shibboleth Logout and returns to the given URL.
-     *
-     * @param url the url
-     */
-    public static void logoutShibboleth(String url) {
-        try {
-            FacesContext.getCurrentInstance().getExternalContext().redirect("/Shibboleth.sso/Logout?return=" +
-                    URLEncoder.encode(url, StandardCharsets.UTF_8.displayName()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Loads the properties from the servlet context.
