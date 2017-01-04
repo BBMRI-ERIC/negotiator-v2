@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri">
+
+<composite:interface>
+	<composite:attribute name="backingBean" required="true"
+		shortDescription="A backing bean to invoke filter methods." />
+</composite:interface>
+
+<composite:implementation>
+
+	<h:panelGroup layout="block" styleClass="row queriesTopLine">
+		<h:panelGroup id="filterList" layout="block"
+			styleClass="pull-left col-md-12">
+			<h:form styleClass="form-horizontal">
+
+				<h:outputLabel for="filterInputText"
+					value="#{label['queryview.title.search']}"
+					styleClass="col-md-2 control-label pull-left" />
+				<h:panelGroup class="col-md-5 pull-left">
+					<h:panelGroup class="input-group">
+						<h:inputText value="#{sessionBean.filter}" size="20"
+							id="filterInputText"
+							pt:placeholder="#{label['queryview.search']}"
+							title="#{label['queryview.tooltip.searchbox']}"
+							styleClass="form-control" />
+						<h:panelGroup class="input-group-btn">
+							<h:commandButton id="addFilterButton"
+								action="#{cc.attrs.backingBean.addFilter()}" style="display: none;" />
+
+							<h:commandLink styleClass="btn btn-default"
+								title="#{label['queryview.tooltip.searchIcon']}"
+								action="#{cc.attrs.backingBean.addFilter()}">
+								<i class="fa fa-search"></i>
+							</h:commandLink>
+						</h:panelGroup>
+					</h:panelGroup>
+				</h:panelGroup>
+
+				<h:panelGroup styleClass="search-top-margin col-md-5 pull-left">
+					<ui:repeat var="item" value="#{sessionBean.filters}">
+						<h:panelGroup styleClass="badge filterBadge">#{item}
+                            <h:commandLink	action="#{cc.attrs.backingBean.removeFilter(item)}">
+								<i class="fa fa-times"></i>
+							</h:commandLink>
+						</h:panelGroup>
+					</ui:repeat>
+				</h:panelGroup>
+			</h:form>
+		</h:panelGroup>
+	</h:panelGroup>
+
+
+
+</composite:implementation>
+
+</html>

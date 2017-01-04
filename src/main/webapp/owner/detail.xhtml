@@ -46,49 +46,12 @@
 	<ui:define name="body">
 
 		<h:panelGroup layout="block" styleClass="col-md-3">
-			<h:panelGroup layout="block" styleClass="row queriesTopLine">
-				<h:panelGroup id="filterList" layout="block"
-					styleClass="pull-left col-md-12">
-					<h:form styleClass="form-horizontal">
-
-						<h:outputLabel for="filterInputText"
-							value="#{label['queryview.title.search']}"
-							styleClass="col-md-2 control-label pull-left" />
-						<h:panelGroup class="col-md-5 pull-left">
-							<h:panelGroup class="input-group">
-								<h:inputText value="#{sessionBean.filter}" size="20"
-									id="filterInputText"
-									pt:placeholder="#{label['queryview.search']}"
-									title="#{label['queryview.tooltip.searchbox']}"
-									styleClass="form-control" />
-								<h:panelGroup class="input-group-btn">
-									<h:commandButton id="addFilterButton"
-										action="#{ownerQueriesDetailBean.addFilter()}"
-										style="display: none;" />
-
-									<h:commandLink styleClass="btn btn-default"
-										title="#{label['queryview.tooltip.searchIcon']}"
-										action="#{ownerQueriesDetailBean.addFilter()}">
-										<i class="fa fa-search"></i>
-									</h:commandLink>
-								</h:panelGroup>
-							</h:panelGroup>
-						</h:panelGroup>
-
-						<h:panelGroup styleClass="search-top-margin col-md-5 pull-left">
-							<ui:repeat var="item" value="#{sessionBean.filters}">
-								<h:panelGroup styleClass="badge filterBadge">#{item}
-                                    <h:commandLink
-										action="#{ownerQueriesDetailBean.removeFilter(item)}">
-										<i class="fa fa-times"></i>
-									</h:commandLink>
-								</h:panelGroup>
-							</ui:repeat>
-						</h:panelGroup>
-					</h:form>
-				</h:panelGroup>
-			</h:panelGroup>
-
+			
+			
+			
+			<bbmricc:searchDetail backingBean="#{ownerQueriesDetailBean}"/>
+			
+			
 
 
 			<h:panelGroup id="test" layout="block">

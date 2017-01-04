@@ -48,15 +48,7 @@
 
 		<h:panelGroup layout="block" styleClass="col-md-3">
 
-			<h:panelGroup layout="block" styleClass="row queriesTopLine"
-				style='visibility: hidden'>
-				<h:panelGroup layout="block" styleClass="col-md-6">
-					<a href="#" class="btn btn-danger btn-sm btn-block" role="button"><i
-						class="glyphicon glyphicon-edit"></i> #{label['global.newQuery']}</a>
-
-					<p />
-				</h:panelGroup>
-			</h:panelGroup>
+			<bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
 
 			<h:form>
 
