@@ -204,4 +204,10 @@ a:hover {
  cursor:pointer;
 }
 
+.tabSubtitle {
+	margin: 0 auto;
+    width: 10em;
+    display: block;
+    color: #999999;
+}
 
