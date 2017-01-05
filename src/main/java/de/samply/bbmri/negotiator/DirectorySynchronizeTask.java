@@ -53,7 +53,7 @@ public class DirectorySynchronizeTask extends TimerTask {
         try(Config config = ConfigFactory.get()) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
-            DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisUrl(),
+            DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisRestUrl(),
                     negotiatorConfig.getMolgenisResourceBiobanks(), negotiatorConfig.getMolgenisResourceCollections());
 
             logger.info("Starting synchronization with the directory");

@@ -2,6 +2,8 @@
 
 ## Version 0.0.1
 
+- Added another URL for molgenis in case the URL for the REST interface is different
+  from the URL used to create the query
 - Added ClamAV settings for virus detection, see example configuration file
 - Switched to Perun as authentication. The example configuration file now contains the values for perun. Set "de.samply.development" to true
   to enable the development mode, which is necessary for now.

@@ -66,11 +66,18 @@ public class Negotiator implements Serializable {
     private String molgenisResourceCollections;
 
     /**
-     * The URL for the synchronization with the directory.
+     * The URL used to redirect the user to create a new query
      */
     @XmlElement
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private String molgenisUrl;
+
+    /**
+     * The URL for the synchronization with the directory.
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String molgenisRestUrl;
 
     /**
      * The password that molgenis will use for the directory REST endpoint
@@ -288,6 +295,14 @@ public class Negotiator implements Serializable {
 
     public void setPerunUsername(String perunUsername) {
         this.perunUsername = perunUsername;
+    }
+
+    public String getMolgenisRestUrl() {
+        return molgenisRestUrl;
+    }
+
+    public void setMolgenisRestUrl(String molgenisRestUrl) {
+        this.molgenisRestUrl = molgenisRestUrl;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
