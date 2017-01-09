@@ -92,6 +92,18 @@ public class Negotiator implements Serializable {
     private String molgenisUsername;
 
     /**
+     * The username for the Molgenis API
+     */
+    @XmlElement
+    private String molgenisApiUsername;
+
+    /**
+     * The password for the Molgenis API
+     */
+    @XmlElement
+    private String molgenisApiPassword;
+
+    /**
      * The password that molgenis will use for the directory REST endpoint
      */
     @XmlElement
@@ -303,6 +315,22 @@ public class Negotiator implements Serializable {
 
     public void setMolgenisRestUrl(String molgenisRestUrl) {
         this.molgenisRestUrl = molgenisRestUrl;
+    }
+
+    public String getMolgenisApiUsername() {
+        return molgenisApiUsername;
+    }
+
+    public void setMolgenisApiUsername(String molgenisApiUsername) {
+        this.molgenisApiUsername = molgenisApiUsername;
+    }
+
+    public String getMolgenisApiPassword() {
+        return molgenisApiPassword;
+    }
+
+    public void setMolgenisApiPassword(String molgenisApiPassword) {
+        this.molgenisApiPassword = molgenisApiPassword;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
