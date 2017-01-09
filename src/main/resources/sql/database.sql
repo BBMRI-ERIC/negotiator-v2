@@ -20,7 +20,7 @@ COMMENT ON COLUMN biobank."directory_id" IS 'The directory ID, e.g. eu_bbmri_eri
 
 CREATE TABLE collection (
     "id" SERIAL NOT NULL,
-    "name" CHARACTER VARYING(255) NOT NULL,
+    "name" TEXT NOT NULL,
     "directory_id" CHARACTER VARYING(255) NOT NULL UNIQUE,
     "biobank_id" INTEGER REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY ("id")
