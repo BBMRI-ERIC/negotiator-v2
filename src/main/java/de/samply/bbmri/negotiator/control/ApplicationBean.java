@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.control;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.sql.ResultSet;
+import java.util.Map;
 import java.util.Random;
 
 import javax.annotation.PostConstruct;
@@ -148,7 +149,39 @@ public class ApplicationBean implements Serializable {
     public void redirectToIndexPage() {
         FacesContext fc = FacesContext.getCurrentInstance();
         ConfigurableNavigationHandler nav = (ConfigurableNavigationHandler) fc.getApplication().getNavigationHandler();
-
         nav.performNavigation("index");
+    }
+
+    public Map<NegotiatorStatus.NegotiatorTaskType, NegotiatorStatus.NegotiatorTaskStatus> getSuccessStatus() {
+        return NegotiatorStatus.get().getSuccessMap();
+    }
+
+    public Map<NegotiatorStatus.NegotiatorTaskType, NegotiatorStatus.NegotiatorTaskStatus> getFailStatus() {
+        return NegotiatorStatus.get().getFailMap();
+    }
+
+    /**
+     * Returns the JSF version of the currently used JSF library
+     * @return
+     */
+    public String getJSFVersion() {
+        return FacesContext.class.getPackage().getImplementationVersion();
+    }
+
+    /**
+     * Returns the JSF vendor of the currently used JSF library
+     * @return
+     */
+    public String getJSFTitle() {
+        return FacesContext.class.getPackage().getImplementationTitle();
+    }
+
+    /**
+     * Returns the database version.
+     *
+     * @return the database version
+     */
+    public String getDBVersion() {
+        return "" + Constants.DB_REQUIRED_VERSION;
     }
 }

@@ -72,8 +72,12 @@ public class DirectorySynchronizeTask extends TimerTask {
 
             logger.info("Synchronization with the directory finished.");
             config.commit();
+
+            NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY,
+                    "Biobanks: " + allBiobanks.size() + ", Collections: " + allCollections.size());
         } catch (Exception e) {
             logger.error("Synchronization failed", e);
+            NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
         }
     }
 }
