@@ -48,15 +48,7 @@
 
 		<h:panelGroup layout="block" styleClass="col-md-3">
 
-			<h:panelGroup layout="block" styleClass="row queriesTopLine"
-				style='visibility: hidden'>
-				<h:panelGroup layout="block" styleClass="col-md-6">
-					<a href="#" class="btn btn-danger btn-sm btn-block" role="button"><i
-						class="glyphicon glyphicon-edit"></i> #{label['global.newQuery']}</a>
-
-					<p />
-				</h:panelGroup>
-			</h:panelGroup>
+			<bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
 
 			<h:form>
 
@@ -299,7 +291,9 @@
 					<div id="comments" class="tab-pane fade in active">
 
 						<h3>#{label['querydetail.title.comments']}</h3>
-
+							<span id="commentsSubtitle" class="tabSubtitle"> #{label['querydetail.subtitle.commentsAvailability']} </span>
+							<p></p>
+							
 						<ui:repeat value="#{researcherQueriesDetailBean.comments}"
 							var="comment">
 
@@ -319,6 +313,8 @@
 					<div id="sampleAvailability" class="tab-pane fade">
 
 						<h3>#{label['querydetail.title.sampleAvailability']}</h3>
+									<span id="sampleAvailabilitySubtitle" class="tabSubtitle"> #{label['querydetail.subtitle.sampleAvailability']} </span>
+						
 
 						<p>
 							<b> <h:outputText value="#{label['message.noOffers']}"

@@ -31,6 +31,7 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
 	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
+	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
 	template="../components/default.xhtml">
 
 	<!-- Queries page for the researcher -->
@@ -56,8 +57,12 @@
                            #{label['queryview.title.createNewQuery']}
                 </h:outputLink>
 			</h:panelGroup>
+			
+			<h:panelGroup layout="block" style="margin-top:60px">
+			    <bbmricc:search backingBean="#{researcherQueriesBean}"/>
+			</h:panelGroup>
 
-			<h:panelGroup layout="block" style="margin-top:20px" styleClass="col-md-12">
+			<h:panelGroup layout="block" styleClass="col-md-12">
 				<h:form>
 					<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
 						

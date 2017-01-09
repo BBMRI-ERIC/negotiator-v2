@@ -196,6 +196,13 @@ a:hover {
     background-color: #ccc;
 }
 
+.tabSubtitle {
+	margin: 0 auto;
+    width: 10em;
+    display: block;
+    color: #999999;
+}
+
 .archived-query .panel-body {
     background-color: #eee;
 }

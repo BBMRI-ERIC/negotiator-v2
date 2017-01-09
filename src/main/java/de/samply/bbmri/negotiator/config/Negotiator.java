@@ -66,11 +66,18 @@ public class Negotiator implements Serializable {
     private String molgenisResourceCollections;
 
     /**
-     * The URL for the synchronization with the directory.
+     * The URL used to redirect the user to create a new query
      */
     @XmlElement
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private String molgenisUrl;
+
+    /**
+     * The URL for the synchronization with the directory.
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String molgenisRestUrl;
 
     /**
      * The password that molgenis will use for the directory REST endpoint
@@ -83,6 +90,18 @@ public class Negotiator implements Serializable {
      */
     @XmlElement
     private String molgenisUsername;
+
+    /**
+     * The username for the Molgenis API
+     */
+    @XmlElement
+    private String molgenisApiUsername;
+
+    /**
+     * The password for the Molgenis API
+     */
+    @XmlElement
+    private String molgenisApiPassword;
 
     /**
      * The password that molgenis will use for the directory REST endpoint
@@ -288,6 +307,30 @@ public class Negotiator implements Serializable {
 
     public void setPerunUsername(String perunUsername) {
         this.perunUsername = perunUsername;
+    }
+
+    public String getMolgenisRestUrl() {
+        return molgenisRestUrl;
+    }
+
+    public void setMolgenisRestUrl(String molgenisRestUrl) {
+        this.molgenisRestUrl = molgenisRestUrl;
+    }
+
+    public String getMolgenisApiUsername() {
+        return molgenisApiUsername;
+    }
+
+    public void setMolgenisApiUsername(String molgenisApiUsername) {
+        this.molgenisApiUsername = molgenisApiUsername;
+    }
+
+    public String getMolgenisApiPassword() {
+        return molgenisApiPassword;
+    }
+
+    public void setMolgenisApiPassword(String molgenisApiPassword) {
+        this.molgenisApiPassword = molgenisApiPassword;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

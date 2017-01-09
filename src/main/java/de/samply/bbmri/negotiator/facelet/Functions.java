@@ -26,6 +26,9 @@
 
 package de.samply.bbmri.negotiator.facelet;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
@@ -42,6 +45,17 @@ public class Functions {
     public static String userImage(Integer userId) {
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         return externalContext.getApplicationContextPath() + "/images?userId=" + userId;
+    }
+
+    /**
+     * Returns the whole stack trace output for the given exception
+     * @param e the exception
+     * @return
+     */
+    public static String getStackTrace(Exception e) {
+        StringWriter writer = new StringWriter();
+        e.printStackTrace(new PrintWriter(writer, true));
+        return writer.toString();
     }
 
 }

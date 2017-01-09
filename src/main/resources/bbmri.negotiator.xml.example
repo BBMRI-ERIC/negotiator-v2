@@ -38,7 +38,13 @@
 
     <molgenisResourceCollections>eu_bbmri_eric_collections</molgenisResourceCollections>
 
+    <molgenisApiUsername>molgenis@negotiator.bbmri</molgenisApiUsername>
+
+    <molgenisApiPassword>gogogo</molgenisApiPassword>
+
     <molgenisUrl>https://molgenis52.gcc.rug.nl</molgenisUrl>
+
+    <molgenisRestUrl>https://molgenis52.gcc.rug.nl</molgenisRestUrl>
 
     <attachmentPath>/home/my-upload-folder/uploads/</attachmentPath>
 

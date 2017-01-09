@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
   ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
   ~ Deutsches Krebsforschungszentrum in Heidelberg
@@ -24,23 +24,18 @@
   ~ License, version 2.0, the licensors of this Program grant you additional
   ~ permission to convey the resulting work.
   -->
-<facelet-taglib version="2.2"
-                xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd">
 
-    <namespace>http://negotiator.bbmri.dkfz.de/functions</namespace>
-    
-    <function>
-        <function-name>userImage</function-name>
-        <function-class>de.samply.bbmri.negotiator.facelet.Functions</function-class>
-        <function-signature>java.lang.String userImage(java.lang.Integer)</function-signature>
-    </function>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
+	template="base.xhtml">
 
-    <function>
-        <function-name>getStackTrace</function-name>
-        <function-class>de.samply.bbmri.negotiator.facelet.Functions</function-class>
-        <function-signature>java.lang.String getStackTrace(java.lang.Exception)</function-signature>
-    </function>
 
-</facelet-taglib>
+	<ui:param name="bodyClass" value="container" />
+
+	<ui:param name="errorLabel" value="#{label['error.serverError']}"/>
+
+</ui:composition>

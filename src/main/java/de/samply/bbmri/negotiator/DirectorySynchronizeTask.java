@@ -53,8 +53,9 @@ public class DirectorySynchronizeTask extends TimerTask {
         try(Config config = ConfigFactory.get()) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
-            DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisUrl(),
-                    negotiatorConfig.getMolgenisResourceBiobanks(), negotiatorConfig.getMolgenisResourceCollections());
+            DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisRestUrl(),
+                    negotiatorConfig.getMolgenisResourceBiobanks(), negotiatorConfig.getMolgenisResourceCollections(),
+                    negotiatorConfig.getMolgenisApiUsername(), negotiatorConfig.getMolgenisApiPassword());
 
             logger.info("Starting synchronization with the directory");
 
@@ -72,8 +73,12 @@ public class DirectorySynchronizeTask extends TimerTask {
 
             logger.info("Synchronization with the directory finished.");
             config.commit();
+
+            NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY,
+                    "Biobanks: " + allBiobanks.size() + ", Collections: " + allCollections.size());
         } catch (Exception e) {
             logger.error("Synchronization failed", e);
+            NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
         }
     }
 }
