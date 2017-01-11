@@ -39,7 +39,7 @@ public class DummyData {
     @Test
     public void testResearcherQueries() throws SQLException {
         try(Config config = ConfigFactory.get()) {
-            assertTrue(DbUtil.getQueryStatsDTOs(config, 6).size() == 2);
+            assertTrue(DbUtil.getQueryStatsDTOs(config, 6, null).size() == 2);
         }
     }
 

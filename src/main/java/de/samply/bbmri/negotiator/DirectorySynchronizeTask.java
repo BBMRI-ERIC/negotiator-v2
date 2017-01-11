@@ -54,9 +54,16 @@ public class DirectorySynchronizeTask extends TimerTask {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
             DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisRestUrl(),
+                    negotiatorConfig.getMolgenisResourceBiobanks(), negotiatorConfig.getMolgenisResourceCollections());
+
+            /**
+            * Code below is commented out as it was causing error. Needs to be looked into
+            */
+
+           /* DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisRestUrl(),
                     negotiatorConfig.getMolgenisResourceBiobanks(), negotiatorConfig.getMolgenisResourceCollections(),
                     negotiatorConfig.getMolgenisApiUsername(), negotiatorConfig.getMolgenisApiPassword());
-
+            */
             logger.info("Starting synchronization with the directory");
 
             List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();

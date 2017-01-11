@@ -59,7 +59,7 @@ public class DatabaseSetup {
 
     public void testCommentStatsDTO() throws SQLException {
         try(Config config = ConfigFactory.get()) {
-            DbUtil.getQueryStatsDTOs(config, 1);
+            DbUtil.getQueryStatsDTOs(config, 1, null);
         }
     }
 }
