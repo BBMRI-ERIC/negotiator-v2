@@ -30,7 +30,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -47,6 +50,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
@@ -70,6 +74,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
+
+    @ManagedProperty(value = "#{sessionBean}")
+    private SessionBean sessionBean;
+
 
     /**
      * The QueryStatsDTO object used to get all the information for queries.
@@ -177,6 +185,39 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return null;
     }
 
+    /**
+     * Add search filter
+     */
+    public void addFilter() {
+        queries = null;
+        sessionBean.addFilter();
+    }
+
+    /**
+     * Removes the search filter.
+     *
+     * @param arg
+     *
+     */
+    public void removeFilter(String arg) {
+        queries = null;
+        sessionBean.removeFilter(arg);
+    }
+
+    /**
+     * Split search terms by list of delimiters
+     * @return unique search terms
+     */
+    private Set<String> getFilterTerms() {
+        Set<String> filterTerms = new HashSet<String>();
+        for(String filters : sessionBean.getFilters()) {
+            // split by 0 or more spaces, followed by either 'and','or', comma or more spaces
+            String[] filterTermsArray = filters.split("\\s*(and|or|,)\\s*");
+            Collections.addAll(filterTerms, filterTermsArray);
+        }
+        return filterTerms;
+    }
+
 
     /**
      * Redirects the user to directory for editing the query
@@ -198,7 +239,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public List<QueryStatsDTO> getQueries() {
         if (queries == null) {
             try (Config config = ConfigFactory.get()) {
-                 queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId());
+                queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -361,6 +402,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setListOfSampleOffers(List<List<OfferPersonDTO>> listOfSampleOffers) {
         this.listOfSampleOffers = listOfSampleOffers;
+    }
+
+    public SessionBean getSessionBean() {
+        return sessionBean;
+    }
+
+    public void setSessionBean(SessionBean sessionBean) {
+        this.sessionBean = sessionBean;
     }
 
 }

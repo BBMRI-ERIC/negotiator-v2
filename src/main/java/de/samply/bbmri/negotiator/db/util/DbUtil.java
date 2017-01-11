@@ -211,8 +211,22 @@ public class DbUtil {
      * @param userId the researcher ID
      * @return
      */
-    public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId) {
+    public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId, Set<String> filters) {
         Person commentAuthor = Tables.PERSON.as("comment_author");
+
+        Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
+
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+
+            }
+            condition = condition.and(titleCondition.or(textCondition));
+        }
 
         Result<Record> fetch = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
@@ -223,7 +237,7 @@ public class DbUtil {
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
                 .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
                 .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
-                .where(Tables.QUERY.RESEARCHER_ID.eq(userId))
+                .where(condition)
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc()).fetch();
 
@@ -774,5 +788,4 @@ public class DbUtil {
         }
         return target;
     }
-
 }

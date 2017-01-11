@@ -28,7 +28,10 @@ package de.samply.bbmri.negotiator.control.researcher;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -40,6 +43,7 @@ import org.jooq.Result;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
@@ -65,6 +69,10 @@ public class ResearcherQueriesBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
+    @ManagedProperty(value = "#{sessionBean}")
+    private SessionBean sessionBean;
+
+
     /**
      * The selected query, if there is one
      */
@@ -85,16 +93,40 @@ public class ResearcherQueriesBean implements Serializable {
      */
     @PostConstruct
     public void init() {
-        try(Config config = ConfigFactory.get()) {
-            String jsonQuery = "Some json text received in proper format from paul";
-            queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId());
-            createQuery(jsonQuery);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
+    /**
+     * Add search filter
+     */
+    public void addFilter() {
+        queries = null;
+        sessionBean.addFilter();
+    }
 
+    /**
+     * Removes the search filter.
+     *
+     * @param arg
+     *
+     */
+    public void removeFilter(String arg) {
+        queries = null;
+        sessionBean.removeFilter(arg);
+    }
+
+    /**
+     * Split search terms by list of delimiters
+     * @return unique search terms
+     */
+    private Set<String> getFilterTerms() {
+        Set<String> filterTerms = new HashSet<String>();
+        for(String filters : sessionBean.getFilters()) {
+            // split by 0 or more spaces, followed by either 'and','or', comma or more spaces
+            String[] filterTermsArray = filters.split("\\s*(and|or|,)\\s*");
+            Collections.addAll(filterTerms, filterTermsArray);
+        }
+        return filterTerms;
+    }
 
     /**
      * Allows a researcher to initiate the process of creating a query from the negotiator. Redirects the user to directory in this case.
@@ -139,6 +171,13 @@ public class ResearcherQueriesBean implements Serializable {
     }
 
     public List<QueryStatsDTO> getQueries() {
+        try(Config config = ConfigFactory.get()) {
+            String jsonQuery = "Some json text received in proper format from paul";
+            queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+            createQuery(jsonQuery);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return queries;
     }
 
@@ -176,5 +215,13 @@ public class ResearcherQueriesBean implements Serializable {
 
     public void setCommentText(String commentText) {
         this.commentText = commentText;
+    }
+
+    public SessionBean getSessionBean() {
+        return sessionBean;
+    }
+
+    public void setSessionBean(SessionBean sessionBean) {
+        this.sessionBean = sessionBean;
     }
 }
