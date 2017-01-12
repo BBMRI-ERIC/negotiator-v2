@@ -260,7 +260,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, userBean.getBiobankOwner());
+				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter);
 				sortQueries();
 			} catch (SQLException e) {
 				e.printStackTrace();

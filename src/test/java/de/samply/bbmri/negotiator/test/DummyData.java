@@ -50,7 +50,7 @@ public class DummyData {
       @Test
     public void testOwnerQueries() throws SQLException {
         try(Config config = ConfigFactory.get()) {
-            assertTrue(DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), null, true).size() == 3);
+            assertTrue(DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), null).size() == 3);
         }
     }
 
@@ -62,18 +62,18 @@ public class DummyData {
     @Test
     public void testFlagOwner() throws SQLException {
         try(Config config = ConfigFactory.get()) {
-            List<OwnerQueryStatsDTO> ownerQueries = DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), Flag.ARCHIVED, true);
+            List<OwnerQueryStatsDTO> ownerQueries = DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), Flag.ARCHIVED);
             assertTrue(ownerQueries.size() == 1);
             OwnerQueryStatsDTO ownerQueryStatsDTO = ownerQueries.get(0);
 
             DbUtil.flagQuery(config, ownerQueryStatsDTO, Flag.ARCHIVED, 5);
 
-            assertTrue(DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), Flag.ARCHIVED, true).size() == 0 );
+            assertTrue(DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), Flag.ARCHIVED).size() == 0 );
 
             ownerQueryStatsDTO.setFlag(Flag.UNFLAGGED);
             DbUtil.flagQuery(config, ownerQueryStatsDTO, Flag.ARCHIVED, 5);
 
-            assertTrue(DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), Flag.ARCHIVED, true).size() == 1);
+            assertTrue(DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), Flag.ARCHIVED).size() == 1);
         }
     }
 

@@ -178,7 +178,7 @@ public class OwnerQueriesBean implements Serializable {
 			try (Config config = ConfigFactory.get()) {
 
 			    queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
-					        flagFilter, userBean.getBiobankOwner());
+					        flagFilter);
 				sortQueries();
 
 			} catch (SQLException e) {

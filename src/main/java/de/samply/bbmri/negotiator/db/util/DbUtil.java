@@ -219,20 +219,20 @@ public class DbUtil {
         if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
             Condition textCondition = DSL.trueCondition();
-            
+            Condition nameCondition = DSL.trueCondition();
+
             for(String filter : filters) {
                 titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
                 textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(commentAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
 
             }
-            condition = condition.and(titleCondition.or(textCondition));
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
         }
 
         Result<Record> fetch = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
                 .select(getFields(Tables.PERSON, "query_author"))
-                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-                .select(commentAuthor.ID.countDistinct().as("comment_count"))
                 .from(Tables.QUERY)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
                 .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
@@ -251,7 +251,7 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag, Boolean biobankOwner) {
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
     	Person queryAuthor = Tables.PERSON.as("query_author");
 
     	Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
@@ -259,20 +259,14 @@ public class DbUtil {
     	if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
             Condition textCondition = DSL.trueCondition();
-            Condition biobankOwnerCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
 
             for(String filter : filters) {
                 titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
     			textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
-    			if(biobankOwner){
-
-    			    biobankOwnerCondition = biobankOwnerCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
-    			}
-    			else{
-
-    			}
+   			    nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
             }
-    		condition = condition.and(titleCondition.or(textCondition).or(biobankOwnerCondition));
+    		condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
     	}
 
         if (flag != null && flag != Flag.UNFLAGGED) {
@@ -787,5 +781,17 @@ public class DbUtil {
             }
         }
         return target;
+    }
+
+    public static Result<Record> getCommentCountAndTime(Config config, Integer queryId){
+
+        Result<Record> result = config.dsl()
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .from(Tables.COMMENT)
+                .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+                .fetch();
+
+        return result;
     }
 }

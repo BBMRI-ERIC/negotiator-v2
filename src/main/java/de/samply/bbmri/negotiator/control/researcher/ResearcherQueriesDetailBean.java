@@ -29,6 +29,7 @@ package de.samply.bbmri.negotiator.control.researcher;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -43,6 +44,9 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
+
+import org.jooq.Record;
+import org.jooq.Result;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -240,11 +244,25 @@ public class ResearcherQueriesDetailBean implements Serializable {
         if (queries == null) {
             try (Config config = ConfigFactory.get()) {
                 queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+                for (int i = 0; i < queries.size(); ++i) {
+                    getCommentCountAndTime(i);
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
         return queries;
+    }
+
+    public void getCommentCountAndTime(int index){
+        try(Config config = ConfigFactory.get()) {
+            Result<Record> result = DbUtil.getCommentCountAndTime(config, queries.get(index).getQuery().getId());
+            result.get(0).getValue("comment_count");
+            queries.get(index).setCommentCount((int) result.get(0).getValue("comment_count"));
+            queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
