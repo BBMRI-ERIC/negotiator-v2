@@ -42,9 +42,9 @@
 
     <molgenisApiPassword>gogogo</molgenisApiPassword>
 
-    <molgenisUrl>https://molgenis52.gcc.rug.nl</molgenisUrl>
+    <molgenisUrl>http://old.bbmri-eric.eu/bbmri-eric-directory-2.0</molgenisUrl>
 
-    <molgenisRestUrl>https://molgenis52.gcc.rug.nl</molgenisRestUrl>
+    <molgenisRestUrl>http://old.bbmri-eric.eu</molgenisRestUrl>
 
     <attachmentPath>/home/my-upload-folder/uploads/</attachmentPath>
 
