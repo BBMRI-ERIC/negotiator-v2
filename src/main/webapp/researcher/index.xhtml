@@ -42,20 +42,20 @@
 	<ui:define name="body">
 
 		<h:panelGroup layout="block" styleClass="col-md-12">
-					
-			<h:panelGroup				
+
+			<h:panelGroup layout="block" styleClass="col-md-12">
+				<h:outputLink
+						value="#{researcherQueriesBean.createQueryNegotiator()}"
+						styleClass="btn btn-primary"
+						title="#{label['queryview.tooltip.createNewQuery']}">
+					#{label['queryview.title.createNewQuery']}
+				</h:outputLink>
+			</h:panelGroup>
+
+			<h:panelGroup
 			    rendered="#{researcherQueriesBean.queries.size() == 0}"
 				layout="block" styleClass="empty-queries col-md-12">
 				<h3>#{label['queryview.noQueriesMade']}</h3>
-			</h:panelGroup>
-
-			 <h:panelGroup layout="block" styleClass="col-md-12">
-				<h:outputLink
-					value="#{researcherQueriesBean.createQueryNegotiator()}"
-					styleClass="btn btn-primary"
-					title="#{label['queryview.tooltip.createNewQuery']}">
-                           #{label['queryview.title.createNewQuery']}
-                </h:outputLink>
 			</h:panelGroup>
 			
 			<h:panelGroup layout="block" style="margin-top:60px">
