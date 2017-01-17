@@ -46,10 +46,20 @@
     <ui:param name="bodyClass" value="container"/>
 	
     <ui:define name="body">
-        <bbmricc:search backingBean="#{ownerQueriesBean}"/>
+		<h:panelGroup
+			rendered="#{ownerQueriesBean.queries.size() > 0 or ownerQueriesBean.filterTerms.size() > 0}"
+			layout="block" style="margin-top:60px">
+			<bbmricc:search backingBean="#{ownerQueriesBean}" />
+		</h:panelGroup>
+
+		<h:panelGroup
+			rendered="#{ownerQueriesBean.queries.size() == 0 and ownerQueriesBean.filterTerms.size() > 0}"
+			layout="block" styleClass="col-md-12">
+			<h3>#{label['queryview.noSearchResults']}</h3>
+		</h:panelGroup>
 
 		<h:panelGroup layout="block">
-            <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0}" layout="block">
+            <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0 and ownerQueriesBean.filterTerms.size() == 0}" layout="block">
                 <h3>#{label['queryview.noQueries']}</h3>
             </h:panelGroup>
 

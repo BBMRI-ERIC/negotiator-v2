@@ -53,14 +53,20 @@
 			</h:panelGroup>
 
 			<h:panelGroup
-			    rendered="#{researcherQueriesBean.queries.size() == 0}"
+			    rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() == 0}"
 				layout="block" styleClass="empty-queries col-md-12">
 				<h3>#{label['queryview.noQueriesMade']}</h3>
 			</h:panelGroup>
 			
-			<h:panelGroup layout="block" style="margin-top:60px">
+			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() > 0 or researcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">      
 			    <bbmricc:search backingBean="#{researcherQueriesBean}"/>
 			</h:panelGroup>
+			
+			<h:panelGroup
+                rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() > 0}"
+                layout="block" styleClass="col-md-12">
+                <h3>#{label['queryview.noSearchResults']}</h3>
+            </h:panelGroup>
 
 			<h:panelGroup layout="block" styleClass="col-md-12">
 				<h:form>

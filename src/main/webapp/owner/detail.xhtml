@@ -49,6 +49,12 @@
 			
 			<bbmricc:searchDetail backingBean="#{ownerQueriesDetailBean}"/>
 
+			<h:panelGroup
+				rendered="#{ownerQueriesDetailBean.queries.size() == 0 and ownerQueriesDetailBean.filterTerms.size() > 0}"
+				layout="block" styleClass="col-md-12">
+				<h3>#{label['queryview.noSearchResults']}</h3>
+			</h:panelGroup>
+
 			<h:panelGroup id="test" layout="block">
 				<h:form>
 					<ui:repeat var="queryDto"
