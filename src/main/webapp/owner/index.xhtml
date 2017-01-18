@@ -55,85 +55,93 @@
 
             <ui:repeat var="queryDto" value="#{ownerQueriesBean.getQueries()}">
 
-                <h:panelGroup layout="block" styleClass="panel panel-default #{queryDto.isArchived() ? 'archived-query' : ''} ">
-                    <h:panelGroup layout="block" styleClass="panel-heading">
-                        <h:form id="queryItemActions">
-                            <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
-                                           title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
-                                           action="#{ownerQueriesBean.starQuery(queryDto)}">
-                                <i class="fa fa-star"></i>
-                            </h:commandLink>
+                <h:panelGroup layout="block" styleClass="deco-none">
+                    <h:panelGroup layout="block" styleClass="panel panel-default #{queryDto.isArchived() ? 'archived-query' : ''} ">
+                        <h:panelGroup layout="block" styleClass="panel-heading">
+                            <h:form id="queryItemActions">
+                                <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
+                                               title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+                                               action="#{ownerQueriesBean.starQuery(queryDto)}">
+                                    <i class="fa fa-star"></i>
+                                </h:commandLink>
 
-                            <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}" style="margin-left: 30px;" >
-                                <f:param name="queryId" value="#{queryDto.query.id}"/>
-                                <f:param name="flag" value="#{ownerQueriesBean.flagFilter}"/>
-                                <h:outputText value="#{queryDto.query.title}"/>
-                            </h:link>
+                                <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}" style="margin-left: 30px;" styleClass="detailLink">
+                                    <f:param name="queryId" value="#{queryDto.query.id}"/>
+                                    <f:param name="flag" value="#{ownerQueriesBean.flagFilter}"/>
+                                    <h:outputText value="#{queryDto.query.title}"/>
+                                </h:link>
 
-                            <h:panelGroup styleClass="pull-right">
+                                <h:panelGroup styleClass="pull-right">
 
-                                <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="...">
+                                    <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="...">
 
-                                    <h:commandLink  styleClass="#{queryDto.isArchived() ? 'btn btn-success' : 'btn btn-default'}" 
-                                    title="#{queryDto.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
-                                                    action="#{ownerQueriesBean.archiveQuery(queryDto)}">
-                                        <i class="fa fa-folder-open"></i>
-                                    </h:commandLink>
+                                        <h:commandLink  styleClass="#{queryDto.isArchived() ? 'btn btn-success' : 'btn btn-default'}"
+                                        title="#{queryDto.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
+                                                        action="#{ownerQueriesBean.archiveQuery(queryDto)}">
+                                            <i class="fa fa-folder-open"></i>
+                                        </h:commandLink>
 
-                                    <h:commandLink styleClass="#{queryDto.isIgnored() ? 'btn btn-success' : 'btn btn-default'}"
-                                    
-                                    title="#{queryDto.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
-                                                   action="#{ownerQueriesBean.ignoreQuery(queryDto)}">
-                                        <i class="fa fa-sign-out"></i>
-                                    </h:commandLink>
+                                        <h:commandLink styleClass="#{queryDto.isIgnored() ? 'btn btn-success' : 'btn btn-default'}"
 
-                                </h:panelGroup>
+                                        title="#{queryDto.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
+                                                       action="#{ownerQueriesBean.ignoreQuery(queryDto)}">
+                                            <i class="fa fa-sign-out"></i>
+                                        </h:commandLink>
 
-                                <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{queryDto.commentCount > 0}">
-                                    <h:outputText title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-                                                  value="#{queryDto.commentCount}"/>
-                                </h:panelGroup>
-                                
-                            </h:panelGroup>
-                        </h:form>
-                    </h:panelGroup>
-
-                    <h:panelGroup layout="block" styleClass="panel-body">
-                        <h:panelGroup layout="block" styleClass="row">
-                            <h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
-                                <bbmricc:avatar person="#{queryDto.queryAuthor}"/>
-                            </h:panelGroup>
-
-                            <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
-                                <h:panelGroup layout="block" styleClass="row queryOwner">
-                                    #{queryDto.queryAuthor.authName}
-                                </h:panelGroup>
-
-                                <h:panelGroup layout="block" styleClass="row">
-                                    <h:panelGroup layout="block" styleClass="col-md-12">
-                                        #{queryDto.query.text}
                                     </h:panelGroup>
+
+                                    <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{queryDto.commentCount > 0}">
+                                        <h:outputText title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
+                                                      value="#{queryDto.commentCount}"/>
+                                    </h:panelGroup>
+
+                                </h:panelGroup>
+                            </h:form>
+                        </h:panelGroup>
+
+                        <h:panelGroup layout="block" styleClass="panel-body">
+                            <h:panelGroup layout="block" styleClass="row">
+                                <h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
+                                    <bbmricc:avatar person="#{queryDto.queryAuthor}"/>
                                 </h:panelGroup>
 
-                                <h:panelGroup layout="block" styleClass="row">
-                                    <h:panelGroup layout="block" styleClass="col-md-12">
-                                        <h:panelGroup styleClass="pull-right">
+                                <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
+                                    <h:panelGroup layout="block" styleClass="row queryOwner">
+                                        #{queryDto.queryAuthor.authName}
+                                    </h:panelGroup>
 
-                                            <h:outputText
-                                                value="#{queryDto.query.queryCreationTime}"
-                                                title="#{label['queryview.queryitem.datetime.creation']}">
-                                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-                                            </h:outputText>
+                                    <h:panelGroup layout="block" styleClass="row">
+                                        <h:panelGroup layout="block" styleClass="col-md-12">
+                                            #{queryDto.query.text}
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup layout="block" styleClass="row">
+                                        <h:panelGroup layout="block" styleClass="col-md-12">
+                                            <h:panelGroup styleClass="pull-right">
+
+                                                <h:outputText
+                                                    value="#{queryDto.query.queryCreationTime}"
+                                                    title="#{label['queryview.queryitem.datetime.creation']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+                                                </h:outputText>
+                                            </h:panelGroup>
                                         </h:panelGroup>
                                     </h:panelGroup>
                                 </h:panelGroup>
-                            </h:panelGroup>
 
+                            </h:panelGroup>
                         </h:panelGroup>
                     </h:panelGroup>
                 </h:panelGroup>
 
             </ui:repeat>
+
+            <h:outputScript>
+                $(function() {
+                    setupQueryLinks();
+                });
+            </h:outputScript>
         </h:panelGroup>
     </ui:define>
 

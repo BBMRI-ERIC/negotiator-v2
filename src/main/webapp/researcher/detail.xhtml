@@ -54,15 +54,16 @@
 
 				<ui:repeat var="item" value="#{researcherQueriesDetailBean.queries}">
 
-					<h:link outcome="detail" styleClass="deco-none">
-						<f:param name="queryId" value="#{item.query.id}" />
+					<h:panelGroup layout="block" styleClass="deco-none">
 
 						<h:panelGroup layout="block"
 							styleClass="panel panel-default #{item.query.id == researcherQueriesDetailBean.queryId ? 'selected-query' : ''}">
 
 							<h:panelGroup layout="block" styleClass="panel-heading">
 
-                                #{item.query.title}
+								<h:link outcome="detail" styleClass="detailLink" value="#{item.query.title}">
+									<f:param name="queryId" value="#{item.query.id}" />
+								</h:link>
 
                                 <h:panelGroup styleClass="pull-right"
 									rendered="#{item.commentCount > 0}">
@@ -112,10 +113,15 @@
 
 						</h:panelGroup>
 
-
-					</h:link>
+					</h:panelGroup>
 
 				</ui:repeat>
+
+				<h:outputScript>
+					$(function() {
+						setupQueryLinks();
+					});
+				</h:outputScript>
 
 			</h:form>
 

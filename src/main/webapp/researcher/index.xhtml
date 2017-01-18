@@ -65,19 +65,18 @@
 			<h:panelGroup layout="block" styleClass="col-md-12">
 				<h:form>
 					<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
-						
 
+						<h:panelGroup layout="block" styleClass="deco-none">
 
 							<h:panelGroup layout="block" styleClass="panel panel-default">
-
 								<h:panelGroup layout="block" styleClass="panel-heading">
-															
-							<h:link outcome="detail" value="#{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
-							    style="font-weight: bold;">								
-                                   <f:param name="queryId" value="#{item.query.id}"/>
-                               </h:link>
 
-                               <h:panelGroup styleClass="pull-right"
+									<h:link outcome="detail" value="#{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
+											styleClass="detailLink">
+										<f:param name="queryId" value="#{item.query.id}"/>
+									</h:link>
+
+                               		<h:panelGroup styleClass="pull-right"
 										rendered="#{item.commentCount > 0}">
 
 										<h:panelGroup styleClass="badge queryNumberResponsesBadge">
@@ -123,8 +122,17 @@
 									</h:panelGroup>
 								</h:panelGroup>
 
-							</h:panelGroup>					
+							</h:panelGroup>
+
+						</h:panelGroup>
+
 					</ui:repeat>
+
+					<h:outputScript>
+						$(function() {
+							setupQueryLinks();
+						});
+					</h:outputScript>
 
 				</h:form>
 			</h:panelGroup>
