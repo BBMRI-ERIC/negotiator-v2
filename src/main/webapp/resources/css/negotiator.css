@@ -211,6 +211,11 @@ a:hover {
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
 }
 
+.deco-none:hover .panel {
+    border-color: #ec6707;
+    outline: 0;
+}
+
 .panel-collapse {
 padding-left: 0px;
 padding-right: 0px;
