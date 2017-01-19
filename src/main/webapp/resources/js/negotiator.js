@@ -94,3 +94,12 @@ function setupQueryLinks() {
         e.stopPropagation();
     });
 }
+
+/**
+ * Initializes the truncate-panel elements with the jquery truncate plugin
+ */
+$(function() {
+    $(".truncate-panel").truncate({
+        multiline: true
+    });
+});

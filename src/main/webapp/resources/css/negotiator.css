@@ -217,6 +217,12 @@ a:hover {
 }
 
 .panel-collapse {
-padding-left: 0px;
-padding-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.truncate-panel {
+    max-height: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }

@@ -49,6 +49,7 @@
     <!-- Preload the JSF library, otherwise the negotiator.js will not work -->
     <h:outputScript name="jsf.js" library="javax.faces"/>
     <script type="text/javascript" src="#{resource['js/negotiator.js']}?version=#{applicationBean.version}"></script>
+    <script type="text/javascript" src="#{resource['js/jquery.truncate.min.js']}?version=#{applicationBean.version}"></script>
 
     <!-- The google Analytics script is only used on the negotiator.bbmri-eric.eu server -->
     <h:outputScript rendered="#{facesContext.externalContext.requestServerName == 'negotiator.bbmri-eric.eu'}">
