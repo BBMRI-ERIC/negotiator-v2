@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Observable;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -38,7 +37,6 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +44,8 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
@@ -62,6 +62,8 @@ public class QueryBean implements Serializable {
    private int jsonQueryId;
 
    private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
+
+   private Flag flagFilter = Flag.UNFLAGGED;
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
@@ -110,7 +112,7 @@ public class QueryBean implements Serializable {
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
                config.commit();
                setId(record.getId());
-               List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId());
+               List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId(), Flag.IGNORED);
 
                QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrl(record.getId()),
                        config.map(record, Query.class));

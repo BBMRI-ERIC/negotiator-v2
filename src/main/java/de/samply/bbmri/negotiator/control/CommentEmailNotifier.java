@@ -33,6 +33,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.notification.Notification;
@@ -50,6 +51,8 @@ public class CommentEmailNotifier {
 	private final String url;
 
 	private static final String emailSubject = "BBMRI Negotiator: new comment on request ";
+
+	private Flag flagFilter = Flag.UNFLAGGED;
 
 	public CommentEmailNotifier(Query query, String url) {
 		this.query = query;
@@ -69,7 +72,7 @@ public class CommentEmailNotifier {
 
 	    try (Config config = ConfigFactory.get()) {
 
-	        List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, query.getId());
+	        List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, query.getId(), Flag.IGNORED);
 
 			notification.addParameter("queryName", query.getTitle());
 			notification.addParameter("url", url);

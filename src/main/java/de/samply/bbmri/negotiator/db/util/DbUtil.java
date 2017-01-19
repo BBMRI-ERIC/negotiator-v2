@@ -525,14 +525,17 @@ public class DbUtil {
     /*
      * Return all people associated to this query
      */
-    public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId) {
+    public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId, Flag flag) {
 
         Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
                 .from(Tables.QUERY_COLLECTION)
                 .join(Tables.COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
                 .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .leftOuterJoin(Tables.FLAGGED_QUERY).on(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON.ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .and( Tables.FLAGGED_QUERY.FLAG.notEqual(flag).or(Tables.FLAGGED_QUERY.FLAG.isNull()))
+                .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId).or(Tables.FLAGGED_QUERY.QUERY_ID.isNull()))
                 .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
           return config.map(record, NegotiatorDTO.class);
     }
