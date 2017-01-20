@@ -184,4 +184,20 @@ public class ApplicationBean implements Serializable {
     public String getDBVersion() {
         return "" + Constants.DB_REQUIRED_VERSION;
     }
+
+    /**
+     * Returns the branch of the commit
+     * @return
+     */
+    public String getGitBranch() {
+        return ServletUtil.getBuildCommitBranch(getFacesContext());
+    }
+
+    /**
+     * Returns the Git Commit SHA ID.
+     * @return
+     */
+    public String getGitCommitId() {
+        return ServletUtil.getBuildCommitId(getFacesContext());
+    }
 }
