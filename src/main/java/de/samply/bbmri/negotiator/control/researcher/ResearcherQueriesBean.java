@@ -135,7 +135,7 @@ public class ResearcherQueriesBean implements Serializable {
      * @return String The directory URL
      */
     public String createQueryNegotiator() {
-        return NegotiatorConfig.get().getNegotiator().getMolgenisUrl();
+        return NegotiatorConfig.get().getNegotiator().getMolgenisUrl() + "?mode=debug";
     }
 
 
