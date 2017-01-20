@@ -80,6 +80,8 @@
         	<collection>21</collection>
         </fakeCollections>
 
+        <molgenisAcceptInvalidUrl>true</molgenisAcceptInvalidUrl>
+
     </development>
 
     <postgresql xmlns:c="http://schema.samply.de/common">

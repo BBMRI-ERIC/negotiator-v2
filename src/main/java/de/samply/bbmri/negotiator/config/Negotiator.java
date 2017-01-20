@@ -358,6 +358,13 @@ public class Negotiator implements Serializable {
         private boolean fakeDirectoryCollections = false;
 
         /**
+         * If false, the REST api for the directory accepts any URL, otherwise it will accept URLs that start
+         * with $molgenisUrl only.
+         */
+        @XmlElement
+        private boolean molgenisAcceptInvalidUrl = false;
+
+        /**
          * The list of collections, that will be faked.
          */
         @XmlElementWrapper( name="fakeCollections" )
@@ -394,6 +401,14 @@ public class Negotiator implements Serializable {
 
         public void setCollectionList(List<String> collectionList) {
             this.collectionList = collectionList;
+        }
+
+        public boolean getMolgenisAcceptInvalidUrl() {
+            return molgenisAcceptInvalidUrl;
+        }
+
+        public void setMolgenisAcceptInvalidUrl(boolean molgenisAcceptInvalidUrl) {
+            this.molgenisAcceptInvalidUrl = molgenisAcceptInvalidUrl;
         }
     }
 }
