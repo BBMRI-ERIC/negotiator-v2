@@ -226,3 +226,10 @@ a:hover {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/**
+ * shows '\n' as newline in HTML
+ */
+.pre-wrap {
+    white-space: pre-wrap;
+}
