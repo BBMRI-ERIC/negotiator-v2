@@ -242,7 +242,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 * Split search terms by list of delimiters
 	 * @return unique search terms
 	 */
-	private Set<String> getFilterTerms() {
+	public Set<String> getFilterTerms() {
 		Set<String> filterTerms = new HashSet<String>();
 		for(String filters : sessionBean.getFilters()) {
 			// split by 0 or more spaces, followed by either 'and','or', comma or more spaces

@@ -28,19 +28,17 @@ package de.samply.bbmri.negotiator.control;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
-import de.samply.bbmri.negotiator.notification.Notification;
-import de.samply.bbmri.negotiator.notification.NotificationThread;
-import de.samply.common.mailing.EmailBuilder;
-import de.samply.common.mailing.OutgoingEmail;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
+import de.samply.bbmri.negotiator.notification.Notification;
+import de.samply.bbmri.negotiator.notification.NotificationThread;
+import de.samply.common.mailing.EmailBuilder;
 
 
 /**
@@ -52,6 +50,10 @@ public class CommentEmailNotifier {
 
 	private final String url;
 
+	private static final String emailSubject = "BBMRI Negotiator: new comment on request ";
+
+	private Flag flagFilter = Flag.UNFLAGGED;
+
 	public CommentEmailNotifier(Query query, String url) {
 		this.query = query;
 		this.url = url;
@@ -61,16 +63,16 @@ public class CommentEmailNotifier {
 	 * Sends notification email when a new comment gets added to a query
 	 */
 	public void sendEmailNotification() {
-		
+
 		EmailBuilder builder = MailUtil.initializeBuilder();
 	    builder.addTemplateFile("NewCommentNotification.soy", "Notification");
 
 		Notification notification = new Notification();
-		notification.setSubject("Nothing");
+		notification.setSubject(getEmailsubject() + query.getTitle());
 
 	    try (Config config = ConfigFactory.get()) {
-	    
-	        List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, query.getId());
+
+	        List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, query.getId(), Flag.IGNORED);
 
 			notification.addParameter("queryName", query.getTitle());
 			notification.addParameter("url", url);
@@ -86,4 +88,8 @@ public class CommentEmailNotifier {
             e.printStackTrace();
         }
 	}
+
+    public static String getEmailsubject() {
+        return emailSubject;
+    }
 }

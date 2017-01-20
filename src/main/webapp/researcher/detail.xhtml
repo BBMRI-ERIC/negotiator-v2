@@ -49,6 +49,14 @@
 		<h:panelGroup layout="block" styleClass="col-md-3">
 
 			<bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
+			
+			<h:panelGroup
+                rendered="#{researcherQueriesDetailBean.queries.size() == 0 and researcherQueriesDetailBean.filterTerms.size() > 0}"
+                layout="block" styleClass="col-md-12">
+                <h3>#{label['queryview.noSearchResults']}</h3>
+            </h:panelGroup>
+			
+			
 
 			<h:form>
 
