@@ -61,30 +61,37 @@
 								    </li>															
 							    </ul>
 						    </li>
-						</c:if>						
+						</c:if>
+						<ui:fragment rendered="#{userBean.isAdmin()}">
+							<li>
+								<h:link outcome="/admin/index">
+									<h:outputText value="#{label['admin.interface']}"/>
+								</h:link>
+							</li>
+						</ui:fragment>
 					</ul>
 
 
 					<ul class="nav navbar-nav navbar-right navbar-user">
 						<ui:fragment rendered="#{! userBean.loginValid}">
-							<li class="pull-right"><a
-								href="#{userBean.authenticationUrl}">#{label['queryview.login']}</a></li>
+							<li class="pull-right">
+								<a href="#{userBean.authenticationUrl}">#{label['queryview.login']}</a>
+							</li>
 						</ui:fragment>
 
 						<ui:fragment rendered="#{userBean.loginValid}">
-							<li class="dropdown"><a class="dropdown-toggle"
-								data-toggle="dropdown" href="#"> <i
-									class="fa fa-user fa-fw userIcon" />
+							<li class="dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+									<i class="fa fa-user fa-fw userIcon" />
 									#{userBean.userRealName.trim().length() > 0 ?
 									userBean.userRealName : userBean.userEmail} <span class="caret"></span>
-							</a>
+								</a>
 								<ul id="userPanel" class="dropdown-menu">
-									<li><h:commandLink action="#{userBean.profile}">
-											<i class="fa fa-book" /> #{label['queryview.profile']}
-                                        </h:commandLink></li>
-									<li><h:commandLink action="#{userBean.logout}">
+									<li>
+										<h:commandLink action="#{userBean.logout}">
 											<i class="fa fa-sign-out" /> #{label['queryview.logout']}
-                                        </h:commandLink></li>
+										</h:commandLink>
+									</li>
 								</ul></li>
 						</ui:fragment>
 					</ul>

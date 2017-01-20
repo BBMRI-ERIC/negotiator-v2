@@ -22,8 +22,13 @@
 			<h:panelGroup layout="block" styleClass="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
 					<li>
-						<h:link outcome="index" styleClass="#{view.viewId == '/admin/index'}">
+						<h:link outcome="index">
 							#{label['admin.status']}
+						</h:link>
+					</li>
+					<li>
+						<h:link outcome="email">
+							#{label['admin.email']}
 						</h:link>
 					</li>
 				</ul>

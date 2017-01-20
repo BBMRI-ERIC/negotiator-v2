@@ -321,6 +321,23 @@ public class UserBean implements Serializable {
 	}
 
 	/**
+	 * Returns true, if the user is an admin, false otherwise.
+	 * @return
+     */
+	public Boolean isAdmin() {
+		List<String> admins = NegotiatorConfig.get().getNegotiator().getAdmins();
+
+		/**
+		 * Create the userBean if necessary
+		 */
+		if(getLoginValid() && admins != null && admins.contains(userIdentity)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Profile.
 	 *
 	 * @return the string

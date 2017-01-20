@@ -164,6 +164,13 @@ public class Negotiator implements Serializable {
     private int clamavPort;
 
     /**
+     * The list of collections, that will be faked.
+     */
+    @XmlElementWrapper( name="admins" )
+    @XmlElement( name="id" )
+    private List<String> admins;
+
+    /**
      * The settings for development mode
      */
     @XmlElement
@@ -331,6 +338,14 @@ public class Negotiator implements Serializable {
 
     public void setMolgenisApiPassword(String molgenisApiPassword) {
         this.molgenisApiPassword = molgenisApiPassword;
+    }
+
+    public List<String> getAdmins() {
+        return admins;
+    }
+
+    public void setAdmins(List<String> admins) {
+        this.admins = admins;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
