@@ -78,13 +78,11 @@
 								#{label['navbar.help']}
 							</a>
 							<ul id="help" class="dropdown-menu">
-								<ui:fragment rendered="#{userBean.biobankOwner}">
-									<li>
-										<h:link outcome="/owner/product-tour">
-											#{label['navbar.owner.product-tour']}
-										</h:link>
-									</li>
-								</ui:fragment>
+								<li>
+									<h:link outcome="/help/owner-product-tour">
+										#{label['navbar.owner.product-tour']}
+									</h:link>
+								</li>
 							</ul>
 						</li>
 
