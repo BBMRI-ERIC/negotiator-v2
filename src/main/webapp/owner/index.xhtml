@@ -69,7 +69,7 @@
                     <h:panelGroup layout="block" styleClass="panel panel-default #{queryDto.isArchived() ? 'archived-query' : ''} ">
                         <h:panelGroup layout="block" styleClass="panel-heading">
                             <h:form id="queryItemActions">
-                                <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
+                                <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
                                                title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
                                                action="#{ownerQueriesBean.starQuery(queryDto)}">
                                     <i class="fa fa-star"></i>
@@ -85,13 +85,13 @@
 
                                     <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="...">
 
-                                        <h:commandLink  styleClass="#{queryDto.isArchived() ? 'btn btn-success' : 'btn btn-default'}"
+                                        <h:commandLink  styleClass="#{queryDto.isArchived() ? 'btn btn-primary' : 'btn btn-default'}"
                                         title="#{queryDto.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
                                                         action="#{ownerQueriesBean.archiveQuery(queryDto)}">
                                             <i class="fa fa-folder-open"></i>
                                         </h:commandLink>
 
-                                        <h:commandLink styleClass="#{queryDto.isIgnored() ? 'btn btn-success' : 'btn btn-default'}"
+                                        <h:commandLink styleClass="#{queryDto.isIgnored() ? 'btn btn-primary' : 'btn btn-default'}"
 
                                         title="#{queryDto.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
                                                        action="#{ownerQueriesBean.ignoreQuery(queryDto)}">

@@ -4,7 +4,7 @@
 	xmlns:c="http://java.sun.com/jstl/core"
 	xmlns:ui="http://java.sun.com/jsf/facelets">
 
-	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 		<h:panelGroup styleClass="container" layout="block" id="navbar">
 			<h:panelGroup layout="block" styleClass="navbar-header">
 
@@ -73,6 +73,21 @@
 
 
 					<ul class="nav navbar-nav navbar-right navbar-user">
+						<li class="dropdown">
+							<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+								#{label['navbar.help']}
+							</a>
+							<ul id="help" class="dropdown-menu">
+								<ui:fragment rendered="#{userBean.biobankOwner}">
+									<li>
+										<h:link outcome="/owner/product-tour">
+											#{label['navbar.owner.product-tour']}
+										</h:link>
+									</li>
+								</ui:fragment>
+							</ul>
+						</li>
+
 						<ui:fragment rendered="#{! userBean.loginValid}">
 							<li class="pull-right">
 								<a href="#{userBean.authenticationUrl}">#{label['queryview.login']}</a>

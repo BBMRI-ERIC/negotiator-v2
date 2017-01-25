@@ -70,7 +70,7 @@ hr {
 .bbmriModule {
     font-size: 10.5pt;
     font-weight: bold;
-    color: whitesmoke;
+    color: #777;
 }
 
 #filterList {
@@ -232,4 +232,53 @@ a:hover {
  */
 .pre-wrap {
     white-space: pre-wrap;
+}
+
+.crashcourse-title {
+    margin-top:0px;
+}
+
+.crashcouse-row {
+    padding-top: 3em;
+    padding-bottom: 3em;
+    border-bottom:1px solid #dddddd;
+}
+
+.crashcourse-point {
+    padding-top:1.4em;
+}
+
+.crashcourse-image {
+    display: block;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+#endlogo-container {
+    float: right;
+    padding: 1em;
+    display: inline-block;
+}
+
+#negotiator-blurb {
+    float: left;
+    padding: 1em;
+    display: none;
+}
+
+.crashcourse-details-link {
+    color: #eb690b;
+    text-decoration: underline;
+}
+
+.crashcourse-details-modal {
+    width:1400px;
+}
+
+.projectName {
+    color: #eb690b;
 }

@@ -67,7 +67,7 @@
 								<h:panelGroup layout="block" styleClass="panel-heading">
 
 									<h:commandLink
-										styleClass="#{queryDto.isStarred() ? 'btn btn-success' : 'btn btn-default'} btn-xs"
+										styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
 										title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
 										action="#{ownerQueriesDetailBean.starQuery(queryDto)}">
 										<i class="fa fa-star"></i>
@@ -88,14 +88,14 @@
 											role="group" aria-label="...">
 
 											<h:commandLink
-												styleClass="#{queryDto.isArchived() ? 'btn btn-success' : 'btn btn-default'}"
+												styleClass="#{queryDto.isArchived() ? 'btn btn-primary' : 'btn btn-default'}"
 												title="#{queryDto.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
 												action="#{ownerQueriesDetailBean.archiveQuery(queryDto)}">
 												<i class="fa fa-folder-open"></i>
 											</h:commandLink>
 
 											<h:commandLink
-												styleClass="#{queryDto.isIgnored() ? 'btn btn-success' : 'btn btn-default'}"
+												styleClass="#{queryDto.isIgnored() ? 'btn btn-primary' : 'btn btn-default'}"
 												title="#{queryDto.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
 												action="#{ownerQueriesDetailBean.ignoreQuery(queryDto)}">
 												<i class="fa fa-sign-out"></i>
