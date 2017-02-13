@@ -39,8 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import de.samply.bbmri.auth.rest.Scope;
-import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 
@@ -123,22 +121,7 @@ public class AuthorizationFilter implements Filter {
                 return;
             }
 
-            StringBuilder requestURL = new StringBuilder(request.getServletPath());
-
-            /**
-             * Construct a redirect URL to the authentication system and back.
-             * Store the requested URL in a cookie, which will be deleted once the browser
-             * is closed (maxAge = -1, see documentation)
-             */
-
-            if (request.getQueryString() != null) {
-                requestURL.append("?").append(request.getQueryString());
-            }
-
-            String url = OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
-                    request.getServerName(), request.getServerPort(), request.getContextPath(),
-                    requestURL.toString(), userBean.getState(), Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
-
+            String url = userBean.getAuthenticationUrl(request);
             response.sendRedirect(url);
         }
     }
