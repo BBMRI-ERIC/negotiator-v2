@@ -73,7 +73,8 @@ public class AuthorizationFilter implements Filter {
         /**
          * Skip /api/.*
          */
-        if(path.startsWith(((HttpServletRequest) req).getContextPath() + "/api/")) {
+        if(path.startsWith(request.getContextPath() + "/api/") ||
+                path.equals(request.getContextPath() + "/logout.xhtml")) {
             chain.doFilter(req, res);
             return;
         }

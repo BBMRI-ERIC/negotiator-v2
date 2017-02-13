@@ -164,9 +164,7 @@ public class UserBean implements Serializable {
              */
             context.redirect(context.getRequestContextPath());
         } else {
-            // redirect user away
-            context.redirect(OAuth2ClientConfig.getLogoutUrl(config, context.getRequestScheme(),
-                    context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(), "/"));
+            context.redirect(context.getRequestContextPath() + "/logout.xhtml");
         }
 	}
 
