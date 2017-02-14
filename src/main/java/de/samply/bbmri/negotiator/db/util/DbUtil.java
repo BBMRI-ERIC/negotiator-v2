@@ -282,7 +282,7 @@ public class DbUtil {
 				.select(getFields(Tables.QUERY, "query"))
 				.select(getFields(queryAuthor, "query_author"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-    			.select(Tables.COMMENT.ID.count().as("comment_count"))
+    			.select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
                         .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
     			.from(Tables.QUERY)
