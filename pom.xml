@@ -18,7 +18,7 @@
         <version.samply.common.upgrade>2.0.0</version.samply.common.upgrade>
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
-        <version.samply.directory.client>1.0.0</version.samply.directory.client>
+        <version.samply.directory.client>1.0.0-molgenis</version.samply.directory.client>
     </properties>
 
     <dependencies>
