@@ -1,8 +1,9 @@
 package de.samply.bbmri.negotiator.rest.dto;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
 
 /**
  * Created by paul on 11.10.16.
@@ -13,13 +14,13 @@ public class CollectionDTO implements Serializable {
     /**
      * The biobank ID.
      */
-    @XmlElement
+    @XmlElement(name = "biobankId")
     private String biobankID;
 
     /**
      * The collection ID.
      */
-    @XmlElement
+    @XmlElement(name ="collectionId")
     private String collectionID;
 
     public String getCollectionID() {
