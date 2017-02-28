@@ -70,7 +70,7 @@ hr {
 .bbmriModule {
     font-size: 10.5pt;
     font-weight: bold;
-    color: whitesmoke;
+    color: #777;
 }
 
 #filterList {
@@ -135,14 +135,10 @@ hr {
 .deco-none:hover {
     color: black;
     text-decoration: none;
-}
-
-.deco-none:hover .panel-heading {
-    background-color: #ccc;
-}
-
-.deco-none:hover .panel-body {
-    background-color: #eee;
+    cursor: pointer;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(236, 103, 7, 1);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(236, 103, 7, 1);
 }
 
 .avatar-pic-comment-column {
@@ -215,7 +211,74 @@ a:hover {
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
 }
 
+.deco-none:hover .panel {
+    border-color: #ec6707;
+    outline: 0;
+}
+
 .panel-collapse {
-padding-left: 0px;
-padding-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.truncate-panel {
+    max-height: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/**
+ * shows '\n' as newline in HTML
+ */
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
+.crashcourse-title {
+    margin-top:0px;
+}
+
+.crashcouse-row {
+    padding-top: 3em;
+    padding-bottom: 3em;
+    border-bottom:1px solid #dddddd;
+}
+
+.crashcourse-point {
+    padding-top:1.4em;
+}
+
+.crashcourse-image {
+    display: block;
+    max-height: 400px;
+    width: auto;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+#endlogo-container {
+    float: right;
+    padding: 1em;
+    display: inline-block;
+}
+
+#negotiator-blurb {
+    float: left;
+    padding: 1em;
+    display: none;
+}
+
+.crashcourse-details-link {
+    color: #eb690b;
+    text-decoration: underline;
+}
+
+.crashcourse-details-modal {
+    width:1400px;
+}
+
+.projectName {
+    color: #eb690b;
 }

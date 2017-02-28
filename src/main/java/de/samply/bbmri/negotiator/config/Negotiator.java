@@ -164,6 +164,13 @@ public class Negotiator implements Serializable {
     private int clamavPort;
 
     /**
+     * The list of collections, that will be faked.
+     */
+    @XmlElementWrapper( name="admins" )
+    @XmlElement( name="id" )
+    private List<String> admins;
+
+    /**
      * The settings for development mode
      */
     @XmlElement
@@ -333,6 +340,14 @@ public class Negotiator implements Serializable {
         this.molgenisApiPassword = molgenisApiPassword;
     }
 
+    public List<String> getAdmins() {
+        return admins;
+    }
+
+    public void setAdmins(List<String> admins) {
+        this.admins = admins;
+    }
+
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Development implements Serializable {
 
@@ -356,6 +371,13 @@ public class Negotiator implements Serializable {
          */
         @XmlElement
         private boolean fakeDirectoryCollections = false;
+
+        /**
+         * If false, the REST api for the directory accepts any URL, otherwise it will accept URLs that start
+         * with $molgenisUrl only.
+         */
+        @XmlElement
+        private boolean molgenisAcceptInvalidUrl = false;
 
         /**
          * The list of collections, that will be faked.
@@ -394,6 +416,14 @@ public class Negotiator implements Serializable {
 
         public void setCollectionList(List<String> collectionList) {
             this.collectionList = collectionList;
+        }
+
+        public boolean getMolgenisAcceptInvalidUrl() {
+            return molgenisAcceptInvalidUrl;
+        }
+
+        public void setMolgenisAcceptInvalidUrl(boolean molgenisAcceptInvalidUrl) {
+            this.molgenisAcceptInvalidUrl = molgenisAcceptInvalidUrl;
         }
     }
 }

@@ -36,6 +36,11 @@
         <url-pattern>/owner/*</url-pattern>
         <url-pattern>/researcher/*</url-pattern>
     </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>AdminFilter</filter-name>
+        <url-pattern>/admin/*</url-pattern>
+    </filter-mapping>
     <!-- / Filters -->
 
     <servlet-mapping>

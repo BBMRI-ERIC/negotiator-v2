@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 1.0.1
+
+- updated the product tour image for the biobank owner
+
+## Version 1.0.0
+
+- initial release
+
 ## Version 0.0.1
 
 - Added another URL for molgenis in case the URL for the REST interface is different

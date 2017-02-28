@@ -102,7 +102,8 @@ public class Directory {
                 throw new BadRequestException();
             }
 
-            if(!query.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
+            if(!negotiator.getDevelopment().getMolgenisAcceptInvalidUrl() &&
+                    !query.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
                 logger.error("Directory posted wrong redirect URL, aborting");
                 throw new BadRequestException();
             }

@@ -164,14 +164,12 @@ public class UserBean implements Serializable {
              */
             context.redirect(context.getRequestContextPath());
         } else {
-            // redirect user away
-            context.redirect(OAuth2ClientConfig.getLogoutUrl(config, context.getRequestScheme(),
-                    context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(), "/"));
+            context.redirect(context.getRequestContextPath() + "/logout.xhtml");
         }
 	}
 
 	/**
-	 * Inits the.
+	 * Inits the state.
 	 */
 	@PostConstruct
 	public void init() {
@@ -180,7 +178,7 @@ public class UserBean implements Serializable {
 	}
 
 	/**
-	 * Returns the URL for Samply.Auth
+	 * Returns the URL for Perun
 	 *
 	 * @return the authentication url
 	 * @throws UnsupportedEncodingException
@@ -189,15 +187,30 @@ public class UserBean implements Serializable {
 	public String getAuthenticationUrl() throws UnsupportedEncodingException {
 		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 		HttpServletRequest req = (HttpServletRequest) context.getRequest();
+		return getAuthenticationUrl(req);
+	}
 
-		StringBuffer requestURL = new StringBuffer(context.getRequestServletPath());
-		if (req.getQueryString() != null) {
-			requestURL.append("?").append(req.getQueryString());
+	/**
+	 * Returns the URL to Perun for the given HttpServletRequest. Uses the request query string to determine the
+	 * redirect URL back to the negotiator.
+	 * @param request
+	 * @return
+	 * @throws UnsupportedEncodingException
+     */
+	public String getAuthenticationUrl(HttpServletRequest request) throws UnsupportedEncodingException {
+		StringBuilder requestURL = new StringBuilder(request.getServletPath());
+
+		/**
+		 * Construct a redirect URL to the authentication system and back.
+		 */
+
+		if (request.getQueryString() != null) {
+			requestURL.append("?").append(request.getQueryString());
 		}
 
-		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), context.getRequestScheme(),
-		        context.getRequestServerName(), context.getRequestServerPort(), context.getRequestContextPath(),
-		        requestURL.toString(), state, Scope.OPENID);
+		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+				request.getServerName(), request.getServerPort(), request.getContextPath(),
+				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
 	}
 
 	/**
@@ -317,6 +330,23 @@ public class UserBean implements Serializable {
 
 		} catch (SQLException | IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Returns true, if the user is an admin, false otherwise.
+	 * @return
+     */
+	public Boolean isAdmin() {
+		List<String> admins = NegotiatorConfig.get().getNegotiator().getAdmins();
+
+		/**
+		 * Create the userBean if necessary
+		 */
+		if(getLoginValid() && admins != null && admins.contains(userIdentity)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 

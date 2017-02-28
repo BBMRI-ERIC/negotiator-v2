@@ -30,40 +30,17 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-	template="default.xhtml">
+	template="components/default.xhtml">
 
-	<ui:param name="bodyClass" value="container"/>
+	<ui:param name="bodyClass" value="container" />
 
 	<ui:define name="body">
 
-		<h3>#{label['admin.status']}</h3>
+		<h1>#{label['logout.header']}</h1>
 
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th>#{label['admin.table.taskType']}</th>
-					<th>#{label['admin.table.lastSuccess']}</th>
-					<th>#{label['admin.table.lastSuccessMessage']}</th>
-					<th>#{label['admin.table.lastFail']}</th>
-					<th>#{label['admin.table.lastFailMessage']}</th>
-				</tr>
-			</thead>
-			<tbody>
-				<ui:repeat value="#{applicationBean.successStatus.keySet().toArray()}" var="type">
-					<tr class="#{applicationBean.successStatus.get(type).date.after(applicationBean.failStatus.get(type).date) ? 'success' : 'danger'}">
-						<td>#{label[type]}</td>
-						<td>#{applicationBean.successStatus.get(type).date}</td>
-						<td>#{applicationBean.successStatus.get(type).message}</td>
-						<td>#{applicationBean.failStatus.get(type).date}</td>
-						<td>#{applicationBean.failStatus.get(type).message}</td>
-					</tr>
-				</ui:repeat>
-			</tbody>
-		</table>
-
-		<div>
-			Git-Branch: #{applicationBean.gitBranch}, Git-Commit-ID: #{applicationBean.gitCommitId}, Version: #{applicationBean.version}
-		</div>
+		<h3>
+			<h:outputText value="#{label['logout.closeBrowser']}"/>
+		</h3>
 
 	</ui:define>
 

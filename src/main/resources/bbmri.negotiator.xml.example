@@ -26,42 +26,68 @@
 
 <negotiator>
 
+    <!-- The username that Perun will use for the push mechanism (Basic Authentication) -->
     <perunUsername>perun</perunUsername>
 
+    <!-- The password that Perun will use for the push mechanism (Basic Authentication) -->
     <perunPassword>gogogo</perunPassword>
 
+    <!-- The username that the directory will use for the POST request on the negotiator to create a query -->
     <molgenisUsername>molgenis</molgenisUsername>
 
+    <!-- The password that the directory will use for the POST request on the negotiator to create a query -->
     <molgenisPassword>gogogo</molgenisPassword>
 
+    <!-- The ID of the entity in the directory for biobanks -->
     <molgenisResourceBiobanks>eu_bbmri_eric_biobanks</molgenisResourceBiobanks>
 
+    <!-- The ID of the entity in the directory for collections -->
     <molgenisResourceCollections>eu_bbmri_eric_collections</molgenisResourceCollections>
 
+    <!-- The username that the negotiator will use for the REST API from the directory -->
     <molgenisApiUsername>molgenis@negotiator.bbmri</molgenisApiUsername>
 
+    <!-- The password that the negotiator will use for the REST API from the directory -->
     <molgenisApiPassword>gogogo</molgenisApiPassword>
 
+    <!-- The URL to the directory UI -->
     <molgenisUrl>http://old.bbmri-eric.eu/bbmri-eric-directory-2.0</molgenisUrl>
 
+    <!-- The URL to the directory REST API -->
     <molgenisRestUrl>http://old.bbmri-eric.eu</molgenisRestUrl>
 
+    <!-- The local path on the server where all attachments will be stored -->
     <attachmentPath>/home/my-upload-folder/uploads/</attachmentPath>
 
+    <!-- If false no emails will be sent from this negotiator -->
     <mailEnabled>true</mailEnabled>
 
+    <!-- The host on which clamavd is running. Leave empty to disable live antivirus check -->
     <clamavHost>localhost</clamavHost>
 
+    <!-- The port on which clamavd is listening. Leave empty to disable live antivirus check -->
     <clamavPort>3310</clamavPort>
 
+    <!-- The list of admins. Each ID must be a Perun "subject" ID. -->
+    <admins>
+        <id>https://auth-dev.mitro.dkfz.de/users/7</id>
+    </admins>
+
+    <!-- Development options -->
     <development>
 
+        <!-- If true, the automatic redirect to perun is disabled. Instead the user can chose directory to be a biobanker
+            or a researcher. -->
         <authenticationDisabled>true</authenticationDisabled>
 
+        <!-- If true, upon installation of the database the negotiator will deploy the dummy data -->
         <deployDummyData>true</deployDummyData>
 
+        <!-- If true, the negotiator will fake the list of collections from the directory with the list of collections
+            from the "fakeCollections" -->
         <fakeDirectoryCollections>true</fakeDirectoryCollections>
 
+        <!-- The fake collections. Each collection must be an "ID" that is available in the database. -->
         <fakeCollections>
         	<collection>7</collection>
         	<collection>8</collection>
@@ -79,6 +105,10 @@
         	<collection>20</collection>
         	<collection>21</collection>
         </fakeCollections>
+
+        <!-- If true, the negotiator accepts "invalid" URLs from the directory, e.g. if "molgenisUrl" is "https://molgenis52.gcc.rug.nl" but
+            but the URL in the payload starts with "http://localhost:8080/molgenis" -->
+        <molgenisAcceptInvalidUrl>true</molgenisAcceptInvalidUrl>
 
     </development>
 
@@ -106,6 +136,8 @@
                 TlejWev7e6WCNSpGynY+NbmRa8YE26oBMulXco/JSZhTQrB3lQhxFUNNKDjm41pj
                 0wIDAQAB
             </o2:hostPublicKey>
+
+            <!-- The "client" client ID works for localhost only. -->
             <o2:clientId>client</o2:clientId>
             <o2:clientSecret>secret</o2:clientSecret>
 
@@ -116,7 +148,11 @@
         <ms:protocol>smtp</ms:protocol>
         <ms:fromAddress>noreply@www12.inet.dkfz-heidelberg.de</ms:fromAddress>
         <ms:fromName>bbmri.notification</ms:fromName>
+
+        <!-- Leave empty to enable anonymous authentication -->
         <ms:user></ms:user>
+
+        <!-- Leave empty to enable anonymous authentication -->
         <ms:password></ms:password>
         <ms:port>25</ms:port>
         <ms:templateFolder>resources/emailTemplates/</ms:templateFolder>
