@@ -30,41 +30,31 @@
 	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-	template="default.xhtml">
+	template="components/default.xhtml">
 
 	<ui:param name="bodyClass" value="container"/>
 
 	<ui:define name="body">
 
-		<h3>#{label['admin.status']}</h3>
+		<p>
+			<button type="button" class="btn btn-default">Default</button>
+			<button type="button" class="btn btn-primary">Primary</button>
+			<button type="button" class="btn btn-success">Success</button>
+			<button type="button" class="btn btn-info">Info</button>
+			<button type="button" class="btn btn-warning">Warning</button>
+			<button type="button" class="btn btn-danger">Danger</button>
+			<button type="button" class="btn btn-link">Link</button>
+		</p>
 
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th>#{label['admin.table.taskType']}</th>
-					<th>#{label['admin.table.lastSuccess']}</th>
-					<th>#{label['admin.table.lastSuccessMessage']}</th>
-					<th>#{label['admin.table.lastFail']}</th>
-					<th>#{label['admin.table.lastFailMessage']}</th>
-				</tr>
-			</thead>
-			<tbody>
-				<ui:repeat value="#{applicationBean.successStatus.keySet().toArray()}" var="type">
-					<tr class="#{applicationBean.successStatus.get(type).date.after(applicationBean.failStatus.get(type).date) ? 'success' : 'danger'}">
-						<td>#{label[type]}</td>
-						<td>#{applicationBean.successStatus.get(type).date}</td>
-						<td>#{applicationBean.successStatus.get(type).message}</td>
-						<td>#{applicationBean.failStatus.get(type).date}</td>
-						<td>#{applicationBean.failStatus.get(type).message}</td>
-					</tr>
-				</ui:repeat>
-			</tbody>
-		</table>
-
-		<div>
-			Git-Branch: #{applicationBean.gitBranch}, Git-Commit-ID: #{applicationBean.gitCommitId}, Version: #{applicationBean.version}
-		</div>
+		<p>
+			<button type="button" class="btn btn-default btn-default:hover">Default</button>
+			<button type="button" class="btn btn-primary">Primary</button>
+			<button type="button" class="btn btn-success">Success</button>
+			<button type="button" class="btn btn-info">Info</button>
+			<button type="button" class="btn btn-warning">Warning</button>
+			<button type="button" class="btn btn-danger">Danger</button>
+			<button type="button" class="btn btn-link">Link</button>
+		</p>
 
 	</ui:define>
-
 </ui:composition>

@@ -81,3 +81,25 @@ function initializeFileUpload() {
         });
     });
 }
+
+/**
+ * Sets up the panel to be links to the query details.
+ */
+function setupQueryLinks() {
+    $(".panel").click(function() {
+        window.location.href = $(this).find("a.detailLink").attr('href');
+    });
+
+    $(".panel a").click(function(e) {
+        e.stopPropagation();
+    });
+}
+
+/**
+ * Initializes the truncate-panel elements with the jquery truncate plugin
+ */
+$(function() {
+    $(".truncate-panel").truncate({
+        multiline: true
+    });
+});

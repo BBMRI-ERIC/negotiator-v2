@@ -54,6 +54,10 @@
 
     <clamavPort>3310</clamavPort>
 
+    <admins>
+        <id>https://auth-dev.mitro.dkfz.de/users/7</id>
+    </admins>
+
     <development>
 
         <authenticationDisabled>true</authenticationDisabled>
@@ -79,6 +83,8 @@
         	<collection>20</collection>
         	<collection>21</collection>
         </fakeCollections>
+
+        <molgenisAcceptInvalidUrl>true</molgenisAcceptInvalidUrl>
 
     </development>
 

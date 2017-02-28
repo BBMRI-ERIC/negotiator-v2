@@ -1,0 +1,63 @@
+.btn {
+    background-image: none;
+    border-radius: 10px;
+    display: inline-block;
+    border-color: transparent;
+}
+
+.btn:hover, .btn:active, .btn:focus {
+    border-color: transparent;
+}
+
+.btn-default {
+    background-color: #FFF;
+    border-color: #CCC;
+}
+
+.btn-default:hover, .btn-default:active, .btn-default:focus {
+    border-color: #ADADAD;
+}
+
+.btn-default:hover {
+    background-color: #E6E6E6;
+    border-color: #ADADAD;
+}
+
+.btn-primary {
+    background-color: #004275;
+}
+
+.btn-primary:hover, .btn-primary:active, .btn-primary:focus {
+    border-color: transparent;
+    background-color: #3271a0;
+}
+
+.btn-success {
+    background-color: #ec6707;
+}
+
+.btn-success:hover, .btn-success:focus {
+    background-color: #ff9345;
+    color: white;
+}
+
+.btn-info {
+}
+
+.btn-warning {
+    background-color: #e5e388;
+    color: #333333;
+}
+
+.btn-danger {
+    background-color: #ff9999;
+}
+
+
+.btn-warning:hover, .btn-warning:focus {
+
+}
+
+.btn-danger:hover, .btn-danger:focus {
+
+}
