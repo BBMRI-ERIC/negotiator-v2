@@ -13,12 +13,20 @@
     </parent>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <version.samply.webjar>1.6.0</version.samply.webjar>
         <version.samply.auth.client>1.0.0</version.samply.auth.client>
         <version.samply.common.upgrade>2.0.0</version.samply.common.upgrade>
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
         <version.samply.directory.client>1.0.0-molgenis</version.samply.directory.client>
+
+        <database.server>steffi16</database.server>
+        <database.port>5432</database.port>
+        <database.username>negotiator</database.username>
+        <database.password>test123</database.password>
+        <database.name>negotiator2</database.name>
     </properties>
 
     <dependencies>
@@ -343,6 +351,20 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp/META-INF</directory>
+                            <filtering>true</filtering>
+                            <targetPath>META-INF</targetPath>
+                        </resource>
+                    </webResources>
+                </configuration>
             </plugin>
         </plugins>
     </build>
