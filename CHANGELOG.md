@@ -3,6 +3,7 @@
 ## Version 1.0.1
 
 - updated the product tour image for the biobank owner
+- switched to Tomcat JDBC Connection pool
 
 ## Version 1.0.0
 

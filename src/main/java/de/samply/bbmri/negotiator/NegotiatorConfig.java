@@ -26,24 +26,21 @@
 
 package de.samply.bbmri.negotiator;
 
-import java.io.FileNotFoundException;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.common.config.HostAuth;
 import de.samply.common.config.OAuth2Client;
 import de.samply.common.config.ObjectFactory;
-import de.samply.common.config.Postgresql;
 import de.samply.common.config.Proxy;
 import de.samply.common.mailing.MailSending;
 import de.samply.config.util.JAXBUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.FileNotFoundException;
 
 /**
  * The negotiator configuration singleton.
@@ -62,9 +59,6 @@ public class NegotiatorConfig {
 
     /** The oauth2 client configuration, read from FILE_NEGOTIATOR. */
     private OAuth2Client oauth2 = new OAuth2Client();
-
-    /** The postgresql database attributes, read from FILE_NEGOTIATOR. */
-    private Postgresql postgresql = new Postgresql();
 
     /**
      * Mail configuration, read from FILE_NEGOTIATOR.
@@ -156,7 +150,6 @@ public class NegotiatorConfig {
                 instance.projectName, instance.fallback);
 
         instance.oauth2 = instance.negotiator.getoAuth2Client();
-        instance.postgresql = instance.negotiator.getPostgresql();
         instance.mailConfig = instance.negotiator.getMailSending();
 
         /**
@@ -200,14 +193,6 @@ public class NegotiatorConfig {
         return maintenanceMode;
     }
 
-    /**
-     * Gets the current postgresql database configuration
-     * @return
-     */
-    public Postgresql getPostgresql() {
-        return postgresql;
-    }
-    
     /**
      * Get current mail sender configuration
      * @return
