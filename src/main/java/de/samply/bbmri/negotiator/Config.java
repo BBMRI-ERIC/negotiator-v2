@@ -34,6 +34,7 @@ import java.util.List;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.modelmapper.ModelMapper;
@@ -56,6 +57,11 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
     Config(Connection connection) {
         set(connection);
         set(SQLDialect.POSTGRES);
+
+     // Disable JOOQ logging
+        Settings settings = new Settings();
+        settings.withExecuteLogging(false);
+        setSettings(settings);
 
         dsl = DSL.using(this);
     }
