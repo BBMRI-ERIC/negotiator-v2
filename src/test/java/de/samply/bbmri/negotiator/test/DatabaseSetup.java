@@ -43,7 +43,7 @@ public class DatabaseSetup {
 
     @Test
     public void test() throws SQLException {
-    	try(Config config = ConfigFactory.get()) {
+    	try(Config config = TestSuite.getConfiguration()) {
             PersonDao dao = new PersonDao(config);
 
             Person p = new Person();
@@ -58,7 +58,7 @@ public class DatabaseSetup {
     }
 
     public void testCommentStatsDTO() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
+        try(Config config = TestSuite.getConfiguration()) {
             DbUtil.getQueryStatsDTOs(config, 1, null);
         }
     }

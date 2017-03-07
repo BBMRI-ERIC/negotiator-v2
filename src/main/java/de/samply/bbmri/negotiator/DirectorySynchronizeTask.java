@@ -48,9 +48,15 @@ public class DirectorySynchronizeTask extends TimerTask {
      */
     private final static Logger logger = LoggerFactory.getLogger(DirectorySynchronizeTask.class);
 
+    private Config config = null;
+
+    public void setTestConfig(Config config) {
+        this.config = config;
+    }
+
     @Override
     public void run() {
-        try(Config config = ConfigFactory.get()) {
+        try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
             DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisRestUrl(),

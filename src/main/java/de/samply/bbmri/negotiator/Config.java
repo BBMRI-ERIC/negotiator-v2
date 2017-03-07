@@ -54,7 +54,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
      */
     private final DSLContext dsl;
 
-    Config(Connection connection) {
+    public Config(Connection connection) {
         set(connection);
         set(SQLDialect.POSTGRES);
 

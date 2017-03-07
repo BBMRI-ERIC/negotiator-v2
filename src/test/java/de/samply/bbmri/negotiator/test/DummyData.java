@@ -25,7 +25,7 @@ public class DummyData {
      */
     @Test
     public void testComments() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
+        try(Config config = TestSuite.getConfiguration()) {
             assertTrue(DbUtil.getComments(config, 1).size() == 2);
 
             assertTrue(DbUtil.getComments(config, 2).size() == 3);
@@ -38,7 +38,7 @@ public class DummyData {
      */
     @Test
     public void testResearcherQueries() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
+        try(Config config = TestSuite.getConfiguration()) {
             assertTrue(DbUtil.getQueryStatsDTOs(config, 6, null).size() == 2);
         }
     }
@@ -49,7 +49,7 @@ public class DummyData {
      */
       @Test
     public void testOwnerQueries() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
+        try(Config config = TestSuite.getConfiguration()) {
             assertTrue(DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), null).size() == 3);
         }
     }
@@ -61,7 +61,7 @@ public class DummyData {
      */
     @Test
     public void testFlagOwner() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
+        try(Config config = TestSuite.getConfiguration()) {
             List<OwnerQueryStatsDTO> ownerQueries = DbUtil.getOwnerQueries(config, 5, new HashSet<String>(), Flag.ARCHIVED);
             assertTrue(ownerQueries.size() == 1);
             OwnerQueryStatsDTO ownerQueryStatsDTO = ownerQueries.get(0);
@@ -83,7 +83,7 @@ public class DummyData {
      */
     @Test
     public void testAddComment() throws SQLException {
-        try(Config config = ConfigFactory.get()) {
+        try(Config config = TestSuite.getConfiguration()) {
             DbUtil.addComment(config, 1, 5, "Haha, this is just a test comment");
         }
     }

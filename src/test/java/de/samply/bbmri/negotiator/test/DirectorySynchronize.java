@@ -44,9 +44,10 @@ public class DirectorySynchronize {
     @Test
     public void trySynchronize() throws SQLException {
         DirectorySynchronizeTask task = new DirectorySynchronizeTask();
+        task.setTestConfig(TestSuite.getConfiguration());
         task.run();
 
-        try(Config config = ConfigFactory.get()) {
+        try(Config config = TestSuite.getConfiguration()) {
             assertTrue(config.dsl().selectFrom(Tables.BIOBANK).fetch().size() > 10);
         }
     }

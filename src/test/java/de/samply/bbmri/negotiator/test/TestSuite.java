@@ -26,8 +26,9 @@
 
 package de.samply.bbmri.negotiator.test;
 
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.jdbc.ResourceManager;
 import de.samply.common.config.ObjectFactory;
 import de.samply.common.config.Postgresql;
 import de.samply.common.sql.SQLUtil;
@@ -45,6 +46,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 
@@ -57,11 +59,27 @@ import java.sql.SQLException;
 public class TestSuite {
     public static final String FILE_POSTGRESQL = "bbmri.test.postgres.xml";
 
+    private static Postgresql postgresql;
+
 	@BeforeClass
     public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, SamplyUpgradeException, NamingException {
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File file = new File(classLoader.getResource(FILE_POSTGRESQL).getFile());
-        Postgresql postgresql = JAXBUtil.unmarshall(file, getJAXBContext(),
+        NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
+
+	    String prop = "bbmri.negotiator.confdir";
+        File file = null;
+
+        if(System.getProperty(prop) != null) {
+            file = new File(System.getProperty(prop) + File.separator + FILE_POSTGRESQL);
+        } else {
+            ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+            file = new File(classLoader.getResource(FILE_POSTGRESQL).getFile());
+        }
+
+        if(file == null) {
+            System.err.println("Could not find configuration file for test suite. Cancling tests!");
+        }
+
+        postgresql = JAXBUtil.unmarshall(file, getJAXBContext(),
                 Postgresql.class);
 
         /**
@@ -82,9 +100,19 @@ public class TestSuite {
                 Negotiator.class);
     }
 
+    public static Config getConfiguration() throws SQLException {
+        return new Config(getConnection());
+    }
+
     public static Connection getConnection() throws SQLException {
-        Connection connection = ResourceManager.getConnection();
+        String url = "jdbc:postgresql://" + postgresql.getHost() + "/" +
+                postgresql.getDatabase() +
+                "?user=" + postgresql.getUsername() +
+                "&password=" + postgresql.getPassword();
+
+        Connection connection = DriverManager.getConnection(url);
         connection.setAutoCommit(false);
+
         return connection;
     }
 }
