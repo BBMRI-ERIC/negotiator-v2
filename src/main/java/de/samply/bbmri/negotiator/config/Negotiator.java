@@ -122,12 +122,6 @@ public class Negotiator implements Serializable {
     private String attachmentPath;
 
     /**
-     * The database configuration.
-     */
-    @XmlElement
-    private Postgresql postgresql;
-
-    /**
      * The OAuth2 Client configuration.
      */
     @XmlElement
@@ -175,14 +169,6 @@ public class Negotiator implements Serializable {
      */
     @XmlElement
     private Development development = new Development();
-
-    public Postgresql getPostgresql() {
-        return postgresql;
-    }
-
-    public void setPostgresql(Postgresql postgresql) {
-        this.postgresql = postgresql;
-    }
 
     public OAuth2Client getoAuth2Client() {
         return oAuth2Client;

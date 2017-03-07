@@ -26,23 +26,26 @@
 
 package de.samply.bbmri.negotiator.test;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-
+import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.jdbc.ResourceManager;
+import de.samply.common.config.ObjectFactory;
+import de.samply.common.config.Postgresql;
+import de.samply.common.sql.SQLUtil;
+import de.samply.common.upgrade.SamplyUpgradeException;
+import de.samply.config.util.JAXBUtil;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.xml.sax.SAXException;
 
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.common.config.Postgresql;
-import de.samply.common.sql.SQLUtil;
-import de.samply.common.upgrade.SamplyUpgradeException;
+import javax.naming.NamingException;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 
 /**
@@ -52,14 +55,14 @@ import de.samply.common.upgrade.SamplyUpgradeException;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({DatabaseSetup.class, DirectorySynchronize.class, DummyData.class})
 public class TestSuite {
-
-    private static Postgresql postgresql;
+    public static final String FILE_POSTGRESQL = "bbmri.test.postgres.xml";
 
 	@BeforeClass
-    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, SamplyUpgradeException {
-        NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
-
-        postgresql = NegotiatorConfig.get().getPostgresql();
+    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, SamplyUpgradeException, NamingException {
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File file = new File(classLoader.getResource(FILE_POSTGRESQL).getFile());
+        Postgresql postgresql = JAXBUtil.unmarshall(file, getJAXBContext(),
+                Postgresql.class);
 
         /**
          * Manually drop all tables in the database.
@@ -74,14 +77,13 @@ public class TestSuite {
         connection.commit();
     }
 
-    public static Connection getConnection() throws SQLException {
-    	
-        String url = "jdbc:postgresql://" + postgresql.getHost() + "/" +
-        		postgresql.getDatabase() +
-                "?user=" + postgresql.getUsername() +
-                "&password=" + postgresql.getPassword();
+    private static JAXBContext getJAXBContext() throws JAXBException {
+        return JAXBContext.newInstance(ObjectFactory.class, de.samply.common.mailing.ObjectFactory.class,
+                Negotiator.class);
+    }
 
-        Connection connection = DriverManager.getConnection(url);
+    public static Connection getConnection() throws SQLException {
+        Connection connection = ResourceManager.getConnection();
         connection.setAutoCommit(false);
         return connection;
     }

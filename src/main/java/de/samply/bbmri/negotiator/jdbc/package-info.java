@@ -1,6 +1,10 @@
-/**
- * Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
- * Deutsches Krebsforschungszentrum in Heidelberg
+/*
+ * Copyright (C) 2015 Working Group on Joint Research,
+ * Division of Medical Informatics,
+ * Institute of Medical Biometrics, Epidemiology and Informatics,
+ * University Medical Center of the Johannes Gutenberg University Mainz
+ *
+ * Contact: info@osse-register.de
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
@@ -13,7 +17,7 @@
  * details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program; if not, see http://www.gnu.org/licenses.
+ * along with this program; if not, see <http://www.gnu.org/licenses>.
  *
  * Additional permission under GNU GPL version 3 section 7:
  *
@@ -23,24 +27,8 @@
  * License, version 2.0, the licensors of this Program grant you additional
  * permission to convey the resulting work.
  */
-
-package de.samply.bbmri.negotiator;
-
-import de.samply.bbmri.negotiator.jdbc.ResourceManager;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-
 /**
- * Creates a Config object based on the tomcat jdbc connection pool
+ * Contains the resource manager for database access
+ *
  */
-public class ConfigFactory {
-
-    public static Config get() throws SQLException {
-        Connection connection = ResourceManager.getConnection();
-        connection.setAutoCommit(false);
-
-        return new Config(connection);
-    }
-
-}
+package de.samply.bbmri.negotiator.jdbc;
