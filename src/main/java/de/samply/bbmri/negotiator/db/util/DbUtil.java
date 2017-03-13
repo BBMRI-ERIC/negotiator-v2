@@ -59,7 +59,6 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
@@ -189,19 +188,6 @@ public class DbUtil {
         return config.dsl().selectFrom(Tables.QUERY)
                 .where(Tables.QUERY.NEGOTIATOR_TOKEN.eq(token))
                 .fetchOne();
-    }
-
-    /**
-     * Insert JSON text the database.
-     * @param config JOOQ configuration
-     * @param jsonQuery the JSON query to be inserted
-     * @return the primary key/sequence of the inserted query. This will be sent to the perun.
-     */
-    public static Result<JsonQueryRecord> insertQuery(Config config, String jsonQuery) {
-        return config.dsl().insertInto(Tables.JSON_QUERY)
-                    .set(Tables.JSON_QUERY.JSON_TEXT, jsonQuery)
-                    .returning(Tables.JSON_QUERY.ID)
-                    .fetch();
     }
 
     /**

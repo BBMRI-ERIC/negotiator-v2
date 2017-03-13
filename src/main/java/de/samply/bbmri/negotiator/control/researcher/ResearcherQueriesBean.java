@@ -48,9 +48,7 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 
@@ -138,26 +136,6 @@ public class ResearcherQueriesBean implements Serializable {
         return NegotiatorConfig.get().getNegotiator().getMolgenisUrl() + "?mode=debug";
     }
 
-
-
-
-    /**
-     * Creates a new structured query in Database
-     * @param jsonQuery - json text received from the directory
-     * @return The temporary Query id to be sent to perun.
-     */
-    public Integer createQuery(String jsonQuery) {
-        Integer temporaryQueryId = null;
-        try(Config config = ConfigFactory.get()) {
-            Result<JsonQueryRecord> id =  DbUtil.insertQuery(config, jsonQuery);
-            temporaryQueryId = id.getValue(0, Tables.JSON_QUERY.ID);
-            config.get().commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return temporaryQueryId;
-    }
-
     /**
      * Selects all the comments made on a query
      * @param query
@@ -174,13 +152,11 @@ public class ResearcherQueriesBean implements Serializable {
 
     public List<QueryStatsDTO> getQueries() {
         try(Config config = ConfigFactory.get()) {
-            String jsonQuery = "Some json text received in proper format from paul";
             queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
 
             for (int i = 0; i < queries.size(); ++i) {
                 getCommentCountAndTime(i);
             }
-            createQuery(jsonQuery);
         } catch (SQLException e) {
             e.printStackTrace();
         }
