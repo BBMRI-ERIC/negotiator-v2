@@ -179,6 +179,14 @@
 
 					<p class="pre-wrap">#{ownerQueriesDetailBean.selectedQuery.text}</p>
 
+					<h:outputLabel for="filterInputText"
+								   value="#{label['queryview.title.searchParameters']}" />
+					<h:outputText
+							value="#{ownerQueriesDetailBean.humanReadableQuery}"
+							style="margin-left: 22px;">
+					</h:outputText>
+					<br />
+					<br></br>
 				</h:panelGroup>
 
 				<h:panelGroup layout="block" styleClass="col-md-12">

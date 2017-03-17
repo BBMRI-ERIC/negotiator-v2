@@ -26,6 +26,7 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
@@ -50,6 +52,8 @@ import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
+import de.samply.bbmri.negotiator.rest.RestApplication;
+import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 
 /**
  * Manages the query detail view for owners
@@ -65,6 +69,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	@ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
+
+	/**
+	 * The structured query object
+	 */
+	private String humanReadableQuery = null;
 
 	/**
      * The OwnerQueryStatsDTO object used to get all the information for queries.
@@ -136,9 +145,16 @@ public class OwnerQueriesDetailBean implements Serializable {
             	}
             }
 
+            if(selectedQuery != null) {
+				RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+				ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+				QueryDTO queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
+				setHumanReadableQuery(queryDTO.getHumanReadable());
+			}
+
            associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
-        } catch (SQLException e) {
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 	}
@@ -353,4 +369,11 @@ public class OwnerQueriesDetailBean implements Serializable {
         this.offerPersonDTO = offerPersonDTO;
     }
 
+	public String getHumanReadableQuery() {
+		return humanReadableQuery;
+	}
+
+	public void setHumanReadableQuery(String humanReadableQuery) {
+		this.humanReadableQuery = humanReadableQuery;
+	}
 }
