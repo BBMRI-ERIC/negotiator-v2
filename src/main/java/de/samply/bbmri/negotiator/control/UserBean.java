@@ -137,6 +137,11 @@ public class UserBean implements Serializable {
 	 */
 	private Person person;
 
+    /**
+     * The redirect URL used when the user lands at the negotiator from the directory, after making a new query. It contains the temporary query id.
+     */
+    private String newQueryRedirectURL;
+
 	/**
 	 * Basic Constructor for when the user bean is created without dependency injection.
 	 */
@@ -200,12 +205,15 @@ public class UserBean implements Serializable {
 	public String getAuthenticationUrl(HttpServletRequest request) throws UnsupportedEncodingException {
 		StringBuilder requestURL = new StringBuilder(request.getServletPath());
 
+
 		/**
 		 * Construct a redirect URL to the authentication system and back.
 		 */
 
 		if (request.getQueryString() != null) {
-			requestURL.append("?").append(request.getQueryString());
+			requestURL.setLength(0);
+			requestURL.append("/index.xhtml");
+		    setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
 		}
 
 		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
@@ -586,4 +594,12 @@ public class UserBean implements Serializable {
 	public void setResearcher(Boolean researcher) {
 		this.researcher = researcher;
 	}
+
+    public String getNewQueryRedirectURL() {
+        return newQueryRedirectURL;
+    }
+
+    public void setNewQueryRedirectURL(String newQueryRedirectURL) {
+        this.newQueryRedirectURL = newQueryRedirectURL;
+    }
 }

@@ -48,6 +48,8 @@ import de.samply.bbmri.negotiator.control.UserBean;
  */
 @WebFilter(filterName = "ResearcherOwnerFilter")
 public class ResearcherOwnerFilter implements Filter {
+
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -64,6 +66,13 @@ public class ResearcherOwnerFilter implements Filter {
         if(!userBean.getBiobankOwner() && !userBean.getResearcher() && NegotiatorConfig.get().getNegotiator().isAuthenticationDisabled()) {
             HttpServletResponse resp = (HttpServletResponse) response;
             resp.sendRedirect(req.getContextPath() + "/dev/chose.xhtml");
+            return;
+        }
+
+        if(userBean.getNewQueryRedirectURL() != null){
+            HttpServletResponse resp = (HttpServletResponse) response;
+            resp.sendRedirect(req.getContextPath() + userBean.getNewQueryRedirectURL());
+            userBean.setNewQueryRedirectURL(null);
             return;
         }
 
