@@ -282,3 +282,8 @@ a:hover {
 .projectName {
     color: #eb690b;
 }
+
+/* Make the whole panels click-able where this style is used  */
+.clickable{
+
+}

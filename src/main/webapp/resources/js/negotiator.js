@@ -86,11 +86,11 @@ function initializeFileUpload() {
  * Sets up the panel to be links to the query details.
  */
 function setupQueryLinks() {
-    $(".panel").click(function() {
+    $(".clickable").click(function() {
         window.location.href = $(this).find("a.detailLink").attr('href');
     });
 
-    $(".panel a").click(function(e) {
+    $(".clickable a").click(function(e) {
         e.stopPropagation();
     });
 }

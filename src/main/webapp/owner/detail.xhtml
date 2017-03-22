@@ -61,7 +61,7 @@
 
 						<h:panelGroup layout="block" styleClass="deco-none">
 							<h:panelGroup layout="block"
-								styleClass="panel panel-default #{queryDto.query.id == ownerQueriesDetailBean.queryId ? 'selected-query' : ''}
+								styleClass="panel panel-default clickable #{queryDto.query.id == ownerQueriesDetailBean.queryId ? 'selected-query' : ''}
 								#{queryDto.isArchived() ? 'archived-query' : ''} ">
 
 								<h:panelGroup layout="block" styleClass="panel-heading">

@@ -66,7 +66,7 @@
             <ui:repeat var="queryDto" value="#{ownerQueriesBean.getQueries()}">
 
                 <h:panelGroup layout="block" styleClass="deco-none">
-                    <h:panelGroup layout="block" styleClass="panel panel-default #{queryDto.isArchived() ? 'archived-query' : ''} ">
+                    <h:panelGroup layout="block" styleClass="panel panel-default clickable #{queryDto.isArchived() ? 'archived-query' : ''} ">
                         <h:panelGroup layout="block" styleClass="panel-heading">
                             <h:form id="queryItemActions">
                                 <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
