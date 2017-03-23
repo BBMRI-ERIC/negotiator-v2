@@ -52,9 +52,21 @@
 			
            <div class="form-group">
            		#{label['queryview.title.title']}  <i class="fa fa-pencil-square-o" />
-				<h:inputText id="title" value="#{queryBean.queryTitle}" styleClass="form-control" required="true"/><br></br>
+				<h:inputText id="title" value="#{queryBean.queryTitle}" styleClass="form-control"
+				     validatorMessage="#{label['error.invalidTitleLength']}">								
+					<f:validateLength for="title" minimum="5" maximum="30" />				    	
+				</h:inputText>				
+				<h:messages id="titleValidationMessage" for="title" style="color:red" showSummary="true" showDetails="false" />
+				
+				<br></br>
                	#{label['queryview.title.text']}  <i class="fa fa-pencil-square-o" /> 
-               	<h:inputTextarea id="text" value="#{queryBean.queryText}" styleClass="form-control" rows="5" required="true" />
+               	<h:inputTextarea id="description" value="#{queryBean.queryText}" styleClass="form-control" rows="5"  
+               	     validatorMessage="#{label['error.invalidDescriptionLength']}"> 
+               	
+	               	<f:validateLength for="description" minimum="5" maximum="500" />
+	                <h:messages id="descriptionValidationMessage" for="description"
+	                                style="color:red" showSummary="true" showDetails="false" />
+               	</h:inputTextarea>
            </div> 
                          
            <h:panelGroup layout="block" styleClass="pull-right">
