@@ -41,7 +41,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.JoinType;
 import org.jooq.Record;
-import org.jooq.Record2;
+import org.jooq.Record3;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
@@ -93,8 +93,8 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord getQueryDescription(Config config, Integer id) {
-        Record2<String,String> result = config.dsl()
-                .select(Tables.QUERY.TITLE, Tables.QUERY.TEXT)
+        Record3<String,String,String> result = config.dsl()
+                .select(Tables.QUERY.TITLE, Tables.QUERY.TEXT, Tables.QUERY.JSON_TEXT)
                 .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(id))
                 .fetchOne();

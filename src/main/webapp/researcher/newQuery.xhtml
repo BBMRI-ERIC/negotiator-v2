@@ -49,8 +49,19 @@
     <h:form id="form" enctype="multipart/form-data">
 
        <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
-			
-           <div class="form-group">
+
+				<h:panelGroup layout="block">
+					<h:outputLabel for="structuredQuery"
+						value="#{label['queryview.title.searchParameters']}" />
+					<h:outputText id="structuredQuery"
+						value="#{queryBean.humanReadableFilters}"
+						style="margin-left: 22px;">
+					</h:outputText>
+					<br />
+					<br></br>
+				</h:panelGroup>
+
+				<div class="form-group">
            		#{label['queryview.title.title']}  <i class="fa fa-pencil-square-o" />
 				<h:inputText id="title" value="#{queryBean.queryTitle}" styleClass="form-control"
 				     validatorMessage="#{label['error.invalidTitleLength']}">								

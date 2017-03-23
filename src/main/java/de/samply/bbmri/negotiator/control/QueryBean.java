@@ -89,11 +89,12 @@ public class QueryBean implements Serializable {
 	           QueryRecord queryRecord = DbUtil.getQueryDescription(config, id);
 	           queryText = queryRecord.getText();
 	           queryTitle = queryRecord.getTitle();
+	           jsonQuery = queryRecord.getJsonText();
 	       }
 	       else{
 	           jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-               humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
 	       }
+	       humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
 	   }
 	   catch (Exception e) {
 		   logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
