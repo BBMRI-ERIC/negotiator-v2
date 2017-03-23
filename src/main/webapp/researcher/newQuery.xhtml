@@ -56,17 +56,15 @@
 				     validatorMessage="#{label['error.invalidTitleLength']}">								
 					<f:validateLength for="title" minimum="5" maximum="30" />				    	
 				</h:inputText>				
-				<h:messages id="titleValidationMessage" for="title" style="color:red" showSummary="true" showDetails="false" />
+				<h:message for="title" style="color:red" styleClass="pre-wrap" />
 				
 				<br></br>
                	#{label['queryview.title.text']}  <i class="fa fa-pencil-square-o" /> 
                	<h:inputTextarea id="description" value="#{queryBean.queryText}" styleClass="form-control" rows="5"  
-               	     validatorMessage="#{label['error.invalidDescriptionLength']}"> 
-               	
-	               	<f:validateLength for="description" minimum="5" maximum="500" />
-	                <h:messages id="descriptionValidationMessage" for="description"
-	                                style="color:red" showSummary="true" showDetails="false" />
+               	     validatorMessage="#{label['error.invalidDescriptionLength']}">                	
+	               	<f:validateLength for="description" minimum="5" maximum="500" />	                
                	</h:inputTextarea>
+               	<h:message for="description" style="color:red" styleClass="pre-wrap" />
            </div> 
                          
            <h:panelGroup layout="block" styleClass="pull-right">
