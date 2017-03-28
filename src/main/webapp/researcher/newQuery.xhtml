@@ -123,7 +123,7 @@
 
 							<!-- Show that there are no uploaded attachments yet -->
 							<h:panelGroup layout="block"
-								rendered="#{queryBean.numberOfAttachments == '0'}"
+								rendered="#{queryBean.attachments.size() == 0}"
 								styleClass="row">
 								<h:panelGroup styleClass="form-group" layout="block">
 									<h:outputLabel

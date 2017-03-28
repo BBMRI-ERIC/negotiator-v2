@@ -100,22 +100,22 @@ public class QueryBean implements Serializable {
     * The jsonText of the query.
     */
    private String jsonQuery;
+
    /**
     * The human readable filters of the query.
     */
    private String humanReadableFilters;
+
    /**
     * The mode of the page - editing or creating a new query
     */
    private String mode = null;
-   /**
-    * The number of attachments for a query.
-    */
-   private Integer numberOfAttachments;
+
    /**
     * List of all the attachments for a given query
     */
    private List<QueryAttachmentDTO> attachments;
+
    /**
     * Query attachment upload
     */
@@ -134,7 +134,6 @@ public class QueryBean implements Serializable {
 	           queryText = queryRecord.getText();
 	           queryTitle = queryRecord.getTitle();
 	           jsonQuery = queryRecord.getJsonText();
-	           setNumberOfAttachments(queryRecord.getNumAttachments());
 	           setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
 	       }
 	       else{
@@ -178,7 +177,7 @@ public class QueryBean implements Serializable {
     * Uploads and stores content of file from provided input stream
     */
    public String uploadAttachment() {
-           int attachmentIndex = getNumberOfAttachments();
+           int attachmentIndex = getAttachments().size();
            String uploadName = FileUtil.getFileName(file, id, attachmentIndex);
 
            if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
@@ -307,14 +306,6 @@ public class QueryBean implements Serializable {
 
     public void setMode(String mode) {
         this.mode = mode;
-    }
-
-    public Integer getNumberOfAttachments() {
-        return numberOfAttachments;
-    }
-
-    public void setNumberOfAttachments(Integer numberOfAttachments) {
-        this.numberOfAttachments = numberOfAttachments;
     }
 
     public List<QueryAttachmentDTO> getAttachments() {
