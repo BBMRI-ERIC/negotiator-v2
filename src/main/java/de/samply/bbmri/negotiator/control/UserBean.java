@@ -216,7 +216,7 @@ public class UserBean implements Serializable {
 		    setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
 		}
 
-		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+		return OAuth2ClientConfig.getRedirectUrlPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
 				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
 	}
