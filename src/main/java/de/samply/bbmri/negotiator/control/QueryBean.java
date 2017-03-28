@@ -29,25 +29,33 @@ package de.samply.bbmri.negotiator.control;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
+import javax.servlet.http.Part;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.FileUtil;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
+import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
 
 
@@ -59,6 +67,11 @@ import de.samply.bbmri.negotiator.rest.Directory;
 public class QueryBean implements Serializable {
 
    private static final long serialVersionUID = -611428463046308071L;
+
+   /**
+    * Query attachment upload
+    */
+   private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
    private int jsonQueryId;
 
    private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
@@ -68,14 +81,45 @@ public class QueryBean implements Serializable {
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
 
+   /**
+    * The query id if user is in the edit mode.
+    */
    private Integer id = null;
+
+   /**
+    * The description of the query.
+    */
    private String queryText;
+
+   /**
+    * The title of the query.
+    */
    private String queryTitle;
+
+   /**
+    * The jsonText of the query.
+    */
    private String jsonQuery;
+   /**
+    * The human readable filters of the query.
+    */
    private String humanReadableFilters;
+   /**
+    * The mode of the page - editing or creating a new query
+    */
    private String mode = null;
-
-
+   /**
+    * The number of attachments for a query.
+    */
+   private Integer numberOfAttachments;
+   /**
+    * List of all the attachments for a given query
+    */
+   private List<QueryAttachmentDTO> attachments;
+   /**
+    * Query attachment upload
+    */
+   private Part file;
 
    /**
 	* Initializes this bean by registering email notification observer
@@ -90,6 +134,8 @@ public class QueryBean implements Serializable {
 	           queryText = queryRecord.getText();
 	           queryTitle = queryRecord.getTitle();
 	           jsonQuery = queryRecord.getJsonText();
+	           setNumberOfAttachments(queryRecord.getNumAttachments());
+	           setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
 	       }
 	       else{
 	           jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
@@ -101,6 +147,9 @@ public class QueryBean implements Serializable {
 	   }
    }
 
+   /**
+    * Saves the newly created or edited query in the database.
+    */
    public String saveQuery() throws SQLException {
        // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
@@ -124,6 +173,71 @@ public class QueryBean implements Serializable {
        }
        return "/researcher/index";
    }
+
+   /**
+    * Uploads and stores content of file from provided input stream
+    */
+   public String uploadAttachment() {
+           int attachmentIndex = getNumberOfAttachments();
+           String uploadName = FileUtil.getFileName(file, id, attachmentIndex);
+
+           if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
+               try(Config config = ConfigFactory.get()) {
+                   DbUtil.updateNumQueryAttachments(config, getId(), ++attachmentIndex);
+                   DbUtil.insertQueryAttachmentRecord(config, getId(), uploadName);
+                   config.commit();
+               } catch (SQLException e) {
+                   e.printStackTrace();
+               }
+           }
+           return "/researcher/newQuery?queryId="+getId()+"&faces-redirect=true";
+   }
+
+   /**
+    * Validates uploaded file to be of correct size, content type and format
+    * @param ctx
+    * @param comp
+    * @param value
+    * @throws IOException
+    */
+   public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
+       List<FacesMessage> msgs = new ArrayList<FacesMessage>();
+       Part file = (Part)value;
+       if(file != null) {
+           if (file.getSize() > MAX_UPLOAD_SIZE) {
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The given file was too big.", "File too big."));
+           }
+
+           if (!"application/pdf".equals(file.getContentType())) {
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The uploaded file was not a PDF file.", "Not a PDF file"));
+           }
+
+           if(FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                       "The uploaded file contains malicious content and therefore has been rejected.", "Malicious content"));
+           }
+
+           if (!msgs.isEmpty()) {
+               throw new ValidatorException(msgs);
+           }
+       }
+   }
+
+   /**
+    * Removes an attachment from the given query
+    */
+   public String removeAttachment(String attachment) {
+       //TODO - remove physical file from file system
+       try (Config config = ConfigFactory.get()) {
+           DbUtil.deleteQueryAttachmentRecord(config, getId(), attachment);
+           config.commit();
+
+       } catch (SQLException e) {
+           e.printStackTrace();
+       }
+       return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
+   }
+
 
    /**
     * Build url to be able to navigate to the query with id=queryId
@@ -193,5 +307,29 @@ public class QueryBean implements Serializable {
 
     public void setMode(String mode) {
         this.mode = mode;
+    }
+
+    public Integer getNumberOfAttachments() {
+        return numberOfAttachments;
+    }
+
+    public void setNumberOfAttachments(Integer numberOfAttachments) {
+        this.numberOfAttachments = numberOfAttachments;
+    }
+
+    public List<QueryAttachmentDTO> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<QueryAttachmentDTO> attachments) {
+        this.attachments = attachments;
+    }
+
+    public Part getFile() {
+        return file;
+    }
+
+    public void setFile(Part file) {
+        this.file = file;
     }
 }

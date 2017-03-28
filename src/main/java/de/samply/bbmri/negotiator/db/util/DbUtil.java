@@ -41,7 +41,6 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.JoinType;
 import org.jooq.Record;
-import org.jooq.Record3;
 import org.jooq.Result;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
@@ -93,9 +92,8 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord getQueryDescription(Config config, Integer id) {
-        Record3<String,String,String> result = config.dsl()
-                .select(Tables.QUERY.TITLE, Tables.QUERY.TEXT, Tables.QUERY.JSON_TEXT)
-                .from(Tables.QUERY)
+        Record result = config.dsl()
+                .selectFrom(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(id))
                 .fetchOne();
 
@@ -138,6 +136,11 @@ public class DbUtil {
         config.dsl().delete(Tables.QUERY_ATTACHMENT)
             .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
             .and(Tables.QUERY_ATTACHMENT.ATTACHMENT.eq(attachment)).execute();
+
+        config.dsl().update(Tables.QUERY)
+        .set(Tables.QUERY.NUM_ATTACHMENTS, Tables.QUERY.NUM_ATTACHMENTS.sub(1))
+        .where(Tables.QUERY.ID.eq(queryId)).execute();
+
     }
 
     /**

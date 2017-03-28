@@ -36,13 +36,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 
 import org.jooq.Record;
@@ -52,8 +48,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.FileUtil;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
@@ -263,71 +257,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Validates uploaded file to be of correct size, content type and format
-     * @param ctx
-     * @param comp
-     * @param value
-     * @throws IOException
-     */
-    public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
-        List<FacesMessage> msgs = new ArrayList<FacesMessage>();
-        Part file = (Part)value;
-        if(file != null) {
-            if (file.getSize() > MAX_UPLOAD_SIZE) {
-                msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The given file was too big.", "File too big."));
-            }
-
-            if (!"application/pdf".equals(file.getContentType())) {
-                msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The uploaded file was not a PDF file.", "Not a PDF file"));
-            }
-
-            if(FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
-                msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "The uploaded file contains malicious content and therefore has been rejected.", "Malicious content"));
-            }
-
-            if (!msgs.isEmpty()) {
-                throw new ValidatorException(msgs);
-            }
-        }
-    }
-
-
-    /**
-     * Uploads and stores content of file from provided input stream
-     */
-    public String uploadAttachment() {
-        int attachmentIndex = selectedQuery.getNumAttachments();
-        String uploadName = FileUtil.getFileName(file, queryId, attachmentIndex);
-
-        if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
-            try(Config config = ConfigFactory.get()) {
-                DbUtil.updateNumQueryAttachments(config, selectedQuery.getId(), ++attachmentIndex);
-                DbUtil.insertQueryAttachmentRecord(config, selectedQuery.getId(), uploadName);
-                config.commit();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return "/researcher/detail?queryId="+selectedQuery.getId()+"&faces-redirect=true";
-    }
-
-    /*
-     * Remove query attachment record
-     */
-    public String removeAttachment(String attachment) {
-        //TODO - remove physical file from file system
-        try (Config config = ConfigFactory.get()) {
-            DbUtil.deleteQueryAttachmentRecord(config, selectedQuery.getId(), attachment);
-            config.commit();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return "/researcher/detail?queryId="+selectedQuery.getId()+"&faces-redirect=true";
     }
 
     public void setQueries(List<QueryStatsDTO> queries) {

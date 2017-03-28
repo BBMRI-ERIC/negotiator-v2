@@ -217,15 +217,7 @@
 													title="#{label['attachmentview.tooltip.attachmentDownload']}"
 													style="color:#333" />
 											</h:outputLink>
-
-											<label class="input-group-btn"> <h:commandLink
-													styleClass="btn btn-default"
-													action="#{researcherQueriesDetailBean.removeAttachment(attachment.attachment)}"
-													title="#{label['attachmentview.tooltip.attachmentDelete']}">
-													<i class="fa fa-times" aria-hidden="true"
-														style="font-size: 13px;" />
-												</h:commandLink>
-											</label>
+											
 										</h:panelGroup>
 									</h:panelGroup>
 								</h:panelGroup>
@@ -242,30 +234,10 @@
 								</h:panelGroup>
 							</h:panelGroup>
 						</h:panelGroup>
-
+						
+                        <!-- Upload the attachments for a query -->
 						<h:panelGroup layout="block" styleClass="col-md-6">
-							<h:panelGroup class="input-group" layout="block">
-								<input type="text" class="form-control" readonly="readonly" />
-
-								<label class="input-group-btn"> <h:panelGroup
-										class="btn btn-default">
-										<h:outputText value="#{label['querydetail.action.browse']}" />
-										<h:inputFile id="file"
-											value="#{researcherQueriesDetailBean.file}"
-											validator="#{researcherQueriesDetailBean.validateFile}"
-											onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
-											style="display: none;" />
-									</h:panelGroup> <h:commandButton id="uploadBtn" value="Upload"
-										action="#{researcherQueriesDetailBean.uploadAttachment}"
-										styleClass="btn btn-primary disabled" />
-								</label>
-							</h:panelGroup>
-
-							<h:outputScript>
-								$(function() {
-									initializeFileUpload();
-								});
-							</h:outputScript>
+							
 						</h:panelGroup>
 					</h:panelGroup>
 				</h:panelGroup>
