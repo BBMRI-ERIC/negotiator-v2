@@ -55,8 +55,19 @@
 					value="#{queryBean.humanReadableFilters}"
 					style="margin-left: 22px;">
 				</h:outputText>
-				<br />
-				<br></br>
+				
+				<br/>
+				<br/>
+				<h:form>				
+					<h:commandLink action="#{queryBean.editSearchParameters()}"	styleClass="btn btn-primary" 
+						title="#{label['queryview.tooltip.editSearchParameters']}">
+	                                #{label['queryview.title.editSearchParameters']}
+	                </h:commandLink>
+                </h:form>                
+                
+                <br/>
+                <br/>
+                
 			</h:panelGroup>
 
 
@@ -169,14 +180,12 @@
 
 					<h:commandButton action="#{queryBean.saveQuery()}"
 						value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
-						title="#{label['querydetail.action.addQuery']}"
+						title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"						
 						styleClass="btn btn-primary" />
 				</h:panelGroup>
 			</h:form>
 			
 		</h:panelGroup>
-
-
 
 	</ui:define>
 </ui:composition>

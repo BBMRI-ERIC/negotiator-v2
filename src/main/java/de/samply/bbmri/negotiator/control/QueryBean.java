@@ -45,6 +45,9 @@ import javax.servlet.http.Part;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
@@ -112,38 +115,44 @@ public class QueryBean implements Serializable {
    private String mode = null;
 
    /**
+    * The token sent to directory for authentication.
+    */
+   private String ntoken;
+
+   /**
     * List of all the attachments for a given query
     */
    private List<QueryAttachmentDTO> attachments;
 
    /**
-    * Query attachment upload
+    * Query attachment upload.
     */
    private Part file;
 
    /**
-	* Initializes this bean by registering email notification observer
-	*/
+    * Initializes this bean by registering email notification observer
+    */
    public void initialize() {
-	   try(Config config = ConfigFactory.get()) {
-	       /* If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited. */
-	       if(id != null)
-	       {
-	           setMode("edit");
-	           QueryRecord queryRecord = DbUtil.getQueryDescription(config, id);
-	           queryText = queryRecord.getText();
-	           queryTitle = queryRecord.getTitle();
-	           jsonQuery = queryRecord.getJsonText();
-	           setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
-	       }
-	       else{
-	           jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-	       }
-	       humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
-	   }
-	   catch (Exception e) {
-		   logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
-	   }
+       try(Config config = ConfigFactory.get()) {
+           /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
+           if(id != null)
+           {
+               setMode("edit");
+               QueryRecord queryRecord = DbUtil.getQueryDescription(config, id);
+               queryText = queryRecord.getText();
+               queryTitle = queryRecord.getTitle();
+               jsonQuery = queryRecord.getJsonText();
+               ntoken = queryRecord.getNegotiatorToken();
+               setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
+           }
+           else{
+               jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+           }
+           humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
+       }
+       catch (Exception e) {
+           logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
+       }
    }
 
    /**
@@ -171,6 +180,25 @@ public class QueryBean implements Serializable {
            e.printStackTrace();
        }
        return "/researcher/index";
+   }
+
+   /**
+    * Redirects the user to directory for editing the query
+ * @throws IOException
+ * @throws JsonMappingException
+ * @throws JsonParseException
+    */
+   public void editSearchParameters() throws JsonParseException, JsonMappingException, IOException {
+       ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+
+       /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited.
+          Add token if an existing query is being edited. Else the user is still in the process of creating a
+          query and it has not been saved in the Query table hence no token is used.*/
+       if(id != null) {
+           externalContext.redirect(Directory.getQueryDTO(jsonQuery).getUrl() + "&nToken=" + ntoken);
+       }else{
+           externalContext.redirect(Directory.getQueryDTO(jsonQuery).getUrl());
+       }
    }
 
    /**

@@ -216,19 +216,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return filterTerms;
     }
 
-
-    /**
-     * Redirects the user to directory for editing the query
-     */
-    public String editQuery() {
-        if(queryDTO != null && selectedQuery != null) {
-            return queryDTO.getUrl() + "&nToken=" + selectedQuery.getNegotiatorToken();
-        } else {
-            return "http://test.com";
-        }
-    }
-
-
     /**
      * Returns the list of queries in which the current bio bank owner is a part of(all queries that on owner can see)
      *

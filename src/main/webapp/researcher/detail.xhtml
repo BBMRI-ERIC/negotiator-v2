@@ -169,16 +169,14 @@
 						<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 					</h:outputText>
 				</h:panelGroup>
-			</h:panelGroup>
-
-			<br></br>
+			</h:panelGroup>			
 
 			<h:panelGroup
 				rendered="#{researcherQueriesDetailBean.collections.size() > 0}"
 				layout="block">
 
 				<a href="#" data-toggle="collapse" data-target="#collection-list">
-					#{label['queryview.action.showcollections']} </a>
+					<b>#{label['queryview.action.showcollections']} </b> </a>
 
 				<div id="collection-list" class="collapse">
 					<ul>
@@ -188,9 +186,11 @@
 						</ui:repeat>
 					</ul>
 				</div>
-
-			</h:panelGroup>
-
+			</h:panelGroup>			
+			
+			<br/>
+            <br/>			
+			
 			<h:panelGroup
 				rendered="#{researcherQueriesDetailBean.collections.size() == 0}"
 				layout="block">
@@ -205,14 +205,14 @@
 
 				<h:panelGroup styleClass="row" layout="block">
 					<h:panelGroup styleClass="col-md-12" layout="block">
-						<h:panelGroup layout="block" styleClass="col-md-6">
+						<h:panelGroup layout="block" styleClass="col-md-4">
 							<ui:repeat value="#{researcherQueriesDetailBean.attachments}"
 								var="attachment">
 								<h:panelGroup layout="block" styleClass="row">
 									<h:panelGroup layout="block" styleClass="form-group">
 										<h:panelGroup class="input-group" layout="block">
 											<h:outputLink value="../attachment/#{attachment.attachment}"
-												styleClass="input-group-addon" style="text-align: left;">
+												styleClass="input-group-addon" style="text-align: left; border-radius:10px;">
 												<h:outputText value="#{attachment.attachment}"
 													title="#{label['attachmentview.tooltip.attachmentDownload']}"
 													style="color:#333" />
@@ -235,9 +235,8 @@
 							</h:panelGroup>
 						</h:panelGroup>
 						
-                        <!-- Upload the attachments for a query -->
-						<h:panelGroup layout="block" styleClass="col-md-6">
-							
+                        <!-- Balancing the col-md grid -->
+						<h:panelGroup layout="block" styleClass="col-md-8">							
 						</h:panelGroup>
 					</h:panelGroup>
 				</h:panelGroup>
@@ -246,19 +245,13 @@
 			<h:panelGroup styleClass="col-md-12" layout="block">
 
 				<h:panelGroup styleClass="row btn-toolbar" layout="block">
-					<h:outputLink value="#{researcherQueriesDetailBean.editQuery()}"
-						styleClass="btn btn-primary" style="margin-left: -8px;"
-						title="#{label['queryview.tooltip.editQuery']}">
-                                #{label['queryview.title.editQuery']}
-                            </h:outputLink>
 
 					<h:button outcome="newQuery"
-						value="#{label['queryview.title.editQueryDescription']}"
-						title="#{label['queryview.tooltip.editQueryDescription']}"
-						styleClass="btn btn-primary">
+						value="#{label['queryview.title.editQuery']}"
+						title="#{label['queryview.tooltip.editQuery']}"
+						styleClass="btn btn-primary" style="margin-left: -8px;">
 
-						<f:param name="queryId"
-							value="#{researcherQueriesDetailBean.selectedQuery.id}" />
+						<f:param name="queryId"	value="#{researcherQueriesDetailBean.selectedQuery.id}" />
 					</h:button>
 				</h:panelGroup>
 
