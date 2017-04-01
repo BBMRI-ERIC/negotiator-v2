@@ -34,7 +34,7 @@ import javax.faces.bean.SessionScoped;
 
 /**
  * Session scoped bean for general data of the session
- * 
+ *
  * User session data are stored in the UserBean!.
  */
 @ManagedBean
@@ -46,9 +46,21 @@ public class SessionBean implements Serializable {
 
     /** The filters. */
     private List<String> filters = null;
-    
+
     /** The filter to add. */
     private String filter = null;
+
+    /**
+     * The title of the query when an attachment is being uploaded. This might not be the final
+     * title and is thus cleared from the session bean once the page is refreshed after attachment upload.
+     */
+    private String transientQueryTitle;
+
+    /**
+     * The text of the query when an attachment is being uploaded. This might not be the final
+     * text and is thus cleared from the session bean once the page is refreshed after attachment upload.
+     */
+    private String transientQueryText;
 
     /**
      * Removes all the filters at once.
@@ -128,4 +140,19 @@ public class SessionBean implements Serializable {
         this.filter = filter;
     }
 
+    public String getTransientQueryTitle() {
+        return transientQueryTitle;
+    }
+
+    public void setTransientQueryTitle(String transientQueryTitle) {
+        this.transientQueryTitle = transientQueryTitle;
+    }
+
+    public String getTransientQueryText() {
+        return transientQueryText;
+    }
+
+    public void setTransientQueryText(String transientQueryText) {
+        this.transientQueryText = transientQueryText;
+    }
 }

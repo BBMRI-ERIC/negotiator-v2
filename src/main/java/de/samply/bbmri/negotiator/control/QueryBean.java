@@ -85,6 +85,12 @@ public class QueryBean implements Serializable {
    private UserBean userBean;
 
    /**
+    * Session bean use to store transient edit query values
+    */
+   @ManagedProperty(value = "#{sessionBean}")
+   private SessionBean sessionBean;
+
+   /**
     * The query id if user is in the edit mode.
     */
    private Integer id = null;
@@ -139,8 +145,19 @@ public class QueryBean implements Serializable {
            {
                setMode("edit");
                QueryRecord queryRecord = DbUtil.getQueryDescription(config, id);
-               queryText = queryRecord.getText();
-               queryTitle = queryRecord.getTitle();
+
+               /**
+                * Save query title and text temporarily when a file is being uploaded.
+                */
+               if(sessionBean.getTransientQueryTitle() != null && sessionBean.getTransientQueryText() != null){
+                   queryTitle = sessionBean.getTransientQueryTitle();
+                   queryText = sessionBean.getTransientQueryText();
+                   clearEditChanges();
+               }else{
+                   queryTitle = queryRecord.getTitle();
+                   queryText = queryRecord.getText();
+               }
+
                jsonQuery = queryRecord.getJsonText();
                ntoken = queryRecord.getNegotiatorToken();
                setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
@@ -191,14 +208,34 @@ public class QueryBean implements Serializable {
    public void editSearchParameters() throws JsonParseException, JsonMappingException, IOException {
        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 
-       /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited.
-          Add token if an existing query is being edited. Else the user is still in the process of creating a
-          query and it has not been saved in the Query table hence no token is used.*/
-       if(id != null) {
+       /**
+        * Add token if an existing query is being edited. Else the user is still in the process of creating a
+        * query and it has not been saved in the Query table hence no token is used.
+        */
+       if(mode.equals("edit")) {
            externalContext.redirect(Directory.getQueryDTO(jsonQuery).getUrl() + "&nToken=" + ntoken);
        }else{
            externalContext.redirect(Directory.getQueryDTO(jsonQuery).getUrl());
        }
+   }
+
+   /**
+    * Save title and text in session bean when uploading attachment.
+    * @param title query title
+    * @param text query description
+    */
+   public void saveEditChangesTemporarily(String title, String text) {
+       sessionBean.setTransientQueryTitle(title);
+       sessionBean.setTransientQueryText(text);
+   }
+
+   /**
+    * Clear title and text from session bean once the attachment is uploaded and the initialize function .
+    * has updated values.
+    */
+   public void clearEditChanges() {
+       sessionBean.setTransientQueryTitle(null);
+       sessionBean.setTransientQueryText(null);
    }
 
    /**
@@ -212,12 +249,16 @@ public class QueryBean implements Serializable {
                try(Config config = ConfigFactory.get()) {
                    DbUtil.updateNumQueryAttachments(config, getId(), ++attachmentIndex);
                    DbUtil.insertQueryAttachmentRecord(config, getId(), uploadName);
+                   if(mode.equals("edit")){
+                       saveEditChangesTemporarily(queryTitle, queryText);
+                   }
                    config.commit();
                } catch (SQLException e) {
                    e.printStackTrace();
                }
            }
            return "/researcher/newQuery?queryId="+getId()+"&faces-redirect=true";
+
    }
 
    /**
@@ -350,5 +391,13 @@ public class QueryBean implements Serializable {
 
     public void setFile(Part file) {
         this.file = file;
+    }
+
+    public SessionBean getSessionBean() {
+        return sessionBean;
+    }
+
+    public void setSessionBean(SessionBean sessionBean) {
+        this.sessionBean = sessionBean;
     }
 }
