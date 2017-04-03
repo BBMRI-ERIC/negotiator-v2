@@ -73,6 +73,7 @@ public class AuthorizationFilter implements Filter {
          */
         if(path.startsWith(request.getContextPath() + "/api/") ||
                 path.startsWith(request.getContextPath() + "/help/") ||
+                path.equals(request.getContextPath() + "/login.xhtml") ||
                 path.equals(request.getContextPath() + "/logout.xhtml")) {
             chain.doFilter(req, res);
             return;
@@ -122,8 +123,9 @@ public class AuthorizationFilter implements Filter {
                 return;
             }
 
-            String url = userBean.getAuthenticationUrl(request);
-            response.sendRedirect(url);
+            response.sendRedirect(request.getContextPath() + "/login.xhtml");
+//            String url = userBean.getAuthenticationUrl(request);
+//            response.sendRedirect(url);
         }
     }
 

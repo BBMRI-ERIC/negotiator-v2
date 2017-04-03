@@ -196,6 +196,19 @@ public class UserBean implements Serializable {
 	}
 
 	/**
+	 * Returns the URL for Perun
+	 *
+	 * @return the authentication url
+	 * @throws UnsupportedEncodingException
+	 *             the unsupported encoding exception
+	 */
+	public String getAuthenticationRegisterUrl() throws UnsupportedEncodingException {
+		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+		HttpServletRequest req = (HttpServletRequest) context.getRequest();
+		return getAuthenticationRegisterUrl(req);
+	}
+
+	/**
 	 * Returns the URL to Perun for the given HttpServletRequest. Uses the request query string to determine the
 	 * redirect URL back to the negotiator.
 	 * @param request
@@ -216,12 +229,38 @@ public class UserBean implements Serializable {
 		    setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
 		}
 
-		return OAuth2ClientConfig.getRedirectUrlPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
 				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
 	}
 
-	/**
+    /**
+     * Returns the URL to Perun for the given HttpServletRequest. Uses the request query string to determine the
+     * redirect URL back to the negotiator.
+     * @param request
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public String getAuthenticationRegisterUrl(HttpServletRequest request) throws UnsupportedEncodingException {
+        StringBuilder requestURL = new StringBuilder(request.getServletPath());
+
+
+        /**
+         * Construct a redirect URL to the authentication system and back.
+         */
+
+        if (request.getQueryString() != null) {
+            requestURL.setLength(0);
+            requestURL.append("/index.xhtml");
+            setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
+        }
+
+        return OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+                request.getServerName(), request.getServerPort(), request.getContextPath(),
+                requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+    }
+
+    /**
 	 * Lets the user login and sets all necessary fields.
 	 *
 	 * @param client
