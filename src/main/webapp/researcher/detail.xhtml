@@ -198,49 +198,36 @@
 					styleClass="form-control-static" />
 			</h:panelGroup>
 
-			<h:form id="uploadform" enctype="multipart/form-data">
-				<h:outputText value="#{label['querydetail.title.attachments']}"
-					title="#{label['attachmentview.tooltip.attachment']}"
-					styleClass="attachment-title" />
 
-				<h:panelGroup styleClass="row" layout="block">
-					<h:panelGroup styleClass="col-md-12" layout="block">
-						<h:panelGroup layout="block" styleClass="col-md-4">
-							<ui:repeat value="#{researcherQueriesDetailBean.attachments}"
-								var="attachment">
-								<h:panelGroup layout="block" styleClass="row">
-									<h:panelGroup layout="block" styleClass="form-group">
-										<h:panelGroup class="input-group" layout="block">
-											<h:outputLink value="../attachment/#{attachment.attachment}"
-												styleClass="input-group-addon" style="text-align: left; border-radius:10px;">
-												<h:outputText value="#{attachment.attachment}"
-													title="#{label['attachmentview.tooltip.attachmentDownload']}"
-													style="color:#333" />
-											</h:outputLink>
-											
-										</h:panelGroup>
-									</h:panelGroup>
-								</h:panelGroup>
-							</ui:repeat>
+			<!-- Using h:dataTable to display attachments -->
+					<h:panelGroup layout="block" style="margin-bottom: 20px">
 
-							<!-- Show that there are no uploads yet -->
-							<h:panelGroup layout="block"
-								rendered="#{researcherQueriesDetailBean.attachments.size() == 0}"
-								styleClass="row">
-								<h:panelGroup styleClass="form-group" layout="block">
-									<h:outputLabel
-										value="#{label['attachmentview.text.noattachments']}"
-										styleClass="form-control-static" />
-								</h:panelGroup>
-							</h:panelGroup>
-						</h:panelGroup>
-						
-                        <!-- Balancing the col-md grid -->
-						<h:panelGroup layout="block" styleClass="col-md-8">							
-						</h:panelGroup>
+
+						<h:dataTable value="#{researcherQueriesDetailBean.attachments}"
+							var="attachment" columnClasses="column1, column2"
+							class="table-striped table-bordered table-responsive"
+							rendered="#{researcherQueriesDetailBean.attachments.size() > 0}">
+
+							<h:column styleClass="attachment-links">
+								<!-- column header -->
+								<f:facet name="header" >Attachments</f:facet>
+								<!-- row record -->
+
+								<h:outputLink value="../attachment/#{attachment.attachment}"
+									style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+
+									<h:outputText value="#{attachment.attachment}"
+										title="#{label['attachmentview.tooltip.attachmentDownload']}"
+										style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap "
+										styleClass="attachment-links">
+									</h:outputText>
+								</h:outputLink>
+							</h:column>
+						</h:dataTable>
+
 					</h:panelGroup>
-				</h:panelGroup>
-			</h:form>
+				
+
 
 			<h:panelGroup styleClass="col-md-12" layout="block">
 
@@ -249,7 +236,7 @@
 					<h:button outcome="newQuery"
 						value="#{label['queryview.title.editQuery']}"
 						title="#{label['queryview.tooltip.editQuery']}"
-						styleClass="btn btn-primary" style="margin-left: -8px;">
+						styleClass="btn btn-primary" style="margin-left: -8px; margin-bottom: 20px ">
 
 						<f:param name="queryId"	value="#{researcherQueriesDetailBean.selectedQuery.id}" />
 					</h:button>

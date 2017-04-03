@@ -287,3 +287,21 @@ a:hover {
 .clickable{
 
 }
+
+.column1 {
+	min-width: 300px;
+	max-width: 405px; 
+}
+
+.column2 {
+	min-width: 70px;
+	max-width: 100px; 
+}
+
+.attachment-links {
+    margin: 5px 5px 5px 5px; 
+}
+
+.attachment-delete-links {
+    margin: 5px 5px 5px 25px; 
+}
