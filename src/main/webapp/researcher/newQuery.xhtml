@@ -98,17 +98,16 @@
 				<!-- Using h:dataTable to display attachments -->
 				<h:panelGroup styleClass="row" layout="block">
 					<h:panelGroup styleClass="col-md-12" layout="block">
-						<h:panelGroup layout="block" styleClass="col-md-6" style="margin-left: -14px">
 
 
 							<h:dataTable value="#{queryBean.attachments}" var="attachment"
-								columnClasses="column1, column2"
-								class="table-striped table-bordered table-responsive"
+								columnClasses="col-md-11, col-md-1"
+								class="table-striped table-bordered table-responsive table-fullwidth"
 								rendered="#{queryBean.attachments.size() > 0}">
 
 								<h:column>
 									<!-- column header -->
-									<f:facet name="header" >Attachments</f:facet>
+									<f:facet name="header" >Attachments (only PDF files are accepted)</f:facet>
 									<!-- row record -->
 
 									<h:outputLink value="../attachment/#{attachment.attachment}"
@@ -155,7 +154,7 @@
 							<!-- Upload the attachments for a query -->
 							<h:panelGroup layout="block" style="margin-top: 20px;" >
 								<h:panelGroup class="input-group" layout="block">
-									<input type="text" class="form-control" readonly="readonly" />
+									<input type="text" class="form-control" readonly="readonly" onclick="$('#uploadform\\:file').click();" />
 
 									<label class="input-group-btn"> <h:panelGroup
 											class="btn btn-default">
@@ -169,7 +168,9 @@
 											styleClass="btn btn-primary disabled" />
 									</label>
 								</h:panelGroup>
-
+								<h:panelGroup layout="block">
+									<h:message for="file" />
+								</h:panelGroup>
 								<h:outputScript>
 			                        $(function() {
 			                            initializeFileUpload();
@@ -178,9 +179,7 @@
 							</h:panelGroup>
 
 
-						</h:panelGroup>
-						<h:panelGroup layout="block" styleClass="col-md-6">
-						</h:panelGroup>
+
 					</h:panelGroup>
 				</h:panelGroup>
 

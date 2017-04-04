@@ -242,23 +242,25 @@ public class QueryBean implements Serializable {
     * Uploads and stores content of file from provided input stream
     */
    public String uploadAttachment() {
-           int attachmentIndex = getAttachments().size();
-           String uploadName = FileUtil.getFileName(file, id, attachmentIndex);
+       if(file == null)
+           return "";
 
-           if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
-               try(Config config = ConfigFactory.get()) {
-                   DbUtil.updateNumQueryAttachments(config, getId(), ++attachmentIndex);
-                   DbUtil.insertQueryAttachmentRecord(config, getId(), uploadName);
-                   if(mode.equals("edit")){
-                       saveEditChangesTemporarily(queryTitle, queryText);
-                   }
-                   config.commit();
-               } catch (SQLException e) {
-                   e.printStackTrace();
+       int attachmentIndex = getAttachments().size();
+       String uploadName = FileUtil.getFileName(file, id, attachmentIndex);
+
+       if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
+           try(Config config = ConfigFactory.get()) {
+               DbUtil.updateNumQueryAttachments(config, getId(), ++attachmentIndex);
+               DbUtil.insertQueryAttachmentRecord(config, getId(), uploadName);
+               if(mode.equals("edit")){
+                   saveEditChangesTemporarily(queryTitle, queryText);
                }
+               config.commit();
+           } catch (SQLException e) {
+               e.printStackTrace();
            }
-           return "/researcher/newQuery?queryId="+getId()+"&faces-redirect=true";
-
+       }
+       return "/researcher/newQuery?queryId="+getId()+"&faces-redirect=true";
    }
 
    /**
@@ -273,16 +275,18 @@ public class QueryBean implements Serializable {
        Part file = (Part)value;
        if(file != null) {
            if (file.getSize() > MAX_UPLOAD_SIZE) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The given file was too big.", "File too big."));
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "File too big.", "The given file was too big." +
+                       " Maximum size allowed is: "+MAX_UPLOAD_SIZE/1024/1024+" MB"));
            }
 
            if (!"application/pdf".equals(file.getContentType())) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "The uploaded file was not a PDF file.", "Not a PDF file"));
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not a PDF file", "The uploaded file was not " +
+                       "a PDF file."));
            }
 
            if(FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                       "The uploaded file contains malicious content and therefore has been rejected.", "Malicious content"));
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "File possibly infected",
+                       "The uploaded file triggered a virus warning and therefore has been rejected."));
            }
 
            if (!msgs.isEmpty()) {
