@@ -245,21 +245,33 @@ public class QueryBean implements Serializable {
        if(file == null)
            return "";
 
-       int attachmentIndex = getAttachments().size();
-       String uploadName = FileUtil.getFileName(file, id, attachmentIndex);
+       String originalFileName = FileUtil.getFileName(file);
 
-       if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
-           try(Config config = ConfigFactory.get()) {
-               DbUtil.updateNumQueryAttachments(config, getId(), ++attachmentIndex);
-               DbUtil.insertQueryAttachmentRecord(config, getId(), uploadName);
+       try(Config config = ConfigFactory.get()) {
+           Integer fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName);
+           if(fileId == null) {
+               // something went wrong in db
+               config.rollback();
+               return "";
+           }
+
+           //XXX: this needs to match the pattern in FileServlet.doGet and ResearcherQueriesDetailBean.getAttachmentMap
+           String uploadName = "query_"+getId()+"_file_"+fileId+"_name_"+originalFileName;
+
+           if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
                if(mode.equals("edit")){
                    saveEditChangesTemporarily(queryTitle, queryText);
                }
                config.commit();
-           } catch (SQLException e) {
-               e.printStackTrace();
+           } else {
+               // something went wrong saving the file to disk
+               config.rollback();
            }
+       } catch (SQLException e) {
+           e.printStackTrace();
+           return "";
        }
+
        return "/researcher/newQuery?queryId="+getId()+"&faces-redirect=true";
    }
 

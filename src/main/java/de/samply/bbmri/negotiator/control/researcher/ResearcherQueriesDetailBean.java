@@ -30,11 +30,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -103,7 +99,15 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     private List<CommentPersonDTO> comments;
 
+    /**
+     * List of attachments
+     */
     private List<QueryAttachmentDTO> attachments;
+
+    /**
+     * Map of saved filename and realname of attachments
+     */
+    private HashMap<String, String> attachmentMap = null;
 
     /**
      * Query attachment upload
@@ -308,6 +312,22 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setAttachments(List<QueryAttachmentDTO> attachments) {
         this.attachments = attachments;
+    }
+
+    /**
+     * Lazyloaded map of saved filenames and original filenames
+     * @return
+     */
+    public HashMap<String, String> getAttachmentMap() {
+        if(attachmentMap == null) {
+            attachmentMap = new HashMap<>();
+            for(QueryAttachmentDTO att : attachments) {
+                //XXX: this pattern needs to match
+                String uploadName = "query_" + queryId + "_file_" + att.getId() + "_name_" + att.getAttachment();
+                attachmentMap.put(uploadName, att.getAttachment());
+            }
+        }
+        return attachmentMap;
     }
 
     public List<QueryAttachmentDTO> getAttachments() {

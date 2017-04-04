@@ -74,6 +74,14 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
     }
 
     /**
+     * Executes a SQL-Rollback
+     * @throws SQLException
+     */
+    public void rollback() throws SQLException {
+        get().rollback();
+    }
+
+    /**
      * Returns the SQL connection.
      * @return
      */

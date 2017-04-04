@@ -72,12 +72,11 @@ public class FileUtil {
      * @param filePart
      * @return
      */
-    public static String getFileName(Part filePart, int queryId, int numAttachments) {
+    public static String getFileName(Part filePart) {
         String header = filePart.getHeader("content-disposition");
         for(String headerPart : header.split(";")) {
             if(headerPart.trim().startsWith("filename")){
-                return "Query" + queryId + "-" + numAttachments + headerPart.substring(headerPart.indexOf('=') + 1).trim().replace("\"", "");
-              
+                return headerPart.substring(headerPart.indexOf('=') + 1).trim().replace("\"", "");
             }
         }
         return null;

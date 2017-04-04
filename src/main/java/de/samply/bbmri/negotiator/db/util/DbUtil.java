@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -54,15 +55,6 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
@@ -121,14 +113,21 @@ public class DbUtil {
      * Insert query attachment name
      * @param queryId
      * @param attachment
+     * @return the ID of the inserted attachment
      * @throws SQLException
      */
-    public static void insertQueryAttachmentRecord(Config config, Integer queryId, String attachment) {
-       config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
+    public static Integer insertQueryAttachmentRecord(Config config, Integer queryId, String attachment) {
+        Result<QueryAttachmentRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
                 .set(Tables.QUERY_ATTACHMENT.ATTACHMENT, attachment)
                 .set(Tables.QUERY_ATTACHMENT.QUERY_ID, queryId)
                 .returning(Tables.QUERY_ATTACHMENT.ID)
                 .fetch();
+
+        if(result == null || result.getValues(Tables.QUERY_ATTACHMENT.ID) == null || result.getValues(Tables
+                .QUERY_ATTACHMENT.ID).size() < 1)
+            return null;
+
+        return result.getValues(Tables.QUERY_ATTACHMENT.ID).get(0);
     }
 
 

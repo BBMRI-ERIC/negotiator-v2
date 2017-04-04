@@ -203,7 +203,7 @@
 					<h:panelGroup layout="block" style="margin-bottom: 20px">
 
 
-						<h:dataTable value="#{researcherQueriesDetailBean.attachments}"
+						<h:dataTable value="#{researcherQueriesDetailBean.attachmentMap.entrySet().toArray()}"
 							var="attachment"
 							class="table-striped table-bordered table-responsive table-fullwidth"
 							rendered="#{researcherQueriesDetailBean.attachments.size() > 0}">
@@ -213,10 +213,10 @@
 								<f:facet name="header" >Attachments</f:facet>
 								<!-- row record -->
 
-								<h:outputLink value="../attachment/#{attachment.attachment}"
+								<h:outputLink value="../attachment/#{attachment.key}"
 									style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
 
-									<h:outputText value="#{attachment.attachment}"
+									<h:outputText value="#{attachment.value}"
 										title="#{label['attachmentview.tooltip.attachmentDownload']}"
 										style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap "
 										styleClass="attachment-links">

@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -65,8 +67,25 @@ public class FileServlet extends HttpServlet {
         /* Get requested file by path info.  */
         String requestedFile = request.getPathInfo();
 
+        // We provide for the fileservlet a concatted name with queryID and fileID in it
+        // and here now cut it in pieces again. The reason for that is "security", so
+        // you cannot by simple guess download files of other queries.
+
+        //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
+        // patterngrops 1: queryID, 2: fileID, 3: fileName
+        Pattern pattern = Pattern.compile("^\\/query_(\\d*)_file_(\\d*)_name_(.*)");
+        Matcher matcher = pattern.matcher(requestedFile);
+        String downloadFilename = null;
+
+        if(matcher.find()) {
+            downloadFilename = matcher.group(3);
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
+            return;
+        }
+
         /* Check if file is actually supplied to the request URI.  */
-        if (requestedFile == null) {
+        if (requestedFile == null || downloadFilename == null || "".equals(downloadFilename)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
             return;
         }
@@ -93,7 +112,7 @@ public class FileServlet extends HttpServlet {
         response.setBufferSize(DEFAULT_BUFFER_SIZE);
         response.setContentType(contentType);
         response.setHeader("Content-Length", String.valueOf(file.length()));
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + downloadFilename + "\"");
 
         /* Prepare streams.  */
         BufferedInputStream input = null;

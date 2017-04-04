@@ -29,6 +29,7 @@ package de.samply.bbmri.negotiator.model;
 public class QueryAttachmentDTO {
     
     private int queryId;
+    private int id;
     private String attachment;
    
     public int getQueryId() {
@@ -37,6 +38,15 @@ public class QueryAttachmentDTO {
     public void setQueryId(int queryId) {
         this.queryId = queryId;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getAttachment() {
         return attachment;
     }
