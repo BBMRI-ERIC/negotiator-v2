@@ -86,6 +86,8 @@ public class Directory {
             /**
              * Check authentication
              */
+
+
             Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
             AuthenticationService.authenticate(request, negotiator.getMolgenisUsername(), negotiator.getMolgenisPassword());
 
@@ -151,7 +153,7 @@ public class Directory {
 
                 CreateQueryResultDTO result = new CreateQueryResultDTO();
 
-                String builder = getLocalUrl(request) + "/researcher/detail.xhtml?queryId=" + queryRecord.getId();
+                String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
 
                 result.setRedirectUri(builder);
 
@@ -164,12 +166,12 @@ public class Directory {
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     /**
      * Convert the string to an object, so that we can store it in the database.
-     * @throws IOException 
-     * @throws JsonMappingException 
-     * @throws JsonParseException 
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonParseException
     */
     public static QueryDTO getQueryDTO(String queryString) throws JsonParseException, JsonMappingException, IOException {
     	RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
