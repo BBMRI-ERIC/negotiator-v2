@@ -42,11 +42,10 @@
 		<f:viewAction action="#{researcherQueriesDetailBean.initialize}" />
 	</f:metadata>
 
-	<ui:param name="bodyClass" value="container-fluid" />
+	<ui:param name="bodyClass" value="container-fluid body-nomargin" />
 
 	<ui:define name="body">
-
-		<h:panelGroup layout="block" styleClass="col-md-3">
+		<h:panelGroup layout="block" styleClass="col-md-3 left-panel">
 
 			<bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
 			
@@ -133,10 +132,10 @@
 
 			</h:form>
 
-		</h:panelGroup>
+        </h:panelGroup>
 
-		<h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1"
-			id="right-panel">
+		<h:panelGroup layout="block" styleClass="col-md-6 right-panel" id="right-panel">
+            <h:panelGroup layout="block" styleClass="main-content">
 
 
 			<h:panelGroup layout="block">
@@ -348,9 +347,9 @@
 				    }
 				});
 		   </h:outputScript>
-			
-			
-			
+
+
+            </h:panelGroup>
 		</h:panelGroup>
 
 	</ui:define>

@@ -2,6 +2,9 @@ body {
     margin-top: 50px;
 }
 
+.body-nomargin {
+    margin-top: 0px;
+}
 .nav-tabs .glyphicon:not (.no-margin ) {
     margin-right: 10px;
 }
@@ -304,4 +307,33 @@ a:hover {
 
 .attachment-delete-links {
     margin: 5px 5px 5px 25px; 
+}
+
+
+@media (min-width: 768px){
+    .left-panel {
+        position: absolute;
+        top: 80px;
+        bottom: 0;
+        left: 0;
+        width: 25%;
+        overflow-y: scroll;
+    }
+
+    .left-panel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .right-panel {
+        position: absolute;
+        top: 80px;
+        bottom: 0;
+        right: 0;
+        overflow-y: scroll;
+        width: 75%;
+    }
+
+    .right-panel::-webkit-scrollbar {
+        display: none;
+    }
 }
