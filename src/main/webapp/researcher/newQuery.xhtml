@@ -188,9 +188,11 @@
                 
 				<h:panelGroup layout="block" styleClass="pull-right">
                     <h:button outcome="detail" styleClass="btn btn-primary" value="#{label['global.button.cancel']}"
-                              style="margin-right: 5px;">
+                              style="margin-right: 5px;"  rendered="#{queryBean.mode == 'edit'}">                              
+                              
                         <f:param name="queryId" value="#{queryBean.id}" />
                     </h:button>
+                    
 					<h:commandButton action="#{queryBean.saveQuery()}"
 						value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
 						title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"						
