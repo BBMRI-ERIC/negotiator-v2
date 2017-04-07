@@ -1,0 +1,137 @@
+<!--
+  ~ Copyright (c) 2017. Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  ~
+  -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
+      xmlns:composite="http://java.sun.com/jsf/composite">
+
+
+<composite:interface>
+    <composite:attribute name="item" required="true" shortDescription="The query to display"/>
+    <composite:attribute name="selectedQuery" required="true" shortDescription="The currently selected query"/>
+    <composite:attribute name="backingBean" required="true"
+                         shortDescription="A backing bean to invoke filter methods."/>
+</composite:interface>
+
+<composite:implementation>
+    <h:panelGroup layout="block" styleClass="deco-none">
+        <h:panelGroup layout="block"
+                      styleClass="panel panel-default clickable #{cc.attrs.item.query.id == cc.attrs.selectedQuery ? 'selected-query' : ''}
+								#{cc.attrs.item.isArchived() ? 'archived-query' : ''} ">
+
+            <h:panelGroup layout="block" styleClass="panel-heading">
+
+                <h:commandLink
+                        styleClass="#{cc.attrs.item.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
+                        title="#{cc.attrs.item.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+                        action="#{cc.attrs.backingBean.starQuery(queryDto)}">
+                    <i class="fa fa-star"></i>
+                </h:commandLink>
+
+                <h:link outcome="detail"
+                        title="#{label['queryview.queryitem.action.clickme']}"
+                        style="margin-left: 30px;" styleClass="detailLink">
+                    <f:param name="queryId" value="#{cc.attrs.item.query.id}" />
+                    <f:param name="flag" value="#{ownerQueriesBean.flagFilter}" />
+                    <h:outputText value="#{cc.attrs.item.query.title}" />
+                </h:link>
+
+                <h:panelGroup styleClass="pull-right">
+
+                    <h:panelGroup layout="block"
+                                  styleClass="btn-group queryActionButtons pull-right"
+                                  role="group" aria-label="...">
+
+                        <h:commandLink
+                                styleClass="#{cc.attrs.item.isArchived() ? 'btn btn-primary' : 'btn btn-default'}"
+                                title="#{cc.attrs.item.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
+                                action="#{cc.attrs.backingBean.archiveQuery(queryDto)}">
+                            <i class="fa fa-folder-open"></i>
+                        </h:commandLink>
+
+                        <h:commandLink
+                                styleClass="#{cc.attrs.item.isIgnored() ? 'btn btn-primary' : 'btn btn-default'}"
+                                title="#{cc.attrs.item.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
+                                action="#{cc.attrs.backingBean.ignoreQuery(queryDto)}">
+                            <i class="fa fa-sign-out"></i>
+                        </h:commandLink>
+
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="badge queryNumberResponsesBadge"
+                                  rendered="#{cc.attrs.item.commentCount > 0}">
+                        <h:outputText
+                                title="#{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
+                                value="#{cc.attrs.item.commentCount}" />
+                    </h:panelGroup>
+
+                </h:panelGroup>
+
+            </h:panelGroup>
+
+
+            <h:panelGroup layout="block" styleClass="panel-body">
+                <h:panelGroup layout="block" styleClass="row">
+                    <h:panelGroup layout="block" styleClass="col-md-2 col-xs-2">
+                        <bbmricc:avatar person="#{cc.attrs.item.queryAuthor}" />
+                    </h:panelGroup>
+
+                    <h:panelGroup styleClass="col-md-10">
+                        <h:panelGroup layout="block" styleClass="row queryOwner">
+                            #{cc.attrs.item.queryAuthor.authName}
+                        </h:panelGroup>
+                        <h:panelGroup layout="block" styleClass="row">
+                            <h:panelGroup layout="block" styleClass="col-md-12 truncate-panel">
+                                #{cc.attrs.item.query.text}
+                            </h:panelGroup>
+
+                        </h:panelGroup>
+
+                        <h:panelGroup layout="block" styleClass="row">
+                            <h:panelGroup layout="block" styleClass="col-md-12">
+                                <h:panelGroup styleClass="pull-right">
+
+                                    <h:outputText value="#{cc.attrs.item.query.queryCreationTime}"
+                                                  title="#{label['queryview.queryitem.datetime.creation']}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+                                    </h:outputText>
+                                </h:panelGroup>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:panelGroup>
+
+        </h:panelGroup>
+    </h:panelGroup>
+</composite:implementation>
+
+</html>

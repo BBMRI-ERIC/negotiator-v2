@@ -337,3 +337,10 @@ a:hover {
         display: none;
     }
 }
+
+.avatar-image {
+    min-height: 40px;
+    height: 40px;
+    width: 40px;
+    min-width: 40px;
+}

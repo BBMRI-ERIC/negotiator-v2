@@ -26,332 +26,274 @@
   -->
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
-	template="../components/default.xhtml">
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
+                template="../components/default.xhtml">
 
-	<!-- Queries detail page for the owner -->
+    <f:metadata>
+        <f:viewParam name="queryId"
+                     value="#{researcherQueriesDetailBean.queryId}"/>
+        <f:viewAction action="#{researcherQueriesDetailBean.initialize}"/>
+    </f:metadata>
 
-	<f:metadata>
-		<f:viewParam name="queryId"
-			value="#{researcherQueriesDetailBean.queryId}" />
-		<f:viewAction action="#{researcherQueriesDetailBean.initialize}" />
-	</f:metadata>
+    <!-- Queries detail page for the owner -->
 
-	<ui:param name="bodyClass" value="container-fluid body-nomargin" />
+    <ui:param name="bodyClass" value="container-fluid body-nomargin"/>
 
-	<ui:define name="body">
-		<h:panelGroup layout="block" styleClass="col-md-3 left-panel">
+    <ui:define name="body">
+        <h:panelGroup layout="block" styleClass="col-md-3 left-panel">
 
-			<bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
-			
-			<h:panelGroup
-                rendered="#{researcherQueriesDetailBean.queries.size() == 0 and researcherQueriesDetailBean.filterTerms.size() > 0}"
-                layout="block" styleClass="col-md-12">
+            <bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
+
+            <!-- queryboxes BEGIN -->
+            <h:panelGroup
+                    rendered="#{researcherQueriesDetailBean.queries.size() == 0 and researcherQueriesDetailBean.filterTerms.size() > 0}"
+                    layout="block" styleClass="col-md-12">
                 <h3>#{label['queryview.noSearchResults']}</h3>
             </h:panelGroup>
-			
-			
 
-			<h:form>
+            <ui:fragment rendered="#{researcherQueriesDetailBean.queries.size() > 0}">
+                <h:form>
 
-				<ui:repeat var="item" value="#{researcherQueriesDetailBean.queries}">
+                    <ui:repeat value="#{researcherQueriesDetailBean.queries}" var="item">
+                        <bbmricc:queryboxResearcher item="#{item}" selectedQuery="#{researcherQueriesDetailBean.queryId}"/>
+                    </ui:repeat>
 
-					<h:panelGroup layout="block" styleClass="deco-none">
+                    <h:outputScript>
+                        $(function () {
+                            setupQueryLinks();
+                        });
+                    </h:outputScript>
 
-						<h:panelGroup layout="block"
-							styleClass="panel panel-default clickable #{item.query.id == researcherQueriesDetailBean.queryId ? 'selected-query' : ''}">
-
-							<h:panelGroup layout="block" styleClass="panel-heading">
-
-								<h:link outcome="detail" styleClass="detailLink" value="#{item.query.title}">
-									<f:param name="queryId" value="#{item.query.id}" />
-								</h:link>
-
-                                <h:panelGroup styleClass="pull-right"
-									rendered="#{item.commentCount > 0}">
-
-									<h:panelGroup styleClass="badge queryNumberResponsesBadge">
-										<h:outputText
-											title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-											value="#{item.commentCount}" />
-									</h:panelGroup>
-
-									<h:outputText value="#{item.lastCommentTime}"
-										styleClass="queryCreationDate"
-										title="#{label['queryview.queryitem.datetime.last.comment']}">
-										<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-									</h:outputText>
-
-								</h:panelGroup>
-
-							</h:panelGroup>
-
-
-							<h:panelGroup layout="block" styleClass="panel-body">
-								<h:panelGroup layout="block" styleClass="row">
-
-									<h:panelGroup layout="block" styleClass="col-md-11">
-										<h:panelGroup layout="block" styleClass="row">
-											<h:panelGroup layout="block" styleClass="col-md-10 truncate-panel">
-                                                #{item.query.text}
-                                            </h:panelGroup>
-
-										</h:panelGroup>
-
-										<h:panelGroup layout="block" styleClass="row">
-											<h:panelGroup layout="block" styleClass="col-md-12">
-												<h:panelGroup styleClass="pull-right">
-
-													<h:outputText value="#{item.query.queryCreationTime}"
-														title="#{label['queryview.queryitem.datetime.creation']}">
-														<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-													</h:outputText>
-												</h:panelGroup>
-											</h:panelGroup>
-										</h:panelGroup>
-									</h:panelGroup>
-								</h:panelGroup>
-							</h:panelGroup>
-
-						</h:panelGroup>
-
-					</h:panelGroup>
-
-				</ui:repeat>
-
-				<h:outputScript>
-					$(function() {
-						setupQueryLinks();
-					});
-				</h:outputScript>
-
-			</h:form>
+                </h:form>
+            </ui:fragment>
+            <!-- queryboxes END -->
 
         </h:panelGroup>
 
-		<h:panelGroup layout="block" styleClass="col-md-6 right-panel" id="right-panel">
+
+        <h:panelGroup layout="block" styleClass="col-md-6 right-panel" id="right-panel">
             <h:panelGroup layout="block" styleClass="main-content">
 
 
-			<h:panelGroup layout="block">
+                <h:panelGroup layout="block">
 
-				<h:messages showSummary="true" showDetail="false"
-					styleClass="list-group"
-					errorClass="list-group-item list-group-item-danger"
-					infoClass="list-group-item list-group-item-info" />
+                    <h:messages showSummary="true" showDetail="false"
+                                styleClass="list-group"
+                                errorClass="list-group-item list-group-item-danger"
+                                infoClass="list-group-item list-group-item-info"/>
 
-				<h:panelGroup layout="block">
+                    <h:panelGroup layout="block">
 
-					<h3>#{researcherQueriesDetailBean.selectedQuery.title}</h3>
+                        <h3>#{researcherQueriesDetailBean.selectedQuery.title}</h3>
 
-					<p class="pre-wrap">#{researcherQueriesDetailBean.selectedQuery.text}</p>
+                        <p class="pre-wrap">#{researcherQueriesDetailBean.selectedQuery.text}</p>
 
-					<h:outputLabel for="filterInputText"
-						value="#{label['queryview.title.searchParameters']}" />
-					<h:outputText
-						value="#{researcherQueriesDetailBean.humanReadableQuery}"
-						style="margin-left: 22px;">
-					</h:outputText>
-					<br />
-					<br></br>
-				</h:panelGroup>
+                        <h:outputLabel value="#{label['queryview.title.searchParameters']}"/>
+                        <h:outputText
+                                value="#{researcherQueriesDetailBean.humanReadableQuery}"
+                                style="margin-left: 22px;">
+                        </h:outputText>
+                        <br/>
+                        <br/>
+                    </h:panelGroup>
 
-				<h:panelGroup layout="block" styleClass="pull-right">
-					<h:outputText
-						title="#{label['queryview.queryitem.datetime.creation']}"
-						value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
-						<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-					</h:outputText>
-				</h:panelGroup>
-			</h:panelGroup>			
+                    <h:panelGroup layout="block" styleClass="pull-right">
+                        <h:outputText
+                                title="#{label['queryview.queryitem.datetime.creation']}"
+                                value="#{researcherQueriesDetailBean.selectedQuery.queryCreationTime}">
+                            <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
+                        </h:outputText>
+                    </h:panelGroup>
+                </h:panelGroup>
 
-			<h:panelGroup
-				rendered="#{researcherQueriesDetailBean.collections.size() > 0}"
-				layout="block">
+                <h:panelGroup
+                        rendered="#{researcherQueriesDetailBean.collections.size() > 0}"
+                        layout="block">
 
-				<a href="#" data-toggle="collapse" data-target="#collection-list">
-					<b>#{label['queryview.action.showcollections']} </b> </a>
+                    <a href="#" data-toggle="collapse" data-target="#collection-list">
+                        <b>#{label['queryview.action.showcollections']} </b> </a>
 
-				<div id="collection-list" class="collapse">
-					<ul>
-						<ui:repeat value="#{researcherQueriesDetailBean.collections}"
-							var="collection">
-							<li>#{collection.name}</li>
-						</ui:repeat>
-					</ul>
-				</div>
-			</h:panelGroup>			
-			
-			<br/>
-            <br/>			
-			
-			<h:panelGroup
-				rendered="#{researcherQueriesDetailBean.collections.size() == 0}"
-				layout="block">
-				<h:outputLabel value="#{label['queryview.title.nocollections']}"
-					styleClass="form-control-static" />
-			</h:panelGroup>
+                    <div id="collection-list" class="collapse">
+                        <ul>
+                            <ui:repeat value="#{researcherQueriesDetailBean.collections}"
+                                       var="collection">
+                                <li>#{collection.name}</li>
+                            </ui:repeat>
+                        </ul>
+                    </div>
+                </h:panelGroup>
 
+                <br/>
+                <br/>
 
-			<!-- Using h:dataTable to display attachments -->
-					<h:panelGroup layout="block" style="margin-bottom: 20px">
+                <h:panelGroup
+                        rendered="#{researcherQueriesDetailBean.collections.size() == 0}"
+                        layout="block">
+                    <h:outputLabel value="#{label['queryview.title.nocollections']}"
+                                   styleClass="form-control-static"/>
+                </h:panelGroup>
 
 
-						<h:dataTable value="#{researcherQueriesDetailBean.attachmentMap.entrySet().toArray()}"
-							var="attachment"
-							class="table-striped table-bordered table-responsive table-fullwidth"
-							rendered="#{researcherQueriesDetailBean.attachments.size() > 0}">
-
-							<h:column styleClass="attachment-links">
-								<!-- column header -->
-								<f:facet name="header" >Attachments</f:facet>
-								<!-- row record -->
-
-								<h:outputLink value="../attachment/#{attachment.key}"
-									style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-
-									<h:outputText value="#{attachment.value}"
-										title="#{label['attachmentview.tooltip.attachmentDownload']}"
-										style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap "
-										styleClass="attachment-links">
-									</h:outputText>
-								</h:outputLink>
-							</h:column>
-						</h:dataTable>
-
-					</h:panelGroup>
-				
+                <!-- Using h:dataTable to display attachments -->
+                <h:panelGroup layout="block" style="margin-bottom: 20px">
 
 
-			<h:panelGroup styleClass="col-md-12" layout="block">
+                    <h:dataTable value="#{researcherQueriesDetailBean.attachmentMap.entrySet().toArray()}"
+                                 var="attachment"
+                                 class="table-striped table-bordered table-responsive table-fullwidth"
+                                 rendered="#{researcherQueriesDetailBean.attachments.size() > 0}">
 
-				<h:panelGroup styleClass="row btn-toolbar" layout="block">
+                        <h:column styleClass="attachment-links">
+                            <!-- column header -->
+                            <f:facet name="header">Attachments</f:facet>
+                            <!-- row record -->
 
-					<h:button outcome="newQuery"
-						value="#{label['queryview.title.editQuery']}"
-						title="#{label['queryview.tooltip.editQuery']}"
-						styleClass="btn btn-primary" style="margin-left: -8px; margin-bottom: 20px ">
+                            <h:outputLink value="../attachment/#{attachment.key}"
+                                          style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
 
-						<f:param name="queryId"	value="#{researcherQueriesDetailBean.selectedQuery.id}" />
-					</h:button>
-				</h:panelGroup>
+                                <h:outputText value="#{attachment.value}"
+                                              title="#{label['attachmentview.tooltip.attachmentDownload']}"
+                                              style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap "
+                                              styleClass="attachment-links">
+                                </h:outputText>
+                            </h:outputLink>
+                        </h:column>
+                    </h:dataTable>
 
-			</h:panelGroup>
-
-			<h:panelGroup layout="block" style="margin-top:60px;">
-
-				<ul class="nav nav-tabs"  id="myTab">
-					<li class="active" id="first"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
-					</li>
-					<li id="second"><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
-					</li>
-				</ul>
-
-				<div class="tab-content">
-					<div id="comments" class="tab-pane fade in active">
-
-						<h3>#{label['querydetail.title.comments']}</h3>
-							<span id="commentsSubtitle" class="tabSubtitle"> #{label['querydetail.subtitle.commentsAvailability']} </span>
-							<p></p>
-							
-						<ui:repeat value="#{researcherQueriesDetailBean.comments}"
-							var="comment">
-
-							<bbmricc:comment comment="#{comment.comment}"
-								person="#{comment.person}" collections="#{comment.collections}" />
-
-						</ui:repeat>
-
-						<div class="col-xs-12">
-							<hr></hr>
-						</div>
-
-						<bbmricc:commentReply
-							query="#{researcherQueriesDetailBean.selectedQuery}" />
-					</div>
-
-					<div id="sampleAvailability" class="tab-pane fade">
-
-						<h3>#{label['querydetail.title.sampleAvailability']}</h3>
-									<span id="sampleAvailabilitySubtitle" class="tabSubtitle"> #{label['querydetail.subtitle.sampleAvailability']} </span>
-						
-
-						<p>
-							<b> <h:outputText value="#{label['message.noOffers']}"
-									rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}" />
-							</b>
-						</p>
-
-						<c:forEach begin="1"
-							end="#{researcherQueriesDetailBean.offerMakers.size()}" var="i">
-							<div class="panel panel-default">
-								<div class="panel-heading" role="tab" id="heading#{i}">
-									<h4 class="panel-title">
-										<a 
-										    role="button" data-toggle="collapse"
-											data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
-											aria-controls="sample-list"> Biobanker #{i} 
-										</a>
-									</h4>
-								</div>
-								<div id="hh#{i}" class="panel-collapse collapse" role="tabpanel"
-									aria-labelledby="heading#{i}">
+                </h:panelGroup>
 
 
+                <h:panelGroup styleClass="col-md-12" layout="block">
 
-									<div class="panel-body">										                                    
-										<ui:repeat
-											value="#{researcherQueriesDetailBean.listOfSampleOffers[i-1]}"
-											var="offers">
+                    <h:panelGroup styleClass="row btn-toolbar" layout="block">
 
-											<bbmricc:comment comment="#{offers.offer}"
-												person="#{offers.person}"
-												collections="#{offers.collections}" />
+                        <h:button outcome="newQuery"
+                                  value="#{label['queryview.title.editQuery']}"
+                                  title="#{label['queryview.tooltip.editQuery']}"
+                                  styleClass="btn btn-primary" style="margin-left: -8px; margin-bottom: 20px ">
 
-										</ui:repeat>
+                            <f:param name="queryId" value="#{researcherQueriesDetailBean.selectedQuery.id}"/>
+                        </h:button>
+                    </h:panelGroup>
 
-										<div class="col-xs-12">
-											<hr></hr>
-										</div>
-										
-										<bbmricc:commentReply makeOffer="true"				                            
-				                            query="#{researcherQueriesDetailBean.selectedQuery}"
-				                            offer="#{researcherQueriesDetailBean.offerMakers[i-1]}" />
-									</div>
-								</div>
-							</div>
-						</c:forEach>
+                </h:panelGroup>
 
-						
-					</div>
-				</div>
+                <h:panelGroup layout="block" style="margin-top:60px;">
 
-			</h:panelGroup>
-			
-			<h:outputScript>				
-				$(function() { 
-				   
-				    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-				   
-				        localStorage.setItem('lastTab', $(this).attr('href'));
-				    });
-								   
-				    var lastTab = localStorage.getItem('lastTab');
-				    if (lastTab) {
-				        $('[href="' + lastTab + '"]').tab('show');
-				    }
-				});
-		   </h:outputScript>
+                    <ul class="nav nav-tabs" id="myTab">
+                        <li class="active" id="first"><a data-toggle="tab"
+                                                         href="#comments">#{label['querydetail.title.comments']}</a>
+                        </li>
+                        <li id="second"><a data-toggle="tab"
+                                           href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="comments" class="tab-pane fade in active">
+
+                            <h3>#{label['querydetail.title.comments']}</h3>
+                            <span id="commentsSubtitle"
+                                  class="tabSubtitle"> #{label['querydetail.subtitle.commentsAvailability']} </span>
+                            <p/>
+
+                            <ui:repeat value="#{researcherQueriesDetailBean.comments}"
+                                       var="comment">
+
+                                <bbmricc:comment comment="#{comment.comment}"
+                                                 person="#{comment.person}" collections="#{comment.collections}"/>
+
+                            </ui:repeat>
+
+                            <div class="col-xs-12">
+                                <hr/>
+                            </div>
+
+                            <bbmricc:commentReply
+                                    query="#{researcherQueriesDetailBean.selectedQuery}"/>
+                        </div>
+
+                        <div id="sampleAvailability" class="tab-pane fade">
+
+                            <h3>#{label['querydetail.title.sampleAvailability']}</h3>
+                            <span id="sampleAvailabilitySubtitle"
+                                  class="tabSubtitle"> #{label['querydetail.subtitle.sampleAvailability']} </span>
+
+
+                            <p>
+                                <b> <h:outputText value="#{label['message.noOffers']}"
+                                                  rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}"/>
+                                </b>
+                            </p>
+
+                            <c:forEach begin="1"
+                                       end="#{researcherQueriesDetailBean.offerMakers.size()}" var="i">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading" role="tab" id="heading#{i}">
+                                        <h4 class="panel-title">
+                                            <a
+                                                    role="button" data-toggle="collapse"
+                                                    data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
+                                                    aria-controls="sample-list"> Biobanker #{i}
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="hh#{i}" class="panel-collapse collapse" role="tabpanel"
+                                         aria-labelledby="heading#{i}">
+
+
+                                        <div class="panel-body">
+                                            <ui:repeat
+                                                    value="#{researcherQueriesDetailBean.listOfSampleOffers[i-1]}"
+                                                    var="offers">
+
+                                                <bbmricc:comment comment="#{offers.offer}"
+                                                                 person="#{offers.person}"
+                                                                 collections="#{offers.collections}"/>
+
+                                            </ui:repeat>
+
+                                            <div class="col-xs-12">
+                                                <hr/>
+                                            </div>
+
+                                            <bbmricc:commentReply makeOffer="true"
+                                                                  query="#{researcherQueriesDetailBean.selectedQuery}"
+                                                                  offer="#{researcherQueriesDetailBean.offerMakers[i-1]}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:forEach>
+
+
+                        </div>
+                    </div>
+
+                </h:panelGroup>
+
+                <h:outputScript>
+                    $(function () {
+
+                        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+                            localStorage.setItem('lastTab', $(this).attr('href'));
+                        });
+
+                        var lastTab = localStorage.getItem('lastTab');
+                        if (lastTab) {
+                            $('[href="' + lastTab + '"]').tab('show');
+                        }
+                    });
+                </h:outputScript>
 
 
             </h:panelGroup>
-		</h:panelGroup>
+        </h:panelGroup>
 
-	</ui:define>
+    </ui:define>
 
 </ui:composition>
