@@ -37,9 +37,12 @@
 	<!-- Queries page for the researcher -->
 
 
-	<ui:param name="bodyClass" value="container" />
+	<ui:param name="bodyClass" value="container body-nomargin" />
 
 	<ui:define name="body">
+		<h:panelGroup layout="block" styleClass="row">
+			<h3>#{label['pagetitle_my_queries']}</h3>
+		</h:panelGroup>
 
 		<h:panelGroup layout="block" styleClass="col-md-12">
 

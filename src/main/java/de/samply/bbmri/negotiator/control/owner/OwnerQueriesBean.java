@@ -249,4 +249,8 @@ public class OwnerQueriesBean implements Serializable {
 	public void setFlagFilter(Flag flagFilter) {
 		this.flagFilter = flagFilter;
 	}
+
+	public String getPagetitle() {
+		return "pagetitle_"+flagFilter;
+	}
 }

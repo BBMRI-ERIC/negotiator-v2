@@ -41,18 +41,18 @@
 		<f:viewAction action="#{ownerQueriesDetailBean.initialize}" />
 	</f:metadata>
 
-	<ui:param name="bodyClass" value="container-fluid" />
+	<ui:param name="bodyClass" value="container-fluid body-nomargin" />
 
 	<ui:define name="body">
 
-		<h:panelGroup layout="block" styleClass="col-md-3">
+		<h:panelGroup layout="block" styleClass="col-md-3 left-panel">
 			
 			<bbmricc:searchDetail backingBean="#{ownerQueriesDetailBean}"/>
 
 			<h:panelGroup
 				rendered="#{ownerQueriesDetailBean.queries.size() == 0 and ownerQueriesDetailBean.filterTerms.size() > 0}"
 				layout="block" styleClass="col-md-12">
-				<h3>#{label['queryview.noSearchResults']}</h3>
+				<h3 style="margin-top: 0px;">#{label['queryview.noSearchResults']}</h3>
 			</h:panelGroup>
 
 			<h:panelGroup id="test" layout="block">
@@ -78,7 +78,7 @@
 
 
 
-		<h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1"
+		<h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1 right-panel"
 			id="right-panel">
 
 
@@ -86,7 +86,7 @@
 
 				<h:panelGroup layout="block">
 
-					<h3>#{ownerQueriesDetailBean.selectedQuery.title}</h3>
+					<h3 style="margin-top: 0px;">#{ownerQueriesDetailBean.selectedQuery.title}</h3>
 
 					<p class="pre-wrap">#{ownerQueriesDetailBean.selectedQuery.text}</p>
 
