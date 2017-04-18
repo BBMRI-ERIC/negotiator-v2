@@ -11,12 +11,16 @@
 {deltemplate maincontent}
     {switch $locale}
         {case 'de', 'de_DE'}
-           A new comment has been added to {$queryName}. To view or add comments, please use the following link: {\n}{\n}
+           A new comment has been added to the query "{$queryName}".
+           {\n}To view or add comments, please use the following link:
+           {\n}{\n}
             {$url}
 
 
         {default}
-			A new comment has been added to {$queryName}. To view or add comments, please use the following link: {\n}{\n}
+			A new comment has been added to the query "{$queryName}".
+			{\n}To view or add comments, please use the following link:
+			{\n}{\n}
             {$url}
 
     {/switch}

@@ -11,12 +11,16 @@
 {deltemplate maincontent}
     {switch $locale}
         {case 'de', 'de_DE'}
-           A biobank has shown samply availability for the query {$queryName}. To start negotiating, please use the following link: {\n}{\n}
+           A biobank has shown samply availability for the query "{$queryName}".
+           {\n}To start negotiating, please use the following link:
+           {\n}{\n}
             {$url}
 
 
         {default}
-            A biobank has shown samply availability for the query {$queryName}. To start negotiating, please use the following link: {\n}{\n}
+            A biobank has shown samply availability for the query "{$queryName}".
+            {\n}To start negotiating, please use the following link:
+            {\n}{\n}
             {$url}
 
     {/switch}
