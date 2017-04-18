@@ -227,7 +227,7 @@ public class DbUtil {
                 .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
                 .where(condition)
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
-                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc()).fetch();
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
         return config.map(fetch, QueryStatsDTO.class);
     }
