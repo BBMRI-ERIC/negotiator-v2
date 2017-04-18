@@ -61,6 +61,7 @@ CREATE TABLE "query" (
     "json_text" TEXT NOT NULL,
     "num_attachments" INTEGER NOT NULL,
     "negotiator_token" CHARACTER VARYING(255) NOT NULL UNIQUE,
+    "valid_query" boolean NOT NULL DEFAULT '0', 
     PRIMARY KEY ("id"),
     FOREIGN KEY ("researcher_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );

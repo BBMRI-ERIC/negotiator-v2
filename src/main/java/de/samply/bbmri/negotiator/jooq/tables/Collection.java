@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collection extends TableImpl<CollectionRecord> {
 
-	private static final long serialVersionUID = 1570444657;
+	private static final long serialVersionUID = -1546670117;
 
 	/**
 	 * The reference instance of <code>public.collection</code>
@@ -58,7 +58,7 @@ public class Collection extends TableImpl<CollectionRecord> {
 	/**
 	 * The column <code>public.collection.name</code>. The collection name
 	 */
-	public final TableField<CollectionRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "The collection name");
+	public final TableField<CollectionRecord, String> NAME = createField("name", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "The collection name");
 
 	/**
 	 * The column <code>public.collection.directory_id</code>. The directory ID, e.g. eu_bbmri_eric_collections:NL45:blood_collection

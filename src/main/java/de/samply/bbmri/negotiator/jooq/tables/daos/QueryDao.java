@@ -120,4 +120,11 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	public de.samply.bbmri.negotiator.jooq.tables.pojos.Query fetchOneByNegotiatorToken(String value) {
 		return fetchOne(Query.QUERY.NEGOTIATOR_TOKEN, value);
 	}
+
+	/**
+	 * Fetch records that have <code>valid_query IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByValidQuery(Boolean... values) {
+		return fetch(Query.QUERY.VALID_QUERY, values);
+	}
 }

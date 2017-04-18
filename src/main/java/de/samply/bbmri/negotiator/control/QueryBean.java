@@ -163,6 +163,7 @@ public class QueryBean implements Serializable {
                setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
            }
            else{
+               setMode("newQuery");
                jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
            }
            humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
@@ -184,7 +185,7 @@ public class QueryBean implements Serializable {
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
-               QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId());
+               QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId(), true);
                config.commit();
                setId(record.getId());
                List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId(), Flag.IGNORED);
@@ -240,40 +241,49 @@ public class QueryBean implements Serializable {
 
    /**
     * Uploads and stores content of file from provided input stream
+ * @throws IOException
     */
-   public String uploadAttachment() {
-       if(file == null)
-           return "";
+    public String uploadAttachment() throws IOException {
+        if (file == null)
+            return "";
 
-       String originalFileName = FileUtil.getFileName(file);
+        String originalFileName = FileUtil.getFileName(file);
+        Integer fileId;
+        String uploadName;
 
-       try(Config config = ConfigFactory.get()) {
-           Integer fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName);
-           if(fileId == null) {
-               // something went wrong in db
-               config.rollback();
-               return "";
-           }
+        try (Config config = ConfigFactory.get()) {
+            if (id == null) {
+                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId(), false);
+                config.commit();
+                setId(record.getId());
+            }
 
-           //XXX: this needs to match the pattern in FileServlet.doGet and ResearcherQueriesDetailBean.getAttachmentMap
-           String uploadName = "query_"+getId()+"_file_"+fileId+"_name_"+originalFileName;
+            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName);
+            if (fileId == null) {
+                // something went wrong in db
+                config.rollback();
+                return "";
+            }
+            // XXX: this needs to match the pattern in FileServlet.doGet and
+            // ResearcherQueriesDetailBean.getAttachmentMap
+            uploadName = "query_" + getId() + "_file_" + fileId + "_name_" + originalFileName;
+            if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
+                if (mode.equals("edit")) {
+                    saveEditChangesTemporarily(queryTitle, queryText);
+                }
+                config.commit();
+            } else {
+                // something went wrong saving the file to disk
+                config.rollback();
+            }
 
-           if(FileUtil.saveQueryAttachment(file, uploadName) != null) {
-               if(mode.equals("edit")){
-                   saveEditChangesTemporarily(queryTitle, queryText);
-               }
-               config.commit();
-           } else {
-               // something went wrong saving the file to disk
-               config.rollback();
-           }
-       } catch (SQLException e) {
-           e.printStackTrace();
-           return "";
-       }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
+        }
 
-       return "/researcher/newQuery?queryId="+getId()+"&faces-redirect=true";
-   }
+        return "/researcher/newQuery?queryId=" + getId() + "&faces-redirect=true";
+    }
 
    /**
     * Validates uploaded file to be of correct size, content type and format

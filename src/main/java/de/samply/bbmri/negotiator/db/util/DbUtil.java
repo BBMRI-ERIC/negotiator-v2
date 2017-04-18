@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -55,6 +54,16 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
@@ -104,6 +113,7 @@ public class DbUtil {
         config.dsl().update(Tables.QUERY)
                     .set(Tables.QUERY.TITLE, title)
                     .set(Tables.QUERY.TEXT, text)
+                    .set(Tables.QUERY.VALID_QUERY, true)
                     .where(Tables.QUERY.ID.eq(queryId))
                     .execute();
     }
@@ -538,7 +548,7 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord saveQuery(Config config, String title,
-                                        String text, String jsonText, int researcherId) throws SQLException, IOException {
+                                        String text, String jsonText, int researcherId, Boolean validQuery) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
         queryRecord.setJsonText(jsonText);
@@ -548,6 +558,7 @@ public class DbUtil {
         queryRecord.setResearcherId(researcherId);
         queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
         queryRecord.setNumAttachments(0);
+        queryRecord.setValidQuery(validQuery);
         queryRecord.store();
 
         /**
