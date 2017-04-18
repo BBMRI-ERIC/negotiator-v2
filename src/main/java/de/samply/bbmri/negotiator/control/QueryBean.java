@@ -26,11 +26,17 @@
 
 package de.samply.bbmri.negotiator.control;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -129,6 +135,11 @@ public class QueryBean implements Serializable {
     * List of all the attachments for a given query
     */
    private List<QueryAttachmentDTO> attachments;
+
+    /**
+     * Map of saved filename and realname of attachments
+     */
+    private HashMap<String, String> attachmentMap = null;
 
    /**
     * Query attachment upload.
@@ -321,12 +332,40 @@ public class QueryBean implements Serializable {
     * Removes an attachment from the given query
     */
    public String removeAttachment(String attachment) {
-       //TODO - remove physical file from file system
+       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_name_(.*)");
+       Matcher matcher = pattern.matcher(attachment);
+       String fileID = null;
+
+       logger.debug("Wanting to remove file "+attachment);
+       if(matcher.find()) {
+           fileID = matcher.group(2);
+           logger.debug("Pattern matched and found file ID = "+fileID);
+       }
+
+       Integer fileIdInteger = null;
+       try {
+           fileIdInteger = Integer.parseInt(fileID);
+           logger.debug("Integer version of ID = "+fileIdInteger);
+       } catch(NumberFormatException e) {
+           FacesContext context = FacesContext.getCurrentInstance();
+           context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File could not be deleted",
+                   "The uploaded file could not be deleted due to some unforseen error.") );
+           return "";
+       }
+
+       logger.debug("Removing file "+attachment+" with ID "+fileIdInteger);
        try (Config config = ConfigFactory.get()) {
-           DbUtil.deleteQueryAttachmentRecord(config, getId(), attachment);
+           DbUtil.deleteQueryAttachmentRecord(config, getId(), fileIdInteger);
            config.commit();
 
+           String filePath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
+           File file = new File(filePath, URLDecoder.decode(attachment, "UTF-8"));
+           logger.debug("Deleting physical file "+file.getAbsolutePath());
+
+           file.delete();
        } catch (SQLException e) {
+           e.printStackTrace();
+       } catch(UnsupportedEncodingException e) {
            e.printStackTrace();
        }
        return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
@@ -409,6 +448,22 @@ public class QueryBean implements Serializable {
 
     public void setAttachments(List<QueryAttachmentDTO> attachments) {
         this.attachments = attachments;
+    }
+
+    /**
+     * Lazyloaded map of saved filenames and original filenames
+     * @return
+     */
+    public HashMap<String, String> getAttachmentMap() {
+        if(attachmentMap == null) {
+            attachmentMap = new HashMap<>();
+            for(QueryAttachmentDTO att : attachments) {
+                //XXX: this pattern needs to match
+                String uploadName = "query_" + getId() + "_file_" + att.getId() + "_name_" + att.getAttachment();
+                attachmentMap.put(uploadName, att.getAttachment());
+            }
+        }
+        return attachmentMap;
     }
 
     public Part getFile() {

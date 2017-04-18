@@ -100,7 +100,7 @@
 					<h:panelGroup styleClass="col-md-12" layout="block">
 
 
-							<h:dataTable value="#{queryBean.attachments}" var="attachment"
+							<h:dataTable value="#{queryBean.attachmentMap.entrySet().toArray()}" var="attachment"
 								columnClasses="col-md-11, col-md-1"
 								class="table-striped table-bordered table-responsive table-fullwidth"
 								rendered="#{queryBean.attachments.size() > 0}">
@@ -110,10 +110,10 @@
 									<f:facet name="header" >Attachments (only PDF files are accepted)</f:facet>
 									<!-- row record -->
 
-									<h:outputLink value="../attachment/#{attachment.attachment}"
+									<h:outputLink value="../attachment/#{attachment.key}"
 										style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
 
-										<h:outputText value="#{attachment.attachment}"
+										<h:outputText value="#{attachment.value}"
 											title="#{label['attachmentview.tooltip.attachmentDownload']}"
 											style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap"
 											styleClass="attachment-links">
@@ -131,7 +131,7 @@
 
 
 									<h:commandLink 
-										action="#{queryBean.removeAttachment(attachment.attachment)}"
+										action="#{queryBean.removeAttachment(attachment.key)}"
 										title="#{label['attachmentview.tooltip.attachmentDelete']}">
 										<i class="fa fa-times attachment-delete-links" aria-hidden="true" />
 									</h:commandLink>

@@ -141,10 +141,10 @@ public class DbUtil {
     }
 
 
-    public static void deleteQueryAttachmentRecord(Config config, Integer queryId, String attachment) {
+    public static void deleteQueryAttachmentRecord(Config config, Integer queryId, Integer attachment) {
         config.dsl().delete(Tables.QUERY_ATTACHMENT)
             .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
-            .and(Tables.QUERY_ATTACHMENT.ATTACHMENT.eq(attachment)).execute();
+            .and(Tables.QUERY_ATTACHMENT.ID.eq(attachment)).execute();
 
         config.dsl().update(Tables.QUERY)
         .set(Tables.QUERY.NUM_ATTACHMENTS, Tables.QUERY.NUM_ATTACHMENTS.sub(1))
