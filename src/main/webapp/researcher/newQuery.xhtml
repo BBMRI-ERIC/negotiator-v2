@@ -128,19 +128,44 @@
 									<f:facet name="header">Delete</f:facet>
 
 									<!--   Remove an attachment -->
-
-
-									<h:commandLink 
-										action="#{queryBean.removeAttachment(attachment.key)}"
-										title="#{label['attachmentview.tooltip.attachmentDelete']}">
-										<i class="fa fa-times attachment-delete-links" aria-hidden="true" />
-									</h:commandLink>
-
-
-
+                                    <h:commandLink
+                                                   styleClass="confirm-delete"
+                                                   action="#{queryBean.setToRemoveAttachment(attachment.key)}"
+                                                   title="#{label['attachmentview.tooltip.attachmentDelete']}">
+                                        <i class="fa fa-times attachment-delete-links" aria-hidden="true" />
+                                        <f:ajax onevent="showConfirmDialog"/>
+                                    </h:commandLink>
 								</h:column>
 
 							</h:dataTable>
+
+                        <div class="modal fade" id="modal-from-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        Confirm file deletion
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this file?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                        <h:commandButton action="#{queryBean.removeAttachment()}"
+                                                       value="Yes" styleClass="btn btn-danger btn-ok"
+                                                       title="#{label['attachmentview.tooltip.attachmentDelete']}">
+                                        </h:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h:outputScript>
+                            function showConfirmDialog(data) {
+                                if(data.status == "success") {
+                                    $('#modal-from-dom').modal('show');
+                                }
+                            }
+                        </h:outputScript>
 
 							<!-- Show that there are no uploaded attachments yet -->
 							<h:panelGroup layout="block" rendered="#{queryBean.attachments.size() == 0}" >
