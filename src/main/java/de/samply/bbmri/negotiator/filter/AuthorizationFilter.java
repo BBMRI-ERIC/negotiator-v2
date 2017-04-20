@@ -27,6 +27,8 @@ package de.samply.bbmri.negotiator.filter;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.faces.application.ResourceHandler;
 import javax.servlet.*;
@@ -43,6 +45,8 @@ import java.io.IOException;
  */
 @WebFilter(filterName = "AuthorizationFilter")
 public class AuthorizationFilter implements Filter {
+
+    private Logger logger = LoggerFactory.getLogger(AuthorizationFilter.class);
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()
@@ -93,6 +97,8 @@ public class AuthorizationFilter implements Filter {
             return;
         }
 
+        logger.debug("Accessed page = "+path);
+
         /**
          * Create the userBean if necessary
          */
@@ -104,6 +110,7 @@ public class AuthorizationFilter implements Filter {
         // if user is on register.xhtml (which he should only if he runs the registration link)
         // he gets pushed to perun login with negotiator/index.xhtml as return url
         if(path.equals(request.getContextPath() + "/register.xhtml")) {
+            logger.debug("Redirecting register to index");
             response.sendRedirect(userBean.getAuthenticationUrlIndex(request));
             return;
         }
@@ -111,6 +118,7 @@ public class AuthorizationFilter implements Filter {
         if(userBean.getLoginValid()) {
             // valid user and login page? forward him to index
             if(path.equals(request.getContextPath() + "/login.xhtml")) {
+                logger.debug("Redirecting valid user from login to index");
                 response.sendRedirect(request.getContextPath() + "/index.xhtml");
                 return;
             }
@@ -123,6 +131,11 @@ public class AuthorizationFilter implements Filter {
                 if(path.startsWith(request.getContextPath() + "/dev/")) {
                     chain.doFilter(req, res);
                 } else {
+                    if (request.getQueryString() != null) {
+                        logger.debug("Setting userbean redirect url");
+                        userBean.setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
+                    }
+                    logger.debug("Redirecting invalid user to dev chose");
                     response.sendRedirect(request.getContextPath() + "/dev/chose.xhtml");
                 }
                 return;
@@ -133,6 +146,15 @@ public class AuthorizationFilter implements Filter {
                 chain.doFilter(request, response);
                 return;
             }
+
+            // if a user came from the directory before being logged in, we need to save the query ID into the
+            // usersession
+            if (request.getQueryString() != null) {
+                logger.debug("Setting userbean redirect url");
+                userBean.setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
+            }
+
+            logger.debug("Redirecting invalid user to login.xhtml");
             response.sendRedirect(request.getContextPath() + "/login.xhtml");
         }
     }
