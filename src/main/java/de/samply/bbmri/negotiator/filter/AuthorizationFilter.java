@@ -1,22 +1,22 @@
 /**
  * Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
  * Deutsches Krebsforschungszentrum in Heidelberg
- *
+ * <p>
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Affero General Public License as published by the Free
  * Software Foundation; either version 3 of the License, or (at your option) any
  * later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program; if not, see http://www.gnu.org/licenses.
- *
+ * <p>
  * Additional permission under GNU GPL version 3 section 7:
- *
+ * <p>
  * If you modify this Program, or any covered work, by linking or combining it
  * with Jersey (https://jersey.java.net) (or a modified version of that
  * library), containing parts covered by the terms of the General Public
@@ -25,22 +25,16 @@
  */
 package de.samply.bbmri.negotiator.filter;
 
-import java.io.IOException;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.control.UserBean;
 
 import javax.faces.application.ResourceHandler;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.control.UserBean;
+import java.io.IOException;
 
 /**
  * This filter checks if there is a user logged in or not. If no valid user is
@@ -73,7 +67,6 @@ public class AuthorizationFilter implements Filter {
          */
         if(path.startsWith(request.getContextPath() + "/api/") ||
                 path.startsWith(request.getContextPath() + "/help/") ||
-                path.equals(request.getContextPath() + "/login.xhtml") ||
                 path.equals(request.getContextPath() + "/logout.xhtml")) {
             chain.doFilter(req, res);
             return;
@@ -108,14 +101,26 @@ public class AuthorizationFilter implements Filter {
             session.setAttribute("userBean", userBean);
         }
 
+        // if user is on register.xhtml (which he should only if he runs the registration link)
+        // he gets pushed to perun login with negotiator/index.xhtml as return url
+        if(path.equals(request.getContextPath() + "/register.xhtml")) {
+            response.sendRedirect(userBean.getAuthenticationUrlIndex(request));
+            return;
+        }
+
         if(userBean.getLoginValid()) {
+            // valid user and login page? forward him to index
+            if(path.equals(request.getContextPath() + "/login.xhtml")) {
+                response.sendRedirect(request.getContextPath() + "/index.xhtml");
+                return;
+            }
             chain.doFilter(request, response);
         } else {
             /**
              * For development mode, skip the authentication
              */
             if(NegotiatorConfig.get().getNegotiator().isAuthenticationDisabled()) {
-                if(path.startsWith(request.getContextPath() + "/dev/")){
+                if(path.startsWith(request.getContextPath() + "/dev/")) {
                     chain.doFilter(req, res);
                 } else {
                     response.sendRedirect(request.getContextPath() + "/dev/chose.xhtml");
@@ -123,9 +128,12 @@ public class AuthorizationFilter implements Filter {
                 return;
             }
 
+            // no valid user and on login page? that's fine
+            if(path.equals(request.getContextPath() + "/login.xhtml")) {
+                chain.doFilter(request, response);
+                return;
+            }
             response.sendRedirect(request.getContextPath() + "/login.xhtml");
-//            String url = userBean.getAuthenticationUrl(request);
-//            response.sendRedirect(url);
         }
     }
 

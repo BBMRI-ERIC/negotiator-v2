@@ -61,6 +61,8 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Sessionscoped bean for all data of the session about the user.
@@ -71,6 +73,8 @@ public class UserBean implements Serializable {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
+
+	private Logger logger = LoggerFactory.getLogger(UserBean.class);
 
 	/**
 	 * The subjects from the dummy data.
@@ -195,7 +199,24 @@ public class UserBean implements Serializable {
 		return getAuthenticationUrl(req);
 	}
 
-	/**
+    /**
+     * Returns an auth URL that provides /index.xhtml as redirect url always
+     * @param request
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    public String getAuthenticationUrlIndex(HttpServletRequest request) throws UnsupportedEncodingException {
+
+        // TODO: Add path, in case negotiator is not deployed in ROOT
+        String requestURL = "/index.xhtml";
+
+        return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+                request.getServerName(), request.getServerPort(), request.getContextPath(),
+                requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+    }
+
+
+    /**
 	 * Returns the URL for Perun
 	 *
 	 * @return the authentication url
@@ -244,6 +265,9 @@ public class UserBean implements Serializable {
     public String getAuthenticationRegisterUrl(HttpServletRequest request) throws UnsupportedEncodingException {
         StringBuilder requestURL = new StringBuilder(request.getServletPath());
 
+        // replace last entry to register
+        requestURL.setLength(0);
+        requestURL.append("/register.xhtml");
 
         /**
          * Construct a redirect URL to the authentication system and back.
@@ -251,13 +275,17 @@ public class UserBean implements Serializable {
 
         if (request.getQueryString() != null) {
             requestURL.setLength(0);
-            requestURL.append("/index.xhtml");
+            requestURL.append("/register.xhtml");
             setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
         }
 
-        return OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
-                request.getServerName(), request.getServerPort(), request.getContextPath(),
-                requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+        String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+				request.getServerName(), request.getServerPort(), request.getContextPath(),
+				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+
+		logger.debug("RETURN URL = "+returnURL);
+
+		return returnURL;
     }
 
     /**
