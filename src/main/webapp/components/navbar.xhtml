@@ -15,7 +15,11 @@
 						class="icon-bar"></span>
 				</button>
 				<h:link outcome="/index" styleClass="navbar-brand">
-					<span class="projectName">#{label['queryview.bbmri']}<span class="bbmriModule">#{label['queryview.negotiator']}</span></span>
+					<span class="projectName">#{label['queryview.bbmri']}
+                        <span class="bbmriModule">#{label['queryview.negotiator']}
+                            <span style="font-size: 50%">Build: #{label['build.date']}</span>
+                        </span>
+                    </span>
 				</h:link>
 			</h:panelGroup>
 

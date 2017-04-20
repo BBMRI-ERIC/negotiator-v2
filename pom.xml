@@ -27,6 +27,9 @@
         <database.username>negotiator</database.username>
         <database.password>test123</database.password>
         <database.name>negotiator2</database.name>
+
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
     </properties>
 
     <dependencies>
@@ -216,6 +219,26 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>build.time</name>
+                            <pattern>dd/MM/yyyy HH:mm</pattern>
+                            <locale>en_US</locale>
+                            <timeZone>MET</timeZone>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
 
                 <!-- Specify the maven code generator plugin -->
                 <!-- Use org.jooq for the Open Source edition org.jooq.pro for commercial
@@ -367,6 +390,13 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
 </project>
