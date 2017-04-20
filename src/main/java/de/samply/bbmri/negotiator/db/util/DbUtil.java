@@ -101,23 +101,22 @@ public class DbUtil {
         return config.map(result, QueryRecord.class);
     }
 
-
     /**
-     * Edits/Updates title and description of a query.
+     * Edits/Updates title, description and jsonText of a query.
      * @param title title of the query
      * @param text description of the query
      * @param queryId the query id for which the editing started
      * @throws SQLException
      */
-    public static void editQueryDescription(Config config, String title, String text, Integer queryId) throws SQLException {
+    public static void editQueryDescription(Config config, String title, String text, String jsonText, Integer queryId) throws SQLException {
         config.dsl().update(Tables.QUERY)
                     .set(Tables.QUERY.TITLE, title)
                     .set(Tables.QUERY.TEXT, text)
+                    .set(Tables.QUERY.JSON_TEXT, jsonText)
                     .set(Tables.QUERY.VALID_QUERY, true)
                     .where(Tables.QUERY.ID.eq(queryId))
                     .execute();
     }
-
 
     /**
      * Insert query attachment name

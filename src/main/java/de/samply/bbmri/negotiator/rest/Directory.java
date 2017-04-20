@@ -145,15 +145,17 @@ public class Directory {
                 }
 
                 /**
-                 * Update the existing query and return the new URL back to the directory.
+                 * Update the existing query in the next step (newQuery.xhtml page) and return the new URL back to the directory.
                  */
-                queryRecord.setJsonText(queryString);
-                queryRecord.store();
+
+                JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
+                jsonQueryRecord.setJsonText(queryString);
+                jsonQueryRecord.store();
                 config.commit();
 
                 CreateQueryResultDTO result = new CreateQueryResultDTO();
 
-                String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
+                String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId="+ jsonQueryRecord.getId();
 
                 result.setRedirectUri(builder);
 

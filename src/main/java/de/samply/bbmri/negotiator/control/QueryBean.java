@@ -81,9 +81,11 @@ public class QueryBean implements Serializable {
     * Query attachment upload
     */
    private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
-   private int jsonQueryId;
+   private Integer jsonQueryId;
 
-   private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
+
+
+private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    private Flag flagFilter = Flag.UNFLAGGED;
 
@@ -174,7 +176,12 @@ public class QueryBean implements Serializable {
                    queryText = queryRecord.getText();
                }
 
-               jsonQuery = queryRecord.getJsonText();
+               if (jsonQueryId != null){
+                   jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+               }else{
+                   jsonQuery = queryRecord.getJsonText();
+               }
+
                ntoken = queryRecord.getNegotiatorToken();
                setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
            }
@@ -197,7 +204,7 @@ public class QueryBean implements Serializable {
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited. */
            if(id != null) {
-               DbUtil.editQueryDescription(config, queryTitle, queryText, id);
+               DbUtil.editQueryDescription(config, queryTitle, queryText,jsonQuery, id);
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
@@ -425,13 +432,7 @@ public class QueryBean implements Serializable {
 	 	this.humanReadableFilters = humanReadableFilters;
 	}
 
-	public int getJsonQueryId() {
-		return jsonQueryId;
-	}
 
-	public void setJsonQueryId(int jsonQueryId) {
-		this.jsonQueryId = jsonQueryId;
-	}
 
 	public String getQueryTitle() {
 		return queryTitle;
@@ -513,5 +514,12 @@ public class QueryBean implements Serializable {
         this.sessionBean = sessionBean;
     }
 
+    public Integer getJsonQueryId() {
+        return jsonQueryId;
+    }
+
+    public void setJsonQueryId(Integer jsonQueryId) {
+        this.jsonQueryId = jsonQueryId;
+    }
 
 }
