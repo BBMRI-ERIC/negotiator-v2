@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = -563646850;
+	private static final long serialVersionUID = -1172713166;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -95,6 +95,11 @@ public class Query extends TableImpl<QueryRecord> {
 	 * The column <code>public.query.valid_query</code>.
 	 */
 	public final TableField<QueryRecord, Boolean> VALID_QUERY = createField("valid_query", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>public.query.request_description</code>.
+	 */
+	public final TableField<QueryRecord, String> REQUEST_DESCRIPTION = createField("request_description", org.jooq.impl.SQLDataType.CLOB, this, "");
 
 	/**
 	 * Create a <code>public.query</code> table reference

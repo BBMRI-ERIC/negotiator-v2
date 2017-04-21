@@ -63,7 +63,8 @@ CREATE TABLE "query" (
     "json_text" TEXT NOT NULL,
     "num_attachments" INTEGER NOT NULL,
     "negotiator_token" CHARACTER VARYING(255) NOT NULL UNIQUE,
-    "valid_query" boolean NOT NULL DEFAULT '0', 
+    "valid_query" boolean NOT NULL DEFAULT '0',
+    "request_description" TEXT,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("researcher_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -77,7 +78,7 @@ COMMENT ON COLUMN "query"."text" IS 'text of query';
 COMMENT ON COLUMN "query"."query_creation_time" IS 'date and time of query with out time zone';
 COMMENT ON COLUMN "query"."num_attachments" IS 'number of attachments ever associated with this query - both existing and deleted, used as an index for naming future attachments';
 COMMENT ON COLUMN "query"."researcher_id" IS 'Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)';
-
+COMMENT ON COLUMN "query"."request_description" IS 'description of the request';
 
 CREATE TABLE "query_attachment" (
     "id" SERIAL NOT NULL,
