@@ -63,17 +63,21 @@ public class SessionBean implements Serializable {
     private String transientQueryText;
 
     /**
-     * The request description of the query when an attachment is being uploaded. This might not be the final
-     * text and is thus cleared from the session bean once the page is refreshed after attachment upload.
+     * The json text of the query when the page is refreshed  - for file upload or changing query from directory.
      */
-    private String transientQueryRequestDescription;
+    private String transientQueryJson;
+
+    /**
+     * The variable that decides if session vales have to be loaded or not.
+     */
+    private boolean saveTransientState;
 
     /**
      * Removes all the filters at once.
      */
     public void clearAllFilters() {
         if (filters != null && filters.isEmpty() == false)
-        	filters.clear();
+            filters.clear();
     }
 
     /**
@@ -140,7 +144,7 @@ public class SessionBean implements Serializable {
     /**
      * Sets the filter to add.
      *
-     * @param filter the new filter to add
+     * @param filterToAdd the new filter to add
      */
     public void setFilter(String filter) {
         this.filter = filter;
@@ -162,11 +166,19 @@ public class SessionBean implements Serializable {
         this.transientQueryText = transientQueryText;
     }
 
-    public String getTransientQueryRequestDescription() {
-        return transientQueryRequestDescription;
+    public String getTransientQueryJson() {
+        return transientQueryJson;
     }
 
-    public void setTransientQueryRequestDescription(String transientQueryRequestDescription) {
-        this.transientQueryRequestDescription = transientQueryRequestDescription;
+    public void setTransientQueryJson(String transientQueryJson) {
+        this.transientQueryJson = transientQueryJson;
+    }
+
+    public boolean isSaveTransientState() {
+        return saveTransientState;
+    }
+
+    public void setSaveTransientState(boolean saveTransientState) {
+        this.saveTransientState = saveTransientState;
     }
 }

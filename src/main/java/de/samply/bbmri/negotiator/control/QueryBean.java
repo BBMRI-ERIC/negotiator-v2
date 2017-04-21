@@ -172,23 +172,16 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                /**
                 * Save query title and text temporarily when a file is being uploaded.
                 */
-               if(sessionBean.getTransientQueryTitle() != null && sessionBean.getTransientQueryText() != null){
-                   queryTitle = sessionBean.getTransientQueryTitle();
-                   queryText = sessionBean.getTransientQueryText();
-                   queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
-                   clearEditChanges();
-               }else{
+               if(sessionBean.isSaveTransientState() == false){
                    queryTitle = queryRecord.getTitle();
                    queryText = queryRecord.getText();
-                   queryRequestDescription = queryRecord.getRequestDescription();
-               }
-
-               if (jsonQueryId != null){
-                   jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-               }else{
                    jsonQuery = queryRecord.getJsonText();
+               }else {
+                   /**
+                    * Get the values of the fields before page was refreshed - for file upload or changing query from directory
+                    */
+                   getSavedValues();
                }
-
                ntoken = queryRecord.getNegotiatorToken();
                setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
            }
@@ -246,6 +239,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
         * query and it has not been saved in the Query table hence no token is used.
         */
        if(mode.equals("edit")) {
+           saveEditChangesTemporarily();
            externalContext.redirect(Directory.getQueryDTO(jsonQuery).getUrl() + "&nToken=" + ntoken);
        }else{
            externalContext.redirect(Directory.getQueryDTO(jsonQuery).getUrl());
@@ -253,14 +247,35 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
    }
 
    /**
+    * Gets values from session bean that are saved before page is refreshed - for file upload or changing query from directory.
+    */
+   public void getSavedValues() {
+       queryTitle = sessionBean.getTransientQueryTitle();
+       queryText = sessionBean.getTransientQueryText();
+       if (jsonQueryId != null) {
+           try (Config config = ConfigFactory.get()) {
+               jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+           } catch (SQLException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+           }
+       } else {
+           jsonQuery = sessionBean.getTransientQueryJson();
+       }
+       clearEditChanges();
+
+   }
+
+   /**
     * Save title and text in session bean when uploading attachment.
     * @param title query title
     * @param text query description
     */
-   public void saveEditChangesTemporarily(String title, String text, String requestDescription) {
-       sessionBean.setTransientQueryTitle(title);
-       sessionBean.setTransientQueryText(text);
-       sessionBean.setTransientQueryRequestDescription(requestDescription);
+   public void saveEditChangesTemporarily() {
+       sessionBean.setTransientQueryTitle(queryTitle);
+       sessionBean.setTransientQueryText(queryText);
+       sessionBean.setTransientQueryJson(jsonQuery);
+       sessionBean.setSaveTransientState(true);
    }
 
    /**
@@ -270,7 +285,8 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
    public void clearEditChanges() {
        sessionBean.setTransientQueryTitle(null);
        sessionBean.setTransientQueryText(null);
-       sessionBean.setTransientQueryRequestDescription(null);
+       sessionBean.setTransientQueryJson(null);
+       sessionBean.setSaveTransientState(false);
    }
 
    /**
@@ -305,7 +321,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
             uploadName = "query_" + getId() + "_file_" + fileId + "_name_" + originalFileName;
             if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
                 if (mode.equals("edit")) {
-                    saveEditChangesTemporarily(queryTitle, queryText, queryRequestDescription);
+                    saveEditChangesTemporarily();
                 }
                 config.commit();
             } else {
@@ -412,7 +428,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
            file.delete();
            if (mode.equals("edit")) {
-               saveEditChangesTemporarily(queryTitle, queryText, queryRequestDescription);
+               saveEditChangesTemporarily();
            }
        } catch (SQLException e) {
            e.printStackTrace();
