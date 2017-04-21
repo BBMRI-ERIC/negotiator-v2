@@ -108,10 +108,12 @@ public class DbUtil {
      * @param queryId the query id for which the editing started
      * @throws SQLException
      */
-    public static void editQueryDescription(Config config, String title, String text, String jsonText, Integer queryId) throws SQLException {
+    public static void editQueryDescription(Config config, String title, String text, String requestDescription, String
+            jsonText, Integer queryId) throws SQLException {
         config.dsl().update(Tables.QUERY)
                     .set(Tables.QUERY.TITLE, title)
                     .set(Tables.QUERY.TEXT, text)
+                    .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription)
                     .set(Tables.QUERY.JSON_TEXT, jsonText)
                     .set(Tables.QUERY.VALID_QUERY, true)
                     .where(Tables.QUERY.ID.eq(queryId))
@@ -560,12 +562,14 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord saveQuery(Config config, String title,
-                                        String text, String jsonText, int researcherId, Boolean validQuery) throws SQLException, IOException {
+                                        String text, String requestDescription, String jsonText, int researcherId,
+                                        Boolean validQuery) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
         queryRecord.setJsonText(jsonText);
         queryRecord.setQueryCreationTime(new Timestamp(new Date().getTime()));
         queryRecord.setText(text);
+        queryRecord.setRequestDescription(requestDescription);
         queryRecord.setTitle(title);
         queryRecord.setResearcherId(researcherId);
         queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));

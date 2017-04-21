@@ -91,6 +91,16 @@
 					</h:inputTextarea>
 					<h:message for="description" style="color:red"
 						styleClass="pre-wrap" />
+
+					<br></br> #{label['queryview.title.requestdescription']} <i
+						class="fa fa-pencil-square-o" />
+					<h:inputTextarea id="requestdescription" value="#{queryBean.queryRequestDescription}"
+									 styleClass="form-control" rows="5"
+									 validatorMessage="#{label['error.invalidDescriptionLength']}">
+						<f:validateLength for="requestdescription" minimum="5" maximum="500" />
+					</h:inputTextarea>
+					<h:message for="requestdescription" style="color:red"
+							   styleClass="pre-wrap" />
 				</div>
 
 

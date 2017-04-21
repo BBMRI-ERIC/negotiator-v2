@@ -108,6 +108,11 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
     */
    private String queryText;
 
+    /**
+     * The description of the request.
+     */
+   private String queryRequestDescription;
+
    /**
     * The title of the query.
     */
@@ -170,10 +175,12 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                if(sessionBean.getTransientQueryTitle() != null && sessionBean.getTransientQueryText() != null){
                    queryTitle = sessionBean.getTransientQueryTitle();
                    queryText = sessionBean.getTransientQueryText();
+                   queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
                    clearEditChanges();
                }else{
                    queryTitle = queryRecord.getTitle();
                    queryText = queryRecord.getText();
+                   queryRequestDescription = queryRecord.getRequestDescription();
                }
 
                if (jsonQueryId != null){
@@ -204,11 +211,13 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited. */
            if(id != null) {
-               DbUtil.editQueryDescription(config, queryTitle, queryText,jsonQuery, id);
+               DbUtil.editQueryDescription(config, queryTitle, queryText, queryRequestDescription, jsonQuery, id);
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
-               QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId(), true);
+               QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                       jsonQuery, userBean.getUserId(),
+                       true);
                config.commit();
                setId(record.getId());
                List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId(), Flag.IGNORED);
@@ -248,9 +257,10 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
     * @param title query title
     * @param text query description
     */
-   public void saveEditChangesTemporarily(String title, String text) {
+   public void saveEditChangesTemporarily(String title, String text, String requestDescription) {
        sessionBean.setTransientQueryTitle(title);
        sessionBean.setTransientQueryText(text);
+       sessionBean.setTransientQueryRequestDescription(requestDescription);
    }
 
    /**
@@ -260,6 +270,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
    public void clearEditChanges() {
        sessionBean.setTransientQueryTitle(null);
        sessionBean.setTransientQueryText(null);
+       sessionBean.setTransientQueryRequestDescription(null);
    }
 
    /**
@@ -276,7 +287,9 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
         try (Config config = ConfigFactory.get()) {
             if (id == null) {
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, jsonQuery, userBean.getUserId(), false);
+                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                        jsonQuery, userBean.getUserId()
+                        , false);
                 config.commit();
                 setId(record.getId());
             }
@@ -292,7 +305,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
             uploadName = "query_" + getId() + "_file_" + fileId + "_name_" + originalFileName;
             if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
                 if (mode.equals("edit")) {
-                    saveEditChangesTemporarily(queryTitle, queryText);
+                    saveEditChangesTemporarily(queryTitle, queryText, queryRequestDescription);
                 }
                 config.commit();
             } else {
@@ -399,7 +412,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
            file.delete();
            if (mode.equals("edit")) {
-               saveEditChangesTemporarily(queryTitle, queryText);
+               saveEditChangesTemporarily(queryTitle, queryText, queryRequestDescription);
            }
        } catch (SQLException e) {
            e.printStackTrace();
@@ -520,6 +533,14 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
     public void setJsonQueryId(Integer jsonQueryId) {
         this.jsonQueryId = jsonQueryId;
+    }
+
+    public String getQueryRequestDescription() {
+        return queryRequestDescription;
+    }
+
+    public void setQueryRequestDescription(String queryRequestDescription) {
+        this.queryRequestDescription = queryRequestDescription;
     }
 
 }

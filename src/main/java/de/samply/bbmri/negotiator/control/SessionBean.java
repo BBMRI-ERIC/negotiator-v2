@@ -63,6 +63,12 @@ public class SessionBean implements Serializable {
     private String transientQueryText;
 
     /**
+     * The request description of the query when an attachment is being uploaded. This might not be the final
+     * text and is thus cleared from the session bean once the page is refreshed after attachment upload.
+     */
+    private String transientQueryRequestDescription;
+
+    /**
      * Removes all the filters at once.
      */
     public void clearAllFilters() {
@@ -134,7 +140,7 @@ public class SessionBean implements Serializable {
     /**
      * Sets the filter to add.
      *
-     * @param filterToAdd the new filter to add
+     * @param filter the new filter to add
      */
     public void setFilter(String filter) {
         this.filter = filter;
@@ -154,5 +160,13 @@ public class SessionBean implements Serializable {
 
     public void setTransientQueryText(String transientQueryText) {
         this.transientQueryText = transientQueryText;
+    }
+
+    public String getTransientQueryRequestDescription() {
+        return transientQueryRequestDescription;
+    }
+
+    public void setTransientQueryRequestDescription(String transientQueryRequestDescription) {
+        this.transientQueryRequestDescription = transientQueryRequestDescription;
     }
 }
