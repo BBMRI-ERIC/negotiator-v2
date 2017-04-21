@@ -453,6 +453,19 @@ public class DbUtil {
     }
 
     /**
+     * Returns all users
+     * @param config
+     * @return
+     */
+    public static List<PersonRecord> getAllUsers(Config config) {
+        Result<Record> record =
+                config.dsl().select(getFields(Tables.PERSON, "person")).from(Tables.PERSON).orderBy(Tables.PERSON
+                        .AUTH_NAME).fetch();
+
+        return config.map(record, PersonRecord.class);
+    }
+
+    /**
      * Returns the collection for the given directory ID.
      * @param config database configuration
      * @param id directory collection ID

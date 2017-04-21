@@ -97,8 +97,6 @@ public class AuthorizationFilter implements Filter {
             return;
         }
 
-        logger.debug("Accessed page = "+path);
-
         /**
          * Create the userBean if necessary
          */

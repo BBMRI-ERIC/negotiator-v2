@@ -146,6 +146,13 @@ public class UserBean implements Serializable {
      */
     private String newQueryRedirectURL;
 
+    /**
+     * The identity string of the user who sudo'd another
+     */
+    private String sudoMaster = null;
+
+    private Boolean isAdmin = false;
+
 	/**
 	 * Basic Constructor for when the user bean is created without dependency injection.
 	 */
@@ -153,15 +160,35 @@ public class UserBean implements Serializable {
 		init();
 	}
 
-	/**
+    public String getSudoMaster() {
+        return sudoMaster;
+    }
+
+    public void setSudoMaster(String sudoMaster) {
+        this.sudoMaster = sudoMaster;
+    }
+
+    public Boolean sudoedUser() {
+	    return sudoMaster!=null;
+    }
+
+    /**
 	 * Executes a logout.
 	 *
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public void logout() throws IOException {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+	    // a sudoed user logs out back to his original self
+	    if(sudoedUser()) {
+	        unsudoUser();
+	        context.redirect("/admin/index.xhtml");
+	        return;
+        }
+
 		OAuth2Client config = NegotiatorConfig.get().getOauth2();
-		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 
 		// invalidate session all session scoped beans are destroyed and a new
 		// login won't steal old values
@@ -283,8 +310,6 @@ public class UserBean implements Serializable {
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
 				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
 
-		logger.debug("RETURN URL = "+returnURL);
-
 		return returnURL;
     }
 
@@ -343,6 +368,51 @@ public class UserBean implements Serializable {
 		}
 	}
 
+	public void unsudoUser() {
+	    this.userIdentity = getSudoMaster();
+	    setSudoMaster(null);
+	    isAdmin = true;
+
+        try(Config config = ConfigFactory.get()) {
+            PersonRecord personRecord = config.dsl().selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(this.userIdentity)).fetchOne();
+
+            if(personRecord != null) {
+                userRealName = personRecord.getAuthName();
+                userEmail = personRecord.getAuthEmail();
+                userId = personRecord.getId();
+                createOrGetUser();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Sudos as another user. Only admin users can do that.
+     * @param identity
+     */
+    public void sudoUser(String identity) {
+        if(!isAdmin)
+            return;
+
+        setSudoMaster(this.userIdentity);
+        isAdmin = false;
+        this.userIdentity = identity;
+
+        try(Config config = ConfigFactory.get()) {
+            PersonRecord personRecord = config.dsl().selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(identity)).fetchOne();
+
+            if(personRecord != null) {
+                userRealName = personRecord.getAuthName();
+                userEmail = personRecord.getAuthEmail();
+                userId = personRecord.getId();
+                createOrGetUser();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 	/**
 	 * If the "userIdentity" does not exist in the database, create it.
 	 */
@@ -383,6 +453,9 @@ public class UserBean implements Serializable {
 				person.update();
 			}
 
+			if(person.getIsAdmin())
+			    isAdmin = true;
+
 			loginValid = true;
             researcher = true;
 
@@ -413,16 +486,17 @@ public class UserBean implements Serializable {
 	 * @return
      */
 	public Boolean isAdmin() {
-		List<String> admins = NegotiatorConfig.get().getNegotiator().getAdmins();
-
-		/**
-		 * Create the userBean if necessary
-		 */
-		if(getLoginValid() && admins != null && admins.contains(userIdentity)) {
-			return true;
-		} else {
-			return false;
-		}
+	    return isAdmin;
+//		List<String> admins = NegotiatorConfig.get().getNegotiator().getAdmins();
+//
+//		/**
+//		 * Create the userBean if necessary
+//		 */
+//		if(getLoginValid() && admins != null && admins.contains(userIdentity)) {
+//			return true;
+//		} else {
+//			return false;
+//		}
 	}
 
 	/**

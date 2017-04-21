@@ -32,39 +32,24 @@
 	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
 	template="default.xhtml">
 
+	<f:metadata>
+		<f:viewAction action="#{adminBean.initialize}" />
+	</f:metadata>
+
 	<ui:param name="bodyClass" value="container"/>
 
 	<ui:define name="body">
 
-		<h3>#{label['admin.status']}</h3>
-        Build: #{label['build.date']}
+		<h3>#{label['admin.sudo']}</h3>
+		<h:form>
+			<h:outputText value="Select user to sudo." />
 
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th>#{label['admin.table.taskType']}</th>
-					<th>#{label['admin.table.lastSuccess']}</th>
-					<th>#{label['admin.table.lastSuccessMessage']}</th>
-					<th>#{label['admin.table.lastFail']}</th>
-					<th>#{label['admin.table.lastFailMessage']}</th>
-				</tr>
-			</thead>
-			<tbody>
-				<ui:repeat value="#{applicationBean.successStatus.keySet().toArray()}" var="type">
-					<tr class="#{applicationBean.successStatus.get(type).date.after(applicationBean.failStatus.get(type).date) ? 'success' : 'danger'}">
-						<td>#{label[type]}</td>
-						<td>#{applicationBean.successStatus.get(type).date}</td>
-						<td>#{applicationBean.successStatus.get(type).message}</td>
-						<td>#{applicationBean.failStatus.get(type).date}</td>
-						<td>#{applicationBean.failStatus.get(type).message}</td>
-					</tr>
-				</ui:repeat>
-			</tbody>
-		</table>
+			<h:selectOneMenu value="#{adminBean.sudo}">
+				<f:selectItems value="#{adminBean.users}" />
+			</h:selectOneMenu>
 
-		<div>
-			Git-Branch: #{applicationBean.gitBranch}, Git-Commit-ID: #{applicationBean.gitCommitId}, Version: #{applicationBean.version}
-		</div>
+			<h:commandButton value="Switch user" action="#{adminBean.switchUser()}" />
+		</h:form>
 
 	</ui:define>
 

@@ -53,7 +53,8 @@ INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (17, 'usertest-owner3', 'Researcher test user 3', 'r.proynova@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (18, 'usertest-owner4', 'Researcher test user 4', 'r.proynova@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (19, 'usertest-owner5', 'Researcher test user 5', 'r.proynova@dkfz.de', NULL);
-ALTER SEQUENCE person_id_seq RESTART WITH 20;
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, is_admin) VALUES (20, 'admin001','BBMRI ADMIN', 'admin@negotiator', NULL, TRUE);
+ALTER SEQUENCE person_id_seq RESTART WITH 21;
 
 INSERT INTO person_collection (person_id, collection_id) VALUES (1, 1);
 INSERT INTO person_collection (person_id, collection_id) VALUES (2, 2);
@@ -77,7 +78,8 @@ INSERT INTO person_collection (person_id, collection_id) VALUES (14, 19);
 INSERT INTO person_collection (person_id, collection_id) VALUES (14, 20);
 INSERT INTO person_collection (person_id, collection_id) VALUES (14, 21);
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token, valid_query)
+VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
 '{
     "humanReadable":"name: ‘Germany’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
@@ -90,9 +92,9 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ], "URL": "https://does-not-exist.com"
-}', 0, 'token-1');
+}', 0, 'token-1', TRUE);
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(2, 'Colon cancer', 'Do you have 50 samples on samples of Colorectal cancer as a primary diagnosis (C18.1 to C18.7)?', '2014-05-01 00:00:00', 6,
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token, valid_query) VALUES(2, 'Colon cancer', 'Do you have 50 samples on samples of Colorectal cancer as a primary diagnosis (C18.1 to C18.7)?', '2014-05-01 00:00:00', 6,
 '{
     "humanReadable":"name: ‘Netherlands’, materials: ’Plasma’",
   "collections":[
@@ -105,9 +107,9 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ], "URL": "https://does-not-exist.com"
-}', 0, 'token-2');
+}', 0, 'token-2', TRUE);
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(3, 'Lung cancer', 'For my research, I need information on the response to therapy on patients with lung cancer.', '2016-07-21 17:55:52.70183', 6,
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token, valid_query) VALUES(3, 'Lung cancer', 'For my research, I need information on the response to therapy on patients with lung cancer.', '2016-07-21 17:55:52.70183', 6,
 '{
     "humanReadable":"name: ‘Germany’, materials: ‘DNA’",
   "collections":[
@@ -120,9 +122,9 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ], "URL": "https://does-not-exist.com"
-}', 0, 'token-3');
+}', 0, 'token-3', TRUE);
 
-INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token) VALUES(4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8,
+INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token, valid_query) VALUES(4, 'Skin cancer', 'Are there biobanks with skin cancer research data.', '2016-07-21 17:55:52.70183', 8,
 '{
     "humanReadable":"name: ‘Europe’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
@@ -135,7 +137,7 @@ INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text
       "biobankID":"bbmri-eric:biobankID:BE_B0383"
     }
   ], "URL": "https://does-not-exist.com"
-}', 0, 'token-4');
+}', 0, 'token-4', TRUE);
 
 ALTER SEQUENCE query_id_seq RESTART WITH 5;
 

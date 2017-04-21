@@ -17,7 +17,7 @@
 				<h:link outcome="/index" styleClass="navbar-brand">
 					<span class="projectName">#{label['queryview.bbmri']}
                         <span class="bbmriModule">#{label['queryview.negotiator']}
-                            <span style="font-size: 50%">Build: #{label['build.date']}</span>
+
                         </span>
                     </span>
 				</h:link>
@@ -98,7 +98,12 @@
 						<ui:fragment rendered="#{userBean.loginValid}">
 							<li class="dropdown">
 								<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-									<i class="fa fa-user fa-fw userIcon" />
+									<ui:fragment rendered="#{!userBean.sudoedUser()}">
+                                        <i class="fa fa-user fa-fw userIcon" />
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{userBean.sudoedUser()}">
+                                        <i class="fa fa-user-secret fa-fw userIcon" />
+                                    </ui:fragment>
 									#{userBean.userRealName.trim().length() > 0 ?
 									userBean.userRealName : userBean.userEmail} <span class="caret"></span>
 								</a>

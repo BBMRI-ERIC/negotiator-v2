@@ -36,6 +36,11 @@ public class DevBean implements Serializable {
         return "/researcher/index.xhtml?faces-redirect=true";
     }
 
+    public String choseAdmin() {
+        userBean.fakeUser("admin001");
+        return "/admin/index.xhtml?faces-redirect=true";
+    }
+
     public UserBean getUserBean() {
         return userBean;
     }

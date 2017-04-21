@@ -41,6 +41,7 @@ CREATE TABLE "person" (
     "auth_name" CHARACTER VARYING(255) NOT NULL,
     "auth_email" CHARACTER VARYING(255) NOT NULL,
     "person_image" BYTEA,
+    "is_admin" BOOLEAN NOT NULL DEFAULT '0',
     PRIMARY KEY ("id")
 );
 
@@ -50,6 +51,7 @@ COMMENT ON COLUMN "person".auth_subject IS 'authentication string that comes fro
 COMMENT ON COLUMN "person".auth_name IS 'the real name of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".auth_email IS 'the email of the user, value comes from the authentication service';
 COMMENT ON COLUMN "person".person_image IS 'image/avatar of the person';
+COMMENT ON COLUMN "person".is_admin IS 'boolean if the person is an admin';
 
 
 CREATE TABLE "query" (
