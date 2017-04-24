@@ -297,8 +297,8 @@ a:hover {
 }
 
 .column2 {
-	min-width: 70px;
-	max-width: 100px; 
+	min-width: 25px;
+	max-width: 25px;
 }
 
 .attachment-links {
@@ -343,4 +343,10 @@ a:hover {
     height: 40px;
     width: 40px;
     min-width: 40px;
+}
+
+.required:before {
+    color: #e32;
+    content: '*';
+    display:inline;
 }

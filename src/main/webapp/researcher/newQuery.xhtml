@@ -48,6 +48,17 @@
 
 		<h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
 
+            <h:panelGroup layout="block">
+                <h2>Query details</h2>
+                On this page you can provide the details for your query.<br />
+                First define the search parameters for the samples you are looking for. Click the "Edit Search
+                Parameters" button to change them.<br />
+                Then fill out the form below, giving your query a title and describing both the project you are working
+                on and adding more detailed information for this request in particular.<br />
+                If you have additional information in PDF files available, you can attach them to this query.<br />
+            <p />
+                <br/>
+            </h:panelGroup>
 			<h:panelGroup layout="block">
 				<h:outputLabel for="structuredQuery"
 					value="#{label['queryview.title.searchParameters']}" />
@@ -56,7 +67,6 @@
 					style="margin-left: 22px;">
 				</h:outputText>
 				
-				<br/>
 				<br/>
 				<h:form>				
 					<h:commandLink action="#{queryBean.editSearchParameters()}"	styleClass="btn btn-primary" 
@@ -74,74 +84,75 @@
 			<h:form id="uploadform" enctype="multipart/form-data">
 
 				<div class="form-group">
-					#{label['queryview.title.title']} <i class="fa fa-pencil-square-o" />
+                    <span class="required">
+                        #{label['queryview.title.title']} <i class="fa fa-pencil-square-o" />
+                    </span>
 					<h:inputText id="title" value="#{queryBean.queryTitle}"
-						styleClass="form-control"
+						styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
 						validatorMessage="#{label['error.invalidTitleLength']}">
 						<f:validateLength for="title" minimum="5" maximum="30" />
 					</h:inputText>
 					<h:message for="title" style="color:red" styleClass="pre-wrap" />
 
-					<br></br> #{label['queryview.title.text']} <i
-						class="fa fa-pencil-square-o" />
+					<br></br>
+                    <span class="required">
+                        #{label['queryview.title.text']} <i class="fa fa-pencil-square-o" />
+                    </span>
 					<h:inputTextarea id="description" value="#{queryBean.queryText}"
-						styleClass="form-control" rows="5"
+						styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.text']}"
 						validatorMessage="#{label['error.invalidDescriptionLength']}">
 						<f:validateLength for="description" minimum="5" maximum="500" />
 					</h:inputTextarea>
 					<h:message for="description" style="color:red"
 						styleClass="pre-wrap" />
 
-					<br></br> #{label['queryview.title.requestdescription']} <i
-						class="fa fa-pencil-square-o" />
+					<br></br>
+                    <span class="required">
+                        #{label['queryview.title.requestdescription']} <i class="fa fa-pencil-square-o" />
+                    </span>
 					<h:inputTextarea id="requestdescription" value="#{queryBean.queryRequestDescription}"
 									 styleClass="form-control" rows="5"
+                                     pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
 									 validatorMessage="#{label['error.invalidDescriptionLength']}">
 						<f:validateLength for="requestdescription" minimum="5" maximum="500" />
 					</h:inputTextarea>
 					<h:message for="requestdescription" style="color:red"
 							   styleClass="pre-wrap" />
-				</div>
+				<!--</div>-->
 
 
+                <br></br> #{label['queryview.title.attachments']}
 
 				<!-- Using h:dataTable to display attachments -->
-				<h:panelGroup styleClass="row" layout="block">
-					<h:panelGroup styleClass="col-md-12" layout="block">
+					<h:panelGroup layout="block">
 
 
 							<h:dataTable value="#{queryBean.attachmentMap.entrySet().toArray()}" var="attachment"
-								columnClasses="col-md-11, col-md-1"
+								columnClasses="column1,column2" style="margin-top: 0px;"
 								class="table-striped table-bordered table-responsive table-fullwidth"
 								rendered="#{queryBean.attachments.size() > 0}">
 
 								<h:column>
-									<!-- column header -->
-									<f:facet name="header" >Attachments (only PDF files are accepted)</f:facet>
-									<!-- row record -->
-
-									<h:outputLink value="../attachment/#{attachment.key}"
+									<h:outputLink value="../attachment/#{attachment.key}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
 										style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
 
-										<h:outputText value="#{attachment.value}"
-											title="#{label['attachmentview.tooltip.attachmentDownload']}"
-											style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap"
-											styleClass="attachment-links">
-										</h:outputText>
+                                        <h:panelGroup
+                                                      style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap"
+                                                      styleClass="attachment-links">
+                                            <i class="fa fa-paperclip" style="margin-right: 2px;" />#{attachment.value}
 
+                                        </h:panelGroup>
 									</h:outputLink>
 
 
 								</h:column>
 
 								<h:column>
-									<f:facet name="header">Delete</f:facet>
-
 									<!--   Remove an attachment -->
                                     <h:commandLink
                                                    styleClass="confirm-delete"
                                                    action="#{queryBean.setToRemoveAttachment(attachment.key)}"
-                                                   title="#{label['attachmentview.tooltip.attachmentDelete']}">
+                                                   title="#{label['attachmentview.tooltip.attachmentDelete']}: #{attachment.value}">
                                         <i class="fa fa-times attachment-delete-links" aria-hidden="true" />
                                         <f:ajax onevent="showConfirmDialog"/>
                                     </h:commandLink>
@@ -177,19 +188,12 @@
                             }
                         </h:outputScript>
 
-							<!-- Show that there are no uploaded attachments yet -->
-							<h:panelGroup layout="block" rendered="#{queryBean.attachments.size() == 0}" >
-								<h:panelGroup styleClass="form-group" layout="block">
-									<h:outputLabel
-										value="#{label['attachmentview.text.noattachments']}"
-										styleClass="form-control-static" />
-								</h:panelGroup>
-							</h:panelGroup>
-
 							<!-- Upload the attachments for a query -->
-							<h:panelGroup layout="block" style="margin-top: 20px;" >
+							<h:panelGroup layout="block" style="margin-top: 0px;" >
 								<h:panelGroup class="input-group" layout="block">
-									<input type="text" class="form-control" readonly="readonly" onclick="$('#uploadform\\:file').click();" />
+									<input placeholder="#{label['attachmentview.placeholder']}" type="text"
+                                           class="form-control" readonly="readonly"
+                                            onclick="$('#uploadform\\:file').click();" />
 
 									<label class="input-group-btn"> <h:panelGroup
 											class="btn btn-default">
@@ -216,8 +220,7 @@
 
 
 					</h:panelGroup>
-				</h:panelGroup>
-
+                </div>
 				<br></br>
                 <br></br>
                 
