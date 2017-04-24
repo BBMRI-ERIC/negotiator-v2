@@ -175,6 +175,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                if(sessionBean.isSaveTransientState() == false){
                    queryTitle = queryRecord.getTitle();
                    queryText = queryRecord.getText();
+                   queryRequestDescription = queryRecord.getRequestDescription();
                    jsonQuery = queryRecord.getJsonText();
                }else {
                    /**
@@ -252,6 +253,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
    public void getSavedValues() {
        queryTitle = sessionBean.getTransientQueryTitle();
        queryText = sessionBean.getTransientQueryText();
+       queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
        if (jsonQueryId != null) {
            try (Config config = ConfigFactory.get()) {
                jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
@@ -268,13 +270,12 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    /**
     * Save title and text in session bean when uploading attachment.
-    * @param title query title
-    * @param text query description
     */
    public void saveEditChangesTemporarily() {
        sessionBean.setTransientQueryTitle(queryTitle);
        sessionBean.setTransientQueryText(queryText);
        sessionBean.setTransientQueryJson(jsonQuery);
+       sessionBean.setTransientQueryRequestDescription(queryRequestDescription);
        sessionBean.setSaveTransientState(true);
    }
 
@@ -285,6 +286,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
    public void clearEditChanges() {
        sessionBean.setTransientQueryTitle(null);
        sessionBean.setTransientQueryText(null);
+       sessionBean.setTransientQueryRequestDescription(null);
        sessionBean.setTransientQueryJson(null);
        sessionBean.setSaveTransientState(false);
    }
