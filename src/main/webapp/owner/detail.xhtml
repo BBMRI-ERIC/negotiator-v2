@@ -121,15 +121,15 @@
 							<h:panelGroup layout="block" class="pull-left"
 								styleClass="col-md-6">
 
-								<ui:repeat value="#{ownerQueriesDetailBean.attachments}"
+								<ui:repeat value="#{ownerQueriesDetailBean.attachmentMap.entrySet().toArray()}"
 									var="attachment">
 
 
 									<h:panelGroup
 										styleClass=" pull-left col-md-12 attachment-style"
 										style=" overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-										<h:outputLink value="../attachment/#{attachment.attachment}">
-											<h:outputText value="#{attachment.attachment}"
+										<h:outputLink value="../attachment/#{attachment.key}">
+											<h:outputText value="#{attachment.value}"
 												title="#{label['attachmentview.tooltip.attachmentDownload']}"
 												style="color:#333" />
 										</h:outputLink>
@@ -168,7 +168,7 @@
 					<ul class="nav nav-tabs">
 						<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
 						</li>
-						<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
+						<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
 						</li>
 					</ul>
 
@@ -176,7 +176,6 @@
 						<div id="comments" class="tab-pane fade in active">
 
 							<h3>#{label['querydetail.title.comments']}</h3>
-							<span id="commentsSubtitle" class="tabSubtitle"> #{label['querydetail.subtitle.commentsAvailability']} </span>
 							<p></p>
 
 							<ui:repeat value="#{ownerQueriesDetailBean.comments}"
@@ -198,8 +197,7 @@
 
 						<div id="sampleAvailability" class="tab-pane fade">
 
-							<h3>#{label['querydetail.title.sampleAvailability']}</h3>
-									<span id="sampleAvailabilitySubtitle" class="tabSubtitle"> #{label['querydetail.subtitle.sampleAvailability']} </span>
+							<h3>#{label['querydetail.title.privateNegotiation']}</h3>
 							<p>
 								<b> <h:outputText value="#{label['message.offerSamples']}"
 										rendered="#{ownerQueriesDetailBean.offerPersonDTO.size() == 0}" />

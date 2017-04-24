@@ -29,11 +29,7 @@ package de.samply.bbmri.negotiator.control.owner;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -116,7 +112,12 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     private List<QueryAttachmentDTO> attachments;
 
-    /**
+	/**
+	 * Map of saved filename and realname of attachments
+	 */
+	private HashMap<String, String> attachmentMap = null;
+
+	/**
      * The list of offers(private comments) for the selected query
      */
     private List<OfferPersonDTO> offerPersonDTO;
@@ -351,6 +352,22 @@ public class OwnerQueriesDetailBean implements Serializable {
 
     public void setAssociatedBiobanks(List<BiobankRecord> associatedBiobanks) {
         this.associatedBiobanks = associatedBiobanks;
+    }
+
+    /**
+     * Lazyloaded map of saved filenames and original filenames
+     * @return
+     */
+    public HashMap<String, String> getAttachmentMap() {
+        if(attachmentMap == null) {
+            attachmentMap = new HashMap<>();
+            for(QueryAttachmentDTO att : attachments) {
+                //XXX: this pattern needs to match
+                String uploadName = "query_" + queryId + "_file_" + att.getId() + "_name_" + att.getAttachment();
+                attachmentMap.put(uploadName, att.getAttachment());
+            }
+        }
+        return attachmentMap;
     }
 
     public List<QueryAttachmentDTO> getAttachments() {

@@ -193,7 +193,7 @@
                                                          href="#comments">#{label['querydetail.title.comments']}</a>
                         </li>
                         <li id="second"><a data-toggle="tab"
-                                           href="#sampleAvailability">#{label['querydetail.title.sampleAvailability']}</a>
+                                           href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
                         </li>
                     </ul>
 
@@ -201,8 +201,6 @@
                         <div id="comments" class="tab-pane fade in active">
 
                             <h3>#{label['querydetail.title.comments']}</h3>
-                            <span id="commentsSubtitle"
-                                  class="tabSubtitle"> #{label['querydetail.subtitle.commentsAvailability']} </span>
                             <p/>
 
                             <ui:repeat value="#{researcherQueriesDetailBean.comments}"
@@ -223,9 +221,7 @@
 
                         <div id="sampleAvailability" class="tab-pane fade">
 
-                            <h3>#{label['querydetail.title.sampleAvailability']}</h3>
-                            <span id="sampleAvailabilitySubtitle"
-                                  class="tabSubtitle"> #{label['querydetail.subtitle.sampleAvailability']} </span>
+                            <h3>#{label['querydetail.title.privateNegotiation']}</h3>
 
 
                             <p>
