@@ -38,6 +38,8 @@ import javax.faces.bean.ViewScoped;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
@@ -50,6 +52,7 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  * Manages the query detail view for owners
@@ -363,7 +366,16 @@ public class OwnerQueriesDetailBean implements Serializable {
             attachmentMap = new HashMap<>();
             for(QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
-                String uploadName = "query_" + queryId + "_file_" + att.getId() + "_name_" + att.getAttachment();
+                String uploadName = "query_" + queryId + "_file_" + att.getId();
+
+                Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
+
+                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
+                        uploadName) + ".pdf";
+
+
+                uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
+
                 attachmentMap.put(uploadName, att.getAttachment());
             }
         }

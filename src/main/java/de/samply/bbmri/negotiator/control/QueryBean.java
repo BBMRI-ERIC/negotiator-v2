@@ -48,6 +48,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 
+import de.samply.bbmri.negotiator.config.Negotiator;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -320,7 +322,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
             }
             // XXX: this needs to match the pattern in FileServlet.doGet and
             // ResearcherQueriesDetailBean.getAttachmentMap
-            uploadName = "query_" + getId() + "_file_" + fileId + "_name_" + originalFileName;
+            uploadName = "query_" + getId() + "_file_" + fileId + ".pdf";
             if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
                 if (mode.equals("edit")) {
                     saveEditChangesTemporarily();
@@ -522,7 +524,16 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
             attachmentMap = new HashMap<>();
             for(QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
-                String uploadName = "query_" + getId() + "_file_" + att.getId() + "_name_" + att.getAttachment();
+                String uploadName = "query_" + getId() + "_file_" + att.getId();
+
+                Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
+
+                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
+                        uploadName) + ".pdf";
+
+
+                uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
+
                 attachmentMap.put(uploadName, att.getAttachment());
             }
         }

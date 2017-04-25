@@ -37,6 +37,9 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.servlet.http.Part;
 
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.config.Negotiator;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -323,7 +326,16 @@ public class ResearcherQueriesDetailBean implements Serializable {
             attachmentMap = new HashMap<>();
             for(QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
-                String uploadName = "query_" + queryId + "_file_" + att.getId() + "_name_" + att.getAttachment();
+                String uploadName = "query_" + queryId + "_file_" + att.getId();
+
+                Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
+
+                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
+                        uploadName) + ".pdf";
+
+
+                uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
+
                 attachmentMap.put(uploadName, att.getAttachment());
             }
         }

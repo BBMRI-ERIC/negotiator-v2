@@ -25,6 +25,8 @@
   -->
 
 <negotiator>
+    <!-- The salt used to salt an uploaded file hash with -->
+    <uploadFileSalt>test1234</uploadFileSalt>
 
     <!-- The username that Perun will use for the push mechanism (Basic Authentication) -->
     <perunUsername>perun</perunUsername>

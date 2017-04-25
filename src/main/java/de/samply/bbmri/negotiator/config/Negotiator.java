@@ -51,6 +51,14 @@ public class Negotiator implements Serializable {
 
     private static final long serialVersionUID = 6899649893727493806L;
 
+
+    /**
+     * Salt for file uploads
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String uploadFileSalt;
+
     /**
      * The Molgenis resource name for the biobanks
      */
@@ -332,6 +340,14 @@ public class Negotiator implements Serializable {
 
     public void setAdmins(List<String> admins) {
         this.admins = admins;
+    }
+
+    public String getUploadFileSalt() {
+        return uploadFileSalt;
+    }
+
+    public void setUploadFileSalt(String uploadFileSalt) {
+        this.uploadFileSalt = uploadFileSalt;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
