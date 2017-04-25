@@ -147,7 +147,7 @@
 
 
                     <h:dataTable value="#{researcherQueriesDetailBean.attachmentMap.entrySet().toArray()}"
-                                 var="attachment"
+                                 var="attachment" style="table-layout: fixed;"
                                  class="table-striped table-bordered table-responsive table-fullwidth"
                                  rendered="#{researcherQueriesDetailBean.attachments.size() > 0}">
 
@@ -156,20 +156,20 @@
                             <f:facet name="header">Attachments</f:facet>
                             <!-- row record -->
 
-                            <h:outputLink value="../attachment/#{attachment.key}"
+                            <h:outputLink value="../attachment/#{attachment.key}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
                                           style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
 
-                                <h:outputText value="#{attachment.value}"
-                                              title="#{label['attachmentview.tooltip.attachmentDownload']}"
-                                              style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap "
-                                              styleClass="attachment-links">
-                                </h:outputText>
-                            </h:outputLink>
+                                <h:panelGroup
+                                        style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap"
+                                        styleClass="attachment-links">
+                                    <i class="fa fa-paperclip" style="margin-right: 2px;" />#{attachment.value}
+
+                                </h:panelGroup>
+                             </h:outputLink>
                         </h:column>
                     </h:dataTable>
 
                 </h:panelGroup>
-
 
                 <h:panelGroup styleClass="col-md-12" layout="block">
 
@@ -200,9 +200,6 @@
                     <div class="tab-content">
                         <div id="comments" class="tab-pane fade in active">
 
-                            <h3>#{label['querydetail.title.comments']}</h3>
-                            <p/>
-
                             <ui:repeat value="#{researcherQueriesDetailBean.comments}"
                                        var="comment">
 
@@ -221,28 +218,27 @@
 
                         <div id="sampleAvailability" class="tab-pane fade">
 
-                            <h3>#{label['querydetail.title.privateNegotiation']}</h3>
+                            <ui:fragment rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}">
+                                <br />
+                                <p>
+                                    <b> <h:outputText value="#{label['message.noOffers']}" /> </b>
+                                </p>
+                            </ui:fragment>
 
-
-                            <p>
-                                <b> <h:outputText value="#{label['message.noOffers']}"
-                                                  rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}"/>
-                                </b>
-                            </p>
-
-                            <c:forEach begin="1"
-                                       end="#{researcherQueriesDetailBean.offerMakers.size()}" var="i">
+                            <c:set var="oneMarkerOnly" value="#{researcherQueriesDetailBean.offerMakers.size() == 1}" />
+                            <c:forEach begin="1" end="#{researcherQueriesDetailBean.offerMakers.size()}" var="i">
                                 <div class="panel panel-default">
                                     <div class="panel-heading" role="tab" id="heading#{i}">
                                         <h4 class="panel-title">
-                                            <a
-                                                    role="button" data-toggle="collapse"
+                                            <a role="button" data-toggle="collapse"
                                                     data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
                                                     aria-controls="sample-list"> Biobanker #{i}
                                             </a>
                                         </h4>
                                     </div>
-                                    <div id="hh#{i}" class="panel-collapse collapse" role="tabpanel"
+                                    <div id="hh#{i}"
+                                         class="panel-collapse collapse #{oneMarkerOnly?'in':''}"
+                                         role="tabpanel"
                                          aria-labelledby="heading#{i}">
 
 

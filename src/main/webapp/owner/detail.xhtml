@@ -88,10 +88,13 @@
 
 					<h3 style="margin-top: 0px;">#{ownerQueriesDetailBean.selectedQuery.title}</h3>
 
-					<p class="pre-wrap">#{ownerQueriesDetailBean.selectedQuery.text}</p>
+                    <h4>#{label['queryview.title.text']}</h4>
+                    <p class="pre-wrap">#{ownerQueriesDetailBean.selectedQuery.text}</p>
 
-					<h:outputLabel for="filterInputText"
-								   value="#{label['queryview.title.searchParameters']}" />
+                    <h4>#{label['queryview.title.requestdescription']}</h4>
+                    <p class="pre-wrap">#{ownerQueriesDetailBean.selectedQuery.requestDescription}</p>
+
+					<h:outputLabel value="#{label['queryview.title.searchParameters']}" />
 					<h:outputText
 							value="#{ownerQueriesDetailBean.humanReadableQuery}"
 							style="margin-left: 22px;">
@@ -110,17 +113,32 @@
 					</p>
 				</h:panelGroup>
 
-				<h:outputText styleClass="attachment-title"
-					value="#{label['querydetail.title.attachments']}"
-					title="#{label['attachmentview.tooltip.attachment']}"
-					rendered="#{ownerQueriesDetailBean.attachments.size() > 0}" />
+                <h:panelGroup layout="block">
 
-				<h:panelGroup class="container-fluid">
-					<h:panelGroup class="row">
-						<h:panelGroup styleClass="col-md-12">
-							<h:panelGroup layout="block" class="pull-left"
-								styleClass="col-md-6">
+								<h:dataTable value="#{ownerQueriesDetailBean.attachmentMap.entrySet().toArray()}"
+											 var="attachment" style="table-layout: fixed;"
+											 class="table-striped table-bordered table-responsive table-fullwidth"
+											 rendered="#{ownerQueriesDetailBean.attachments.size() > 0}">
 
+									<h:column styleClass="attachment-links">
+										<!-- column header -->
+										<f:facet name="header">Attachments</f:facet>
+										<!-- row record -->
+
+										<h:outputLink value="../attachment/#{attachment.key}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
+													  style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+
+											<h:panelGroup
+													style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap"
+													styleClass="attachment-links">
+												<i class="fa fa-paperclip" style="margin-right: 2px;" />#{attachment.value}
+
+											</h:panelGroup>
+										</h:outputLink>
+									</h:column>
+								</h:dataTable>
+
+                                <ui:remove>
 								<ui:repeat value="#{ownerQueriesDetailBean.attachmentMap.entrySet().toArray()}"
 									var="attachment">
 
@@ -137,20 +155,16 @@
 
 
 								</ui:repeat>
+                                </ui:remove>
+
 							</h:panelGroup>
 
-							<h:panelGroup styleClass="col-md-6">
-							</h:panelGroup>
-
-						</h:panelGroup>
-					</h:panelGroup>
-				</h:panelGroup>
 
 
 				<ui:fragment
 					rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
-					<div class="col-xs-12">
+					<div class="col-xs-12" style="margin-top:20px;">
 						<hr></hr>
 					</div>
 
@@ -163,7 +177,7 @@
                     #{biobank.name}#{!loop.last ? ', ' : ''}
                 </ui:repeat>
 
-				<h:panelGroup layout="block" style="margin-top:60px;">
+				<h:panelGroup layout="block" style="margin-top:10px;">
 
 					<ul class="nav nav-tabs">
 						<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
@@ -174,9 +188,6 @@
 
 					<div class="tab-content">
 						<div id="comments" class="tab-pane fade in active">
-
-							<h3>#{label['querydetail.title.comments']}</h3>
-							<p></p>
 
 							<ui:repeat value="#{ownerQueriesDetailBean.comments}"
 								var="comment">
@@ -196,14 +207,12 @@
 						</div>
 
 						<div id="sampleAvailability" class="tab-pane fade">
-
-							<h3>#{label['querydetail.title.privateNegotiation']}</h3>
-							<p>
-								<b> <h:outputText value="#{label['message.offerSamples']}"
-										rendered="#{ownerQueriesDetailBean.offerPersonDTO.size() == 0}" />
-								</b>
-							</p>
-
+                        <ui:fragment rendered="#{ownerQueriesDetailBean.offerPersonDTO.size() == 0}">
+                            <br />
+                            <p>
+                                <b> <h:outputText value="#{label['message.offerSamples']}"/> </b>
+                            </p>
+                        </ui:fragment>
 							<ui:repeat value="#{ownerQueriesDetailBean.offerPersonDTO}"
 								var="offerPersonDTO">
 
