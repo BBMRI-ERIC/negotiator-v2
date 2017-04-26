@@ -437,6 +437,8 @@ public class UserBean implements Serializable {
 				 */
 				person.setPersonImage(IdenticonUtil.generateIdenticon(256));
 				person.store();
+
+				isAdmin = false;
 			} else {
 				/**
 				 * Otherwise just update some fields.
@@ -451,10 +453,10 @@ public class UserBean implements Serializable {
 					person.setPersonImage(IdenticonUtil.generateIdenticon(256));
 				}
 				person.update();
-			}
 
-			if(person.getIsAdmin())
-			    isAdmin = true;
+				if(person.getIsAdmin())
+					isAdmin = true;
+			}
 
 			loginValid = true;
             researcher = true;
