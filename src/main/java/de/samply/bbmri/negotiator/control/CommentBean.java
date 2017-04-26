@@ -62,7 +62,7 @@ public class CommentBean implements Serializable {
             DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment);
             config.commit();
 
-            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrl(query.getId()));
+            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()));
             notifier.sendEmailNotification();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,6 +85,21 @@ public class CommentBean implements Serializable {
                 context.getRequestServerPort(), context.getRequestContextPath(),
                 context.getRequestServletPath() + "?queryId=" + queryId);
     }
+
+    /**
+     * Build url to be able to navigate to the query with id=queryId for a biobanker
+     *
+     * @param queryId
+     * @return
+     */
+    public String getQueryUrlForBiobanker(Integer queryId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + queryId);
+    }
+
 
     public UserBean getUserBean() {
         return userBean;

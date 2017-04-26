@@ -218,7 +218,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                setId(record.getId());
                List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId(), Flag.IGNORED);
 
-               QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrl(record.getId()),
+               QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(record.getId()),
                        config.map(record, Query.class));
                notifier.sendEmailNotification();
            }
@@ -456,6 +456,21 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                context.getRequestServerPort(), context.getRequestContextPath(),
                "/researcher/detail.xhtml?queryId=" + getId());
    }
+
+    /**
+     * Build url to be able to navigate to the query with id=queryId for a biobanker
+     *
+     * @param queryId
+     * @return
+     */
+    public String getQueryUrlForBiobanker(Integer queryId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + getId());
+    }
+
 
     public String getHumanReadableFilters() {
 	 	return humanReadableFilters;
