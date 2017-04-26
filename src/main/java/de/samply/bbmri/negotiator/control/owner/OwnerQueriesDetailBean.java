@@ -129,7 +129,7 @@ public class OwnerQueriesDetailBean implements Serializable {
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
-	public void initialize() {
+	public String initialize() {
 		try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
             setOfferPersonDTO(DbUtil.getOffers(config, queryId, userBean.getUserId()));
@@ -154,13 +154,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 				ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
 				QueryDTO queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
 				setHumanReadableQuery(queryDTO.getHumanReadable());
-			}
+			} else {
+                /**
+                 * If it is null, it means that either the user can not access it due to insufficient privileges,
+                 * or that the query simply does not exist.
+                 */
+                return "/errors/not-found.xhtml";
+            }
 
            associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+
+        return null;
 	}
 
     /**
