@@ -71,6 +71,9 @@
                     <p class="crashcourse-point">
                         Discuss details with the researcher and the other biobankers in the comments.
                     </p>
+                    <p>
+                        <a href="#commentDetailsModal" class="crashcourse-details-link" role="button" data-toggle="modal">View more</a>
+                    </p>
                 </div>
             </div>
             <div class="row crashcouse-row">
@@ -85,6 +88,9 @@
                     </p>
                     <p class="crashcourse-point">
                         Don't miss new developments - we send you a notification if there is a new post in your conversation.
+                    </p>
+                    <p>
+                        <a href="#sampleAvailabilityModal" class="crashcourse-details-link" role="button" data-toggle="modal">View more</a>
                     </p>
                 </div>
                 <div class="col-sm-8">
@@ -120,12 +126,37 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                        <h3>Biobanker's Inbox view</h3>
+                        <h3>Biobanker's Inbox View</h3>
                     </div>
-                    <div class="modal-body"><img src="#{resource['images/biobanker-inbox-annotated2.png']}"/></div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-inbox-annotated.png']}"/></div>
                 </div>
             </div>
         </div>
+        
+        <div class="modal fade" id="commentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog crashcourse-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3>Biobanker's Detail View</h3>
+                    </div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-queryDetail-annotated.png']}"/></div>
+                </div>
+            </div>
+        </div>
+        
+         <div class="modal fade" id="sampleAvailabilityModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog crashcourse-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3>Biobanker's Sample Availability View</h3>
+                    </div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-sampleAvailability-annotated.png']}"/></div>
+                </div>
+            </div>
+        </div>
+        
     </ui:define>
 
 </ui:composition>
