@@ -47,6 +47,9 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Keys;
@@ -107,17 +110,45 @@ public class DbUtil {
      * @param text description of the query
      * @param queryId the query id for which the editing started
      * @throws SQLException
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonParseException
      */
-    public static void editQueryDescription(Config config, String title, String text, String requestDescription, String
-            jsonText, Integer queryId) throws SQLException {
-        config.dsl().update(Tables.QUERY)
-                    .set(Tables.QUERY.TITLE, title)
-                    .set(Tables.QUERY.TEXT, text)
-                    .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription)
-                    .set(Tables.QUERY.JSON_TEXT, jsonText)
-                    .set(Tables.QUERY.VALID_QUERY, true)
-                    .where(Tables.QUERY.ID.eq(queryId))
-                    .execute();
+    public static void editQueryDescription(Config config, String title, String text, String requestDescription,
+            String jsonText, Integer queryId) {
+        try {config.dsl().update(Tables.QUERY).set(Tables.QUERY.TITLE, title).set(Tables.QUERY.TEXT, text)
+             .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription).set(Tables.QUERY.JSON_TEXT, jsonText)
+             .set(Tables.QUERY.VALID_QUERY, true).where(Tables.QUERY.ID.eq(queryId)).execute();
+
+            /**
+             * Updates the relationship between query and collection.
+             */
+            QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
+
+            if (NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
+                    && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
+                logger.info("Faking collections from the directory.");
+                for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
+                    CollectionRecord dbCollection = getCollection(config, collection);
+
+                    if (dbCollection != null) {
+                        addQueryToCollection(config, queryId, dbCollection.getId());
+                    }
+                }
+            } else {
+                for (CollectionDTO collection : queryDTO.getCollections()) {
+                    CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
+
+                    if (dbCollection != null) {
+                        addQueryToCollection(config, queryId, dbCollection.getId());
+                    }
+                }
+            }
+
+            config.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
