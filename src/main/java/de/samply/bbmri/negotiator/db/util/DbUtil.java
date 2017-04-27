@@ -471,7 +471,7 @@ public class DbUtil {
     public static List<BiobankRecord> getAssociatedBiobanks(Config config, Integer queryId, Integer userId) {
         Result<Record> record =
 
-                config.dsl().select(getFields(Tables.BIOBANK, "biobank"))
+                config.dsl().selectDistinct(getFields(Tables.BIOBANK, "biobank"))
                 .from(Tables.BIOBANK)
 
                 .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
