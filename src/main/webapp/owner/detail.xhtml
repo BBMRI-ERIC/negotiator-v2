@@ -26,235 +26,162 @@
   -->
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
-	template="../components/default.xhtml">
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
+    template="../components/default.xhtml">
 
-	<!-- Queries detail page for the owner -->
+    <!-- Queries detail page for the owner -->
 
-	<f:metadata>
-		<f:viewParam name="queryId" value="#{ownerQueriesDetailBean.queryId}" />
-		<f:viewParam name="flag" value="#{ownerQueriesDetailBean.flagFilter}" />
-		<f:viewAction action="#{ownerQueriesDetailBean.initialize}" />
-	</f:metadata>
+    <f:metadata>
+        <f:viewParam name="queryId" value="#{ownerQueriesDetailBean.queryId}" />
+        <f:viewParam name="flag" value="#{ownerQueriesDetailBean.flagFilter}" />
+        <f:viewAction action="#{ownerQueriesDetailBean.initialize}" />
+    </f:metadata>
 
-	<ui:param name="bodyClass" value="container-fluid body-nomargin" />
+    <ui:param name="bodyClass" value="container-fluid body-nomargin" />
 
-	<ui:define name="body">
+    <ui:define name="body">
 
-		<h:panelGroup layout="block" styleClass="col-md-3 left-panel">
-			
-			<bbmricc:searchDetail backingBean="#{ownerQueriesDetailBean}"/>
+        <h:panelGroup layout="block" styleClass="col-md-3 left-panel">
 
-			<h:panelGroup
-				rendered="#{ownerQueriesDetailBean.queries.size() == 0 and ownerQueriesDetailBean.filterTerms.size() > 0}"
-				layout="block" styleClass="col-md-12">
-				<h3 style="margin-top: 0px;">#{label['queryview.noSearchResults']}</h3>
-			</h:panelGroup>
+            <bbmricc:searchDetail backingBean="#{ownerQueriesDetailBean}"/>
 
-			<h:panelGroup id="test" layout="block">
-				<h:form>
-					<ui:repeat var="queryDto" value="#{ownerQueriesDetailBean.getQueries()}">
+            <h:panelGroup
+                rendered="#{ownerQueriesDetailBean.queries.size() == 0 and ownerQueriesDetailBean.filterTerms.size() > 0}"
+                layout="block" styleClass="col-md-12">
+                <h3 style="margin-top: 0px;">#{label['queryview.noSearchResults']}</h3>
+            </h:panelGroup>
 
-						<bbmricc:queryboxOwner item="#{queryDto}" selectedQuery="#{ownerQueriesDetailBean.queryId}" backingBean="#{ownerQueriesDetailBean}"/>
+            <h:panelGroup id="test" layout="block">
+                <h:form>
+                    <ui:repeat var="queryDto" value="#{ownerQueriesDetailBean.getQueries()}">
 
-					</ui:repeat>
+                        <bbmricc:queryboxOwner item="#{queryDto}" selectedQuery="#{ownerQueriesDetailBean.queryId}" backingBean="#{ownerQueriesDetailBean}"/>
 
-					<h:outputScript>
-						$(function() {
-							setupQueryLinks();
-						});
-					</h:outputScript>
+                    </ui:repeat>
 
-				</h:form>
+                    <h:outputScript>
+                        $(function() {
+                            setupQueryLinks();
+                        });
+                    </h:outputScript>
 
-			</h:panelGroup>
+                </h:form>
 
-		</h:panelGroup>
+            </h:panelGroup>
 
-
-
-
-		<h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1 right-panel"
-			id="right-panel">
-
-
-			<h:panelGroup layout="block">
-
-				<h:panelGroup layout="block">
-
-					<h3 style="margin-top: 0px;">#{ownerQueriesDetailBean.selectedQuery.title}</h3>
-
-                    <h4>#{label['queryview.title.text']}</h4>
-                    <p class="pre-wrap">#{ownerQueriesDetailBean.selectedQuery.text}</p>
-
-                    <h4>#{label['queryview.title.requestdescription']}</h4>
-                    <p class="pre-wrap">#{ownerQueriesDetailBean.selectedQuery.requestDescription}</p>
-
-					<h:outputLabel value="#{label['queryview.title.searchParameters']}" />
-					<h:outputText
-							value="#{ownerQueriesDetailBean.humanReadableQuery}"
-							style="margin-left: 22px;">
-					</h:outputText>
-					<br />
-					<br></br>
-				</h:panelGroup>
-
-				<h:panelGroup layout="block" styleClass="col-md-12">
-					<p class="pull-right">
-						<h:outputText
-							title="#{label['queryview.queryitem.datetime.creation']}"
-							value="#{ownerQueriesDetailBean.selectedQuery.queryCreationTime}">
-							<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-						</h:outputText>
-					</p>
-				</h:panelGroup>
-
-                <h:panelGroup layout="block">
-
-								<h:dataTable value="#{ownerQueriesDetailBean.attachmentMap.entrySet().toArray()}"
-											 var="attachment" style="table-layout: fixed;"
-											 class="table-striped table-bordered table-responsive table-fullwidth"
-											 rendered="#{ownerQueriesDetailBean.attachments.size() > 0}">
-
-									<h:column styleClass="attachment-links">
-										<!-- column header -->
-										<f:facet name="header">Attachments</f:facet>
-										<!-- row record -->
-
-										<h:outputLink value="../attachment/#{attachment.key}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
-													  style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-
-											<h:panelGroup
-													style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap"
-													styleClass="attachment-links">
-												<i class="fa fa-paperclip" style="margin-right: 2px;" />#{attachment.value}
-
-											</h:panelGroup>
-										</h:outputLink>
-									</h:column>
-								</h:dataTable>
-
-                                <ui:remove>
-								<ui:repeat value="#{ownerQueriesDetailBean.attachmentMap.entrySet().toArray()}"
-									var="attachment">
-
-
-									<h:panelGroup
-										styleClass=" pull-left col-md-12 attachment-style"
-										style=" overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-										<h:outputLink value="../attachment/#{attachment.key}">
-											<h:outputText value="#{attachment.value}"
-												title="#{label['attachmentview.tooltip.attachmentDownload']}"
-												style="color:#333" />
-										</h:outputLink>
-									</h:panelGroup>
-
-
-								</ui:repeat>
-                                </ui:remove>
-
-							</h:panelGroup>
+        </h:panelGroup>
 
 
 
-				<ui:fragment
-					rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
-					<div class="col-xs-12" style="margin-top:20px;">
-						<hr></hr>
-					</div>
+        <h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1 right-panel"
+            id="right-panel">
 
-					<b>#{label['querydetail.owner.associatedbiobanks']}</b>
 
-				</ui:fragment>
+            <h:panelGroup layout="block">
 
-				<ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
-					var="biobank" varStatus="loop">
-                    #{biobank.name}#{!loop.last ? ', ' : ''}
-                </ui:repeat>
+                <bbmricc:queryDetailData bean="#{ownerQueriesDetailBean}" />
 
-				<h:panelGroup layout="block" style="margin-top:10px;">
+                <bbmricc:queryDetailAttachments bean="#{ownerQueriesDetailBean}" />
 
-					<ul class="nav nav-tabs">
-						<li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
-						</li>
-						<li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
-						</li>
-					</ul>
+                <ui:fragment
+                    rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
-					<div class="tab-content">
-						<div id="comments" class="tab-pane fade in active">
+                    <div class="col-xs-12" style="margin-top:20px;">
+                        <hr></hr>
+                    </div>
 
-							<ui:repeat value="#{ownerQueriesDetailBean.comments}"
-								var="comment">
+                    <b>#{label['querydetail.owner.associatedbiobanks']}</b>
 
-								<bbmricc:comment comment="#{comment.comment}"
-									person="#{comment.person}" collections="#{comment.collections}" />
+                    <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
+                               var="biobank" varStatus="loop">
+                        #{biobank.name}#{!loop.last ? ', ' : ''}
+                    </ui:repeat>
 
-							</ui:repeat>
+                </ui:fragment>
 
-							<div class="col-xs-12">
-								<hr></hr>
-							</div>
+                <h:panelGroup layout="block" style="margin-top:10px;">
 
-							<bbmricc:commentReply
-								query="#{ownerQueriesDetailBean.selectedQuery}" />
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+                        </li>
+                        <li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
+                        </li>
+                    </ul>
 
-						</div>
+                    <div class="tab-content">
+                        <div id="comments" class="tab-pane fade in active">
 
-						<div id="sampleAvailability" class="tab-pane fade">
+                            <ui:repeat value="#{ownerQueriesDetailBean.comments}"
+                                var="comment">
+
+                                <bbmricc:comment comment="#{comment.comment}"
+                                    person="#{comment.person}" collections="#{comment.collections}" />
+
+                            </ui:repeat>
+
+                            <div class="col-xs-12">
+                                <hr></hr>
+                            </div>
+
+                            <bbmricc:commentReply
+                                query="#{ownerQueriesDetailBean.selectedQuery}" />
+
+                        </div>
+
+                        <div id="sampleAvailability" class="tab-pane fade">
                         <ui:fragment rendered="#{ownerQueriesDetailBean.offerPersonDTO.size() == 0}">
                             <br />
                             <p>
                                 <b> <h:outputText value="#{label['message.offerSamples']}"/> </b>
                             </p>
                         </ui:fragment>
-							<ui:repeat value="#{ownerQueriesDetailBean.offerPersonDTO}"
-								var="offerPersonDTO">
+                            <ui:repeat value="#{ownerQueriesDetailBean.offerPersonDTO}"
+                                var="offerPersonDTO">
 
-								<bbmricc:comment comment="#{offerPersonDTO.offer}"
-									person="#{offerPersonDTO.person}"
-									collections="#{offerPersonDTO.collections}" />
+                                <bbmricc:comment comment="#{offerPersonDTO.offer}"
+                                    person="#{offerPersonDTO.person}"
+                                    collections="#{offerPersonDTO.collections}" />
 
-							</ui:repeat>
+                            </ui:repeat>
 
-							<div class="col-xs-12">
-								<hr></hr>
-							</div>
+                            <div class="col-xs-12">
+                                <hr></hr>
+                            </div>
 
-							<bbmricc:commentReply makeOffer="true"
-								query="#{ownerQueriesDetailBean.selectedQuery}"
-								offer="#{ownerQueriesDetailBean.userBean.userId}" />
+                            <bbmricc:commentReply makeOffer="true"
+                                query="#{ownerQueriesDetailBean.selectedQuery}"
+                                offer="#{ownerQueriesDetailBean.userBean.userId}" />
 
-						</div>
-					</div>
-				</h:panelGroup>
-				
-				<h:outputScript>                
-	                $(function() { 
-	                   
-	                    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-	                   
-	                        localStorage.setItem('lastTab', $(this).attr('href'));
-	                    });
-	                                   
-	                    var lastTab = localStorage.getItem('lastTab');
-	                    if (lastTab) {
-	                        $('[href="' + lastTab + '"]').tab('show');
-	                    }
-	                });
+                        </div>
+                    </div>
+                </h:panelGroup>
+
+                <h:outputScript>
+                    $(function() {
+
+                        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+                            localStorage.setItem('lastTab', $(this).attr('href'));
+                        });
+
+                        var lastTab = localStorage.getItem('lastTab');
+                        if (lastTab) {
+                            $('[href="' + lastTab + '"]').tab('show');
+                        }
+                    });
               </h:outputScript>
-				
-				
-				
-			</h:panelGroup>
 
-		</h:panelGroup>
 
-	</ui:define>
+
+            </h:panelGroup>
+
+        </h:panelGroup>
+
+    </ui:define>
 
 </ui:composition>

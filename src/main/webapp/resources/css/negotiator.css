@@ -350,3 +350,21 @@ a:hover {
     content: '*';
     display:inline;
 }
+
+div.text {
+    margin: 0;
+    padding: 0;
+    padding-bottom: 0.5em;
+}
+
+div.text label {
+    margin: 0;
+    padding: 0;
+    display: block;
+    font-size: 100%;
+    padding-top: .1em;
+    padding-right: .25em;
+    width: 11em;
+    text-align: left;
+    float: left;
+}

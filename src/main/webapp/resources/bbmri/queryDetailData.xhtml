@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:composite="http://java.sun.com/jsf/composite"
+>
+
+<composite:interface>
+    <composite:attribute name="bean" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+
+    <h:panelGroup layout="block" id="queryDetailData">
+
+        <h3 style="margin-top: 0px; margin-bottom: 0px; text-align: left">
+            #{cc.attrs.bean.selectedQuery.title}
+        </h3>
+        <h:panelGroup layout="block" style="font-size: smaller ">
+            <h:outputText
+                    title="#{label['queryview.queryitem.datetime.creation']}"
+                    value="#{cc.attrs.bean.selectedQuery.queryCreationTime}">
+                <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
+            </h:outputText>
+        </h:panelGroup>
+
+        <h4>#{label['queryview.title.text']}</h4>
+        <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.text}</p>
+
+        <h4>#{label['queryview.title.requestdescription']}</h4>
+        <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.requestDescription}</p>
+
+        <h:panelGroup styleClass="text" layout="block">
+            <h:outputLabel value="#{label['queryview.title.searchParameters']}"/>
+            <h:outputText
+                    value="#{cc.attrs.bean.humanReadableQuery}"
+                    style="margin-left: 22px;">
+            </h:outputText>
+        </h:panelGroup>
+    </h:panelGroup>
+</composite:implementation>
+
+</html>
