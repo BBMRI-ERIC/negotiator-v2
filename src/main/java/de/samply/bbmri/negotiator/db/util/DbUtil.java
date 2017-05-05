@@ -43,6 +43,7 @@ import org.jooq.JoinType;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jooq.Table;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -645,10 +646,21 @@ public class DbUtil {
      * @param collectionId the collection id which will be associated with the query
      */
     private static void addQueryToCollection(Config config, Integer queryId, Integer collectionId) {
-        QueryCollectionRecord queryCollectionRecord = config.dsl().newRecord(Tables.QUERY_COLLECTION);
-        queryCollectionRecord.setQueryId(queryId);
-        queryCollectionRecord.setCollectionId(collectionId);
-        queryCollectionRecord.store();
+        try {
+            QueryCollectionRecord queryCollectionRecord = config.dsl().newRecord(Tables.QUERY_COLLECTION);
+            queryCollectionRecord.setQueryId(queryId);
+            queryCollectionRecord.setCollectionId(collectionId);
+            queryCollectionRecord.store();
+        } catch (DataAccessException e) {
+            // we expect a duplicate key value exception here if the entry already exists
+            if(e.getMessage().contains("duplicate key")) {
+                logger.debug("Duplicate key exception caught.");
+            } else {
+                // TODO: localisation issues? future changes might break this, but then the exception is still caught
+                logger.error("The exception is not matching the phrase 'duplicate key'");
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
