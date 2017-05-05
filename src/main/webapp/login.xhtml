@@ -19,19 +19,35 @@
 
     <ui:define name="body">
 
+
         <h1>Welcome to the BBMRI Negotiator.</h1>
-        
+
+        <ui:fragment rendered="#{userBean.hasNewQueryRedirectURL()}">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Login to continue the query creation process
+                </div>
+                <div class="panel-body">
+                    You have started the creation of a new query, but are not yet logged in on the Negotiator.<br />
+                    Please <a href="#{userBean.authenticationUrl}">login</a> with your accout, or <a
+                        href="#{userBean.authenticationRegisterUrl}">create a new account</a>.<br />
+                    After being logged in, you can continue the creation of your query.
+                </div>
+            </div>
+        </ui:fragment>
+
+
         <p>The BBMRI-ERIC Negotiator is a brand-new service that
-			provides an efficient communication platform for biobankers and
-			researchers requesting samples and/or data. It substantially
-			simplifies the communication steps that are necessary to obtain
-			information on the availability of relevant samples/data,
-			particularly if the researchers need to communicate with multiple
-			candidate biobanks. The Negotiator 1.0 is connected to the already
-			established	 <a href="https://directory.bbmri-eric.eu" target="_blank"><b>BBMRI-ERIC Directory</b></a>
-			, the biggest biobanking catalogue on
-			the globe.
-		</p>
+            provides an efficient communication platform for biobankers and
+            researchers requesting samples and/or data.<br />
+            It substantially simplifies the communication steps that are necessary to obtain
+            information on the availability of relevant samples/data,
+            particularly if the researchers need to communicate with multiple
+            candidate biobanks.<br />
+            The Negotiator 1.0 is connected to the already established
+            <a href="https://directory.bbmri-eric.eu" target="_blank"><b>BBMRI-ERIC Directory</b></a>,
+            the biggest biobanking catalogue on the globe.
+        </p>
         
         
 

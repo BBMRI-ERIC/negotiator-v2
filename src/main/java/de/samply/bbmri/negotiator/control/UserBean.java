@@ -738,6 +738,10 @@ public class UserBean implements Serializable {
 		this.researcher = researcher;
 	}
 
+	public Boolean hasNewQueryRedirectURL() {
+		return newQueryRedirectURL != null;
+	}
+
     public String getNewQueryRedirectURL() {
         return newQueryRedirectURL;
     }
