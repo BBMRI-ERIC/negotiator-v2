@@ -50,13 +50,16 @@ public class CommentEmailNotifier {
 
 	private final String url;
 
+	private final String comment;
+
 	private static final String emailSubject = "BBMRI Negotiator: new comment on request ";
 
 	private Flag flagFilter = Flag.UNFLAGGED;
 
-	public CommentEmailNotifier(Query query, String url) {
+	public CommentEmailNotifier(Query query, String url, String comment) {
 		this.query = query;
 		this.url = url;
+		this.comment = comment;
 	}
 
 	/**
@@ -76,6 +79,7 @@ public class CommentEmailNotifier {
 
 			notification.addParameter("queryName", query.getTitle());
 			notification.addParameter("url", url);
+			notification.addParameter("comment", comment);
 			notification.setLocale("de");
 
 	        for(NegotiatorDTO negotiator : negotiators) {

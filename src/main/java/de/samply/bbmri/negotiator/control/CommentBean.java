@@ -62,7 +62,7 @@ public class CommentBean implements Serializable {
             DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment);
             config.commit();
 
-            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()));
+            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment);
             notifier.sendEmailNotification();
         } catch (SQLException e) {
             e.printStackTrace();
