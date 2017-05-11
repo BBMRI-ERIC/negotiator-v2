@@ -36,13 +36,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.JoinType;
-import org.jooq.Record;
-import org.jooq.Result;
-import org.jooq.Table;
+import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -567,9 +561,9 @@ public class DbUtil {
     }
 
     /*
-     * Return all people associated to this query
+     * Return all biobankers associated to this query, except the one who made the comment
      */
-    public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId, Flag flag) {
+    public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId, Flag flag, int userId) {
 
         Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
                 .from(Tables.QUERY_COLLECTION)
@@ -580,8 +574,21 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                 .and( Tables.FLAGGED_QUERY.FLAG.notEqual(flag).or(Tables.FLAGGED_QUERY.FLAG.isNull()))
                 .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId).or(Tables.FLAGGED_QUERY.QUERY_ID.isNull()))
+                .and (Tables.PERSON.ID.notEqual(userId))
                 .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
           return config.map(record, NegotiatorDTO.class);
+    }
+
+    /*
+     * Return query owner
+     */
+    public static NegotiatorDTO getQueryOwner(Config config, Integer queryId) {
+        Result<Record> record = config.dsl().select(getFields(Tables.PERSON,"person"))
+                .from(Tables.PERSON)
+                .join(Tables.QUERY).on(Tables.QUERY.RESEARCHER_ID.eq(Tables.PERSON.ID))
+                .where(Tables.QUERY.ID.eq(queryId)).fetch();
+
+        return config.map(record.get(0), NegotiatorDTO.class);
     }
 
     /**
