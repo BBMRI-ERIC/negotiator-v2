@@ -216,7 +216,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                        true);
                config.commit();
                setId(record.getId());
-               List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId(), Flag.IGNORED);
+               List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId(), Flag.IGNORED, userBean.getUserId());
 
                QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(record.getId()),
                        config.map(record, Query.class));
