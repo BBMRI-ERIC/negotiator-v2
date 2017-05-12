@@ -126,6 +126,13 @@ public class DbUtil {
              */
             QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
 
+            // collections already saved for this query
+            List<Collection> alreadySavedCollectiontsList = getCollectionsForQuery(config, queryId);
+            HashMap<Integer, Boolean> alreadySavedCollections = new HashMap<>();
+            for(Collection savedOne: alreadySavedCollectiontsList) {
+                alreadySavedCollections.put(savedOne.getId(), true);
+            }
+
             if (NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
                     && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
                 logger.info("Faking collections from the directory.");
@@ -133,7 +140,10 @@ public class DbUtil {
                     CollectionRecord dbCollection = getCollection(config, collection);
 
                     if (dbCollection != null) {
-                        addQueryToCollection(config, queryId, dbCollection.getId());
+                        if(!alreadySavedCollections.get(dbCollection.getId())) {
+                            addQueryToCollection(config, queryId, dbCollection.getId());
+                            alreadySavedCollections.put(dbCollection.getId(), true);
+                        }
                     }
                 }
             } else {
@@ -141,7 +151,10 @@ public class DbUtil {
                     CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
 
                     if (dbCollection != null) {
-                        addQueryToCollection(config, queryId, dbCollection.getId());
+                        if(!alreadySavedCollections.get(dbCollection.getId())) {
+                            addQueryToCollection(config, queryId, dbCollection.getId());
+                            alreadySavedCollections.put(dbCollection.getId(), true);
+                        }
                     }
                 }
             }
