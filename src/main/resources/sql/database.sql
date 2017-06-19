@@ -237,4 +237,15 @@ COMMENT ON COLUMN "offer".offer_from IS 'Foreign key which exists as primary key
 COMMENT ON COLUMN "offer"."text" IS 'Text of the comment.';
 
 
+CREATE TABLE "connector_log" (
+    "id" SERIAL NOT NULL,
+    "last_query_time" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    PRIMARY KEY("id")
+);
+
+COMMENT ON TABLE "connector_log" IS 'table to store the timestamp when the connector makes a get request for new queries';
+
+COMMENT ON COLUMN "connector_log"."id" IS 'Primary key';
+COMMENT ON COLUMN "connector_log"."last_query_time" IS 'Timestamp when the request was made. ';
+
 

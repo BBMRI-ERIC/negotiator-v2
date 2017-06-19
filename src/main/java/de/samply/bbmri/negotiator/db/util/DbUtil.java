@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import de.samply.bbmri.negotiator.jooq.tables.records.*;
+import de.samply.bbmri.negotiator.rest.dto.*;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -52,16 +54,6 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
@@ -69,10 +61,7 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
-import de.samply.bbmri.negotiator.rest.dto.CollectionDTO;
-import de.samply.bbmri.negotiator.rest.dto.PerunMappingDTO;
-import de.samply.bbmri.negotiator.rest.dto.PerunPersonDTO;
-import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import de.samply.bbmri.negotiator.rest.dto.GetQueryResultDTO;
 import de.samply.directory.client.dto.DirectoryBiobank;
 import de.samply.directory.client.dto.DirectoryCollection;
 
@@ -81,7 +70,54 @@ import de.samply.directory.client.dto.DirectoryCollection;
  */
 public class DbUtil {
 
+
+
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
+
+
+    /**
+     * Gets all the valid queries that entered the negotiator after the given timestamp.
+     * @param config JOOQ configuration
+     * @param timestamp
+     */
+    public static List<GetQueryResultDTO> getAllNewQueries(Config config, Timestamp timestamp) {
+        Result<Record> result = config.dsl()
+                .select(Tables.QUERY.TITLE.as("query_title"))
+                .select(Tables.QUERY.TEXT.as("query_text"))
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
+                .fetch();
+
+        return config.map(result, GetQueryResultDTO.class);
+    }
+
+    /**
+     * Gets the time when the last connector request was made for the queries.
+     * @param config JOOQ configuration
+     */
+    public static ConnectorLogRecord getLastRequestTime(Config config) {
+        Record result = config.dsl()
+                .selectFrom(Tables.CONNECTOR_LOG)
+                .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
+                .limit(1)
+                .fetchOne();
+
+        return config.map(result, ConnectorLogRecord.class);
+    }
+
+    /**
+     * Logs the time when the connector request was made for the queries.
+     * @param config JOOQ configuration
+     */
+    public static void logGetQueryTime(Config config) {
+        try { ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
+              connectorLogRecord.setLastQueryTime(new Timestamp(new Date().getTime()));
+              connectorLogRecord.store();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Get title and text of a query.

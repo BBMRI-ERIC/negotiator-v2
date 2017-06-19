@@ -22,11 +22,11 @@
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
         <version.samply.directory.client>1.0.1</version.samply.directory.client>
 
-        <database.server>steffi16</database.server>
+        <database.server>localhost</database.server>
         <database.port>5432</database.port>
-        <database.username>negotiator</database.username>
-        <database.password>test123</database.password>
-        <database.name>negotiator2</database.name>
+        <database.username>saher</database.username>
+        <database.password>saher</database.password>
+        <database.name>negotiator</database.name>
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>

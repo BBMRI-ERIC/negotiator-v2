@@ -7,6 +7,7 @@ package de.samply.bbmri.negotiator.jooq;
 import de.samply.bbmri.negotiator.jooq.tables.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
+import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Offer;
@@ -48,6 +49,11 @@ public class Tables {
 	 * table to store commentCount on a query
 	 */
 	public static final Comment COMMENT = de.samply.bbmri.negotiator.jooq.tables.Comment.COMMENT;
+
+	/**
+	 * table to store the timestamp when the connector makes a get request for new queries
+	 */
+	public static final ConnectorLog CONNECTOR_LOG = de.samply.bbmri.negotiator.jooq.tables.ConnectorLog.CONNECTOR_LOG;
 
 	/**
 	 * Table for queries that are flagged/bookmarked. bookmark options are starred, archived and ignored.
