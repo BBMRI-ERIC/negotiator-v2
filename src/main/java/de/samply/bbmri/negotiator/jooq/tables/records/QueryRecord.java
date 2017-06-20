@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Record10<Integer, String, String, Timestamp, Integer, String, Integer, String, Boolean, String> {
 
-	private static final long serialVersionUID = -916266678;
+	private static final long serialVersionUID = 1514959370;
 
 	/**
 	 * Setter for <code>public.query.id</code>. primary key
@@ -159,14 +159,14 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	}
 
 	/**
-	 * Setter for <code>public.query.request_description</code>. description of the request
+	 * Setter for <code>public.query.request_description</code>.
 	 */
 	public void setRequestDescription(String value) {
 		setValue(9, value);
 	}
 
 	/**
-	 * Getter for <code>public.query.request_description</code>. description of the request
+	 * Getter for <code>public.query.request_description</code>.
 	 */
 	public String getRequestDescription() {
 		return (String) getValue(9);

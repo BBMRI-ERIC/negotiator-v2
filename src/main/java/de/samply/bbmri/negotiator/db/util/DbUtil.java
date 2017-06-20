@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
+import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
@@ -54,14 +55,7 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.NegotiatorDTO;
-import de.samply.bbmri.negotiator.model.OfferPersonDTO;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
-import de.samply.bbmri.negotiator.rest.dto.GetQueryResultDTO;
 import de.samply.directory.client.dto.DirectoryBiobank;
 import de.samply.directory.client.dto.DirectoryCollection;
 
@@ -80,7 +74,7 @@ public class DbUtil {
      * @param config JOOQ configuration
      * @param timestamp
      */
-    public static List<GetQueryResultDTO> getAllNewQueries(Config config, Timestamp timestamp) {
+    public static List<QueryDetail> getAllNewQueries(Config config, Timestamp timestamp) {
         Result<Record> result = config.dsl()
                 .select(Tables.QUERY.TITLE.as("query_title"))
                 .select(Tables.QUERY.TEXT.as("query_text"))
@@ -89,7 +83,7 @@ public class DbUtil {
                 .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
                 .fetch();
 
-        return config.map(result, GetQueryResultDTO.class);
+        return config.map(result, QueryDetail.class);
     }
 
     /**
