@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <version.samply.webjar>1.6.0</version.samply.webjar>
-        <version.samply.auth.client>1.0.1</version.samply.auth.client>
+        <version.samply.auth.client>1.0.2-SNAPSHOT</version.samply.auth.client>
         <version.samply.common.upgrade>2.0.0</version.samply.common.upgrade>
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
