@@ -241,7 +241,7 @@ public class UserBean implements Serializable {
 
         return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
                 request.getServerName(), request.getServerPort(), request.getContextPath(),
-                requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+                requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
     }
 
 
@@ -281,7 +281,7 @@ public class UserBean implements Serializable {
 
 		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
-				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE);
+				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
 	}
 
     /**
@@ -310,7 +310,7 @@ public class UserBean implements Serializable {
 
         String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
-				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
 
 		return returnURL;
     }
