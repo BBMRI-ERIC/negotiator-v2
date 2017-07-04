@@ -1,23 +1,39 @@
+/*
+ * Copyright (c) 2017. Medizinische Informatik in der Translationalen Onkologie,
+ * Deutsches Krebsforschungszentrum in Heidelberg
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation; either version 3 of the License, or (at your option) any
+ * later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program; if not, see http://www.gnu.org/licenses.
+ *
+ * Additional permission under GNU GPL version 3 section 7:
+ *
+ * If you modify this Program, or any covered work, by linking or combining it
+ * with Jersey (https://jersey.java.net) (or a modified version of that
+ * library), containing parts covered by the terms of the General Public
+ * License, version 2.0, the licensors of this Program grant you additional
+ * permission to convey the resulting work.
+ */
+
 package de.samply.bbmri.negotiator.rest;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import de.samply.bbmri.negotiator.rest.dto.CreateQueryResultDTO;
-import de.samply.bbmri.negotiator.rest.dto.GetQueryResultDTO;
-import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import de.samply.bbmri.negotiator.model.QueryDetail;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -25,40 +41,44 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Created by Saher Maqsood on 6/12/2017.
+ * Created on 6/12/2017.
  */
 
 /**
  * Root resource
  */
-/*@Path("connector")
+@Path("connector")
 public class Connector {
 
     @GET
     @Path("/get_query")
     @Produces(MediaType.APPLICATION_XML)
-    public List<GetQueryResultDTO> getQuery() {
+    public List<QueryDetail> getQuery() {
         try (Config config = ConfigFactory.get()) {
 
-            *//**
-             * Get last time a request was made by the connector
-             *//*
+            /**
+            * Get last time a request was made by the connector
+            */
+
             ConnectorLogRecord connectorLogRecord = DbUtil.getLastRequestTime(config);
 
-            *//**
-             * Get all queries created after the last request was made
-             *//*
-            List<GetQueryResultDTO> newQueries = DbUtil.getAllNewQueries(config, connectorLogRecord.getLastQueryTime());
+            /**
+            * Get all queries created after the last request was made
+            */
 
-            *//**
-             * Update the latest get request time.
-             *//*
+            List<QueryDetail> newQueries = DbUtil.getAllNewQueries(config, connectorLogRecord.getLastQueryTime());
+
+            /**
+            *  Update the latest get request time.
+            */
+
+
             DbUtil.logGetQueryTime(config);
             config.commit();
 
-            *//**
-             * Returns a list of all the newly created queries.
-             *//*
+            /**
+            *   Returns a list of all the newly created queries.
+            */
 
             return newQueries;
 
@@ -68,4 +88,4 @@ public class Connector {
         }
     }
 }
-*/
+
