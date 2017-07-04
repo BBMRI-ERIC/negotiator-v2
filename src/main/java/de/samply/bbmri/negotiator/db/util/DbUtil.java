@@ -905,4 +905,21 @@ public class DbUtil {
 
         return result;
     }
+
+    /**
+     * Gets a list of all biobanks and their collections
+     * @param config    DB access handle
+     * @return
+     */
+    public static Result<Record> getBiobanksAndTheirCollection(Config config) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.COLLECTION, "collection"))
+                .select(getFields(Tables.BIOBANK, "biobank"))
+                .from(Tables.COLLECTION)
+                .join(Tables.BIOBANK, JoinType.LEFT_OUTER_JOIN).on(Tables.COLLECTION.BIOBANK_ID.eq(Tables
+                        .BIOBANK.ID))
+                .orderBy(Tables.BIOBANK.NAME.asc()).fetch();
+
+        return result;
+    }
 }
