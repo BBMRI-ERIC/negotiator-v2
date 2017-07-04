@@ -31,6 +31,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
+import de.samply.bbmri.negotiator.model.BiobankCollections;
 import de.samply.bbmri.negotiator.model.QueryDetail;
 
 import javax.ws.rs.*;
@@ -85,6 +86,24 @@ public class Connector {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    /**
+     * REST to get a list of all biobanks and their collections
+     * @return
+     */
+    @GET
+    @Path("/collections")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCollections() {
+        try(Config config = ConfigFactory.get()) {
+            List<BiobankCollections> data = DbUtil.getBiobanksAndTheirCollection(config);
+            return Response.status(200).entity(data).build();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            return Response.status(500).build();
         }
     }
 }

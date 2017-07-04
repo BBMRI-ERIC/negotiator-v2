@@ -493,6 +493,20 @@ public class DbUtil {
 	}
 
     /**
+     * Returns a list of all fields for the given table
+     * @param table
+     * @return
+     */
+    private static List<Field<?>> getFields(Table<?> table) {
+        List<Field<?>> target = new ArrayList<>();
+        for(Field<?> f : table.fields()) {
+            target.add(f.as(f.getName()));
+        }
+
+        return target;
+    }
+
+    /**
      * Returns the location for the given directory ID.
      * @param config database configuration
      * @param directoryId directory biobank ID
@@ -911,15 +925,35 @@ public class DbUtil {
      * @param config    DB access handle
      * @return
      */
-    public static Result<Record> getBiobanksAndTheirCollection(Config config) {
+    public static List<BiobankCollections> getBiobanksAndTheirCollection(Config config) {
         Result<Record> result = config.dsl()
+                .select(getFields(Tables.BIOBANK))
                 .select(getFields(Tables.COLLECTION, "collection"))
-                .select(getFields(Tables.BIOBANK, "biobank"))
-                .from(Tables.COLLECTION)
-                .join(Tables.BIOBANK, JoinType.LEFT_OUTER_JOIN).on(Tables.COLLECTION.BIOBANK_ID.eq(Tables
+                .from(Tables.BIOBANK)
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.COLLECTION.BIOBANK_ID.eq(Tables
                         .BIOBANK.ID))
                 .orderBy(Tables.BIOBANK.NAME.asc()).fetch();
 
-        return result;
+        List<BiobankCollections> map = config.map(result, BiobankCollections.class);
+        List<BiobankCollections> target = new ArrayList<>();
+        /**
+         * Now we have to do weird things, grouping them together manually
+         */
+        HashMap<Integer, BiobankCollections> mapped = new HashMap<>();
+
+        for(BiobankCollections dto : map) {
+            if(!mapped.containsKey(dto.getId())) {
+                mapped.put(dto.getId(), dto);
+
+                if(dto.getCollections() != null) {
+                    dto.getCollections().add(dto.getCollection());
+                }
+
+                target.add(dto);
+            } else {
+                mapped.get(dto.getId()).getCollections().add(dto.getCollection());
+            }
+        }
+        return target;
     }
 }
