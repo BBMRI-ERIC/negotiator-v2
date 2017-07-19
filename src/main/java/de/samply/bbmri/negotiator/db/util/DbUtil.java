@@ -164,7 +164,7 @@ public class DbUtil {
                     CollectionRecord dbCollection = getCollection(config, collection);
 
                     if (dbCollection != null) {
-                        if(!alreadySavedCollections.get(dbCollection.getId())) {
+                        if(!alreadySavedCollections.containsKey(dbCollection.getId())) {
                             addQueryToCollection(config, queryId, dbCollection.getId());
                             alreadySavedCollections.put(dbCollection.getId(), true);
                         }
@@ -175,7 +175,7 @@ public class DbUtil {
                     CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
 
                     if (dbCollection != null) {
-                        if(!alreadySavedCollections.get(dbCollection.getId())) {
+                        if(!alreadySavedCollections.containsKey(dbCollection.getId())) {
                             addQueryToCollection(config, queryId, dbCollection.getId());
                             alreadySavedCollections.put(dbCollection.getId(), true);
                         }
