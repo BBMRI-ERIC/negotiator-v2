@@ -90,7 +90,7 @@
 					<h:inputText id="title" value="#{queryBean.queryTitle}"
 						styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
 						validatorMessage="#{label['error.invalidTitleLength']}">
-						<f:validateLength for="title" minimum="5" maximum="30" />
+						<f:validateLength for="title" minimum="5" maximum="300" />
 					</h:inputText>
 					<h:message for="title" style="color:red" styleClass="pre-wrap" />
 
