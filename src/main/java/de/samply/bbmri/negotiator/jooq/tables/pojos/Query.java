@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = 70504260;
+	private static final long serialVersionUID = 1873681595;
 
 	private Integer   id;
 	private String    title;
@@ -35,6 +35,7 @@ public class Query implements Serializable {
 	private String    negotiatorToken;
 	private Boolean   validQuery;
 	private String    requestDescription;
+	private String    ethicsVote;
 
 	public Query() {}
 
@@ -49,6 +50,7 @@ public class Query implements Serializable {
 		this.negotiatorToken = value.negotiatorToken;
 		this.validQuery = value.validQuery;
 		this.requestDescription = value.requestDescription;
+		this.ethicsVote = value.ethicsVote;
 	}
 
 	public Query(
@@ -61,7 +63,8 @@ public class Query implements Serializable {
 		Integer   numAttachments,
 		String    negotiatorToken,
 		Boolean   validQuery,
-		String    requestDescription
+		String    requestDescription,
+		String    ethicsVote
 	) {
 		this.id = id;
 		this.title = title;
@@ -73,6 +76,7 @@ public class Query implements Serializable {
 		this.negotiatorToken = negotiatorToken;
 		this.validQuery = validQuery;
 		this.requestDescription = requestDescription;
+		this.ethicsVote = ethicsVote;
 	}
 
 	public Integer getId() {
@@ -153,5 +157,13 @@ public class Query implements Serializable {
 
 	public void setRequestDescription(String requestDescription) {
 		this.requestDescription = requestDescription;
+	}
+
+	public String getEthicsVote() {
+		return this.ethicsVote;
+	}
+
+	public void setEthicsVote(String ethicsVote) {
+		this.ethicsVote = ethicsVote;
 	}
 }

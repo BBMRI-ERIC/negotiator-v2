@@ -134,4 +134,11 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByRequestDescription(String... values) {
 		return fetch(Query.QUERY.REQUEST_DESCRIPTION, values);
 	}
+
+	/**
+	 * Fetch records that have <code>ethics_vote IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByEthicsVote(String... values) {
+		return fetch(Query.QUERY.ETHICS_VOTE, values);
+	}
 }

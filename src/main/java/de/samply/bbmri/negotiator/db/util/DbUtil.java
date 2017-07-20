@@ -120,7 +120,7 @@ public class DbUtil {
      * @return QueryRecord object
      * @throws SQLException
      */
-    public static QueryRecord getQueryDescription(Config config, Integer id) {
+    public static QueryRecord getQueryFromId(Config config, Integer id) {
         Record result = config.dsl()
                 .selectFrom(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(id))
@@ -139,11 +139,15 @@ public class DbUtil {
      * @throws JsonMappingException
      * @throws JsonParseException
      */
-    public static void editQueryDescription(Config config, String title, String text, String requestDescription,
-            String jsonText, Integer queryId) {
-        try {config.dsl().update(Tables.QUERY).set(Tables.QUERY.TITLE, title).set(Tables.QUERY.TEXT, text)
-             .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription).set(Tables.QUERY.JSON_TEXT, jsonText)
-             .set(Tables.QUERY.VALID_QUERY, true).where(Tables.QUERY.ID.eq(queryId)).execute();
+    public static void editQuery(Config config, String title, String text, String requestDescription,
+            String jsonText, String ethicsVote, Integer queryId) {
+        try {config.dsl().update(Tables.QUERY)
+                .set(Tables.QUERY.TITLE, title)
+                .set(Tables.QUERY.TEXT, text)
+                .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription)
+                .set(Tables.QUERY.JSON_TEXT, jsonText)
+                .set(Tables.QUERY.ETHICS_VOTE, ethicsVote)
+                .set(Tables.QUERY.VALID_QUERY, true).where(Tables.QUERY.ID.eq(queryId)).execute();
 
             /**
              * Updates the relationship between query and collection.
@@ -658,7 +662,7 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord saveQuery(Config config, String title,
-                                        String text, String requestDescription, String jsonText, int researcherId,
+                                        String text, String requestDescription, String jsonText, String ethicsVote, int researcherId,
                                         Boolean validQuery) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
@@ -667,6 +671,7 @@ public class DbUtil {
         queryRecord.setText(text);
         queryRecord.setRequestDescription(requestDescription);
         queryRecord.setTitle(title);
+        queryRecord.setEthicsVote(ethicsVote);
         queryRecord.setResearcherId(researcherId);
         queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
         queryRecord.setNumAttachments(0);
