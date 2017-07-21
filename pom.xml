@@ -9,14 +9,14 @@
     <parent>
         <artifactId>parent</artifactId>
         <groupId>de.samply</groupId>
-        <version>9.2</version>
+        <version>9.3</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <version.samply.webjar>1.6.0</version.samply.webjar>
-        <version.samply.auth.client>1.0.2-SNAPSHOT</version.samply.auth.client>
+        <version.samply.auth.client>1.0.2</version.samply.auth.client>
         <version.samply.common.upgrade>2.0.0</version.samply.common.upgrade>
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
@@ -214,6 +214,17 @@
                     <artifactId>myfaces-impl</artifactId>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <profile>
+            <id>maxdatabase</id>
+            <properties>
+                <database.server>steffi16</database.server>
+                <database.port>5432</database.port>
+                <database.name>negotiator2</database.name>
+                <database.username>negotiator</database.username>
+                <database.password>test123</database.password>
+            </properties>
         </profile>
     </profiles>
 
