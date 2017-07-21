@@ -925,6 +925,27 @@ public class DbUtil {
         return result;
     }
 
+
+    /**
+     * Gets a list of Persons who are responsible for a given collection
+     * @param config    DB access handle
+     * @param collectionDirectoryId   the Directory ID of a Collection
+     * @return
+     */
+    public static List<CollectionOwner> getCollectionOwners(Config config, String collectionDirectoryId) {
+        Result<Record> result = config.dsl().select(getFields(Tables.PERSON))
+                .from(Tables.PERSON)
+                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq
+                        (Tables.PERSON.ID))
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq
+                        (Tables.COLLECTION.ID))
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionDirectoryId))
+                .fetch();
+
+        List<CollectionOwner> users = config.map(result, CollectionOwner.class);
+        return users;
+    }
+
     /**
      * Gets a list of all biobanks and their collections
      * @param config    DB access handle

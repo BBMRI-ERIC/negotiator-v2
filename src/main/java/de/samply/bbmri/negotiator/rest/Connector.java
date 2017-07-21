@@ -32,6 +32,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
 import de.samply.bbmri.negotiator.model.BiobankCollections;
+import de.samply.bbmri.negotiator.model.CollectionOwner;
 import de.samply.bbmri.negotiator.model.QueryDetail;
 
 import javax.ws.rs.*;
@@ -100,6 +101,25 @@ public class Connector {
     public Response getCollections() {
         try(Config config = ConfigFactory.get()) {
             List<BiobankCollections> data = DbUtil.getBiobanksAndTheirCollection(config);
+            return Response.status(200).entity(data).build();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            return Response.status(500).build();
+        }
+    }
+
+
+    /**
+     * REST to get a list of persons who are responsible for a given collection directory ID
+     * @param collectionDirectoryId   the directory ID of a collection
+     * @return
+     */
+    @GET
+    @Path("/collection_owners")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsersOfConnector(@QueryParam("id") String collectionDirectoryId) {
+        try(Config config = ConfigFactory.get()) {
+            List<CollectionOwner> data = DbUtil.getCollectionOwners(config, collectionDirectoryId);
             return Response.status(200).entity(data).build();
         } catch(SQLException e) {
             e.printStackTrace();
