@@ -982,4 +982,19 @@ public class DbUtil {
         }
         return target;
     }
+
+    /**
+     * Gets a list of all the queries from the database
+     * @param config    DB access handle
+     * @return List<QueryRecord> list of query record objects
+     */
+    public static List<QueryRecord> getQueries(Config config){
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY))
+                .from(Tables.QUERY)
+                .orderBy(Tables.QUERY.ID.asc()).fetch();
+
+        List<QueryRecord> queries = config.map(result, QueryRecord.class);
+        return queries;
+    }
 }
