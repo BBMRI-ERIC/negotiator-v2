@@ -36,10 +36,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import de.samply.bbmri.negotiator.jooq.tables.pojos.*;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import org.jooq.*;
+import org.jooq.Query;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -54,7 +57,6 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.rest.Directory;
 import de.samply.directory.client.dto.DirectoryBiobank;
 import de.samply.directory.client.dto.DirectoryCollection;
@@ -996,5 +998,20 @@ public class DbUtil {
 
         List<QueryRecord> queries = config.map(result, QueryRecord.class);
         return queries;
+    }
+
+    /**
+     * Check if the query exists in our system
+     * @param config    DB access handle
+     * @return Query query object
+     */
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query CheckIfQueryExists(Config config, int queryId){
+        Result<Record> record = config.dsl()
+                .select(getFields(Tables.QUERY))
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.ID.eq(queryId)).fetch();
+
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = config.map(record.get(0), de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+        return query;
     }
 }

@@ -45,7 +45,7 @@
 
     <ui:define name="body">
 
-        <h:panelGroup layout="block" styleClass="col-md-3 left-panel">
+        <h:panelGroup layout="block" styleClass="col-md-3 left-panel" rendered="#{ownerQueriesDetailBean.nonConfidential}">
 
             <bbmricc:searchDetail backingBean="#{ownerQueriesDetailBean}"/>
 
@@ -105,13 +105,16 @@
                 </ui:fragment>
 
                 <h:panelGroup layout="block" style="margin-top:10px;">
+                    <f:verbatim rendered="#{ownerQueriesDetailBean.nonConfidential}">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+                            </li>
+                            <li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
+                            </li>
+                        </ul>
+                    </f:verbatim>
 
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
-                        </li>
-                        <li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
-                        </li>
-                    </ul>
+
 
                     <div class="tab-content">
                         <div id="comments" class="tab-pane fade in active">
@@ -128,8 +131,8 @@
                                 <hr></hr>
                             </div>
 
-                            <bbmricc:commentReply
-                                query="#{ownerQueriesDetailBean.selectedQuery}" />
+                            <bbmricc:commentReply rendered="#{ownerQueriesDetailBean.nonConfidential}"
+                                query="#{ownerQueriesDetailBean.selectedQuery}"  />
 
                         </div>
 
