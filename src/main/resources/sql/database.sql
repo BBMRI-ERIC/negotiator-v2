@@ -176,6 +176,7 @@ COMMENT ON COLUMN "flagged_query"."flag" IS 'The flag of the comment. One of "AR
 CREATE TABLE "query_collection" (
     "query_id" INTEGER NOT NULL,
     "collection_id" INTEGER NOT NULL,
+    "expect_connector_result" BOOLEAN NOT NULL DEFAULT '0',
     PRIMARY KEY("query_id", "collection_id"),
     FOREIGN KEY ("collection_id") REFERENCES "collection"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
@@ -185,6 +186,7 @@ CREATE INDEX "queryIdIndexQueryCollection" ON "query_collection" (query_id);
 
 
 COMMENT ON TABLE "query_collection" IS 'Table for connecting queries with collections';
+COMMENT ON COLUMN "query_collection"."expect_connector_result" IS 'Column that tells the negotiator to expect results from the given connector';
 
 
 CREATE TABLE "person_collection" (

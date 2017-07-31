@@ -415,6 +415,19 @@ public class OwnerQueriesDetailBean implements Serializable {
         return attachmentMap;
     }
 
+	/**
+	 * Tell the negotiator to expect results for the selected query from the connector
+	 *
+	 */
+    public void ExpectConnectorResult(){
+		try (Config config = ConfigFactory.get()) {
+			// TODO: Set "expect_connector_result" field in "query_collection" table to true.
+			setNonConfidential(true);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
     public List<QueryAttachmentDTO> getAttachments() {
         return attachments;
     }
