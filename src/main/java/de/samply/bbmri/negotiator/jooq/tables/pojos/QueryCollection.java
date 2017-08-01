@@ -22,24 +22,28 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollection implements Serializable {
 
-	private static final long serialVersionUID = 110769222;
+	private static final long serialVersionUID = -559378921;
 
 	private Integer queryId;
 	private Integer collectionId;
+	private Boolean expectConnectorResult;
 
 	public QueryCollection() {}
 
 	public QueryCollection(QueryCollection value) {
 		this.queryId = value.queryId;
 		this.collectionId = value.collectionId;
+		this.expectConnectorResult = value.expectConnectorResult;
 	}
 
 	public QueryCollection(
 		Integer queryId,
-		Integer collectionId
+		Integer collectionId,
+		Boolean expectConnectorResult
 	) {
 		this.queryId = queryId;
 		this.collectionId = collectionId;
+		this.expectConnectorResult = expectConnectorResult;
 	}
 
 	public Integer getQueryId() {
@@ -56,5 +60,13 @@ public class QueryCollection implements Serializable {
 
 	public void setCollectionId(Integer collectionId) {
 		this.collectionId = collectionId;
+	}
+
+	public Boolean getExpectConnectorResult() {
+		return this.expectConnectorResult;
+	}
+
+	public void setExpectConnectorResult(Boolean expectConnectorResult) {
+		this.expectConnectorResult = expectConnectorResult;
 	}
 }

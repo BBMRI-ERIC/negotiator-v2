@@ -1014,4 +1014,21 @@ public class DbUtil {
         de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = config.map(record.get(0), de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
         return query;
     }
+
+    /**
+     * Check if there are queries expecting results from this collection
+     * @param config    DB access handle
+     * @param collectionId    unique id of collection
+     * @return List<QueryCollection> list of qyery_collection records
+     */
+    public static List<QueryCollection> CheckExpectedResults(Config config, int collectionId){
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_COLLECTION))
+                .from(Tables.QUERY_COLLECTION)
+                .where(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT.eq(true))
+                .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)).fetch();
+
+        List<QueryCollection> queryCollections = config.map(result, QueryCollection.class);
+        return queryCollections;
+    }
 }

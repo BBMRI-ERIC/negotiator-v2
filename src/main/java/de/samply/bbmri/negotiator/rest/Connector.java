@@ -30,6 +30,7 @@ package de.samply.bbmri.negotiator.rest;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection;
 import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
 import de.samply.bbmri.negotiator.model.BiobankCollections;
 import de.samply.bbmri.negotiator.model.CollectionOwner;
@@ -61,29 +62,23 @@ public class Connector {
             /**
             * Get last time a request was made by the connector
             */
-
             ConnectorLogRecord connectorLogRecord = DbUtil.getLastRequestTime(config);
 
             /**
             * Get all queries created after the last request was made
             */
-
             List<QueryDetail> newQueries = DbUtil.getAllNewQueries(config, connectorLogRecord.getLastQueryTime());
 
             /**
             *  Update the latest get request time.
             */
-
-
             DbUtil.logGetQueryTime(config);
             config.commit();
 
             /**
             *   Returns a list of all the newly created queries.
             */
-
             return newQueries;
-
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -122,6 +117,24 @@ public class Connector {
             List<CollectionOwner> data = DbUtil.getCollectionOwners(config, collectionDirectoryId);
             return Response.status(200).entity(data).build();
         } catch(SQLException e) {
+            e.printStackTrace();
+            return Response.status(500).build();
+        }
+    }
+
+    /**
+     * REST to get a list of queries whose results are expected from the connector.
+     * @param collectionId   the directory ID of a collection
+     * @return
+     */
+    @POST
+    @Path("/get_results")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getResults(@QueryParam("id") int collectionId) {
+        try (Config config = ConfigFactory.get()) {
+            List<QueryCollection> queryCollectionList = DbUtil.CheckExpectedResults(config, collectionId);
+            return Response.status(200).entity(queryCollectionList).build();
+        } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(500).build();
         }
