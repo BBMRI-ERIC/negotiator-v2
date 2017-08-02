@@ -29,8 +29,6 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-                xmlns:p="http://primefaces.org/ui"
                 template="default.xhtml">
 
     <ui:param name="bodyClass" value="container"/>
@@ -40,7 +38,8 @@
         <h3>#{label['admin.debug.query']}</h3>
 
         <h:form styleClass="form-horizontal">
-            <h:commandButton action="#{adminDebugBean.setQueries()}" value="#{label['admin.debug.click']}" styleClass="btn btn-default"/>
+            <h:commandButton action="#{adminDebugBean.loadQueries()}" value="#{label['admin.debug.click']}"
+                             styleClass="btn btn-default"/>
         </h:form>
 
         <h:dataTable rendered="#{adminDebugBean.queries.size() > 0}" value="#{adminDebugBean.queries}" var="query"
@@ -59,7 +58,7 @@
             </h:column>
             <h:column>
                 <f:facet name="header">Text</f:facet>
-                <h:panelGroup  style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap">
+                <h:panelGroup style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap">
                     #{query.getText()}
                 </h:panelGroup>
             </h:column>

@@ -54,20 +54,26 @@ public class AdminDebugBean implements Serializable {
      */
     private List<QueryRecord> queries;
 
+//region properties
+    public List<QueryRecord> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(List<QueryRecord> queries) {
+        this.queries = queries;
+    }
+//endregion
 
     /**
      * Sets the queries list by getting all the queries from the data base
+     *
      * @return
      */
-    public void setQueries() {
+    public void loadQueries() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueries(config);
         } catch(SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    public List<QueryRecord> getQueries() {
-        return queries;
     }
 }
