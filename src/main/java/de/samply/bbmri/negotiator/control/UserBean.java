@@ -148,6 +148,11 @@ public class UserBean implements Serializable {
      */
     private String newQueryRedirectURL;
 
+	/**
+	 * The collections of this user
+	 */
+	private List<Collection> collections;
+
     /**
      * The identity string of the user who sudo'd another
      */
@@ -474,7 +479,7 @@ public class UserBean implements Serializable {
 			/**
 			 * Check if the user is a biobanker
 			 */
-            List<Collection> collections = DbUtil.getCollections(config, person.getId());
+            collections = DbUtil.getCollections(config, person.getId());
 
             if(collections.size() > 0) {
                 biobankOwner = true;
@@ -758,5 +763,13 @@ public class UserBean implements Serializable {
 
     public void setNewQueryRedirectURL(String newQueryRedirectURL) {
         this.newQueryRedirectURL = newQueryRedirectURL;
+    }
+
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
     }
 }

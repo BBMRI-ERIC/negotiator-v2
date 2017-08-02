@@ -44,6 +44,7 @@ import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
@@ -137,7 +138,9 @@ public class OwnerQueriesDetailBean implements Serializable {
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
 	public String initialize() {
-		try(Config config = ConfigFactory.get()) {
+        setNonConfidential(false);
+
+        try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
             setOfferPersonDTO(DbUtil.getOffers(config, queryId, userBean.getUserId()));
 
@@ -145,7 +148,6 @@ public class OwnerQueriesDetailBean implements Serializable {
              * Get all the attachments for selected query.
              */
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
-
 
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
@@ -166,7 +168,7 @@ public class OwnerQueriesDetailBean implements Serializable {
             	/*
             	 * Check why the selected query is null. There could be two possibilities.
             	 */
-            	Query query = DbUtil.CheckIfQueryExists(config, queryId);
+                Query query = DbUtil.CheckIfQueryExists(config, queryId);
             	if(query == null){
 
 					/**
@@ -181,8 +183,16 @@ public class OwnerQueriesDetailBean implements Serializable {
             		 * We give a partial read access to him now.
             		 */
             		logger.info("Giving temporary read rights to confidential biobanker");
-					setNonConfidential(false);
+					setNonConfidential(true);
 					setSelectedQuery(query);
+
+					// also add it to the list of queries loaded, so it appears on the navigation in the left for
+                    // convienience
+                    OwnerQueryStatsDTO addme = new OwnerQueryStatsDTO();
+                    addme.setQuery(query);
+                    Person queryAuthor = DbUtil.getPersonDetails(config, query.getResearcherId());
+                    addme.setQueryAuthor(queryAuthor);
+					queries.add(0, addme);
 					return null;
 				}
             }
@@ -419,14 +429,18 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 * Tell the negotiator to expect results for the selected query from the connector
 	 *
 	 */
-    public void ExpectConnectorResult(){
+    public void participateInQuery(){
 		try (Config config = ConfigFactory.get()) {
-			// TODO: Set "expect_connector_result" field in "query_collection" table to true.
-			setNonConfidential(true);
+		    //TODO: have the biobanker decide which of his (possibly) many collections he wants to participate with.
+            //      For now all will participate
+            DbUtil.participateInQueryAndExpectResults(config, queryId, userBean.getCollections());
+
+            // reload
+            initialize();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
+    }
 
     public List<QueryAttachmentDTO> getAttachments() {
         return attachments;

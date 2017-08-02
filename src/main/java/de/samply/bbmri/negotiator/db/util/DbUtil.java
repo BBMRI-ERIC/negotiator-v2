@@ -710,17 +710,34 @@ public class DbUtil {
         return queryRecord;
     }
 
+
     /**
      * Adds the given collectionId to the given queryId.
+     * No results from a connector will be expected.
+     *
      * @param config current config
      * @param queryId the query id which will be associated with a collection
      * @param collectionId the collection id which will be associated with the query
      */
     private static void addQueryToCollection(Config config, Integer queryId, Integer collectionId) {
+        addQueryToCollection(config, queryId, collectionId, false);
+    }
+
+    /**
+     * Adds the given collectionId to the given queryId.
+     *
+     * @param config current config
+     * @param queryId the query id which will be associated with a collection
+     * @param collectionId the collection id which will be associated with the query
+     * @param expectResults if or not to expect results from a (confidential) connector
+     */
+    private static void addQueryToCollection(Config config, Integer queryId, Integer collectionId, Boolean
+            expectResults) {
         try {
             QueryCollectionRecord queryCollectionRecord = config.dsl().newRecord(Tables.QUERY_COLLECTION);
             queryCollectionRecord.setQueryId(queryId);
             queryCollectionRecord.setCollectionId(collectionId);
+            queryCollectionRecord.setExpectConnectorResult(expectResults);
             queryCollectionRecord.store();
         } catch (DataAccessException e) {
             // we expect a duplicate key value exception here if the entry already exists
@@ -1001,6 +1018,23 @@ public class DbUtil {
     }
 
     /**
+     * Gets details of a person/user
+     * @param config    DB access handle
+     * @param personId  the person ID
+     * @return
+     */
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Person getPersonDetails(Config config, int personId) {
+        Result<Record> record = config.dsl()
+                .select(getFields(Tables.PERSON))
+                .from(Tables.PERSON)
+                .where(Tables.PERSON.ID.eq(personId)).fetch();
+
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = config.map(record.get(0), de.samply.bbmri
+                .negotiator.jooq.tables.pojos.Person.class);
+        return person;
+    }
+
+    /**
      * Check if the query exists in our system
      * @param config    DB access handle
      * @return Query query object
@@ -1010,6 +1044,9 @@ public class DbUtil {
                 .select(getFields(Tables.QUERY))
                 .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(queryId)).fetch();
+
+        if(record.isEmpty())
+            return null;
 
         de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = config.map(record.get(0), de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
         return query;
@@ -1030,5 +1067,38 @@ public class DbUtil {
 
         List<QueryCollection> queryCollections = config.map(result, QueryCollection.class);
         return queryCollections;
+    }
+
+    /**
+     * A confidential biobanker decides to participate in a query, so we have to add all his collections
+     * to the query_collection table.
+     * If the entry already exists, update the entry to expect results from the connector
+     *
+     * @param config    DB handle
+     * @param queryId   the query ID
+     * @param collections   the collections of the user
+     */
+    public static void participateInQueryAndExpectResults(Config config, int queryId, List<Collection> collections) {
+        if(collections == null || collections.isEmpty())
+            return;
+
+        try {
+            for(Collection collection: collections) {
+                // if already there, update the expect result flag
+                int changedEntry = config.dsl().update(Tables.QUERY_COLLECTION)
+                        .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, true)
+                        .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                        .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collection.getId()))
+                        .execute();
+
+                if(changedEntry == 0) {
+                    addQueryToCollection(config, queryId, collection.getId(), true);
+                }
+            }
+
+            config.commit();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
