@@ -132,7 +132,7 @@ public class Connector {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getResults(@QueryParam("id") int collectionId) {
         try (Config config = ConfigFactory.get()) {
-            List<QueryCollection> queryCollectionList = DbUtil.CheckExpectedResults(config, collectionId);
+            List<QueryCollection> queryCollectionList = DbUtil.checkExpectedResults(config, collectionId);
             return Response.status(200).entity(queryCollectionList).build();
         } catch (SQLException e) {
             e.printStackTrace();

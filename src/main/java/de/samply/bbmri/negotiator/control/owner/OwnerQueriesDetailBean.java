@@ -168,7 +168,7 @@ public class OwnerQueriesDetailBean implements Serializable {
             	/*
             	 * Check why the selected query is null. There could be two possibilities.
             	 */
-                Query query = DbUtil.CheckIfQueryExists(config, queryId);
+                Query query = DbUtil.checkIfQueryExists(config, queryId);
             	if(query == null){
 
 					/**

@@ -1039,7 +1039,7 @@ public class DbUtil {
      * @param config    DB access handle
      * @return Query query object
      */
-    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query CheckIfQueryExists(Config config, int queryId){
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query checkIfQueryExists(Config config, int queryId){
         Result<Record> record = config.dsl()
                 .select(getFields(Tables.QUERY))
                 .from(Tables.QUERY)
@@ -1058,7 +1058,7 @@ public class DbUtil {
      * @param collectionId    unique id of collection
      * @return List<QueryCollection> list of qyery_collection records
      */
-    public static List<QueryCollection> CheckExpectedResults(Config config, int collectionId){
+    public static List<QueryCollection> checkExpectedResults(Config config, int collectionId){
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.QUERY_COLLECTION))
                 .from(Tables.QUERY_COLLECTION)
