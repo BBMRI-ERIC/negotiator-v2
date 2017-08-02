@@ -41,7 +41,7 @@ CREATE TABLE "person" (
     "auth_name" CHARACTER VARYING(255) NOT NULL,
     "auth_email" CHARACTER VARYING(255) NOT NULL,
     "person_image" BYTEA,
-    "is_admin" BOOLEAN NOT NULL DEFAULT '0',
+    "is_admin" BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY ("id")
 );
 
@@ -63,7 +63,7 @@ CREATE TABLE "query" (
     "json_text" TEXT NOT NULL,
     "num_attachments" INTEGER NOT NULL,
     "negotiator_token" CHARACTER VARYING(255) NOT NULL UNIQUE,
-    "valid_query" boolean NOT NULL DEFAULT '0',
+    "valid_query" BOOLEAN NOT NULL DEFAULT FALSE,
     "request_description" TEXT,
     "ethics_vote" TEXT,
     PRIMARY KEY ("id"),
@@ -176,7 +176,7 @@ COMMENT ON COLUMN "flagged_query"."flag" IS 'The flag of the comment. One of "AR
 CREATE TABLE "query_collection" (
     "query_id" INTEGER NOT NULL,
     "collection_id" INTEGER NOT NULL,
-    "expect_connector_result" BOOLEAN NOT NULL DEFAULT '0',
+    "expect_connector_result" BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY("query_id", "collection_id"),
     FOREIGN KEY ("collection_id") REFERENCES "collection"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
