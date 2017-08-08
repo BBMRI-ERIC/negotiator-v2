@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
+                template="../components/default.xhtml">
+
+    <ui:param name="bodyClass" value="container"/>
+
+    <ui:define name="body">
+        <div class="container">
+
+            <div id="researchers-crashcourse">
+                <h1 class="mainHL">Crash course for researchers </h1>
+                <div class="row crashcourse-row">
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/search-in-directory.png']}" class="crashcourse-image"/>
+                    </div>
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title"> 1. Specify what you need</h2>
+                        <p class="crashcourse-point">
+                            Filter the biobanks in the Directory with your criteria.
+                        </p>
+                        <p class="crashcourse-point">
+                            Add a human-readable description of your project and sample requests so the biobankers can better understand your needs and offer the best samples.
+                        </p>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title">2. Communicate with the biobanks </h2>
+                        <p class="crashcourse-point">
+                            Biobanks that match your criteria will leave comments under your request.
+                        </p>
+                        <p class="crashcourse-point">
+                            Answer them to clarify the request, or add more details.
+                        </p>
+                    </div>
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/commenting.png']}" class="crashcourse-image"/>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title">3. Discuss access conditions </h2>
+                        <p class="crashcourse-point">
+                            Biobanks that wish to supply samples will start a private conversation with you.
+                        </p>
+                        <p class="crashcourse-point">
+                            Talk with them to understand their access policy and define the extent of collaboration.
+                        </p>
+                        <p class="crashcourse-point">
+                            Don't miss new developments - we send you a notification if there is a new post in your conversation.
+                        </p>
+                    </div>
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/providing-samples.png']}" class="crashcourse-image"/>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/handshake.png.png']}" class="crashcourse-image"/>
+                    </div>
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title"> 4. End of negotiation</h2>
+                        <p class="crashcourse-point">
+                            When you have come to an agreement with a biobank, the negotiation is complete.
+                        </p>
+                        <p class="crashcourse-point">
+                            From there, the biobank will send you the samples as described during the negotiation.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div id="negotiator-blurb" style="display: block">
+                The negotiator is a service provided to you by BBMRI-ERIC.
+            </div>
+            <div id="endlogo-container">
+                <img src="#{resource['images/bbmri-logo.png']}" id="endlogo"/>
+            </div>
+
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>
+

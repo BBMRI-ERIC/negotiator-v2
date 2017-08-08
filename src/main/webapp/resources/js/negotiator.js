@@ -103,3 +103,13 @@ $(function() {
         multiline: true
     });
 });
+
+function showBiobankerHelp() {
+    document.getElementById('biobankers-crashcourse').style.display = 'block';
+    document.getElementById('researchers-crashcourse').style.display = 'none';
+}
+
+function showResearcherHelp() {
+    document.getElementById('researchers-crashcourse').style.display = 'block';
+    document.getElementById('biobankers-crashcourse').style.display = 'none';
+}
