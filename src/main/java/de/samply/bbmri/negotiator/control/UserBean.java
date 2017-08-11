@@ -32,6 +32,7 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -42,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.docuverse.identicon.IdenticonUtil;
 
+import com.nimbusds.jwt.JWTClaimsSet;
 import de.samply.bbmri.auth.client.AuthClient;
 import de.samply.bbmri.auth.client.InvalidKeyException;
 import de.samply.bbmri.auth.client.InvalidTokenException;
@@ -146,6 +148,11 @@ public class UserBean implements Serializable {
      */
     private String newQueryRedirectURL;
 
+	/**
+	 * The collections of this user
+	 */
+	private List<Collection> collections;
+
     /**
      * The identity string of the user who sudo'd another
      */
@@ -239,7 +246,7 @@ public class UserBean implements Serializable {
 
         return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
                 request.getServerName(), request.getServerPort(), request.getContextPath(),
-                requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+                requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
     }
 
 
@@ -279,7 +286,7 @@ public class UserBean implements Serializable {
 
 		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
-				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
 	}
 
     /**
@@ -308,7 +315,7 @@ public class UserBean implements Serializable {
 
         String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
-				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE);
+				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
 
 		return returnURL;
     }
@@ -325,6 +332,14 @@ public class UserBean implements Serializable {
 	 */
 	public void login(AuthClient client) throws InvalidTokenException, InvalidKeyException {
 		accessToken = client.getAccessToken();
+
+		logger.debug("AC Header: "+accessToken.getHeader());
+		logger.debug("AC State : "+accessToken.getState());
+		Map<String, Object> claims = accessToken.getClaimsSet().getClaims();
+
+		for(String claim: claims.keySet()) {
+			logger.debug("AC Claim "+claim+" : "+claims.get(claim));
+		}
 
 		/**
 		 * Make sure that if the access token contains a state parameter, that it matches the state variable. If it does
@@ -464,7 +479,7 @@ public class UserBean implements Serializable {
 			/**
 			 * Check if the user is a biobanker
 			 */
-            List<Collection> collections = DbUtil.getCollections(config, person.getId());
+            collections = DbUtil.getCollections(config, person.getId());
 
             if(collections.size() > 0) {
                 biobankOwner = true;
@@ -748,5 +763,13 @@ public class UserBean implements Serializable {
 
     public void setNewQueryRedirectURL(String newQueryRedirectURL) {
         this.newQueryRedirectURL = newQueryRedirectURL;
+    }
+
+    public List<Collection> getCollections() {
+        return collections;
+    }
+
+    public void setCollections(List<Collection> collections) {
+        this.collections = collections;
     }
 }

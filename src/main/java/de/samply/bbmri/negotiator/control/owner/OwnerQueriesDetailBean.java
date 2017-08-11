@@ -44,6 +44,7 @@ import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
@@ -53,6 +54,8 @@ import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the query detail view for owners
@@ -62,6 +65,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class OwnerQueriesDetailBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+
+	private Logger logger = LoggerFactory.getLogger(OwnerQueriesDetailBean.class);
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -94,7 +99,6 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
 	private Query selectedQuery = null;
 
-
 	 /**
      * The input text box for the user to make a comment.
      */
@@ -125,12 +129,18 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     private List<OfferPersonDTO> offerPersonDTO;
 
+	/**
+	 * A boolean that specifies if a non-confidential view must be rendered for a non-confidential biobanker(for connector) and vise versa
+	 */
+	private boolean nonConfidential = true;
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
 	public String initialize() {
-		try(Config config = ConfigFactory.get()) {
+        setNonConfidential(false);
+
+        try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
             setOfferPersonDTO(DbUtil.getOffers(config, queryId, userBean.getUserId()));
 
@@ -139,13 +149,12 @@ public class OwnerQueriesDetailBean implements Serializable {
              */
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
 
-
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
-            for(OwnerQueryStatsDTO query : getQueries()) {
-            	if(query.getQuery().getId() == queryId) {
-            		selectedQuery = query.getQuery();
+            for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
+            	if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
+            		selectedQuery = ownerQueryStatsDTO.getQuery();
             	}
             }
 
@@ -155,11 +164,37 @@ public class OwnerQueriesDetailBean implements Serializable {
 				QueryDTO queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
 				setHumanReadableQuery(queryDTO.getHumanReadable());
 			} else {
-                /**
-                 * If it is null, it means that either the user can not access it due to insufficient privileges,
-                 * or that the query simply does not exist.
-                 */
-                return "/errors/not-found.xhtml";
+
+            	/*
+            	 * Check why the selected query is null. There could be two possibilities.
+            	 */
+                Query query = DbUtil.checkIfQueryExists(config, queryId);
+            	if(query == null){
+
+					/**
+					 * If 'query' is null, it means that the 'selected query' simply does not exist in our system.
+					 */
+					return "/errors/not-found.xhtml";
+
+				}else{
+
+            		/*
+            		 *If 'query' is not null this means the biobanker does not have access privileges to the 'selected query'.
+            		 * We give a partial read access to him now.
+            		 */
+            		logger.info("Giving temporary read rights to confidential biobanker");
+					setNonConfidential(true);
+					setSelectedQuery(query);
+
+					// also add it to the list of queries loaded, so it appears on the navigation in the left for
+                    // convienience
+                    OwnerQueryStatsDTO addme = new OwnerQueryStatsDTO();
+                    addme.setQuery(query);
+                    Person queryAuthor = DbUtil.getPersonDetails(config, query.getResearcherId());
+                    addme.setQueryAuthor(queryAuthor);
+					queries.add(0, addme);
+					return null;
+				}
             }
 
            associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
@@ -390,6 +425,23 @@ public class OwnerQueriesDetailBean implements Serializable {
         return attachmentMap;
     }
 
+	/**
+	 * Tell the negotiator to expect results for the selected query from the connector
+	 *
+	 */
+    public void participateInQuery(){
+		try (Config config = ConfigFactory.get()) {
+		    //TODO: have the biobanker decide which of his (possibly) many collections he wants to participate with.
+            //      For now all will participate
+            DbUtil.participateInQueryAndExpectResults(config, queryId, userBean.getCollections());
+
+            // reload
+            initialize();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    }
+
     public List<QueryAttachmentDTO> getAttachments() {
         return attachments;
     }
@@ -413,4 +465,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void setHumanReadableQuery(String humanReadableQuery) {
 		this.humanReadableQuery = humanReadableQuery;
 	}
+
+	public boolean isNonConfidential() {
+		return nonConfidential;
+	}
+
+	public void setNonConfidential(boolean nonConfidential) {
+		this.nonConfidential = nonConfidential;
+	}
+
 }

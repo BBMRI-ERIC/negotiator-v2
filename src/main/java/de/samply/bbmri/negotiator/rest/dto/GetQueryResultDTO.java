@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+/*
+ * Copyright (c) 2017. Medizinische Informatik in der Translationalen Onkologie,
  * Deutsches Krebsforschungszentrum in Heidelberg
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -24,44 +24,34 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.model;
+package de.samply.bbmri.negotiator.rest.dto;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import java.io.Serializable;
+@XmlRootElement
+public class GetQueryResultDTO {
 
-@Deprecated
-public class QueryLocationDTO implements Serializable {
 
-    private Comment comment;
+    private String queryTitle;
 
-    private Biobank biobank;
 
-    private Person person;
+    private String queryText;
 
-    public Comment getComment() {
-        return comment;
+//region properties
+    public String getQueryTitle() {
+        return queryTitle;
     }
 
-    public void setComment(Comment comment) {
-        this.comment = comment;
+    public void setQueryTitle(String queryTitle) {
+        this.queryTitle = queryTitle;
     }
 
-    public Biobank getBiobank() {
-        return biobank;
+    public String getQueryText() {
+        return queryText;
     }
 
-    public void setBiobank(Biobank biobank) {
-        this.biobank = biobank;
+    public void setQueryText(String queryText) {
+        this.queryText = queryText;
     }
-
-    public Person getPerson() {
-        return person;
-    }
-
-    public void setPerson(Person person) {
-        this.person = person;
-    }
+//endregion
 }

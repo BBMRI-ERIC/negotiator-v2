@@ -160,6 +160,11 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
     */
    private Part file;
 
+    /**
+     * String containing ethics code, if available.
+     */
+    private String ethicsVote;
+
    /**
     * Initializes this bean by registering email notification observer
     */
@@ -169,7 +174,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
            if(id != null)
            {
                setMode("edit");
-               QueryRecord queryRecord = DbUtil.getQueryDescription(config, id);
+               QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
 
                /**
                 * Save query title and text temporarily when a file is being uploaded.
@@ -179,6 +184,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                    queryText = queryRecord.getText();
                    queryRequestDescription = queryRecord.getRequestDescription();
                    jsonQuery = queryRecord.getJsonText();
+                   ethicsVote = queryRecord.getEthicsVote();
                }else {
                    /**
                     * Get the values of the fields before page was refreshed - for file upload or changing query from directory
@@ -205,14 +211,14 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
    public String saveQuery() throws SQLException {
        // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
-           /* If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited. */
+           /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
            if(id != null) {
-               DbUtil.editQueryDescription(config, queryTitle, queryText, queryRequestDescription, jsonQuery, id);
+               DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id);
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                       jsonQuery, userBean.getUserId(),
+                       jsonQuery, ethicsVote, userBean.getUserId(),
                        true);
                config.commit();
                setId(record.getId());
@@ -256,11 +262,12 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
        queryTitle = sessionBean.getTransientQueryTitle();
        queryText = sessionBean.getTransientQueryText();
        queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
+       ethicsVote = sessionBean.getTransientEthicsCode();
+
        if (jsonQueryId != null) {
            try (Config config = ConfigFactory.get()) {
                jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
            } catch (SQLException e) {
-               // TODO Auto-generated catch block
                e.printStackTrace();
            }
        } else {
@@ -278,6 +285,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
        sessionBean.setTransientQueryText(queryText);
        sessionBean.setTransientQueryJson(jsonQuery);
        sessionBean.setTransientQueryRequestDescription(queryRequestDescription);
+       sessionBean.setTransientEthicsCode(ethicsVote);
        sessionBean.setSaveTransientState(true);
    }
 
@@ -290,7 +298,9 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
        sessionBean.setTransientQueryText(null);
        sessionBean.setTransientQueryRequestDescription(null);
        sessionBean.setTransientQueryJson(null);
+       sessionBean.setTransientEthicsCode(null);
        sessionBean.setSaveTransientState(false);
+
    }
 
    /**
@@ -308,7 +318,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
         try (Config config = ConfigFactory.get()) {
             if (id == null) {
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, userBean.getUserId()
+                        jsonQuery, ethicsVote, userBean.getUserId()
                         , false);
                 config.commit();
                 setId(record.getId());
@@ -585,6 +595,13 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
     public void setQueryRequestDescription(String queryRequestDescription) {
         this.queryRequestDescription = queryRequestDescription;
+    }
+    public String getEthicsVote() {
+        return ethicsVote;
+    }
+
+    public void setEthicsVote(String ethicsVote) {
+        this.ethicsVote = ethicsVote;
     }
 
 }

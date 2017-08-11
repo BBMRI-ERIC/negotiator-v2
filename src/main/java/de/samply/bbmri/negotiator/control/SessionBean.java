@@ -74,6 +74,11 @@ public class SessionBean implements Serializable {
     private String transientQueryRequestDescription;
 
     /**
+     * The ethics code of the query when the page is refreshed  - for file upload or changing query from directory.
+     */
+    private String transientEthicsCode;
+
+    /**
      * The variable that decides if session vales have to be loaded or not.
      */
     private boolean saveTransientState;
@@ -194,5 +199,13 @@ public class SessionBean implements Serializable {
 
     public void setSaveTransientState(boolean saveTransientState) {
         this.saveTransientState = saveTransientState;
+    }
+
+    public String getTransientEthicsCode() {
+        return transientEthicsCode;
+    }
+
+    public void setTransientEthicsCode(String transientEthicsCode) {
+        this.transientEthicsCode = transientEthicsCode;
     }
 }

@@ -29,9 +29,6 @@ package de.samply.bbmri.negotiator.rest.dto;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * Created by paul on 29.09.16.
- */
 @XmlRootElement
 public class CreateQueryResultDTO {
 

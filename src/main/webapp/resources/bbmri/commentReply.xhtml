@@ -39,11 +39,12 @@
 	<composite:attribute name="query" required="true" />
 	<composite:attribute name="offer" required="false" />
 	<composite:attribute name="makeOffer" required="false" default="false"  />
+	<composite:attribute name="rendered" required="false" />
 </composite:interface>
 
 <composite:implementation>
 
-	<h:panelGroup layout="block" styleClass="col-md-12">
+	<h:panelGroup layout="block" styleClass="col-md-12" rendered="#{cc.attrs.rendered}">
 
 		<h:form id="myform">
 

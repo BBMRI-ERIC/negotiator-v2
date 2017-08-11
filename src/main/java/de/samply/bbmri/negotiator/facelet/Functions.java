@@ -32,9 +32,6 @@ import java.io.StringWriter;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
-/**
- * Created by paul on 6/30/16.
- */
 public class Functions {
 
     /**

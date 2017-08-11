@@ -4,35 +4,43 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
     <artifactId>bbmri-negotiator</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 
     <parent>
         <artifactId>parent</artifactId>
         <groupId>de.samply</groupId>
-        <version>9.2</version>
+        <version>9.3</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <version.samply.webjar>1.6.0</version.samply.webjar>
-        <version.samply.auth.client>1.0.1</version.samply.auth.client>
+        <version.samply.auth.client>1.0.2</version.samply.auth.client>
         <version.samply.common.upgrade>2.0.0</version.samply.common.upgrade>
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
-        <version.samply.directory.client>1.0.1</version.samply.directory.client>
+        <version.samply.directory.client>1.0.2</version.samply.directory.client>
+        <version.samply.negotiator.dto>1.0.0</version.samply.negotiator.dto>
 
-        <database.server>steffi16</database.server>
+        <database.server>localhost</database.server>
         <database.port>5432</database.port>
-        <database.username>negotiator</database.username>
-        <database.password>test123</database.password>
-        <database.name>negotiator2</database.name>
+        <database.name>negotiator</database.name>
+        <database.username>saher</database.username>
+        <database.password>saher</database.password>
+
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>negotiator-dto</artifactId>
+            <version>${version.samply.negotiator.dto}</version>
+        </dependency>
+
         <dependency>
             <groupId>de.samply</groupId>
             <artifactId>common-upgrade</artifactId>
@@ -207,6 +215,17 @@
                     <artifactId>myfaces-impl</artifactId>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <profile>
+            <id>maxdatabase</id>
+            <properties>
+                <database.server>steffi16</database.server>
+                <database.port>5432</database.port>
+                <database.name>negotiator2</database.name>
+                <database.username>negotiator</database.username>
+                <database.password>test123</database.password>
+            </properties>
         </profile>
     </profiles>
 

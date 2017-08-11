@@ -36,9 +36,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
-/**
- * Created by paul on 28.09.16.
- */
 public class RestApplication extends ResourceConfig {
 
     /**

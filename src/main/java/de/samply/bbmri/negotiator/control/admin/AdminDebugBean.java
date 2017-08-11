@@ -24,56 +24,56 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.notification;
+package de.samply.bbmri.negotiator.control.admin;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.common.mailing.EmailBuilder;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 
-import java.util.*;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.List;
 
-public class Notification {
+/**
+ * Created on 7/25/2017.
+ */
 
-    private List<Person> addressees;
 
-    private String locale;
+/**
+ * Outputs the details of the given queryId
+ */
+@ViewScoped
+@ManagedBean
+public class AdminDebugBean implements Serializable {
 
-    private String subject;
+    /**
+     * The list of queries
+     */
+    private List<QueryRecord> queries;
 
-    private Map<String, String> parameters = new HashMap<>();
-
-    public Notification() {
-        addressees = new ArrayList<>();
+    //region properties
+    public List<QueryRecord> getQueries() {
+        return queries;
     }
 
-    public Map<String, String> getParameters() {
-        return Collections.unmodifiableMap(parameters);
+    public void setQueries(List<QueryRecord> queries) {
+        this.queries = queries;
     }
+//endregion
 
-    public void addParameter(String key, String value) {
-        parameters.put(key, value);
-    }
-
-    public List<Person> getAddressees() {
-        return Collections.unmodifiableList(addressees);
-    }
-
-    public void addAddressee(Person person) {
-        addressees.add(person);
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getLocale() {
-        return locale;
-    }
-
-    public void setLocale(String locale) {
-        this.locale = locale;
+    /**
+     * Sets the queries list by getting all the queries from the data base
+     *
+     * @return
+     */
+    public void loadQueries() {
+        try(Config config = ConfigFactory.get()) {
+            queries = DbUtil.getQueries(config);
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

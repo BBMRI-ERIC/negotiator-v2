@@ -90,7 +90,7 @@
 					<h:inputText id="title" value="#{queryBean.queryTitle}"
 						styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
 						validatorMessage="#{label['error.invalidTitleLength']}">
-						<f:validateLength for="title" minimum="5" maximum="30" />
+						<f:validateLength for="title" minimum="5" maximum="250" />
 					</h:inputText>
 					<h:message for="title" style="color:red" styleClass="pre-wrap" />
 
@@ -118,10 +118,18 @@
 					</h:inputTextarea>
 					<h:message for="requestdescription" style="color:red"
 							   styleClass="pre-wrap" />
-				<!--</div>-->
 
+                    <br></br>
+					#{label['queryview.title.ethicsVote']}
+                    <h:inputTextarea id="ethicsVote" value="#{queryBean.ethicsVote}"
+                                     styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.ethicsVote']}"
+                                     validatorMessage="#{label['error.invalidDescriptionLength']}">
+                        <f:validateLength for="description" maximum="2000" />
+                    </h:inputTextarea>
+                    <h:message for="ethicsVote" style="color:red"
+                               styleClass="pre-wrap" />
 
-                <br></br> #{label['queryview.title.attachments']}
+                    <br></br> #{label['queryview.title.attachments']}
 
 				<!-- Using h:dataTable to display attachments -->
 					<h:panelGroup layout="block">

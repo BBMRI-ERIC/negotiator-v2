@@ -291,6 +291,16 @@ a:hover {
 
 }
 
+.rows{
+    min-height: 25px;
+    max-height: 65px;
+}
+
+.columns {
+    min-width: 200px;
+    max-width: 400px;
+}
+
 .column1 {
 	min-width: 300px;
 	max-width: 405px; 
@@ -367,4 +377,9 @@ div.text label {
     width: 11em;
     text-align: left;
     float: left;
+}
+
+th, td {
+    text-align: center;
+    padding: 4px;
 }

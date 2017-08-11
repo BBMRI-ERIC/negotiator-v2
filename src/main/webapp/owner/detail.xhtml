@@ -104,14 +104,26 @@
 
                 </ui:fragment>
 
-                <h:panelGroup layout="block" style="margin-top:10px;">
+                <h:form styleClass="form-horizontal" style="width: 100%; margin-top: 10px;">
+                    <h:commandButton action="#{ownerQueriesDetailBean.participateInQuery()}"
+                                     value="#{label['querydetail.action.participate']}"
+                                     rendered="#{ownerQueriesDetailBean.nonConfidential == true}"
+                                     styleClass="btn btn-primary">
+                            <f:ajax render="left-panel right-panel" />
+                    </h:commandButton>
+                </h:form>
 
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
-                        </li>
-                        <li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
-                        </li>
-                    </ul>
+                <h:panelGroup layout="block" style="margin-top:10px;">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+                            </li>
+                            <ui:fragment rendered="#{ownerQueriesDetailBean.nonConfidential == false}">
+                            <li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
+                            </li>
+                            </ui:fragment>
+                        </ul>
+
+
 
                     <div class="tab-content">
                         <div id="comments" class="tab-pane fade in active">
@@ -128,8 +140,8 @@
                                 <hr></hr>
                             </div>
 
-                            <bbmricc:commentReply
-                                query="#{ownerQueriesDetailBean.selectedQuery}" />
+                            <bbmricc:commentReply rendered="#{ownerQueriesDetailBean.nonConfidential == false}"
+                                query="#{ownerQueriesDetailBean.selectedQuery}"  />
 
                         </div>
 
@@ -154,6 +166,7 @@
                             </div>
 
                             <bbmricc:commentReply makeOffer="true"
+                                                  rendered="#{ownerQueriesDetailBean.nonConfidential == false}"
                                 query="#{ownerQueriesDetailBean.selectedQuery}"
                                 offer="#{ownerQueriesDetailBean.userBean.userId}" />
 

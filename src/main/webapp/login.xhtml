@@ -15,7 +15,7 @@
         </c:if>
     </f:metadata>
 
-    <ui:param name="bodyClass" value="container" />
+    <ui:param name="bodyClass" value="container body-nomargin" />
 
     <ui:define name="body">
 
@@ -47,9 +47,254 @@
             The Negotiator 1.0 is connected to the already established
             <a href="https://directory.bbmri-eric.eu" target="_blank"><b>BBMRI-ERIC Directory</b></a>,
             the biggest biobanking catalogue on the globe.
+            <br />
+            In case of any issues, contact us at <b>negotiator@helpdesk.bbmri-eric.eu</b>
         </p>
-        
-        
+
+
+        <div id="choice-biobanker-researcher">
+            <h1> How does the Negotiator help me? </h1>
+            <br></br>
+
+
+            <div id="buttons-side-by-side">
+
+                <h:form>
+                    <h:commandLink id="biobanker-button" value="As a biobanker" styleClass="btn btn-primary"
+                                   onclick="showBiobankerHelp()">
+                        <f:ajax execute="@form" render="@none"/>
+                    </h:commandLink>
+
+                    <h:commandLink id="researcher-button" value="As a researcher" styleClass="btn btn-primary"
+                                   style="margin-left: 20px" onclick="showResearcherHelp()">
+                        <f:ajax execute="@form" render="@none"/>
+                    </h:commandLink>
+                </h:form>
+            </div>
+        </div>
+        <div class="container">
+            <div id="biobankers-crashcourse" style="display:none;">
+                <h1 class="mainHL">Crash course for biobankers</h1>
+                <div class="row crashcouse-row">
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title">1. Discover requests </h2>
+                        <p class="crashcourse-point">
+                            Requests in your inbox matched your biobank in a <a
+                                href="http://old.bbmri-eric.eu/bbmri-eric-directory-2.0">Directory</a> search.
+                        </p>
+                        <p class="crashcourse-point">
+                            Sort the requests. The categories Starred, Ignored and Archived help you keep a clutter-free overview.
+                        </p>
+                        <p class="crashcourse-point">
+                            Need to find a specific request? There is a keyword search directly in the inbox.
+                        </p>
+                        <p>
+                            <a href="#inboxDetailsModal" class="crashcourse-details-link" role="button" data-toggle="modal">View more</a>
+                        </p>
+                    </div>
+
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/sorting.png']}" class="crashcourse-image"/>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/commenting.png']}" class="crashcourse-image"/>
+                    </div>
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title">2. Understand a request </h2>
+                        <p class="crashcourse-point">
+                            Read the requesting researcher's description in the request view.
+                        </p>
+                        <p class="crashcourse-point">
+                            Discuss details with the researcher and the other biobankers in the comments.
+                        </p>
+                        <p>
+                            <a href="#commentDetailsModal" class="crashcourse-details-link" role="button" data-toggle="modal">View more</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title">3. Discuss access conditions </h2>
+                        <p class="crashcourse-point">
+                            Signal that you can supply the requested samples in the "Sample availability" discussion. It is kept private between you and the researcher.
+                        </p>
+                        <p class="crashcourse-point">
+                            Explain your access policy and keep in touch with the researcher during the approval process.
+                        </p>
+                        <p class="crashcourse-point">
+                            Don't miss new developments - we send you a notification if there is a new post in your conversation.
+                        </p>
+                        <p>
+                            <a href="#sampleAvailabilityModal" class="crashcourse-details-link" role="button" data-toggle="modal">View more</a>
+                        </p>
+                    </div>
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/providing-samples.png']}" class="crashcourse-image"/>
+                    </div>
+                </div>
+
+                <div class="row crashcouse-row">
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/handshake.png']}" class="crashcourse-image"/>
+                    </div>
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title"> 4. End of negotiation</h2>
+                        <p class="crashcourse-point">
+                            When you agree on how and when to send the samples, the negotiation is complete.
+                        </p>
+                        <p class="crashcourse-point">
+                            From there, you can follow the usual process in your biobank to send samples to the requester.
+                        </p>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+
+                    <div class="col-sm-3">
+                    </div>
+                    <div class="col-sm-6">
+                        <a class="btn btn-primary cta"> Proceed to registration </a>
+                        <p> or write to negotiator@helpdesk.bbmri-eric.eu for support </p>
+                    </div>
+                    <div class="col-sm-3">
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="researchers-crashcourse" style="display:none;">
+                <h1 class="mainHL">Crash course for researchers </h1>
+                <div class="row crashcourse-row">
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/search-in-directory.png']}" class="crashcourse-image"/>
+                    </div>
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title"> 1. Specify what you need</h2>
+                        <p class="crashcourse-point">
+                            Filter the biobanks in the Directory with your criteria.
+                        </p>
+                        <p class="crashcourse-point">
+                            Add a human-readable description of your project and sample requests so the biobankers can better understand your needs and offer the best samples.
+                        </p>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title">2. Communicate with the biobanks </h2>
+                        <p class="crashcourse-point">
+                            Biobanks that match your criteria will leave comments under your request.
+                        </p>
+                        <p class="crashcourse-point">
+                            Answer them to clarify the request, or add more details.
+                        </p>
+                    </div>
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/commenting.png']}" class="crashcourse-image"/>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title">3. Discuss access conditions </h2>
+                        <p class="crashcourse-point">
+                            Biobanks that wish to supply samples will start a private conversation with you.
+                        </p>
+                        <p class="crashcourse-point">
+                            Talk with them to understand their access policy and define the extent of collaboration.
+                        </p>
+                        <p class="crashcourse-point">
+                            Don't miss new developments - we send you a notification if there is a new post in your conversation.
+                        </p>
+                    </div>
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/providing-samples.png']}" class="crashcourse-image"/>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+                    <div class="col-sm-8">
+                        <img src="#{resource['images/handshake.png.png']}" class="crashcourse-image"/>
+                    </div>
+                    <div class="col-sm-4">
+                        <h2 class="card-title crashcourse-title"> 4. End of negotiation</h2>
+                        <p class="crashcourse-point">
+                            When you have come to an agreement with a biobank, the negotiation is complete.
+                        </p>
+                        <p class="crashcourse-point">
+                            From there, the biobank will send you the samples as described during the negotiation.
+                        </p>
+                    </div>
+                </div>
+                <div class="row crashcouse-row">
+
+                    <div class="col-sm-3">
+                    </div>
+                    <div class="col-sm-6">
+                        <a class="btn btn-primary cta"> Proceed to registration </a>
+                        <p> or write to negotiator@helpdesk.bbmri-eric.eu for support </p>
+                    </div>
+                    <div class="col-sm-3">
+                    </div>
+                </div>
+
+            </div>
+
+            <h:panelGroup id="footerDiv" style="display: block; margin-top: 30em"  >
+
+                <div id="negotiator-blurb" style="display: block">
+                    The negotiator is a service provided to you by BBMRI-ERIC.
+                </div>
+                <div id="endlogo-container">
+                    <img src="#{resource['images/bbmri-logo.png']}" id="endlogo"/>
+                </div>
+
+            </h:panelGroup>
+
+
+
+        </div>
+
+
+
+
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="inboxDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog crashcourse-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3>Biobanker's Inbox View</h3>
+                    </div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-inbox-annotated.png']}"/></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="commentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog crashcourse-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3>Biobanker's Detail View</h3>
+                    </div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-queryDetail-annotated.png']}"/></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="sampleAvailabilityModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog crashcourse-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3>Biobanker's Sample Availability View</h3>
+                    </div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-sampleAvailability-annotated.png']}"/></div>
+                </div>
+            </div>
+        </div>
 
     </ui:define>
 

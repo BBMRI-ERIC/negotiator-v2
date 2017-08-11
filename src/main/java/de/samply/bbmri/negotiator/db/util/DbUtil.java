@@ -36,7 +36,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import de.samply.bbmri.negotiator.jooq.tables.pojos.*;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.records.*;
+import de.samply.bbmri.negotiator.model.*;
+import de.samply.bbmri.negotiator.rest.dto.*;
 import org.jooq.*;
+import org.jooq.Query;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -51,28 +57,7 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.NegotiatorDTO;
-import de.samply.bbmri.negotiator.model.OfferPersonDTO;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
-import de.samply.bbmri.negotiator.rest.dto.CollectionDTO;
-import de.samply.bbmri.negotiator.rest.dto.PerunMappingDTO;
-import de.samply.bbmri.negotiator.rest.dto.PerunPersonDTO;
-import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.directory.client.dto.DirectoryBiobank;
 import de.samply.directory.client.dto.DirectoryCollection;
 
@@ -81,7 +66,54 @@ import de.samply.directory.client.dto.DirectoryCollection;
  */
 public class DbUtil {
 
+
+
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
+
+
+    /**
+     * Gets all the valid queries that entered the negotiator after the given timestamp.
+     * @param config JOOQ configuration
+     * @param timestamp
+     */
+    public static List<QueryDetail> getAllNewQueries(Config config, Timestamp timestamp) {
+        Result<Record> result = config.dsl()
+                .select(Tables.QUERY.TITLE.as("query_title"))
+                .select(Tables.QUERY.TEXT.as("query_text"))
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
+                .fetch();
+
+        return config.map(result, QueryDetail.class);
+    }
+
+    /**
+     * Gets the time when the last connector request was made for the queries.
+     * @param config JOOQ configuration
+     */
+    public static ConnectorLogRecord getLastRequestTime(Config config) {
+        Record result = config.dsl()
+                .selectFrom(Tables.CONNECTOR_LOG)
+                .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
+                .limit(1)
+                .fetchOne();
+
+        return config.map(result, ConnectorLogRecord.class);
+    }
+
+    /**
+     * Logs the time when the connector request was made for the queries.
+     * @param config JOOQ configuration
+     */
+    public static void logGetQueryTime(Config config) {
+        try { ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
+              connectorLogRecord.setLastQueryTime(new Timestamp(new Date().getTime()));
+              connectorLogRecord.store();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Get title and text of a query.
@@ -90,7 +122,7 @@ public class DbUtil {
      * @return QueryRecord object
      * @throws SQLException
      */
-    public static QueryRecord getQueryDescription(Config config, Integer id) {
+    public static QueryRecord getQueryFromId(Config config, Integer id) {
         Record result = config.dsl()
                 .selectFrom(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(id))
@@ -109,11 +141,15 @@ public class DbUtil {
      * @throws JsonMappingException
      * @throws JsonParseException
      */
-    public static void editQueryDescription(Config config, String title, String text, String requestDescription,
-            String jsonText, Integer queryId) {
-        try {config.dsl().update(Tables.QUERY).set(Tables.QUERY.TITLE, title).set(Tables.QUERY.TEXT, text)
-             .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription).set(Tables.QUERY.JSON_TEXT, jsonText)
-             .set(Tables.QUERY.VALID_QUERY, true).where(Tables.QUERY.ID.eq(queryId)).execute();
+    public static void editQuery(Config config, String title, String text, String requestDescription,
+            String jsonText, String ethicsVote, Integer queryId) {
+        try {config.dsl().update(Tables.QUERY)
+                .set(Tables.QUERY.TITLE, title)
+                .set(Tables.QUERY.TEXT, text)
+                .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription)
+                .set(Tables.QUERY.JSON_TEXT, jsonText)
+                .set(Tables.QUERY.ETHICS_VOTE, ethicsVote)
+                .set(Tables.QUERY.VALID_QUERY, true).where(Tables.QUERY.ID.eq(queryId)).execute();
 
             /**
              * Updates the relationship between query and collection.
@@ -134,7 +170,7 @@ public class DbUtil {
                     CollectionRecord dbCollection = getCollection(config, collection);
 
                     if (dbCollection != null) {
-                        if(!alreadySavedCollections.get(dbCollection.getId())) {
+                        if(!alreadySavedCollections.containsKey(dbCollection.getId())) {
                             addQueryToCollection(config, queryId, dbCollection.getId());
                             alreadySavedCollections.put(dbCollection.getId(), true);
                         }
@@ -145,7 +181,7 @@ public class DbUtil {
                     CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
 
                     if (dbCollection != null) {
-                        if(!alreadySavedCollections.get(dbCollection.getId())) {
+                        if(!alreadySavedCollections.containsKey(dbCollection.getId())) {
                             addQueryToCollection(config, queryId, dbCollection.getId());
                             alreadySavedCollections.put(dbCollection.getId(), true);
                         }
@@ -463,6 +499,20 @@ public class DbUtil {
 	}
 
     /**
+     * Returns a list of all fields for the given table
+     * @param table
+     * @return
+     */
+    private static List<Field<?>> getFields(Table<?> table) {
+        List<Field<?>> target = new ArrayList<>();
+        for(Field<?> f : table.fields()) {
+            target.add(f.as(f.getName()));
+        }
+
+        return target;
+    }
+
+    /**
      * Returns the location for the given directory ID.
      * @param config database configuration
      * @param directoryId directory biobank ID
@@ -614,7 +664,7 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord saveQuery(Config config, String title,
-                                        String text, String requestDescription, String jsonText, int researcherId,
+                                        String text, String requestDescription, String jsonText, String ethicsVote, int researcherId,
                                         Boolean validQuery) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
@@ -623,6 +673,7 @@ public class DbUtil {
         queryRecord.setText(text);
         queryRecord.setRequestDescription(requestDescription);
         queryRecord.setTitle(title);
+        queryRecord.setEthicsVote(ethicsVote);
         queryRecord.setResearcherId(researcherId);
         queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
         queryRecord.setNumAttachments(0);
@@ -659,17 +710,34 @@ public class DbUtil {
         return queryRecord;
     }
 
+
     /**
      * Adds the given collectionId to the given queryId.
+     * No results from a connector will be expected.
+     *
      * @param config current config
      * @param queryId the query id which will be associated with a collection
      * @param collectionId the collection id which will be associated with the query
      */
     private static void addQueryToCollection(Config config, Integer queryId, Integer collectionId) {
+        addQueryToCollection(config, queryId, collectionId, false);
+    }
+
+    /**
+     * Adds the given collectionId to the given queryId.
+     *
+     * @param config current config
+     * @param queryId the query id which will be associated with a collection
+     * @param collectionId the collection id which will be associated with the query
+     * @param expectResults if or not to expect results from a (confidential) connector
+     */
+    private static void addQueryToCollection(Config config, Integer queryId, Integer collectionId, Boolean
+            expectResults) {
         try {
             QueryCollectionRecord queryCollectionRecord = config.dsl().newRecord(Tables.QUERY_COLLECTION);
             queryCollectionRecord.setQueryId(queryId);
             queryCollectionRecord.setCollectionId(collectionId);
+            queryCollectionRecord.setExpectConnectorResult(expectResults);
             queryCollectionRecord.store();
         } catch (DataAccessException e) {
             // we expect a duplicate key value exception here if the entry already exists
@@ -874,5 +942,163 @@ public class DbUtil {
                 .fetch();
 
         return result;
+    }
+
+
+    /**
+     * Gets a list of Persons who are responsible for a given collection
+     * @param config    DB access handle
+     * @param collectionDirectoryId   the Directory ID of a Collection
+     * @return
+     */
+    public static List<CollectionOwner> getCollectionOwners(Config config, String collectionDirectoryId) {
+        Result<Record> result = config.dsl().select(getFields(Tables.PERSON))
+                .from(Tables.PERSON)
+                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq
+                        (Tables.PERSON.ID))
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq
+                        (Tables.COLLECTION.ID))
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionDirectoryId))
+                .fetch();
+
+        List<CollectionOwner> users = config.map(result, CollectionOwner.class);
+        return users;
+    }
+
+    /**
+     * Gets a list of all biobanks and their collections
+     * @param config    DB access handle
+     * @return
+     */
+    public static List<BiobankCollections> getBiobanksAndTheirCollection(Config config) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.BIOBANK))
+                .select(getFields(Tables.COLLECTION, "collection"))
+                .from(Tables.BIOBANK)
+                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.COLLECTION.BIOBANK_ID.eq(Tables
+                        .BIOBANK.ID))
+                .orderBy(Tables.BIOBANK.NAME.asc()).fetch();
+
+        List<BiobankCollections> map = config.map(result, BiobankCollections.class);
+        List<BiobankCollections> target = new ArrayList<>();
+        /**
+         * Now we have to do weird things, grouping them together manually
+         */
+        HashMap<Integer, BiobankCollections> mapped = new HashMap<>();
+
+        for(BiobankCollections dto : map) {
+            if(!mapped.containsKey(dto.getId())) {
+                mapped.put(dto.getId(), dto);
+
+                if(dto.getCollections() != null) {
+                    dto.getCollections().add(dto.getCollection());
+                }
+
+                target.add(dto);
+            } else {
+                mapped.get(dto.getId()).getCollections().add(dto.getCollection());
+            }
+        }
+        return target;
+    }
+
+    /**
+     * Gets a list of all the queries from the database
+     * @param config    DB access handle
+     * @return List<QueryRecord> list of query record objects
+     */
+    public static List<QueryRecord> getQueries(Config config){
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY))
+                .from(Tables.QUERY)
+                .orderBy(Tables.QUERY.ID.asc()).fetch();
+
+        List<QueryRecord> queries = config.map(result, QueryRecord.class);
+        return queries;
+    }
+
+    /**
+     * Gets details of a person/user
+     * @param config    DB access handle
+     * @param personId  the person ID
+     * @return
+     */
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Person getPersonDetails(Config config, int personId) {
+        Result<Record> record = config.dsl()
+                .select(getFields(Tables.PERSON))
+                .from(Tables.PERSON)
+                .where(Tables.PERSON.ID.eq(personId)).fetch();
+
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = config.map(record.get(0), de.samply.bbmri
+                .negotiator.jooq.tables.pojos.Person.class);
+        return person;
+    }
+
+    /**
+     * Check if the query exists in our system
+     * @param config    DB access handle
+     * @return Query query object
+     */
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query checkIfQueryExists(Config config, int queryId){
+        Result<Record> record = config.dsl()
+                .select(getFields(Tables.QUERY))
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.ID.eq(queryId)).fetch();
+
+        if(record.isEmpty())
+            return null;
+
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = config.map(record.get(0), de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+        return query;
+    }
+
+    /**
+     * Check if there are queries expecting results from this collection
+     * @param config    DB access handle
+     * @param collectionId    unique id of collection
+     * @return List<QueryCollection> list of qyery_collection records
+     */
+    public static List<QueryCollection> checkExpectedResults(Config config, int collectionId){
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_COLLECTION))
+                .from(Tables.QUERY_COLLECTION)
+                .where(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT.eq(true))
+                .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)).fetch();
+
+        List<QueryCollection> queryCollections = config.map(result, QueryCollection.class);
+        return queryCollections;
+    }
+
+    /**
+     * A confidential biobanker decides to participate in a query, so we have to add all his collections
+     * to the query_collection table.
+     * If the entry already exists, update the entry to expect results from the connector
+     *
+     * @param config    DB handle
+     * @param queryId   the query ID
+     * @param collections   the collections of the user
+     */
+    public static void participateInQueryAndExpectResults(Config config, int queryId, List<Collection> collections) {
+        if(collections == null || collections.isEmpty())
+            return;
+
+        try {
+            for(Collection collection: collections) {
+                // if already there, update the expect result flag
+                int changedEntry = config.dsl().update(Tables.QUERY_COLLECTION)
+                        .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, true)
+                        .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                        .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collection.getId()))
+                        .execute();
+
+                if(changedEntry == 0) {
+                    addQueryToCollection(config, queryId, collection.getId(), true);
+                }
+            }
+
+            config.commit();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

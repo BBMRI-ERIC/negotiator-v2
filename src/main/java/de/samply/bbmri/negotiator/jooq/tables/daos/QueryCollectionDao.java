@@ -64,4 +64,11 @@ public class QueryCollectionDao extends DAOImpl<QueryCollectionRecord, de.samply
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection> fetchByCollectionId(Integer... values) {
 		return fetch(QueryCollection.QUERY_COLLECTION.COLLECTION_ID, values);
 	}
+
+	/**
+	 * Fetch records that have <code>expect_connector_result IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection> fetchByExpectConnectorResult(Boolean... values) {
+		return fetch(QueryCollection.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, values);
+	}
 }

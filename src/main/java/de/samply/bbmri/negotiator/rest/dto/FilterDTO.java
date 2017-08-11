@@ -28,9 +28,6 @@ package de.samply.bbmri.negotiator.rest.dto;
 
 import javax.xml.bind.annotation.XmlElement;
 
-/**
- * Created by paul on 04.10.16.
- */
 public class FilterDTO {
 
     /**

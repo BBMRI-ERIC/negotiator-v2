@@ -7,6 +7,7 @@ package de.samply.bbmri.negotiator.jooq;
 import de.samply.bbmri.negotiator.jooq.tables.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.Comment;
+import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.Offer;
@@ -20,6 +21,7 @@ import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
@@ -60,6 +62,7 @@ public class Keys {
 	public static final Identity<BiobankRecord, Integer> IDENTITY_BIOBANK = Identities0.IDENTITY_BIOBANK;
 	public static final Identity<CollectionRecord, Integer> IDENTITY_COLLECTION = Identities0.IDENTITY_COLLECTION;
 	public static final Identity<CommentRecord, Integer> IDENTITY_COMMENT = Identities0.IDENTITY_COMMENT;
+	public static final Identity<ConnectorLogRecord, Integer> IDENTITY_CONNECTOR_LOG = Identities0.IDENTITY_CONNECTOR_LOG;
 	public static final Identity<JsonQueryRecord, Integer> IDENTITY_JSON_QUERY = Identities0.IDENTITY_JSON_QUERY;
 	public static final Identity<OfferRecord, Integer> IDENTITY_OFFER = Identities0.IDENTITY_OFFER;
 	public static final Identity<PersonRecord, Integer> IDENTITY_PERSON = Identities0.IDENTITY_PERSON;
@@ -76,6 +79,7 @@ public class Keys {
 	public static final UniqueKey<CollectionRecord> COLLECTION_PKEY = UniqueKeys0.COLLECTION_PKEY;
 	public static final UniqueKey<CollectionRecord> COLLECTION_DIRECTORY_ID_KEY = UniqueKeys0.COLLECTION_DIRECTORY_ID_KEY;
 	public static final UniqueKey<CommentRecord> COMMENT_PKEY = UniqueKeys0.COMMENT_PKEY;
+	public static final UniqueKey<ConnectorLogRecord> CONNECTOR_LOG_PKEY = UniqueKeys0.CONNECTOR_LOG_PKEY;
 	public static final UniqueKey<FlaggedQueryRecord> FLAGGED_QUERY_PKEY = UniqueKeys0.FLAGGED_QUERY_PKEY;
 	public static final UniqueKey<JsonQueryRecord> JSON_QUERY_PKEY = UniqueKeys0.JSON_QUERY_PKEY;
 	public static final UniqueKey<OfferRecord> OFFER_PKEY = UniqueKeys0.OFFER_PKEY;
@@ -119,6 +123,7 @@ public class Keys {
 		public static Identity<BiobankRecord, Integer> IDENTITY_BIOBANK = createIdentity(Biobank.BIOBANK, Biobank.BIOBANK.ID);
 		public static Identity<CollectionRecord, Integer> IDENTITY_COLLECTION = createIdentity(Collection.COLLECTION, Collection.COLLECTION.ID);
 		public static Identity<CommentRecord, Integer> IDENTITY_COMMENT = createIdentity(Comment.COMMENT, Comment.COMMENT.ID);
+		public static Identity<ConnectorLogRecord, Integer> IDENTITY_CONNECTOR_LOG = createIdentity(ConnectorLog.CONNECTOR_LOG, ConnectorLog.CONNECTOR_LOG.ID);
 		public static Identity<JsonQueryRecord, Integer> IDENTITY_JSON_QUERY = createIdentity(JsonQuery.JSON_QUERY, JsonQuery.JSON_QUERY.ID);
 		public static Identity<OfferRecord, Integer> IDENTITY_OFFER = createIdentity(Offer.OFFER, Offer.OFFER.ID);
 		public static Identity<PersonRecord, Integer> IDENTITY_PERSON = createIdentity(Person.PERSON, Person.PERSON.ID);
@@ -133,6 +138,7 @@ public class Keys {
 		public static final UniqueKey<CollectionRecord> COLLECTION_PKEY = createUniqueKey(Collection.COLLECTION, Collection.COLLECTION.ID);
 		public static final UniqueKey<CollectionRecord> COLLECTION_DIRECTORY_ID_KEY = createUniqueKey(Collection.COLLECTION, Collection.COLLECTION.DIRECTORY_ID);
 		public static final UniqueKey<CommentRecord> COMMENT_PKEY = createUniqueKey(Comment.COMMENT, Comment.COMMENT.ID);
+		public static final UniqueKey<ConnectorLogRecord> CONNECTOR_LOG_PKEY = createUniqueKey(ConnectorLog.CONNECTOR_LOG, ConnectorLog.CONNECTOR_LOG.ID);
 		public static final UniqueKey<FlaggedQueryRecord> FLAGGED_QUERY_PKEY = createUniqueKey(FlaggedQuery.FLAGGED_QUERY, FlaggedQuery.FLAGGED_QUERY.QUERY_ID, FlaggedQuery.FLAGGED_QUERY.PERSON_ID);
 		public static final UniqueKey<JsonQueryRecord> JSON_QUERY_PKEY = createUniqueKey(JsonQuery.JSON_QUERY, JsonQuery.JSON_QUERY.ID);
 		public static final UniqueKey<OfferRecord> OFFER_PKEY = createUniqueKey(Offer.OFFER, Offer.OFFER.ID);
