@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:bootstrap/css/bootstrap.css']}&amp;version=#{applicationBean.version}" />
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:font-lato/css/font-lato.css']}&amp;version=#{applicationBean.version}" />
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:font-awesome/css/font-awesome.css']}&amp;version=#{applicationBean.version}" />
+
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:samply/css/base.css']}&amp;version=#{applicationBean.version}" />
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:samply/css/fadein.css']}&amp;version=#{applicationBean.version}" />
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:jquery/css/jquery-ui.css']}&amp;version=#{applicationBean.version}" />
+
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:select2/css/select2.css']}&amp;version=#{applicationBean.version}" />
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:datatables/css/dataTables.bootstrap.min.css']}&amp;version=#{applicationBean.version}" />
+    
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['css/buttons.css']}?version=#{applicationBean.version}" />
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['webjar:samply/css/demo-ribbon.css']}&amp;version=#{applicationBean.version}" />
+
+    <link type="text/css" href="#{resource['css/bbmri.css']}?version=#{applicationBean.version}" rel="stylesheet" />
+    
+    <link type="text/css" rel="stylesheet"
+        href="#{resource['css/negotiator.css']}?version=#{applicationBean.version}" />
+
+
+    <script type="text/javascript"
+        src="#{resource['webjar:jquery/js/jquery.min.js']}&amp;version=#{applicationBean.version}"></script>
+    <script type="text/javascript"
+        src="#{resource['webjar:jquery/js/jquery-ui.min.js']}&amp;version=#{applicationBean.version}"></script>
+    <script type="text/javascript"
+        src="#{resource['webjar:bootstrap/js/bootstrap.js']}&amp;version=#{applicationBean.version}"></script>
+    <script type="text/javascript"
+        src="#{resource['webjar:select2/js/select2.min.js']}&amp;version=#{applicationBean.version}"></script>
+    <script type="text/javascript"
+        src="#{resource['webjar:datatables/js/jquery.dataTables.min.js']}&amp;version=#{applicationBean.version}"></script>
+    <script type="text/javascript"
+        src="#{resource['webjar:datatables/js/dataTables.bootstrap.min.js']}&amp;version=#{applicationBean.version}"></script>
+
+    <!-- Preload the JSF library, otherwise the negotiator.js will not work -->
+    <h:outputScript name="jsf.js" library="javax.faces"/>
+    <script type="text/javascript" src="#{resource['js/negotiator.js']}?version=#{applicationBean.version}"></script>
+    <script type="text/javascript" src="#{resource['js/jquery.truncate.min.js']}?version=#{applicationBean.version}"></script>
+
+    <!-- The google Analytics script is only used on the negotiator.bbmri-eric.eu server -->
+    <h:outputScript rendered="#{facesContext.externalContext.requestServerName == 'negotiator.bbmri-eric.eu'}">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function()
+                { (i[r].q=i[r].q||[]).push(arguments)}
+
+                ,i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-41289707-5', 'auto');
+        ga('send', 'pageview');
+    </h:outputScript>
+
+</ui:composition>

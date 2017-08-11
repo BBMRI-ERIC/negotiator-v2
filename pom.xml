@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>war</packaging>
+    <artifactId>bbmri-negotiator</artifactId>
+    <version>1.2.0</version>
+
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>de.samply</groupId>
+        <version>9.3</version>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <version.samply.webjar>1.6.0</version.samply.webjar>
+        <version.samply.auth.client>1.0.2</version.samply.auth.client>
+        <version.samply.common.upgrade>2.0.0</version.samply.common.upgrade>
+        <version.samply.common.util>1.0.0</version.samply.common.util>
+        <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
+        <version.samply.directory.client>1.0.2</version.samply.directory.client>
+        <version.samply.negotiator.dto>1.0.0</version.samply.negotiator.dto>
+
+        <database.server>localhost</database.server>
+        <database.port>5432</database.port>
+        <database.name>negotiator</database.name>
+        <database.username>saher</database.username>
+        <database.password>saher</database.password>
+
+
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>negotiator-dto</artifactId>
+            <version>${version.samply.negotiator.dto}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>common-upgrade</artifactId>
+            <version>${version.samply.common.upgrade}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>common-util</artifactId>
+            <version>${version.samply.common.util}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>common-mailing</artifactId>
+            <version>${version.samply.common.mailing}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>directory-client</artifactId>
+            <version>${version.samply.directory.client}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply.webjar</groupId>
+            <artifactId>samply</artifactId>
+            <version>${version.samply.webjar}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>bbmri-auth-client</artifactId>
+            <version>${version.samply.auth.client}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-web</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>3.6.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-meta</artifactId>
+            <version>3.6.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-codegen</artifactId>
+            <version>3.6.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>0.7.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.modelmapper.extensions</groupId>
+            <artifactId>modelmapper-jooq</artifactId>
+            <version>0.7.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+
+        <dependency>
+           <groupId>commons-configuration</groupId>
+           <artifactId>commons-configuration</artifactId>
+           <version>1.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fi.solita.clamav</groupId>
+            <artifactId>clamav-client</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+
+    </dependencies>
+
+    <distributionManagement>
+        <site>
+            <id>mitro-maven</id>
+            <url>dav:https://nexus.mitro.dkfz.de/content/sites/sites/samply/${project.artifactId}</url>
+        </site>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <id>mojarra</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.faces</groupId>
+                    <artifactId>jsf-impl</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.sun.faces</groupId>
+                    <artifactId>jsf-api</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>myfaces</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.myfaces.core</groupId>
+                    <artifactId>myfaces-impl</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>maxdatabase</id>
+            <properties>
+                <database.server>steffi16</database.server>
+                <database.port>5432</database.port>
+                <database.name>negotiator2</database.name>
+                <database.username>negotiator</database.username>
+                <database.password>test123</database.password>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.10</version>
+                <executions>
+                    <execution>
+                        <id>timestamp-property</id>
+                        <goals>
+                            <goal>timestamp-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>build.time</name>
+                            <pattern>dd/MM/yyyy HH:mm</pattern>
+                            <locale>en_US</locale>
+                            <timeZone>MET</timeZone>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+
+                <!-- Specify the maven code generator plugin -->
+                <!-- Use org.jooq for the Open Source edition org.jooq.pro for commercial
+                    editions, org.jooq.pro-java-6 for commercial editions with Java 6 support,
+                    org.jooq.trial for the free trial edition -->
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>3.6.4</version>
+
+                <!-- Manage the plugin's dependency. In this example, we'll use a PostgreSQL
+                    database -->
+                <dependencies>
+                    <dependency>
+                        <groupId>org.postgresql</groupId>
+                        <artifactId>postgresql</artifactId>
+                        <version>9.4.1208</version>
+                    </dependency>
+                </dependencies>
+
+                <!-- Specify the plugin configuration. The configuration format is the
+                    same as for the standalone code generator -->
+                <configuration>
+
+                    <!-- JDBC connection parameters -->
+                    <jdbc>
+                        <driver>org.postgresql.Driver</driver>
+                        <url>jdbc:postgresql://${database.server}:${database.port}/${database.name}</url>
+                        <user>${database.username}</user>
+                        <password>${database.password}</password>
+                    </jdbc>
+
+                    <!-- Generator parameters -->
+                    <generator>
+                        <database>
+                            <name>org.jooq.util.postgres.PostgresDatabase</name>
+                            <includes>.*</includes>
+                            <excludes>samplyDbVersion</excludes>
+                            <inputSchema>public</inputSchema>
+                        </database>
+
+                        <generate>
+                            <!-- Generation flags: See advanced configuration properties -->
+
+
+                            <!-- Primary key / foreign key relations should be generated and used.
+                                This is a prerequisite for various advanced features. Defaults to true -->
+
+
+                            <relations>true</relations>
+
+                            <!-- Generate deprecated code for backwards compatibility Defaults to
+                                true -->
+
+
+                            <deprecated>true</deprecated>
+
+                            <!-- Generate instance fields in your tables, as opposed to static fields.
+                                This simplifies aliasing. Defaults to true -->
+
+
+                            <instanceFields>true</instanceFields>
+
+                            <!-- Generate the javax.annotation.Generated annotation to indicate jOOQ
+                                version used for source code. Defaults to true -->
+
+
+                            <generatedAnnotation>true</generatedAnnotation>
+
+                            <!-- Generate jOOQ Record classes for type-safe querying. You can turn
+                                this off, if you don't need "active records" for CRUD Defaults to true -->
+
+
+                            <records>true</records>
+
+                            <!-- Generate POJOs in addition to Record classes for usage of the ResultQuery.fetchInto(Class)
+                                API Defaults to false -->
+
+
+                            <pojos>true</pojos>
+
+                            <!-- Generate immutable POJOs for usage of the ResultQuery.fetchInto(Class)
+                                API This overrides any value set in <pojos/> Defaults to false -->
+
+
+                            <immutablePojos>false</immutablePojos>
+
+                            <!-- Generate interfaces that will be implemented by records and/or pojos.
+                                You can also use these interfaces in Record.into(Class<?>) and similar methods,
+                                to let jOOQ return proxy objects for them. Defaults to false -->
+
+
+                            <interfaces>false</interfaces>
+
+                            <!-- Generate DAOs in addition to POJO classes Defaults to false -->
+
+
+                            <daos>true</daos>
+
+                            <!-- Annotate POJOs and Records with JPA annotations for increased compatibility
+                                and better integration with JPA/Hibernate, etc Defaults to false -->
+
+
+                            <jpaAnnotations>false</jpaAnnotations>
+
+                            <!-- Annotate POJOs and Records with JSR-303 validation annotations Defaults
+                                to false -->
+
+
+                            <validationAnnotations>false</validationAnnotations>
+
+                        </generate>
+
+                        <target>
+                            <packageName>de.samply.bbmri.negotiator.jooq</packageName>
+                            <directory>./src/main/java</directory>
+                        </target>
+                    </generator>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/pkg.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webapp/META-INF</directory>
+                            <filtering>true</filtering>
+                            <targetPath>META-INF</targetPath>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+</project>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
+                template="../components/default.xhtml">
+
+    <ui:param name="bodyClass" value="container"/>
+
+    <ui:define name="body">
+        <div class="container">
+            <h1 class="mainHL">Crash course for biobankers</h1>
+            <div class="row crashcouse-row">
+                <div class="col-sm-4">
+                    <h2 class="card-title crashcourse-title">1. Discover requests </h2>
+                    <p class="crashcourse-point">
+                        Requests in your inbox matched your biobank in a <a href="http://old.bbmri-eric.eu/bbmri-eric-directory-2.0">Directory</a> search.
+                    </p>
+                    <p class="crashcourse-point">
+                        Sort the requests. The categories Favorite, Ignored and Archived help you keep a clutter-free overview.
+                    </p>
+                    <p class="crashcourse-point">
+                        Need to find a specific request? There is a keyword search directly in the inbox.
+                    </p>
+                    <p>
+                        <a href="#inboxDetailsModal" class="crashcourse-details-link" role="button" data-toggle="modal">View more</a>
+                    </p>
+                </div>
+
+                <div class="col-sm-8">
+                    <img src="#{resource['images/sorting.png']}" class="crashcourse-image"/>
+                </div>
+            </div>
+            <div class="row crashcouse-row">
+                <div class="col-sm-8">
+                    <img src="#{resource['images/commenting.png']}" class="crashcourse-image"/>
+                </div>
+                <div class="col-sm-4">
+                    <h2 class="card-title crashcourse-title">2. Understand a request </h2>
+                    <p class="crashcourse-point">
+                        Read the requesting researcher's description in the request view.
+                    </p>
+                    <p class="crashcourse-point">
+                        Discuss details with the researcher and the other biobankers in the comments.
+                    </p>
+                    <p>
+                        <a href="#commentDetailsModal" class="crashcourse-details-link" role="button" data-toggle="modal">View more</a>
+                    </p>
+                </div>
+            </div>
+            <div class="row crashcouse-row">
+
+                <div class="col-sm-4">
+                    <h2 class="card-title crashcourse-title">3. Discuss access conditions </h2>
+                    <p class="crashcourse-point">
+                        Signal that you can supply the requested samples in the "Sample availability" discussion. It is kept private between you and the researcher.
+                    </p>
+                    <p class="crashcourse-point">
+                        Explain your access policy and keep in touch with the researcher during the approval process.
+                    </p>
+                    <p class="crashcourse-point">
+                        Don't miss new developments - we send you a notification if there is a new post in your conversation.
+                    </p>
+                    <p>
+                        <a href="#sampleAvailabilityModal" class="crashcourse-details-link" role="button" data-toggle="modal">View more</a>
+                    </p>
+                </div>
+                <div class="col-sm-8">
+                    <img src="#{resource['images/providing-samples.png']}" class="crashcourse-image"/>
+                </div>
+            </div>
+
+            <div class="row crashcouse-row">
+                <div class="col-sm-8">
+                    <img src="#{resource['images/handshake.png']}" class="crashcourse-image"/>
+                </div>
+                <div class="col-sm-4">
+                    <h2 class="card-title crashcourse-title"> 4. End of negotiation</h2>
+                    <p class="crashcourse-point">
+                        When you agree on how and when to send the samples, the negotiation is complete.
+                    </p>
+                    <p class="crashcourse-point">
+                        From there, you can follow the usual process in your biobank to send samples to the requester.
+                    </p>
+                </div>
+            </div>
+            <div id="negotiator-blurb">
+                The negotiator is a service provided to you by BBMRI-ERIC.
+            </div>
+            <div id="endlogo-container">
+                <img src="#{resource['images/bbmri-logo.png']}" id="endlogo"/>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="inboxDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog crashcourse-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3>Biobanker's Inbox View</h3>
+                    </div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-inbox-annotated.png']}"/></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal fade" id="commentDetailsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog crashcourse-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3>Biobanker's Detail View</h3>
+                    </div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-queryDetail-annotated.png']}"/></div>
+                </div>
+            </div>
+        </div>
+        
+         <div class="modal fade" id="sampleAvailabilityModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog crashcourse-details-modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h3>Biobanker's Sample Availability View</h3>
+                    </div>
+                    <div class="modal-body"><img src="#{resource['images/biobanker-sampleAvailability-annotated.png']}"/></div>
+                </div>
+            </div>
+        </div>
+        
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:c="http://java.sun.com/jstl/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<h:panelGroup styleClass="container" layout="block" id="navbar">
+			<h:panelGroup layout="block" styleClass="navbar-header">
+
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<h:link outcome="/index" styleClass="navbar-brand">
+					<span class="projectName">#{label['queryview.bbmri']}
+                        <span class="bbmriModule">#{label['queryview.negotiator']}
+
+                        </span>
+                    </span>
+				</h:link>
+			</h:panelGroup>
+
+
+			<h:form>
+				<h:panelGroup layout="block" styleClass="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<c:if test="#{userBean.biobankOwner}">
+						    <li class="dropdown"><a href="#" class="dropdown-toggle"
+							    data-toggle="dropdown" role="button" aria-haspopup="true"
+							    aria-expanded="false" title="#{label['queryview.action.menu']}">#{label['queryview.myBiobank']}<span class="caret"></span></a>
+							    <ul class="dropdown-menu">
+								    <li>
+								        <h:link outcome="/owner/index" value="#{label['queryview.inbox']}" title="#{label['queryview.action.viewInbox']}">  																		 
+					  				    </h:link>
+								
+								    </li>
+								    <li>
+								        <h:link outcome="/owner/index" value="#{label['queryview.starred']}" title="#{label['queryview.action.viewStarred']}" >
+								            <f:param name="flag" value="STARRED"/>  																		 
+					  				    </h:link>								
+								    </li>								
+								    <li>								
+								        <h:link outcome="/owner/index" value="#{label['queryview.archived']}" title="#{label['queryview.action.viewArchived']}" >
+								            <f:param name="flag" value="ARCHIVED"/>  																		 
+					  				    </h:link>								
+								    </li>
+								    <li>								
+								        <h:link outcome="/owner/index" value="#{label['queryview.ignored']}" title="#{label['queryview.action.viewIgnored']}" >
+								            <f:param name="flag" value="IGNORED"/>  																		 
+					  			        </h:link>
+								    </li>
+							    </ul>
+						    </li>
+						</c:if>
+						<c:if test="#{userBean.researcher}">
+								    <li>
+								        <h:link value="#{label['queryview.myCreatedQueries']}" outcome="/researcher/index.xhtml"> 
+								        </h:link>								
+								    </li>															
+						</c:if>
+						<ui:fragment rendered="#{userBean.isAdmin()}">
+							<li>
+								<h:link outcome="/admin/index">
+									<h:outputText value="#{label['admin.interface']}"/>
+								</h:link>
+							</li>
+						</ui:fragment>
+					</ul>
+
+
+					<ul class="nav navbar-nav navbar-right navbar-user">
+						<li class="dropdown">
+							<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+								#{label['navbar.help']}
+							</a>
+							<ul id="help" class="dropdown-menu">
+								<li>
+									<h:link outcome="/help/owner-product-tour">
+										#{label['navbar.owner.product-tour']}
+									</h:link>
+								</li>
+								<li>
+									<h:link outcome="/help/researcher-product-tour">
+										#{label['navbar.researcher.product-tour']}
+									</h:link>
+								</li>
+							</ul>
+						</li>
+
+						<ui:fragment rendered="#{! userBean.loginValid}">
+							<li class="pull-right">
+								<a href="#{userBean.authenticationUrl}">#{label['queryview.login']}</a>
+							</li>
+							<li class="pull-right">
+								<a href="#{userBean.authenticationRegisterUrl}">#{label['queryview.register']}</a>
+							</li>
+
+						</ui:fragment>
+
+						<ui:fragment rendered="#{userBean.loginValid}">
+							<li class="dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+									<ui:fragment rendered="#{!userBean.sudoedUser()}">
+                                        <i class="fa fa-user fa-fw userIcon" />
+                                    </ui:fragment>
+                                    <ui:fragment rendered="#{userBean.sudoedUser()}">
+                                        <i class="fa fa-user-secret fa-fw userIcon" />
+                                    </ui:fragment>
+									#{userBean.userRealName.trim().length() > 0 ?
+									userBean.userRealName : userBean.userEmail} <span class="caret"></span>
+								</a>
+								<ul id="userPanel" class="dropdown-menu">
+									<li>
+										<h:commandLink action="#{userBean.logout}">
+											<i class="fa fa-sign-out" /> #{label['queryview.logout']}
+										</h:commandLink>
+									</li>
+								</ul></li>
+						</ui:fragment>
+					</ul>
+				</h:panelGroup>
+			</h:form>
+		</h:panelGroup>
+
+	</nav>
+</ui:composition>

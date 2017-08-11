@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
+	template="../components/default.xhtml">
+
+	<f:metadata>
+		<f:viewParam name="queryId" value="#{queryBean.id}" />
+		<f:viewParam name="jsonQueryId" value="#{queryBean.jsonQueryId}" />
+		<f:viewAction action="#{queryBean.initialize}" />
+	</f:metadata>
+
+	<!-- Queries page for the researcher -->
+
+
+	<ui:param name="bodyClass" value="container body-nomargin" />
+
+	<ui:define name="body">
+
+		<h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
+
+            <h:panelGroup layout="block">
+                <h2>Query details</h2>
+                On this page you can provide the details for your query.<br />
+                First define the search parameters for the samples you are looking for. Click the "Edit Search
+                Parameters" button to change them.<br />
+                Then fill out the form below, giving your query a title and describing both the project you are working
+                on and adding more detailed information for this request in particular.<br />
+                If you have additional information in PDF files available, you can attach them to this query.<br />
+            <p />
+                <br/>
+            </h:panelGroup>
+			<h:panelGroup layout="block">
+				<h:outputLabel for="structuredQuery"
+					value="#{label['queryview.title.searchParameters']}" />
+				<h:outputText id="structuredQuery"
+					value="#{queryBean.humanReadableFilters}"
+					style="margin-left: 22px;">
+				</h:outputText>
+				
+				<br/>
+				<h:form>				
+					<h:commandLink action="#{queryBean.editSearchParameters()}"	styleClass="btn btn-primary" 
+						title="#{label['queryview.tooltip.editSearchParameters']}">
+	                                #{label['queryview.title.editSearchParameters']}
+	                </h:commandLink>
+                </h:form>                
+                
+                <br/>
+                <br/>
+                
+			</h:panelGroup>
+
+
+			<h:form id="uploadform" enctype="multipart/form-data">
+
+				<div class="form-group">
+                    <span class="required">
+                        #{label['queryview.title.title']} <i class="fa fa-pencil-square-o" />
+                    </span>
+					<h:inputText id="title" value="#{queryBean.queryTitle}"
+						styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
+						validatorMessage="#{label['error.invalidTitleLength']}">
+						<f:validateLength for="title" minimum="5" maximum="250" />
+					</h:inputText>
+					<h:message for="title" style="color:red" styleClass="pre-wrap" />
+
+					<br></br>
+                    <span class="required">
+                        #{label['queryview.title.text']} <i class="fa fa-pencil-square-o" />
+                    </span>
+					<h:inputTextarea id="description" value="#{queryBean.queryText}"
+						styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.text']}"
+						validatorMessage="#{label['error.invalidDescriptionLength']}">
+						<f:validateLength for="description" minimum="5" maximum="500" />
+					</h:inputTextarea>
+					<h:message for="description" style="color:red"
+						styleClass="pre-wrap" />
+
+					<br></br>
+                    <span class="required">
+                        #{label['queryview.title.requestdescription']} <i class="fa fa-pencil-square-o" />
+                    </span>
+					<h:inputTextarea id="requestdescription" value="#{queryBean.queryRequestDescription}"
+									 styleClass="form-control" rows="5"
+                                     pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
+									 validatorMessage="#{label['error.invalidDescriptionLength']}">
+						<f:validateLength for="requestdescription" minimum="5" maximum="500" />
+					</h:inputTextarea>
+					<h:message for="requestdescription" style="color:red"
+							   styleClass="pre-wrap" />
+
+                    <br></br>
+					#{label['queryview.title.ethicsVote']}
+                    <h:inputTextarea id="ethicsVote" value="#{queryBean.ethicsVote}"
+                                     styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.ethicsVote']}"
+                                     validatorMessage="#{label['error.invalidDescriptionLength']}">
+                        <f:validateLength for="description" maximum="2000" />
+                    </h:inputTextarea>
+                    <h:message for="ethicsVote" style="color:red"
+                               styleClass="pre-wrap" />
+
+                    <br></br> #{label['queryview.title.attachments']}
+
+				<!-- Using h:dataTable to display attachments -->
+					<h:panelGroup layout="block">
+
+
+							<h:dataTable value="#{queryBean.attachmentMap.entrySet().toArray()}" var="attachment"
+								columnClasses="column1,column2" style="margin-top: 0px;"
+								class="table-striped table-bordered table-responsive table-fullwidth"
+								rendered="#{queryBean.attachments.size() > 0}">
+
+								<h:column>
+									<h:outputLink value="../attachment/#{attachment.key}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
+										style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+
+                                        <h:panelGroup
+                                                      style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap"
+                                                      styleClass="attachment-links">
+                                            <i class="fa fa-paperclip" style="margin-right: 2px;" />#{attachment.value}
+
+                                        </h:panelGroup>
+									</h:outputLink>
+
+
+								</h:column>
+
+								<h:column>
+									<!--   Remove an attachment -->
+                                    <h:commandLink
+                                                   styleClass="confirm-delete"
+                                                   action="#{queryBean.setToRemoveAttachment(attachment.key)}"
+                                                   title="#{label['attachmentview.tooltip.attachmentDelete']}: #{attachment.value}">
+                                        <i class="fa fa-times attachment-delete-links" aria-hidden="true" />
+                                        <f:ajax onevent="showConfirmDialog"/>
+                                    </h:commandLink>
+								</h:column>
+
+							</h:dataTable>
+
+                        <div class="modal fade" id="modal-from-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        Confirm file deletion
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this file?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                        <h:commandButton action="#{queryBean.removeAttachment()}"
+                                                       value="Yes" styleClass="btn btn-danger btn-ok"
+                                                       title="#{label['attachmentview.tooltip.attachmentDelete']}">
+                                        </h:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h:outputScript>
+                            function showConfirmDialog(data) {
+                                if(data.status == "success") {
+                                    $('#modal-from-dom').modal('show');
+                                }
+                            }
+                        </h:outputScript>
+
+							<!-- Upload the attachments for a query -->
+							<h:panelGroup layout="block" style="margin-top: 0px;" >
+								<h:panelGroup class="input-group" layout="block">
+									<input placeholder="#{label['attachmentview.placeholder']}" type="text"
+                                           class="form-control" readonly="readonly"
+                                            onclick="$('#uploadform\\:file').click();" />
+
+									<label class="input-group-btn"> <h:panelGroup
+											class="btn btn-default">
+											<h:outputText value="#{label['querydetail.action.browse']}" />
+											<h:inputFile id="file" value="#{queryBean.file}"
+												validator="#{queryBean.validateFile}"
+												onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
+												style="display: none;" />
+										</h:panelGroup> <h:commandButton id="uploadBtn" value="Upload"
+											action="#{queryBean.uploadAttachment}"
+											styleClass="btn btn-primary disabled" />
+									</label>
+								</h:panelGroup>
+								<h:panelGroup layout="block">
+									<h:message for="file" />
+								</h:panelGroup>
+								<h:outputScript>
+			                        $(function() {
+			                            initializeFileUpload();
+			                        });
+			                    </h:outputScript>
+							</h:panelGroup>
+
+
+
+					</h:panelGroup>
+                </div>
+				<br></br>
+                <br></br>
+                
+				<h:panelGroup layout="block" styleClass="pull-right">
+                    <h:button outcome="detail" styleClass="btn btn-primary" value="#{label['global.button.cancel']}"
+                              style="margin-right: 5px;"  rendered="#{queryBean.mode == 'edit'}">                              
+                              
+                        <f:param name="queryId" value="#{queryBean.id}" />
+                    </h:button>
+                    
+					<h:commandButton action="#{queryBean.saveQuery()}"
+						value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
+						title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"						
+						styleClass="btn btn-primary" />
+                </h:panelGroup>
+			</h:form>
+			
+		</h:panelGroup>
+
+	</ui:define>
+</ui:composition>

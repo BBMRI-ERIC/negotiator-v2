@@ -1,0 +1,37 @@
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets">
+
+        <div class="modal fade" id="errorDialog" tabindex="-1" role="dialog" aria-labelledby="errorMessages">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">
+                            <span class="sr-only">Close</span>
+                        </button>
+                        <h4 class="modal-title" id="errorMessages">Validation errors</h4>
+                    </div>
+                    <div class="modal-body">
+                        <span>#{msg.errors}</span>
+
+                        <h:messages showSummary="true" showDetail="true" styleClass="list-group" errorClass="list-group-item list-group-item-danger"/>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <h:outputScript>
+            $(function() {
+                if(#{facesContext.messageList.size()} > 0) {
+                    $("#errorDialog").modal("show");
+                }
+            });
+            </h:outputScript>
+        </div>
+
+</ui:composition>

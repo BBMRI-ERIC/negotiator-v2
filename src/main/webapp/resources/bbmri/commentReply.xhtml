@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:composite="http://java.sun.com/jsf/composite"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri">
+
+
+<composite:interface>
+	<composite:attribute name="query" required="true" />
+	<composite:attribute name="offer" required="false" />
+	<composite:attribute name="makeOffer" required="false" default="false"  />
+	<composite:attribute name="rendered" required="false" />
+</composite:interface>
+
+<composite:implementation>
+
+	<h:panelGroup layout="block" styleClass="col-md-12" rendered="#{cc.attrs.rendered}">
+
+		<h:form id="myform">
+
+			<h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
+
+				<bbmricc:avatar person="#{userBean.person}" />
+
+			</h:panelGroup>
+
+			<h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
+				<h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'false'}">
+					<h:inputTextarea id="commentText" value="#{commentBean.comment}"
+						styleClass="form-control" rows="5"
+						validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 500 characters ">
+						<f:validateLength for="commentText" minimum="1" maximum="500" />
+						<h:messages id="commentValidationMessage" for="commentText"
+							style="color:red" showSummary="true" showDetails="false" />
+					</h:inputTextarea>					
+				</h:panelGroup>	
+
+				<h:panelGroup layout="block" styleClass="pull-right"  style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'false'}">
+					<h:commandButton
+						action="#{commentBean.saveComment(cc.attrs.query)}"
+						value="#{label['querydetail.action.addComment.buttontext']}"
+						title="#{label['querydetail.action.addComment']}"
+						styleClass="btn btn-primary" />
+				</h:panelGroup>				
+
+                <h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'true'}">
+                    <h:inputTextarea id="offerCommentText" value="#{offerBean.offerComment}"
+                        styleClass="form-control" rows="5"
+                        validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 500 characters ">
+                        <f:validateLength for="offerCommentText" minimum="1" maximum="500" />
+                        <h:messages id="offerCommentValidationMessage" for="offerCommentText"
+                            style="color:red" showSummary="true" showDetails="false" />
+                    </h:inputTextarea>
+				</h:panelGroup>
+
+				<h:panelGroup layout="block" style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'true'}">
+					<h:panelGroup styleClass="pull-left" >
+<!-- 						<h:commandButton disabled="#{true}" -->
+<!-- 							value="#{label['querydetail.action.privateDiscussion']}" -->
+<!-- 							title="#{label['querydetail.action.addOffer']}" -->
+<!-- 							styleClass="btn btn-primary" /> -->
+					</h:panelGroup>
+
+					<h:panelGroup styleClass="pull-right">
+						<h:commandButton action="#{offerBean.saveOffer(cc.attrs.query, cc.attrs.offer)}"
+							value="#{label['querydetail.action.addOffer.buttontext']}"
+							title="#{label['querydetail.action.addOffer']}"
+							styleClass="btn btn-primary" />
+					</h:panelGroup>
+				</h:panelGroup>
+
+			</h:panelGroup>
+		</h:form>
+	</h:panelGroup>
+</composite:implementation>
+
+</html>

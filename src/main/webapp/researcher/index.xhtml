@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
+	xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
+	template="../components/default.xhtml">
+
+	<!-- Queries page for the researcher -->
+
+
+	<ui:param name="bodyClass" value="container body-nomargin" />
+
+	<ui:define name="body">
+		<h:panelGroup layout="block" styleClass="row">
+			<h3>#{label['pagetitle_my_queries']}</h3>
+		</h:panelGroup>
+
+		<h:panelGroup layout="block" styleClass="col-md-12">
+
+			<h:panelGroup layout="block" styleClass="col-md-12">
+				<h:outputLink
+						value="#{researcherQueriesBean.createQueryNegotiator()}"
+						styleClass="btn btn-primary"
+						title="#{label['queryview.tooltip.createNewQuery']}">
+					#{label['queryview.title.createNewQuery']}
+				</h:outputLink>
+			</h:panelGroup>
+
+			<h:panelGroup
+			    rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() == 0}"
+				layout="block" styleClass="empty-queries col-md-12">
+				<h3>#{label['queryview.noQueriesMade']}</h3>
+			</h:panelGroup>
+			
+			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() > 0 or researcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">      
+			    <bbmricc:search backingBean="#{researcherQueriesBean}"/>
+			</h:panelGroup>
+			
+			<h:panelGroup
+                rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() > 0}"
+                layout="block" styleClass="col-md-12">
+                <h3>#{label['queryview.noSearchResults']}</h3>
+            </h:panelGroup>
+
+			<h:panelGroup layout="block" styleClass="col-md-12">
+				<h:form>
+					<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
+
+						<h:panelGroup layout="block" styleClass="deco-none">
+
+							<h:panelGroup layout="block" styleClass="panel panel-default clickable">
+								<h:panelGroup layout="block" styleClass="panel-heading">
+
+									<h:link outcome="detail" value="#{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
+											styleClass="detailLink">
+										<f:param name="queryId" value="#{item.query.id}"/>
+									</h:link>
+
+                               		<h:panelGroup styleClass="pull-right"
+										rendered="#{item.commentCount > 0}">
+
+										<h:panelGroup styleClass="badge queryNumberResponsesBadge">
+											<h:outputText
+												title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
+												value="#{item.commentCount}" />
+										</h:panelGroup>
+
+										<h:outputText value="#{item.lastCommentTime}"
+											styleClass="queryCreationDate"
+											title="#{label['queryview.queryitem.datetime.last.comment']}">
+											<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+										</h:outputText>
+
+									</h:panelGroup>
+
+								</h:panelGroup>
+
+
+								<h:panelGroup layout="block" styleClass="panel-body">
+									<h:panelGroup layout="block" styleClass="row">
+
+										<h:panelGroup layout="block" styleClass="col-md-11">
+											<h:panelGroup layout="block" styleClass="row">
+												<h:panelGroup layout="block" styleClass="col-md-10 truncate-panel">
+                                               #{item.query.text}
+                                           </h:panelGroup>
+
+											</h:panelGroup>
+
+											<h:panelGroup layout="block" styleClass="row">
+												<h:panelGroup layout="block" styleClass="col-md-12">
+													<h:panelGroup styleClass="pull-right">
+
+														<h:outputText value="#{item.query.queryCreationTime}"
+															title="#{label['queryview.queryitem.datetime.creation']}">
+															<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+														</h:outputText>
+													</h:panelGroup>
+												</h:panelGroup>
+											</h:panelGroup>
+										</h:panelGroup>
+									</h:panelGroup>
+								</h:panelGroup>
+
+							</h:panelGroup>
+
+						</h:panelGroup>
+
+					</ui:repeat>
+
+					<h:outputScript>
+						$(function() {
+							setupQueryLinks();
+						});
+					</h:outputScript>
+
+				</h:form>
+			</h:panelGroup>
+		</h:panelGroup>
+	</ui:define>
+</ui:composition>
+
+
+
+
+

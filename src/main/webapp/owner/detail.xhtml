@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+    xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
+    template="../components/default.xhtml">
+
+    <!-- Queries detail page for the owner -->
+
+    <f:metadata>
+        <f:viewParam name="queryId" value="#{ownerQueriesDetailBean.queryId}" />
+        <f:viewParam name="flag" value="#{ownerQueriesDetailBean.flagFilter}" />
+        <f:viewAction action="#{ownerQueriesDetailBean.initialize}" />
+    </f:metadata>
+
+    <ui:param name="bodyClass" value="container-fluid body-nomargin" />
+
+    <ui:define name="body">
+
+        <h:panelGroup layout="block" styleClass="col-md-3 left-panel">
+
+            <bbmricc:searchDetail backingBean="#{ownerQueriesDetailBean}"/>
+
+            <h:panelGroup
+                rendered="#{ownerQueriesDetailBean.queries.size() == 0 and ownerQueriesDetailBean.filterTerms.size() > 0}"
+                layout="block" styleClass="col-md-12">
+                <h3 style="margin-top: 0px;">#{label['queryview.noSearchResults']}</h3>
+            </h:panelGroup>
+
+            <h:panelGroup id="test" layout="block">
+                <h:form>
+                    <ui:repeat var="queryDto" value="#{ownerQueriesDetailBean.getQueries()}">
+
+                        <bbmricc:queryboxOwner item="#{queryDto}" selectedQuery="#{ownerQueriesDetailBean.queryId}" backingBean="#{ownerQueriesDetailBean}"/>
+
+                    </ui:repeat>
+
+                    <h:outputScript>
+                        $(function() {
+                            setupQueryLinks();
+                        });
+                    </h:outputScript>
+
+                </h:form>
+
+            </h:panelGroup>
+
+        </h:panelGroup>
+
+
+
+
+        <h:panelGroup layout="block" styleClass="col-md-6 col-md-offset-1 right-panel"
+            id="right-panel">
+
+
+            <h:panelGroup layout="block">
+
+                <bbmricc:queryDetailData bean="#{ownerQueriesDetailBean}" />
+
+                <bbmricc:queryDetailAttachments bean="#{ownerQueriesDetailBean}" />
+
+                <ui:fragment
+                    rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
+
+                    <div class="col-xs-12" style="margin-top:20px;">
+                        <hr></hr>
+                    </div>
+
+                    <b>#{label['querydetail.owner.associatedbiobanks']}</b>
+
+                    <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
+                               var="biobank" varStatus="loop">
+                        #{biobank.name}#{!loop.last ? ', ' : ''}
+                    </ui:repeat>
+
+                </ui:fragment>
+
+                <h:form styleClass="form-horizontal" style="width: 100%; margin-top: 10px;">
+                    <h:commandButton action="#{ownerQueriesDetailBean.participateInQuery()}"
+                                     value="#{label['querydetail.action.participate']}"
+                                     rendered="#{ownerQueriesDetailBean.nonConfidential == true}"
+                                     styleClass="btn btn-primary">
+                            <f:ajax render="left-panel right-panel" />
+                    </h:commandButton>
+                </h:form>
+
+                <h:panelGroup layout="block" style="margin-top:10px;">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+                            </li>
+                            <ui:fragment rendered="#{ownerQueriesDetailBean.nonConfidential == false}">
+                            <li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
+                            </li>
+                            </ui:fragment>
+                        </ul>
+
+
+
+                    <div class="tab-content">
+                        <div id="comments" class="tab-pane fade in active">
+
+                            <ui:repeat value="#{ownerQueriesDetailBean.comments}"
+                                var="comment">
+
+                                <bbmricc:comment comment="#{comment.comment}"
+                                    person="#{comment.person}" collections="#{comment.collections}" />
+
+                            </ui:repeat>
+
+                            <div class="col-xs-12">
+                                <hr></hr>
+                            </div>
+
+                            <bbmricc:commentReply rendered="#{ownerQueriesDetailBean.nonConfidential == false}"
+                                query="#{ownerQueriesDetailBean.selectedQuery}"  />
+
+                        </div>
+
+                        <div id="sampleAvailability" class="tab-pane fade">
+                        <ui:fragment rendered="#{ownerQueriesDetailBean.offerPersonDTO.size() == 0}">
+                            <br />
+                            <p>
+                                <b> <h:outputText value="#{label['message.offerSamples']}"/> </b>
+                            </p>
+                        </ui:fragment>
+                            <ui:repeat value="#{ownerQueriesDetailBean.offerPersonDTO}"
+                                var="offerPersonDTO">
+
+                                <bbmricc:comment comment="#{offerPersonDTO.offer}"
+                                    person="#{offerPersonDTO.person}"
+                                    collections="#{offerPersonDTO.collections}" />
+
+                            </ui:repeat>
+
+                            <div class="col-xs-12">
+                                <hr></hr>
+                            </div>
+
+                            <bbmricc:commentReply makeOffer="true"
+                                                  rendered="#{ownerQueriesDetailBean.nonConfidential == false}"
+                                query="#{ownerQueriesDetailBean.selectedQuery}"
+                                offer="#{ownerQueriesDetailBean.userBean.userId}" />
+
+                        </div>
+                    </div>
+                </h:panelGroup>
+
+                <h:outputScript>
+                    $(function() {
+
+                        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+                            localStorage.setItem('lastTab', $(this).attr('href'));
+                        });
+
+                        var lastTab = localStorage.getItem('lastTab');
+                        if (lastTab) {
+                            $('[href="' + lastTab + '"]').tab('show');
+                        }
+                    });
+              </h:outputScript>
+
+
+
+            </h:panelGroup>
+
+        </h:panelGroup>
+
+    </ui:define>
+
+</ui:composition>
