@@ -21,6 +21,7 @@
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
         <version.samply.directory.client>1.0.2</version.samply.directory.client>
+        <version.samply.negotiator.dto>1.0.0</version.samply.negotiator.dto>
 
         <database.server>localhost</database.server>
         <database.port>5432</database.port>
@@ -37,7 +38,7 @@
         <dependency>
             <groupId>de.samply</groupId>
             <artifactId>negotiator-dto</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${version.samply.negotiator.dto}</version>
         </dependency>
 
         <dependency>
