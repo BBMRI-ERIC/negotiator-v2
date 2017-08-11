@@ -26,9 +26,6 @@
 
 package de.samply.bbmri.negotiator;
 
-/**
- * Created by paul on 6/16/16.
- */
 public class Constants {
 
     /**

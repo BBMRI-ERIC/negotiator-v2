@@ -54,7 +54,7 @@ public class AdminDebugBean implements Serializable {
      */
     private List<QueryRecord> queries;
 
-//region properties
+    //region properties
     public List<QueryRecord> getQueries() {
         return queries;
     }

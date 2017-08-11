@@ -44,10 +44,6 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Created on 6/12/2017.
- */
-
-/**
  * Root resource
  */
 @Path("connector")

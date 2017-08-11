@@ -42,9 +42,7 @@ public class MailUtil {
 
     /**
      * Initialize an EmailBuilder with the two default templates - main.soy and footer.soy
-     * @param mailSending
      * @return EmailBuilder
-     * @throws FileNotFoundException
      */
     public static EmailBuilder initializeBuilder() {
           

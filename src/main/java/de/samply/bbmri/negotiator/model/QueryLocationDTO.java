@@ -32,9 +32,6 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 
 import java.io.Serializable;
 
-/**
- * Created by paul on 6/30/16.
- */
 @Deprecated
 public class QueryLocationDTO implements Serializable {
 

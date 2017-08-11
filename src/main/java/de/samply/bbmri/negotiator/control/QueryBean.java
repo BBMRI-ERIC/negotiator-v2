@@ -268,7 +268,6 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
            try (Config config = ConfigFactory.get()) {
                jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
            } catch (SQLException e) {
-               // TODO Auto-generated catch block
                e.printStackTrace();
            }
        } else {

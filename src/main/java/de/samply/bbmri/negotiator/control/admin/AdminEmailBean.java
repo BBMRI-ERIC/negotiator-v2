@@ -1,13 +1,12 @@
 package de.samply.bbmri.negotiator.control.admin;
 
-import java.io.Serializable;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.common.mailing.EmailBuilder;
 import de.samply.common.mailing.OutgoingEmail;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
 
 /**
  * Sends an email to the given address.
@@ -23,8 +22,19 @@ public class AdminEmailBean implements Serializable {
      */
     private String emailAddress;
 
+//region properties
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+//endregion
+
     /**
      * Sends the email
+     *
      * @return
      */
     public String sendEmail() {
@@ -40,13 +50,5 @@ public class AdminEmailBean implements Serializable {
         emailAddress = "";
 
         return null;
-    }
-
-    public String getEmailAddress() {
-        return emailAddress;
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        this.emailAddress = emailAddress;
     }
 }
