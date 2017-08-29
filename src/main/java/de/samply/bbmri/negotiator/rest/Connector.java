@@ -50,15 +50,15 @@ import java.util.List;
 public class Connector {
 
     @GET
-    @Path("/get_query")
-    @Produces(MediaType.APPLICATION_XML)
-    public List<QueryDetail> getQuery() {
+    @Path("/queries")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<QueryDetail> getQuery(@QueryParam("collectionId") String collectionId) {
         try (Config config = ConfigFactory.get()) {
 
             /**
             * Get last time a request was made by the connector
             */
-            ConnectorLogRecord connectorLogRecord = DbUtil.getLastRequestTime(config);
+            ConnectorLogRecord connectorLogRecord = DbUtil.getLastRequestTime(config, collectionId );
 
             /**
             * Get all queries created after the last request was made
@@ -68,7 +68,7 @@ public class Connector {
             /**
             *  Update the latest get request time.
             */
-            DbUtil.logGetQueryTime(config);
+            DbUtil.logGetQueryTime(config, collectionId);
             config.commit();
 
             /**

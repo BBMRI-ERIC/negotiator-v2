@@ -15,6 +15,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -36,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 
-	private static final long serialVersionUID = -649438734;
+	private static final long serialVersionUID = -846503133;
 
 	/**
 	 * The reference instance of <code>public.connector_log</code>
@@ -52,9 +53,9 @@ public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 	}
 
 	/**
-	 * The column <code>public.connector_log.id</code>. Primary key
+	 * The column <code>public.connector_log.collection_id</code>. Primary key and also the foreign key that comes from table Collections
 	 */
-	public final TableField<ConnectorLogRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "Primary key");
+	public final TableField<ConnectorLogRecord, Integer> COLLECTION_ID = createField("collection_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "Primary key and also the foreign key that comes from table Collections");
 
 	/**
 	 * The column <code>public.connector_log.last_query_time</code>. Timestamp when the request was made. 
@@ -105,6 +106,14 @@ public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 	@Override
 	public List<UniqueKey<ConnectorLogRecord>> getKeys() {
 		return Arrays.<UniqueKey<ConnectorLogRecord>>asList(Keys.CONNECTOR_LOG_PKEY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<ForeignKey<ConnectorLogRecord, ?>> getReferences() {
+		return Arrays.<ForeignKey<ConnectorLogRecord, ?>>asList(Keys.CONNECTOR_LOG__CONNECTOR_LOG_COLLECTION_ID_FKEY);
 	}
 
 	/**

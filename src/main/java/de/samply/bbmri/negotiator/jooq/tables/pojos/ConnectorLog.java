@@ -24,32 +24,32 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConnectorLog implements Serializable {
 
-	private static final long serialVersionUID = -1910818720;
+	private static final long serialVersionUID = -1376711136;
 
-	private Integer   id;
+	private Integer   collectionId;
 	private Timestamp lastQueryTime;
 
 	public ConnectorLog() {}
 
 	public ConnectorLog(ConnectorLog value) {
-		this.id = value.id;
+		this.collectionId = value.collectionId;
 		this.lastQueryTime = value.lastQueryTime;
 	}
 
 	public ConnectorLog(
-		Integer   id,
+		Integer   collectionId,
 		Timestamp lastQueryTime
 	) {
-		this.id = id;
+		this.collectionId = collectionId;
 		this.lastQueryTime = lastQueryTime;
 	}
 
-	public Integer getId() {
-		return this.id;
+	public Integer getCollectionId() {
+		return this.collectionId;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setCollectionId(Integer collectionId) {
+		this.collectionId = collectionId;
 	}
 
 	public Timestamp getLastQueryTime() {

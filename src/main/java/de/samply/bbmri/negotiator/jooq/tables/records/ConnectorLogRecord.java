@@ -31,19 +31,19 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConnectorLogRecord extends UpdatableRecordImpl<ConnectorLogRecord> implements Record2<Integer, Timestamp> {
 
-	private static final long serialVersionUID = 676521472;
+	private static final long serialVersionUID = 363489695;
 
 	/**
-	 * Setter for <code>public.connector_log.id</code>. Primary key
+	 * Setter for <code>public.connector_log.collection_id</code>. Primary key and also the foreign key that comes from table Collections
 	 */
-	public void setId(Integer value) {
+	public void setCollectionId(Integer value) {
 		setValue(0, value);
 	}
 
 	/**
-	 * Getter for <code>public.connector_log.id</code>. Primary key
+	 * Getter for <code>public.connector_log.collection_id</code>. Primary key and also the foreign key that comes from table Collections
 	 */
-	public Integer getId() {
+	public Integer getCollectionId() {
 		return (Integer) getValue(0);
 	}
 
@@ -98,7 +98,7 @@ public class ConnectorLogRecord extends UpdatableRecordImpl<ConnectorLogRecord> 
 	 */
 	@Override
 	public Field<Integer> field1() {
-		return ConnectorLog.CONNECTOR_LOG.ID;
+		return ConnectorLog.CONNECTOR_LOG.COLLECTION_ID;
 	}
 
 	/**
@@ -114,7 +114,7 @@ public class ConnectorLogRecord extends UpdatableRecordImpl<ConnectorLogRecord> 
 	 */
 	@Override
 	public Integer value1() {
-		return getId();
+		return getCollectionId();
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class ConnectorLogRecord extends UpdatableRecordImpl<ConnectorLogRecord> 
 	 */
 	@Override
 	public ConnectorLogRecord value1(Integer value) {
-		setId(value);
+		setCollectionId(value);
 		return this;
 	}
 
@@ -167,10 +167,10 @@ public class ConnectorLogRecord extends UpdatableRecordImpl<ConnectorLogRecord> 
 	/**
 	 * Create a detached, initialised ConnectorLogRecord
 	 */
-	public ConnectorLogRecord(Integer id, Timestamp lastQueryTime) {
+	public ConnectorLogRecord(Integer collectionId, Timestamp lastQueryTime) {
 		super(ConnectorLog.CONNECTOR_LOG);
 
-		setValue(0, id);
+		setValue(0, collectionId);
 		setValue(1, lastQueryTime);
 	}
 }

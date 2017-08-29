@@ -49,21 +49,21 @@ public class ConnectorLogDao extends DAOImpl<ConnectorLogRecord, de.samply.bbmri
 	 */
 	@Override
 	protected Integer getId(de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog object) {
-		return object.getId();
+		return object.getCollectionId();
 	}
 
 	/**
-	 * Fetch records that have <code>id IN (values)</code>
+	 * Fetch records that have <code>collection_id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog> fetchById(Integer... values) {
-		return fetch(ConnectorLog.CONNECTOR_LOG.ID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog> fetchByCollectionId(Integer... values) {
+		return fetch(ConnectorLog.CONNECTOR_LOG.COLLECTION_ID, values);
 	}
 
 	/**
-	 * Fetch a unique record that has <code>id = value</code>
+	 * Fetch a unique record that has <code>collection_id = value</code>
 	 */
-	public de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog fetchOneById(Integer value) {
-		return fetchOne(ConnectorLog.CONNECTOR_LOG.ID, value);
+	public de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog fetchOneByCollectionId(Integer value) {
+		return fetchOne(ConnectorLog.CONNECTOR_LOG.COLLECTION_ID, value);
 	}
 
 	/**

@@ -92,9 +92,10 @@ public class DbUtil {
      * Gets the time when the last connector request was made for the queries.
      * @param config JOOQ configuration
      */
-    public static ConnectorLogRecord getLastRequestTime(Config config) {
+    public static ConnectorLogRecord getLastRequestTime(Config config, String collectionId) {
         Record result = config.dsl()
                 .selectFrom(Tables.CONNECTOR_LOG)
+                .where(Tables.CONNECTOR_LOG.COLLECTION_ID.eq(Integer.valueOf(collectionId)))
                 .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
                 .limit(1)
                 .fetchOne();
@@ -106,8 +107,9 @@ public class DbUtil {
      * Logs the time when the connector request was made for the queries.
      * @param config JOOQ configuration
      */
-    public static void logGetQueryTime(Config config) {
+    public static void logGetQueryTime(Config config, String collectionId) {
         try { ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
+              connectorLogRecord.setCollectionId(Integer.valueOf(collectionId));
               connectorLogRecord.setLastQueryTime(new Timestamp(new Date().getTime()));
               connectorLogRecord.store();
         } catch (Exception e) {
