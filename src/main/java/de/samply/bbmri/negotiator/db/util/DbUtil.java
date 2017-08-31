@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.*;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
@@ -1061,14 +1060,14 @@ public class DbUtil {
      * @return List<QueryCollection> list of qyery_collection records
      */
     public static List<QueryCollection> checkExpectedResults(Config config, int collectionId){
-        Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY_COLLECTION))
+        Result<Record2<Integer, Integer>> result = config.dsl()
+                .select(Tables.QUERY_COLLECTION.QUERY_ID, Tables.QUERY_COLLECTION.COLLECTION_ID)
                 .from(Tables.QUERY_COLLECTION)
                 .where(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT.eq(true))
                 .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)).fetch();
 
-        List<QueryCollection> queryCollections = config.map(result, QueryCollection.class);
-        return queryCollections;
+        List<QueryCollection> queryCollectionList = config.map(result, QueryCollection.class);
+        return queryCollectionList;
     }
 
     /**
@@ -1103,4 +1102,5 @@ public class DbUtil {
             e.printStackTrace();
         }
     }
+
 }

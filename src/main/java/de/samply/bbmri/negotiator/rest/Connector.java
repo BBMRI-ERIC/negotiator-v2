@@ -30,11 +30,12 @@ package de.samply.bbmri.negotiator.rest;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection;
 import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
 import de.samply.bbmri.negotiator.model.BiobankCollections;
 import de.samply.bbmri.negotiator.model.CollectionOwner;
 import de.samply.bbmri.negotiator.model.QueryDetail;
+import de.samply.bbmri.negotiator.model.QueryCollection;
+
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -120,13 +121,13 @@ public class Connector {
 
     /**
      * REST to get a list of queries whose results are expected from the connector.
-     * @param collectionId   the directory ID of a collection
+     * @param collectionId   the id from collection table
      * @return
      */
-    @POST
-    @Path("/get_results")
+    @GET
+    @Path("/expected_results")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getResults(@QueryParam("id") int collectionId) {
+    public Response getResults(@QueryParam("collectionId") int collectionId) {
         try (Config config = ConfigFactory.get()) {
             List<QueryCollection> queryCollectionList = DbUtil.checkExpectedResults(config, collectionId);
             return Response.status(200).entity(queryCollectionList).build();
@@ -134,6 +135,20 @@ public class Connector {
             e.printStackTrace();
             return Response.status(500).build();
         }
+    }
+
+    /**
+     * REST to get results from the connector.
+     * @param collectionId   the id from collection table
+     * @param queryId   the id of query
+     * @param result   the result
+     * @return
+     */
+    @POST
+    @Path("/results")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getResults(@QueryParam("collectionId") int collectionId, @QueryParam("queryId") int queryId,@QueryParam("result") String result) {
+       //TODO - save the result in negotiator or do what ever is required
     }
 }
 
