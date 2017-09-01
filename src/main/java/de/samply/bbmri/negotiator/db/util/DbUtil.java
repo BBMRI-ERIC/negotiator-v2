@@ -40,6 +40,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
+import de.samply.bbmri.negotiator.model.QueryCollection;
 import org.jooq.*;
 import org.jooq.Query;
 import org.jooq.exception.DataAccessException;
@@ -1059,7 +1060,8 @@ public class DbUtil {
      * @param collectionId    unique id of collection
      * @return List<QueryCollection> list of qyery_collection records
      */
-    public static List<QueryCollection> checkExpectedResults(Config config, int collectionId){
+    public static List<de.samply.bbmri.negotiator.model.QueryCollection> checkExpectedResults(Config config, int
+            collectionId){
         Result<Record2<Integer, Integer>> result = config.dsl()
                 .select(Tables.QUERY_COLLECTION.QUERY_ID, Tables.QUERY_COLLECTION.COLLECTION_ID)
                 .from(Tables.QUERY_COLLECTION)
