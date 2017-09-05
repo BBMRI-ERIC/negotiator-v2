@@ -100,7 +100,7 @@ public class Keys {
 	public static final ForeignKey<CollectionRecord, BiobankRecord> COLLECTION__COLLECTION_BIOBANK_ID_FKEY = ForeignKeys0.COLLECTION__COLLECTION_BIOBANK_ID_FKEY;
 	public static final ForeignKey<CommentRecord, QueryRecord> COMMENT__COMMENT_QUERY_ID_FKEY = ForeignKeys0.COMMENT__COMMENT_QUERY_ID_FKEY;
 	public static final ForeignKey<CommentRecord, PersonRecord> COMMENT__COMMENT_PERSON_ID_FKEY = ForeignKeys0.COMMENT__COMMENT_PERSON_ID_FKEY;
-	public static final ForeignKey<ConnectorLogRecord, CollectionRecord> CONNECTOR_LOG__CONNECTOR_LOG_COLLECTION_ID_FKEY = ForeignKeys0.CONNECTOR_LOG__CONNECTOR_LOG_COLLECTION_ID_FKEY;
+	public static final ForeignKey<ConnectorLogRecord, CollectionRecord> CONNECTOR_LOG__CONNECTOR_LOG_DIRECTORY_COLLECTION_ID_FKEY = ForeignKeys0.CONNECTOR_LOG__CONNECTOR_LOG_DIRECTORY_COLLECTION_ID_FKEY;
 	public static final ForeignKey<FlaggedQueryRecord, QueryRecord> FLAGGED_QUERY__FLAGGED_QUERY_QUERY_ID_FKEY = ForeignKeys0.FLAGGED_QUERY__FLAGGED_QUERY_QUERY_ID_FKEY;
 	public static final ForeignKey<FlaggedQueryRecord, PersonRecord> FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY = ForeignKeys0.FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY;
 	public static final ForeignKey<OfferRecord, QueryRecord> OFFER__OFFER_QUERY_ID_FKEY = ForeignKeys0.OFFER__OFFER_QUERY_ID_FKEY;
@@ -124,7 +124,7 @@ public class Keys {
 		public static Identity<BiobankRecord, Integer> IDENTITY_BIOBANK = createIdentity(Biobank.BIOBANK, Biobank.BIOBANK.ID);
 		public static Identity<CollectionRecord, Integer> IDENTITY_COLLECTION = createIdentity(Collection.COLLECTION, Collection.COLLECTION.ID);
 		public static Identity<CommentRecord, Integer> IDENTITY_COMMENT = createIdentity(Comment.COMMENT, Comment.COMMENT.ID);
-		public static Identity<ConnectorLogRecord, Integer> IDENTITY_CONNECTOR_LOG = createIdentity(ConnectorLog.CONNECTOR_LOG, ConnectorLog.CONNECTOR_LOG.COLLECTION_ID);
+		public static Identity<ConnectorLogRecord, Integer> IDENTITY_CONNECTOR_LOG = createIdentity(ConnectorLog.CONNECTOR_LOG, ConnectorLog.CONNECTOR_LOG.ID);
 		public static Identity<JsonQueryRecord, Integer> IDENTITY_JSON_QUERY = createIdentity(JsonQuery.JSON_QUERY, JsonQuery.JSON_QUERY.ID);
 		public static Identity<OfferRecord, Integer> IDENTITY_OFFER = createIdentity(Offer.OFFER, Offer.OFFER.ID);
 		public static Identity<PersonRecord, Integer> IDENTITY_PERSON = createIdentity(Person.PERSON, Person.PERSON.ID);
@@ -139,7 +139,7 @@ public class Keys {
 		public static final UniqueKey<CollectionRecord> COLLECTION_PKEY = createUniqueKey(Collection.COLLECTION, Collection.COLLECTION.ID);
 		public static final UniqueKey<CollectionRecord> COLLECTION_DIRECTORY_ID_KEY = createUniqueKey(Collection.COLLECTION, Collection.COLLECTION.DIRECTORY_ID);
 		public static final UniqueKey<CommentRecord> COMMENT_PKEY = createUniqueKey(Comment.COMMENT, Comment.COMMENT.ID);
-		public static final UniqueKey<ConnectorLogRecord> CONNECTOR_LOG_PKEY = createUniqueKey(ConnectorLog.CONNECTOR_LOG, ConnectorLog.CONNECTOR_LOG.COLLECTION_ID);
+		public static final UniqueKey<ConnectorLogRecord> CONNECTOR_LOG_PKEY = createUniqueKey(ConnectorLog.CONNECTOR_LOG, ConnectorLog.CONNECTOR_LOG.ID);
 		public static final UniqueKey<FlaggedQueryRecord> FLAGGED_QUERY_PKEY = createUniqueKey(FlaggedQuery.FLAGGED_QUERY, FlaggedQuery.FLAGGED_QUERY.QUERY_ID, FlaggedQuery.FLAGGED_QUERY.PERSON_ID);
 		public static final UniqueKey<JsonQueryRecord> JSON_QUERY_PKEY = createUniqueKey(JsonQuery.JSON_QUERY, JsonQuery.JSON_QUERY.ID);
 		public static final UniqueKey<OfferRecord> OFFER_PKEY = createUniqueKey(Offer.OFFER, Offer.OFFER.ID);
@@ -158,7 +158,7 @@ public class Keys {
 		public static final ForeignKey<CollectionRecord, BiobankRecord> COLLECTION__COLLECTION_BIOBANK_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.BIOBANK_PKEY, Collection.COLLECTION, Collection.COLLECTION.BIOBANK_ID);
 		public static final ForeignKey<CommentRecord, QueryRecord> COMMENT__COMMENT_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, Comment.COMMENT, Comment.COMMENT.QUERY_ID);
 		public static final ForeignKey<CommentRecord, PersonRecord> COMMENT__COMMENT_PERSON_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, Comment.COMMENT, Comment.COMMENT.PERSON_ID);
-		public static final ForeignKey<ConnectorLogRecord, CollectionRecord> CONNECTOR_LOG__CONNECTOR_LOG_COLLECTION_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.COLLECTION_PKEY, ConnectorLog.CONNECTOR_LOG, ConnectorLog.CONNECTOR_LOG.COLLECTION_ID);
+		public static final ForeignKey<ConnectorLogRecord, CollectionRecord> CONNECTOR_LOG__CONNECTOR_LOG_DIRECTORY_COLLECTION_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.COLLECTION_DIRECTORY_ID_KEY, ConnectorLog.CONNECTOR_LOG, ConnectorLog.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID);
 		public static final ForeignKey<FlaggedQueryRecord, QueryRecord> FLAGGED_QUERY__FLAGGED_QUERY_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, FlaggedQuery.FLAGGED_QUERY, FlaggedQuery.FLAGGED_QUERY.QUERY_ID);
 		public static final ForeignKey<FlaggedQueryRecord, PersonRecord> FLAGGED_QUERY__FLAGGED_QUERY_PERSON_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.PERSON_PKEY, FlaggedQuery.FLAGGED_QUERY, FlaggedQuery.FLAGGED_QUERY.PERSON_ID);
 		public static final ForeignKey<OfferRecord, QueryRecord> OFFER__OFFER_QUERY_ID_FKEY = createForeignKey(de.samply.bbmri.negotiator.jooq.Keys.QUERY_PKEY, Offer.OFFER, Offer.OFFER.QUERY_ID);

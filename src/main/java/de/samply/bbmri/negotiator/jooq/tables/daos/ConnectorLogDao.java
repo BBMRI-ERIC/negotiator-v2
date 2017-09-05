@@ -49,21 +49,28 @@ public class ConnectorLogDao extends DAOImpl<ConnectorLogRecord, de.samply.bbmri
 	 */
 	@Override
 	protected Integer getId(de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog object) {
-		return object.getCollectionId();
+		return object.getId();
 	}
 
 	/**
-	 * Fetch records that have <code>collection_id IN (values)</code>
+	 * Fetch records that have <code>id IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog> fetchByCollectionId(Integer... values) {
-		return fetch(ConnectorLog.CONNECTOR_LOG.COLLECTION_ID, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog> fetchById(Integer... values) {
+		return fetch(ConnectorLog.CONNECTOR_LOG.ID, values);
 	}
 
 	/**
-	 * Fetch a unique record that has <code>collection_id = value</code>
+	 * Fetch a unique record that has <code>id = value</code>
 	 */
-	public de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog fetchOneByCollectionId(Integer value) {
-		return fetchOne(ConnectorLog.CONNECTOR_LOG.COLLECTION_ID, value);
+	public de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog fetchOneById(Integer value) {
+		return fetchOne(ConnectorLog.CONNECTOR_LOG.ID, value);
+	}
+
+	/**
+	 * Fetch records that have <code>directory_collection_id IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog> fetchByDirectoryCollectionId(String... values) {
+		return fetch(ConnectorLog.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID, values);
 	}
 
 	/**

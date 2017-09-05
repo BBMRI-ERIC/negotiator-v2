@@ -41,8 +41,8 @@ import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
+import javafx.scene.control.Tab;
 import org.jooq.*;
-import org.jooq.Query;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -70,11 +70,32 @@ public class DbUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
 
+    /**
+     * Gets the time when first valid query was created in the negotiator.
+     * @param config JOOQ configuration
+     * @return Timestamp timestamp of query
+     */
+    public static Timestamp getFirstQueryCreationTime(Config config){
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.QUERY.QUERY_CREATION_TIME)
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc())
+                .fetchAny();
+
+        if (result == null){
+            return null;
+        }
+
+        Timestamp timestamp =  result.value1();
+        return timestamp;
+    }
 
     /**
      * Gets all the valid queries that entered the negotiator after the given timestamp.
      * @param config JOOQ configuration
      * @param timestamp
+     * @return List<QueryDetail> list of queries
      */
     public static List<QueryDetail> getAllNewQueries(Config config, Timestamp timestamp) {
         Result<Record> result = config.dsl()
@@ -91,16 +112,23 @@ public class DbUtil {
     /**
      * Gets the time when the last connector request was made for the queries.
      * @param config JOOQ configuration
+     * @param collectionId collection id of the connector
+     * @return  Timestamp of last request
      */
-    public static ConnectorLogRecord getLastRequestTime(Config config, String collectionId) {
-        Record result = config.dsl()
-                .selectFrom(Tables.CONNECTOR_LOG)
-                .where(Tables.CONNECTOR_LOG.COLLECTION_ID.eq(Integer.valueOf(collectionId)))
+    public static Timestamp getLastRequestTime(Config config, String collectionId) {
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.CONNECTOR_LOG.LAST_QUERY_TIME)
+                .from(Tables.CONNECTOR_LOG)
+                .where(Tables.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID.eq(collectionId))
                 .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
-                .limit(1)
-                .fetchOne();
+                .fetchAny();
 
-        return config.map(result, ConnectorLogRecord.class);
+        if (result == null){
+            return null;
+        }
+
+        Timestamp timestamp = result.value1();
+        return timestamp;
     }
 
     /**
@@ -109,7 +137,7 @@ public class DbUtil {
      */
     public static void logGetQueryTime(Config config, String collectionId) {
         try { ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
-              connectorLogRecord.setCollectionId(Integer.valueOf(collectionId));
+              connectorLogRecord.setDirectoryCollectionId(collectionId);
               connectorLogRecord.setLastQueryTime(new Timestamp(new Date().getTime()));
               connectorLogRecord.store();
         } catch (Exception e) {

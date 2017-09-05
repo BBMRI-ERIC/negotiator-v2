@@ -30,7 +30,6 @@ package de.samply.bbmri.negotiator.rest;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
 import de.samply.bbmri.negotiator.model.BiobankCollections;
 import de.samply.bbmri.negotiator.model.CollectionOwner;
 import de.samply.bbmri.negotiator.model.QueryDetail;
@@ -42,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -59,12 +59,20 @@ public class Connector {
             /**
             * Get last time a request was made by the connector
             */
-            ConnectorLogRecord connectorLogRecord = DbUtil.getLastRequestTime(config, collectionId );
+            Timestamp timestamp = DbUtil.getLastRequestTime(config, collectionId );
+
+
+            if(timestamp == null){
+                /**
+                 * This will be the case when a connector is new to the system and is requesting for the first time.
+                 */
+                timestamp = DbUtil.getFirstQueryCreationTime(config);
+            }
 
             /**
-            * Get all queries created after the last request was made
-            */
-            List<QueryDetail> newQueries = DbUtil.getAllNewQueries(config, connectorLogRecord.getLastQueryTime());
+             * Get all queries created after the last request was made
+             */
+            List<QueryDetail> newQueries = DbUtil.getAllNewQueries(config, timestamp);
 
             /**
             *  Update the latest get request time.

@@ -242,15 +242,17 @@ COMMENT ON COLUMN "offer"."text" IS 'Text of the comment.';
 
 
 CREATE TABLE "connector_log" (
-    "collection_id" SERIAL NOT NULL,
+    "id" SERIAL NOT NULL ,
+    "directory_collection_id" CHARACTER VARYING(255) NOT NULL,
     "last_query_time" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    PRIMARY KEY("collection_id"),
-    FOREIGN KEY ("collection_id") REFERENCES "collection"("id") ON UPDATE CASCADE ON DELETE CASCADE
+    PRIMARY KEY("id"),
+    FOREIGN KEY ("directory_collection_id") REFERENCES "collection"("directory_id") ON UPDATE CASCADE ON DELETE CASCADE
 );
-CREATE INDEX "collectionIdIndexconnectorLog" ON "connector_log" (collection_id);
+CREATE INDEX "collectionIdIndexconnectorLog" ON "connector_log" (directory_collection_id);
 
 COMMENT ON TABLE "connector_log" IS 'table to store the timestamp when the connector makes a get request for new queries';
-COMMENT ON COLUMN "connector_log"."collection_id" IS 'Primary key and also the foreign key that comes from table Collections'  ;
+COMMENT ON COLUMN "connector_log"."id" IS 'Primary key'  ;
+COMMENT ON COLUMN "connector_log"."directory_collection_id" IS 'Foreign key that comes from table "Collections.directory_id". It is not the primary key of its table but it is still unique so we can use it as a foreign key constraint'  ;
 COMMENT ON COLUMN "connector_log"."last_query_time" IS 'Timestamp when the request was made. ';
 
 
