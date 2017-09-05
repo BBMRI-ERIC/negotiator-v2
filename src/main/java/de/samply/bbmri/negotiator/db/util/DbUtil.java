@@ -41,7 +41,6 @@ import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
-import javafx.scene.control.Tab;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
