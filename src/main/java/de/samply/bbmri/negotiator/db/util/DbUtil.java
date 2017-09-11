@@ -132,16 +132,32 @@ public class DbUtil {
 
     /**
      * Logs the time when the connector request was made for the queries.
+     *
      * @param config JOOQ configuration
+     * @param collectionId The collection directoryID
+     * @return 1:ok, 0:error, -1:collectionId unknown
      */
-    public static void logGetQueryTime(Config config, String collectionId) {
+    public static int logGetQueryTime(Config config, String collectionId) {
         try { ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
               connectorLogRecord.setDirectoryCollectionId(collectionId);
               connectorLogRecord.setLastQueryTime(new Timestamp(new Date().getTime()));
               connectorLogRecord.store();
+              return 1;
         } catch (Exception e) {
-            e.printStackTrace();
+            if(e instanceof DataAccessException) {
+                if(e.getMessage().contains("is not present in table \"collection\"")) {
+                    logger.error("Collection with name "+collectionId+" unknown!");
+                    return -1;
+                } else {
+                    logger.error("Data Access Exception: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                e.printStackTrace();
+            }
         }
+
+        return 0;
     }
 
     /**

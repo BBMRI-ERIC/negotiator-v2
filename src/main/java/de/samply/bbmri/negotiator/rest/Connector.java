@@ -53,7 +53,10 @@ public class Connector {
     @GET
     @Path("/queries")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<QueryDetail> getQuery(@QueryParam("collectionId") String collectionId) {
+    public Response getQuery(@QueryParam("collectionId") String collectionId) {
+        if(collectionId == null)
+            return Response.status(400).build();
+
         try (Config config = ConfigFactory.get()) {
 
             /**
@@ -77,13 +80,15 @@ public class Connector {
             /**
             *  Update the latest get request time.
             */
-            DbUtil.logGetQueryTime(config, collectionId);
+            if(DbUtil.logGetQueryTime(config, collectionId) == -1) {
+                return Response.status(400).build();
+            }
             config.commit();
 
             /**
             *   Returns a list of all the newly created queries.
             */
-            return newQueries;
+            return Response.status(200).entity(newQueries).build();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -118,6 +123,9 @@ public class Connector {
     @Path("/collection_owners")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUsersOfConnector(@QueryParam("id") String collectionDirectoryId) {
+        if(collectionDirectoryId == null)
+            return Response.status(400).build();
+
         try(Config config = ConfigFactory.get()) {
             List<CollectionOwner> data = DbUtil.getCollectionOwners(config, collectionDirectoryId);
             return Response.status(200).entity(data).build();
@@ -135,7 +143,10 @@ public class Connector {
     @GET
     @Path("/expected_results")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getResults(@QueryParam("collectionId") int collectionId) {
+    public Response getResults(@QueryParam("collectionId") Integer collectionId) {
+        if(collectionId == null)
+            return Response.status(400).build();
+
         try (Config config = ConfigFactory.get()) {
             List<QueryCollection> queryCollectionList = DbUtil.checkExpectedResults(config, collectionId);
             return Response.status(200).entity(queryCollectionList).build();
