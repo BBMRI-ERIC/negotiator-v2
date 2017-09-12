@@ -1116,6 +1116,21 @@ public class DbUtil {
     }
 
     /**
+     * Gets the collectionId of a collectionDirectoryId
+     * @param config    DB access handle
+     * @param collectionDirectoryId
+     * @return
+     */
+    public static Integer getCollectionId(Config config, String collectionDirectoryId) {
+        Record1<Integer> result = config.dsl().select(Tables.COLLECTION.ID)
+                .from(Tables.COLLECTION)
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionDirectoryId))
+                .fetchOne();
+
+        return result.value1();
+    }
+
+    /**
      * A confidential biobanker decides to participate in a query, so we have to add all his collections
      * to the query_collection table.
      * If the entry already exists, update the entry to expect results from the connector
