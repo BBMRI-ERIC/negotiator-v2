@@ -58,6 +58,7 @@ CREATE TABLE "query" (
     "id" SERIAL NOT NULL,
     "title" CHARACTER VARYING(255) NOT NULL,
     "text" TEXT,
+    "query_xml" TEXT,
     "query_creation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "researcher_id" INTEGER NOT NULL,
     "json_text" TEXT NOT NULL,
@@ -76,6 +77,7 @@ COMMENT ON TABLE "query" IS 'query table to contain all  queries';
 COMMENT ON COLUMN "query"."id" IS 'primary key';
 COMMENT ON COLUMN "query"."title" IS 'title of query';
 COMMENT ON COLUMN "query"."text" IS 'text of query';
+COMMENT ON COLUMN "query"."query_xml" IS 'XML version of the query';
 COMMENT ON COLUMN "query"."query_creation_time" IS 'date and time of query with out time zone';
 COMMENT ON COLUMN "query"."num_attachments" IS 'number of attachments ever associated with this query - both existing and deleted, used as an index for naming future attachments';
 COMMENT ON COLUMN "query"."researcher_id" IS 'Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)';

@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollectionRecord extends UpdatableRecordImpl<QueryCollectionRecord> implements Record3<Integer, Integer, Boolean> {
 
-	private static final long serialVersionUID = 1473189467;
+	private static final long serialVersionUID = -330870075;
 
 	/**
 	 * Setter for <code>public.query_collection.query_id</code>.
@@ -59,14 +59,14 @@ public class QueryCollectionRecord extends UpdatableRecordImpl<QueryCollectionRe
 	}
 
 	/**
-	 * Setter for <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
+	 * Setter for <code>public.query_collection.expect_connector_result</code>.
 	 */
 	public void setExpectConnectorResult(Boolean value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
+	 * Getter for <code>public.query_collection.expect_connector_result</code>.
 	 */
 	public Boolean getExpectConnectorResult() {
 		return (Boolean) getValue(2);

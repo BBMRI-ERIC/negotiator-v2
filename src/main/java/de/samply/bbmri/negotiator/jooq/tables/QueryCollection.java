@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollection extends TableImpl<QueryCollectionRecord> {
 
-	private static final long serialVersionUID = 321035951;
+	private static final long serialVersionUID = -502256599;
 
 	/**
 	 * The reference instance of <code>public.query_collection</code>
@@ -60,9 +60,9 @@ public class QueryCollection extends TableImpl<QueryCollectionRecord> {
 	public final TableField<QueryCollectionRecord, Integer> COLLECTION_ID = createField("collection_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
+	 * The column <code>public.query_collection.expect_connector_result</code>.
 	 */
-	public final TableField<QueryCollectionRecord, Boolean> EXPECT_CONNECTOR_RESULT = createField("expect_connector_result", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "Column that tells the negotiator to expect results from the given connector");
+	public final TableField<QueryCollectionRecord, Boolean> EXPECT_CONNECTOR_RESULT = createField("expect_connector_result", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>public.query_collection</code> table reference

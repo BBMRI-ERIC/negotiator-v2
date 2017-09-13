@@ -100,11 +100,14 @@ public class DbUtil {
         Result<Record> result = config.dsl()
                 .select(Tables.QUERY.TITLE.as("query_title"))
                 .select(Tables.QUERY.TEXT.as("query_text"))
+                .select(Tables.QUERY.ID.as("query_id"))
+                .select(Tables.QUERY.QUERY_XML.as("query_xml"))
                 .from(Tables.QUERY)
                 .where(Tables.QUERY.VALID_QUERY.eq(true))
                 .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
                 .fetch();
 
+        //TODO: The mapper does not map the query_xml at all, why?
         return config.map(result, QueryDetail.class);
     }
 
