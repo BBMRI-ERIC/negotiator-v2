@@ -41,6 +41,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
+import de.samply.share.model.bbmri.BbmriResult;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -65,9 +66,23 @@ import de.samply.directory.client.dto.DirectoryCollection;
  */
 public class DbUtil {
 
-
-
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
+
+
+    /**
+     * Saves the results received from the connector
+     * @param config JOOQ configuration
+     * @param result BBMRIResult object containing result
+     */
+    public static void saveConnectorQueryResult(Config config, BbmriResult result){
+        config.dsl().update(Tables.QUERY_COLLECTION)
+                .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT , false)
+                .set(Tables.QUERY_COLLECTION.DONORS , result.getNumberOfDonors())
+                .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getQueryId())
+                .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(result.getCollectionId())))
+                .execute();
+    }
 
     /**
      * Gets the time when first valid query was created in the negotiator.

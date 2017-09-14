@@ -22,11 +22,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollection implements Serializable {
 
-	private static final long serialVersionUID = -559378921;
+	private static final long serialVersionUID = -1536912669;
 
 	private Integer queryId;
 	private Integer collectionId;
 	private Boolean expectConnectorResult;
+	private Integer donors;
+	private Integer samples;
 
 	public QueryCollection() {}
 
@@ -34,16 +36,22 @@ public class QueryCollection implements Serializable {
 		this.queryId = value.queryId;
 		this.collectionId = value.collectionId;
 		this.expectConnectorResult = value.expectConnectorResult;
+		this.donors = value.donors;
+		this.samples = value.samples;
 	}
 
 	public QueryCollection(
 		Integer queryId,
 		Integer collectionId,
-		Boolean expectConnectorResult
+		Boolean expectConnectorResult,
+		Integer donors,
+		Integer samples
 	) {
 		this.queryId = queryId;
 		this.collectionId = collectionId;
 		this.expectConnectorResult = expectConnectorResult;
+		this.donors = donors;
+		this.samples = samples;
 	}
 
 	public Integer getQueryId() {
@@ -68,5 +76,21 @@ public class QueryCollection implements Serializable {
 
 	public void setExpectConnectorResult(Boolean expectConnectorResult) {
 		this.expectConnectorResult = expectConnectorResult;
+	}
+
+	public Integer getDonors() {
+		return this.donors;
+	}
+
+	public void setDonors(Integer donors) {
+		this.donors = donors;
+	}
+
+	public Integer getSamples() {
+		return this.samples;
+	}
+
+	public void setSamples(Integer samples) {
+		this.samples = samples;
 	}
 }

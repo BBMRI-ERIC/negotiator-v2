@@ -22,6 +22,7 @@
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
         <version.samply.directory.client>1.0.2</version.samply.directory.client>
         <version.samply.negotiator.dto>1.0.1-SNAPSHOT</version.samply.negotiator.dto>
+        <version.samply.share.dto>2.0.5-BBMRI-CONNECTOR-SNAPSHOT</version.samply.share.dto>
 
         <database.server>localhost</database.server>
         <database.port>5432</database.port>
@@ -35,6 +36,12 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>share-dto</artifactId>
+            <version>${version.samply.share.dto}</version>
+        </dependency>
+
         <dependency>
             <groupId>de.samply</groupId>
             <artifactId>negotiator-dto</artifactId>

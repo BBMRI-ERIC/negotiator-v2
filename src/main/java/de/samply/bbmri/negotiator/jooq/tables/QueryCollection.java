@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollection extends TableImpl<QueryCollectionRecord> {
 
-	private static final long serialVersionUID = -502256599;
+	private static final long serialVersionUID = 321035951;
 
 	/**
 	 * The reference instance of <code>public.query_collection</code>
@@ -60,9 +60,19 @@ public class QueryCollection extends TableImpl<QueryCollectionRecord> {
 	public final TableField<QueryCollectionRecord, Integer> COLLECTION_ID = createField("collection_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.query_collection.expect_connector_result</code>.
+	 * The column <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
 	 */
-	public final TableField<QueryCollectionRecord, Boolean> EXPECT_CONNECTOR_RESULT = createField("expect_connector_result", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
+	public final TableField<QueryCollectionRecord, Boolean> EXPECT_CONNECTOR_RESULT = createField("expect_connector_result", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "Column that tells the negotiator to expect results from the given connector");
+
+	/**
+	 * The column <code>public.query_collection.donors</code>. result of query: amount of donors
+	 */
+	public final TableField<QueryCollectionRecord, Integer> DONORS = createField("donors", org.jooq.impl.SQLDataType.INTEGER, this, "result of query: amount of donors");
+
+	/**
+	 * The column <code>public.query_collection.samples</code>. result of query: amount of samples
+	 */
+	public final TableField<QueryCollectionRecord, Integer> SAMPLES = createField("samples", org.jooq.impl.SQLDataType.INTEGER, this, "result of query: amount of samples");
 
 	/**
 	 * Create a <code>public.query_collection</code> table reference

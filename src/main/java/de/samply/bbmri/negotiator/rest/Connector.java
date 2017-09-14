@@ -31,6 +31,13 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.model.*;
+import de.samply.bbmri.negotiator.model.BiobankCollections;
+import de.samply.bbmri.negotiator.model.CollectionOwner;
+import de.samply.bbmri.negotiator.model.QueryDetail;
+import de.samply.bbmri.negotiator.model.QueryCollection;
+import de.samply.share.model.bbmri.BbmriResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import javax.ws.rs.*;
@@ -47,6 +54,8 @@ import java.util.List;
  */
 @Path("connector")
 public class Connector {
+
+    private static Logger logger = LoggerFactory.getLogger(Connector.class);
 
     @GET
     @Path("/queries")
@@ -167,17 +176,22 @@ public class Connector {
 
     /**
      * REST to get results from the connector.
-     * @param result   the result
+     * @param result BBMRI result object
      * @return
      */
     @POST
     @Path("/results")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getResults(QueryResult result) {
-       //TODO - save the result in negotiator or do what ever is required
-        System.out.println("RESULT from: "+result.getCollectionId());
-
-        return Response.accepted().build();
+    @Consumes(MediaType.APPLICATION_XML)
+    public Response getResults(BbmriResult result) {
+        try (Config config = ConfigFactory.get()) {
+            logger.debug("The query results in {} donors and {} samples.", result.getNumberOfDonors(), result.getNumberOfSamples());
+            // save result to DB
+            DbUtil.saveConnectorQueryResult(config, result);
+            return Response.status(200).build();
+        } catch (SQLException e){
+            e.printStackTrace();
+            return Response.status(500).build();
+        }
     }
 }
 

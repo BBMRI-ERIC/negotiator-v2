@@ -179,6 +179,8 @@ CREATE TABLE "query_collection" (
     "query_id" INTEGER NOT NULL,
     "collection_id" INTEGER NOT NULL,
     "expect_connector_result" BOOLEAN NOT NULL DEFAULT FALSE,
+    "donors" INTEGER NULL,
+    "samples" INTEGER NULL,
     PRIMARY KEY("query_id", "collection_id"),
     FOREIGN KEY ("collection_id") REFERENCES "collection"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
@@ -189,6 +191,9 @@ CREATE INDEX "queryIdIndexQueryCollection" ON "query_collection" (query_id);
 
 COMMENT ON TABLE "query_collection" IS 'Table for connecting queries with collections';
 COMMENT ON COLUMN "query_collection"."expect_connector_result" IS 'Column that tells the negotiator to expect results from the given connector';
+COMMENT ON COLUMN "query_collection"."donors" IS 'result of query: amount of donors';
+COMMENT ON COLUMN "query_collection"."samples" IS 'result of query: amount of samples';
+
 
 
 CREATE TABLE "person_collection" (
