@@ -75,12 +75,14 @@ public class DbUtil {
      * @param result BBMRIResult object containing result
      */
     public static void saveConnectorQueryResult(Config config, BbmriResult result){
+        Integer collectionId = getCollectionId(config, result.getDirectoryCollectionId());
+
         config.dsl().update(Tables.QUERY_COLLECTION)
                 .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT , false)
                 .set(Tables.QUERY_COLLECTION.DONORS , result.getNumberOfDonors())
                 .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getQueryId())
-                .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(result.getCollectionId())))
+                .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
                 .execute();
     }
 
