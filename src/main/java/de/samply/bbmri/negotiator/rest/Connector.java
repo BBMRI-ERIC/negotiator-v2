@@ -185,6 +185,7 @@ public class Connector {
     public Response getResults(BbmriResult result) {
         try (Config config = ConfigFactory.get()) {
             logger.debug("The query results in {} donors and {} samples.", result.getNumberOfDonors(), result.getNumberOfSamples());
+
             // save result to DB
             DbUtil.saveConnectorQueryResult(config, result);
             return Response.status(200).build();
