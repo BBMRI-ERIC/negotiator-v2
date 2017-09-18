@@ -84,6 +84,11 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getQueryId())
                 .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
                 .execute();
+        try {
+            config.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
