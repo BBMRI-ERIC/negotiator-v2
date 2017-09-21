@@ -56,7 +56,7 @@ import java.sql.SQLException;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-        DatabaseSetup.class,
+//        DatabaseSetup.class,
         DirectorySynchronize.class,
         DummyData.class
 })

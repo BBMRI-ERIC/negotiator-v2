@@ -82,7 +82,7 @@ public class ConnectorOwnerTest {
         NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
 
         File file = null;
-        String prop = "bbmri.connector.confdir";
+        String prop = "bbmri.negotiator.confdir";
 
         if(System.getProperty(prop) != null) {
             file = new File(System.getProperty(prop) + File.separator + FILE_POSTGRESQL);
