@@ -81,6 +81,7 @@ public class DbUtil {
                 .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT , false)
                 .set(Tables.QUERY_COLLECTION.DONORS , result.getNumberOfDonors())
                 .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
+                .set(Tables.QUERY_COLLECTION.RESULT_RECEIVED_TIME, new Timestamp(new Date().getTime()))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getQueryId())
                 .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
                 .execute();

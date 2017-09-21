@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Record12<Integer, String, String, Timestamp, Integer, String, Integer, String, Boolean, String, String, String> {
 
-	private static final long serialVersionUID = -1137652140;
+	private static final long serialVersionUID = -1493499052;
 
 	/**
 	 * Setter for <code>public.query.id</code>. primary key
@@ -159,42 +159,42 @@ public class QueryRecord extends UpdatableRecordImpl<QueryRecord> implements Rec
 	}
 
 	/**
-	 * Setter for <code>public.query.request_description</code>.
+	 * Setter for <code>public.query.request_description</code>. description of the request
 	 */
 	public void setRequestDescription(String value) {
 		setValue(9, value);
 	}
 
 	/**
-	 * Getter for <code>public.query.request_description</code>.
+	 * Getter for <code>public.query.request_description</code>. description of the request
 	 */
 	public String getRequestDescription() {
 		return (String) getValue(9);
 	}
 
 	/**
-	 * Setter for <code>public.query.ethics_vote</code>.
+	 * Setter for <code>public.query.ethics_vote</code>. ethics vote for the query
 	 */
 	public void setEthicsVote(String value) {
 		setValue(10, value);
 	}
 
 	/**
-	 * Getter for <code>public.query.ethics_vote</code>.
+	 * Getter for <code>public.query.ethics_vote</code>. ethics vote for the query
 	 */
 	public String getEthicsVote() {
 		return (String) getValue(10);
 	}
 
 	/**
-	 * Setter for <code>public.query.query_xml</code>.
+	 * Setter for <code>public.query.query_xml</code>. XML version of the query
 	 */
 	public void setQueryXml(String value) {
 		setValue(11, value);
 	}
 
 	/**
-	 * Getter for <code>public.query.query_xml</code>.
+	 * Getter for <code>public.query.query_xml</code>. XML version of the query
 	 */
 	public String getQueryXml() {
 		return (String) getValue(11);
