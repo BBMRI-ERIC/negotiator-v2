@@ -55,7 +55,11 @@ import java.sql.SQLException;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({DatabaseSetup.class, DirectorySynchronize.class, DummyData.class})
+@Suite.SuiteClasses({
+        DatabaseSetup.class,
+        DirectorySynchronize.class,
+        DummyData.class
+})
 public class TestSuite {
     public static final String FILE_POSTGRESQL = "bbmri.test.postgres.xml";
 
@@ -82,17 +86,20 @@ public class TestSuite {
         postgresql = JAXBUtil.unmarshall(file, getJAXBContext(),
                 Postgresql.class);
 
+
+        // GRRRRRR. Whoever wrote this, deserves a slow death. NEVER clean an existing database in a testsuite
+
         /**
          * Manually drop all tables in the database.
          */
-        Connection connection = getConnection();
-        connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
-        connection.commit();
-
-        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
-        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData.sql"));
-
-        connection.commit();
+//        Connection connection = getConnection();
+//        connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
+//        connection.commit();
+//
+//        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
+//        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData.sql"));
+//
+//        connection.commit();
     }
 
     private static JAXBContext getJAXBContext() throws JAXBException {
