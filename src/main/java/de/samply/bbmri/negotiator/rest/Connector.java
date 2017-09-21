@@ -57,11 +57,18 @@ public class Connector {
 
     private static Logger logger = LoggerFactory.getLogger(Connector.class);
 
+    /**
+     * Gets a list of new queries for a given connector
+     * @param directoryCollectionId the directory ID of the connector
+     * @return
+     */
     @GET
     @Path("/queries")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getQuery(@QueryParam("collectionId") String collectionId) {
-        if(collectionId == null)
+    public Response getQuery(@QueryParam("directoryCollectionId") String directoryCollectionId) {
+        //TODO: add access control
+
+        if(directoryCollectionId == null)
             return Response.status(400).build();
 
         try (Config config = ConfigFactory.get()) {
@@ -69,7 +76,7 @@ public class Connector {
             /**
             * Get last time a request was made by the connector
             */
-            Timestamp timestamp = DbUtil.getLastRequestTime(config, collectionId );
+            Timestamp timestamp = DbUtil.getLastRequestTime(config, directoryCollectionId );
 
 
             if(timestamp == null){
@@ -87,7 +94,7 @@ public class Connector {
             /**
             *  Update the latest get request time.
             */
-            if(DbUtil.logGetQueryTime(config, collectionId) == -1) {
+            if(DbUtil.logGetQueryTime(config, directoryCollectionId) == -1) {
                 return Response.status(400).build();
             }
             config.commit();
@@ -111,6 +118,8 @@ public class Connector {
     @Path("/collections")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCollections() {
+        //TODO: add access control
+
         try(Config config = ConfigFactory.get()) {
             List<BiobankCollections> data = DbUtil.getBiobanksAndTheirCollection(config);
             return Response.status(200).entity(data).build();
@@ -123,18 +132,20 @@ public class Connector {
 
     /**
      * REST to get a list of persons who are responsible for a given collection directory ID
-     * @param collectionDirectoryId   the directory ID of a collection
+     * @param directoryCollectionId   the directory ID of a collection
      * @return
      */
     @GET
     @Path("/collection_owners")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsersOfConnector(@QueryParam("id") String collectionDirectoryId) {
-        if(collectionDirectoryId == null)
+    public Response getUsersOfConnector(@QueryParam("directoryCollectionId") String directoryCollectionId) {
+        //TODO: add access control
+
+        if(directoryCollectionId == null)
             return Response.status(400).build();
 
         try(Config config = ConfigFactory.get()) {
-            List<CollectionOwner> data = DbUtil.getCollectionOwners(config, collectionDirectoryId);
+            List<CollectionOwner> data = DbUtil.getCollectionOwners(config, directoryCollectionId);
             return Response.status(200).entity(data).build();
         } catch(SQLException e) {
             e.printStackTrace();
@@ -144,19 +155,21 @@ public class Connector {
 
     /**
      * REST to get a list of queries whose results are expected from the connector.
-     * @param collectionDirectoryId   the directoryId from collection table
+     * @param directoryCollectionId   the directoryId from collection table
      * @return
      */
     @GET
     @Path("/expected_results")
     @Produces(MediaType.APPLICATION_XML)
-    public Response getResults(@QueryParam("collectionDirectoryId") String collectionDirectoryId) {
-        if(collectionDirectoryId == null)
+    public Response getResults(@QueryParam("directoryCollectionId") String directoryCollectionId) {
+        //TODO: add access control
+
+        if(directoryCollectionId == null)
             return Response.status(400).build();
 
         try (Config config = ConfigFactory.get()) {
             // translate collectionDirectoryId to collectionId
-            Integer collectionId = DbUtil.getCollectionId(config, collectionDirectoryId);
+            Integer collectionId = DbUtil.getCollectionId(config, directoryCollectionId);
 
             if(collectionId == null) {
                 return Response.status(400).build();
@@ -183,6 +196,8 @@ public class Connector {
     @Path("/results")
     @Consumes(MediaType.APPLICATION_XML)
     public Response getResults(BbmriResult result) {
+        //TODO: add access control
+
         try (Config config = ConfigFactory.get()) {
             logger.debug("The query results in {} donors and {} samples.", result.getNumberOfDonors(), result.getNumberOfSamples());
 

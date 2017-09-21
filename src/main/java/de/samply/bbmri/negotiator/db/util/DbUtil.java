@@ -1143,13 +1143,13 @@ public class DbUtil {
     /**
      * Gets the collectionId of a collectionDirectoryId
      * @param config    DB access handle
-     * @param collectionDirectoryId
+     * @param directoryCollectionId
      * @return
      */
-    public static Integer getCollectionId(Config config, String collectionDirectoryId) {
+    public static Integer getCollectionId(Config config, String directoryCollectionId) {
         Record1<Integer> result = config.dsl().select(Tables.COLLECTION.ID)
                 .from(Tables.COLLECTION)
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionDirectoryId))
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryCollectionId))
                 .fetchOne();
 
         return result.value1();
