@@ -202,7 +202,10 @@ public class Connector {
             logger.debug("The query results in {} donors and {} samples.", result.getNumberOfDonors(), result.getNumberOfSamples());
 
             // save result to DB
-            DbUtil.saveConnectorQueryResult(config, result);
+            if(!DbUtil.saveConnectorQueryResult(config, result)) {
+                return Response.status(500).build();
+            }
+
             return Response.status(200).build();
         } catch (SQLException e){
             e.printStackTrace();

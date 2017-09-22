@@ -74,8 +74,11 @@ public class DbUtil {
      * @param config JOOQ configuration
      * @param result BBMRIResult object containing result
      */
-    public static void saveConnectorQueryResult(Config config, BbmriResult result){
+    public static Boolean saveConnectorQueryResult(Config config, BbmriResult result){
         Integer collectionId = getCollectionId(config, result.getDirectoryCollectionId());
+
+        if(collectionId == null)
+            return false;
 
         config.dsl().update(Tables.QUERY_COLLECTION)
                 .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT , false)
@@ -87,9 +90,12 @@ public class DbUtil {
                 .execute();
         try {
             config.commit();
+            return true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 
     /**
@@ -1152,6 +1158,10 @@ public class DbUtil {
                 .from(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryCollectionId))
                 .fetchOne();
+
+        // unknown directoryCollectionId
+        if(result == null)
+            return null;
 
         return result.value1();
     }
