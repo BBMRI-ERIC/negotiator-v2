@@ -68,6 +68,23 @@ public class DbUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
 
+    /**
+     * Sets the field for starting negotiation for a query to true.
+     * @param config JOOQ configuration
+     * @param queryId id of the query
+     */
+    public static String startNegotiation(Config config, Integer queryId){
+        config.dsl().update(Tables.QUERY)
+                .set(Tables.QUERY.NEGOTIATION_STARTED, true)
+                .where(Tables.QUERY.ID.eq(queryId))
+                .execute();
+        try {
+            config.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
     /**
      * Saves the results received from the connector

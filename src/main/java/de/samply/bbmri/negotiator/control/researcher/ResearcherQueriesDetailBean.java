@@ -35,10 +35,16 @@ import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.model.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -52,10 +58,6 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.OfferPersonDTO;
-import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 
@@ -75,6 +77,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
+    /**
+     * The enum for different statuses of a query as marked by a biobanker.
+     */
+    private Flag flagFilter = Flag.UNFLAGGED;
 
     /**
      * The QueryStatsDTO object used to get all the information for queries.
@@ -168,8 +174,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
             if(selectedQuery == null) {
                 /**
-                 * If it is null, it means that either the user can not access it due to insufficient privileges,
-                 * or that the query simply does not exist.
+                 * If it is null, it means that the query simply does not exist.
                  */
                 return "/errors/not-found.xhtml";
             } else {
@@ -188,6 +193,50 @@ public class ResearcherQueriesDetailBean implements Serializable {
         }
 
         return null;
+    }
+
+
+    /**
+     * Gets the potential biobankers and sends out the emails
+     *
+     */
+    public void sendEmailsToPotentialBiobankers() {
+        try(Config config = ConfigFactory.get()) {
+            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, userBean.getUserId());
+            QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(), selectedQuery);
+            notifier.sendEmailNotification();
+        } catch (SQLException e) {
+
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * Build url to be able to navigate to the query with id=selectedQuery.getId() for a biobanker
+     *
+     * @return
+     */
+    public String getQueryUrlForBiobanker() {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
+    }
+
+    /**
+     * Starts negotiation for a query and sends out emails to biobankers.
+     * @return refreshes the view
+     */
+    public String startNegotiation() {
+        try(Config config = ConfigFactory.get()) {
+            DbUtil.startNegotiation(config, selectedQuery.getId());
+            sendEmailsToPotentialBiobankers();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
     }
 
     /**

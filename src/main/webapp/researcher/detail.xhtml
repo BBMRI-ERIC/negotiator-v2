@@ -140,7 +140,30 @@
 
                 </h:panelGroup>
 
-                <h:panelGroup layout="block" style="margin-top:10px;">
+
+                <h:panelGroup styleClass="row" layout="block">
+                    <h:panelGroup styleClass="col-md-12" >
+                        <h:panelGroup styleClass="col-md-4" >
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-4" >
+                            <h:form id="form">
+                                <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                                <h:commandButton id="startNegotiation"
+                                                 rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStarted == false}"
+                                                 value="#{label['querydetail.action.startNegotiation.buttonText']}"
+                                                 action="#{researcherQueriesDetailBean.startNegotiation()}"
+                                                 title="#{label['querydetail.tooltip.startNegotiation']}"
+                                                 styleClass="btn btn-primary" style="margin-top: 40px"/>
+                            </h:form>
+
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-4" >
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGroup>
+
+                <!-- Show the chat panel only after negotiation starts. -->
+                <h:panelGroup layout="block" rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStarted == true}" style="margin-top:10px;">
 
                     <ul class="nav nav-tabs" id="myTab">
                         <li class="active" id="first"><a data-toggle="tab"

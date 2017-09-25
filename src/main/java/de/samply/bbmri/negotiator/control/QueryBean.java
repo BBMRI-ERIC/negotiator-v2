@@ -89,8 +89,6 @@ public class QueryBean implements Serializable {
 
 private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
-   private Flag flagFilter = Flag.UNFLAGGED;
-
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
 
@@ -221,12 +219,6 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                        jsonQuery, ethicsVote, userBean.getUserId(),
                        true);
                config.commit();
-               setId(record.getId());
-               List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId(), Flag.IGNORED, userBean.getUserId());
-
-               QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(record.getId()),
-                       config.map(record, Query.class));
-               notifier.sendEmailNotification();
            }
        } catch (IOException e) {
            e.printStackTrace();

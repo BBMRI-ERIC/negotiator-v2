@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = 799092252;
+	private static final long serialVersionUID = 1785446899;
 
 	private Integer   id;
 	private String    title;
@@ -37,6 +37,7 @@ public class Query implements Serializable {
 	private String    requestDescription;
 	private String    ethicsVote;
 	private String    queryXml;
+	private Boolean   negotiationStarted;
 
 	public Query() {}
 
@@ -53,6 +54,7 @@ public class Query implements Serializable {
 		this.requestDescription = value.requestDescription;
 		this.ethicsVote = value.ethicsVote;
 		this.queryXml = value.queryXml;
+		this.negotiationStarted = value.negotiationStarted;
 	}
 
 	public Query(
@@ -67,7 +69,8 @@ public class Query implements Serializable {
 		Boolean   validQuery,
 		String    requestDescription,
 		String    ethicsVote,
-		String    queryXml
+		String    queryXml,
+		Boolean   negotiationStarted
 	) {
 		this.id = id;
 		this.title = title;
@@ -81,6 +84,7 @@ public class Query implements Serializable {
 		this.requestDescription = requestDescription;
 		this.ethicsVote = ethicsVote;
 		this.queryXml = queryXml;
+		this.negotiationStarted = negotiationStarted;
 	}
 
 	public Integer getId() {
@@ -177,5 +181,13 @@ public class Query implements Serializable {
 
 	public void setQueryXml(String queryXml) {
 		this.queryXml = queryXml;
+	}
+
+	public Boolean getNegotiationStarted() {
+		return this.negotiationStarted;
+	}
+
+	public void setNegotiationStarted(Boolean negotiationStarted) {
+		this.negotiationStarted = negotiationStarted;
 	}
 }
