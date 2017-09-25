@@ -94,18 +94,26 @@ public class DbUtil {
     public static Boolean saveConnectorQueryResult(Config config, BbmriResult result){
         Integer collectionId = getCollectionId(config, result.getDirectoryCollectionId());
 
-        if(collectionId == null)
+        if(collectionId == null) {
+            logger.error("Could not find the collection with ID {}", result.getDirectoryCollectionId());
             return false;
+        }
 
-        config.dsl().update(Tables.QUERY_COLLECTION)
-                .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT , false)
-                .set(Tables.QUERY_COLLECTION.DONORS , result.getNumberOfDonors())
-                .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
-                .set(Tables.QUERY_COLLECTION.RESULT_RECEIVED_TIME, new Timestamp(new Date().getTime()))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getQueryId())
-                .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
-                .execute();
         try {
+            config.dsl().delete(Tables.QUERY_COLLECTION)
+                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getQueryId())
+                    .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
+                    .execute();
+
+            config.dsl().insertInto(Tables.QUERY_COLLECTION)
+                    .set(Tables.QUERY_COLLECTION.QUERY_ID, result.getQueryId())
+                    .set(Tables.QUERY_COLLECTION.COLLECTION_ID, collectionId)
+                    .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT , false)
+                    .set(Tables.QUERY_COLLECTION.DONORS , result.getNumberOfDonors())
+                    .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
+                    .set(Tables.QUERY_COLLECTION.RESULT_RECEIVED_TIME, new Timestamp(new Date().getTime()))
+                    .execute();
+
             config.commit();
             return true;
         } catch (SQLException e) {
