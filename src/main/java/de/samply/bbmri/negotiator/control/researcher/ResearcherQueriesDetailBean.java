@@ -78,11 +78,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private SessionBean sessionBean;
 
     /**
-     * The enum for different statuses of a query as marked by a biobanker.
-     */
-    private Flag flagFilter = Flag.UNFLAGGED;
-
-    /**
      * The QueryStatsDTO object used to get all the information for queries.
      */
     private List<QueryStatsDTO> queries;
@@ -195,44 +190,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return null;
     }
 
-
     /**
-     * Gets the potential biobankers and sends out the emails
-     *
-     */
-    public void sendEmailsToPotentialBiobankers() {
-        try(Config config = ConfigFactory.get()) {
-            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, userBean.getUserId());
-            QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(), selectedQuery);
-            notifier.sendEmailNotification();
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * Build url to be able to navigate to the query with id=selectedQuery.getId() for a biobanker
-     *
-     * @return
-     */
-    public String getQueryUrlForBiobanker() {
-        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-
-        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
-                context.getRequestServerPort(), context.getRequestContextPath(),
-                "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
-    }
-
-    /**
-     * Starts negotiation for a query and sends out emails to biobankers.
+     * Starts negotiation for a query.
      * @return refreshes the view
      */
     public String startNegotiation() {
         try(Config config = ConfigFactory.get()) {
             DbUtil.startNegotiation(config, selectedQuery.getId());
-            sendEmailsToPotentialBiobankers();
         } catch (SQLException e) {
             e.printStackTrace();
         }
