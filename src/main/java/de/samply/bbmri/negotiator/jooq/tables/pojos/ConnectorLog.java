@@ -24,11 +24,12 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConnectorLog implements Serializable {
 
-	private static final long serialVersionUID = 478697939;
+	private static final long serialVersionUID = 1083818690;
 
 	private Integer   id;
 	private String    directoryCollectionId;
 	private Timestamp lastQueryTime;
+	private Timestamp lastNegotiationTime;
 
 	public ConnectorLog() {}
 
@@ -36,16 +37,19 @@ public class ConnectorLog implements Serializable {
 		this.id = value.id;
 		this.directoryCollectionId = value.directoryCollectionId;
 		this.lastQueryTime = value.lastQueryTime;
+		this.lastNegotiationTime = value.lastNegotiationTime;
 	}
 
 	public ConnectorLog(
 		Integer   id,
 		String    directoryCollectionId,
-		Timestamp lastQueryTime
+		Timestamp lastQueryTime,
+		Timestamp lastNegotiationTime
 	) {
 		this.id = id;
 		this.directoryCollectionId = directoryCollectionId;
 		this.lastQueryTime = lastQueryTime;
+		this.lastNegotiationTime = lastNegotiationTime;
 	}
 
 	public Integer getId() {
@@ -70,5 +74,13 @@ public class ConnectorLog implements Serializable {
 
 	public void setLastQueryTime(Timestamp lastQueryTime) {
 		this.lastQueryTime = lastQueryTime;
+	}
+
+	public Timestamp getLastNegotiationTime() {
+		return this.lastNegotiationTime;
+	}
+
+	public void setLastNegotiationTime(Timestamp lastNegotiationTime) {
+		this.lastNegotiationTime = lastNegotiationTime;
 	}
 }

@@ -76,6 +76,7 @@ public class DbUtil {
     public static String startNegotiation(Config config, Integer queryId){
         config.dsl().update(Tables.QUERY)
                 .set(Tables.QUERY.NEGOTIATION_STARTED, true)
+                .set(Tables.QUERY.NEGOTIATION_STARTED_TIME, new Timestamp(new Date().getTime()))
                 .where(Tables.QUERY.ID.eq(queryId))
                 .execute();
         try {
@@ -171,7 +172,7 @@ public class DbUtil {
      * @param collectionId collection id of the connector
      * @return  Timestamp of last request
      */
-    public static Timestamp getLastRequestTime(Config config, String collectionId) {
+    public static Timestamp getLastNewQueryTime(Config config, String collectionId) {
         Record1<Timestamp> result = config.dsl()
                 .select(Tables.CONNECTOR_LOG.LAST_QUERY_TIME)
                 .from(Tables.CONNECTOR_LOG)
@@ -1224,4 +1225,91 @@ public class DbUtil {
         }
     }
 
+    /**
+     * Gets the time when the last connector request was made for the negotiations.
+     *
+     * @param config       JOOQ configuration
+     * @param collectionId collection id of the connector
+     * @return Timestamp of last request
+     */
+    public static Timestamp getLastNewNegotiationTime(Config config, String collectionId) {
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.CONNECTOR_LOG.LAST_NEGOTIATION_TIME)
+                .from(Tables.CONNECTOR_LOG)
+                .where(Tables.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID.eq(collectionId))
+                .and (Tables.CONNECTOR_LOG.LAST_NEGOTIATION_TIME.isNotNull())
+                .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
+                .fetchAny();
+
+        if (result == null) {
+            return null;
+        }
+
+        Timestamp timestamp = result.value1();
+        return timestamp;
+    }
+
+    /**
+     * Gets all the negotiations after the given timestamp.
+     *
+     * @param config    JOOQ configuration
+     * @param timestamp
+     * @return List<QueryDetail> list of queries
+     */
+    public static List<QueryCollection> getAllNewNegotiations(Config config, Timestamp timestamp, String directoryCollectionId) {
+        Integer collectionId = getCollectionId(config, directoryCollectionId);
+
+        Result<Record> result = config.dsl()
+                .select(Tables.QUERY.ID.as("queryId"))
+                .select(Tables.QUERY_COLLECTION.COLLECTION_ID.as("collectionId"))
+                .from(Tables.QUERY)
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN).on(Tables.QUERY_COLLECTION.QUERY_ID.eq(Tables.QUERY.ID))
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .and (Tables.QUERY.NEGOTIATION_STARTED.eq(true))
+                .and(Tables.QUERY.NEGOTIATION_STARTED_TIME.ge(timestamp))
+                .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId))
+                .fetch();
+
+        List<QueryCollection> queryCollectionList = config.map(result, QueryCollection.class);
+        return queryCollectionList;
+    }
+
+
+    /**
+     * Logs the time when the connector request was made for the negotiations.
+     *
+     * @param config                JOOQ configuration
+     * @param directoryCollectionId The collection directoryID
+     */
+    public static void logGetNegotiationTime(Config config, String directoryCollectionId) {
+        ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
+        connectorLogRecord.setDirectoryCollectionId(directoryCollectionId);
+        connectorLogRecord.setLastNegotiationTime(new Timestamp(new Date().getTime()));
+        connectorLogRecord.store();
+    }
+
+
+    /**
+     * Gets the time when first negotiation was started in the negotiator.
+     *
+     * @param config JOOQ configuration
+     * @return Timestamp timestamp of negotiation
+     */
+    public static Timestamp getFirstNegotiationTime(Config config) {
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.QUERY.NEGOTIATION_STARTED_TIME)
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .and (Tables.QUERY.NEGOTIATION_STARTED.eq(true))
+                .and (Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull())
+                .orderBy(Tables.QUERY.NEGOTIATION_STARTED_TIME.asc())
+                .fetchAny();
+
+        if (result == null) {
+            return null;
+        }
+
+        Timestamp timestamp = result.value1();
+        return timestamp;
+    }
 }

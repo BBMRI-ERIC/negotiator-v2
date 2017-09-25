@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = 1785446899;
+	private static final long serialVersionUID = -1396757936;
 
 	private Integer   id;
 	private String    title;
@@ -38,6 +38,7 @@ public class Query implements Serializable {
 	private String    ethicsVote;
 	private String    queryXml;
 	private Boolean   negotiationStarted;
+	private Timestamp negotiationStartedTime;
 
 	public Query() {}
 
@@ -55,6 +56,7 @@ public class Query implements Serializable {
 		this.ethicsVote = value.ethicsVote;
 		this.queryXml = value.queryXml;
 		this.negotiationStarted = value.negotiationStarted;
+		this.negotiationStartedTime = value.negotiationStartedTime;
 	}
 
 	public Query(
@@ -70,7 +72,8 @@ public class Query implements Serializable {
 		String    requestDescription,
 		String    ethicsVote,
 		String    queryXml,
-		Boolean   negotiationStarted
+		Boolean   negotiationStarted,
+		Timestamp negotiationStartedTime
 	) {
 		this.id = id;
 		this.title = title;
@@ -85,6 +88,7 @@ public class Query implements Serializable {
 		this.ethicsVote = ethicsVote;
 		this.queryXml = queryXml;
 		this.negotiationStarted = negotiationStarted;
+		this.negotiationStartedTime = negotiationStartedTime;
 	}
 
 	public Integer getId() {
@@ -189,5 +193,13 @@ public class Query implements Serializable {
 
 	public void setNegotiationStarted(Boolean negotiationStarted) {
 		this.negotiationStarted = negotiationStarted;
+	}
+
+	public Timestamp getNegotiationStartedTime() {
+		return this.negotiationStartedTime;
+	}
+
+	public void setNegotiationStartedTime(Timestamp negotiationStartedTime) {
+		this.negotiationStartedTime = negotiationStartedTime;
 	}
 }
