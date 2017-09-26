@@ -1282,6 +1282,7 @@ public class DbUtil {
      * @param directoryCollectionId The collection directoryID
      */
     public static void logGetNegotiationTime(Config config, String directoryCollectionId) {
+        //TODO What if foreign key constraint fails
         ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
         connectorLogRecord.setDirectoryCollectionId(directoryCollectionId);
         connectorLogRecord.setLastNegotiationTime(new Timestamp(new Date().getTime()));
