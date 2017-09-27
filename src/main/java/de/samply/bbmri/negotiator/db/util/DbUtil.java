@@ -177,6 +177,7 @@ public class DbUtil {
                 .select(Tables.CONNECTOR_LOG.LAST_QUERY_TIME)
                 .from(Tables.CONNECTOR_LOG)
                 .where(Tables.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID.eq(collectionId))
+                .and (Tables.CONNECTOR_LOG.LAST_QUERY_TIME.isNotNull())
                 .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
                 .fetchAny();
 
