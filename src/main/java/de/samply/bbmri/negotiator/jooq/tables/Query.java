@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = -1511962559;
+	private static final long serialVersionUID = -379469107;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -110,11 +110,6 @@ public class Query extends TableImpl<QueryRecord> {
 	 * The column <code>public.query.query_xml</code>. XML version of the query
 	 */
 	public final TableField<QueryRecord, String> QUERY_XML = createField("query_xml", org.jooq.impl.SQLDataType.CLOB, this, "XML version of the query");
-
-	/**
-	 * The column <code>public.query.negotiation_started</code>. describes if the negotiation has started for the query or not.
-	 */
-	public final TableField<QueryRecord, Boolean> NEGOTIATION_STARTED = createField("negotiation_started", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "describes if the negotiation has started for the query or not.");
 
 	/**
 	 * The column <code>public.query.negotiation_started_time</code>. Time when the researcher started the negotiation for the query.

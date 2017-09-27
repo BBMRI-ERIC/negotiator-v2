@@ -37,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 
-	private static final long serialVersionUID = 643948116;
+	private static final long serialVersionUID = -1327666029;
 
 	/**
 	 * The reference instance of <code>public.connector_log</code>
@@ -65,7 +65,7 @@ public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 	/**
 	 * The column <code>public.connector_log.last_query_time</code>. Timestamp when the request was made. 
 	 */
-	public final TableField<ConnectorLogRecord, Timestamp> LAST_QUERY_TIME = createField("last_query_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "Timestamp when the request was made. ");
+	public final TableField<ConnectorLogRecord, Timestamp> LAST_QUERY_TIME = createField("last_query_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "Timestamp when the request was made. ");
 
 	/**
 	 * The column <code>public.connector_log.last_negotiation_time</code>. Time when the connector last fetched for new negotiations.

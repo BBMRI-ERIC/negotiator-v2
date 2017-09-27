@@ -150,13 +150,6 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	}
 
 	/**
-	 * Fetch records that have <code>negotiation_started IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByNegotiationStarted(Boolean... values) {
-		return fetch(Query.QUERY.NEGOTIATION_STARTED, values);
-	}
-
-	/**
 	 * Fetch records that have <code>negotiation_started_time IN (values)</code>
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByNegotiationStartedTime(Timestamp... values) {

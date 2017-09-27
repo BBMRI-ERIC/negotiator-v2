@@ -75,7 +75,6 @@ public class DbUtil {
      */
     public static String startNegotiation(Config config, Integer queryId){
         config.dsl().update(Tables.QUERY)
-                .set(Tables.QUERY.NEGOTIATION_STARTED, true)
                 .set(Tables.QUERY.NEGOTIATION_STARTED_TIME, new Timestamp(new Date().getTime()))
                 .where(Tables.QUERY.ID.eq(queryId))
                 .execute();
@@ -1269,7 +1268,6 @@ public class DbUtil {
                 .from(Tables.QUERY)
                 .join(Tables.QUERY_COLLECTION, JoinType.JOIN).on(Tables.QUERY_COLLECTION.QUERY_ID.eq(Tables.QUERY.ID))
                 .where(Tables.QUERY.VALID_QUERY.eq(true))
-                .and (Tables.QUERY.NEGOTIATION_STARTED.eq(true))
                 .and(Tables.QUERY.NEGOTIATION_STARTED_TIME.ge(timestamp))
                 .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId))
                 .fetch();
@@ -1305,7 +1303,6 @@ public class DbUtil {
                 .select(Tables.QUERY.NEGOTIATION_STARTED_TIME)
                 .from(Tables.QUERY)
                 .where(Tables.QUERY.VALID_QUERY.eq(true))
-                .and (Tables.QUERY.NEGOTIATION_STARTED.eq(true))
                 .and (Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull())
                 .orderBy(Tables.QUERY.NEGOTIATION_STARTED_TIME.asc())
                 .fetchAny();
