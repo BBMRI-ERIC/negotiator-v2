@@ -37,6 +37,8 @@ import de.samply.config.util.JAXBUtil;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.naming.NamingException;
@@ -47,6 +49,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
@@ -62,6 +65,8 @@ import java.sql.SQLException;
 })
 public class TestSuite {
     public static final String FILE_POSTGRESQL = "bbmri.test.postgres.xml";
+
+    private static final Logger logger = LoggerFactory.getLogger(TestSuite.class);
 
     private static Postgresql postgresql;
 
@@ -87,19 +92,29 @@ public class TestSuite {
                 Postgresql.class);
 
 
-        // GRRRRRR. Whoever wrote this, deserves a slow death. NEVER clean an existing database in a testsuite
+        Connection connection = getConnection();
 
-        /**
-         * Manually drop all tables in the database.
-         */
-//        Connection connection = getConnection();
-//        connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
-//        connection.commit();
-//
-//        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
-//        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData.sql"));
-//
-//        connection.commit();
+        // only if the DB is empty you shall create it
+        try(ResultSet set = connection.getMetaData().getTables(null, null, "", new String[]{"TABLE"})) {
+            if(!set.next()) {
+                logger.info("Database empty, creating tables");
+
+                SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
+                SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData.sql"));
+
+                connection.commit();
+            } else {
+                logger.info("Database not empty.");
+            }
+
+//            /**
+//             * Manually drop all tables in the database.
+//             */
+//            connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
+//            connection.commit();
+
+        }
+
     }
 
     private static JAXBContext getJAXBContext() throws JAXBException {
