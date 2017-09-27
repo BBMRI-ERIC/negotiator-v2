@@ -78,7 +78,6 @@ public class Connector {
             */
             Timestamp timestamp = DbUtil.getLastNewQueryTime(config, directoryCollectionId );
 
-
             if(timestamp == null){
                 /**
                  * This will be the case when a connector is new to the system and is requesting for the first time.
@@ -221,31 +220,24 @@ public class Connector {
      */
     @GET
     @Path("/negotiations")
-    //TODO: Check why it fails on media type application_xml
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_XML)
     public Response getNegotiation(@QueryParam("directoryCollectionId") String directoryCollectionId) {
-
         if(directoryCollectionId == null)
             return Response.status(400).build();
 
         try (Config config = ConfigFactory.get()) {
             List<QueryCollection> newNegotiations = null;
 
-
              // Get last time a request was made by the connector
-
             Timestamp timestamp = DbUtil.getLastNewNegotiationTime(config, directoryCollectionId );
 
             if(timestamp == null){
 
                  // Will come here when a connector is new to the system and is requesting for the first time.
-
                 timestamp = DbUtil.getFirstNegotiationTime(config);
                 if(timestamp == null){
 
-
                      // Will come here when no negotiations started in the negotiator yet.
-
                 } else{
                     newNegotiations = DbUtil.getAllNewNegotiations(config, timestamp, directoryCollectionId);
                 }
@@ -258,7 +250,11 @@ public class Connector {
             DbUtil.logGetNegotiationTime(config, directoryCollectionId);
             config.commit();
 
-            return Response.status(200).entity(newNegotiations).build();
+            //Transform to generic list to send as xml
+            GenericEntity<List<QueryCollection>> newNegotiationsEntity = new GenericEntity<List<QueryCollection>>
+                    (newNegotiations) {};
+
+            return Response.status(200).entity(newNegotiationsEntity).build();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
