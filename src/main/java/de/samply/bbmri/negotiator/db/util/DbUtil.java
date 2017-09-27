@@ -106,14 +106,17 @@ public class DbUtil {
                     .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
                     .execute();
 
-            config.dsl().insertInto(Tables.QUERY_COLLECTION)
-                    .set(Tables.QUERY_COLLECTION.QUERY_ID, result.getQueryId())
-                    .set(Tables.QUERY_COLLECTION.COLLECTION_ID, collectionId)
-                    .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT , false)
-                    .set(Tables.QUERY_COLLECTION.DONORS , result.getNumberOfDonors())
-                    .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
-                    .set(Tables.QUERY_COLLECTION.RESULT_RECEIVED_TIME, new Timestamp(new Date().getTime()))
-                    .execute();
+            // only save an entry, if the result is actually not 0
+            if(result.getNumberOfSamples() != 0 || result.getNumberOfDonors() != 0) {
+                config.dsl().insertInto(Tables.QUERY_COLLECTION)
+                        .set(Tables.QUERY_COLLECTION.QUERY_ID, result.getQueryId())
+                        .set(Tables.QUERY_COLLECTION.COLLECTION_ID, collectionId)
+                        .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, false)
+                        .set(Tables.QUERY_COLLECTION.DONORS, result.getNumberOfDonors())
+                        .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
+                        .set(Tables.QUERY_COLLECTION.RESULT_RECEIVED_TIME, new Timestamp(new Date().getTime()))
+                        .execute();
+            }
 
             config.commit();
             return true;
