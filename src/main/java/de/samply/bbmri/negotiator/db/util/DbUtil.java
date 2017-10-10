@@ -101,14 +101,14 @@ public class DbUtil {
 
         try {
             config.dsl().delete(Tables.QUERY_COLLECTION)
-                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getQueryId())
+                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getNegotiatorQueryId())
                     .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
                     .execute();
 
             // only save an entry, if the result is actually not 0
             if(result.getNumberOfSamples() != 0 || result.getNumberOfDonors() != 0) {
                 config.dsl().insertInto(Tables.QUERY_COLLECTION)
-                        .set(Tables.QUERY_COLLECTION.QUERY_ID, result.getQueryId())
+                        .set(Tables.QUERY_COLLECTION.QUERY_ID, result.getNegotiatorQueryId())
                         .set(Tables.QUERY_COLLECTION.COLLECTION_ID, collectionId)
                         .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, false)
                         .set(Tables.QUERY_COLLECTION.DONORS, result.getNumberOfDonors())
