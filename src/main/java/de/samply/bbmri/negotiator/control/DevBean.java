@@ -27,6 +27,21 @@ public class DevBean implements Serializable {
         return "/owner/index.xhtml?faces-redirect=true";
     }
 
+    public String choseBiobankOwner1() {
+        userBean.fakeUser("usertest-biobanker1");
+        return "/owner/index.xhtml?faces-redirect=true";
+    }
+
+    public String choseBiobankOwner2() {
+        userBean.fakeUser("usertest-biobanker2");
+        return "/owner/index.xhtml?faces-redirect=true";
+    }
+
+    public String choseBiobankOwner3() {
+        userBean.fakeUser("usertest-biobanker3");
+        return "/owner/index.xhtml?faces-redirect=true";
+    }
+
     /**
      * Choses the researcher as a user
      * @return
