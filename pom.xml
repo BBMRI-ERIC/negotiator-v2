@@ -17,7 +17,6 @@
 
         <version.samply.webjar>1.6.0</version.samply.webjar>
         <version.samply.auth.client>1.0.2</version.samply.auth.client>
-        <version.samply.common.upgrade>2.0.0</version.samply.common.upgrade>
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
         <version.samply.directory.client>1.0.3-SNAPSHOT</version.samply.directory.client>
@@ -46,12 +45,6 @@
             <groupId>de.samply</groupId>
             <artifactId>negotiator-dto</artifactId>
             <version>${version.samply.negotiator.dto}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>de.samply</groupId>
-            <artifactId>common-upgrade</artifactId>
-            <version>${version.samply.common.upgrade}</version>
         </dependency>
 
         <dependency>
@@ -185,6 +178,11 @@
             <version>1.1.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>4.2.0</version>
+        </dependency>
     </dependencies>
 
     <distributionManagement>
@@ -229,7 +227,7 @@
             <properties>
                 <database.server>steffi16</database.server>
                 <database.port>5432</database.port>
-                <database.name>negotiator2</database.name>
+                <database.name>negotiator3</database.name>
                 <database.username>negotiator</database.username>
                 <database.password>test123</database.password>
             </properties>

@@ -29,10 +29,9 @@ package de.samply.bbmri.negotiator.test;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.common.config.ObjectFactory;
 import de.samply.common.config.Postgresql;
-import de.samply.common.sql.SQLUtil;
-import de.samply.common.upgrade.SamplyUpgradeException;
 import de.samply.config.util.JAXBUtil;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -71,7 +70,7 @@ public class TestSuite {
     private static Postgresql postgresql;
 
 	@BeforeClass
-    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, SamplyUpgradeException, NamingException {
+    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, NamingException {
         NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
 
 	    String prop = "bbmri.negotiator.confdir";
@@ -99,8 +98,10 @@ public class TestSuite {
             if(!set.next()) {
                 logger.info("Database empty, creating tables");
 
-                SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
-                SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData.sql"));
+                DbUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database" +
+                        ".sql"));
+                DbUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData" +
+                        ".sql"));
 
                 connection.commit();
             } else {

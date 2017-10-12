@@ -26,8 +26,11 @@
 
 package de.samply.bbmri.negotiator.db.util;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -1313,5 +1316,56 @@ public class DbUtil {
 
         Timestamp timestamp = result.value1();
         return timestamp;
+    }
+
+    /**
+     * Executes the given file name as SQL file. It tries to load the file by using the class loader.
+     * @param filename the file name, e.g. "/sql.upgrades/upgrade1.sql"
+     * @throws SQLException
+     */
+    public static void executeSQLFile(Connection connection, ClassLoader classLoader, String filename) throws SQLException, IOException {
+        InputStream stream = classLoader.getResourceAsStream(filename);
+
+        if(stream == null) {
+            throw new FileNotFoundException();
+        }
+        executeStream(connection, stream);
+    }
+
+    /**
+     * Executes the given string as SQL statement.
+     * @param sql the SQL statement
+     * @throws SQLException
+     */
+    public static void executeSQL(Connection connection, String sql) throws SQLException {
+        try (Statement st = connection.createStatement()) {
+            st.execute(sql);
+            st.close();
+        }
+    }
+
+    /**
+     * Executes the given input stream as SQL statements.
+     * @param stream the input stream for SQL statements.
+     * @throws SQLException
+     */
+    public static void executeStream(Connection connection, InputStream stream) throws SQLException, IOException {
+        InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+
+        String s;
+        StringBuilder sb = new StringBuilder();
+
+        BufferedReader br = new BufferedReader(reader);
+
+        /**
+         * This might be unnecessary.
+         */
+        String separator = System.lineSeparator();
+
+        while ((s = br.readLine()) != null) {
+            sb.append(s).append(separator);
+        }
+        br.close();
+        executeSQL(connection, sb.toString());
     }
 }

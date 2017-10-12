@@ -69,6 +69,14 @@ public class ResourceManager implements Serializable {
     }
 
     /**
+     * Gets the datasource
+     * @return
+     */
+    public static DataSource getDataSource() {
+        return dataSource;
+    }
+
+    /**
      * Gets the Domain Specific Language (DSL) context.
      * 
      * @param connection
