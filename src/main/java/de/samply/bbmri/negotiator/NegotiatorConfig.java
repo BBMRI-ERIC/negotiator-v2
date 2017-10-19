@@ -89,6 +89,11 @@ public class NegotiatorConfig {
     private Negotiator negotiator;
 
     /**
+     * Set to true, if the DB gets installed in this application start
+     */
+    private static Boolean newDatabaseInstallation = false;
+
+    /**
      * Instantiates a new negotiator config.
      */
     private NegotiatorConfig() {
@@ -207,6 +212,22 @@ public class NegotiatorConfig {
      */
     public Negotiator getNegotiator() {
         return instance.negotiator;
+    }
+
+    /**
+     * Ir of not the database was installed during this application start
+     * @return
+     */
+    public static Boolean getNewDatabaseInstallation() {
+        return newDatabaseInstallation;
+    }
+
+    /**
+     * Sets if or not the database was installed during this application start
+     * @param newDatabaseInstallationSet
+     */
+    public static void setNewDatabaseInstallation(Boolean newDatabaseInstallationSet) {
+        newDatabaseInstallation = newDatabaseInstallationSet;
     }
 
     /**

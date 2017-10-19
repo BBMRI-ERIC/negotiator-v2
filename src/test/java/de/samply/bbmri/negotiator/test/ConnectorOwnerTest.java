@@ -32,7 +32,6 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.model.CollectionOwner;
 import de.samply.common.config.ObjectFactory;
 import de.samply.common.config.Postgresql;
-import de.samply.common.upgrade.SamplyUpgradeException;
 import de.samply.config.util.JAXBUtil;
 import org.jooq.conf.Settings;
 import org.junit.BeforeClass;
@@ -78,7 +77,7 @@ public class ConnectorOwnerTest {
     }
 
     @BeforeClass
-    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, SamplyUpgradeException {
+    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException {
         NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
 
         File file = null;
