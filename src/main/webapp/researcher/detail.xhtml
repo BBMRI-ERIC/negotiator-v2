@@ -195,21 +195,47 @@
 
                         <div id="sampleAvailability" class="tab-pane fade">
 
+                            <!--    Dropdown menu using Select2         -->
+                            <h:form id="researcherForm">
+                                <br/>
+                                <h:outputLabel for="select2"  > Select a Biobank</h:outputLabel>
+                                <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 50%" >
+                                    <f:selectItem></f:selectItem>
+                                    <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="collect" itemValue="#{collect.id}" itemLabel="#{collect.name}" />
+                                </h:selectOneMenu>
+                                <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
+                                <br/>
+                            </h:form>
+                            <h:outputScript>
+                                $(".basic-single").select2({
+                                placeholder: " Select a Biobank ",
+                                allowClear: true, width: 'resolve', theme:'classic'
+                                })
+                            </h:outputScript>
+
+
                             <ui:fragment rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}">
                                 <br />
                                 <p>
                                     <b> <h:outputText value="#{label['message.noOffers']}" /> </b>
                                 </p>
                             </ui:fragment>
-
+                            <br />
                             <c:set var="oneMarkerOnly" value="#{researcherQueriesDetailBean.offerMakers.size() == 1}" />
+
+
                             <c:forEach begin="1" end="#{researcherQueriesDetailBean.offerMakers.size()}" var="i">
                                 <div class="panel panel-default">
+
+
+
+
                                     <div class="panel-heading" role="tab" id="heading#{i}">
+
                                         <h4 class="panel-title">
-                                            <a role="button" data-toggle="collapse"
+                                          <a  data-toggle="collapse"
                                                     data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
-                                                    aria-controls="sample-list"> Biobanker #{i}
+                                                    aria-controls="sample-list" >Biobanker#{i}
                                             </a>
                                         </h4>
                                     </div>
@@ -217,7 +243,6 @@
                                          class="panel-collapse collapse #{oneMarkerOnly?'in':''}"
                                          role="tabpanel"
                                          aria-labelledby="heading#{i}">
-
 
                                         <div class="panel-body">
                                             <ui:repeat

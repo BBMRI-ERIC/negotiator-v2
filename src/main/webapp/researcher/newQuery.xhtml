@@ -101,7 +101,7 @@
 					<h:inputTextarea id="description" value="#{queryBean.queryText}"
 						styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.text']}"
 						validatorMessage="#{label['error.invalidDescriptionLength']}">
-						<f:validateLength for="description" minimum="5" maximum="500" />
+						<f:validateLength for="description" minimum="5" maximum="6000" />									<!-- LENGTH Increased -->
 					</h:inputTextarea>
 					<h:message for="description" style="color:red"
 						styleClass="pre-wrap" />

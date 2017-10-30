@@ -35,15 +35,10 @@ import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jooq.Record;
@@ -76,6 +71,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
+
+
+    private List<Collection> dropDownList= new ArrayList<>();
+    /**
+       offerResearcher is biobanker id that researcher has chosen to contact
+    */
+
+    private Integer offerResearcher;
 
     /**
      * The QueryStatsDTO object used to get all the information for queries.
@@ -159,15 +162,28 @@ public class ResearcherQueriesDetailBean implements Serializable {
             collections = DbUtil.getCollectionsForQuery(config, queryId);
 
             /**
+            *new list formed for dropdown feature
+             */
+            dropDownList.addAll(collections);
+            for(int i=0; i<offerMakers.size();i++) {
+                for (int j = 0; j < dropDownList.size(); j++) {
+                    if (offerMakers.get(i) == dropDownList.get(j).getId()) {
+                        dropDownList.remove(j);
+                        break;
+                    }
+                }
+            }
+
+            /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
-            for(QueryStatsDTO query : getQueries()) {
-                if(query.getQuery().getId() == queryId) {
+            for (QueryStatsDTO query : getQueries()) {
+                if (query.getQuery().getId() == queryId) {
                     selectedQuery = query.getQuery();
                 }
             }
 
-            if(selectedQuery == null) {
+            if (selectedQuery == null) {
                 /**
                  * If it is null, it means that the query simply does not exist.
                  */
@@ -183,6 +199,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 setHumanReadableQuery(queryDTO.getHumanReadable());
             }
 
+
+
+
+
+
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -192,10 +213,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     /**
      * Starts negotiation for a query.
+     *
      * @return refreshes the view
      */
     public String startNegotiation() {
-        try(Config config = ConfigFactory.get()) {
+        try (Config config = ConfigFactory.get()) {
             DbUtil.startNegotiation(config, selectedQuery.getId());
         } catch (SQLException e) {
             e.printStackTrace();
@@ -215,7 +237,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * Removes the search filter.
      *
      * @param arg
-     *
      */
     public void removeFilter(String arg) {
         queries = null;
@@ -224,6 +245,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     /**
      * Split search terms by list of delimiters
+     *
      * @return unique search terms
      */
     public Set<String> getFilterTerms() {
@@ -310,13 +332,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.commentText = commentText;
     }
 
-	public String getHumanReadableQuery() {
-		return humanReadableQuery;
-	}
+    public String getHumanReadableQuery() {
+        return humanReadableQuery;
+    }
 
-	public void setHumanReadableQuery(String humanReadableQuery) {
-		this.humanReadableQuery = humanReadableQuery;
-	}
+    public void setHumanReadableQuery(String humanReadableQuery) {
+        this.humanReadableQuery = humanReadableQuery;
+    }
 
     public Part getFile() {
         return file;
@@ -332,18 +354,19 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     /**
      * Lazyloaded map of saved filenames and original filenames
+     *
      * @return
      */
     public HashMap<String, String> getAttachmentMap() {
-        if(attachmentMap == null) {
+        if (attachmentMap == null) {
             attachmentMap = new HashMap<>();
-            for(QueryAttachmentDTO att : attachments) {
+            for (QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
                 String uploadName = "query_" + queryId + "_file_" + att.getId();
 
                 Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
-                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
+                uploadName = uploadName + "_salt_" + DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
                         uploadName) + ".pdf";
 
 
@@ -390,5 +413,30 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public void setSessionBean(SessionBean sessionBean) {
         this.sessionBean = sessionBean;
     }
+
+
+    public Integer getOfferResearcher() {
+
+        return offerResearcher;
+    }
+
+    public void setOfferResearcher(Integer offerResearcher) {
+        this.offerResearcher = offerResearcher;
+    }
+
+    public void addIntoList() {
+        offerMakers.add(offerResearcher);
+
+    }
+
+    public List<Collection> getDropDownList() {
+        return dropDownList;
+    }
+
+    public void setDropDownList(List<Collection> copyList) {
+        this.dropDownList = copyList;
+    }
+
+
 
 }
