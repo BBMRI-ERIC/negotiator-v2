@@ -1,0 +1,6 @@
+DROP TYPE role_type;
+
+DELETE FROM tag;
+
+DROP TABLE tag CASCADE;
+DROP TABLE tagged_query CASCADE;
