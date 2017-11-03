@@ -73,7 +73,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private SessionBean sessionBean;
 
 
-    private List<Collection> dropDownList= new ArrayList<>();
+    private List<CollectionBiobankDTO> dropDownList= new ArrayList<>();
     /**
        offerResearcher is biobanker id that researcher has chosen to contact
     */
@@ -131,7 +131,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     QueryDTO queryDTO = null;
 
-    private List<Collection> collections;
+    private List<CollectionBiobankDTO> collections;
 
     /**
      * The list of biobanker owners who made a sample offer for a given query
@@ -167,7 +167,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             dropDownList.addAll(collections);
             for(int i=0; i<offerMakers.size();i++) {
                 for (int j = 0; j < dropDownList.size(); j++) {
-                    if (offerMakers.get(i) == dropDownList.get(j).getId()) {
+                    if (offerMakers.get(i) == dropDownList.get(j).getCollection().getId()) {
                         dropDownList.remove(j);
                         break;
                     }
@@ -382,11 +382,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return attachments;
     }
 
-    public List<Collection> getCollections() {
+    public List<CollectionBiobankDTO> getCollections() {
         return collections;
     }
 
-    public void setCollections(List<Collection> collections) {
+    public void setCollections(List<CollectionBiobankDTO> collections) {
         this.collections = collections;
     }
 
@@ -429,11 +429,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     }
 
-    public List<Collection> getDropDownList() {
+    public List<CollectionBiobankDTO> getDropDownList() {
         return dropDownList;
     }
 
-    public void setDropDownList(List<Collection> copyList) {
+    public void setDropDownList(List<CollectionBiobankDTO> copyList) {
         this.dropDownList = copyList;
     }
 

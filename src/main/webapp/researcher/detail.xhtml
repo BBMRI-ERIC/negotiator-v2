@@ -109,8 +109,8 @@
                     <div id="collection-list" class="collapse">
                         <ul>
                             <ui:repeat value="#{researcherQueriesDetailBean.collections}"
-                                       var="collection">
-                                <li>#{collection.name}</li>
+                                       var="collect">
+                                <li>#{collect.collection.name}</li>
                             </ui:repeat>
                         </ul>
                     </div>
@@ -201,14 +201,14 @@
                                 <h:outputLabel for="select2"  > Select a Biobank</h:outputLabel>
                                 <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 50%" >
                                     <f:selectItem></f:selectItem>
-                                    <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="collect" itemValue="#{collect.id}" itemLabel="#{collect.name}" />
+                                    <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="collect" itemValue="#{collect.collection.id}" itemLabel="#{collect.biobank.name}" />
                                 </h:selectOneMenu>
                                 <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
                                 <br/>
                             </h:form>
                             <h:outputScript>
                                 $(".basic-single").select2({
-                                placeholder: " Select a Biobank ",
+                                placeholder: " Start new conversation with a biobank ",
                                 allowClear: true, width: 'resolve', theme:'classic'
                                 })
                             </h:outputScript>
@@ -235,7 +235,7 @@
                                         <h4 class="panel-title">
                                           <a  data-toggle="collapse"
                                                     data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
-                                                    aria-controls="sample-list" >Biobanker#{i}
+                                                    aria-controls="sample-list" >#{researcherQueriesDetailBean.collections.get(i-1).biobank.name}
                                             </a>
                                         </h4>
                                     </div>

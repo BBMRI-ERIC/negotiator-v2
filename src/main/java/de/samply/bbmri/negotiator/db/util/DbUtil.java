@@ -266,10 +266,10 @@ public class DbUtil {
             QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
 
             // collections already saved for this query
-            List<Collection> alreadySavedCollectiontsList = getCollectionsForQuery(config, queryId);
+            List<CollectionBiobankDTO> alreadySavedCollectiontsList = getCollectionsForQuery(config, queryId);
             HashMap<Integer, Boolean> alreadySavedCollections = new HashMap<>();
-            for(Collection savedOne: alreadySavedCollectiontsList) {
-                alreadySavedCollections.put(savedOne.getId(), true);
+            for(CollectionBiobankDTO savedOne: alreadySavedCollectiontsList) {
+                alreadySavedCollections.put(savedOne.getCollection().getId(), true);
             }
 
             if (NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
@@ -971,15 +971,24 @@ public class DbUtil {
      * @param queryId the query ID
      * @return
      */
-    public static List<Collection> getCollectionsForQuery(Config config, int queryId) {
-        Result<Record> fetch = config.dsl().select(Tables.COLLECTION.fields())
+    public static List<CollectionBiobankDTO> getCollectionsForQuery(Config config, int queryId) {
+        Result<Record> fetch = config.dsl().select(getFields(Tables.COLLECTION, "collection"))
+                .select(getFields(Tables.BIOBANK, "biobank"))
+                .from(Tables.QUERY_COLLECTION)
+                .join(Tables.COLLECTION)
+                .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .join(Tables.BIOBANK)
+                .on(Tables.COLLECTION.BIOBANK_ID.eq(Tables.BIOBANK.ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .fetch();
+        /** config.dsl().select(Tables.COLLECTION.fields())
                 .from(Tables.COLLECTION)
                 .join(Tables.QUERY_COLLECTION)
                 .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .fetch();
+                .fetch();**/
 
-        return config.map(fetch, Collection.class);
+        return config.map(fetch, CollectionBiobankDTO.class);
     }
 
     /**
