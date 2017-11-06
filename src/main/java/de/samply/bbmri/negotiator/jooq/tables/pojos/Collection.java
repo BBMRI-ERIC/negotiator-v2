@@ -42,8 +42,7 @@ public class Collection implements Serializable {
 		Integer id,
 		String  name,
 		String  directoryId,
-		Integer biobankId,
-		String biobankName
+		Integer biobankId
 	) {
 		this.id = id;
 		this.name = name;

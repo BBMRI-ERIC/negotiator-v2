@@ -198,17 +198,17 @@
                             <!--    Dropdown menu using Select2         -->
                             <h:form id="researcherForm">
                                 <br/>
-                                <h:outputLabel for="select2"  > Select a Biobank</h:outputLabel>
-                                <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 50%" >
+                                <h:outputLabel for="select2"  > Start new conversation with a biobank</h:outputLabel>
+                                <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 40%;margin: 7px" >
                                     <f:selectItem></f:selectItem>
-                                    <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="collect" itemValue="#{collect.collection.id}" itemLabel="#{collect.biobank.name}" />
+                                    <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="dropdown" itemValue="#{dropdown.collection.id}" itemLabel="#{dropdown.biobank.name}" />
                                 </h:selectOneMenu>
                                 <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
                                 <br/>
                             </h:form>
                             <h:outputScript>
                                 $(".basic-single").select2({
-                                placeholder: " Start new conversation with a biobank ",
+                                placeholder: " Select a biobank ",
                                 allowClear: true, width: 'resolve', theme:'classic'
                                 })
                             </h:outputScript>

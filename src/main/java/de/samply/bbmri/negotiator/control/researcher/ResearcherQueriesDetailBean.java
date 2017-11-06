@@ -72,12 +72,19 @@ public class ResearcherQueriesDetailBean implements Serializable {
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
-
-    private List<CollectionBiobankDTO> dropDownList= new ArrayList<>();
     /**
-       offerResearcher is biobanker id that researcher has chosen to contact
-    */
+     * List of collection with biobanks details of a specific query.
+     */
+    private List<CollectionBiobankDTO> collections;
 
+    /**
+     * List to store the person id who has not contacted already
+     */
+    private List<CollectionBiobankDTO> dropDownList= new ArrayList<>();
+
+    /**
+       offerResearcher is collection id that researcher has chosen to contact
+    */
     private Integer offerResearcher;
 
     /**
@@ -94,7 +101,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The selected query, if there is one
      */
     private Query selectedQuery = null;
-
 
      /**
      * The input text box for the user to make a comment.
@@ -131,10 +137,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     QueryDTO queryDTO = null;
 
-    private List<CollectionBiobankDTO> collections;
-
     /**
-     * The list of biobanker owners who made a sample offer for a given query
+     * The list of person who made a sample offer for a given query
      */
     private List<Integer> offerMakers;
 
@@ -198,12 +202,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
                 setHumanReadableQuery(queryDTO.getHumanReadable());
             }
-
-
-
-
-
-
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
