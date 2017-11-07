@@ -196,23 +196,24 @@
                         <div id="sampleAvailability" class="tab-pane fade">
 
                             <!--    Dropdown menu using Select2         -->
-                            <h:form id="researcherForm">
-                                <br/>
-                                <h:outputLabel for="select2"  > Start new conversation with a biobank</h:outputLabel>
-                                <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 40%;margin: 7px" >
-                                    <f:selectItem></f:selectItem>
-                                    <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="dropdown" itemValue="#{dropdown.collection.id}" itemLabel="#{dropdown.biobank.name}" />
-                                </h:selectOneMenu>
-                                <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
-                                <br/>
-                            </h:form>
-                            <h:outputScript>
-                                $(".basic-single").select2({
-                                placeholder: " Select a biobank ",
-                                allowClear: true, width: 'resolve', theme:'classic'
-                                })
-                            </h:outputScript>
-
+                            <h:panelGroup rendered="#{researcherQueriesDetailBean.dropDownList.size() > 0}">
+                                <h:form id="researcherForm">
+                                    <br/>
+                                    <h:outputLabel for="select2"> #{label['queryview.researcher.newconversation.title']}</h:outputLabel>
+                                    <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 40%;margin: 7px" >
+                                        <f:selectItem></f:selectItem>
+                                        <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="dropdown" itemValue="#{dropdown.collection.id}" itemLabel="#{dropdown.biobank.name}" />
+                                    </h:selectOneMenu>
+                                    <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
+                                    <br/>
+                                </h:form>
+                                <h:outputScript>
+                                    $(".basic-single").select2({
+                                    placeholder: "#{label['queryview.researcher.newconversaion.select.placeholder']}",
+                                    allowClear: true, width: 'resolve', theme:'classic'
+                                    })
+                                </h:outputScript>
+                            </h:panelGroup>
 
                             <ui:fragment rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}">
                                 <br />
