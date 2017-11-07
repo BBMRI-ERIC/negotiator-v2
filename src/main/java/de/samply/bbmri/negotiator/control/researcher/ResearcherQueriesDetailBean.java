@@ -166,11 +166,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
             collections = DbUtil.getCollectionsForQuery(config, queryId);
 
             /**
-            *new list formed for dropdown feature
+             * new list formed for dropdown feature
              */
             dropDownList.addAll(collections);
             for(int i=0; i<offerMakers.size();i++) {
                 for (int j = 0; j < dropDownList.size(); j++) {
+                    //TODO: this compares a personID to a collectionID, which is currently wrong.
+                    //TODO: to be fixed along the idea of ticket BIO-983
                     if (offerMakers.get(i) == dropDownList.get(j).getCollection().getId()) {
                         dropDownList.remove(j);
                         break;
