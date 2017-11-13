@@ -54,7 +54,7 @@
         </h:panelGroup>
         <!--        Function for the show more button        -->
         <h4>#{label['queryview.title.text']}</h4>
-        <span class="more">#{cc.attrs.bean.selectedQuery.text}</span>
+        <div style="white-space: pre-wrap"> <span class="more">#{cc.attrs.bean.selectedQuery.text}</span></div>
         <h:outputStylesheet>
             .morecontent span {
                 display: none;
@@ -66,8 +66,8 @@
         <h:outputScript>
         $(document).ready(function() {
         // Configure/customize these variables.
-        var showChar = 300;  // How many characters are shown by default
-        var moretext = "Show more >";
+        var showChar = 1100;  // How many characters are shown by default
+        var moretext = "Show full text";
         var lesstext = "Show less";
 
 
@@ -79,7 +79,7 @@
             var c = content.substr(0, showChar);
             var h = content.substr(showChar, content.length - showChar);
 
-            var html = c + '<span class="moreellipses">&nbsp;</span><span class="morecontent"><span>' + h + '</span>&nbsp;&nbsp;<a href="" class="morelink">' + moretext + '</a></span>';
+            var html = c + '<span class="moreellipses">&nbsp;</span><span class="morecontent"><span>' + h + '</span>&nbsp;&nbsp;<a  style="width: 100px" class="morelink label label-default">' + moretext + '</a></span>';
 
         $(this).html(html);
         }
