@@ -40,6 +40,7 @@ import javax.servlet.http.Part;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.model.*;
+import de.samply.bbmri.negotiator.util.ObjectToJson;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -51,7 +52,6 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -71,7 +71,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
-
+    /**
+     * String contains Json data for JsTree view
+     */
+    private String jsTreeJson;
     /**
      * List of collection with biobanks details of a specific query.
      */
@@ -207,6 +210,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+        /**
+         * We allready have CollectionBiobankDTO which is converted in the JSON format for Tree View
+         */
+        ObjectToJson gen =new ObjectToJson();
+        setJsTreeJson(gen.jsonTree(collections));
 
         return null;
     }
@@ -437,6 +445,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.dropDownList = copyList;
     }
 
+    public String getJsTreeJson() {
+        return jsTreeJson;
+    }
 
+    public void setJsTreeJson(String jsTreeJson) {
+        this.jsTreeJson = jsTreeJson;
+    }
 
 }

@@ -31,7 +31,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
-                template="../components/default.xhtml">
+                template="../components/default.xhtml"
+>
 
     <f:metadata>
         <f:viewParam name="queryId"
@@ -89,8 +90,7 @@
                     <bbmricc:queryDetailData bean="#{researcherQueriesDetailBean}" />
 
                 </h:panelGroup>
-
-                <h:panelGroup id="queryCollectionsDisplay"
+               <h:panelGroup id="queryCollectionsDisplay"
                         rendered="#{researcherQueriesDetailBean.collections.size() > 0}"
                         layout="block">
 
@@ -106,14 +106,22 @@
                         </a>
                     </h:panelGroup>
 
-                    <div id="collection-list" class="collapse">
-                        <ul>
-                            <ui:repeat value="#{researcherQueriesDetailBean.collections}"
-                                       var="collect">
-                                <li>#{collect.collection.name}</li>
-                            </ui:repeat>
-                        </ul>
-                    </div>
+                   <div id="collection-list" class="collapse">
+                       #{researcherQueriesDetailBean.jsTreeJson}
+                   </div>
+                   <h:outputScript>
+                       $.jstree.defaults.core.themes.responsive = true;
+                       $(function() {
+
+                       var data1= JSON.parse(document.getElementById("collection-list").innerHTML)
+                       $('#collection-list').jstree({
+                       'core': {
+
+                       'data': data1
+                       }
+                       });
+                       });
+                   </h:outputScript>
                 </h:panelGroup>
 
                 <h:panelGroup id="noCollectionsText"
