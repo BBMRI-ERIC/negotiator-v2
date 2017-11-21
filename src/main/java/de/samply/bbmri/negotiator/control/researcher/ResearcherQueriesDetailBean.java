@@ -210,11 +210,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+
         /**
          * We allready have CollectionBiobankDTO which is converted in the JSON format for Tree View
          */
-        ObjectToJson gen =new ObjectToJson();
-        setJsTreeJson(gen.jsonTree(collections));
+        setJsTreeJson(ObjectToJson.jsonTree(collections));
 
         return null;
     }

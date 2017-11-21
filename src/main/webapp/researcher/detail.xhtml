@@ -112,14 +112,12 @@
                    <h:outputScript>
                        $.jstree.defaults.core.themes.responsive = true;
                        $(function() {
-
-                       var data1= JSON.parse(document.getElementById("collection-list").innerHTML)
-                       $('#collection-list').jstree({
-                       'core': {
-
-                       'data': data1
-                       }
-                       });
+                           var data1= JSON.parse(document.getElementById("collection-list").innerHTML)
+                           $('#collection-list').jstree({
+                               'core': {
+                                   'data': data1
+                               }
+                           });
                        });
                    </h:outputScript>
                 </h:panelGroup>

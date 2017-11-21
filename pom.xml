@@ -183,6 +183,12 @@
             <artifactId>flyway-core</artifactId>
             <version>4.2.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>jstree</artifactId>
+            <version>3.3.4</version>
+        </dependency>
     </dependencies>
 
     <distributionManagement>
