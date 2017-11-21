@@ -54,7 +54,7 @@
         </h:panelGroup>
         <!--        Function for the show more button        -->
         <h4>#{label['queryview.title.text']}</h4>
-        <div style="white-space: pre-wrap"> <span class="more">#{cc.attrs.bean.selectedQuery.text}</span></div>
+        <div style="white-space: pre-wrap"><span class="more">#{cc.attrs.bean.selectedQuery.text}</span></div>
         <h:outputStylesheet>
             .morecontent span {
                 display: none;
@@ -64,41 +64,58 @@
             }
         </h:outputStylesheet>
         <h:outputScript>
-        $(document).ready(function() {
-        // Configure/customize these variables.
-        var showChar = 1100;  // How many characters are shown by default
-        var moretext = "Show full text";
-        var lesstext = "Show less";
+            $(document).ready(function() {
+
+                var moretext = "Show full text";
+                var lesstext = "Show less";
+
+                // read the lines of the span
+                var lines = [];
+                $.each($('.more').text().split(/\n/), function(i, line){
+                    if(line){
+                        lines.push(line);
+                    } else {
+                        lines.push("");
+                    }
+                });
+
+                // how many lines we want to display (2 more are grayed out)
+                var showLines = 5;
+
+                if(lines.length > showLines + 2) {
+                    var shownContent = lines.slice(0, showLines).join("\n");
+                    var grayedOutLines = lines.slice(showLines, showLines+2).join("\n");
+                    var hiddenContent = lines.slice(showLines+2).join("\n");
 
 
-        $('.more').each(function() {
-        var content = $(this).html();
+                    var html = shownContent +
+                        '<div id="grayoutarea" class="a-expander-content-fade">' + grayedOutLines + '</div>' +
+                        '<span class="moreellipses">&nbsp;</span><span class="morecontent"><span>' + hiddenContent + '</span>&nbsp;&nbsp;<a  style="width: 100px" class="morelink label label-default">' + moretext + '</a></span>';
 
-        if(content.length > showChar)
-        {
-            var c = content.substr(0, showChar);
-            var h = content.substr(showChar, content.length - showChar);
 
-            var html = c + '<span class="moreellipses">&nbsp;</span><span class="morecontent"><span>' + h + '</span>&nbsp;&nbsp;<a  style="width: 100px" class="morelink label label-default">' + moretext + '</a></span>';
+                    $('.more').html(html);
+                }
 
-        $(this).html(html);
-        }
 
-        });
 
-        $(".morelink").click(function(){
-        if($(this).hasClass("less")) {
-        $(this).removeClass("less");
-        $(this).html(moretext);
-        } else {
-        $(this).addClass("less");
-        $(this).html(lesstext);
-        }
-        $(this).parent().prev().toggle();
-        $(this).prev().toggle();
-        return false;
-        });
-        });
+
+                $(".morelink").click(function(){
+                    if($(this).hasClass("less")) {
+                        $(this).removeClass("less");
+                        $(this).html(moretext);
+                        // add grayout
+                        $("#grayoutarea").addClass("a-expander-content-fade");
+                    } else {
+                        $(this).addClass("less");
+                        $(this).html(lesstext);
+                        // remove grayout
+                        $("#grayoutarea").removeClass("a-expander-content-fade");
+                }
+                $(this).parent().prev().toggle();
+                $(this).prev().toggle();
+                return false;
+                });
+            });
         </h:outputScript>
 
         <h4>#{label['queryview.title.requestdescription']}</h4>

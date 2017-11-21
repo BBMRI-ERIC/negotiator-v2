@@ -946,3 +946,9 @@ ul {
 .table-fullwidth {
     width: 100%;
 }
+
+.a-expander-content-fade {
+    background: -webkit-linear-gradient(#333,#fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
