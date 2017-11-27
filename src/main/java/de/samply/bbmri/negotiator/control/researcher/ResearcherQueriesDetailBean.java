@@ -78,12 +78,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * List of collection with biobanks details of a specific query.
      */
-    private List<CollectionBiobankDTO> collections;
+    private List<CollectionBiobankDTO> collections = new ArrayList<CollectionBiobankDTO>();
 
     /**
      * List to store the person id who has not contacted already
      */
-    private List<CollectionBiobankDTO> dropDownList= new ArrayList<>();
+    private List<CollectionBiobankDTO> dropDownList = new ArrayList<CollectionBiobankDTO>();
 
     /**
        offerResearcher is collection id that researcher has chosen to contact
@@ -141,7 +141,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     QueryDTO queryDTO = null;
 
     /**
-     * The list of person who made a sample offer for a given query
+     * The list of BIOBANK ID who are related with a given query
      */
     private List<Integer> offerMakers;
 
@@ -169,18 +169,27 @@ public class ResearcherQueriesDetailBean implements Serializable {
             collections = DbUtil.getCollectionsForQuery(config, queryId);
 
             /**
-             * new list formed for dropdown feature
+             * This is done to remove the repitition of biobanks in the list because of multiple collection
              */
-            dropDownList.addAll(collections);
-            for(int i=0; i<offerMakers.size();i++) {
-                for (int j = 0; j < dropDownList.size(); j++) {
-                    //TODO: this compares a personID to a collectionID, which is currently wrong.
-                    //TODO: to be fixed along the idea of ticket BIO-983
-                    if (offerMakers.get(i) == dropDownList.get(j).getCollection().getId()) {
-                        dropDownList.remove(j);
-                        break;
-                    }
+
+
+            for (int j = 0; j < collections.size(); j++) {
+                    if (!getDropDownList().contains(collections.get(j))) {
+                        dropDownList.add(collections.get(j));
                 }
+            }
+
+            /**
+             * dropdownList removing the chat which are already opened
+             */
+            for(int i=0; i<offerMakers.size();i++)
+            {
+               for(int j=0; j<dropDownList.size();j++){
+                   if(offerMakers.get(i)==dropDownList.get(j).getBiobank().getId()){
+                       dropDownList.remove(j);
+                       break;
+                   }
+               }
             }
 
             /**
@@ -423,23 +432,15 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
 
-    public Integer getOfferResearcher() {
-
-        return offerResearcher;
-    }
+    public Integer getOfferResearcher() { return offerResearcher; }
 
     public void setOfferResearcher(Integer offerResearcher) {
         this.offerResearcher = offerResearcher;
     }
 
-    public void addIntoList() {
-        offerMakers.add(offerResearcher);
+    public void addIntoList() { offerMakers.add(offerResearcher); }
 
-    }
-
-    public List<CollectionBiobankDTO> getDropDownList() {
-        return dropDownList;
-    }
+    public List<CollectionBiobankDTO> getDropDownList() { return dropDownList; }
 
     public void setDropDownList(List<CollectionBiobankDTO> copyList) {
         this.dropDownList = copyList;
@@ -453,4 +454,18 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.jsTreeJson = jsTreeJson;
     }
 
+    /**
+     * method to provide the biobank name respect to its biobank id
+     * @param biobankId
+     * @return Biobank Name
+     */
+    public String bioNameProvider(int biobankId){
+        String bioName=null;
+        for(int i=0;i<collections.size();i++)
+        {
+            if(biobankId==collections.get(i).getBiobank().getId())
+                bioName=collections.get(i).getBiobank().getName();
+        }
+    return bioName;
+    }
 }

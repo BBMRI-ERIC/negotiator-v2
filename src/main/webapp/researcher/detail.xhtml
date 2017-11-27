@@ -110,7 +110,7 @@
                        #{researcherQueriesDetailBean.jsTreeJson}
                    </div>
                    <h:outputScript>
-                       $.jstree.defaults.core.themes.responsive = true;
+                     // $.jstree.defaults.core.themes.responsive = true;
                        $(function() {
                            var data1= JSON.parse(document.getElementById("collection-list").innerHTML)
                            $('#collection-list').jstree({
@@ -208,7 +208,7 @@
                                     <h:outputLabel for="select2"> #{label['queryview.researcher.newconversation.title']}</h:outputLabel>
                                     <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 40%;margin: 7px" >
                                         <f:selectItem></f:selectItem>
-                                        <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="dropdown" itemValue="#{dropdown.collection.id}" itemLabel="#{dropdown.biobank.name}" />
+                                        <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="dropdown" itemValue="#{dropdown.biobank.id}" itemLabel="#{dropdown.biobank.name}" />
                                     </h:selectOneMenu>
                                     <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
                                     <br/>
@@ -242,7 +242,7 @@
                                         <h4 class="panel-title">
                                           <a  data-toggle="collapse"
                                                     data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
-                                                    aria-controls="sample-list" >#{researcherQueriesDetailBean.collections.get(i-1).biobank.name}
+                                                     aria-controls="sample-list">#{researcherQueriesDetailBean.bioNameProvider(researcherQueriesDetailBean.offerMakers.get(i-1))}
                                             </a>
                                         </h4>
                                     </div>
