@@ -134,6 +134,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 */
 	private boolean nonConfidential = true;
 
+	/**
+	 * The list of offerPersonDTO's, hence it's a list of lists.
+	 */
+	private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<List<OfferPersonDTO>>();
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
@@ -142,7 +146,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
-            setOfferPersonDTO(DbUtil.getOffers(config, queryId, userBean.getUserId()));
+
+			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
+
+			for (int i = 0; i < associatedBiobanks.size(); ++i) {
+				List<OfferPersonDTO> offerPersonDTO;
+				offerPersonDTO = DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId());
+				listOfSampleOffers.add(offerPersonDTO);
+			}
 
             /**
              * Get all the attachments for selected query.
@@ -197,7 +208,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 				}
             }
 
-           associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -474,4 +484,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 		this.nonConfidential = nonConfidential;
 	}
 
+	public List<List<OfferPersonDTO>> getListOfSampleOffers() {
+		return listOfSampleOffers;
+	}
+
+	public void setListOfSampleOffers(List<List<OfferPersonDTO>> listOfSampleOffers) {
+		this.listOfSampleOffers = listOfSampleOffers;
+	}
 }
