@@ -63,13 +63,13 @@ public class CollectionBiobankDTO implements Serializable {
     public boolean equals(Object o){
         if(o instanceof CollectionBiobankDTO){
             CollectionBiobankDTO toCompare = (CollectionBiobankDTO) o;
-            return this.getBiobank().getName().equals(toCompare.getBiobank().getName());
+            return this.getBiobank().getId().equals(toCompare.getBiobank().getId());
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return getBiobank().getName().hashCode();
+        return getBiobank().getId().hashCode();
     }
 }

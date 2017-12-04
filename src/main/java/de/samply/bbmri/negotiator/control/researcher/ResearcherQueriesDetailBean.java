@@ -80,6 +80,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     private List<CollectionBiobankDTO> collections = new ArrayList<CollectionBiobankDTO>();
 
+    private List<CollectionBiobankDTO> bioNameList = new ArrayList<CollectionBiobankDTO>();
+
+
     /**
      * List to store the person id who has not contacted already
      */
@@ -173,24 +176,19 @@ public class ResearcherQueriesDetailBean implements Serializable {
              */
 
 
-            for (int j = 0; j < collections.size(); j++) {
-                    if (!getDropDownList().contains(collections.get(j))) {
-                        dropDownList.add(collections.get(j));
+           for (int j = 0; j < collections.size(); j++) {
+                    if (!getDropDownList().contains(collections.get(j)) ) {
+                        if(!offerMakers.contains(collections.get(j).getBiobank().getId()))
+                        {dropDownList.add(collections.get(j));}
+                        else if(offerMakers.contains(collections.get(j).getBiobank().getId()))
+                        {bioNameList.add(collections.get(j));}
+
                 }
             }
 
             /**
              * dropdownList removing the chat which are already opened
              */
-            for(int i=0; i<offerMakers.size();i++)
-            {
-               for(int j=0; j<dropDownList.size();j++){
-                   if(offerMakers.get(i)==dropDownList.get(j).getBiobank().getId()){
-                       dropDownList.remove(j);
-                       break;
-                   }
-               }
-            }
 
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
@@ -454,18 +452,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.jsTreeJson = jsTreeJson;
     }
 
-    /**
-     * method to provide the biobank name respect to its biobank id
-     * @param biobankId
-     * @return Biobank Name
-     */
-    public String bioNameProvider(int biobankId){
-        String bioName=null;
-        for(int i=0;i<collections.size();i++)
-        {
-            if(biobankId==collections.get(i).getBiobank().getId())
-                bioName=collections.get(i).getBiobank().getName();
-        }
-    return bioName;
+    public List<CollectionBiobankDTO> getBioNameList() {
+        return bioNameList;
+    }
+
+    public void setBioNameList(List<CollectionBiobankDTO> bioNameList) {
+        this.bioNameList = bioNameList;
     }
 }
