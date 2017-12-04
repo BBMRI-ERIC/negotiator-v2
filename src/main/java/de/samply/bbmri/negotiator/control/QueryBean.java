@@ -383,8 +383,8 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
     * Removes an attachment from the given query
     */
    public String removeAttachment() {
-       String attachment = toRemoveAttachment;
 
+        String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
        // reset it
        toRemoveAttachment = null;
 
@@ -393,7 +393,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
        //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
        // patterngrops 1: queryID, 2: fileID, 3: fileName
-       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_name_(.*)");
+       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_salt_(.*)");
        Matcher matcher = pattern.matcher(attachment);
 
        String fileID = null;
