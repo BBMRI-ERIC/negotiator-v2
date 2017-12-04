@@ -137,7 +137,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	/**
 	 * The list of offerPersonDTO's, hence it's a list of lists.
 	 */
-	private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<List<OfferPersonDTO>>();
+	private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
@@ -150,9 +150,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				List<OfferPersonDTO> offerPersonDTO;
-				offerPersonDTO = DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId());
-				listOfSampleOffers.add(offerPersonDTO);
+				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId()));
 			}
 
             /**
