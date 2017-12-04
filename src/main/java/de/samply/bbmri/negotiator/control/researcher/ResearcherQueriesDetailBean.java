@@ -78,15 +78,15 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * List of collection with biobanks details of a specific query.
      */
-    private List<CollectionBiobankDTO> collections = new ArrayList<CollectionBiobankDTO>();
+    private List<CollectionBiobankDTO> collections = new ArrayList<>();
 
-    private List<CollectionBiobankDTO> bioNameList = new ArrayList<CollectionBiobankDTO>();
+    private List<CollectionBiobankDTO> bioNameList = new ArrayList<>();
 
 
     /**
      * List to store the person id who has not contacted already
      */
-    private List<CollectionBiobankDTO> dropDownList = new ArrayList<CollectionBiobankDTO>();
+    private List<CollectionBiobankDTO> dropDownList = new ArrayList<>();
 
     /**
        offerResearcher is collection id that researcher has chosen to contact
@@ -174,21 +174,16 @@ public class ResearcherQueriesDetailBean implements Serializable {
             /**
              * This is done to remove the repitition of biobanks in the list because of multiple collection
              */
-
-
            for (int j = 0; j < collections.size(); j++) {
-                    if (!getDropDownList().contains(collections.get(j)) ) {
-                        if(!offerMakers.contains(collections.get(j).getBiobank().getId()))
-                        {dropDownList.add(collections.get(j));}
-                        else if(offerMakers.contains(collections.get(j).getBiobank().getId()))
-                        {bioNameList.add(collections.get(j));}
-
+                if (!getDropDownList().contains(collections.get(j)) ) {
+                    if(!offerMakers.contains(collections.get(j).getBiobank().getId())) {
+                        dropDownList.add(collections.get(j));
+                    }
+                    else {
+                        bioNameList.add(collections.get(j));
+                    }
                 }
             }
-
-            /**
-             * dropdownList removing the chat which are already opened
-             */
 
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
