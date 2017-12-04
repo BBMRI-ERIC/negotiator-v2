@@ -149,11 +149,6 @@ INSERT INTO query_collection(query_id, collection_id) VALUES (1, 5);
 INSERT INTO query_collection(query_id, collection_id) VALUES (2, 5);
 INSERT INTO query_collection(query_id, collection_id) VALUES (3, 5);
 
-INSERT INTO tag(id, query_id, text) VALUES (1, 2, 'Lung');
-ALTER SEQUENCE tag_id_seq RESTART WITH 2;
-
-INSERT INTO tagged_query(query_id, tag_id) VALUES (1, 1);
-
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (1, 1, 5, '2016-01-01 00:00:00', 'I think the query is too general');
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (2, 1, 2, '2016-01-01 15:00:00', 'I agree with you on that');
 INSERT INTO comment(id, query_id, person_id, comment_time, text) VALUES (3, 2, 2, '2015-05-01 00:00:00', 'Yes, we have it. Additionally I would recommend you to ask also for C19, C20 codes.');
