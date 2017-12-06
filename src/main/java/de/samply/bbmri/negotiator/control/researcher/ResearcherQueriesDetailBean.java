@@ -143,6 +143,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     QueryDTO queryDTO = null;
 
+    private int noOfBiobanksFound;
     /**
      * The list of BIOBANK ID who are related with a given query
      */
@@ -174,16 +175,20 @@ public class ResearcherQueriesDetailBean implements Serializable {
             /**
              * This is done to remove the repitition of biobanks in the list because of multiple collection
              */
-           for (int j = 0; j < collections.size(); j++) {
+            for (int j = 0; j < collections.size(); j++) {
                 if (!getDropDownList().contains(collections.get(j)) ) {
-                    if(!offerMakers.contains(collections.get(j).getBiobank().getId())) {
+                    if (!offerMakers.contains(collections.get(j).getBiobank().getId())) {
                         dropDownList.add(collections.get(j));
                     }
-                    else {
+                }
+                if(!getBioNameList().contains(collections.get(j))) {
+                    if (offerMakers.contains(collections.get(j).getBiobank().getId())) {
                         bioNameList.add(collections.get(j));
                     }
                 }
             }
+
+            noOfBiobanksFound=dropDownList.size()+bioNameList.size();
 
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
@@ -453,5 +458,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setBioNameList(List<CollectionBiobankDTO> bioNameList) {
         this.bioNameList = bioNameList;
+    }
+    public int getNoOfBiobanksFound() {
+        return noOfBiobanksFound;
+    }
+
+    public void setNoOfBiobanksFound(int noOfBiobanksFound) {
+        this.noOfBiobanksFound = noOfBiobanksFound;
     }
 }

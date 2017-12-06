@@ -72,7 +72,7 @@ public class ObjectToJson {
             stat.setId(biobankNameList.get(i));
             stat.setParent("#");
             stat.setText(biobankNameList.get(i));
-            stat.setIcon("/");
+            stat.setIcon("glyphicon glyphicon-triangle-right");
             setParentNode.add(stat);
         }
 
@@ -116,7 +116,7 @@ public class ObjectToJson {
             stat.setId(collectionBiobankDTOS.get(i).getCollection().getName());
             stat.setParent(collectionBiobankDTOS.get(i).getBiobank().getName());
             stat.setText(collectionBiobankDTOS.get(i).getCollection().getName());
-            stat.setIcon("/");
+            stat.setIcon("fa fa-circle-o");
             setChildNode.add(stat);
         }
 

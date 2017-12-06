@@ -90,14 +90,12 @@
                     <bbmricc:queryDetailData bean="#{researcherQueriesDetailBean}" />
 
                 </h:panelGroup>
-               <h:panelGroup id="queryCollectionsDisplay"
-                        rendered="#{researcherQueriesDetailBean.collections.size() > 0}"
-                        layout="block">
+               <h:panelGroup id="queryCollectionsDisplay" layout="block">
 
                     <h:panelGroup styleClass="text" layout="block">
                         <h:outputLabel value="#{label['queryview.title.amountMatchingCollections']}"/>
                         <h:outputText
-                                value="#{researcherQueriesDetailBean.collections.size()}"
+                                value="#{researcherQueriesDetailBean.noOfBiobanksFound}"
                                 style="margin-left: 22px;">
                         </h:outputText>
 
