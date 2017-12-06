@@ -236,12 +236,13 @@
 
                                     <div class="panel-heading" role="tab" id="heading#{i}">
 
-                                        <h4 class="panel-title">
-                                          <a  data-toggle="collapse"
-                                                    data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
-                                                     aria-controls="sample-list">#{researcherQueriesDetailBean.bioNameList.get(i-1).biobank.name}
-                                            </a>
-                                        </h4>
+
+                                          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#hh#{i}">
+                                            <h4 class="panel-title">
+                                                <a  data-toggle="accordian-toggle">#{researcherQueriesDetailBean.bioNameList.get(i-1).biobank.name}></a>
+                                            </h4>
+                                          </div>
+
                                     </div>
                                     <div id="hh#{i}"
                                          class="panel-collapse collapse #{oneMarkerOnly?'in':''}"
