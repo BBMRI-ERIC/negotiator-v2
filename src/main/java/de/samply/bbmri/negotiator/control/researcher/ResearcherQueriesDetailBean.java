@@ -39,6 +39,7 @@ import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -78,15 +79,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * List of collection with biobanks details of a specific query.
      */
-    private List<CollectionBiobankDTO> collections = new ArrayList<>();
-
-    private List<CollectionBiobankDTO> bioNameList = new ArrayList<>();
-
+    private List<CollectionBiobankDTO> matchingBiobankCollection = new ArrayList<>();
 
     /**
      * List to store the person id who has not contacted already
      */
-    private List<CollectionBiobankDTO> dropDownList = new ArrayList<>();
+    private List<CollectionBiobankDTO> biobankWithoutOffer = new ArrayList<>();
 
     /**
        offerResearcher is collection id that researcher has chosen to contact
@@ -147,7 +145,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * The list of BIOBANK ID who are related with a given query
      */
-    private List<Integer> offerMakers;
+    private List<Integer> biobankWithOffer;
 
     /**
      * The list of offerPersonDTO's, hence it's a list of lists.
@@ -160,36 +158,29 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public String initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
-            setOfferMakers(DbUtil.getOfferMakers(config, queryId));
+            setBiobankWithOffer(DbUtil.getOfferMakers(config, queryId));
 
-            for (int i = 0; i < offerMakers.size(); ++i) {
+            for (int i = 0; i < biobankWithOffer.size(); ++i) {
                 List<OfferPersonDTO> offerPersonDTO;
-                offerPersonDTO = DbUtil.getOffers(config, queryId, offerMakers.get(i));
+                offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i));
                 listOfSampleOffers.add(offerPersonDTO);
             }
 
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
 
-            collections = DbUtil.getCollectionsForQuery(config, queryId);
-
+            matchingBiobankCollection = DbUtil.getCollectionsForQuery(config, queryId);
+            noOfBiobanksFound = ObjectToJson.getNewList(matchingBiobankCollection).size();
             /**
              * This is done to remove the repitition of biobanks in the list because of multiple collection
              */
-            for (int j = 0; j < collections.size(); j++) {
-                if (!getDropDownList().contains(collections.get(j)) ) {
-                    if (!offerMakers.contains(collections.get(j).getBiobank().getId())) {
-                        dropDownList.add(collections.get(j));
+            for (int j = 0; j < matchingBiobankCollection.size(); j++) {
+                if (!getBiobankWithoutOffer().contains(matchingBiobankCollection.get(j)) ) {
+                    if (!biobankWithOffer.contains(matchingBiobankCollection.get(j).getBiobank().getId())) {
+                        biobankWithoutOffer.add(matchingBiobankCollection.get(j));
                     }
                 }
-                if(!getBioNameList().contains(collections.get(j))) {
-                    if (offerMakers.contains(collections.get(j).getBiobank().getId())) {
-                        bioNameList.add(collections.get(j));
-                    }
-                }
+
             }
-
-            noOfBiobanksFound=dropDownList.size()+bioNameList.size();
-
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
@@ -221,7 +212,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
         /**
          * We allready have CollectionBiobankDTO which is converted in the JSON format for Tree View
          */
-        setJsTreeJson(ObjectToJson.jsonTree(collections));
+        setJsTreeJson(ObjectToJson.jsonTree(matchingBiobankCollection));
 
         return null;
     }
@@ -397,20 +388,20 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return attachments;
     }
 
-    public List<CollectionBiobankDTO> getCollections() {
-        return collections;
+    public List<CollectionBiobankDTO> getMatchingBiobankCollection() {
+        return matchingBiobankCollection;
     }
 
-    public void setCollections(List<CollectionBiobankDTO> collections) {
-        this.collections = collections;
+    public void setMatchingBiobankCollection(List<CollectionBiobankDTO> matchingBiobankCollection) {
+        this.matchingBiobankCollection = matchingBiobankCollection;
     }
 
-    public List<Integer> getOfferMakers() {
-        return offerMakers;
+    public List<Integer> getBiobankWithOffer() {
+        return biobankWithOffer;
     }
 
-    public void setOfferMakers(List<Integer> offerMakers) {
-        this.offerMakers = offerMakers;
+    public void setBiobankWithOffer(List<Integer> biobankWithOffer) {
+        this.biobankWithOffer = biobankWithOffer;
     }
 
     public List<List<OfferPersonDTO>> getListOfSampleOffers() {
@@ -436,12 +427,15 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.offerResearcher = offerResearcher;
     }
 
-    public void addIntoList() { offerMakers.add(offerResearcher); }
+    public String addIntoList() {
+        biobankWithOffer.add(offerResearcher);
+        return "";
+    }
 
-    public List<CollectionBiobankDTO> getDropDownList() { return dropDownList; }
+    public List<CollectionBiobankDTO> getBiobankWithoutOffer() { return biobankWithoutOffer; }
 
-    public void setDropDownList(List<CollectionBiobankDTO> copyList) {
-        this.dropDownList = copyList;
+    public void setBiobankWithoutOffer(List<CollectionBiobankDTO> copyList) {
+        this.biobankWithoutOffer = copyList;
     }
 
     public String getJsTreeJson() {
@@ -452,18 +446,24 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.jsTreeJson = jsTreeJson;
     }
 
-    public List<CollectionBiobankDTO> getBioNameList() {
-        return bioNameList;
-    }
+     public int getNoOfBiobanksFound() {
+         return noOfBiobanksFound;
+     }
 
-    public void setBioNameList(List<CollectionBiobankDTO> bioNameList) {
-        this.bioNameList = bioNameList;
-    }
-    public int getNoOfBiobanksFound() {
-        return noOfBiobanksFound;
-    }
+     public void setNoOfBiobanksFound(int noOfBiobanksFound) {
+         this.noOfBiobanksFound = noOfBiobanksFound;
+     }
 
-    public void setNoOfBiobanksFound(int noOfBiobanksFound) {
-        this.noOfBiobanksFound = noOfBiobanksFound;
+    public String getBiobankNameList(int id)
+    {
+        String str=null;
+        for(int i=0; i< matchingBiobankCollection.size(); i++)
+        {
+            if(matchingBiobankCollection.get(i).getBiobank().getId()==id)
+            {
+                str=matchingBiobankCollection.get(i).getBiobank().getName();
+            }
+        }
+    return str;
     }
 }

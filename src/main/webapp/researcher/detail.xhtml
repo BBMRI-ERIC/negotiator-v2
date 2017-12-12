@@ -120,7 +120,7 @@
                 </h:panelGroup>
 
                 <h:panelGroup id="noCollectionsText"
-                        rendered="#{researcherQueriesDetailBean.collections.size() == 0}"
+                        rendered="#{researcherQueriesDetailBean.matchingBiobankCollection.size() == 0}"
                         layout="block">
                     <h:outputLabel value="#{label['queryview.title.nocollections']}"
                                    styleClass="form-control-static"/>
@@ -199,13 +199,13 @@
                         <div id="sampleAvailability" class="tab-pane fade">
 
                             <!--    Dropdown menu using Select2         -->
-                            <h:panelGroup rendered="#{researcherQueriesDetailBean.dropDownList.size() > 0}">
+                            <h:panelGroup rendered="#{researcherQueriesDetailBean.biobankWithoutOffer.size() > 0}">
                                 <h:form id="researcherForm">
                                     <br/>
                                     <h:outputLabel for="select2"> #{label['queryview.researcher.newconversation.title']}</h:outputLabel>
                                     <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 40%;margin: 7px" >
                                         <f:selectItem></f:selectItem>
-                                        <f:selectItems value="#{researcherQueriesDetailBean.dropDownList}" var="dropdown" itemValue="#{dropdown.biobank.id}" itemLabel="#{dropdown.biobank.name}" />
+                                        <f:selectItems value="#{researcherQueriesDetailBean.biobankWithoutOffer}" var="dropdown" itemValue="#{dropdown.biobank.id}" itemLabel="#{dropdown.biobank.name}" />
                                     </h:selectOneMenu>
                                     <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
                                     <br/>
@@ -218,17 +218,17 @@
                                 </h:outputScript>
                             </h:panelGroup>
 
-                            <ui:fragment rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}">
+                            <ui:fragment rendered="#{researcherQueriesDetailBean.biobankWithOffer.size() == 0}">
                                 <br />
                                 <p>
                                     <b> <h:outputText value="#{label['message.noOffers']}" /> </b>
                                 </p>
                             </ui:fragment>
                             <br />
-                            <c:set var="oneMarkerOnly" value="#{researcherQueriesDetailBean.offerMakers.size() == 1}" />
+                            <c:set var="oneMarkerOnly" value="#{researcherQueriesDetailBean.biobankWithOffer.size() == 1}" />
 
 
-                            <c:forEach begin="1" end="#{researcherQueriesDetailBean.offerMakers.size()}" var="i">
+                            <c:forEach begin="1" end="#{researcherQueriesDetailBean.biobankWithOffer.size()}" var="i">
                                 <div class="panel panel-default">
 
 
@@ -239,7 +239,7 @@
 
                                           <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#hh#{i}">
                                             <h4 class="panel-title">
-                                                <a  data-toggle="accordian-toggle">#{researcherQueriesDetailBean.bioNameList.get(i-1).biobank.name}></a>
+                                                <a  data-toggle="accordian-toggle">#{researcherQueriesDetailBean.getBiobankNameList(researcherQueriesDetailBean.biobankWithOffer.get(i-1))}</a>
                                             </h4>
                                           </div>
 
@@ -266,7 +266,7 @@
 
                                             <bbmricc:commentReply makeOffer="true"
                                                                   query="#{researcherQueriesDetailBean.selectedQuery}"
-                                                                  offer="#{researcherQueriesDetailBean.offerMakers[i-1]}"/>
+                                                                  offer="#{researcherQueriesDetailBean.biobankWithOffer[i-1]}"/>
                                         </div>
                                     </div>
                                 </div>
