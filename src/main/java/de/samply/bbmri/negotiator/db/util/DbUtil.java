@@ -167,8 +167,22 @@ public class DbUtil {
                 .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
                 .fetch();
 
-        //TODO: The mapper does not map the query_xml at all, why?
-        return config.map(result, QueryDetail.class);
+          // The mapper does not map the query_xml at all, why?
+//        return config.map(result, QueryDetail.class);
+
+        // So doing this manually
+        List<QueryDetail> queryDetails = new ArrayList<>();
+        for (Record record : result) {
+            QueryDetail queryDetail = new QueryDetail();
+            queryDetail.setQueryId(record.getValue("query_id", Integer.class));
+            queryDetail.setQueryText(record.getValue("query_text", String.class));
+            queryDetail.setQueryTitle(record.getValue("query_title", String.class));
+            queryDetail.setQueryXml(record.getValue("query_xml", String.class));
+
+            queryDetails.add(queryDetail);
+        }
+
+        return queryDetails;
     }
 
     /**
