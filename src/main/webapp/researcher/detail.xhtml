@@ -109,7 +109,7 @@
                    </div>
                    <h:outputScript>
                        $(function() {
-                           var data1= JSON.parse(document.getElementById("collection-list").innerHTML)
+                           var data1= JSON.parse(document.getElementById("collection-list").innerHTML);
                            $('#collection-list').jstree({
                                'core': {
                                    'data': data1
@@ -225,8 +225,12 @@
                                 </p>
                             </ui:fragment>
                             <br />
-                            <c:set var="oneMarkerOnly" value="#{researcherQueriesDetailBean.check()}" />
 
+                            <c:forEach var="i" begin="1" end ="#{researcherQueriesDetailBean.biobankWithOffer.size()}">
+                            <c:if test="#{researcherQueriesDetailBean.biobankWithOffer.get(i-1)==researcherQueriesDetailBean.offerResearcher}">
+                                <c:set var="oneMarkerOnly" value="#{i}" />
+                            </c:if>
+                            </c:forEach>
 
                             <c:forEach begin="1" end="#{researcherQueriesDetailBean.biobankWithOffer.size()}" var="i">
                                 <div class="panel panel-default">
@@ -239,7 +243,13 @@
 
                                           <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#hh#{i}">
                                             <h4 class="panel-title">
-                                                <a  data-toggle="accordian-toggle">#{researcherQueriesDetailBean.getBiobankNameList(researcherQueriesDetailBean.biobankWithOffer.get(i-1))}</a>
+
+                                                   <c:forEach var="j"  begin="1" end="#{researcherQueriesDetailBean.matchingBiobankCollection.size()}" >
+                                                    <c:if test="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.id==researcherQueriesDetailBean.biobankWithOffer.get(i-1)}" >
+                                                    <c:set var="biobankName" value="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.name}"/>
+                                                    </c:if>
+                                                    </c:forEach>
+                                                <a  data-toggle="accordian-toggle">#{biobankName}</a>
                                             </h4>
                                           </div>
 

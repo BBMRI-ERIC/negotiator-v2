@@ -150,7 +150,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * The list of offerPersonDTO's, hence it's a list of lists.
      */
-    private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<List<OfferPersonDTO>>();
+    private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
 
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
@@ -431,13 +431,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
         biobankWithOffer.add(offerResearcher);
         return "";
     }
-    public int check(){
-        for(int i=0;i<biobankWithOffer.size();i++){
-            if(biobankWithOffer.get(i)==offerResearcher)
-                return i+1;
-         }
-        return 0;
-    }
     public List<CollectionBiobankDTO> getBiobankWithoutOffer() { return biobankWithoutOffer; }
 
     public void setBiobankWithoutOffer(List<CollectionBiobankDTO> copyList) {
@@ -460,16 +453,4 @@ public class ResearcherQueriesDetailBean implements Serializable {
          this.noOfBiobanksFound = noOfBiobanksFound;
      }
 
-    public String getBiobankNameList(int id)
-    {
-        String str=null;
-        for(int i=0; i< matchingBiobankCollection.size(); i++)
-        {
-            if(matchingBiobankCollection.get(i).getBiobank().getId()==id)
-            {
-                str=matchingBiobankCollection.get(i).getBiobank().getName();
-            }
-        }
-    return str;
-    }
 }
