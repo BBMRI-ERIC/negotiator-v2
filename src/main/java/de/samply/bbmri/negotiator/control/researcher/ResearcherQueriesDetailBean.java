@@ -431,7 +431,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         biobankWithOffer.add(offerResearcher);
         return "";
     }
-
+    public int check(){
+        for(int i=0;i<biobankWithOffer.size();i++){
+            if(biobankWithOffer.get(i)==offerResearcher)
+                return i+1;
+         }
+        return 0;
+    }
     public List<CollectionBiobankDTO> getBiobankWithoutOffer() { return biobankWithoutOffer; }
 
     public void setBiobankWithoutOffer(List<CollectionBiobankDTO> copyList) {

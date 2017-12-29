@@ -225,7 +225,7 @@
                                 </p>
                             </ui:fragment>
                             <br />
-                            <c:set var="oneMarkerOnly" value="#{researcherQueriesDetailBean.biobankWithOffer.size() == 1}" />
+                            <c:set var="oneMarkerOnly" value="#{researcherQueriesDetailBean.check()}" />
 
 
                             <c:forEach begin="1" end="#{researcherQueriesDetailBean.biobankWithOffer.size()}" var="i">
@@ -245,7 +245,7 @@
 
                                     </div>
                                     <div id="hh#{i}"
-                                         class="panel-collapse collapse #{oneMarkerOnly?'in':''}"
+                                         class="panel-collapse collapse #{(i==oneMarkerOnly)?'in':''}"
                                          role="tabpanel"
                                          aria-labelledby="heading#{i}">
 
