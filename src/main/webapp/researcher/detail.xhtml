@@ -204,7 +204,7 @@
                                     <br/>
                                     <h:outputLabel for="select2"> #{label['queryview.researcher.newconversation.title']}</h:outputLabel>
                                     <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 40%;margin: 7px" >
-                                        <f:selectItem></f:selectItem>
+
                                         <f:selectItems value="#{researcherQueriesDetailBean.biobankWithoutOffer}" var="dropdown" itemValue="#{dropdown.biobank.id}" itemLabel="#{dropdown.biobank.name}" />
                                     </h:selectOneMenu>
                                     <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
@@ -241,7 +241,7 @@
                                     <div class="panel-heading" role="tab" id="heading#{i}">
 
 
-                                          <div class="panel-heading" data-toggle="collapse" data-parent="#accordion" data-target="#hh#{i}">
+                                          <div class="panel-heading" data-toggle="collapse" data-target="#hh#{i}">
                                             <h4 class="panel-title">
 
                                                    <c:forEach var="j"  begin="1" end="#{researcherQueriesDetailBean.matchingBiobankCollection.size()}" >
@@ -249,7 +249,7 @@
                                                     <c:set var="biobankName" value="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.name}"/>
                                                     </c:if>
                                                     </c:forEach>
-                                                <a  data-toggle="accordian-toggle">#{biobankName}</a>
+                                                <a>#{biobankName}</a>
                                             </h4>
                                           </div>
 
