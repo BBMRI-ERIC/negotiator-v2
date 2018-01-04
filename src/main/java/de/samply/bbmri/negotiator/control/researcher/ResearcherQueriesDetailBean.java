@@ -141,7 +141,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     QueryDTO queryDTO = null;
 
-    private int noOfBiobanksFound;
+    /**
+     * Biobanks that match to a query
+     */
+    private int matchingBiobanks;
+
     /**
      * The list of BIOBANK ID who are related with a given query
      */
@@ -169,7 +173,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
 
             matchingBiobankCollection = DbUtil.getCollectionsForQuery(config, queryId);
-            noOfBiobanksFound = ObjectToJson.getNewList(matchingBiobankCollection).size();
+            setMatchingBiobanks(ObjectToJson.getUniqueBiobanks(matchingBiobankCollection).size());
             /**
              * This is done to remove the repitition of biobanks in the list because of multiple collection
              */
@@ -210,9 +214,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
         }
 
         /**
-         * We allready have CollectionBiobankDTO which is converted in the JSON format for Tree View
+         * Convert matchingBiobankCollection in the JSON format for Tree View
          */
-        setJsTreeJson(ObjectToJson.jsonTree(matchingBiobankCollection));
+        setJsTreeJson(ObjectToJson.getJsonTree(matchingBiobankCollection));
 
         return null;
     }
@@ -445,12 +449,16 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.jsTreeJson = jsTreeJson;
     }
 
-     public int getNoOfBiobanksFound() {
-         return noOfBiobanksFound;
-     }
+    public int getMatchingBiobanks() {
+        return matchingBiobanks;
+    }
 
-     public void setNoOfBiobanksFound(int noOfBiobanksFound) {
-         this.noOfBiobanksFound = noOfBiobanksFound;
-     }
+    public void setMatchingBiobanks(int matchingBiobanks) {
+        this.matchingBiobanks = matchingBiobanks;
+    }
+
+
+
+
 
 }

@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.JsTreeJson;
 
@@ -36,22 +37,23 @@ import java.util.List;
 
 public class ObjectToJson {
     /**
-     * It add collections and biobanks list and convert it to the json with help of the GSON
+     * It takes a list of biobanks containing collections and and convert it to the json with help of the GSON
      *
-     * @param collections
+     * @param  biobanksContainingCollections
      * @return String JSON data
      */
-    public static String jsonTree(List<CollectionBiobankDTO> collections) {
-        List<JsTreeJson> stats = new ArrayList<>();
-        List<JsTreeJson> statsChildNode;
-        List<JsTreeJson> statsParentNode;
+    public static String getJsonTree(List<CollectionBiobankDTO> biobanksContainingCollections) {
+        List<JsTreeJson> jsTree = new ArrayList<>();
+        List<JsTreeJson> childNodes;
+        List<JsTreeJson> parentNodes;
 
-        statsChildNode = setParentNode(collections);
-        statsParentNode = setChildNode(collections);
-        stats.addAll(statsParentNode);
-        stats.addAll(statsChildNode);
+        parentNodes = setParentNodes(biobanksContainingCollections);
+        childNodes = setChildNodes(biobanksContainingCollections);
+        jsTree.addAll(childNodes);
+        jsTree.addAll(parentNodes);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String jsTreeData = gson.toJson(stats);
+        String jsTreeData = gson.toJson(jsTree);
+
         return jsTreeData;
     }
 
@@ -61,22 +63,22 @@ public class ObjectToJson {
      * @param collectionBiobankDTOS
      * @return the list of parent node list
      */
-    public static List<JsTreeJson> setParentNode(List<CollectionBiobankDTO> collectionBiobankDTOS) {
+    public static List<JsTreeJson> setParentNodes(List<CollectionBiobankDTO> collectionBiobankDTOS) {
 
-        List<JsTreeJson> setParentNode = new ArrayList<>();
-        List<String> biobankNameList;
-        biobankNameList = getNewList(collectionBiobankDTOS);
+        List<JsTreeJson> parentNodes = new ArrayList<>();
+        List<CollectionBiobankDTO> uniqueBiobanks;
+        uniqueBiobanks = getUniqueBiobanks(collectionBiobankDTOS);
 
-        for(int i = 0; i < biobankNameList.size(); i++) {
-            JsTreeJson stat = new JsTreeJson();
-            stat.setId(biobankNameList.get(i));
-            stat.setParent("#");
-            stat.setText(biobankNameList.get(i));
-            stat.setIcon("glyphicon glyphicon-triangle-right");
-            setParentNode.add(stat);
+        for(int i = 0; i < uniqueBiobanks.size(); i++) {
+            JsTreeJson jsTreeJson = new JsTreeJson();
+            jsTreeJson.setId(uniqueBiobanks.get(i).getBiobank().getId().toString());
+            jsTreeJson.setParent("#");
+            jsTreeJson.setText(uniqueBiobanks.get(i).getBiobank().getName());
+            jsTreeJson.setIcon("glyphicon glyphicon-triangle-right");
+            parentNodes.add(jsTreeJson);
         }
 
-        return setParentNode;
+        return parentNodes;
     }
 
     /**
@@ -85,21 +87,18 @@ public class ObjectToJson {
      * @param collectionBiobankDTOS
      * @return the list of names of biobanks which are unique
      */
-    public static List<String> getNewList(List<CollectionBiobankDTO> collectionBiobankDTOS) {
-        List<String> oldList = new ArrayList<>();
-        List<String> newList = new ArrayList<>();
+    public static List<CollectionBiobankDTO> getUniqueBiobanks(List<CollectionBiobankDTO> collectionBiobankDTOS) {
+
+        List<CollectionBiobankDTO> uniqueCollectionBiobankDTO = new ArrayList<>();
 
         for(int i = 0; i < collectionBiobankDTOS.size(); i++) {
-            oldList.add(collectionBiobankDTOS.get(i).getBiobank().getName());
+            // Checking uniqueness based on biobank id
+            if (!uniqueCollectionBiobankDTO.contains(collectionBiobankDTOS.get(i))) {
+                uniqueCollectionBiobankDTO.add(collectionBiobankDTOS.get(i));
+            }
         }
 
-        for(int i = 0; i < oldList.size(); i++) {
-            String str = oldList.get(i);
-            if(oldList.contains(str) && !newList.contains(str))
-                newList.add(str);
-        }
-
-        return newList;
+        return uniqueCollectionBiobankDTO;
     }
 
     /**
@@ -108,18 +107,19 @@ public class ObjectToJson {
      * @param collectionBiobankDTOS
      * @return the list of collections with its correct biobanks associated with it
      */
-    public static List<JsTreeJson> setChildNode(List<CollectionBiobankDTO> collectionBiobankDTOS) {
-        List<JsTreeJson> setChildNode = new ArrayList<>();
+    public static List<JsTreeJson> setChildNodes(List<CollectionBiobankDTO> collectionBiobankDTOS) {
+
+        List<JsTreeJson> childNodes = new ArrayList<>();
 
         for(int i = 0; i < collectionBiobankDTOS.size(); i++) {
-            JsTreeJson stat = new JsTreeJson();
-            stat.setId(collectionBiobankDTOS.get(i).getCollection().getName());
-            stat.setParent(collectionBiobankDTOS.get(i).getBiobank().getName());
-            stat.setText(collectionBiobankDTOS.get(i).getCollection().getName());
-            stat.setIcon("fa fa-circle-o");
-            setChildNode.add(stat);
+            JsTreeJson jsTreeJson = new JsTreeJson();
+            jsTreeJson.setId(collectionBiobankDTOS.get(i).getCollection().getName());
+            jsTreeJson.setParent(collectionBiobankDTOS.get(i).getBiobank().getId().toString());
+            jsTreeJson.setText(collectionBiobankDTOS.get(i).getCollection().getName());
+            jsTreeJson.setIcon("fa fa-circle-o");
+            childNodes.add(jsTreeJson);
         }
 
-        return setChildNode;
+        return childNodes;
     }
 }
