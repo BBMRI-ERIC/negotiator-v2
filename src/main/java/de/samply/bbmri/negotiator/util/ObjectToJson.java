@@ -74,7 +74,7 @@ public class ObjectToJson {
             jsTreeJson.setId(uniqueBiobanks.get(i).getBiobank().getId().toString());
             jsTreeJson.setParent("#");
             jsTreeJson.setText(uniqueBiobanks.get(i).getBiobank().getName());
-            jsTreeJson.setIcon("glyphicon glyphicon-triangle-right");
+            jsTreeJson.setIcon("fa fa-chevron-circle-right");
             parentNodes.add(jsTreeJson);
         }
 
