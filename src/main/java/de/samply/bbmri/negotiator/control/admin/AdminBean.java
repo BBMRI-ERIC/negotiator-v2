@@ -13,6 +13,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +48,40 @@ import java.util.Map;
 @ManagedBean
 @SessionScoped
 public class AdminBean implements Serializable {
-    private Map<String, String> all = new HashMap<>();
-    private Logger logger = LoggerFactory.getLogger(AdminBean.class);
-    private String sudo;
+
+    private static final long serialVersionUID = 1L;
+
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
+
+    private Logger logger = LoggerFactory.getLogger(AdminBean.class);
+
+    private String sudo;
+
+    private Map<String, String> all = new HashMap<>();
+
+    private List<PersonRecord> allUsers = new ArrayList<>();
+
+    public void initialize() {
+        try(Config config = ConfigFactory.get()) {
+           setAllUsers( DbUtil.getAllUsers(config) );
+
+            all = new HashMap<>();
+
+            for(PersonRecord user : allUsers) {
+                all.put(user.getAuthName(), user.getAuthSubject());
+            }
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String switchUser(String userIdentitiy) {
+        userBean.sudoUser(userIdentitiy);
+        return "/index.xhtml?faces-redirect=true";
+    }
+
 
     //region properties
     public UserBean getUserBean() {
@@ -73,24 +103,13 @@ public class AdminBean implements Serializable {
     public Map<String, String> getUsers() {
         return all;
     }
+
+    public List<PersonRecord> getAllUsers() {
+        return allUsers;
+    }
+
+    public void setAllUsers(List<PersonRecord> allUsers) {
+        this.allUsers = allUsers;
+    }
 //endregion
-
-    public void initialize() {
-        try(Config config = ConfigFactory.get()) {
-            List<PersonRecord> allUsers = DbUtil.getAllUsers(config);
-            all = new HashMap<>();
-
-            for(PersonRecord user : allUsers) {
-                all.put(user.getAuthName(), user.getAuthSubject());
-            }
-
-        } catch(SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String switchUser() {
-        userBean.sudoUser(sudo);
-        return "/index.xhtml?faces-redirect=true";
-    }
 }

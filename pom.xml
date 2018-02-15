@@ -26,8 +26,8 @@
         <database.server>localhost</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
-        <database.username>saher</database.username>
-        <database.password>saher</database.password>
+        <database.username>postgres</database.username>
+        <database.password>test1234</database.password>
 
 
         <timestamp>${maven.build.timestamp}</timestamp>

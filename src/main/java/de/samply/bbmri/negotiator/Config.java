@@ -60,7 +60,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
 
      // Disable JOOQ logging
         Settings settings = new Settings();
-        settings.withExecuteLogging(false);
+        settings.withExecuteLogging(true);
         setSettings(settings);
 
         dsl = DSL.using(this);
