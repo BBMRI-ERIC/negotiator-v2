@@ -233,10 +233,10 @@
                             </c:forEach>
 
                             <c:forEach begin="1" end="#{researcherQueriesDetailBean.biobankWithOffer.size()}" var="i">
-                                <h:panelGroup layout="block" styleClass="deco-none">
+
                                 <div class="panel panel-default" >
 
-
+                                    <h:panelGroup layout="block" styleClass="deco-none panel-default">
 
 
                                     <div class="panel-heading" role="tab" id="heading#{i}">
@@ -254,6 +254,7 @@
                                           </div>
 
                                     </div>
+                                    </h:panelGroup>
                                     <div id="hh#{i}"
                                          class="panel-collapse collapse #{(i==oneMarkerOnly)?'in':''}"
                                          role="tabpanel"
@@ -280,7 +281,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </h:panelGroup>
+
                             </c:forEach>
 
 

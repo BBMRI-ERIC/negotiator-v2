@@ -113,7 +113,7 @@
 									 styleClass="form-control" rows="5"
                                      pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
 									 validatorMessage="#{label['error.invalidDescriptionLength']}">
-						<f:validateLength for="requestdescription" minimum="5" maximum="500" />
+						<f:validateLength for="requestdescription" minimum="5" maximum="6000" />							<!-- LENGTH Increased -->
 					</h:inputTextarea>
 					<h:message for="requestdescription" style="color:red"
 							   styleClass="pre-wrap" />
