@@ -604,7 +604,14 @@ tbody {
 }
 
 .panel-title:after {
-   /* content: '+';*/
+    content: '+';
+    position: absolute;
+    right: 1em;
+    top: 0
+}
+
+div[aria-expanded="true"] .panel-title:after {
+    content: '';
     position: absolute;
     right: 1em;
     top: 0

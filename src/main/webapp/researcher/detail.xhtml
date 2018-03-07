@@ -239,11 +239,12 @@
                                           <div id="heading#{i}" class="panel-heading " data-toggle="collapse" data-target="#hh#{i}">
                                             <h4 class="panel-title">
 
-                                                   <c:forEach var="j"  begin="1" end="#{researcherQueriesDetailBean.matchingBiobankCollection.size()}" >
-                                                    <c:if test="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.id==researcherQueriesDetailBean.biobankWithOffer.get(i-1)}" >
-                                                    <c:set var="biobankName" value="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.name}"/>
+                                                <c:forEach var="j" begin="1" end="#{researcherQueriesDetailBean.matchingBiobankCollection.size()}">
+                                                    <c:if test="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.id==researcherQueriesDetailBean.biobankWithOffer.get(i-1)}">
+                                                        <c:set var="biobankName" value="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.name}"/>
                                                     </c:if>
-                                                    </c:forEach><i class="fa fa-chevron-circle-right"></i>  <a>#{biobankName}</a>
+                                                </c:forEach>
+                                                <a>#{biobankName}</a>
                                             </h4>
                                           </div>
 
