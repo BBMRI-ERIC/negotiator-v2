@@ -236,13 +236,7 @@
 
                                 <div class="panel panel-default" >
 
-                                    <h:panelGroup layout="block" styleClass="deco-none panel-default">
-
-
-                                    <div class="panel-heading" role="tab" id="heading#{i}">
-
-
-                                          <div class="panel-heading" data-toggle="collapse" data-target="#hh#{i}">
+                                          <div id="heading#{i}" class="panel-heading deco-none" data-toggle="collapse" data-target="#hh#{i}">
                                             <h4 class="panel-title">
 
                                                    <c:forEach var="j"  begin="1" end="#{researcherQueriesDetailBean.matchingBiobankCollection.size()}" >
@@ -253,8 +247,6 @@
                                             </h4>
                                           </div>
 
-                                    </div>
-                                    </h:panelGroup>
                                     <div id="hh#{i}"
                                          class="panel-collapse collapse #{(i==oneMarkerOnly)?'in':''}"
                                          role="tabpanel"
