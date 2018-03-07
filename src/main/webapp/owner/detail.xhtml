@@ -157,18 +157,12 @@
 
 
                             <c:forEach begin="1" end="#{ownerQueriesDetailBean.associatedBiobanks.size()}" var="i">
-                                <div class="panel panel-default">
+                                <div class="panel panel-default deco-none">
 
 
-
-
-                                    <div class="panel-heading" role="tab" id="heading#{i}">
-
+                                    <div id="heading#{i}" class="panel-heading" data-toggle="collapse" data-target="#hh#{i}" >
                                         <h4 class="panel-title">
-                                            <a  data-toggle="collapse"
-                                                data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
-                                                aria-controls="sample-list">#{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name}
-                                            </a>
+                                            <a> #{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name} </a>
                                         </h4>
                                     </div>
                                     <div id="hh#{i}"
