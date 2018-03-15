@@ -575,13 +575,13 @@ public class DbUtil {
      * @param queryId
      * @param personId
      * @param comment
-     * @param offerFrom
+     * @param biobankInPrivateChat biobank id
      */
-    public static void addOfferComment(Config config, int queryId, int personId, String comment, Integer offerFrom) throws SQLException {
+    public static void addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
         OfferRecord record = config.dsl().newRecord(Tables.OFFER);
         record.setQueryId(queryId);
         record.setPersonId(personId);
-        record.setOfferFrom(offerFrom);
+        record.setBiobankInPrivateChat(biobankInPrivateChat);
         record.setText(comment);
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
@@ -1013,11 +1013,11 @@ public class DbUtil {
      */
     public static List<Integer> getOfferMakers(Config config, int queryId) {
         List<Integer> offerMakers = config.dsl()
-                .selectDistinct(Tables.OFFER.OFFER_FROM)
+                .selectDistinct(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT)
                 .from(Tables.OFFER)
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .fetch()
-                .getValues(Tables.OFFER.OFFER_FROM, Integer.class);
+                .getValues(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT, Integer.class);
 
         return offerMakers;
     }
@@ -1028,7 +1028,7 @@ public class DbUtil {
      * @param queryId
      * @return target
      */
-    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer offerFrom) {
+    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer biobankInPrivateChat) {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.OFFER, "offer"))
                 .select(getFields(Tables.PERSON, "person"))
@@ -1038,7 +1038,7 @@ public class DbUtil {
                 .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
                 .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
-                .and(Tables.OFFER.OFFER_FROM.eq(offerFrom))
+                .and(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT.eq(biobankInPrivateChat))
                 .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
 
         List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);

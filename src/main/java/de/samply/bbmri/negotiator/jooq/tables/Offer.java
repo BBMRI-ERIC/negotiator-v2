@@ -37,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer extends TableImpl<OfferRecord> {
 
-	private static final long serialVersionUID = -1912208269;
+	private static final long serialVersionUID = -922595301;
 
 	/**
 	 * The reference instance of <code>public.offer</code>
@@ -68,9 +68,9 @@ public class Offer extends TableImpl<OfferRecord> {
 	public final TableField<OfferRecord, Integer> PERSON_ID = createField("person_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists as primary key in the person table. describes the person who made the comment.");
 
 	/**
-	 * The column <code>public.offer.offer_from</code>. Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.
+	 * The column <code>public.offer.biobank_in_private_chat</code>. Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.
 	 */
-	public final TableField<OfferRecord, Integer> OFFER_FROM = createField("offer_from", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.");
+	public final TableField<OfferRecord, Integer> BIOBANK_IN_PRIVATE_CHAT = createField("biobank_in_private_chat", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.");
 
 	/**
 	 * The column <code>public.offer.comment_time</code>. timestamp of when the comment was made on the offer.

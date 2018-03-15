@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfferRecord extends UpdatableRecordImpl<OfferRecord> implements Record6<Integer, Integer, Integer, Integer, Timestamp, String> {
 
-	private static final long serialVersionUID = 2023743352;
+	private static final long serialVersionUID = 987200976;
 
 	/**
 	 * Setter for <code>public.offer.id</code>. Primary key
@@ -76,16 +76,16 @@ public class OfferRecord extends UpdatableRecordImpl<OfferRecord> implements Rec
 	}
 
 	/**
-	 * Setter for <code>public.offer.offer_from</code>. Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.
+	 * Setter for <code>public.offer.biobank_in_private_chat</code>. Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.
 	 */
-	public void setOfferFrom(Integer value) {
+	public void setBiobankInPrivateChat(Integer value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>public.offer.offer_from</code>. Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.
+	 * Getter for <code>public.offer.biobank_in_private_chat</code>. Foreign key which exists as primary key in the person table. describes the owner of the samples who made the offer.
 	 */
-	public Integer getOfferFrom() {
+	public Integer getBiobankInPrivateChat() {
 		return (Integer) getValue(3);
 	}
 
@@ -178,7 +178,7 @@ public class OfferRecord extends UpdatableRecordImpl<OfferRecord> implements Rec
 	 */
 	@Override
 	public Field<Integer> field4() {
-		return Offer.OFFER.OFFER_FROM;
+		return Offer.OFFER.BIOBANK_IN_PRIVATE_CHAT;
 	}
 
 	/**
@@ -226,7 +226,7 @@ public class OfferRecord extends UpdatableRecordImpl<OfferRecord> implements Rec
 	 */
 	@Override
 	public Integer value4() {
-		return getOfferFrom();
+		return getBiobankInPrivateChat();
 	}
 
 	/**
@@ -277,7 +277,7 @@ public class OfferRecord extends UpdatableRecordImpl<OfferRecord> implements Rec
 	 */
 	@Override
 	public OfferRecord value4(Integer value) {
-		setOfferFrom(value);
+		setBiobankInPrivateChat(value);
 		return this;
 	}
 
@@ -327,13 +327,13 @@ public class OfferRecord extends UpdatableRecordImpl<OfferRecord> implements Rec
 	/**
 	 * Create a detached, initialised OfferRecord
 	 */
-	public OfferRecord(Integer id, Integer queryId, Integer personId, Integer offerFrom, Timestamp commentTime, String text) {
+	public OfferRecord(Integer id, Integer queryId, Integer personId, Integer biobankInPrivateChat, Timestamp commentTime, String text) {
 		super(Offer.OFFER);
 
 		setValue(0, id);
 		setValue(1, queryId);
 		setValue(2, personId);
-		setValue(3, offerFrom);
+		setValue(3, biobankInPrivateChat);
 		setValue(4, commentTime);
 		setValue(5, text);
 	}
