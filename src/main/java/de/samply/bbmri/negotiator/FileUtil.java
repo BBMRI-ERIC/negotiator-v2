@@ -44,7 +44,13 @@ public class FileUtil {
 
 
     private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
-    
+
+    /**
+     * ClamAV timeout in milliseconds. Set to 20 seconds.
+     *
+     */
+    private static final int DEFAULT_TIMEOUT = 20000;
+
     /**
      * Copies file to query attachments directory
      * @param file file
@@ -88,7 +94,7 @@ public class FileUtil {
      * @param inputStream the fileinputstream that will be checked for viruses
      * @return true, if a virus has been found. False otherwise
      */
-    public static boolean checkVirusClamAV(Negotiator config, InputStream inputStream) {
+    public static boolean checkVirusClamAV(Negotiator config, InputStream inputStream) throws IOException {
         /**
          * If there is no clamav configured, return false and do not check for viruses
          */
@@ -97,17 +103,21 @@ public class FileUtil {
             return false;
         }
 
-        ClamAVClient cl = new ClamAVClient(config.getClamavHost(), config.getClamavPort());
+        ClamAVClient cl = new ClamAVClient(config.getClamavHost(), config.getClamavPort(), DEFAULT_TIMEOUT);
 
         /**
          * ClamAV has been configured, but once an error occurs, we assume
          * something is very wrong and do not continue.
          */
         try {
-            return !ClamAVClient.isCleanReply(cl.scan(inputStream));
+            if (ClamAVClient.isCleanReply(cl.scan(inputStream))) {
+                return false;
+            } else {
+                return true;
+            }
         } catch (Exception e) {
             logger.error("Error while scanning file: ", e);
-            return true;
+            throw e;
         }
     }
 }

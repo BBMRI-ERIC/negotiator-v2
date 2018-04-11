@@ -215,7 +215,13 @@
 									</label>
 								</h:panelGroup>
 								<h:panelGroup layout="block">
-									<h:message for="file" style="color:red" />
+									<ul>
+										<ui:repeat value="#{queryBean.msgs}" var="msgs">
+											<li>
+												<h:outputText id="uploadMessages" value="#{msgs.detail}" style="#{msgs.summary == 'Upload Failed' ? 'color: red' : 'color: green'}" />
+											</li>
+										</ui:repeat>
+									</ul>
 								</h:panelGroup>
 								<h:outputScript>
 			                        $(function() {
