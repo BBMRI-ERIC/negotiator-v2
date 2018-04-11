@@ -35,10 +35,15 @@ import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
@@ -229,6 +234,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public String startNegotiation() {
         try (Config config = ConfigFactory.get()) {
             DbUtil.startNegotiation(config, selectedQuery.getId());
+            //Send out email notifications once the researcher starts negotiation.
+            sendEmailsToPotentialBiobankers();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -246,7 +253,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * Removes the search filter.
      *
-     * @param arg
+     * @param arg The string to be removed as filter
      */
     public void removeFilter(String arg) {
         queries = null;
@@ -296,6 +303,31 @@ public class ResearcherQueriesDetailBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Gets the potential biobankers and sends out the emails
+     */
+    public void sendEmailsToPotentialBiobankers() {
+        try (Config config = ConfigFactory.get()) {
+            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, userBean.getUserId());
+            QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(), selectedQuery);
+            notifier.sendEmailNotification();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Builds url for biobanker to navigate to the query with id=selectedQuery.getId()
+     * @return    The URL for the biobanker
+     */
+    public String getQueryUrlForBiobanker() {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
     }
 
     public void setQueries(List<QueryStatsDTO> queries) {
@@ -365,7 +397,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * Lazyloaded map of saved filenames and original filenames
      *
-     * @return
+     * @return  Hash map of upload name with file salt and the uploaded file
      */
     public HashMap<String, String> getAttachmentMap() {
         if (attachmentMap == null) {
