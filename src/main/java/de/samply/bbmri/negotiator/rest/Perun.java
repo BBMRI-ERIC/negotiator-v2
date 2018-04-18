@@ -71,6 +71,7 @@ public class Perun {
 
             return Response.ok().build();
         } catch (SQLException e) {
+            logger.error("Failure in perun user synchronization");
             e.printStackTrace();
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_USER, e.getMessage());
             return Response.serverError().build();
@@ -107,6 +108,7 @@ public class Perun {
 
             return Response.ok().build();
         } catch (SQLException e) {
+            logger.error("Failure in perun mapping synchronization");
             e.printStackTrace();
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, e.getMessage());
             return Response.serverError().build();
