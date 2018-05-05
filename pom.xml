@@ -18,7 +18,7 @@
         <version.samply.webjar>1.6.0</version.samply.webjar>
         <version.samply.auth.client>1.0.3</version.samply.auth.client>
         <version.samply.common.util>1.0.0</version.samply.common.util>
-        <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
+        <version.samply.common.mailing>2.0.2-SNAPSHOT</version.samply.common.mailing>
         <version.samply.directory.client>1.0.3-SNAPSHOT</version.samply.directory.client>
         <version.samply.negotiator.dto>1.0.1-SNAPSHOT</version.samply.negotiator.dto>
         <version.samply.share.dto>2.0.5-BBMRI-CONNECTOR-SNAPSHOT</version.samply.share.dto>
