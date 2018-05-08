@@ -23,11 +23,13 @@ Before starting the application, it is necessary to create a database.
 
 ## Development mode
 
-By settings the runtime property `de.samply.development` to `true`, the application is started in development mode, that means:
+By settings the runtime property `de.samply.development.authenticationDisabled` to `true` in the bbmri.negotiator.xml,
+ the application is started in development mode, that means:
 
-- if the database is empty, the necessary tables **and the dummy data** are created.
-
-You can set this property by opening the runtime configuration of your tomcat server and adding `-Dde.samply.development=true` to the VM arguments.
+- You don't need to be authenticated from PERUN (our identity provider) to use the application. You can just select one
+  of the two roles at the login screen.
+  
+- You can create dummy data by setting `de.samply.development.deployDummyData` to `true`(Also in the bbmri.negotiator.xml).
 
 
 ## Installation
