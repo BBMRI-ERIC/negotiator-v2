@@ -756,12 +756,13 @@ public class DbUtil {
                 .join(Tables.COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
                 .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .leftOuterJoin(Tables.FLAGGED_QUERY).on(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON.ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .and( Tables.FLAGGED_QUERY.FLAG.notEqual(flag).or(Tables.FLAGGED_QUERY.FLAG.isNull()))
-                .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId).or(Tables.FLAGGED_QUERY.QUERY_ID.isNull()))
                 .and (Tables.PERSON.ID.notEqual(userId))
-                .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
+                .and (Tables.PERSON.ID.notIn (
+                        config.dsl().select(Tables.FLAGGED_QUERY.PERSON_ID)
+                        .from(Tables.FLAGGED_QUERY)
+                .where (Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and (Tables.FLAGGED_QUERY.FLAG.eq(flag))))
+                .fetch();
           return config.map(record, NegotiatorDTO.class);
     }
 
