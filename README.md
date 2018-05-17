@@ -29,7 +29,18 @@ By settings the runtime property `de.samply.development.authenticationDisabled` 
 - You don't need to be authenticated from PERUN (our identity provider) to use the application. You can just select one
   of the two roles at the login screen.
   
+- You can run the application without connecting it with a directory. This would mean that you can not make/edit queries. 
+  However, you can still work with dummy queries given in the dummy data.   
+  
 - You can create dummy data by setting `de.samply.development.deployDummyData` to `true`(Also in the bbmri.negotiator.xml).
+
+Now if the application is started; after creating the database, the dummy data would be added to the database. 
+
+The directory synchronization task fails in this case(because there is no connection to the directory) but that should 
+not effect working of the negotiator. The directory synchronization can also be switched off by commenting out the 
+following line from de.samply.bbmri.negotiator.listener.ServletListner.java
+
+`timer.schedule(new DirectorySynchronizeTask(), 10000, 1000 * 60 * 60);` 
 
 
 ## Installation
