@@ -2,51 +2,38 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:bootstrap/css/bootstrap.css']}&amp;version=#{applicationBean.version}" />
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:font-lato/css/font-lato.css']}&amp;version=#{applicationBean.version}" />
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:font-awesome/css/font-awesome.css']}&amp;version=#{applicationBean.version}" />
+    <h:outputStylesheet library="webjars" name="bootstrap/3.3.7-1/css/bootstrap.css" />
+
+    <!-- <link type='text/css' href='http://fonts.googleapis.com/css?family=Lato:400,700' /> -->
+
+    <h:outputStylesheet library="webjars" name="font-awesome/4.7.0/css/font-awesome-jsf.css" />
+    <h:outputStylesheet library="webjars" name="font-awesome/4.7.0/css/font-awesome.min-jsf.css" />
+    <h:outputStylesheet library="webjar" name="samply/css/base.css" />
+    <h:outputStylesheet library="webjar" name="samply/css/fadein.css" />
+    <h:outputStylesheet library="webjars" name="jquery-ui/1.12.1/jquery-ui.css" />
+
+    <h:outputStylesheet library="webjars" name="select2/4.0.3/css/select2.css" />
+    <h:outputStylesheet library="webjars" name="datatables/1.10.16/css/dataTables.bootstrap.min.css" />
+    <h:outputStylesheet library="css" name="buttons.css" />
+    <h:outputStylesheet library="webjar" name="samply/css/demo-ribbon.css" />
+
+    <h:outputStylesheet library="css" name="bbmri.css" />
+    <h:outputStylesheet library="css" name="negotiator.css" />
 
     <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:samply/css/base.css']}&amp;version=#{applicationBean.version}" />
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:samply/css/fadein.css']}&amp;version=#{applicationBean.version}" />
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:jquery/css/jquery-ui.css']}&amp;version=#{applicationBean.version}" />
+          href="#{resource['webjars:jstree/3.3.4/dist/themes/default/style.min.css']}&amp;version=#{applicationBean.version}" />
 
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:select2/css/select2.css']}&amp;version=#{applicationBean.version}" />
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:datatables/css/dataTables.bootstrap.min.css']}&amp;version=#{applicationBean.version}" />
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['css/buttons.css']}?version=#{applicationBean.version}" />
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['webjar:samply/css/demo-ribbon.css']}&amp;version=#{applicationBean.version}" />
 
-    <link type="text/css" href="#{resource['css/bbmri.css']}?version=#{applicationBean.version}" rel="stylesheet" />
-    
-    <link type="text/css" rel="stylesheet"
-        href="#{resource['css/negotiator.css']}?version=#{applicationBean.version}" />
-    <link type="text/css" rel="stylesheet"
-             href="#{resource['webjars:jstree/3.3.4/dist/themes/default/style.min.css']}&amp;version=#{applicationBean.version}" />
-
-    <script type="text/javascript"
-        src="#{resource['webjar:jquery/js/jquery.min.js']}&amp;version=#{applicationBean.version}"></script>
-    <script type="text/javascript"
-        src="#{resource['webjar:jquery/js/jquery-ui.min.js']}&amp;version=#{applicationBean.version}"></script>
-    <script type="text/javascript"
-        src="#{resource['webjar:bootstrap/js/bootstrap.js']}&amp;version=#{applicationBean.version}"></script>
-    <script type="text/javascript"
-        src="#{resource['webjar:select2/js/select2.min.js']}&amp;version=#{applicationBean.version}"></script>
-    <script type="text/javascript"
-        src="#{resource['webjar:datatables/js/jquery.dataTables.min.js']}&amp;version=#{applicationBean.version}"></script>
-    <script type="text/javascript"
-        src="#{resource['webjar:datatables/js/dataTables.bootstrap.min.js']}&amp;version=#{applicationBean.version}"></script>
+    <h:outputScript library="webjars" name="jquery/3.3.1/jquery.min.js" />
+    <h:outputScript library="webjars" name="jquery-ui/1.12.1/jquery-ui.min.js" />
+    <h:outputScript library="webjars" name="bootstrap/3.3.7-1/js/bootstrap.js" />
+    <h:outputScript library="webjars" name="select2/4.0.3/js/select2.min.js" />
+    <h:outputScript library="webjars" name="datatables/1.10.16/js/jquery.dataTables.min.js" />
+    <h:outputScript library="webjars" name="datatables/1.10.16/js/dataTables.bootstrap.min.js" />
 
     <script type="text/javascript"
             src="#{resource['webjars:jstree/3.3.4/dist/jstree.min.js']}&amp;version=#{applicationBean.version}"></script>
+
     <!-- Preload the JSF library, otherwise the negotiator.js will not work -->
     <h:outputScript name="jsf.js" library="javax.faces"/>
     <script type="text/javascript" src="#{resource['js/negotiator.js']}?version=#{applicationBean.version}"></script>
