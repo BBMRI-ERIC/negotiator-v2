@@ -15,20 +15,19 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <version.samply.webjar>2.0.0-SNAPSHOT</version.samply.webjar>
+        <version.samply.webjar>2.0.1</version.samply.webjar>
         <version.samply.auth.client>1.0.3</version.samply.auth.client>
         <version.samply.common.util>1.0.0</version.samply.common.util>
-        <version.samply.common.mailing>2.0.2-SNAPSHOT</version.samply.common.mailing>
-        <version.samply.directory.client>1.0.3-SNAPSHOT</version.samply.directory.client>
-        <version.samply.negotiator.dto>1.0.1-SNAPSHOT</version.samply.negotiator.dto>
-        <version.samply.share.dto>2.0.5-BBMRI-CONNECTOR-SNAPSHOT</version.samply.share.dto>
+        <version.samply.common.mailing>2.0.0</version.samply.common.mailing>
+        <version.samply.directory.client>2.0.0</version.samply.directory.client>
+        <version.samply.negotiator.dto>2.0.0</version.samply.negotiator.dto>
+        <version.samply.share.dto>4.0.0</version.samply.share.dto>
 
         <database.server>localhost</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>saher</database.username>
         <database.password>saher</database.password>
-
 
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
@@ -265,18 +264,6 @@
                 </dependency>
             </dependencies>
         </profile>
-
-        <!--
-        <profile>
-            <id>myfaces</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.myfaces.core</groupId>
-                    <artifactId>myfaces-impl</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        -->
 
         <profile>
             <id>maxdatabase</id>
