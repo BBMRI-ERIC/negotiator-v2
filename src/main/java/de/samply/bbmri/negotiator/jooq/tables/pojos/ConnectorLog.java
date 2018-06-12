@@ -24,24 +24,32 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConnectorLog implements Serializable {
 
-	private static final long serialVersionUID = -1910818720;
+	private static final long serialVersionUID = 1083818690;
 
 	private Integer   id;
+	private String    directoryCollectionId;
 	private Timestamp lastQueryTime;
+	private Timestamp lastNegotiationTime;
 
 	public ConnectorLog() {}
 
 	public ConnectorLog(ConnectorLog value) {
 		this.id = value.id;
+		this.directoryCollectionId = value.directoryCollectionId;
 		this.lastQueryTime = value.lastQueryTime;
+		this.lastNegotiationTime = value.lastNegotiationTime;
 	}
 
 	public ConnectorLog(
 		Integer   id,
-		Timestamp lastQueryTime
+		String    directoryCollectionId,
+		Timestamp lastQueryTime,
+		Timestamp lastNegotiationTime
 	) {
 		this.id = id;
+		this.directoryCollectionId = directoryCollectionId;
 		this.lastQueryTime = lastQueryTime;
+		this.lastNegotiationTime = lastNegotiationTime;
 	}
 
 	public Integer getId() {
@@ -52,11 +60,27 @@ public class ConnectorLog implements Serializable {
 		this.id = id;
 	}
 
+	public String getDirectoryCollectionId() {
+		return this.directoryCollectionId;
+	}
+
+	public void setDirectoryCollectionId(String directoryCollectionId) {
+		this.directoryCollectionId = directoryCollectionId;
+	}
+
 	public Timestamp getLastQueryTime() {
 		return this.lastQueryTime;
 	}
 
 	public void setLastQueryTime(Timestamp lastQueryTime) {
 		this.lastQueryTime = lastQueryTime;
+	}
+
+	public Timestamp getLastNegotiationTime() {
+		return this.lastNegotiationTime;
+	}
+
+	public void setLastNegotiationTime(Timestamp lastNegotiationTime) {
+		this.lastNegotiationTime = lastNegotiationTime;
 	}
 }

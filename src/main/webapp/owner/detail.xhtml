@@ -26,12 +26,12 @@
   -->
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:ui="http://java.sun.com/jsf/facelets"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-    xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
-    template="../components/default.xhtml">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+                template="../components/default.xhtml">
 
     <!-- Queries detail page for the owner -->
 
@@ -146,30 +146,52 @@
                         </div>
 
                         <div id="sampleAvailability" class="tab-pane fade">
-                        <ui:fragment rendered="#{ownerQueriesDetailBean.offerPersonDTO.size() == 0}">
+                            <ui:fragment rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() == 0}">
+                                <br />
+                                <p>
+                                    <b> <h:outputText value="#{label['message.noOffers']}" /> </b>
+                                </p>
+                            </ui:fragment>
                             <br />
-                            <p>
-                                <b> <h:outputText value="#{label['message.offerSamples']}"/> </b>
-                            </p>
-                        </ui:fragment>
-                            <ui:repeat value="#{ownerQueriesDetailBean.offerPersonDTO}"
-                                var="offerPersonDTO">
+                            <c:set var="oneMarkerOnly" value="#{ownerQueriesDetailBean.associatedBiobanks.size() == 1}" />
 
-                                <bbmricc:comment comment="#{offerPersonDTO.offer}"
-                                    person="#{offerPersonDTO.person}"
-                                    collections="#{offerPersonDTO.collections}" />
 
-                            </ui:repeat>
+                            <c:forEach begin="1" end="#{ownerQueriesDetailBean.associatedBiobanks.size()}" var="i">
+                                <div class="panel panel-default deco-none">
 
-                            <div class="col-xs-12">
-                                <hr></hr>
-                            </div>
 
-                            <bbmricc:commentReply makeOffer="true"
-                                                  rendered="#{ownerQueriesDetailBean.nonConfidential == false}"
-                                query="#{ownerQueriesDetailBean.selectedQuery}"
-                                offer="#{ownerQueriesDetailBean.userBean.userId}" />
+                                    <div id="heading#{i}" class="panel-heading" data-toggle="collapse" data-target="#hh#{i}" >
+                                        <h4 class="panel-title">
+                                            <a> #{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name} </a>
+                                        </h4>
+                                    </div>
+                                    <div id="hh#{i}"
+                                         class="panel-collapse collapse #{oneMarkerOnly?'in':''}"
+                                         role="tabpanel"
+                                         aria-labelledby="heading#{i}">
 
+                                        <div class="panel-body">
+                                            <ui:repeat
+                                                    value="#{ownerQueriesDetailBean.listOfSampleOffers[i-1]}"
+                                                    var="offers">
+
+                                                <bbmricc:comment comment="#{offers.offer}"
+                                                                 person="#{offers.person}"
+                                                                 collections="#{offers.collections}"/>
+
+                                            </ui:repeat>
+
+                                            <div class="col-xs-12">
+                                                <hr/>
+                                            </div>
+
+                                            <bbmricc:commentReply makeOffer="true"
+                                                                  query="#{ownerQueriesDetailBean.selectedQuery}"
+                                                                  offer="#{ownerQueriesDetailBean.associatedBiobanks[i-1].id}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </c:forEach>
                         </div>
                     </div>
                 </h:panelGroup>

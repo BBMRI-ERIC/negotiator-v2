@@ -610,6 +610,13 @@ tbody {
     top: 0
 }
 
+div[aria-expanded="true"] .panel-title:after {
+    content: '-';
+    position: absolute;
+    right: 1em;
+    top: 0
+}
+
 .panel-title.accordion-title-animation:after {
     content: '-';
     padding-right: 30.3%;
@@ -945,4 +952,10 @@ ul {
 
 .table-fullwidth {
     width: 100%;
+}
+
+.a-expander-content-fade {
+    background: -webkit-linear-gradient(#333,#fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }

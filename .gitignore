@@ -3,6 +3,7 @@
 /.metadata
 /.project
 /.settings
+/.idea
 /build
 /target
 *.iml

@@ -38,7 +38,10 @@ import javax.servlet.annotation.WebListener;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import de.samply.bbmri.negotiator.control.ApplicationBean;
+import de.samply.bbmri.negotiator.db.util.Migration;
 import org.apache.logging.log4j.core.config.Configurator;
+import org.flywaydb.core.api.FlywayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -85,11 +88,23 @@ public class ServletListener implements ServletContextListener {
             logger.info("Registering PostgreSQL driver");
             Class.forName("org.postgresql.Driver").newInstance();
 
+            // Check for DB changes
+            logger.debug("DB upgrade start");
+            Boolean newDatabaseInstallation = false;
+            try {
+                newDatabaseInstallation = Migration.doUpgrade();
+            } catch(FlywayException | SQLException e) {
+                logger.error("Could not initialize or migrate database", e);
+                NegotiatorConfig.get().setMaintenanceMode(true);
+                e.printStackTrace();
+            }
+            logger.debug("DB upgrade end");
+
             /**
              * Initialize the configuration singleton
              */
             NegotiatorConfig.initialize(projectName, fallback);
-
+            NegotiatorConfig.setNewDatabaseInstallation(newDatabaseInstallation);
 
             logger.info("Starting directory synchronize task timer");
 

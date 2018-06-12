@@ -16,8 +16,7 @@ import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
-import de.samply.bbmri.negotiator.jooq.tables.Tag;
-import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
+import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +42,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = 1022191354;
+	private static final long serialVersionUID = -324057882;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -74,8 +73,7 @@ public class Public extends SchemaImpl {
 			Sequences.OFFER_ID_SEQ,
 			Sequences.PERSON_ID_SEQ,
 			Sequences.QUERY_ATTACHMENT_ID_SEQ,
-			Sequences.QUERY_ID_SEQ,
-			Sequences.TAG_ID_SEQ);
+			Sequences.QUERY_ID_SEQ);
 	}
 
 	@Override
@@ -99,7 +97,6 @@ public class Public extends SchemaImpl {
 			Query.QUERY,
 			QueryAttachment.QUERY_ATTACHMENT,
 			QueryCollection.QUERY_COLLECTION,
-			Tag.TAG,
-			TaggedQuery.TAGGED_QUERY);
+			SchemaVersion.SCHEMA_VERSION);
 	}
 }

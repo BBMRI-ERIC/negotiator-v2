@@ -38,6 +38,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,8 +47,6 @@ import com.docuverse.identicon.IdenticonUtil;
 import de.samply.bbmri.negotiator.*;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import de.samply.common.sql.SQLUtil;
-import de.samply.common.upgrade.Upgrade;
 
 /**
  * The Class ApplicationBean.
@@ -77,57 +76,35 @@ public class ApplicationBean implements Serializable {
     @PostConstruct
     public void initializeDbUpgrades() {
         try (Config config = ConfigFactory.get()) {
-            Upgrade<Void> upgrade = new Upgrade<>(Constants.DB_REQUIRED_VERSION, Constants.DB_PACKAGE_NAME, config.get());
-
             /**
-             * Check if there are any tables, if not, execute database.sql
+             * In case the application has been started in development mode, deploy the dummy data.
              */
-            try (ResultSet set = config.get().getMetaData().getTables(null, null, "", new String[] { "TABLE" })) {
-                if(!set.next()) {
-                    logger.info("Database empty, creating tables");
+            if(NegotiatorConfig.get().getNegotiator().deployDummyData()) {
+                logger.info("Developer wants, that I deploy dummy data");
 
-                    SQLUtil.executeSQLFile(config.get(), getClass().getClassLoader(), "/sql/database.sql");
+                if(!NegotiatorConfig.getNewDatabaseInstallation()) {
+                    logger.debug("Not a new DB installation. Bailing on deploying Dummy Data");
+                    return;
+                }
 
-                    /**
-                     * In case the application has been started in development mode, deploy the dummy data.
-                     */
-                    if(NegotiatorConfig.get().getNegotiator().deployDummyData()) {
-                        logger.info("Deploying dummy data");
-                        SQLUtil.executeSQLFile(config.get(), getClass().getClassLoader(), "/sql/dummyData.sql");
+                DbUtil.executeSQLFile(config.get(), getClass().getClassLoader(), "/sql/dummyData.sql");
 
-                        Random random = new Random();
+                Random random = new Random();
 
-                        /**
-                         * Generate identicons for every user in the dummy data and store them in the DB.
-                         */
-                        for(PersonRecord person : config.dsl().selectFrom(Tables.PERSON)) {
-                            if(person.getPersonImage() == null) {
-                                logger.info("Generating identicon for user {}", person.getAuthName());
-                                person.setPersonImage(IdenticonUtil.generateIdenticon(new BigInteger(64, random).intValue(), 256));
-                                person.update();
-                            }
-                        }
+                /**
+                 * Generate identicons for every user in the dummy data and store them in the DB.
+                 */
+                for(PersonRecord person : config.dsl().selectFrom(Tables.PERSON)) {
+                    if(person.getPersonImage() == null) {
+                        logger.info("Generating identicon for user {}", person.getAuthName());
+                        person.setPersonImage(IdenticonUtil.generateIdenticon(new BigInteger(64, random).intValue(), 256));
+                        person.update();
                     }
                 }
+
+                config.get().commit();
             }
 
-            logger.info("Initiating database upgrades");
-
-            /**
-             * Execute all upgrades
-             */
-            if(!upgrade.executeUpgrades()) {
-                logger.error("Database upgrades not successful. Starting in maintenance mode.");
-                NegotiatorConfig.get().setMaintenanceMode(true);
-            } else {
-                logger.info("Database upgrades successful. Current version: {}", Constants.DB_REQUIRED_VERSION);
-                NegotiatorConfig.get().setMaintenanceMode(false);
-            }
-
-            /**
-             * And commit all changes
-             */
-            config.get().commit();
         } catch (Exception e) {
             e.printStackTrace();
             NegotiatorConfig.get().setMaintenanceMode(true);

@@ -50,22 +50,26 @@ public class NotificationThread extends Thread {
 
     @Override
     public void run() {
-        logger.debug("Notification thread started");
+        try {
+            logger.debug("Notification thread started");
+            for(Person person : notification.getAddressees()) {
+                OutgoingEmail email = new OutgoingEmail();
 
-        for(Person person : notification.getAddressees()) {
-            OutgoingEmail email = new OutgoingEmail();
+                for(Map.Entry<String, String> parameters : notification.getParameters().entrySet()) {
+                    email.putParameter(parameters.getKey(), parameters.getValue());
+                }
 
-            for(Map.Entry<String, String> parameters : notification.getParameters().entrySet()) {
-                email.putParameter(parameters.getKey(), parameters.getValue());
+                email.putParameter("name", person.getAuthName());
+                email.setSubject(notification.getSubject());
+                email.addAddressee(person.getAuthEmail());
+                email.setBuilder(builder);
+                MailUtil.sendEmail(email);
             }
 
-            email.putParameter("name", person.getAuthName());
-            email.setSubject(notification.getSubject());
-            email.addAddressee(person.getAuthEmail());
-            email.setBuilder(builder);
-            MailUtil.sendEmail(email);
+            logger.debug("Notification thread finished");
+        } catch (Exception e) {
+            logger.error("Exception in notification thread");
+            e.printStackTrace();
         }
-
-        logger.debug("Notification thread finished");
     }
 }

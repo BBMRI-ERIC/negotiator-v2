@@ -16,8 +16,7 @@ import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
-import de.samply.bbmri.negotiator.jooq.tables.Tag;
-import de.samply.bbmri.negotiator.jooq.tables.TaggedQuery;
+import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import javax.annotation.Generated;
 
@@ -96,12 +95,7 @@ public class Tables {
 	public static final QueryCollection QUERY_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.QueryCollection.QUERY_COLLECTION;
 
 	/**
-	 * Table that contains tags for queries
+	 * The table public.schema_version
 	 */
-	public static final Tag TAG = de.samply.bbmri.negotiator.jooq.tables.Tag.TAG;
-
-	/**
-	 * Table for queries that are tagged by names e.g. colonCancer,SkinCancer etc. Tag names need to be decided .
-	 */
-	public static final TaggedQuery TAGGED_QUERY = de.samply.bbmri.negotiator.jooq.tables.TaggedQuery.TAGGED_QUERY;
+	public static final SchemaVersion SCHEMA_VERSION = de.samply.bbmri.negotiator.jooq.tables.SchemaVersion.SCHEMA_VERSION;
 }

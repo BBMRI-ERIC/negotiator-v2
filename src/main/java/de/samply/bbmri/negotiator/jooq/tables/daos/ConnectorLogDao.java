@@ -67,9 +67,23 @@ public class ConnectorLogDao extends DAOImpl<ConnectorLogRecord, de.samply.bbmri
 	}
 
 	/**
+	 * Fetch records that have <code>directory_collection_id IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog> fetchByDirectoryCollectionId(String... values) {
+		return fetch(ConnectorLog.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID, values);
+	}
+
+	/**
 	 * Fetch records that have <code>last_query_time IN (values)</code>
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog> fetchByLastQueryTime(Timestamp... values) {
 		return fetch(ConnectorLog.CONNECTOR_LOG.LAST_QUERY_TIME, values);
+	}
+
+	/**
+	 * Fetch records that have <code>last_negotiation_time IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ConnectorLog> fetchByLastNegotiationTime(Timestamp... values) {
+		return fetch(ConnectorLog.CONNECTOR_LOG.LAST_NEGOTIATION_TIME, values);
 	}
 }

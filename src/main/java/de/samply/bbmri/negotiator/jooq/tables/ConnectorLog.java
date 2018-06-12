@@ -15,6 +15,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -36,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 
-	private static final long serialVersionUID = -649438734;
+	private static final long serialVersionUID = -1327666029;
 
 	/**
 	 * The reference instance of <code>public.connector_log</code>
@@ -57,9 +58,19 @@ public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 	public final TableField<ConnectorLogRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "Primary key");
 
 	/**
+	 * The column <code>public.connector_log.directory_collection_id</code>. Foreign key that comes from table "Collections.directory_id". It is not the primary key of its table but it is still unique so we can use it as a foreign key constraint
+	 */
+	public final TableField<ConnectorLogRecord, String> DIRECTORY_COLLECTION_ID = createField("directory_collection_id", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "Foreign key that comes from table \"Collections.directory_id\". It is not the primary key of its table but it is still unique so we can use it as a foreign key constraint");
+
+	/**
 	 * The column <code>public.connector_log.last_query_time</code>. Timestamp when the request was made. 
 	 */
-	public final TableField<ConnectorLogRecord, Timestamp> LAST_QUERY_TIME = createField("last_query_time", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "Timestamp when the request was made. ");
+	public final TableField<ConnectorLogRecord, Timestamp> LAST_QUERY_TIME = createField("last_query_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "Timestamp when the request was made. ");
+
+	/**
+	 * The column <code>public.connector_log.last_negotiation_time</code>. Time when the connector last fetched for new negotiations.
+	 */
+	public final TableField<ConnectorLogRecord, Timestamp> LAST_NEGOTIATION_TIME = createField("last_negotiation_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "Time when the connector last fetched for new negotiations.");
 
 	/**
 	 * Create a <code>public.connector_log</code> table reference
@@ -105,6 +116,14 @@ public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 	@Override
 	public List<UniqueKey<ConnectorLogRecord>> getKeys() {
 		return Arrays.<UniqueKey<ConnectorLogRecord>>asList(Keys.CONNECTOR_LOG_PKEY);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<ForeignKey<ConnectorLogRecord, ?>> getReferences() {
+		return Arrays.<ForeignKey<ConnectorLogRecord, ?>>asList(Keys.CONNECTOR_LOG__CONNECTOR_LOG_DIRECTORY_COLLECTION_ID_FKEY);
 	}
 
 	/**

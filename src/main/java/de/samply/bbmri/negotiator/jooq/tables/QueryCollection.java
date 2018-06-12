@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollection extends TableImpl<QueryCollectionRecord> {
 
-	private static final long serialVersionUID = 321035951;
+	private static final long serialVersionUID = -1579157554;
 
 	/**
 	 * The reference instance of <code>public.query_collection</code>
@@ -63,6 +64,21 @@ public class QueryCollection extends TableImpl<QueryCollectionRecord> {
 	 * The column <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
 	 */
 	public final TableField<QueryCollectionRecord, Boolean> EXPECT_CONNECTOR_RESULT = createField("expect_connector_result", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "Column that tells the negotiator to expect results from the given connector");
+
+	/**
+	 * The column <code>public.query_collection.donors</code>. result of query: amount of donors
+	 */
+	public final TableField<QueryCollectionRecord, Integer> DONORS = createField("donors", org.jooq.impl.SQLDataType.INTEGER, this, "result of query: amount of donors");
+
+	/**
+	 * The column <code>public.query_collection.samples</code>. result of query: amount of samples
+	 */
+	public final TableField<QueryCollectionRecord, Integer> SAMPLES = createField("samples", org.jooq.impl.SQLDataType.INTEGER, this, "result of query: amount of samples");
+
+	/**
+	 * The column <code>public.query_collection.result_received_time</code>. the time when the result is received from the connector.
+	 */
+	public final TableField<QueryCollectionRecord, Timestamp> RESULT_RECEIVED_TIME = createField("result_received_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "the time when the result is received from the connector.");
 
 	/**
 	 * Create a <code>public.query_collection</code> table reference

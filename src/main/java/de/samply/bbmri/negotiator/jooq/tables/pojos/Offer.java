@@ -24,12 +24,12 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer implements Serializable {
 
-	private static final long serialVersionUID = 1083709471;
+	private static final long serialVersionUID = 1713424993;
 
 	private Integer   id;
 	private Integer   queryId;
 	private Integer   personId;
-	private Integer   offerFrom;
+	private Integer   biobankInPrivateChat;
 	private Timestamp commentTime;
 	private String    text;
 
@@ -39,7 +39,7 @@ public class Offer implements Serializable {
 		this.id = value.id;
 		this.queryId = value.queryId;
 		this.personId = value.personId;
-		this.offerFrom = value.offerFrom;
+		this.biobankInPrivateChat = value.biobankInPrivateChat;
 		this.commentTime = value.commentTime;
 		this.text = value.text;
 	}
@@ -48,14 +48,14 @@ public class Offer implements Serializable {
 		Integer   id,
 		Integer   queryId,
 		Integer   personId,
-		Integer   offerFrom,
+		Integer   biobankInPrivateChat,
 		Timestamp commentTime,
 		String    text
 	) {
 		this.id = id;
 		this.queryId = queryId;
 		this.personId = personId;
-		this.offerFrom = offerFrom;
+		this.biobankInPrivateChat = biobankInPrivateChat;
 		this.commentTime = commentTime;
 		this.text = text;
 	}
@@ -84,12 +84,12 @@ public class Offer implements Serializable {
 		this.personId = personId;
 	}
 
-	public Integer getOfferFrom() {
-		return this.offerFrom;
+	public Integer getBiobankInPrivateChat() {
+		return this.biobankInPrivateChat;
 	}
 
-	public void setOfferFrom(Integer offerFrom) {
-		this.offerFrom = offerFrom;
+	public void setBiobankInPrivateChat(Integer biobankInPrivateChat) {
+		this.biobankInPrivateChat = biobankInPrivateChat;
 	}
 
 	public Timestamp getCommentTime() {

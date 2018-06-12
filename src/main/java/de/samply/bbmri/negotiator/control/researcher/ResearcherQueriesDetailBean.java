@@ -35,10 +35,18 @@ import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.model.*;
+import de.samply.bbmri.negotiator.util.ObjectToJson;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -50,12 +58,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.OfferPersonDTO;
-import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 
@@ -74,7 +77,24 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
+    /**
+     * String contains Json data for JsTree view
+     */
+    private String jsTreeJson;
+    /**
+     * List of collection with biobanks details of a specific query.
+     */
+    private List<CollectionBiobankDTO> matchingBiobankCollection = new ArrayList<>();
 
+    /**
+     * List to store the person id who has not contacted already
+     */
+    private List<CollectionBiobankDTO> biobankWithoutOffer = new ArrayList<>();
+
+    /**
+       offerResearcher is collection id that researcher has chosen to contact
+    */
+    private Integer offerResearcher;
 
     /**
      * The QueryStatsDTO object used to get all the information for queries.
@@ -90,7 +110,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The selected query, if there is one
      */
     private Query selectedQuery = null;
-
 
      /**
      * The input text box for the user to make a comment.
@@ -127,17 +146,20 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     QueryDTO queryDTO = null;
 
-    private List<Collection> collections;
+    /**
+     * Biobanks that match to a query
+     */
+    private int matchingBiobanks;
 
     /**
-     * The list of biobanker owners who made a sample offer for a given query
+     * The list of BIOBANK ID who are related with a given query
      */
-    private List<Integer> offerMakers;
+    private List<Integer> biobankWithOffer;
 
     /**
      * The list of offerPersonDTO's, hence it's a list of lists.
      */
-    private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<List<OfferPersonDTO>>();
+    private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
 
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
@@ -145,31 +167,41 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public String initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId));
-            setOfferMakers(DbUtil.getOfferMakers(config, queryId));
+            setBiobankWithOffer(DbUtil.getOfferMakers(config, queryId));
 
-            for (int i = 0; i < offerMakers.size(); ++i) {
+            for (int i = 0; i < biobankWithOffer.size(); ++i) {
                 List<OfferPersonDTO> offerPersonDTO;
-                offerPersonDTO = DbUtil.getOffers(config, queryId, offerMakers.get(i));
+                offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i));
                 listOfSampleOffers.add(offerPersonDTO);
             }
 
             setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
 
-            collections = DbUtil.getCollectionsForQuery(config, queryId);
+            matchingBiobankCollection = DbUtil.getCollectionsForQuery(config, queryId);
+            setMatchingBiobanks(ObjectToJson.getUniqueBiobanks(matchingBiobankCollection).size());
+            /**
+             * This is done to remove the repitition of biobanks in the list because of multiple collection
+             */
+            for (int j = 0; j < matchingBiobankCollection.size(); j++) {
+                if (!getBiobankWithoutOffer().contains(matchingBiobankCollection.get(j)) ) {
+                    if (!biobankWithOffer.contains(matchingBiobankCollection.get(j).getBiobank().getId())) {
+                        biobankWithoutOffer.add(matchingBiobankCollection.get(j));
+                    }
+                }
 
+            }
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
-            for(QueryStatsDTO query : getQueries()) {
-                if(query.getQuery().getId() == queryId) {
+            for (QueryStatsDTO query : getQueries()) {
+                if (query.getQuery().getId() == queryId) {
                     selectedQuery = query.getQuery();
                 }
             }
 
-            if(selectedQuery == null) {
+            if (selectedQuery == null) {
                 /**
-                 * If it is null, it means that either the user can not access it due to insufficient privileges,
-                 * or that the query simply does not exist.
+                 * If it is null, it means that the query simply does not exist.
                  */
                 return "/errors/not-found.xhtml";
             } else {
@@ -182,12 +214,32 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
                 setHumanReadableQuery(queryDTO.getHumanReadable());
             }
-
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
+        /**
+         * Convert matchingBiobankCollection in the JSON format for Tree View
+         */
+        setJsTreeJson(ObjectToJson.getJsonTree(matchingBiobankCollection));
+
         return null;
+    }
+
+    /**
+     * Starts negotiation for a query.
+     *
+     * @return refreshes the view
+     */
+    public String startNegotiation() {
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.startNegotiation(config, selectedQuery.getId());
+            //Send out email notifications once the researcher starts negotiation.
+            sendEmailsToPotentialBiobankers();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
     }
 
     /**
@@ -201,8 +253,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * Removes the search filter.
      *
-     * @param arg
-     *
+     * @param arg The string to be removed as filter
      */
     public void removeFilter(String arg) {
         queries = null;
@@ -211,6 +262,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     /**
      * Split search terms by list of delimiters
+     *
      * @return unique search terms
      */
     public Set<String> getFilterTerms() {
@@ -251,6 +303,31 @@ public class ResearcherQueriesDetailBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Gets the potential biobankers and sends out the emails
+     */
+    public void sendEmailsToPotentialBiobankers() {
+        try (Config config = ConfigFactory.get()) {
+            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, userBean.getUserId());
+            QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(), selectedQuery);
+            notifier.sendEmailNotification();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Builds url for biobanker to navigate to the query with id=selectedQuery.getId()
+     * @return    The URL for the biobanker
+     */
+    public String getQueryUrlForBiobanker() {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
     }
 
     public void setQueries(List<QueryStatsDTO> queries) {
@@ -297,13 +374,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.commentText = commentText;
     }
 
-	public String getHumanReadableQuery() {
-		return humanReadableQuery;
-	}
+    public String getHumanReadableQuery() {
+        return humanReadableQuery;
+    }
 
-	public void setHumanReadableQuery(String humanReadableQuery) {
-		this.humanReadableQuery = humanReadableQuery;
-	}
+    public void setHumanReadableQuery(String humanReadableQuery) {
+        this.humanReadableQuery = humanReadableQuery;
+    }
 
     public Part getFile() {
         return file;
@@ -319,18 +396,19 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     /**
      * Lazyloaded map of saved filenames and original filenames
-     * @return
+     *
+     * @return  Hash map of upload name with file salt and the uploaded file
      */
     public HashMap<String, String> getAttachmentMap() {
-        if(attachmentMap == null) {
+        if (attachmentMap == null) {
             attachmentMap = new HashMap<>();
-            for(QueryAttachmentDTO att : attachments) {
+            for (QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
                 String uploadName = "query_" + queryId + "_file_" + att.getId();
 
                 Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
-                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
+                uploadName = uploadName + "_salt_" + DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
                         uploadName) + ".pdf";
 
 
@@ -346,20 +424,20 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return attachments;
     }
 
-    public List<Collection> getCollections() {
-        return collections;
+    public List<CollectionBiobankDTO> getMatchingBiobankCollection() {
+        return matchingBiobankCollection;
     }
 
-    public void setCollections(List<Collection> collections) {
-        this.collections = collections;
+    public void setMatchingBiobankCollection(List<CollectionBiobankDTO> matchingBiobankCollection) {
+        this.matchingBiobankCollection = matchingBiobankCollection;
     }
 
-    public List<Integer> getOfferMakers() {
-        return offerMakers;
+    public List<Integer> getBiobankWithOffer() {
+        return biobankWithOffer;
     }
 
-    public void setOfferMakers(List<Integer> offerMakers) {
-        this.offerMakers = offerMakers;
+    public void setBiobankWithOffer(List<Integer> biobankWithOffer) {
+        this.biobankWithOffer = biobankWithOffer;
     }
 
     public List<List<OfferPersonDTO>> getListOfSampleOffers() {
@@ -377,5 +455,42 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public void setSessionBean(SessionBean sessionBean) {
         this.sessionBean = sessionBean;
     }
+
+
+    public Integer getOfferResearcher() { return offerResearcher; }
+
+    public void setOfferResearcher(Integer offerResearcher) {
+        this.offerResearcher = offerResearcher;
+    }
+
+    public String addIntoList() {
+        biobankWithOffer.add(offerResearcher);
+        return "";
+    }
+    public List<CollectionBiobankDTO> getBiobankWithoutOffer() { return biobankWithoutOffer; }
+
+    public void setBiobankWithoutOffer(List<CollectionBiobankDTO> copyList) {
+        this.biobankWithoutOffer = copyList;
+    }
+
+    public String getJsTreeJson() {
+        return jsTreeJson;
+    }
+
+    public void setJsTreeJson(String jsTreeJson) {
+        this.jsTreeJson = jsTreeJson;
+    }
+
+    public int getMatchingBiobanks() {
+        return matchingBiobanks;
+    }
+
+    public void setMatchingBiobanks(int matchingBiobanks) {
+        this.matchingBiobanks = matchingBiobanks;
+    }
+
+
+
+
 
 }

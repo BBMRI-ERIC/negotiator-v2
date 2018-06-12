@@ -29,14 +29,15 @@ package de.samply.bbmri.negotiator.test;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.common.config.ObjectFactory;
 import de.samply.common.config.Postgresql;
-import de.samply.common.sql.SQLUtil;
-import de.samply.common.upgrade.SamplyUpgradeException;
 import de.samply.config.util.JAXBUtil;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import javax.naming.NamingException;
@@ -47,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 
@@ -55,14 +57,20 @@ import java.sql.SQLException;
  */
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({DatabaseSetup.class, DirectorySynchronize.class, DummyData.class})
+@Suite.SuiteClasses({
+//        DatabaseSetup.class,
+        DirectorySynchronize.class,
+        DummyData.class
+})
 public class TestSuite {
     public static final String FILE_POSTGRESQL = "bbmri.test.postgres.xml";
+
+    private static final Logger logger = LoggerFactory.getLogger(TestSuite.class);
 
     private static Postgresql postgresql;
 
 	@BeforeClass
-    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, SamplyUpgradeException, NamingException {
+    public static void start() throws IOException, ParserConfigurationException, JAXBException, SAXException, SQLException, NamingException {
         NegotiatorConfig.initialize("bbmri.negotiator", "not-available");
 
 	    String prop = "bbmri.negotiator.confdir";
@@ -82,17 +90,32 @@ public class TestSuite {
         postgresql = JAXBUtil.unmarshall(file, getJAXBContext(),
                 Postgresql.class);
 
-        /**
-         * Manually drop all tables in the database.
-         */
+
         Connection connection = getConnection();
-        connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
-        connection.commit();
 
-        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database.sql"));
-        SQLUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData.sql"));
+        // only if the DB is empty you shall create it
+        try(ResultSet set = connection.getMetaData().getTables(null, null, "", new String[]{"TABLE"})) {
+            if(!set.next()) {
+                logger.info("Database empty, creating tables");
 
-        connection.commit();
+                DbUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/database" +
+                        ".sql"));
+                DbUtil.executeStream(connection, TestSuite.class.getClassLoader().getResourceAsStream("sql/dummyData" +
+                        ".sql"));
+
+                connection.commit();
+            } else {
+                logger.info("Database not empty.");
+            }
+
+//            /**
+//             * Manually drop all tables in the database.
+//             */
+//            connection.createStatement().execute("DROP OWNED BY \"" + postgresql.getUsername() + "\"");
+//            connection.commit();
+
+        }
+
     }
 
     private static JAXBContext getJAXBContext() throws JAXBException {

@@ -26,8 +26,11 @@
 
 package de.samply.bbmri.negotiator.db.util;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,13 +39,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.*;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
+import de.samply.bbmri.negotiator.model.QueryCollection;
+import de.samply.share.model.bbmri.BbmriResult;
 import org.jooq.*;
-import org.jooq.Query;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -66,53 +69,173 @@ import de.samply.directory.client.dto.DirectoryCollection;
  */
 public class DbUtil {
 
-
-
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
 
+    /**
+     * Sets the field for starting negotiation for a query to true.
+     * @param config JOOQ configuration
+     * @param queryId id of the query
+     */
+    public static String startNegotiation(Config config, Integer queryId){
+        config.dsl().update(Tables.QUERY)
+                .set(Tables.QUERY.NEGOTIATION_STARTED_TIME, new Timestamp(new Date().getTime()))
+                .where(Tables.QUERY.ID.eq(queryId))
+                .execute();
+        try {
+            config.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     * Saves the results received from the connector
+     * @param config JOOQ configuration
+     * @param result BBMRIResult object containing result
+     */
+    public static Boolean saveConnectorQueryResult(Config config, BbmriResult result){
+        Integer collectionId = getCollectionId(config, result.getDirectoryCollectionId());
+
+        if(collectionId == null) {
+            logger.error("Could not find the collection with ID {}", result.getDirectoryCollectionId());
+            return false;
+        }
+
+        try {
+            config.dsl().delete(Tables.QUERY_COLLECTION)
+                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getNegotiatorQueryId())
+                    .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
+                    .execute();
+
+            // only save an entry, if the result is actually not 0
+            if(result.getNumberOfSamples() != 0 || result.getNumberOfDonors() != 0) {
+                config.dsl().insertInto(Tables.QUERY_COLLECTION)
+                        .set(Tables.QUERY_COLLECTION.QUERY_ID, result.getNegotiatorQueryId())
+                        .set(Tables.QUERY_COLLECTION.COLLECTION_ID, collectionId)
+                        .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, false)
+                        .set(Tables.QUERY_COLLECTION.DONORS, result.getNumberOfDonors())
+                        .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
+                        .set(Tables.QUERY_COLLECTION.RESULT_RECEIVED_TIME, new Timestamp(new Date().getTime()))
+                        .execute();
+            }
+
+            config.commit();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets the time when first valid query was created in the negotiator.
+     * @param config JOOQ configuration
+     * @return Timestamp timestamp of query
+     */
+    public static Timestamp getFirstQueryCreationTime(Config config){
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.QUERY.QUERY_CREATION_TIME)
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc())
+                .fetchAny();
+
+        if (result == null){
+            return null;
+        }
+
+        Timestamp timestamp =  result.value1();
+        return timestamp;
+    }
 
     /**
      * Gets all the valid queries that entered the negotiator after the given timestamp.
      * @param config JOOQ configuration
      * @param timestamp
+     * @return List<QueryDetail> list of queries
      */
     public static List<QueryDetail> getAllNewQueries(Config config, Timestamp timestamp) {
         Result<Record> result = config.dsl()
                 .select(Tables.QUERY.TITLE.as("query_title"))
                 .select(Tables.QUERY.TEXT.as("query_text"))
+                .select(Tables.QUERY.ID.as("query_id"))
+                .select(Tables.QUERY.QUERY_XML.as("query_xml"))
                 .from(Tables.QUERY)
                 .where(Tables.QUERY.VALID_QUERY.eq(true))
                 .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
                 .fetch();
 
-        return config.map(result, QueryDetail.class);
+          // The mapper does not map the query_xml at all, why?
+//        return config.map(result, QueryDetail.class);
+
+        // So doing this manually
+        List<QueryDetail> queryDetails = new ArrayList<>();
+        for (Record record : result) {
+            QueryDetail queryDetail = new QueryDetail();
+            queryDetail.setQueryId(record.getValue("query_id", Integer.class));
+            queryDetail.setQueryText(record.getValue("query_text", String.class));
+            queryDetail.setQueryTitle(record.getValue("query_title", String.class));
+            queryDetail.setQueryXml(record.getValue("query_xml", String.class));
+
+            queryDetails.add(queryDetail);
+        }
+
+        return queryDetails;
     }
 
     /**
      * Gets the time when the last connector request was made for the queries.
      * @param config JOOQ configuration
+     * @param collectionId collection id of the connector
+     * @return  Timestamp of last request
      */
-    public static ConnectorLogRecord getLastRequestTime(Config config) {
-        Record result = config.dsl()
-                .selectFrom(Tables.CONNECTOR_LOG)
+    public static Timestamp getLastNewQueryTime(Config config, String collectionId) {
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.CONNECTOR_LOG.LAST_QUERY_TIME)
+                .from(Tables.CONNECTOR_LOG)
+                .where(Tables.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID.eq(collectionId))
+                .and (Tables.CONNECTOR_LOG.LAST_QUERY_TIME.isNotNull())
                 .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
-                .limit(1)
-                .fetchOne();
+                .fetchAny();
 
-        return config.map(result, ConnectorLogRecord.class);
+        if (result == null){
+            return null;
+        }
+
+        Timestamp timestamp = result.value1();
+        return timestamp;
     }
 
     /**
      * Logs the time when the connector request was made for the queries.
+     *
      * @param config JOOQ configuration
+     * @param collectionId The collection directoryID
+     * @return 1:ok, 0:error, -1:collectionId unknown
      */
-    public static void logGetQueryTime(Config config) {
+    public static int logGetQueryTime(Config config, String collectionId) {
         try { ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
+              connectorLogRecord.setDirectoryCollectionId(collectionId);
               connectorLogRecord.setLastQueryTime(new Timestamp(new Date().getTime()));
               connectorLogRecord.store();
+              return 1;
         } catch (Exception e) {
-            e.printStackTrace();
+            if(e instanceof DataAccessException) {
+                if(e.getMessage().contains("is not present in table \"collection\"")) {
+                    logger.error("Collection with name "+collectionId+" unknown!");
+                    return -1;
+                } else {
+                    logger.error("Data Access Exception: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                e.printStackTrace();
+            }
         }
+
+        return 0;
     }
 
     /**
@@ -157,10 +280,10 @@ public class DbUtil {
             QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
 
             // collections already saved for this query
-            List<Collection> alreadySavedCollectiontsList = getCollectionsForQuery(config, queryId);
+            List<CollectionBiobankDTO> alreadySavedCollectiontsList = getCollectionsForQuery(config, queryId);
             HashMap<Integer, Boolean> alreadySavedCollections = new HashMap<>();
-            for(Collection savedOne: alreadySavedCollectiontsList) {
-                alreadySavedCollections.put(savedOne.getId(), true);
+            for(CollectionBiobankDTO savedOne: alreadySavedCollectiontsList) {
+                alreadySavedCollections.put(savedOne.getCollection().getId(), true);
             }
 
             if (NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
@@ -452,13 +575,13 @@ public class DbUtil {
      * @param queryId
      * @param personId
      * @param comment
-     * @param offerFrom
+     * @param biobankInPrivateChat biobank id
      */
-    public static void addOfferComment(Config config, int queryId, int personId, String comment, Integer offerFrom) throws SQLException {
+    public static void addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
         OfferRecord record = config.dsl().newRecord(Tables.OFFER);
         record.setQueryId(queryId);
         record.setPersonId(personId);
-        record.setOfferFrom(offerFrom);
+        record.setBiobankInPrivateChat(biobankInPrivateChat);
         record.setText(comment);
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
@@ -633,12 +756,13 @@ public class DbUtil {
                 .join(Tables.COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
                 .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .leftOuterJoin(Tables.FLAGGED_QUERY).on(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON.ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .and( Tables.FLAGGED_QUERY.FLAG.notEqual(flag).or(Tables.FLAGGED_QUERY.FLAG.isNull()))
-                .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId).or(Tables.FLAGGED_QUERY.QUERY_ID.isNull()))
                 .and (Tables.PERSON.ID.notEqual(userId))
-                .orderBy(Tables.PERSON.AUTH_EMAIL).fetch();
+                .and (Tables.PERSON.ID.notIn (
+                        config.dsl().select(Tables.FLAGGED_QUERY.PERSON_ID)
+                        .from(Tables.FLAGGED_QUERY)
+                .where (Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and (Tables.FLAGGED_QUERY.FLAG.eq(flag))))
+                .fetch();
           return config.map(record, NegotiatorDTO.class);
     }
 
@@ -862,15 +986,24 @@ public class DbUtil {
      * @param queryId the query ID
      * @return
      */
-    public static List<Collection> getCollectionsForQuery(Config config, int queryId) {
-        Result<Record> fetch = config.dsl().select(Tables.COLLECTION.fields())
+    public static List<CollectionBiobankDTO> getCollectionsForQuery(Config config, int queryId) {
+        Result<Record> fetch = config.dsl().select(getFields(Tables.COLLECTION, "collection"))
+                .select(getFields(Tables.BIOBANK, "biobank"))
+                .from(Tables.QUERY_COLLECTION)
+                .join(Tables.COLLECTION)
+                .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .join(Tables.BIOBANK)
+                .on(Tables.COLLECTION.BIOBANK_ID.eq(Tables.BIOBANK.ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .fetch();
+        /** config.dsl().select(Tables.COLLECTION.fields())
                 .from(Tables.COLLECTION)
                 .join(Tables.QUERY_COLLECTION)
                 .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .fetch();
+                .fetch();**/
 
-        return config.map(fetch, Collection.class);
+        return config.map(fetch, CollectionBiobankDTO.class);
     }
 
     /**
@@ -881,11 +1014,11 @@ public class DbUtil {
      */
     public static List<Integer> getOfferMakers(Config config, int queryId) {
         List<Integer> offerMakers = config.dsl()
-                .selectDistinct(Tables.OFFER.OFFER_FROM)
+                .selectDistinct(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT)
                 .from(Tables.OFFER)
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .fetch()
-                .getValues(Tables.OFFER.OFFER_FROM, Integer.class);
+                .getValues(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT, Integer.class);
 
         return offerMakers;
     }
@@ -896,7 +1029,7 @@ public class DbUtil {
      * @param queryId
      * @return target
      */
-    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer offerFrom) {
+    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer biobankInPrivateChat) {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.OFFER, "offer"))
                 .select(getFields(Tables.PERSON, "person"))
@@ -906,7 +1039,7 @@ public class DbUtil {
                 .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
                 .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
-                .and(Tables.OFFER.OFFER_FROM.eq(offerFrom))
+                .and(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT.eq(biobankInPrivateChat))
                 .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
 
         List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
@@ -1058,15 +1191,35 @@ public class DbUtil {
      * @param collectionId    unique id of collection
      * @return List<QueryCollection> list of qyery_collection records
      */
-    public static List<QueryCollection> checkExpectedResults(Config config, int collectionId){
-        Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY_COLLECTION))
+    public static List<de.samply.bbmri.negotiator.model.QueryCollection> checkExpectedResults(Config config, int
+            collectionId){
+        Result<Record2<Integer, Integer>> result = config.dsl()
+                .select(Tables.QUERY_COLLECTION.QUERY_ID, Tables.QUERY_COLLECTION.COLLECTION_ID)
                 .from(Tables.QUERY_COLLECTION)
                 .where(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT.eq(true))
                 .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)).fetch();
 
-        List<QueryCollection> queryCollections = config.map(result, QueryCollection.class);
-        return queryCollections;
+        List<QueryCollection> queryCollectionList = config.map(result, QueryCollection.class);
+        return queryCollectionList;
+    }
+
+    /**
+     * Gets the collectionId of a collectionDirectoryId
+     * @param config    DB access handle
+     * @param directoryCollectionId
+     * @return
+     */
+    public static Integer getCollectionId(Config config, String directoryCollectionId) {
+        Record1<Integer> result = config.dsl().select(Tables.COLLECTION.ID)
+                .from(Tables.COLLECTION)
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryCollectionId))
+                .fetchOne();
+
+        // unknown directoryCollectionId
+        if(result == null)
+            return null;
+
+        return result.value1();
     }
 
     /**
@@ -1100,5 +1253,143 @@ public class DbUtil {
         } catch(SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Gets the time when the last connector request was made for the negotiations.
+     *
+     * @param config       JOOQ configuration
+     * @param collectionId collection id of the connector
+     * @return Timestamp of last request
+     */
+    public static Timestamp getLastNewNegotiationTime(Config config, String collectionId) {
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.CONNECTOR_LOG.LAST_NEGOTIATION_TIME)
+                .from(Tables.CONNECTOR_LOG)
+                .where(Tables.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID.eq(collectionId))
+                .and (Tables.CONNECTOR_LOG.LAST_NEGOTIATION_TIME.isNotNull())
+                .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
+                .fetchAny();
+
+        if (result == null) {
+            return null;
+        }
+
+        Timestamp timestamp = result.value1();
+        return timestamp;
+    }
+
+    /**
+     * Gets all the negotiations after the given timestamp.
+     *
+     * @param config    JOOQ configuration
+     * @param timestamp
+     * @return List<QueryDetail> list of queries
+     */
+    public static List<QueryCollection> getAllNewNegotiations(Config config, Timestamp timestamp, String directoryCollectionId) {
+        Integer collectionId = getCollectionId(config, directoryCollectionId);
+
+        Result<Record> result = config.dsl()
+                .select(Tables.QUERY.ID.as("queryId"))
+                .select(Tables.QUERY_COLLECTION.COLLECTION_ID.as("collectionId"))
+                .from(Tables.QUERY)
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN).on(Tables.QUERY_COLLECTION.QUERY_ID.eq(Tables.QUERY.ID))
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .and(Tables.QUERY.NEGOTIATION_STARTED_TIME.ge(timestamp))
+                .and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId))
+                .fetch();
+
+        List<QueryCollection> queryCollectionList = config.map(result, QueryCollection.class);
+        return queryCollectionList;
+    }
+
+
+    /**
+     * Logs the time when the connector request was made for the negotiations.
+     *
+     * @param config                JOOQ configuration
+     * @param directoryCollectionId The collection directoryID
+     */
+    public static void logGetNegotiationTime(Config config, String directoryCollectionId) {
+        //TODO What if foreign key constraint fails
+        ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
+        connectorLogRecord.setDirectoryCollectionId(directoryCollectionId);
+        connectorLogRecord.setLastNegotiationTime(new Timestamp(new Date().getTime()));
+        connectorLogRecord.store();
+    }
+
+
+    /**
+     * Gets the time when first negotiation was started in the negotiator.
+     *
+     * @param config JOOQ configuration
+     * @return Timestamp timestamp of negotiation
+     */
+    public static Timestamp getFirstNegotiationTime(Config config) {
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.QUERY.NEGOTIATION_STARTED_TIME)
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .and (Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull())
+                .orderBy(Tables.QUERY.NEGOTIATION_STARTED_TIME.asc())
+                .fetchAny();
+
+        if (result == null) {
+            return null;
+        }
+
+        Timestamp timestamp = result.value1();
+        return timestamp;
+    }
+
+    /**
+     * Executes the given file name as SQL file. It tries to load the file by using the class loader.
+     * @param filename the file name, e.g. "/sql.upgrades/upgrade1.sql"
+     * @throws SQLException
+     */
+    public static void executeSQLFile(Connection connection, ClassLoader classLoader, String filename) throws SQLException, IOException {
+        InputStream stream = classLoader.getResourceAsStream(filename);
+
+        if(stream == null) {
+            throw new FileNotFoundException();
+        }
+        executeStream(connection, stream);
+    }
+
+    /**
+     * Executes the given string as SQL statement.
+     * @param sql the SQL statement
+     * @throws SQLException
+     */
+    public static void executeSQL(Connection connection, String sql) throws SQLException {
+        try (Statement st = connection.createStatement()) {
+            st.execute(sql);
+            st.close();
+        }
+    }
+
+    /**
+     * Executes the given input stream as SQL statements.
+     * @param stream the input stream for SQL statements.
+     * @throws SQLException
+     */
+    public static void executeStream(Connection connection, InputStream stream) throws SQLException, IOException {
+        InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+
+        String s;
+        StringBuilder sb = new StringBuilder();
+
+        BufferedReader br = new BufferedReader(reader);
+
+        /**
+         * This might be unnecessary.
+         */
+        String separator = System.lineSeparator();
+
+        while ((s = br.readLine()) != null) {
+            sb.append(s).append(separator);
+        }
+        br.close();
+        executeSQL(connection, sb.toString());
     }
 }

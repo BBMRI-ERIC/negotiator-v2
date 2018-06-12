@@ -23,11 +23,12 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = 1873681595;
+	private static final long serialVersionUID = 1632306161;
 
 	private Integer   id;
 	private String    title;
 	private String    text;
+	private String    queryXml;
 	private Timestamp queryCreationTime;
 	private Integer   researcherId;
 	private String    jsonText;
@@ -36,6 +37,7 @@ public class Query implements Serializable {
 	private Boolean   validQuery;
 	private String    requestDescription;
 	private String    ethicsVote;
+	private Timestamp negotiationStartedTime;
 
 	public Query() {}
 
@@ -43,6 +45,7 @@ public class Query implements Serializable {
 		this.id = value.id;
 		this.title = value.title;
 		this.text = value.text;
+		this.queryXml = value.queryXml;
 		this.queryCreationTime = value.queryCreationTime;
 		this.researcherId = value.researcherId;
 		this.jsonText = value.jsonText;
@@ -51,12 +54,14 @@ public class Query implements Serializable {
 		this.validQuery = value.validQuery;
 		this.requestDescription = value.requestDescription;
 		this.ethicsVote = value.ethicsVote;
+		this.negotiationStartedTime = value.negotiationStartedTime;
 	}
 
 	public Query(
 		Integer   id,
 		String    title,
 		String    text,
+		String    queryXml,
 		Timestamp queryCreationTime,
 		Integer   researcherId,
 		String    jsonText,
@@ -64,11 +69,13 @@ public class Query implements Serializable {
 		String    negotiatorToken,
 		Boolean   validQuery,
 		String    requestDescription,
-		String    ethicsVote
+		String    ethicsVote,
+		Timestamp negotiationStartedTime
 	) {
 		this.id = id;
 		this.title = title;
 		this.text = text;
+		this.queryXml = queryXml;
 		this.queryCreationTime = queryCreationTime;
 		this.researcherId = researcherId;
 		this.jsonText = jsonText;
@@ -77,6 +84,7 @@ public class Query implements Serializable {
 		this.validQuery = validQuery;
 		this.requestDescription = requestDescription;
 		this.ethicsVote = ethicsVote;
+		this.negotiationStartedTime = negotiationStartedTime;
 	}
 
 	public Integer getId() {
@@ -101,6 +109,14 @@ public class Query implements Serializable {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public String getQueryXml() {
+		return this.queryXml;
+	}
+
+	public void setQueryXml(String queryXml) {
+		this.queryXml = queryXml;
 	}
 
 	public Timestamp getQueryCreationTime() {
@@ -165,5 +181,13 @@ public class Query implements Serializable {
 
 	public void setEthicsVote(String ethicsVote) {
 		this.ethicsVote = ethicsVote;
+	}
+
+	public Timestamp getNegotiationStartedTime() {
+		return this.negotiationStartedTime;
+	}
+
+	public void setNegotiationStartedTime(Timestamp negotiationStartedTime) {
+		this.negotiationStartedTime = negotiationStartedTime;
 	}
 }

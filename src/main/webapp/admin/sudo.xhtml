@@ -26,11 +26,10 @@
   -->
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-	template="default.xhtml">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                template="default.xhtml">
 
 	<f:metadata>
 		<f:viewAction action="#{adminBean.initialize}" />
@@ -44,11 +43,28 @@
 		<h:form>
 			<h:outputText value="Select user to sudo." />
 
-			<h:selectOneMenu value="#{adminBean.sudo}">
-				<f:selectItems value="#{adminBean.users}" />
-			</h:selectOneMenu>
+			<table class="table table-hover">
+				<thead>
+				<tr>
+					<th>#{label['admin.sudo.user.name']}</th>
+					<th>#{label['admin.sudo.take.Identitiy']}</th>
+				</tr>
+				</thead>
 
-			<h:commandButton value="Switch user" action="#{adminBean.switchUser()}" />
+				<tbody>
+				<ui:repeat value="#{adminBean.allUsers}" var="alle">
+				     <tr>
+							<td>#{alle.getAuthName()}</td>
+							<td><h:commandButton value="Switch user" action="#{adminBean.switchUser(alle.getAuthSubject())}" /></td>
+					</tr>
+				</ui:repeat>
+
+				</tbody>
+
+			</table>
+
+
+
 		</h:form>
 
 	</ui:define>

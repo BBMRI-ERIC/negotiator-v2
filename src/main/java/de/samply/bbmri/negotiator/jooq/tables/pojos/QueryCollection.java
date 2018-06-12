@@ -5,6 +5,7 @@ package de.samply.bbmri.negotiator.jooq.tables.pojos;
 
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 import javax.annotation.Generated;
 
@@ -22,11 +23,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollection implements Serializable {
 
-	private static final long serialVersionUID = -559378921;
+	private static final long serialVersionUID = 748233488;
 
-	private Integer queryId;
-	private Integer collectionId;
-	private Boolean expectConnectorResult;
+	private Integer   queryId;
+	private Integer   collectionId;
+	private Boolean   expectConnectorResult;
+	private Integer   donors;
+	private Integer   samples;
+	private Timestamp resultReceivedTime;
 
 	public QueryCollection() {}
 
@@ -34,16 +38,25 @@ public class QueryCollection implements Serializable {
 		this.queryId = value.queryId;
 		this.collectionId = value.collectionId;
 		this.expectConnectorResult = value.expectConnectorResult;
+		this.donors = value.donors;
+		this.samples = value.samples;
+		this.resultReceivedTime = value.resultReceivedTime;
 	}
 
 	public QueryCollection(
-		Integer queryId,
-		Integer collectionId,
-		Boolean expectConnectorResult
+		Integer   queryId,
+		Integer   collectionId,
+		Boolean   expectConnectorResult,
+		Integer   donors,
+		Integer   samples,
+		Timestamp resultReceivedTime
 	) {
 		this.queryId = queryId;
 		this.collectionId = collectionId;
 		this.expectConnectorResult = expectConnectorResult;
+		this.donors = donors;
+		this.samples = samples;
+		this.resultReceivedTime = resultReceivedTime;
 	}
 
 	public Integer getQueryId() {
@@ -68,5 +81,29 @@ public class QueryCollection implements Serializable {
 
 	public void setExpectConnectorResult(Boolean expectConnectorResult) {
 		this.expectConnectorResult = expectConnectorResult;
+	}
+
+	public Integer getDonors() {
+		return this.donors;
+	}
+
+	public void setDonors(Integer donors) {
+		this.donors = donors;
+	}
+
+	public Integer getSamples() {
+		return this.samples;
+	}
+
+	public void setSamples(Integer samples) {
+		this.samples = samples;
+	}
+
+	public Timestamp getResultReceivedTime() {
+		return this.resultReceivedTime;
+	}
+
+	public void setResultReceivedTime(Timestamp resultReceivedTime) {
+		this.resultReceivedTime = resultReceivedTime;
 	}
 }

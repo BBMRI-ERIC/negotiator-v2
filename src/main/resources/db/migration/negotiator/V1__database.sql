@@ -58,6 +58,7 @@ CREATE TABLE "query" (
     "id" SERIAL NOT NULL,
     "title" CHARACTER VARYING(255) NOT NULL,
     "text" TEXT,
+    "query_xml" TEXT,
     "query_creation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     "researcher_id" INTEGER NOT NULL,
     "json_text" TEXT NOT NULL,
@@ -66,6 +67,7 @@ CREATE TABLE "query" (
     "valid_query" BOOLEAN NOT NULL DEFAULT FALSE,
     "request_description" TEXT,
     "ethics_vote" TEXT,
+    "negotiation_started_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL,
     PRIMARY KEY ("id"),
     FOREIGN KEY ("researcher_id") REFERENCES "person"("id") ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -76,11 +78,14 @@ COMMENT ON TABLE "query" IS 'query table to contain all  queries';
 COMMENT ON COLUMN "query"."id" IS 'primary key';
 COMMENT ON COLUMN "query"."title" IS 'title of query';
 COMMENT ON COLUMN "query"."text" IS 'text of query';
+COMMENT ON COLUMN "query"."query_xml" IS 'XML version of the query';
 COMMENT ON COLUMN "query"."query_creation_time" IS 'date and time of query with out time zone';
 COMMENT ON COLUMN "query"."num_attachments" IS 'number of attachments ever associated with this query - both existing and deleted, used as an index for naming future attachments';
 COMMENT ON COLUMN "query"."researcher_id" IS 'Foreign key. Exists as primary key in the researcher table(which takes it in turn from the person table)';
 COMMENT ON COLUMN "query"."request_description" IS 'description of the request';
 COMMENT ON COLUMN "query"."ethics_vote" IS 'ethics vote for the query';
+COMMENT ON COLUMN "query"."negotiation_started_time" IS 'Time when the researcher started the negotiation for the query.';
+
 
 CREATE TABLE "query_attachment" (
     "id" SERIAL NOT NULL,
@@ -177,6 +182,8 @@ CREATE TABLE "query_collection" (
     "query_id" INTEGER NOT NULL,
     "collection_id" INTEGER NOT NULL,
     "expect_connector_result" BOOLEAN NOT NULL DEFAULT FALSE,
+    "donors" INTEGER NULL,
+    "samples" INTEGER NULL,
     PRIMARY KEY("query_id", "collection_id"),
     FOREIGN KEY ("collection_id") REFERENCES "collection"("id") ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY ("query_id") REFERENCES "query"("id") ON UPDATE CASCADE ON DELETE CASCADE
@@ -187,6 +194,9 @@ CREATE INDEX "queryIdIndexQueryCollection" ON "query_collection" (query_id);
 
 COMMENT ON TABLE "query_collection" IS 'Table for connecting queries with collections';
 COMMENT ON COLUMN "query_collection"."expect_connector_result" IS 'Column that tells the negotiator to expect results from the given connector';
+COMMENT ON COLUMN "query_collection"."donors" IS 'result of query: amount of donors';
+COMMENT ON COLUMN "query_collection"."samples" IS 'result of query: amount of samples';
+
 
 
 CREATE TABLE "person_collection" (
@@ -242,14 +252,19 @@ COMMENT ON COLUMN "offer"."text" IS 'Text of the comment.';
 
 
 CREATE TABLE "connector_log" (
-    "id" SERIAL NOT NULL,
-    "last_query_time" TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    PRIMARY KEY("id")
+    "id" SERIAL NOT NULL ,
+    "directory_collection_id" CHARACTER VARYING(255) NOT NULL,
+    "last_query_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL,
+    "last_negotiation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL,
+    PRIMARY KEY("id"),
+    FOREIGN KEY ("directory_collection_id") REFERENCES "collection"("directory_id") ON UPDATE CASCADE ON DELETE CASCADE
 );
+CREATE INDEX "collectionIdIndexconnectorLog" ON "connector_log" (directory_collection_id);
 
 COMMENT ON TABLE "connector_log" IS 'table to store the timestamp when the connector makes a get request for new queries';
-
-COMMENT ON COLUMN "connector_log"."id" IS 'Primary key';
+COMMENT ON COLUMN "connector_log"."id" IS 'Primary key'  ;
+COMMENT ON COLUMN "connector_log"."directory_collection_id" IS 'Foreign key that comes from table "Collections.directory_id". It is not the primary key of its table but it is still unique so we can use it as a foreign key constraint'  ;
 COMMENT ON COLUMN "connector_log"."last_query_time" IS 'Timestamp when the request was made. ';
+COMMENT ON COLUMN "connector_log"."last_negotiation_time" IS 'Time when the connector last fetched for new negotiations.';
 
 

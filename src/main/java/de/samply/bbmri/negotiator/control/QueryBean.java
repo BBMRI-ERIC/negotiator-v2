@@ -49,6 +49,7 @@ import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.util.AntiVirusExceptionEnum;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,8 +89,6 @@ public class QueryBean implements Serializable {
 
 
 private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
-
-   private Flag flagFilter = Flag.UNFLAGGED;
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
@@ -165,6 +164,11 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
      */
     private String ethicsVote;
 
+    /**
+     * List of faces messages
+     */
+    private List<FacesMessage> msgs = new ArrayList<>();
+
    /**
     * Initializes this bean by registering email notification observer
     */
@@ -221,12 +225,6 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                        jsonQuery, ethicsVote, userBean.getUserId(),
                        true);
                config.commit();
-               setId(record.getId());
-               List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, record.getId(), Flag.IGNORED, userBean.getUserId());
-
-               QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(record.getId()),
-                       config.map(record, Query.class));
-               notifier.sendEmailNotification();
            }
        } catch (IOException e) {
            e.printStackTrace();
@@ -359,23 +357,33 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
     * @throws IOException
     */
    public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
-       List<FacesMessage> msgs = new ArrayList<FacesMessage>();
+       //clear message list every time a new file is selected for validation
+       msgs.clear();
        Part file = (Part)value;
        if(file != null) {
            if (file.getSize() > MAX_UPLOAD_SIZE) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "File too big.", "The given file was too big." +
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed", "The given file was too big." +
                        " Maximum size allowed is: "+MAX_UPLOAD_SIZE/1024/1024+" MB"));
            }
 
            if (!"application/pdf".equals(file.getContentType())) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Not a PDF file", "The uploaded file was not " +
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed", "The uploaded file was not " +
                        "a PDF file."));
            }
 
-           if(FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "File possibly infected",
-                       "The uploaded file triggered a virus warning and therefore has been rejected."));
+
+           try {
+               if (FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
+                   msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed",
+                           "The uploaded file triggered a virus warning and therefore has not been accepted."));
+               }
+           } catch (Exception e) {
+               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed",
+                       "The uploaded file triggered a virus warning and therefore has not been accepted."));
+
+               generateAntiVirusExceptionMessages(e.getMessage());
            }
+
 
            if (!msgs.isEmpty()) {
                throw new ValidatorException(msgs);
@@ -391,8 +399,8 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
     * Removes an attachment from the given query
     */
    public String removeAttachment() {
-       String attachment = toRemoveAttachment;
 
+        String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
        // reset it
        toRemoveAttachment = null;
 
@@ -401,7 +409,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
        //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
        // patterngrops 1: queryID, 2: fileID, 3: fileName
-       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_name_(.*)");
+       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_salt_(.*)");
        Matcher matcher = pattern.matcher(attachment);
 
        String fileID = null;
@@ -481,6 +489,24 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                 "/owner/detail.xhtml?queryId=" + getId());
     }
 
+    /**
+     * Generates a 'readable' anti-virus(clamAV) message for the user.
+     * @param antiVirusException   exception generated by anti-virus (clamAV)
+     */
+    private void generateAntiVirusExceptionMessages(String antiVirusException){
+
+        if (antiVirusException.contains(AntiVirusExceptionEnum.antiVirusMessageType.SocketTimeoutException.text()) ){
+
+            msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed",
+                    "Read timed out at the network. Please try again in a few moments"));
+        }
+
+        if (antiVirusException.contains(AntiVirusExceptionEnum.antiVirusMessageType.ConnectException.text())){
+
+            msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,"Upload Failed",
+                    "Connection refused. Please report the problem." ));
+        }
+    }
 
     public String getHumanReadableFilters() {
 	 	return humanReadableFilters;
@@ -602,6 +628,14 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
     public void setEthicsVote(String ethicsVote) {
         this.ethicsVote = ethicsVote;
+    }
+
+    public List<FacesMessage> getMsgs() {
+        return msgs;
+    }
+
+    public void setMsgs(List<FacesMessage> msgs) {
+        this.msgs = msgs;
     }
 
 }

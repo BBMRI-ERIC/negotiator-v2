@@ -28,9 +28,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:composite="http://java.sun.com/jsf/composite"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite"
 >
 
 <composite:interface>
@@ -43,6 +43,7 @@
 
         <h3 style="margin-top: 0px; margin-bottom: 0px; text-align: left">
             #{cc.attrs.bean.selectedQuery.title}
+
         </h3>
         <h:panelGroup layout="block" style="font-size: smaller ">
             <h:outputText
@@ -51,12 +52,75 @@
                 <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
             </h:outputText>
         </h:panelGroup>
-
+        <!--        Function for the show more button        -->
         <h4>#{label['queryview.title.text']}</h4>
-        <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.text}</p>
+        <div style="white-space: pre-wrap"><span class="more">#{cc.attrs.bean.selectedQuery.text}</span></div>
+        <h:outputStylesheet>
+            .morecontent span {
+                display: none;
+            }
+            .morelink {
+                display: block;
+            }
+        </h:outputStylesheet>
+        <h:outputScript>
+            $(document).ready(function() {
+
+                var moretext = "Show full text";
+                var lesstext = "Show less";
+
+                // read the lines of the span
+                var lines = [];
+                $.each($('.more').text().split(/\n/), function(i, line){
+                    if(line){
+                        lines.push(line);
+                    } else {
+                        lines.push("");
+                    }
+                });
+
+                // how many lines we want to display (2 more are grayed out)
+                var showLines = 5;
+
+                if(lines.length > showLines + 2) {
+                    var shownContent = lines.slice(0, showLines).join("\n");
+                    var grayedOutLines = lines.slice(showLines, showLines+2).join("\n");
+                    var hiddenContent = lines.slice(showLines+2).join("\n");
+
+
+                    var html = shownContent +
+                        '<div id="grayoutarea" class="a-expander-content-fade">' + grayedOutLines + '</div>' +
+                        '<span class="moreellipses">&nbsp;</span><span class="morecontent"><span>' + hiddenContent + '</span>&nbsp;&nbsp;<a  style="width: 100px" class="morelink label label-default">' + moretext + '</a></span>';
+
+
+                    $('.more').html(html);
+                }
+
+
+
+
+                $(".morelink").click(function(){
+                    if($(this).hasClass("less")) {
+                        $(this).removeClass("less");
+                        $(this).html(moretext);
+                        // add grayout
+                        $("#grayoutarea").addClass("a-expander-content-fade");
+                    } else {
+                        $(this).addClass("less");
+                        $(this).html(lesstext);
+                        // remove grayout
+                        $("#grayoutarea").removeClass("a-expander-content-fade");
+                }
+                $(this).parent().prev().toggle();
+                $(this).prev().toggle();
+                return false;
+                });
+            });
+        </h:outputScript>
 
         <h4>#{label['queryview.title.requestdescription']}</h4>
         <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.requestDescription}</p>
+
 
         <h4>#{label['queryview.title.ethicsVote']}</h4>
         <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.ethicsVote}</p>

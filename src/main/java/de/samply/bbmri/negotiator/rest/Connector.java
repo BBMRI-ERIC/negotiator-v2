@@ -30,17 +30,23 @@ package de.samply.bbmri.negotiator.rest;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection;
-import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
+import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.model.BiobankCollections;
 import de.samply.bbmri.negotiator.model.CollectionOwner;
 import de.samply.bbmri.negotiator.model.QueryDetail;
+import de.samply.bbmri.negotiator.model.QueryCollection;
+import de.samply.share.model.bbmri.BbmriResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -49,32 +55,53 @@ import java.util.List;
 @Path("connector")
 public class Connector {
 
+    private static Logger logger = LoggerFactory.getLogger(Connector.class);
+
+    /**
+     * Gets a list of new queries for a given connector
+     * @param directoryCollectionId the directory ID of the connector
+     * @return
+     */
     @GET
-    @Path("/get_query")
-    @Produces(MediaType.APPLICATION_XML)
-    public List<QueryDetail> getQuery() {
+    @Path("/queries")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getQuery(@QueryParam("directoryCollectionId") String directoryCollectionId) {
+        //TODO: add access control
+
+        if(directoryCollectionId == null)
+            return Response.status(400).build();
+
         try (Config config = ConfigFactory.get()) {
 
             /**
             * Get last time a request was made by the connector
             */
-            ConnectorLogRecord connectorLogRecord = DbUtil.getLastRequestTime(config);
+            Timestamp timestamp = DbUtil.getLastNewQueryTime(config, directoryCollectionId );
+
+            if(timestamp == null){
+                /**
+                 * This will be the case when a connector is new to the system and is requesting for the first time.
+                 */
+                timestamp = DbUtil.getFirstQueryCreationTime(config);
+            }
 
             /**
-            * Get all queries created after the last request was made
-            */
-            List<QueryDetail> newQueries = DbUtil.getAllNewQueries(config, connectorLogRecord.getLastQueryTime());
+             * Get all queries created after the last request was made
+             */
+            List<QueryDetail> newQueries = DbUtil.getAllNewQueries(config, timestamp);
 
             /**
             *  Update the latest get request time.
             */
-            DbUtil.logGetQueryTime(config);
+            if(DbUtil.logGetQueryTime(config, directoryCollectionId) == -1) {
+                return Response.status(400).build();
+            }
             config.commit();
 
             /**
             *   Returns a list of all the newly created queries.
             */
-            return newQueries;
+            return Response.status(200).entity(newQueries).build();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -90,6 +117,8 @@ public class Connector {
     @Path("/collections")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCollections() {
+        //TODO: add access control
+
         try(Config config = ConfigFactory.get()) {
             List<BiobankCollections> data = DbUtil.getBiobanksAndTheirCollection(config);
             return Response.status(200).entity(data).build();
@@ -102,15 +131,20 @@ public class Connector {
 
     /**
      * REST to get a list of persons who are responsible for a given collection directory ID
-     * @param collectionDirectoryId   the directory ID of a collection
+     * @param directoryCollectionId   the directory ID of a collection
      * @return
      */
     @GET
     @Path("/collection_owners")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getUsersOfConnector(@QueryParam("id") String collectionDirectoryId) {
+    public Response getUsersOfConnector(@QueryParam("directoryCollectionId") String directoryCollectionId) {
+        //TODO: add access control
+
+        if(directoryCollectionId == null)
+            return Response.status(400).build();
+
         try(Config config = ConfigFactory.get()) {
-            List<CollectionOwner> data = DbUtil.getCollectionOwners(config, collectionDirectoryId);
+            List<CollectionOwner> data = DbUtil.getCollectionOwners(config, directoryCollectionId);
             return Response.status(200).entity(data).build();
         } catch(SQLException e) {
             e.printStackTrace();
@@ -120,19 +154,110 @@ public class Connector {
 
     /**
      * REST to get a list of queries whose results are expected from the connector.
-     * @param collectionId   the directory ID of a collection
+     * @param directoryCollectionId   the directoryId from collection table
      * @return
      */
-    @POST
-    @Path("/get_results")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getResults(@QueryParam("id") int collectionId) {
+    @GET
+    @Path("/expected_results")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response getResults(@QueryParam("directoryCollectionId") String directoryCollectionId) {
+        //TODO: add access control
+
+        if(directoryCollectionId == null)
+            return Response.status(400).build();
+
         try (Config config = ConfigFactory.get()) {
+            // translate collectionDirectoryId to collectionId
+            Integer collectionId = DbUtil.getCollectionId(config, directoryCollectionId);
+
+            if(collectionId == null) {
+                return Response.status(400).build();
+            }
+
             List<QueryCollection> queryCollectionList = DbUtil.checkExpectedResults(config, collectionId);
-            return Response.status(200).entity(queryCollectionList).build();
+
+            GenericEntity<List<QueryCollection>> entity = new GenericEntity<List<QueryCollection>>
+                    (queryCollectionList) {};
+
+            return Response.status(200).entity(entity).build();
         } catch (SQLException e) {
             e.printStackTrace();
             return Response.status(500).build();
+        }
+    }
+
+    /**
+     * REST to get results from the connector.
+     * @param result BBMRI result object
+     * @return
+     */
+    @POST
+    @Path("/results")
+    @Consumes(MediaType.APPLICATION_XML)
+    public Response getResults(BbmriResult result) {
+        //TODO: add access control
+
+        try (Config config = ConfigFactory.get()) {
+            logger.debug("The query results in {} donors and {} samples.", result.getNumberOfDonors(), result.getNumberOfSamples());
+
+            // save result to DB
+            if(!DbUtil.saveConnectorQueryResult(config, result)) {
+                return Response.status(500).build();
+            }
+
+            return Response.status(200).build();
+        } catch (SQLException e){
+            e.printStackTrace();
+            return Response.status(500).build();
+        }
+    }
+
+
+    /**
+     * Gets a list of all the new negotiations
+     * @param directoryCollectionId the directory ID of the connector
+     * @return
+     */
+    @GET
+    @Path("/negotiations")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response getNegotiation(@QueryParam("directoryCollectionId") String directoryCollectionId) {
+        if(directoryCollectionId == null)
+            return Response.status(400).build();
+
+        try (Config config = ConfigFactory.get()) {
+            List<QueryCollection> newNegotiations = null;
+
+             // Get last time a request was made by the connector
+            Timestamp timestamp = DbUtil.getLastNewNegotiationTime(config, directoryCollectionId );
+
+            if(timestamp == null){
+
+                 // Will come here when a connector is new to the system and is requesting for the first time.
+                timestamp = DbUtil.getFirstNegotiationTime(config);
+                if(timestamp == null){
+
+                     // Will come here when no negotiations started in the negotiator yet.
+                } else{
+                    newNegotiations = DbUtil.getAllNewNegotiations(config, timestamp, directoryCollectionId);
+                }
+            } else{
+
+               //   Get all negotiations created after the last request was made
+                newNegotiations = DbUtil.getAllNewNegotiations(config, timestamp, directoryCollectionId);
+            }
+            //Log the Get negotiation time.
+            DbUtil.logGetNegotiationTime(config, directoryCollectionId);
+            config.commit();
+
+            //Transform to generic list to send as xml
+            GenericEntity<List<QueryCollection>> newNegotiationsEntity = new GenericEntity<List<QueryCollection>>
+                    (newNegotiations) {};
+
+            return Response.status(200).entity(newNegotiationsEntity).build();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
 }

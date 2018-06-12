@@ -4,24 +4,24 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
     <artifactId>bbmri-negotiator</artifactId>
-    <version>1.2.0</version>
+    <version>2.0.0</version>
 
     <parent>
         <artifactId>parent</artifactId>
         <groupId>de.samply</groupId>
-        <version>9.3</version>
+        <version>10.1</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <version.samply.webjar>1.6.0</version.samply.webjar>
-        <version.samply.auth.client>1.0.2</version.samply.auth.client>
-        <version.samply.common.upgrade>2.0.0</version.samply.common.upgrade>
+        <version.samply.webjar>2.0.1</version.samply.webjar>
+        <version.samply.auth.client>1.0.3</version.samply.auth.client>
         <version.samply.common.util>1.0.0</version.samply.common.util>
-        <version.samply.common.mailing>1.1.1</version.samply.common.mailing>
-        <version.samply.directory.client>1.0.2</version.samply.directory.client>
-        <version.samply.negotiator.dto>1.0.0</version.samply.negotiator.dto>
+        <version.samply.common.mailing>2.0.0</version.samply.common.mailing>
+        <version.samply.directory.client>2.0.0</version.samply.directory.client>
+        <version.samply.negotiator.dto>2.0.0</version.samply.negotiator.dto>
+        <version.samply.share.dto>4.0.0</version.samply.share.dto>
 
         <database.server>localhost</database.server>
         <database.port>5432</database.port>
@@ -29,22 +29,28 @@
         <database.username>saher</database.username>
         <database.password>saher</database.password>
 
-
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
     </properties>
 
     <dependencies>
+
+        <!-- Using old JUnit 4 TODO: rewrite tests to JUnit 5 and remove this dependency -->
         <dependency>
-            <groupId>de.samply</groupId>
-            <artifactId>negotiator-dto</artifactId>
-            <version>${version.samply.negotiator.dto}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
 
         <dependency>
             <groupId>de.samply</groupId>
-            <artifactId>common-upgrade</artifactId>
-            <version>${version.samply.common.upgrade}</version>
+            <artifactId>share-dto</artifactId>
+            <version>${version.samply.share.dto}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>de.samply</groupId>
+            <artifactId>negotiator-dto</artifactId>
+            <version>${version.samply.negotiator.dto}</version>
         </dependency>
 
         <dependency>
@@ -178,14 +184,66 @@
             <version>1.1.2</version>
         </dependency>
 
-    </dependencies>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>4.2.0</version>
+        </dependency>
 
-    <distributionManagement>
-        <site>
-            <id>mitro-maven</id>
-            <url>dav:https://nexus.mitro.dkfz.de/content/sites/sites/samply/${project.artifactId}</url>
-        </site>
-    </distributionManagement>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+
+        <!-- Webjars -->
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>bootstrap</artifactId>
+            <version>3.3.7-1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>font-awesome</artifactId>
+            <version>4.7.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>3.3.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery-ui</artifactId>
+            <version>1.12.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>select2</artifactId>
+            <version>4.0.3-1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>datatables</artifactId>
+            <version>1.10.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars.bower</groupId>
+            <artifactId>jstree</artifactId>
+            <version>3.3.4</version>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>
@@ -208,21 +266,11 @@
         </profile>
 
         <profile>
-            <id>myfaces</id>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.myfaces.core</groupId>
-                    <artifactId>myfaces-impl</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-
-        <profile>
             <id>maxdatabase</id>
             <properties>
                 <database.server>steffi16</database.server>
                 <database.port>5432</database.port>
-                <database.name>negotiator2</database.name>
+                <database.name>negotiator4</database.name>
                 <database.username>negotiator</database.username>
                 <database.password>test123</database.password>
             </properties>

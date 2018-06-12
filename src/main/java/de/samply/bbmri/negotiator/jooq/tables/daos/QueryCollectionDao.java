@@ -7,6 +7,7 @@ package de.samply.bbmri.negotiator.jooq.tables.daos;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -70,5 +71,26 @@ public class QueryCollectionDao extends DAOImpl<QueryCollectionRecord, de.samply
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection> fetchByExpectConnectorResult(Boolean... values) {
 		return fetch(QueryCollection.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, values);
+	}
+
+	/**
+	 * Fetch records that have <code>donors IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection> fetchByDonors(Integer... values) {
+		return fetch(QueryCollection.QUERY_COLLECTION.DONORS, values);
+	}
+
+	/**
+	 * Fetch records that have <code>samples IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection> fetchBySamples(Integer... values) {
+		return fetch(QueryCollection.QUERY_COLLECTION.SAMPLES, values);
+	}
+
+	/**
+	 * Fetch records that have <code>result_received_time IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryCollection> fetchByResultReceivedTime(Timestamp... values) {
+		return fetch(QueryCollection.QUERY_COLLECTION.RESULT_RECEIVED_TIME, values);
 	}
 }

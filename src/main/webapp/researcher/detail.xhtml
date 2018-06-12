@@ -26,12 +26,13 @@
   -->
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
-                xmlns:bbmricc="http://java.sun.com/jsf/composite/bbmri"
-                template="../components/default.xhtml">
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+                template="../components/default.xhtml"
+>
 
     <f:metadata>
         <f:viewParam name="queryId"
@@ -89,15 +90,12 @@
                     <bbmricc:queryDetailData bean="#{researcherQueriesDetailBean}" />
 
                 </h:panelGroup>
-
-                <h:panelGroup id="queryCollectionsDisplay"
-                        rendered="#{researcherQueriesDetailBean.collections.size() > 0}"
-                        layout="block">
+               <h:panelGroup id="queryCollectionsDisplay" layout="block">
 
                     <h:panelGroup styleClass="text" layout="block">
                         <h:outputLabel value="#{label['queryview.title.amountMatchingCollections']}"/>
                         <h:outputText
-                                value="#{researcherQueriesDetailBean.collections.size()}"
+                                value="#{researcherQueriesDetailBean.matchingBiobanks}"
                                 style="margin-left: 22px;">
                         </h:outputText>
 
@@ -106,18 +104,23 @@
                         </a>
                     </h:panelGroup>
 
-                    <div id="collection-list" class="collapse">
-                        <ul>
-                            <ui:repeat value="#{researcherQueriesDetailBean.collections}"
-                                       var="collection">
-                                <li>#{collection.name}</li>
-                            </ui:repeat>
-                        </ul>
-                    </div>
+                   <div id="collection-list" class="collapse">
+                       #{researcherQueriesDetailBean.jsTreeJson}
+                   </div>
+                   <h:outputScript>
+                       $(function() {
+                           var data1= JSON.parse(document.getElementById("collection-list").innerHTML);
+                           $('#collection-list').jstree({
+                               'core': {
+                                   'data': data1
+                               }
+                           });
+                       });
+                   </h:outputScript>
                 </h:panelGroup>
 
                 <h:panelGroup id="noCollectionsText"
-                        rendered="#{researcherQueriesDetailBean.collections.size() == 0}"
+                        rendered="#{researcherQueriesDetailBean.matchingBiobankCollection.size() == 0}"
                         layout="block">
                     <h:outputLabel value="#{label['queryview.title.nocollections']}"
                                    styleClass="form-control-static"/>
@@ -140,7 +143,30 @@
 
                 </h:panelGroup>
 
-                <h:panelGroup layout="block" style="margin-top:10px;">
+
+                <h:panelGroup styleClass="row" layout="block">
+                    <h:panelGroup styleClass="col-md-12" >
+                        <h:panelGroup styleClass="col-md-4" >
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-4" >
+                            <h:form id="form">
+                                <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                                <h:commandButton id="startNegotiation"
+                                                 rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime == null}"
+                                                 value="#{label['querydetail.action.startNegotiation.buttonText']}"
+                                                 action="#{researcherQueriesDetailBean.startNegotiation()}"
+                                                 title="#{label['querydetail.tooltip.startNegotiation']}"
+                                                 styleClass="btn btn-primary" style="margin-top: 40px"/>
+                            </h:form>
+
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-4" >
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGroup>
+
+                <!-- Show the chat panel only after negotiation starts. -->
+                <h:panelGroup layout="block" rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}" style="margin-top:10px;">
 
                     <ul class="nav nav-tabs" id="myTab">
                         <li class="active" id="first"><a data-toggle="tab"
@@ -172,29 +198,60 @@
 
                         <div id="sampleAvailability" class="tab-pane fade">
 
-                            <ui:fragment rendered="#{researcherQueriesDetailBean.offerMakers.size() == 0}">
+                            <!--    Dropdown menu using Select2         -->
+                            <h:panelGroup rendered="#{researcherQueriesDetailBean.biobankWithoutOffer.size() > 0}">
+                                <h:form id="researcherForm">
+                                    <br/>
+                                    <h:outputLabel for="select2"> #{label['queryview.researcher.newconversation.title']}</h:outputLabel>
+                                    <h:selectOneMenu id="select2" styleClass="basic-single" value="#{researcherQueriesDetailBean.offerResearcher}" style="width: 40%;margin: 7px" >
+
+                                        <f:selectItems value="#{researcherQueriesDetailBean.biobankWithoutOffer}" var="dropdown" itemValue="#{dropdown.biobank.id}" itemLabel="#{dropdown.biobank.name}" />
+                                    </h:selectOneMenu>
+                                    <h:commandButton value="Start" action="#{researcherQueriesDetailBean.addIntoList()}" styleClass="btn btn-primary"/>
+                                    <br/>
+                                </h:form>
+                                <h:outputScript>
+                                    $(".basic-single").select2({
+                                    placeholder: "#{label['queryview.researcher.newconversaion.select.placeholder']}",
+                                    allowClear: true, width: 'resolve', theme:'classic'
+                                    })
+                                </h:outputScript>
+                            </h:panelGroup>
+
+                            <ui:fragment rendered="#{researcherQueriesDetailBean.biobankWithOffer.size() == 0}">
                                 <br />
                                 <p>
                                     <b> <h:outputText value="#{label['message.noOffers']}" /> </b>
                                 </p>
                             </ui:fragment>
+                            <br />
 
-                            <c:set var="oneMarkerOnly" value="#{researcherQueriesDetailBean.offerMakers.size() == 1}" />
-                            <c:forEach begin="1" end="#{researcherQueriesDetailBean.offerMakers.size()}" var="i">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading" role="tab" id="heading#{i}">
-                                        <h4 class="panel-title">
-                                            <a role="button" data-toggle="collapse"
-                                                    data-parent="#accordion" href="#hh#{i}" aria-expanded="false"
-                                                    aria-controls="sample-list"> Biobanker #{i}
-                                            </a>
-                                        </h4>
-                                    </div>
+                            <c:forEach var="i" begin="1" end ="#{researcherQueriesDetailBean.biobankWithOffer.size()}">
+                            <c:if test="#{researcherQueriesDetailBean.biobankWithOffer.get(i-1)==researcherQueriesDetailBean.offerResearcher}">
+                                <c:set var="oneMarkerOnly" value="#{i}" />
+                            </c:if>
+                            </c:forEach>
+
+                            <c:forEach begin="1" end="#{researcherQueriesDetailBean.biobankWithOffer.size()}" var="i">
+
+                                <div class="panel panel-default deco-none" >
+
+                                          <div id="heading#{i}" class="panel-heading " data-toggle="collapse" data-target="#hh#{i}">
+                                            <h4 class="panel-title">
+
+                                                <c:forEach var="j" begin="1" end="#{researcherQueriesDetailBean.matchingBiobankCollection.size()}">
+                                                    <c:if test="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.id==researcherQueriesDetailBean.biobankWithOffer.get(i-1)}">
+                                                        <c:set var="biobankName" value="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.name}"/>
+                                                    </c:if>
+                                                </c:forEach>
+                                                <a>#{biobankName}</a>
+                                            </h4>
+                                          </div>
+
                                     <div id="hh#{i}"
-                                         class="panel-collapse collapse #{oneMarkerOnly?'in':''}"
+                                         class="panel-collapse collapse #{(i==oneMarkerOnly)?'in':''}"
                                          role="tabpanel"
                                          aria-labelledby="heading#{i}">
-
 
                                         <div class="panel-body">
                                             <ui:repeat
@@ -213,10 +270,11 @@
 
                                             <bbmricc:commentReply makeOffer="true"
                                                                   query="#{researcherQueriesDetailBean.selectedQuery}"
-                                                                  offer="#{researcherQueriesDetailBean.offerMakers[i-1]}"/>
+                                                                  offer="#{researcherQueriesDetailBean.biobankWithOffer[i-1]}"/>
                                         </div>
                                     </div>
                                 </div>
+
                             </c:forEach>
 
 

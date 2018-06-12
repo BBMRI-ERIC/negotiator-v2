@@ -26,12 +26,11 @@
   -->
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-	xmlns:bbmri="http://negotiator.bbmri.dkfz.de/functions"
-	template="../components/default.xhtml">
+				xmlns:h="http://xmlns.jcp.org/jsf/html"
+				xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+				xmlns:f="http://xmlns.jcp.org/jsf/core"
+				xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+				template="../components/default.xhtml">
 
 	<f:metadata>
 		<f:viewParam name="queryId" value="#{queryBean.id}" />
@@ -101,7 +100,7 @@
 					<h:inputTextarea id="description" value="#{queryBean.queryText}"
 						styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.text']}"
 						validatorMessage="#{label['error.invalidDescriptionLength']}">
-						<f:validateLength for="description" minimum="5" maximum="500" />
+						<f:validateLength for="description" minimum="5" maximum="6000" />									<!-- LENGTH Increased -->
 					</h:inputTextarea>
 					<h:message for="description" style="color:red"
 						styleClass="pre-wrap" />
@@ -114,7 +113,7 @@
 									 styleClass="form-control" rows="5"
                                      pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
 									 validatorMessage="#{label['error.invalidDescriptionLength']}">
-						<f:validateLength for="requestdescription" minimum="5" maximum="500" />
+						<f:validateLength for="requestdescription" minimum="5" maximum="6000" />							<!-- LENGTH Increased -->
 					</h:inputTextarea>
 					<h:message for="requestdescription" style="color:red"
 							   styleClass="pre-wrap" />
@@ -216,7 +215,13 @@
 									</label>
 								</h:panelGroup>
 								<h:panelGroup layout="block">
-									<h:message for="file" />
+									<ul>
+										<ui:repeat value="#{queryBean.msgs}" var="msgs">
+											<li>
+												<h:outputText id="uploadMessages" value="#{msgs.detail}" style="#{msgs.summary == 'Upload Failed' ? 'color: red' : 'color: green'}" />
+											</li>
+										</ui:repeat>
+									</ul>
 								</h:panelGroup>
 								<h:outputScript>
 			                        $(function() {
