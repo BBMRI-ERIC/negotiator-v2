@@ -10,6 +10,8 @@ This is the BBMRI negotiator
 
 ## Getting Started
 
+This application uses a number of samply libraries which can be found at: https://maven.samply.de/nexus
+
 This application uses a database with the name of 'negotiator'. Feel free to change the name but remember to update it in pom.xml
 Following are the settings in the pom file that need to be updated according to your requirements
 
