@@ -6,6 +6,19 @@
     <artifactId>bbmri-negotiator</artifactId>
     <version>2.0.0</version>
 
+    <repositories>
+        <repository>
+            <id>dkfz-repo1-release</id>
+            <name>DKFZ Maven Repository</name>
+            <url>https://maven.mitro.dkfz.de/oss-releases</url>
+        </repository>
+        <repository>
+            <id>dkfz-repo1-snapshot</id>
+            <name>DKFZ Maven Repository</name>
+            <url>https://maven.mitro.dkfz.de/oss-snapshots</url>
+        </repository>
+    </repositories>
+
     <parent>
         <artifactId>parent</artifactId>
         <groupId>de.samply</groupId>
@@ -448,6 +461,14 @@
                             <targetPath>META-INF</targetPath>
                         </resource>
                     </webResources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
         </plugins>
