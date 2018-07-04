@@ -76,9 +76,9 @@ public class DbUtil {
      * @param config database configuration
      * @return
      */
-    public static List<ListOfDirectories> getDirectories(Config config) {
-        Result<ListOfDirectories> record = config.dsl().selectFrom(Table.LIST_OF_DIRECTORIES).fetch();
-        return config.map(record, ListOfDirectories.class);
+    public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
+        Result<ListOfDirectoriesRecord> record = config.dsl().selectFrom(Table.LIST_OF_DIRECTORIES).fetch();
+        return config.map(record, ListOfDirectoriesRecord.class);
     }
 
     /**
