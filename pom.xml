@@ -28,12 +28,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <version.samply.webjar>2.0.1</version.samply.webjar>
+        <version.samply.webjar>1.5.0</version.samply.webjar>
         <version.samply.auth.client>1.0.3</version.samply.auth.client>
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>2.0.0</version.samply.common.mailing>
         <version.samply.directory.client>2.0.0</version.samply.directory.client>
-        <version.samply.negotiator.dto>2.0.0</version.samply.negotiator.dto>
+        <version.samply.negotiator.dto>1.0.0</version.samply.negotiator.dto>
         <version.samply.share.dto>4.0.0</version.samply.share.dto>
 
         <database.server>localhost</database.server>
