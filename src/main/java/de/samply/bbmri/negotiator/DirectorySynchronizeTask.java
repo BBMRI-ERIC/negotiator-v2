@@ -57,34 +57,59 @@ public class DirectorySynchronizeTask extends TimerTask {
     @Override
     public void run() {
         try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
+            int biobanks = 0;
+            int collections = 0;
+            List<ListOfDirectories> directories = DbUtil.getDirectories(config);
+            for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
+                if (listOfDirectoriesRecord.getSyncActive()) {
+                    logger.info("Synchronization with the directory: " + listOfDirectoriesRecord.getId() + " - " + listOfDirectoriesRecord.getName());
+                    int[] size = runDirectorySync(listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName(), listOfDirectoriesRecord.getRestUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
+                            listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getApiUsername(), listOfDirectoriesRecord.getApiPassword());
+                    if(size.length == 2) {
+                        biobanks += size[0];
+                        collections += size[1];
+                    }
+                }
+            }
+            NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, "Biobanks: " + biobanks + ", Collections: " + collections);
+        } catch (Exception e) {
+            logger.error("Synchronization of directories failed", e);
+            NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
+        }
+    }
+
+    public int[] runDirectorySync(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String username, String password) {
+        try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
-            DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisRestUrl(),
-                    negotiatorConfig.getMolgenisResourceBiobanks(), negotiatorConfig.getMolgenisResourceCollections(),
-                    negotiatorConfig.getMolgenisApiUsername(), negotiatorConfig.getMolgenisApiPassword());
+            DirectoryClient client = new DirectoryClient(dirBaseUrl,
+                    resourceBiobanks, resourceCollections,
+                    username, password);
 
-            logger.info("Starting synchronization with the directory");
+            logger.info("Starting synchronization with the directory: " + directoryId + " - " + name);
 
             List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
 
             for(DirectoryBiobank dto : allBiobanks) {
-                DbUtil.synchronizeBiobank(config, dto);
+                DbUtil.synchronizeBiobank(config, dto, directoryId);
             }
 
             List<DirectoryCollection> allCollections = client.getAllCollections();
 
             for(DirectoryCollection dto : allCollections) {
-                DbUtil.synchronizeCollection(config, dto);
+                DbUtil.synchronizeCollection(config, dto, directoryId);
             }
 
-            logger.info("Synchronization with the directory finished.");
+            logger.info("Synchronization with the directory finished. Biobanks: " + allBiobanks.size() + ", Collections:" + allCollections.size());
             config.commit();
 
-            NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY,
-                    "Biobanks: " + allBiobanks.size() + ", Collections: " + allCollections.size());
+            int[] syncsize = {allBiobanks.size(), allCollections.size()};
+            return syncsize;
         } catch (Exception e) {
-            logger.error("Synchronization failed", e);
+            logger.error("Synchronization of directory failed", e);
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
+            int[] syncsize = {0, 0};
+            return syncsize;
         }
     }
 }
