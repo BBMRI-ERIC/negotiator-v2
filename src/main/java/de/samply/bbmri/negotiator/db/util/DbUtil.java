@@ -649,10 +649,12 @@ public class DbUtil {
      * Returns the location for the given directory ID.
      * @param config database configuration
      * @param directoryId directory biobank ID
+     * @param listOfDirectoryId directory biobank ID
      */
-    public static BiobankRecord getBiobank(Config config, String directoryId) {
+    public static BiobankRecord getBiobank(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.BIOBANK)
                 .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryId))
+                .and(Tables.BIOBANK.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
                 .fetchOne();
     }
 
@@ -695,9 +697,10 @@ public class DbUtil {
      * @param id directory collection ID
      * @return
      */
-    private static CollectionRecord getCollection(Config config, String id) {
+    private static CollectionRecord getCollection(Config config, String id, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(id))
+                .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
                 .fetchOne();
     }
 
@@ -705,9 +708,10 @@ public class DbUtil {
      * Synchronizes the given Biobank from the directory with the Biobank in the database.
      * @param config database configuration
      * @param dto biobank from the directory
+     * @param directoryId ID of the directory the biobank belongs to
      */
-    public static void synchronizeBiobank(Config config, DirectoryBiobank dto) {
-        BiobankRecord record = DbUtil.getBiobank(config, dto.getId());
+    public static void synchronizeBiobank(Config config, DirectoryBiobank dto, int directoryId) {
+        BiobankRecord record = DbUtil.getBiobank(config, dto.getId(), directoryId);
 
         if(record == null) {
             /**
@@ -722,6 +726,7 @@ public class DbUtil {
 
         record.setDescription(dto.getDescription());
         record.setName(dto.getName());
+        record.setListOfDirectoriesId(directoryId);
         record.store();
     }
 
@@ -729,9 +734,10 @@ public class DbUtil {
      * Synchronizes the given Collection from the directory with the Collection in the database.
      * @param config database configuration
      * @param dto collection from the directory
+     * @param directoryId ID of the directory the collection belongs to
      */
-    public static void synchronizeCollection(Config config, DirectoryCollection dto) {
-        CollectionRecord record = DbUtil.getCollection(config, dto.getId());
+    public static void synchronizeCollection(Config config, DirectoryCollection dto, int directoryId) {
+        CollectionRecord record = DbUtil.getCollection(config, dto.getId(), directoryId);
 
         if(record == null) {
             /**
@@ -740,6 +746,7 @@ public class DbUtil {
             logger.debug("Found new collection, with id {}, adding it to the database" , dto.getId());
             record = config.dsl().newRecord(Tables.COLLECTION);
             record.setDirectoryId(dto.getId());
+            record.setListOfDirectoriesId(directoryId);
         } else {
             logger.debug("Biobank {} already exists, updating fields", dto.getId());
         }
@@ -747,7 +754,7 @@ public class DbUtil {
         if(dto.getBiobank() == null) {
             logger.debug("Biobank is null. A collection without a biobank?!");
         } else {
-            BiobankRecord biobankRecord = getBiobank(config, dto.getBiobank().getId());
+            BiobankRecord biobankRecord = getBiobank(config, dto.getBiobank().getId(), directoryId);
 
             record.setBiobankId(biobankRecord.getId());
         }
