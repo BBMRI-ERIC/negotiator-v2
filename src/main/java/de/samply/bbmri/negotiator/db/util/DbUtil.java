@@ -72,6 +72,16 @@ public class DbUtil {
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
 
     /**
+     * Retunrs the list of all Directories
+     * @param config database configuration
+     * @return
+     */
+    public static List<ListOfDirectories> getDirectories(Config config) {
+        Result<ListOfDirectories> record = config.dsl().selectFrom(Table.LIST_OF_DIRECTORIES).fetch();
+        return config.map(record, ListOfDirectories.class);
+    }
+
+    /**
      * Sets the field for starting negotiation for a query to true.
      * @param config JOOQ configuration
      * @param queryId id of the query
