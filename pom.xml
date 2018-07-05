@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
     <artifactId>bbmri-negotiator</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.3-SNAPSHOT</version>
 
     <parent>
         <artifactId>parent</artifactId>
         <groupId>de.samply</groupId>
-        <version>10.1.2-SNAPSHOT</version>
+        <version>10.1.2</version>
     </parent>
 
     <properties>
@@ -19,7 +19,7 @@
         <version.samply.auth.client>1.0.4</version.samply.auth.client>
         <version.samply.common.util>1.0.0</version.samply.common.util>
         <version.samply.common.mailing>2.0.0</version.samply.common.mailing>
-        <version.samply.directory.client>2.0.3-SNAPSHOT</version.samply.directory.client>
+        <version.samply.directory.client>2.0.3</version.samply.directory.client>
         <version.samply.negotiator.dto>2.0.0</version.samply.negotiator.dto>
         <version.samply.share.dto>4.0.0</version.samply.share.dto>
 
