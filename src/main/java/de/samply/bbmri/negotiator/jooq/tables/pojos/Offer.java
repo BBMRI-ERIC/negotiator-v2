@@ -24,14 +24,15 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer implements Serializable {
 
-	private static final long serialVersionUID = 1713424993;
+	private static final long serialVersionUID = 1519650346;
 
 	private Integer   id;
 	private Integer   queryId;
 	private Integer   personId;
-	private Integer   biobankInPrivateChat;
+	private Integer   offerFrom;
 	private Timestamp commentTime;
 	private String    text;
+	private Integer   biobankInPrivateChat;
 
 	public Offer() {}
 
@@ -39,25 +40,28 @@ public class Offer implements Serializable {
 		this.id = value.id;
 		this.queryId = value.queryId;
 		this.personId = value.personId;
-		this.biobankInPrivateChat = value.biobankInPrivateChat;
+		this.offerFrom = value.offerFrom;
 		this.commentTime = value.commentTime;
 		this.text = value.text;
+		this.biobankInPrivateChat = value.biobankInPrivateChat;
 	}
 
 	public Offer(
 		Integer   id,
 		Integer   queryId,
 		Integer   personId,
-		Integer   biobankInPrivateChat,
+		Integer   offerFrom,
 		Timestamp commentTime,
-		String    text
+		String    text,
+		Integer   biobankInPrivateChat
 	) {
 		this.id = id;
 		this.queryId = queryId;
 		this.personId = personId;
-		this.biobankInPrivateChat = biobankInPrivateChat;
+		this.offerFrom = offerFrom;
 		this.commentTime = commentTime;
 		this.text = text;
+		this.biobankInPrivateChat = biobankInPrivateChat;
 	}
 
 	public Integer getId() {
@@ -84,12 +88,12 @@ public class Offer implements Serializable {
 		this.personId = personId;
 	}
 
-	public Integer getBiobankInPrivateChat() {
-		return this.biobankInPrivateChat;
+	public Integer getOfferFrom() {
+		return this.offerFrom;
 	}
 
-	public void setBiobankInPrivateChat(Integer biobankInPrivateChat) {
-		this.biobankInPrivateChat = biobankInPrivateChat;
+	public void setOfferFrom(Integer offerFrom) {
+		this.offerFrom = offerFrom;
 	}
 
 	public Timestamp getCommentTime() {
@@ -106,5 +110,13 @@ public class Offer implements Serializable {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public Integer getBiobankInPrivateChat() {
+		return this.biobankInPrivateChat;
+	}
+
+	public void setBiobankInPrivateChat(Integer biobankInPrivateChat) {
+		this.biobankInPrivateChat = biobankInPrivateChat;
 	}
 }

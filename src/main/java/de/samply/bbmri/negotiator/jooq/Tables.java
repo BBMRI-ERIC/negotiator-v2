@@ -10,13 +10,13 @@ import de.samply.bbmri.negotiator.jooq.tables.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
+import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
-import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import javax.annotation.Generated;
 
@@ -65,6 +65,11 @@ public class Tables {
 	public static final JsonQuery JSON_QUERY = de.samply.bbmri.negotiator.jooq.tables.JsonQuery.JSON_QUERY;
 
 	/**
+	 * Table to store directories
+	 */
+	public static final ListOfDirectories LIST_OF_DIRECTORIES = de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories.LIST_OF_DIRECTORIES;
+
+	/**
 	 * table to store private conversation made on a query between two people(owner and researcher)
 	 */
 	public static final Offer OFFER = de.samply.bbmri.negotiator.jooq.tables.Offer.OFFER;
@@ -93,9 +98,4 @@ public class Tables {
 	 * Table for connecting queries with collections
 	 */
 	public static final QueryCollection QUERY_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.QueryCollection.QUERY_COLLECTION;
-
-	/**
-	 * The table public.schema_version
-	 */
-	public static final SchemaVersion SCHEMA_VERSION = de.samply.bbmri.negotiator.jooq.tables.SchemaVersion.SCHEMA_VERSION;
 }

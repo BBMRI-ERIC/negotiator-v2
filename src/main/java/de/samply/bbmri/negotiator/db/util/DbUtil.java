@@ -77,7 +77,7 @@ public class DbUtil {
      * @return
      */
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
-        Result<ListOfDirectoriesRecord> record = config.dsl().selectFrom(Table.LIST_OF_DIRECTORIES).fetch();
+        Result<ListOfDirectoriesRecord> record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
         return config.map(record, ListOfDirectoriesRecord.class);
     }
 
@@ -701,6 +701,19 @@ public class DbUtil {
         return config.dsl().selectFrom(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(id))
                 .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
+                .fetchOne();
+    }
+
+    //TODO Remove Function and change others
+    /**
+     * Returns the collection for the given directory ID.
+     * @param config database configuration
+     * @param id directory collection ID
+     * @return
+     */
+    private static CollectionRecord getCollection(Config config, String id) {
+        return config.dsl().selectFrom(Tables.COLLECTION)
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(id))
                 .fetchOne();
     }
 

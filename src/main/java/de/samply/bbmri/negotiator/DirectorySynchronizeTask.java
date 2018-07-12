@@ -29,6 +29,8 @@ package de.samply.bbmri.negotiator;
 import java.util.List;
 import java.util.TimerTask;
 
+import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +61,7 @@ public class DirectorySynchronizeTask extends TimerTask {
         try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
             int biobanks = 0;
             int collections = 0;
-            List<ListOfDirectories> directories = DbUtil.getDirectories(config);
+            List<ListOfDirectoriesRecord> directories = DbUtil.getDirectories(config);
             for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
                 if (listOfDirectoriesRecord.getSyncActive()) {
                     logger.info("Synchronization with the directory: " + listOfDirectoriesRecord.getId() + " - " + listOfDirectoriesRecord.getName());

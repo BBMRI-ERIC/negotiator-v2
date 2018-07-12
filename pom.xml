@@ -10,12 +10,12 @@
         <repository>
             <id>dkfz-repo1-release</id>
             <name>DKFZ Maven Repository</name>
-            <url>https://maven.mitro.dkfz.de/oss-releases</url>
+            <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
         </repository>
         <repository>
             <id>dkfz-repo1-snapshot</id>
             <name>DKFZ Maven Repository</name>
-            <url>https://maven.mitro.dkfz.de/oss-snapshots</url>
+            <url>https://maven.samply.de/nexus/content/repositories/oss-snapshots/</url>
         </repository>
     </repositories>
 
