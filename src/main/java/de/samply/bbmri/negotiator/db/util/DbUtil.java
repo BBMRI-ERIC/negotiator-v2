@@ -78,6 +78,107 @@ public class DbUtil {
      */
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
         Result<ListOfDirectoriesRecord> record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
+
+        List<ListOfDirectoriesRecord> test = config.map(record, ListOfDirectoriesRecord.class);
+        return config.map(record, ListOfDirectoriesRecord.class);
+    }
+
+    /**
+     * Retunrs the list of all Directories
+     * @param config database configuration
+     * @param listOfDirectoryId database id of the directory
+     * @return
+     */
+    public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) {
+        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
+        return config.map(record, ListOfDirectoriesRecord.class);
+    }
+
+    /**
+     * Edits/Updates directory.
+     * @param config database configuration
+     * @param listOfDirectoryId
+     * @param name
+     * @param description
+     * @param url
+     * @param username
+     * @param password
+     * @param restUrl
+     * @param apiUsername
+     * @param apiPassword
+     * @param resourceCollections
+     * @param description
+     * @throws SQLException
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonParseException
+     */
+    public static void editDirectory(Config config, Integer listOfDirectoryId, String name, String description, String url,
+                                 String username, String password, String restUrl, String apiUsername, String apiPassword,
+                                     String resourceBiobanks, String resourceCollections) {
+        try {config.dsl().update(Tables.QUERY)
+                .set(Tables.LIST_OF_DIRECTORIES.NAME, name)
+                .set(Tables.LIST_OF_DIRECTORIES.DESCRIPTION, description)
+                .set(Tables.LIST_OF_DIRECTORIES.URL, url)
+                .set(Tables.LIST_OF_DIRECTORIES.USERNAME, username)
+                .set(Tables.LIST_OF_DIRECTORIES.PASSWORD, password)
+                .set(Tables.LIST_OF_DIRECTORIES.REST_URL, restUrl)
+                .set(Tables.LIST_OF_DIRECTORIES.API_USERNAME, apiUsername)
+                .set(Tables.LIST_OF_DIRECTORIES.API_PASSWORD, apiPassword)
+                .set(Tables.LIST_OF_DIRECTORIES.RESOURCE_BIOBANKS, resourceBiobanks)
+                .set(Tables.LIST_OF_DIRECTORIES.RESOURCE_COLLECTIONS, resourceCollections)
+                .where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).execute();
+            config.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a new directory.
+     * @param config database configuration
+     * @param name
+     * @param description
+     * @param url
+     * @param username
+     * @param password
+     * @param restUrl
+     * @param apiUsername
+     * @param apiPassword
+     * @param resourceCollections
+     * @return
+     * @throws SQLException
+     */
+    public static ListOfDirectoriesRecord saveDirectory(Config config, String name, String description, String url,
+                                            String username, String password, String restUrl, String apiUsername, String apiPassword,
+                                            String resourceBiobanks, String resourceCollections) throws SQLException {
+        ListOfDirectoriesRecord listOfDirectoriesRecord = config.dsl().newRecord(Tables.LIST_OF_DIRECTORIES);
+
+        listOfDirectoriesRecord.setName(name);
+        listOfDirectoriesRecord.setDescription(description);
+        listOfDirectoriesRecord.setUrl(url);
+        listOfDirectoriesRecord.setUsername(username);
+        listOfDirectoriesRecord.setPassword(password);
+        listOfDirectoriesRecord.setRestUrl(restUrl);
+        listOfDirectoriesRecord.setApiUsername(apiUsername);
+        listOfDirectoriesRecord.setApiPassword(apiPassword);
+        listOfDirectoriesRecord.setResourceBiobanks(resourceBiobanks);
+        listOfDirectoriesRecord.setResourceCollections(resourceCollections);
+        listOfDirectoriesRecord.store();
+
+        config.commit();
+
+        return listOfDirectoriesRecord;
+    }
+
+    /**
+     * Creates a new directory.
+     * @param config database configuration
+     * @param url
+     * @return
+     */
+    public static ListOfDirectoriesRecord getDirectoryByUrl(Config config, String url) {
+        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
         return config.map(record, ListOfDirectoriesRecord.class);
     }
 
@@ -288,6 +389,7 @@ public class DbUtil {
              * Updates the relationship between query and collection.
              */
             QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
+            ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, queryDTO.getUrl());
 
             // collections already saved for this query
             List<CollectionBiobankDTO> alreadySavedCollectiontsList = getCollectionsForQuery(config, queryId);
@@ -300,7 +402,7 @@ public class DbUtil {
                     && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
                 logger.info("Faking collections from the directory.");
                 for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
-                    CollectionRecord dbCollection = getCollection(config, collection);
+                    CollectionRecord dbCollection = getCollection(config, collection, listOfDirectoriesRecord.getId());
 
                     if (dbCollection != null) {
                         if(!alreadySavedCollections.containsKey(dbCollection.getId())) {
@@ -311,7 +413,7 @@ public class DbUtil {
                 }
             } else {
                 for (CollectionDTO collection : queryDTO.getCollections()) {
-                    CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
+                    CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
 
                     if (dbCollection != null) {
                         if(!alreadySavedCollections.containsKey(dbCollection.getId())) {
@@ -711,11 +813,11 @@ public class DbUtil {
      * @param id directory collection ID
      * @return
      */
-    private static CollectionRecord getCollection(Config config, String id) {
+    /*private static CollectionRecord getCollection(Config config, String id) {
         return config.dsl().selectFrom(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(id))
                 .fetchOne();
-    }
+    }*/
 
     /**
      * Synchronizes the given Biobank from the directory with the Biobank in the database.
@@ -838,12 +940,13 @@ public class DbUtil {
          * Add the relationship between query and collection.
          */
         QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
+        ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, queryDTO.getUrl());
 
         if(NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
                 && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
             logger.info("Faking collections from the directory.");
             for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
-                CollectionRecord dbCollection = getCollection(config, collection);
+                CollectionRecord dbCollection = getCollection(config, collection, listOfDirectoriesRecord.getId());
 
                 if (dbCollection != null) {
                     addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
@@ -851,7 +954,7 @@ public class DbUtil {
             }
         } else {
             for (CollectionDTO collection : queryDTO.getCollections()) {
-                CollectionRecord dbCollection = getCollection(config, collection.getCollectionID());
+                CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
 
                 if (dbCollection != null) {
                     addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
@@ -962,6 +1065,18 @@ public class DbUtil {
     }
 
     /**
+     * Returns the list of collections which the given user is responsible for.
+     * @param config the current configuration
+     * @param collectionId the person ID
+     * @return
+     */
+    public static List<CollectionRecord> getCollections(Config config, String collectionId) {
+        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
+                .fetch(), CollectionRecord.class);
+    }
+
+    /**
      * Saves the given Perun User into the database or updates the user, if he already exists
      * @param config
      * @param personDTO
@@ -990,21 +1105,23 @@ public class DbUtil {
 
         String collectionId = mapping.getName().replaceAll(":Representatives$", "");
 
-        CollectionRecord collection = getCollection(config, collectionId);
+        List<CollectionRecord> collections = getCollections(config, collectionId);
 
-        if(collection != null) {
-            logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
-            dsl.deleteFrom(Tables.PERSON_COLLECTION).where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).execute();
+        for(CollectionRecord collection : collections) {
+            if(collection != null) {
+                logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
+                dsl.deleteFrom(Tables.PERSON_COLLECTION).where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).execute();
 
-            for(PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
+                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                    PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
 
-                if(personRecord != null) {
-                    logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
-                    PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
-                    personCollectionRecord.setCollectionId(collection.getId());
-                    personCollectionRecord.setPersonId(personRecord.getId());
-                    personCollectionRecord.store();
+                    if (personRecord != null) {
+                        logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
+                        PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
+                        personCollectionRecord.setCollectionId(collection.getId());
+                        personCollectionRecord.setPersonId(personRecord.getId());
+                        personCollectionRecord.store();
+                    }
                 }
             }
         }

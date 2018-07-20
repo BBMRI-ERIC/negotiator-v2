@@ -81,6 +81,7 @@ public class DirectorySynchronizeTask extends TimerTask {
     }
 
     public int[] runDirectorySync(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String username, String password) {
+        logger.info("Starting synchronization with the directory: " + directoryId + " - " + name);
         try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
@@ -88,17 +89,23 @@ public class DirectorySynchronizeTask extends TimerTask {
                     resourceBiobanks, resourceCollections,
                     username, password);
 
-            logger.info("Starting synchronization with the directory: " + directoryId + " - " + name);
-
             List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
 
+            logger.info("All Biobanks: " + allBiobanks.size());
+
             for(DirectoryBiobank dto : allBiobanks) {
+                logger.info("Run: " + directoryId);
                 DbUtil.synchronizeBiobank(config, dto, directoryId);
             }
 
+            logger.info("DirectoryBiobank done");
+
             List<DirectoryCollection> allCollections = client.getAllCollections();
 
+            logger.info("All Collections: " + allCollections.size());
+
             for(DirectoryCollection dto : allCollections) {
+                logger.info("Run col: " + directoryId);
                 DbUtil.synchronizeCollection(config, dto, directoryId);
             }
 

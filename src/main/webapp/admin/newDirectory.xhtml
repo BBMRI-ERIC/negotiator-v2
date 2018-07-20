@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+<!-- TODO: template="../components/default.xhtml -->
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                template="../components/default.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="listOfDirectoryId" value="#{editDirectoryBean.id}" />
+        <f:viewAction action="#{editDirectoryBean.initialize}" />
+    </f:metadata>
+
+    <!-- Queries page for the researcher -->
+
+
+    <ui:param name="bodyClass" value="container" />
+
+    <ui:define name="body">
+
+        <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
+
+            <h:panelGroup layout="block">
+                <h2>Add/Edit directory</h2>
+            </h:panelGroup>
+
+            <h:form id="uploadform" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <span class="required">
+                        #{label['directory.table.name']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="name" value="#{editDirectoryBean.directoryName}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.name.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="name" minimum="5" maximum="250" />
+                    </h:inputText>
+                    <h:message for="name" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.description']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputTextarea id="description" value="#{editDirectoryBean.directoryDescription}"
+                                     styleClass="form-control" rows="5" pt:placeholder="#{label['directory.table.description.placeholder']}"
+                                     validatorMessage="#{label['error.invalidDescriptionLength']}">
+                        <f:validateLength for="description" minimum="5" maximum="6000" />									<!-- LENGTH Increased -->
+                    </h:inputTextarea>
+                    <h:message for="description" style="color:red"
+                               styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.url']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="url" value="#{editDirectoryBean.directoryUrl}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.url.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="url" minimum="5" maximum="500" />
+                    </h:inputText>
+                    <h:message for="url" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.resturl']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="resturl" value="#{editDirectoryBean.directoryResturl}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.resturl.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="resturl" minimum="5" maximum="500" />
+                    </h:inputText>
+                    <h:message for="resturl" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.username']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="username" value="#{editDirectoryBean.directoryUsername}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.username.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="username" minimum="5" maximum="250" />
+                    </h:inputText>
+                    <h:message for="username" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.password']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="password" value="#{editDirectoryBean.directoryPassword}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.password.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="password" minimum="5" maximum="250" />
+                    </h:inputText>
+                    <h:message for="password" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.usernameapi']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="usernameapi" value="#{editDirectoryBean.directoryUsernameApi}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.usernameapi.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="usernameapi" minimum="5" maximum="250" />
+                    </h:inputText>
+                    <h:message for="usernameapi" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.passwordapi']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="passwordapi" value="#{editDirectoryBean.directoryPasswordApi}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.passwordapi.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="passwordapi" minimum="5" maximum="250" />
+                    </h:inputText>
+                    <h:message for="passwordapi" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.resourceBiobanks']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="resourceBiobanks" value="#{editDirectoryBean.directoryResourceBiobanks}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.resourceBiobanks.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="resourceBiobanks" minimum="5" maximum="250" />
+                    </h:inputText>
+                    <h:message for="resourceBiobanks" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.resourceCollections']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:inputText id="resourceCollections" value="#{editDirectoryBean.directoryResourceCollections}"
+                                 styleClass="form-control" pt:placeholder="#{label['directory.table.resourceCollections.placeholder']}"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                        <f:validateLength for="resourceCollections" minimum="5" maximum="250" />
+                    </h:inputText>
+                    <h:message for="resourceCollections" style="color:red" styleClass="pre-wrap" />
+
+                    <br></br>
+                    <span class="required">
+                        #{label['directory.table.directorySyncActive']} <i class="fa fa-pencil-square-o" />
+                    </span>
+                    <h:selectBooleanCheckbox id="directorySyncActive" value="#{editDirectoryBean.directorySyncActive}"
+                                 styleClass="form-control" style="margin-left: 10px"
+                                 validatorMessage="#{label['error.invalidTitleLength']}">
+                    </h:selectBooleanCheckbox>
+                    <h:message for="directorySyncActive" style="color:red" styleClass="pre-wrap" />
+                </div>
+                <br></br>
+                <br></br>
+
+                <h:panelGroup layout="block" styleClass="pull-right">
+                    <h:button outcome="detail" styleClass="btn btn-primary" value="#{label['global.button.cancel']}"
+                              style="margin-right: 5px;"  rendered="#{editDirectoryBean.mode == 'edit'}">
+
+                        <f:param name="queryId" value="#{editDirectoryBean.id}" />
+                    </h:button>
+
+                    <h:commandButton action="#{editDirectoryBean.saveDirectory()}"
+                                     value="#{editDirectoryBean.getMode()=='edit' ? label['directory.table.saveDirectoryChanges.buttontext'] : label['directory.table.addDirectory.buttontext']}"
+                                     title="#{editDirectoryBean.getMode()=='edit' ? label['directory.table.saveDirectoryChanges.tooltip'] : label['directory.table.addDirectory.tooltip']}"
+                                     styleClass="btn btn-primary" />
+                </h:panelGroup>
+            </h:form>
+
+        </h:panelGroup>
+
+    </ui:define>
+</ui:composition>

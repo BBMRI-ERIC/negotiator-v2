@@ -48,6 +48,8 @@
                 <th>#{label['directory.table.description']}</th>
                 <th>#{label['directory.table.resourceBiobanks']}</th>
                 <th>#{label['directory.table.resourceCollections']}</th>
+                <th>#{label['directory.table.directorySyncActive']}</th>
+                <th>#{label['directory.table.actions']}</th>
             </tr>
             </thead>
             <tbody>
@@ -59,15 +61,31 @@
                     <td>#{directory.description}</td>
                     <td>#{directory.resourceBiobanks}</td>
                     <td>#{directory.resourceCollections}</td>
+                    <td>#{directory.syncActive}</td>
                     <td>
                         <h:form>
-                            <h:commandButton value="Sync" action="#{directoryBean.syncDirectory(directory.id, directory.name, directory.restUrl, directory.resourceBiobanks, directory.resourceCollections, directory.apiUsername, directory.apiPassword)}" />
+                            <h:button value="#{label['directory.table.actions.syncDirectory']}"
+                                      title="#{label['directory.table.actions.syncDirectory.toottip']}"
+                                      action="#{directoryBean.syncDirectory(directory.id, directory.name, directory.restUrl, directory.resourceBiobanks, directory.resourceCollections, directory.apiUsername, directory.apiPassword)}" />
                         </h:form>
+                        <h:button outcome="newDirectory"
+                                  value="#{label['directory.table.actions.editDirectory']}"
+                                  title="#{label['directory.table.actions.editDirectory.toottip']}"
+                                  styleClass="btn btn-primary" style="margin-top: 10px">
+
+                            <f:param name="listOfDirectoryId" value="#{directory.id}"/>
+                        </h:button>
                     </td>
                 </tr>
             </ui:repeat>
             </tbody>
         </table>
+
+        <h:button outcome="newDirectory"
+                  value="#{label['directory.table.actions.addDirectory']}"
+                  title="#{label['directory.table.actions.addDirectory']}"
+                  styleClass="btn btn-primary" style="margin-top: 10px;margin-bottom: 10px;">
+        </h:button>
 
         <div>
             Git-Branch: #{applicationBean.gitBranch}, Git-Commit-ID: #{applicationBean.gitCommitId}, Version: #{applicationBean.version}

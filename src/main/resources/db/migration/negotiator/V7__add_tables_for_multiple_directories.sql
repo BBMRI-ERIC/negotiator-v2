@@ -1,6 +1,3 @@
-ALTER TABLE offer ADD COLUMN biobank_in_private_chat INTEGER;
-COMMENT ON COLUMN offer."biobank_in_private_chat" IS '<<-- Missing in Code';
-
 CREATE TABLE list_of_directories (
     "id" SERIAL NOT NULL,
     "name" CHARACTER VARYING(255) NOT NULL,

@@ -8,15 +8,22 @@ import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import java.sql.SQLException;
 import java.util.List;
 
+@ManagedBean
+@SessionScoped
 public class DirectoryBean {
     private Logger logger = LoggerFactory.getLogger(DirectoryBean.class);
 
     public List<ListOfDirectoriesRecord> getDirectories() {
         try(Config config = ConfigFactory.get()) {
-            return DbUtil.getDirectories(config);
+            logger.info("getDirectories");
+            List<ListOfDirectoriesRecord> list = DbUtil.getDirectories(config);
+            logger.info("count " + list.size());
+            return list;
         } catch(SQLException e) {
             e.printStackTrace();
         }
