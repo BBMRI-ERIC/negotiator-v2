@@ -806,19 +806,6 @@ public class DbUtil {
                 .fetchOne();
     }
 
-    //TODO Remove Function and change others
-    /**
-     * Returns the collection for the given directory ID.
-     * @param config database configuration
-     * @param id directory collection ID
-     * @return
-     */
-    /*private static CollectionRecord getCollection(Config config, String id) {
-        return config.dsl().selectFrom(Tables.COLLECTION)
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(id))
-                .fetchOne();
-    }*/
-
     /**
      * Synchronizes the given Biobank from the directory with the Biobank in the database.
      * @param config database configuration
