@@ -29,7 +29,6 @@ package de.samply.bbmri.negotiator;
 import java.util.List;
 import java.util.TimerTask;
 
-import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,10 +62,10 @@ public class DirectorySynchronizeTask extends TimerTask {
             int collections = 0;
             List<ListOfDirectoriesRecord> directories = DbUtil.getDirectories(config);
             for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
-                if (listOfDirectoriesRecord.getSyncActive()) {
+                if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
                     logger.info("Synchronization with the directory: " + listOfDirectoriesRecord.getId() + " - " + listOfDirectoriesRecord.getName());
-                    int[] size = runDirectorySync(listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName(), listOfDirectoriesRecord.getRestUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
-                            listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getApiUsername(), listOfDirectoriesRecord.getApiPassword());
+                    int[] size = runDirectorySync(listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName(), listOfDirectoriesRecord.getUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
+                            listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
                     if(size.length == 2) {
                         biobanks += size[0];
                         collections += size[1];

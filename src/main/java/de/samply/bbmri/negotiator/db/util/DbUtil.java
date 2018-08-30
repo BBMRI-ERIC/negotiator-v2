@@ -115,8 +115,8 @@ public class DbUtil {
      */
     public static void editDirectory(Config config, Integer listOfDirectoryId, String name, String description, String url,
                                  String username, String password, String restUrl, String apiUsername, String apiPassword,
-                                     String resourceBiobanks, String resourceCollections) {
-        try {config.dsl().update(Tables.QUERY)
+                                     String resourceBiobanks, String resourceCollections, boolean sync_active) {
+        try {config.dsl().update(Tables.LIST_OF_DIRECTORIES)
                 .set(Tables.LIST_OF_DIRECTORIES.NAME, name)
                 .set(Tables.LIST_OF_DIRECTORIES.DESCRIPTION, description)
                 .set(Tables.LIST_OF_DIRECTORIES.URL, url)
@@ -127,6 +127,7 @@ public class DbUtil {
                 .set(Tables.LIST_OF_DIRECTORIES.API_PASSWORD, apiPassword)
                 .set(Tables.LIST_OF_DIRECTORIES.RESOURCE_BIOBANKS, resourceBiobanks)
                 .set(Tables.LIST_OF_DIRECTORIES.RESOURCE_COLLECTIONS, resourceCollections)
+                .set(Tables.LIST_OF_DIRECTORIES.SYNC_ACTIVE, sync_active)
                 .where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).execute();
             config.commit();
         } catch (Exception e) {
@@ -151,7 +152,7 @@ public class DbUtil {
      */
     public static ListOfDirectoriesRecord saveDirectory(Config config, String name, String description, String url,
                                             String username, String password, String restUrl, String apiUsername, String apiPassword,
-                                            String resourceBiobanks, String resourceCollections) throws SQLException {
+                                            String resourceBiobanks, String resourceCollections, boolean sync_active) throws SQLException {
         ListOfDirectoriesRecord listOfDirectoriesRecord = config.dsl().newRecord(Tables.LIST_OF_DIRECTORIES);
 
         listOfDirectoriesRecord.setName(name);
@@ -164,6 +165,7 @@ public class DbUtil {
         listOfDirectoriesRecord.setApiPassword(apiPassword);
         listOfDirectoriesRecord.setResourceBiobanks(resourceBiobanks);
         listOfDirectoriesRecord.setResourceCollections(resourceCollections);
+        listOfDirectoriesRecord.setSyncActive(sync_active);
         listOfDirectoriesRecord.store();
 
         config.commit();
@@ -178,6 +180,11 @@ public class DbUtil {
      * @return
      */
     public static ListOfDirectoriesRecord getDirectoryByUrl(Config config, String url) {
+        int endindex = url.indexOf("/", 9);
+        if(endindex == -1) {
+            endindex = url.length();
+        }
+        url = url.substring(0, endindex);
         Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
         return config.map(record, ListOfDirectoriesRecord.class);
     }
@@ -389,36 +396,38 @@ public class DbUtil {
              * Updates the relationship between query and collection.
              */
             QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
-            ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, queryDTO.getUrl());
 
-            // collections already saved for this query
-            List<CollectionBiobankDTO> alreadySavedCollectiontsList = getCollectionsForQuery(config, queryId);
-            HashMap<Integer, Boolean> alreadySavedCollections = new HashMap<>();
-            for(CollectionBiobankDTO savedOne: alreadySavedCollectiontsList) {
-                alreadySavedCollections.put(savedOne.getCollection().getId(), true);
-            }
+            for(QuerySearchDTO querySearchDTO : queryDTO.getSearchQueries()) {
+                ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, querySearchDTO.getUrl());
+                // collections already saved for this query
+                List<CollectionBiobankDTO> alreadySavedCollectiontsList = getCollectionsForQuery(config, queryId);
+                HashMap<Integer, Boolean> alreadySavedCollections = new HashMap<>();
+                for (CollectionBiobankDTO savedOne : alreadySavedCollectiontsList) {
+                    alreadySavedCollections.put(savedOne.getCollection().getId(), true);
+                }
 
-            if (NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
-                    && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
-                logger.info("Faking collections from the directory.");
-                for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
-                    CollectionRecord dbCollection = getCollection(config, collection, listOfDirectoriesRecord.getId());
+                if (NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
+                        && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
+                    logger.info("Faking collections from the directory.");
+                    for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
+                        CollectionRecord dbCollection = getCollection(config, collection, listOfDirectoriesRecord.getId());
 
-                    if (dbCollection != null) {
-                        if(!alreadySavedCollections.containsKey(dbCollection.getId())) {
-                            addQueryToCollection(config, queryId, dbCollection.getId());
-                            alreadySavedCollections.put(dbCollection.getId(), true);
+                        if (dbCollection != null) {
+                            if (!alreadySavedCollections.containsKey(dbCollection.getId())) {
+                                addQueryToCollection(config, queryId, dbCollection.getId());
+                                alreadySavedCollections.put(dbCollection.getId(), true);
+                            }
                         }
                     }
-                }
-            } else {
-                for (CollectionDTO collection : queryDTO.getCollections()) {
-                    CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
+                } else {
+                    for (CollectionDTO collection : querySearchDTO.getCollections()) {
+                        CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
 
-                    if (dbCollection != null) {
-                        if(!alreadySavedCollections.containsKey(dbCollection.getId())) {
-                            addQueryToCollection(config, queryId, dbCollection.getId());
-                            alreadySavedCollections.put(dbCollection.getId(), true);
+                        if (dbCollection != null) {
+                            if (!alreadySavedCollections.containsKey(dbCollection.getId())) {
+                                addQueryToCollection(config, queryId, dbCollection.getId());
+                                alreadySavedCollections.put(dbCollection.getId(), true);
+                            }
                         }
                     }
                 }
@@ -927,24 +936,26 @@ public class DbUtil {
          * Add the relationship between query and collection.
          */
         QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
-        ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, queryDTO.getUrl());
+        for(QuerySearchDTO querySearchDTO : queryDTO.getSearchQueries()) {
+            ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, querySearchDTO.getUrl());
 
-        if(NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
-                && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
-            logger.info("Faking collections from the directory.");
-            for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
-                CollectionRecord dbCollection = getCollection(config, collection, listOfDirectoriesRecord.getId());
+            if (NegotiatorConfig.get().getNegotiator().getDevelopment().isFakeDirectoryCollections()
+                    && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
+                logger.info("Faking collections from the directory.");
+                for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
+                    CollectionRecord dbCollection = getCollection(config, collection, listOfDirectoriesRecord.getId());
 
-                if (dbCollection != null) {
-                    addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
+                    if (dbCollection != null) {
+                        addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
+                    }
                 }
-            }
-        } else {
-            for (CollectionDTO collection : queryDTO.getCollections()) {
-                CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
+            } else {
+                for (CollectionDTO collection : querySearchDTO.getCollections()) {
+                    CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
 
-                if (dbCollection != null) {
-                    addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
+                    if (dbCollection != null) {
+                        addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
+                    }
                 }
             }
         }

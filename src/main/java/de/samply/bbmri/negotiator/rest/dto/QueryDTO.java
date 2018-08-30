@@ -26,70 +26,65 @@
 
 package de.samply.bbmri.negotiator.rest.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * The Query object with the structured data as received from the directory.
+ * The Query object with the structured data for multiple search results.
  */
 @XmlRootElement
 public class QueryDTO {
 
     /**
-     * Unknown
+     * The negotiator token for the query. Only not null, if the user refines the query in the negotiator.
      */
-    @XmlElement(name = "URL")
-    private String url;
+    @XmlElement(name = "qToken")
+    private String queryToken;
 
     /**
-     * The filter object
+     * The search queries for the negotiation
      */
-    @XmlElement(name = "humanReadable")
-    private String humanReadable;
+    @XmlElement(name = "searchQueries")
+    private Collection<QuerySearchDTO> searchQueries;
 
-    /**
-     * The collections that can participate in the negotiation
-     */
-    @XmlElement(name = "collections")
-    private Collection<CollectionDTO> collections;
-
-    /**
-     * The negotiator token. Only not null, if the user refines the query in the negotiator.
-     */
-    @XmlElement(name = "nToken")
-    private String token;
-
-    public String getUrl() {
-        return url;
+    public String getNegotiatorToken() {
+        return queryToken;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setNegotiatorToken(String token) {
+        this.queryToken = token;
     }
 
-    public String getToken() {
-        return token;
+    public Collection<QuerySearchDTO> getSearchQueries() { return searchQueries; }
+
+    public void addSearchQuery(QuerySearchDTO querySearchDTO) {
+        searchQueries.add(querySearchDTO);
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void updateSearchQuery(QuerySearchDTO querySearchDTOnew, String nTocken) {
+        for(QuerySearchDTO querySearchDTO : searchQueries) {
+            if(nTocken.equals(querySearchDTO.getToken())) {
+                searchQueries.remove(querySearchDTO);
+                searchQueries.add(querySearchDTOnew);
+            }
+        }
     }
 
-    public Collection<CollectionDTO> getCollections() {
-        return collections;
-    }
-
-    public void setCollections(Collection<CollectionDTO> collections) {
-        this.collections = collections;
-    }
-
-    public String getHumanReadable() {
-        return humanReadable;
-    }
-
-    public void setHumanReadable(String humanReadable) {
-        this.humanReadable = humanReadable;
+    public String toJsonString() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = "";
+        try {
+            jsonString = objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonString;
     }
 }

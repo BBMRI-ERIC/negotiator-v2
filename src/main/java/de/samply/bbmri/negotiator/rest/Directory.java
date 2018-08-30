@@ -43,6 +43,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,8 +87,6 @@ public class Directory {
             /**
              * Check authentication
              */
-
-
             Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
             AuthenticationService.authenticate(request, negotiator.getMolgenisUsername(), negotiator.getMolgenisPassword());
 
@@ -97,20 +96,20 @@ public class Directory {
              */
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-            QueryDTO query = mapper.readValue(queryString, QueryDTO.class);
+            QuerySearchDTO querySearchDTO = mapper.readValue(queryString, QuerySearchDTO.class);
 
-            if(query == null || query.getUrl() == null || query.getHumanReadable() == null || query.getCollections() == null) {
+            if(querySearchDTO == null || querySearchDTO.getUrl() == null || querySearchDTO.getHumanReadable() == null || querySearchDTO.getCollections() == null) {
                 logger.error("Directory posted empty URL, no human readable text or no collections, aborting");
                 throw new BadRequestException();
             }
 
             if(!negotiator.getDevelopment().getMolgenisAcceptInvalidUrl() &&
-                    !query.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
+                    !querySearchDTO.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
                 logger.error("Directory posted wrong redirect URL, aborting");
                 throw new BadRequestException();
             }
 
-            if(query.getCollections().size() < 1) {
+            if(querySearchDTO.getCollections().size() < 1) {
                 logger.error("Directory posted empty list of collections, aborting");
                 throw new BadRequestException();
             }
@@ -120,7 +119,7 @@ public class Directory {
              * create a new json query object. This decision is made based on the negotiator token from
              * the query
              */
-            if(query.getToken() == null) {
+            if(querySearchDTO.getToken() == null) {
 
                 /**
                  * Create the json_query object itself and store it in the database.
@@ -138,7 +137,9 @@ public class Directory {
 
                 return Response.created(new URI(builder)).entity(result).build();
             } else {
-                QueryRecord queryRecord = DbUtil.getQuery(config, query.getToken());
+                // get the id of the query from the structure, the compleat token is still in the request
+                String qTocken = querySearchDTO.getToken().replaceAll("__search__.*", "");
+                QueryRecord queryRecord = DbUtil.getQuery(config, qTocken);
 
                 if(queryRecord == null) {
                     throw new NotFoundException();

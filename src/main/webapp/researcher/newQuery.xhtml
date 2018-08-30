@@ -59,25 +59,102 @@
                 <br/>
             </h:panelGroup>
 			<h:panelGroup layout="block">
-				<h:outputLabel for="structuredQuery"
-					value="#{label['queryview.title.searchParameters']}" />
-				<h:outputText id="structuredQuery"
-					value="#{queryBean.humanReadableFilters}"
-					style="margin-left: 22px;">
-				</h:outputText>
-				
-				<br/>
-				<h:form>				
-					<h:commandLink action="#{queryBean.editSearchParameters()}"	styleClass="btn btn-primary" 
-						title="#{label['queryview.tooltip.editSearchParameters']}">
-	                                #{label['queryview.title.editSearchParameters']}
-	                </h:commandLink>
-                </h:form>                
-                
-                <br/>
-                <br/>
-                
+
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>#{label['queryview.structuredQuery.table.directory']}</th>
+							<th>#{label['queryview.structuredQuery.table.searchParameters']}</th>
+							<th>#{label['queryview.structuredQuery.table.collectionNumbers']}</th>
+							<th>#{label['queryview.structuredQuery.table.actions']}</th>
+						</tr>
+					</thead>
+					<tbody>
+					<ui:repeat value="#{queryBean.searchQueries}" var="searchQuery">
+						<tr>
+							<td>#{queryBean.getDirectoryNameByUrl(searchQuery.url)}</td>
+							<td>#{searchQuery.humanReadable}</td>
+							<td>#{searchQuery.numberOfCollections}</td>
+							<td>
+                                <h:form>
+                                    <h:commandLink action="#{queryBean.editSearchParameters(searchQuery.url, searchQuery.token)}"	styleClass="btn btn-primary"
+                                                   title="#{label['queryview.structuredQuery.table.tooltip.editSearchParameters']}">
+                                        #{label['queryview.structuredQuery.table.editSearchParameters']}
+                                    </h:commandLink>
+                                </h:form>
+                            </td>
+						</tr>
+					</ui:repeat>
+					</tbody>
+				</table>
+
+
+
 			</h:panelGroup>
+
+			<br/>
+
+			<h:panelGroup layout="block" style="float: right;">
+				<style>
+					.searchparametertooltip {
+						background-color: #004275;
+						border-radius: 10px;
+						display: inline-block;
+						position: relative;
+						font-weight: bold;
+						color: #fff;
+						padding: 6px 12px;
+						margin-bottom: 0;
+						font-size: 14px;
+						line-height: 1.42857143;
+						text-align: center;
+						white-space: nowrap;
+						vertical-align: middle;
+						cursor: pointer;
+					}
+
+					.searchparametertooltip .searchparametertooltiparea {
+						visibility: hidden;
+						background-color: black;
+						color: #eee;
+						text-align: center;
+						border-radius: 6px;
+						padding: 10px;
+						margin: 10px;
+						right: 10px;
+						border: 1px;
+						border-color: #000000;
+
+						/* Position the tooltip */
+						position: absolute;
+						z-index: 1;
+					}
+
+					.searchparametertooltip:hover .searchparametertooltiparea {
+						visibility: visible;
+					}
+
+					.searchparametertooltip .searchparametertooltiparea .searchparametertooltipareabtn {
+						margin: 5px;
+					}
+				</style>
+
+				<span class="searchparametertooltip">+
+					<span class="searchparametertooltiparea">
+						<ui:repeat value="#{directoryBean.directories}" var="directory">
+							<h:form>
+								<h:commandLink action="#{queryBean.addSearchParameters(directory.restUrl)}"	styleClass="btn btn-primary searchparametertooltipareabtn"
+											   title="#{directory.name}">
+									#{directory.name}
+								</h:commandLink>
+							</h:form>
+						</ui:repeat>
+					</span>
+				</span>
+
+			</h:panelGroup>
+
+			<br/>
 
 
 			<h:form id="uploadform" enctype="multipart/form-data">

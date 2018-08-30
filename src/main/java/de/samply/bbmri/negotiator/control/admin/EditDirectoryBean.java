@@ -142,12 +142,12 @@ public class EditDirectoryBean implements Serializable {
             if(id != null) {
                 DbUtil.editDirectory(config, id, directoryName, directoryDescription, directoryUrl, directoryUsername,
                         directoryPassword, directoryResturl, directoryUsernameApi,
-                        directoryPasswordApi, directoryResourceBiobanks, directoryResourceCollections);
+                        directoryPasswordApi, directoryResourceBiobanks, directoryResourceCollections, directorySyncActive);
                 config.commit();
             } else {
                 ListOfDirectoriesRecord record = DbUtil.saveDirectory(config, directoryName, directoryDescription, directoryUrl, directoryUsername,
                         directoryPassword, directoryResturl, directoryUsernameApi,
-                        directoryPasswordApi, directoryResourceBiobanks, directoryResourceCollections);
+                        directoryPasswordApi, directoryResourceBiobanks, directoryResourceCollections, directorySyncActive);
                 config.commit();
             }
         } catch (Exception e) {

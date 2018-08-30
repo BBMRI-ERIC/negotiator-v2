@@ -36,7 +36,7 @@
         <version.samply.negotiator.dto>2.0.0</version.samply.negotiator.dto>
         <version.samply.share.dto>4.0.0</version.samply.share.dto>
 
-        <database.server>localhost</database.server>
+        <database.server>negotiator-db</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>saher</database.username>

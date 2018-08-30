@@ -212,7 +212,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
                 ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
-                setHumanReadableQuery(queryDTO.getHumanReadable());
+                //TODO: Human readable need rework
+                //setHumanReadableQuery(queryDTO.getHumanReadable());
+                setHumanReadableQuery("TODO");
             }
         } catch (SQLException | IOException e) {
             e.printStackTrace();
