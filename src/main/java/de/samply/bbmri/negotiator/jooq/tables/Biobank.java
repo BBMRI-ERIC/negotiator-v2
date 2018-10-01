@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Biobank extends TableImpl<BiobankRecord> {
 
-	private static final long serialVersionUID = 59223519;
+	private static final long serialVersionUID = -2009611783;
 
 	/**
 	 * The reference instance of <code>public.biobank</code>
@@ -70,9 +70,9 @@ public class Biobank extends TableImpl<BiobankRecord> {
 	public final TableField<BiobankRecord, String> DIRECTORY_ID = createField("directory_id", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "The directory ID, e.g. eu_bbmri_eric_biobank:NL45");
 
 	/**
-	 * The column <code>public.biobank.list_of_directories_id</code>. <<-- Missing in Code
+	 * The column <code>public.biobank.list_of_directories_id</code>. The directorie Id where the biobank belongs to
 	 */
-	public final TableField<BiobankRecord, Integer> LIST_OF_DIRECTORIES_ID = createField("list_of_directories_id", org.jooq.impl.SQLDataType.INTEGER, this, "<<-- Missing in Code");
+	public final TableField<BiobankRecord, Integer> LIST_OF_DIRECTORIES_ID = createField("list_of_directories_id", org.jooq.impl.SQLDataType.INTEGER, this, "The directorie Id where the biobank belongs to");
 
 	/**
 	 * Create a <code>public.biobank</code> table reference
@@ -117,7 +117,7 @@ public class Biobank extends TableImpl<BiobankRecord> {
 	 */
 	@Override
 	public List<UniqueKey<BiobankRecord>> getKeys() {
-		return Arrays.<UniqueKey<BiobankRecord>>asList(Keys.BIOBANK_PKEY, Keys.BIOBANK_DIRECTORY_ID_KEY);
+		return Arrays.<UniqueKey<BiobankRecord>>asList(Keys.BIOBANK_PKEY);
 	}
 
 	/**

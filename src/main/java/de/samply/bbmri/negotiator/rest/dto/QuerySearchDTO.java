@@ -31,7 +31,7 @@ public class QuerySearchDTO {
      * The negotiator token. Only not null, if the user refines the query in the negotiator.
      */
     @XmlElement(name = "nToken")
-    private String token;
+    private String nToken;
 
     public int getNumberOfCollections() { return collections.size(); }
 
@@ -44,11 +44,11 @@ public class QuerySearchDTO {
     }
 
     public String getToken() {
-        return token;
+        return nToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setToken(String nToken) {
+        this.nToken = nToken;
     }
 
     public Collection<CollectionDTO> getCollections() {

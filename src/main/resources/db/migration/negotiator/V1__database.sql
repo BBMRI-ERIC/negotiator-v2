@@ -1,7 +1,7 @@
 CREATE TYPE "role_type" AS ENUM ('OWNER', 'RESEARCHER');
 CREATE TYPE "flag" AS ENUM ('UNFLAGGED', 'ARCHIVED', 'IGNORED', 'STARRED');
 
-CREATE TABLE  (
+CREATE TABLE biobank (
     "id" SERIAL NOT NULL,
     "name" CHARACTER VARYING(255) NOT NULL,
     "description" TEXT,
@@ -256,8 +256,7 @@ CREATE TABLE "connector_log" (
     "directory_collection_id" CHARACTER VARYING(255) NOT NULL,
     "last_query_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL,
     "last_negotiation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL,
-    PRIMARY KEY("id"),
-    FOREIGN KEY ("directory_collection_id") REFERENCES "collection"("directory_id") ON UPDATE CASCADE ON DELETE CASCADE
+    PRIMARY KEY("id")
 );
 CREATE INDEX "collectionIdIndexconnectorLog" ON "connector_log" (directory_collection_id);
 

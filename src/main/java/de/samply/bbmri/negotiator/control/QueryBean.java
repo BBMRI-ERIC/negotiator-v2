@@ -212,9 +212,11 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
            }
            else{
                setMode("newQuery");
-               //TODO:  kleines query
                String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+               // Add Token to query String
+               searchJsonQuery = searchJsonQuery.replace("\"URL\"", "\"token\":\"" + UUID.randomUUID().toString().replace("-", "") + "\",\"URL\"");
                jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
+               System.out.println("jsonQuery: " + jsonQuery);
            }
            logger.debug("jsonQuery: " + jsonQuery);
            QueryDTO queryDTO = Directory.getQueryDTO(jsonQuery);
@@ -262,10 +264,6 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
        // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
-           //TODO: Query speicern
-           if("searchQueries".contains("")) {
-
-           }
            if(id != null) {
                DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id);
                config.commit();
@@ -275,6 +273,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                        jsonQuery, ethicsVote, userBean.getUserId(),
                        true);
                config.commit();
+               return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
            }
        } catch (IOException e) {
            e.printStackTrace();
@@ -355,7 +354,6 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
      */
    private String generateJsonQuery(String searchJsonQuery) {
         try (Config config = ConfigFactory.get()) {
-            //TODO: Working on query
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
             // Get the stored query object
@@ -365,7 +363,6 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
             // Get the search query object from the new json string
             QuerySearchDTO querySearchDTO = mapper.readValue(searchJsonQuery, QuerySearchDTO.class);
             // check searchQueryTocken if update of query or new
-            // TODO Problem Tocken
             if(querySearchDTO.getToken() == null) {
                 querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
                 queryDTO.addSearchQuery(querySearchDTO);

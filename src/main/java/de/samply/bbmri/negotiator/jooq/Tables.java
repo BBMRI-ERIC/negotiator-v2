@@ -17,6 +17,7 @@ import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
+import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import javax.annotation.Generated;
 
@@ -98,4 +99,9 @@ public class Tables {
 	 * Table for connecting queries with collections
 	 */
 	public static final QueryCollection QUERY_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.QueryCollection.QUERY_COLLECTION;
+
+	/**
+	 * The table public.schema_version
+	 */
+	public static final SchemaVersion SCHEMA_VERSION = de.samply.bbmri.negotiator.jooq.tables.SchemaVersion.SCHEMA_VERSION;
 }

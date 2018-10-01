@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BiobankRecord extends UpdatableRecordImpl<BiobankRecord> implements Record5<Integer, String, String, String, Integer> {
 
-	private static final long serialVersionUID = -186271856;
+	private static final long serialVersionUID = -2139851216;
 
 	/**
 	 * Setter for <code>public.biobank.id</code>. primary key
@@ -87,14 +87,14 @@ public class BiobankRecord extends UpdatableRecordImpl<BiobankRecord> implements
 	}
 
 	/**
-	 * Setter for <code>public.biobank.list_of_directories_id</code>. <<-- Missing in Code
+	 * Setter for <code>public.biobank.list_of_directories_id</code>. The directorie Id where the biobank belongs to
 	 */
 	public void setListOfDirectoriesId(Integer value) {
 		setValue(4, value);
 	}
 
 	/**
-	 * Getter for <code>public.biobank.list_of_directories_id</code>. <<-- Missing in Code
+	 * Getter for <code>public.biobank.list_of_directories_id</code>. The directorie Id where the biobank belongs to
 	 */
 	public Integer getListOfDirectoriesId() {
 		return (Integer) getValue(4);

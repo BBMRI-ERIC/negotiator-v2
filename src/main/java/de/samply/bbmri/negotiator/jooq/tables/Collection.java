@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collection extends TableImpl<CollectionRecord> {
 
-	private static final long serialVersionUID = 869231372;
+	private static final long serialVersionUID = -655490908;
 
 	/**
 	 * The reference instance of <code>public.collection</code>
@@ -118,7 +118,7 @@ public class Collection extends TableImpl<CollectionRecord> {
 	 */
 	@Override
 	public List<UniqueKey<CollectionRecord>> getKeys() {
-		return Arrays.<UniqueKey<CollectionRecord>>asList(Keys.COLLECTION_PKEY, Keys.COLLECTION_DIRECTORY_ID_KEY);
+		return Arrays.<UniqueKey<CollectionRecord>>asList(Keys.COLLECTION_PKEY);
 	}
 
 	/**

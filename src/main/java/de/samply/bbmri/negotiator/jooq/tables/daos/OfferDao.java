@@ -81,10 +81,10 @@ public class OfferDao extends DAOImpl<OfferRecord, de.samply.bbmri.negotiator.jo
 	}
 
 	/**
-	 * Fetch records that have <code>offer_from IN (values)</code>
+	 * Fetch records that have <code>biobank_in_private_chat IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Offer> fetchByOfferFrom(Integer... values) {
-		return fetch(Offer.OFFER.OFFER_FROM, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Offer> fetchByBiobankInPrivateChat(Integer... values) {
+		return fetch(Offer.OFFER.BIOBANK_IN_PRIVATE_CHAT, values);
 	}
 
 	/**
@@ -99,12 +99,5 @@ public class OfferDao extends DAOImpl<OfferRecord, de.samply.bbmri.negotiator.jo
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Offer> fetchByText(String... values) {
 		return fetch(Offer.OFFER.TEXT, values);
-	}
-
-	/**
-	 * Fetch records that have <code>biobank_in_private_chat IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Offer> fetchByBiobankInPrivateChat(Integer... values) {
-		return fetch(Offer.OFFER.BIOBANK_IN_PRIVATE_CHAT, values);
 	}
 }

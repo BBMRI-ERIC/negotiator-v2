@@ -51,7 +51,7 @@
                 <h2>Query details</h2>
                 On this page you can provide the details for your query.<br />
                 First define the search parameters for the samples you are looking for. Click the "Edit Search
-                Parameters" button to change them.<br />
+                Parameters" button to change them. If you like to add additonal search queries, for the same catalouge or an other catalouge use the "Add new Search Query" button to be redirected to one og the catalogues<br />
                 Then fill out the form below, giving your query a title and describing both the project you are working
                 on and adding more detailed information for this request in particular.<br />
                 If you have additional information in PDF files available, you can attach them to this query.<br />
@@ -74,7 +74,7 @@
 						<tr>
 							<td>#{queryBean.getDirectoryNameByUrl(searchQuery.url)}</td>
 							<td>#{searchQuery.humanReadable}</td>
-							<td>#{searchQuery.numberOfCollections}</td>
+							<td>#{searchQuery.numberOfCollections}<div style="display:none;">| #{searchQuery.token}</div></td>
 							<td>
                                 <h:form>
                                     <h:commandLink action="#{queryBean.editSearchParameters(searchQuery.url, searchQuery.token)}"	styleClass="btn btn-primary"
@@ -139,7 +139,7 @@
 					}
 				</style>
 
-				<span class="searchparametertooltip">+
+				<span class="searchparametertooltip">Add new Search Query
 					<span class="searchparametertooltiparea">
 						<ui:repeat value="#{directoryBean.directories}" var="directory">
 							<h:form>
