@@ -38,27 +38,27 @@ public class CollectionDTO implements Serializable {
      * The biobank ID.
      */
     @XmlElement(name = "biobankId")
-    private String biobankID;
+    private String biobankId;
 
     /**
      * The collection ID.
      */
     @XmlElement(name ="collectionId")
-    private String collectionID;
+    private String collectionId;
 
     public String getCollectionID() {
-        return collectionID;
+        return collectionId;
     }
 
     public void setCollectionID(String collectionID) {
-        this.collectionID = collectionID;
+        this.collectionId = collectionID;
     }
 
     public String getBiobankID() {
-        return biobankID;
+        return biobankId;
     }
 
     public void setBiobankID(String biobankID) {
-        this.biobankID = biobankID;
+        this.biobankId = biobankID;
     }
 }

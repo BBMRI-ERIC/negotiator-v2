@@ -395,8 +395,8 @@ public class DbUtil {
             /**
              * Updates the relationship between query and collection.
              */
+            // TODO: ERROR in Mapper -> Resulting in BiobankID and CollectionID = null
             QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
-
             for(QuerySearchDTO querySearchDTO : queryDTO.getSearchQueries()) {
                 ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, querySearchDTO.getUrl());
                 // collections already saved for this query

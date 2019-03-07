@@ -28,6 +28,12 @@ package de.samply.bbmri.negotiator.rest.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.control.QueryBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +47,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class QueryDTO {
+
+    private static Logger logger = LoggerFactory.getLogger(QueryDTO.class);
 
     /**
      * The negotiator token for the query. Only not null, if the user refines the query in the negotiator.
@@ -86,5 +94,21 @@ public class QueryDTO {
             e.printStackTrace();
         }
         return jsonString;
+    }
+
+    public String getHumanReadable() {
+        String humanReadable = "";
+        try(Config config = ConfigFactory.get()) {
+            for (QuerySearchDTO querySearchDTO : searchQueries) {
+                String humanReadableString = querySearchDTO.getHumanReadable();
+                int numberOfCollections = querySearchDTO.getNumberOfCollections();
+                String directory = DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl()).getName();
+                humanReadable += directory + " (" + numberOfCollections + "): " + humanReadableString + "<br>";
+            }
+        } catch (Exception e) {
+            logger.error("Falid generating HumanReadable form", e);
+            return "-";
+        }
+        return humanReadable;
     }
 }

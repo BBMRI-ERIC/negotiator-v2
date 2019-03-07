@@ -115,7 +115,7 @@
                     <h:inputText id="password" value="#{editDirectoryBean.directoryPassword}"
                                  styleClass="form-control" pt:placeholder="#{label['directory.table.password.placeholder']}"
                                  validatorMessage="#{label['error.invalidTitleLength']}">
-                        <f:validateLength for="password" minimum="5" maximum="250" />
+                        <f:validateLength for="password" minimum="0" maximum="250" />
                     </h:inputText>
                     <h:message for="password" style="color:red" styleClass="pre-wrap" />
 
@@ -126,7 +126,7 @@
                     <h:inputText id="usernameapi" value="#{editDirectoryBean.directoryUsernameApi}"
                                  styleClass="form-control" pt:placeholder="#{label['directory.table.usernameapi.placeholder']}"
                                  validatorMessage="#{label['error.invalidTitleLength']}">
-                        <f:validateLength for="usernameapi" minimum="5" maximum="250" />
+                        <f:validateLength for="usernameapi" minimum="0" maximum="250" />
                     </h:inputText>
                     <h:message for="usernameapi" style="color:red" styleClass="pre-wrap" />
 
@@ -137,7 +137,7 @@
                     <h:inputText id="passwordapi" value="#{editDirectoryBean.directoryPasswordApi}"
                                  styleClass="form-control" pt:placeholder="#{label['directory.table.passwordapi.placeholder']}"
                                  validatorMessage="#{label['error.invalidTitleLength']}">
-                        <f:validateLength for="passwordapi" minimum="5" maximum="250" />
+                        <f:validateLength for="passwordapi" minimum="0" maximum="250" />
                     </h:inputText>
                     <h:message for="passwordapi" style="color:red" styleClass="pre-wrap" />
 
@@ -148,7 +148,7 @@
                     <h:inputText id="resourceBiobanks" value="#{editDirectoryBean.directoryResourceBiobanks}"
                                  styleClass="form-control" pt:placeholder="#{label['directory.table.resourceBiobanks.placeholder']}"
                                  validatorMessage="#{label['error.invalidTitleLength']}">
-                        <f:validateLength for="resourceBiobanks" minimum="5" maximum="250" />
+                        <f:validateLength for="resourceBiobanks" minimum="0" maximum="250" />
                     </h:inputText>
                     <h:message for="resourceBiobanks" style="color:red" styleClass="pre-wrap" />
 

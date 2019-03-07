@@ -103,11 +103,17 @@ public class Directory {
                 throw new BadRequestException();
             }
 
-            if(!negotiator.getDevelopment().getMolgenisAcceptInvalidUrl() &&
-                    !querySearchDTO.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
+            System.out.println(negotiator.getDevelopment().getMolgenisAcceptInvalidUrl());
+            System.out.println(querySearchDTO.getUrl().toLowerCase());
+            System.out.println(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase());
+
+            /*if(!negotiator.getDevelopment().getMolgenisAcceptInvalidUrl()) {
+                    //&&
+                    //DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl().toLowerCase().replaceAll("/.*", "")) != null)  {
+                    //!querySearchDTO.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
                 logger.error("Directory posted wrong redirect URL, aborting");
                 throw new BadRequestException();
-            }
+            }*/
 
             if(querySearchDTO.getCollections().size() < 1) {
                 logger.error("Directory posted empty list of collections, aborting");
@@ -119,13 +125,14 @@ public class Directory {
              * create a new json query object. This decision is made based on the negotiator token from
              * the query
              */
-            if(querySearchDTO.getToken() == null) {
+            if(querySearchDTO.getToken() == null  || querySearchDTO.getToken().equals("")) {
 
                 /**
                  * Create the json_query object itself and store it in the database.
                  */
                 JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
                 jsonQueryRecord.setJsonText(queryString);
+                System.out.println("queryString: " + queryString);
                 jsonQueryRecord.store();
                 config.commit();
 
@@ -163,6 +170,8 @@ public class Directory {
                 return Response.accepted(result).location(new URI(builder)).build();
             }
         } catch (IOException | URISyntaxException e) {
+            System.err.println("-------Error API");
+            e.printStackTrace();
             throw new BadRequestException();
         } catch (SQLException e) {
             e.printStackTrace();

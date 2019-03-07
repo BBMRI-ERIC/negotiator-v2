@@ -50,6 +50,7 @@ public class DirectorySynchronizeTask extends TimerTask {
     private final static Logger logger = LoggerFactory.getLogger(DirectorySynchronizeTask.class);
 
     private Config config = null;
+    private Negotiator negotiatorConfig_;
 
     public void setTestConfig(Config config) {
         this.config = config;
@@ -58,6 +59,7 @@ public class DirectorySynchronizeTask extends TimerTask {
     @Override
     public void run() {
         try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
+            negotiatorConfig_ = NegotiatorConfig.get().getNegotiator();
             int biobanks = 0;
             int collections = 0;
             List<ListOfDirectoriesRecord> directories = DbUtil.getDirectories(config);

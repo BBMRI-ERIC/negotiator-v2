@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE list_of_directories (
     "id" SERIAL NOT NULL,
     "name" CHARACTER VARYING(255) NOT NULL,
@@ -31,3 +33,6 @@ ALTER TABLE biobank ADD COLUMN list_of_directories_id INTEGER;
 COMMENT ON COLUMN biobank."list_of_directories_id" IS 'The directorie Id where the biobank belongs to';
 ALTER TABLE collection ADD COLUMN list_of_directories_id INTEGER;
 COMMENT ON COLUMN collection."list_of_directories_id" IS 'The directorie Id where the biobank belongs to';
+
+UPDATE public.query SET json_text = '{"token":"' || uuid_generate_v4() || '",' || substring(json_text, 2) WHERE json_text ILIKE '%token%';
+UPDATE public.query SET json_text = '{"searchQueries":[' || json_text || '],"negotiatorToken":"' || uuid_generate_v4() || '"}';

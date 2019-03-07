@@ -213,8 +213,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
                 //TODO: Human readable need rework
-                //setHumanReadableQuery(queryDTO.getHumanReadable());
-                setHumanReadableQuery("TODO");
+                setHumanReadableQuery(queryDTO.getHumanReadable());
+                //setHumanReadableQuery("TODO");
             }
         } catch (SQLException | IOException e) {
             e.printStackTrace();

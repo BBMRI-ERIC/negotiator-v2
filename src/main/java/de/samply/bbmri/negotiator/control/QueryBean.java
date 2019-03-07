@@ -95,7 +95,7 @@ public class QueryBean implements Serializable {
 
 
 
-private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
+    private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
