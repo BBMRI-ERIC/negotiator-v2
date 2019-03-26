@@ -1,0 +1,55 @@
+{namespace samply.mailing}
+
+/**
+ * A personal greeting.
+ * @param? name The name of the person.
+ * @param? title The title of the person.
+ * @param? locale The locale of the mail
+ */
+{deltemplate greeting}
+    <p>
+    {switch $locale}
+        {case 'de', 'de_DE', 'de_CH'}
+            {if  $name}
+                Sehr geehrte/r Herr/Frau {if $title}{$title} {/if}{$name}
+            {else}
+                Sehr geehrte Damen und Herren
+            {/if}
+        {default}
+            Dear{sp}
+            {if $name}
+                {if $title}
+                    {$title}
+                {else}
+                    Mr/Mrs
+                {/if}
+                {sp}{$name}
+            {else}
+                Sir or Madam
+            {/if}
+    {/switch},</p>
+{/deltemplate}
+
+/**
+ * Mail template
+ * @param? name The name of the addressed person.
+ * @param? title The title of the addressed person.
+ * @param? locale The locale of the mail
+ */
+{template .mail}
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        </head>
+        <body style="font-family: Arial,sans-serif;">
+
+            {delcall greeting allowemptydefault="false" data="all" /}
+
+            {delcall maincontent allowemptydefault="false" data="all" /}
+
+            {delcall footer allowemptydefault="true" data="all" /}
+
+        <body>
+    </html>
+{/template}

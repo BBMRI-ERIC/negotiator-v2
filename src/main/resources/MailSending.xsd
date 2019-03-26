@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<xsd:schema attributeFormDefault="unqualified" version="1.0"
+            elementFormDefault="qualified" 
+            targetNamespace="http://schema.samply.de/config/MailSending"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:xml="http://www.w3.org/XML/1998/namespace" 
+            xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+            xmlns="http://schema.samply.de/config/MailSending"
+            jxb:version="2.1"
+            xmlns:es="http://schema.samply.de/config/MailSending">
+    
+    <!-- (in trunk directory) compile to Java object on command line with:
+        xjc -encoding utf-8 -d .\src\main\java  -npa .\src\main\resources\MailSending.xsd
+    -->
+    
+    <xsd:annotation>
+        <xsd:appinfo>
+            <jxb:schemaBindings>
+                <jxb:package name="de.samply.common.mailing" />
+            </jxb:schemaBindings>
+        </xsd:appinfo>
+    </xsd:annotation>
+    
+    <xsd:element name="mailSending" type="mailSending">
+    </xsd:element>
+        
+    <xsd:complexType name="mailSending">
+        <xsd:all>
+            <xsd:element name="host" type="xsd:string" minOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>DNS name or IP address of mail server 
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="protocol">
+                <xsd:annotation>
+                    <xsd:documentation>Protocol to use for mail sending
+                    </xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="smtp"/>
+                        <xsd:enumeration value="smtps"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+
+            <xsd:element name="port" type="xsd:int">
+                <xsd:annotation>
+                    <xsd:documentation>Port name for mail server and protocol
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="fromAddress" type="xsd:string" minOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>Address that is set as default sender 
+                        address of an email
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            
+            <xsd:element name="fromName" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Optional display name of the sender.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="user" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>User name to login into mail server
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+
+            <xsd:element name="password" type="xsd:string" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Password for user to login into mail server
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            
+            <xsd:element name="templateFolder" type="xsd:string" minOccurs="1">
+                <xsd:annotation>
+                    <xsd:documentation>The folder contains the Mail templates.
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            
+        </xsd:all>
+    </xsd:complexType>
+
+</xsd:schema>
