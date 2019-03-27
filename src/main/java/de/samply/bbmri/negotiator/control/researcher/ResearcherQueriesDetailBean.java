@@ -326,7 +326,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     public void sendEmailsToPotentialBiobankers() {
         try (Config config = ConfigFactory.get()) {
-            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, userBean.getUserId());
+            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, 0);
             QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(), selectedQuery);
             notifier.sendEmailNotification();
         } catch (SQLException e) {
