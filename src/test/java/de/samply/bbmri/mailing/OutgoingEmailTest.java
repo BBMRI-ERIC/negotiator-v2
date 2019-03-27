@@ -1,6 +1,5 @@
 package de.samply.bbmri.mailing;
 
-import de.samply.common.mailing.OutgoingEmail;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
