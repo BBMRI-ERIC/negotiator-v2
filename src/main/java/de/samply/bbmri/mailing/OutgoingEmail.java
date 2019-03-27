@@ -12,7 +12,7 @@ public class OutgoingEmail {
     private List<Address> replyTo;
     private List<Address> ccRecipients;
     private EmailBuilder emailBuilder;
-    public static final String LOCALE_LEY = "locale";
+    public static final String LOCALE_KEY = "locale";
     private final HashMap<String, String> parameters;
 
     private final ArrayList<String> addressees;
@@ -22,7 +22,7 @@ public class OutgoingEmail {
         replyTo = new ArrayList<>();
         ccRecipients = new ArrayList<>();
         parameters = new HashMap<>();
-        parameters.put(LOCALE_LEY, "en");
+        parameters.put(LOCALE_KEY, "en");
     }
 
     /**
@@ -30,7 +30,7 @@ public class OutgoingEmail {
      * @param locale a locale
      */
     public void setLocale(String locale) {
-        parameters.put(LOCALE_LEY, locale);
+        parameters.put(LOCALE_KEY, locale);
     }
 
     public String getSubject() {
@@ -43,7 +43,9 @@ public class OutgoingEmail {
 
     public void addReplyTo(String address) {
         try {
-            replyTo.add(new InternetAddress(address));
+            InternetAddress replayAddress = new InternetAddress(address, true);
+            replayAddress.validate();
+            replyTo.add(replayAddress);
         } catch (AddressException e) {
             throw new IllegalArgumentException(e.getMessage());
         }
