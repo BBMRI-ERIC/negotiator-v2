@@ -29,6 +29,7 @@ package de.samply.bbmri.negotiator.control;
 import java.sql.SQLException;
 import java.util.List;
 
+import de.samply.bbmri.mailing.EmailBuilder;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.MailUtil;
@@ -39,7 +40,6 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.notification.Notification;
 import de.samply.bbmri.negotiator.notification.NotificationThread;
-import de.samply.common.mailing.EmailBuilder;
 
 
 /**

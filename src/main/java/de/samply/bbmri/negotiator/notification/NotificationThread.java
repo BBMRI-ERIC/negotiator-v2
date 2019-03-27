@@ -26,10 +26,10 @@
 
 package de.samply.bbmri.negotiator.notification;
 
+import de.samply.bbmri.mailing.EmailBuilder;
+import de.samply.bbmri.mailing.OutgoingEmail;
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.common.mailing.EmailBuilder;
-import de.samply.common.mailing.OutgoingEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

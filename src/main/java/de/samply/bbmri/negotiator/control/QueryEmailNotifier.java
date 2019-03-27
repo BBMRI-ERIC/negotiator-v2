@@ -30,13 +30,12 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import de.samply.bbmri.mailing.EmailBuilder;
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.notification.Notification;
 import de.samply.bbmri.negotiator.notification.NotificationThread;
-import de.samply.common.mailing.EmailBuilder;
-import de.samply.common.mailing.OutgoingEmail;
 
 
 public class QueryEmailNotifier {

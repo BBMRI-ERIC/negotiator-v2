@@ -26,12 +26,12 @@
 
 package de.samply.bbmri.negotiator;
 
+import de.samply.bbmri.mailing.MailSending;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.common.config.HostAuth;
 import de.samply.common.config.OAuth2Client;
 import de.samply.common.config.ObjectFactory;
 import de.samply.common.config.Proxy;
-import de.samply.common.mailing.MailSending;
 import de.samply.config.util.JAXBUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +109,7 @@ public class NegotiatorConfig {
      */
     private static synchronized JAXBContext getJAXBContext() throws JAXBException {
         if (jaxbContext == null) {
-            jaxbContext = JAXBContext.newInstance(ObjectFactory.class, de.samply.common.mailing.ObjectFactory.class,
+            jaxbContext = JAXBContext.newInstance(ObjectFactory.class, ObjectFactory.class,
                     Negotiator.class);
         }
         return jaxbContext;

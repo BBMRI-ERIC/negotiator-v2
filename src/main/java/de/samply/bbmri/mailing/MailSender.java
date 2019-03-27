@@ -7,7 +7,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import de.samply.common.mailing.ObjectFactory;
 import de.samply.config.util.JAXBUtil;
 import de.samply.string.util.StringUtil;
 import org.slf4j.LoggerFactory;

@@ -28,12 +28,11 @@ package de.samply.bbmri.negotiator;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import de.samply.bbmri.mailing.EmailBuilder;
+import de.samply.bbmri.mailing.MailSender;
+import de.samply.bbmri.mailing.OutgoingEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import de.samply.common.mailing.EmailBuilder;
-import de.samply.common.mailing.MailSender;
-import de.samply.common.mailing.OutgoingEmail;
 
 
 public class MailUtil {
