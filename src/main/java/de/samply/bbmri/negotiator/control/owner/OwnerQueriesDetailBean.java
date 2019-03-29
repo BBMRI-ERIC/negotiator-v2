@@ -171,7 +171,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 				RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
 				ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
 				QueryDTO queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
+				//TODO: Human readable need rework
+				//setHumanReadableQuery(queryDTO.getHumanReadable());
 				setHumanReadableQuery(queryDTO.getHumanReadable());
+				//setHumanReadableQuery("TODO");
 			} else {
 
             	/*

@@ -129,7 +129,8 @@
             <h:outputLabel value="#{label['queryview.title.searchParameters']}"/>
             <h:outputText
                     value="#{cc.attrs.bean.humanReadableQuery}"
-                    style="margin-left: 22px;">
+                    style="margin-left: 22px;"
+                    escape="false">
             </h:outputText>
         </h:panelGroup>
     </h:panelGroup>

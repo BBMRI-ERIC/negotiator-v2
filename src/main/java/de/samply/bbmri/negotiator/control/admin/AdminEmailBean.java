@@ -1,8 +1,8 @@
 package de.samply.bbmri.negotiator.control.admin;
 
+import de.samply.bbmri.mailing.EmailBuilder;
+import de.samply.bbmri.mailing.OutgoingEmail;
 import de.samply.bbmri.negotiator.MailUtil;
-import de.samply.common.mailing.EmailBuilder;
-import de.samply.common.mailing.OutgoingEmail;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;

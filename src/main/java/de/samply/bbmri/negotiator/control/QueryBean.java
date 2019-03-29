@@ -35,6 +35,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,7 +49,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.helper.QuerySearchHelper;
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import de.samply.bbmri.negotiator.rest.RestApplication;
+import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import de.samply.bbmri.negotiator.util.AntiVirusExceptionEnum;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -88,7 +95,7 @@ public class QueryBean implements Serializable {
 
 
 
-private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
+    private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
@@ -125,11 +132,6 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
    private String jsonQuery;
 
    /**
-    * The human readable filters of the query.
-    */
-   private String humanReadableFilters;
-
-   /**
     * The mode of the page - editing or creating a new query
     */
    private String mode = null;
@@ -137,7 +139,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
    /**
     * The token sent to directory for authentication.
     */
-   private String ntoken;
+   private String qtoken;
 
    /**
     * List of all the attachments for a given query
@@ -169,10 +171,16 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
      */
     private List<FacesMessage> msgs = new ArrayList<>();
 
+    /**
+     * List of faces messages
+     */
+    private List<QuerySearchDTO> searchQueries = new ArrayList<>();
+
    /**
     * Initializes this bean by registering email notification observer
     */
    public void initialize() {
+       System.out.println("initialize: " + id + " - " + jsonQueryId);
        try(Config config = ConfigFactory.get()) {
            /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
            if(id != null)
@@ -187,7 +195,11 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                    queryTitle = queryRecord.getTitle();
                    queryText = queryRecord.getText();
                    queryRequestDescription = queryRecord.getRequestDescription();
-                   jsonQuery = queryRecord.getJsonText();
+                   if(jsonQueryId == null) {
+                       jsonQuery = queryRecord.getJsonText();
+                   } else {
+                       jsonQuery = generateJsonQuery(DbUtil.getJsonQuery(config, jsonQueryId));
+                   }
                    ethicsVote = queryRecord.getEthicsVote();
                }else {
                    /**
@@ -195,18 +207,54 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                     */
                    getSavedValues();
                }
-               ntoken = queryRecord.getNegotiatorToken();
+               qtoken = queryRecord.getNegotiatorToken();
                setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
            }
            else{
                setMode("newQuery");
-               jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+               String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+               // Add Token to query String
+               searchJsonQuery = searchJsonQuery.replace("\"URL\"", "\"token\":\"" + UUID.randomUUID().toString().replace("-", "") + "\",\"URL\"");
+               jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
+               System.out.println("jsonQuery: " + jsonQuery);
            }
-           humanReadableFilters = Directory.getQueryDTO(jsonQuery).getHumanReadable();
+           logger.debug("jsonQuery: " + jsonQuery);
+           QueryDTO queryDTO = Directory.getQueryDTO(jsonQuery);
+           System.out.println("Size of SearchQueries: " + queryDTO.getSearchQueries().size());
+           searchQueries = new ArrayList<QuerySearchDTO>(queryDTO.getSearchQueries());
        }
        catch (Exception e) {
            logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
        }
+   }
+
+    public List<ListOfDirectoriesRecord> getDirectories() {
+        try(Config config = ConfigFactory.get()) {
+            List<ListOfDirectoriesRecord> list = DbUtil.getDirectories(config);
+            return list;
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+   public List<QuerySearchDTO> getSearchQueries() {
+        return searchQueries;
+   }
+
+   public String getDirectoryNameByUrl(String url) {
+       try(Config config = ConfigFactory.get()) {
+           if(url.equals("")) {
+               logger.info("Problem URL is empty");
+               return "URL is empty";
+           } else {
+               return DbUtil.getDirectoryByUrl(config, url).getName();
+           }
+       }
+       catch (Exception e) {
+           logger.error("Loading by url faild url: " + url + " jsonQueryId: " + jsonQueryId, e);
+       }
+       return "";
    }
 
    /**
@@ -225,6 +273,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
                        jsonQuery, ethicsVote, userBean.getUserId(),
                        true);
                config.commit();
+               return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
            }
        } catch (IOException e) {
            e.printStackTrace();
@@ -238,7 +287,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
  * @throws JsonMappingException
  * @throws JsonParseException
     */
-   public void editSearchParameters() throws JsonParseException, JsonMappingException, IOException {
+   public void editSearchParameters(String url, String searchToken) throws JsonParseException, JsonMappingException, IOException {
        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 
        /**
@@ -247,11 +296,32 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
         */
        if(mode.equals("edit")) {
            saveEditChangesTemporarily();
-           externalContext.redirect(Directory.getQueryDTO(jsonQuery).getUrl() + "&nToken=" + ntoken);
+           externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
        }else{
-           externalContext.redirect(Directory.getQueryDTO(jsonQuery).getUrl());
+           externalContext.redirect(url);
        }
    }
+
+    /**
+     * Redirects the user to directory for editing the query
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonParseException
+     */
+    public void addSearchParameters(String url) throws JsonParseException, JsonMappingException, IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+
+        /**
+         * Add token if an existing query is being edited. Else the user is still in the process of creating a
+         * query and it has not been saved in the Query table hence no token is used.
+         */
+        if(mode.equals("edit")) {
+            saveEditChangesTemporarily();
+            externalContext.redirect(url + "?nToken=" + qtoken + "__search__");
+        }else{
+            externalContext.redirect(url);
+        }
+    }
 
    /**
     * Gets values from session bean that are saved before page is refreshed - for file upload or changing query from directory.
@@ -264,7 +334,9 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
        if (jsonQueryId != null) {
            try (Config config = ConfigFactory.get()) {
-               jsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+               //TODO: Kleines Query
+               String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+               jsonQuery = generateJsonQuery(searchJsonQuery);
            } catch (SQLException e) {
                e.printStackTrace();
            }
@@ -273,6 +345,43 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
        }
        clearEditChanges();
 
+   }
+
+    /**
+     * Generate the JSON including the new search query String
+     * @param searchJsonQuery
+     * @return
+     */
+   private String generateJsonQuery(String searchJsonQuery) {
+        try (Config config = ConfigFactory.get()) {
+            RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+            // Get the stored query object
+            QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
+            String jsonQueryStored = queryRecord.getJsonText();
+            QueryDTO queryDTO = mapper.readValue(jsonQueryStored, QueryDTO.class);
+            // Get the search query object from the new json string
+            QuerySearchDTO querySearchDTO = mapper.readValue(searchJsonQuery, QuerySearchDTO.class);
+            // check searchQueryTocken if update of query or new
+            if(querySearchDTO.getToken() == null) {
+                querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
+                queryDTO.addSearchQuery(querySearchDTO);
+            } else {
+                String nTocken = querySearchDTO.getToken().replaceAll(".*__search__", "");
+                if (nTocken == null || nTocken.equals("") || nTocken.equals("null")) {
+                    // new search query
+                    querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
+                    queryDTO.addSearchQuery(querySearchDTO);
+                } else {
+                    // edited search query
+                    queryDTO.updateSearchQuery(querySearchDTO, nTocken);
+                }
+            }
+            jsonQuery = queryDTO.toJsonString();
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+        return  jsonQuery;
    }
 
    /**
@@ -508,16 +617,6 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
         }
     }
 
-    public String getHumanReadableFilters() {
-	 	return humanReadableFilters;
-	}
-
-	public void setHumanReadableFilters(String humanReadableFilters) {
-	 	this.humanReadableFilters = humanReadableFilters;
-	}
-
-
-
 	public String getQueryTitle() {
 		return queryTitle;
 	}
@@ -637,5 +736,7 @@ private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
     public void setMsgs(List<FacesMessage> msgs) {
         this.msgs = msgs;
     }
+
+    public String getQtoken() { return qtoken; }
 
 }

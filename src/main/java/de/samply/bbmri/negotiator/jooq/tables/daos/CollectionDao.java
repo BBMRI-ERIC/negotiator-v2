@@ -79,16 +79,16 @@ public class CollectionDao extends DAOImpl<CollectionRecord, de.samply.bbmri.neg
 	}
 
 	/**
-	 * Fetch a unique record that has <code>directory_id = value</code>
-	 */
-	public de.samply.bbmri.negotiator.jooq.tables.pojos.Collection fetchOneByDirectoryId(String value) {
-		return fetchOne(Collection.COLLECTION.DIRECTORY_ID, value);
-	}
-
-	/**
 	 * Fetch records that have <code>biobank_id IN (values)</code>
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Collection> fetchByBiobankId(Integer... values) {
 		return fetch(Collection.COLLECTION.BIOBANK_ID, values);
+	}
+
+	/**
+	 * Fetch records that have <code>list_of_directories_id IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Collection> fetchByListOfDirectoriesId(Integer... values) {
+		return fetch(Collection.COLLECTION.LIST_OF_DIRECTORIES_ID, values);
 	}
 }

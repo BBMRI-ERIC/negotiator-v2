@@ -37,10 +37,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import de.samply.bbmri.mailing.MailSending;
 import de.samply.common.config.OAuth2Client;
 import de.samply.common.config.Postgresql;
 import de.samply.common.config.Proxy;
-import de.samply.common.mailing.MailSending;
 
 /**
  * The main configuration for the negotiator configuration.

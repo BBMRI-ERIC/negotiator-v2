@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collection extends TableImpl<CollectionRecord> {
 
-	private static final long serialVersionUID = -1546670117;
+	private static final long serialVersionUID = -655490908;
 
 	/**
 	 * The reference instance of <code>public.collection</code>
@@ -69,6 +69,11 @@ public class Collection extends TableImpl<CollectionRecord> {
 	 * The column <code>public.collection.biobank_id</code>. The Biobank ID this collection belongs to
 	 */
 	public final TableField<CollectionRecord, Integer> BIOBANK_ID = createField("biobank_id", org.jooq.impl.SQLDataType.INTEGER, this, "The Biobank ID this collection belongs to");
+
+	/**
+	 * The column <code>public.collection.list_of_directories_id</code>. The directorie Id where the biobank belongs to
+	 */
+	public final TableField<CollectionRecord, Integer> LIST_OF_DIRECTORIES_ID = createField("list_of_directories_id", org.jooq.impl.SQLDataType.INTEGER, this, "The directorie Id where the biobank belongs to");
 
 	/**
 	 * Create a <code>public.collection</code> table reference
@@ -113,7 +118,7 @@ public class Collection extends TableImpl<CollectionRecord> {
 	 */
 	@Override
 	public List<UniqueKey<CollectionRecord>> getKeys() {
-		return Arrays.<UniqueKey<CollectionRecord>>asList(Keys.COLLECTION_PKEY, Keys.COLLECTION_DIRECTORY_ID_KEY);
+		return Arrays.<UniqueKey<CollectionRecord>>asList(Keys.COLLECTION_PKEY);
 	}
 
 	/**

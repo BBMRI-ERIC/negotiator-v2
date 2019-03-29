@@ -49,6 +49,11 @@ public class Sequences {
 	public static final Sequence<Long> JSON_QUERY_ID_SEQ = new SequenceImpl<Long>("json_query_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>public.list_of_directories_id_seq</code>
+	 */
+	public static final Sequence<Long> LIST_OF_DIRECTORIES_ID_SEQ = new SequenceImpl<Long>("list_of_directories_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>public.offer_id_seq</code>
 	 */
 	public static final Sequence<Long> OFFER_ID_SEQ = new SequenceImpl<Long>("offer_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

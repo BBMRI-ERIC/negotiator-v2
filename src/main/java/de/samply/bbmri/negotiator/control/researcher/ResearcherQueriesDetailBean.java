@@ -152,6 +152,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private int matchingBiobanks;
 
     /**
+     * Collections that are reachable (mail available)
+     */
+    private String reachableCollections;
+
+    /**
      * The list of BIOBANK ID who are related with a given query
      */
     private List<Integer> biobankWithOffer;
@@ -182,6 +187,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
             /**
              * This is done to remove the repitition of biobanks in the list because of multiple collection
              */
+            int reachable = 0;
+            int unreachable = 0;
             for (int j = 0; j < matchingBiobankCollection.size(); j++) {
                 if (!getBiobankWithoutOffer().contains(matchingBiobankCollection.get(j)) ) {
                     if (!biobankWithOffer.contains(matchingBiobankCollection.get(j).getBiobank().getId())) {
@@ -189,7 +196,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
                     }
                 }
 
+                // Check if Collection is available
+                if(matchingBiobankCollection.get(j).isContacable()) {
+                    reachable++;
+                } else {
+                    unreachable++;
+                }
             }
+            setReachableCollections("(" + reachable + " Collections reachable, " + unreachable + " Collections unreachable)");
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
@@ -212,7 +226,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
                 ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
+                //TODO: Human readable need rework
                 setHumanReadableQuery(queryDTO.getHumanReadable());
+                //setHumanReadableQuery("TODO");
             }
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -310,7 +326,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     public void sendEmailsToPotentialBiobankers() {
         try (Config config = ConfigFactory.get()) {
-            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, userBean.getUserId());
+            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, 0);
             QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(), selectedQuery);
             notifier.sendEmailNotification();
         } catch (SQLException e) {
@@ -489,7 +505,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.matchingBiobanks = matchingBiobanks;
     }
 
+    public String getReachableCollections() {
+        return reachableCollections;
+    }
 
+    public void setReachableCollections(String reachableCollections) {
+        this.reachableCollections = reachableCollections;
+    }
 
 
 

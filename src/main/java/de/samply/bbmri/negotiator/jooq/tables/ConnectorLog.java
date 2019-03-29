@@ -15,7 +15,6 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -37,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 
-	private static final long serialVersionUID = -1327666029;
+	private static final long serialVersionUID = -1264774317;
 
 	/**
 	 * The reference instance of <code>public.connector_log</code>
@@ -116,14 +115,6 @@ public class ConnectorLog extends TableImpl<ConnectorLogRecord> {
 	@Override
 	public List<UniqueKey<ConnectorLogRecord>> getKeys() {
 		return Arrays.<UniqueKey<ConnectorLogRecord>>asList(Keys.CONNECTOR_LOG_PKEY);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public List<ForeignKey<ConnectorLogRecord, ?>> getReferences() {
-		return Arrays.<ForeignKey<ConnectorLogRecord, ?>>asList(Keys.CONNECTOR_LOG__CONNECTOR_LOG_DIRECTORY_COLLECTION_ID_FKEY);
 	}
 
 	/**

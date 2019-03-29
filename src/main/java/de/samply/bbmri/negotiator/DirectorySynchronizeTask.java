@@ -29,6 +29,7 @@ package de.samply.bbmri.negotiator;
 import java.util.List;
 import java.util.TimerTask;
 
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ public class DirectorySynchronizeTask extends TimerTask {
     private final static Logger logger = LoggerFactory.getLogger(DirectorySynchronizeTask.class);
 
     private Config config = null;
+    private Negotiator negotiatorConfig_;
 
     public void setTestConfig(Config config) {
         this.config = config;
@@ -57,34 +59,67 @@ public class DirectorySynchronizeTask extends TimerTask {
     @Override
     public void run() {
         try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
+            negotiatorConfig_ = NegotiatorConfig.get().getNegotiator();
+            int biobanks = 0;
+            int collections = 0;
+            List<ListOfDirectoriesRecord> directories = DbUtil.getDirectories(config);
+            for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
+                if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
+                    logger.info("Synchronization with the directory: " + listOfDirectoriesRecord.getId() + " - " + listOfDirectoriesRecord.getName());
+                    int[] size = runDirectorySync(listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName(), listOfDirectoriesRecord.getUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
+                            listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
+                    if(size.length == 2) {
+                        biobanks += size[0];
+                        collections += size[1];
+                    }
+                }
+            }
+            NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, "Biobanks: " + biobanks + ", Collections: " + collections);
+        } catch (Exception e) {
+            logger.error("Synchronization of directories failed", e);
+            NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
+        }
+    }
+
+    public int[] runDirectorySync(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String username, String password) {
+        logger.info("Starting synchronization with the directory: " + directoryId + " - " + name);
+        try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
-            DirectoryClient client = new DirectoryClient(negotiatorConfig.getMolgenisRestUrl(),
-                    negotiatorConfig.getMolgenisResourceBiobanks(), negotiatorConfig.getMolgenisResourceCollections(),
-                    negotiatorConfig.getMolgenisApiUsername(), negotiatorConfig.getMolgenisApiPassword());
-
-            logger.info("Starting synchronization with the directory");
+            DirectoryClient client = new DirectoryClient(dirBaseUrl,
+                    resourceBiobanks, resourceCollections,
+                    username, password);
 
             List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
 
+            logger.info("All Biobanks: " + allBiobanks.size());
+
             for(DirectoryBiobank dto : allBiobanks) {
-                DbUtil.synchronizeBiobank(config, dto);
+                logger.info("Run: " + directoryId);
+                DbUtil.synchronizeBiobank(config, dto, directoryId);
             }
+
+            logger.info("DirectoryBiobank done");
 
             List<DirectoryCollection> allCollections = client.getAllCollections();
 
+            logger.info("All Collections: " + allCollections.size());
+
             for(DirectoryCollection dto : allCollections) {
-                DbUtil.synchronizeCollection(config, dto);
+                logger.info("Run col: " + directoryId);
+                DbUtil.synchronizeCollection(config, dto, directoryId);
             }
 
-            logger.info("Synchronization with the directory finished.");
+            logger.info("Synchronization with the directory finished. Biobanks: " + allBiobanks.size() + ", Collections:" + allCollections.size());
             config.commit();
 
-            NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY,
-                    "Biobanks: " + allBiobanks.size() + ", Collections: " + allCollections.size());
+            int[] syncsize = {allBiobanks.size(), allCollections.size()};
+            return syncsize;
         } catch (Exception e) {
-            logger.error("Synchronization failed", e);
+            logger.error("Synchronization of directory failed", e);
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
+            int[] syncsize = {0, 0};
+            return syncsize;
         }
     }
 }

@@ -5,7 +5,7 @@ CREATE TABLE biobank (
     "id" SERIAL NOT NULL,
     "name" CHARACTER VARYING(255) NOT NULL,
     "description" TEXT,
-    "directory_id" CHARACTER VARYING(255) NOT NULL UNIQUE,
+    "directory_id" CHARACTER VARYING(255) NOT NULL,
     PRIMARY KEY ("id")
 );
 
@@ -21,7 +21,7 @@ COMMENT ON COLUMN biobank."directory_id" IS 'The directory ID, e.g. eu_bbmri_eri
 CREATE TABLE collection (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "directory_id" CHARACTER VARYING(255) NOT NULL UNIQUE,
+    "directory_id" CHARACTER VARYING(255) NOT NULL,
     "biobank_id" INTEGER REFERENCES biobank("id") ON UPDATE CASCADE ON DELETE CASCADE,
     PRIMARY KEY ("id")
 );
@@ -256,8 +256,7 @@ CREATE TABLE "connector_log" (
     "directory_collection_id" CHARACTER VARYING(255) NOT NULL,
     "last_query_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL,
     "last_negotiation_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL,
-    PRIMARY KEY("id"),
-    FOREIGN KEY ("directory_collection_id") REFERENCES "collection"("directory_id") ON UPDATE CASCADE ON DELETE CASCADE
+    PRIMARY KEY("id")
 );
 CREATE INDEX "collectionIdIndexconnectorLog" ON "connector_log" (directory_collection_id);
 

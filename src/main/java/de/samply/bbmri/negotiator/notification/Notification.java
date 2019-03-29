@@ -27,7 +27,6 @@
 package de.samply.bbmri.negotiator.notification;
 
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.common.mailing.EmailBuilder;
 
 import java.util.*;
 

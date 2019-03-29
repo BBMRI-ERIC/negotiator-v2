@@ -26,70 +26,89 @@
 
 package de.samply.bbmri.negotiator.rest.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.control.QueryBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * The Query object with the structured data as received from the directory.
+ * The Query object with the structured data for multiple search results.
  */
 @XmlRootElement
 public class QueryDTO {
 
-    /**
-     * Unknown
-     */
-    @XmlElement(name = "URL")
-    private String url;
+    private static Logger logger = LoggerFactory.getLogger(QueryDTO.class);
 
     /**
-     * The filter object
+     * The negotiator token for the query. Only not null, if the user refines the query in the negotiator.
      */
-    @XmlElement(name = "humanReadable")
-    private String humanReadable;
+    @XmlElement(name = "qToken")
+    private String queryToken;
 
     /**
-     * The collections that can participate in the negotiation
+     * The search queries for the negotiation
      */
-    @XmlElement(name = "collections")
-    private Collection<CollectionDTO> collections;
+    @XmlElement(name = "searchQueries")
+    private Collection<QuerySearchDTO> searchQueries;
 
-    /**
-     * The negotiator token. Only not null, if the user refines the query in the negotiator.
-     */
-    @XmlElement(name = "nToken")
-    private String token;
-
-    public String getUrl() {
-        return url;
+    public String getNegotiatorToken() {
+        return queryToken;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setNegotiatorToken(String token) {
+        this.queryToken = token;
     }
 
-    public String getToken() {
-        return token;
+    public Collection<QuerySearchDTO> getSearchQueries() { return searchQueries; }
+
+    public void addSearchQuery(QuerySearchDTO querySearchDTO) {
+        searchQueries.add(querySearchDTO);
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void updateSearchQuery(QuerySearchDTO querySearchDTOnew, String nTocken) {
+        for(QuerySearchDTO querySearchDTO : searchQueries) {
+            if(nTocken.equals(querySearchDTO.getToken())) {
+                searchQueries.remove(querySearchDTO);
+                searchQueries.add(querySearchDTOnew);
+            }
+        }
     }
 
-    public Collection<CollectionDTO> getCollections() {
-        return collections;
-    }
-
-    public void setCollections(Collection<CollectionDTO> collections) {
-        this.collections = collections;
+    public String toJsonString() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonString = "";
+        try {
+            jsonString = objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return jsonString;
     }
 
     public String getHumanReadable() {
+        String humanReadable = "";
+        try(Config config = ConfigFactory.get()) {
+            for (QuerySearchDTO querySearchDTO : searchQueries) {
+                String humanReadableString = querySearchDTO.getHumanReadable();
+                int numberOfCollections = querySearchDTO.getNumberOfCollections();
+                String directory = DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl()).getName();
+                humanReadable += directory + " (" + numberOfCollections + "): " + humanReadableString + "<br>";
+            }
+        } catch (Exception e) {
+            logger.error("Falid generating HumanReadable form", e);
+            return "-";
+        }
         return humanReadable;
-    }
-
-    public void setHumanReadable(String humanReadable) {
-        this.humanReadable = humanReadable;
     }
 }

@@ -112,11 +112,18 @@ public class ObjectToJson {
         List<JsTreeJson> childNodes = new ArrayList<>();
 
         for(int i = 0; i < collectionBiobankDTOS.size(); i++) {
+
             JsTreeJson jsTreeJson = new JsTreeJson();
             jsTreeJson.setId(collectionBiobankDTOS.get(i).getCollection().getName());
             jsTreeJson.setParent(collectionBiobankDTOS.get(i).getBiobank().getId().toString());
-            jsTreeJson.setText(collectionBiobankDTOS.get(i).getCollection().getName());
-            jsTreeJson.setIcon("fa fa-circle-o");
+            jsTreeJson.setText(collectionBiobankDTOS.get(i).getCollection().getName() + "");
+            if(collectionBiobankDTOS.get(i).isContacable()) {
+                jsTreeJson.setIcon("fa fa-envelope-open");
+            } else {
+                jsTreeJson.setIcon("fa fa-bell-slash-o");
+            }
+
+
             childNodes.add(jsTreeJson);
         }
 
