@@ -29,6 +29,7 @@ package de.samply.bbmri.negotiator.control.admin;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 
@@ -71,6 +72,15 @@ public class AdminDebugBean implements Serializable {
         return users.get(id).getAuthName();
     }
 
+    public String restNegotiation(Integer id) {
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.restNegotiation(config, id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "/admin/debug.xhtml";
+    }
+
     /**
      * Sets the queries list by getting all the queries from the data base
      *
@@ -79,6 +89,7 @@ public class AdminDebugBean implements Serializable {
     public void loadQueries() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueries(config);
+            users = new HashMap<Integer, PersonRecord>();
             for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
             }

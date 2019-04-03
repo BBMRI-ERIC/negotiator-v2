@@ -98,6 +98,22 @@
                 <f:facet name="header">EthicsVote</f:facet>
                 #{query.getEthicsVote()}
             </h:column>
+            <h:column>
+                <f:facet name="header">Negotiation Started Time</f:facet>
+                #{query.getNegotiationStartedTime().toString()}
+            </h:column>
+            <h:column>
+                <f:facet name="header">Reset Negotiation</f:facet>
+                <h:form id="form">
+                    <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                    <h:commandButton id="resetNegotiation"
+                                     rendered="#{query.getNegotiationStartedTime() != null}"
+                                     value="#{label['querydetail.action.resetNegotiation.buttonText']}"
+                                     action="#{adminDebugBean.restNegotiation(query.getId())}"
+                                     title="#{label['querydetail.tooltip.restNegotiation']}"
+                                     styleClass="btn btn-primary" style="margin-top: 40px"/>
+                </h:form>
+            </h:column>
         </h:dataTable>
 
     </ui:define>
