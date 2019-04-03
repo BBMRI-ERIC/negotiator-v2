@@ -29,12 +29,15 @@ package de.samply.bbmri.negotiator.control.admin;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -53,6 +56,7 @@ public class AdminDebugBean implements Serializable {
      * The list of queries
      */
     private List<QueryRecord> queries;
+    private HashMap<Integer, PersonRecord> users;
 
     //region properties
     public List<QueryRecord> getQueries() {
@@ -64,6 +68,19 @@ public class AdminDebugBean implements Serializable {
     }
 //endregion
 
+    public String getUserName(Integer id) {
+        return users.get(id).getAuthName();
+    }
+
+    public String restNegotiation(Integer id) {
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.restNegotiation(config, id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "/admin/debug.xhtml";
+    }
+
     /**
      * Sets the queries list by getting all the queries from the data base
      *
@@ -72,6 +89,11 @@ public class AdminDebugBean implements Serializable {
     public void loadQueries() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueries(config);
+            users = new HashMap<Integer, PersonRecord>();
+            for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
+                users.put(personRecord.getId(), personRecord);
+            }
+
         } catch(SQLException e) {
             e.printStackTrace();
         }

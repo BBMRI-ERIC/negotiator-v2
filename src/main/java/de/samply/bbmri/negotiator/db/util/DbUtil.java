@@ -208,6 +208,21 @@ public class DbUtil {
     }
 
     /**
+     * Sets the field for starting negotiation for a query to true.
+     * @param config JOOQ configuration
+     * @param queryId id of the query
+     */
+    public static String restNegotiation(Config config, Integer queryId){
+        config.dsl().execute("UPDATE query SET negotiation_started_time=null WHERE id=" + queryId + ";");
+        try {
+            config.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
      * Saves the results received from the connector
      * @param config JOOQ configuration
      * @param result BBMRIResult object containing result
@@ -1307,7 +1322,28 @@ public class DbUtil {
                 .from(Tables.QUERY)
                 .orderBy(Tables.QUERY.ID.asc()).fetch();
 
-        List<QueryRecord> queries = config.map(result, QueryRecord.class);
+        // TODO: QueryRecord Mapping is not working for requestDescription, ethicsVote and negotiationStartedTime
+        // for this malual Mapping
+        // List<QueryRecord> queries = config.map(result, QueryRecord.class);
+        // Workaround
+        List<QueryRecord> queries = new ArrayList<QueryRecord>();
+        for(Record record : result) {
+            QueryRecord queryRecord = new QueryRecord();
+            queryRecord.setId((Integer)record.getValue(0));
+            queryRecord.setTitle((String)record.getValue(1));
+            queryRecord.setText((String)record.getValue(2));
+            queryRecord.setQueryXml((String)record.getValue(3));
+            queryRecord.setQueryCreationTime((Timestamp)record.getValue(4));
+            queryRecord.setResearcherId((Integer)record.getValue(5));
+            queryRecord.setJsonText((String)record.getValue(6));
+            queryRecord.setNumAttachments((Integer)record.getValue(7));
+            queryRecord.setNegotiatorToken((String)record.getValue(8));
+            queryRecord.setValidQuery((Boolean)record.getValue(9));
+            queryRecord.setRequestDescription((String)record.getValue(10));
+            queryRecord.setEthicsVote((String)record.getValue(11));
+            queryRecord.setNegotiationStartedTime((Timestamp)record.getValue(12));
+            queries.add(queryRecord);
+        }
         return queries;
     }
 
