@@ -481,11 +481,7 @@ public class UserBean implements Serializable {
 			 */
             collections = DbUtil.getCollections(config, person.getId());
 
-            if(collections.size() > 0) {
-                biobankOwner = true;
-            } else {
-                biobankOwner = false;
-            }
+            biobankOwner = collections.size() > 0;
 
             this.person = config.map(person, Person.class);
 

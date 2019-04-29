@@ -1,5 +1,6 @@
 package de.samply.bbmri.negotiator.rest;
 
+import java.nio.charset.StandardCharsets;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -67,7 +68,7 @@ public class AuthenticationService {
         String usernameAndPassword = null;
         try {
             byte[] decodedBytes = Base64.decodeBase64(encodedUserPassword);
-            usernameAndPassword = new String(decodedBytes, "UTF-8");
+            usernameAndPassword = new String(decodedBytes, StandardCharsets.UTF_8);
 
             final StringTokenizer tokenizer = new StringTokenizer(
                     usernameAndPassword, ":");

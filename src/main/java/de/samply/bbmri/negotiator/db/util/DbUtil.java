@@ -1347,6 +1347,27 @@ public class DbUtil {
         return queries;
     }
 
+    public static String getFullListForAPI(Config config) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jd))) AS varchar) AS directories FROM (\n" +
+                "SELECT json_build_object('name', name, 'url', url, 'description', description, 'Biobanks',\t\t\t\t\t\t \n" +
+                "(SELECT array_to_json(array_agg(row_to_json(jb))) FROM \n" +
+                "\t(SELECT directory_id, name,\n" +
+                "\t (SELECT array_to_json(array_agg(row_to_json(jc))) FROM\n" +
+                "\t (SELECT directory_id, name\n" +
+                "\t FROM public.collection c WHERE c.list_of_directories_id = b.list_of_directories_id AND c.biobank_id = b.id) jc) AS collections \n" +
+                "\t FROM public.biobank b WHERE b.list_of_directories_id = d.id) jb)) AS directory\t\t\t\t\t\t \n" +
+                "\tFROM public.list_of_directories d\n" +
+                ") jd;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+
+            //PGobject jsonObject = record.getValue(0);
+            return (String)record.getValue(0);
+        }
+        return "ERROR";
+    }
+
     /**
      * Gets details of a person/user
      * @param config    DB access handle
