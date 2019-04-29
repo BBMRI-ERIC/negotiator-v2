@@ -32,11 +32,15 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
+import de.samply.bbmri.negotiator.model.OfferPersonDTO;
+import de.samply.bbmri.negotiator.util.ObjectToJson;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -57,6 +61,40 @@ public class AdminDebugBean implements Serializable {
      */
     private List<QueryRecord> queries;
     private HashMap<Integer, PersonRecord> users;
+
+    //---------------------------------
+    // START Collection Assostiations
+    /**
+     * Collections that are reachable (mail available)
+     */
+    private HashMap<Integer, String> reachableCollections = new HashMap<Integer, String>();
+    /**
+     * List of collection with biobanks details of a specific query.
+     */
+    private HashMap<Integer, List<CollectionBiobankDTO>> matchingBiobankCollection = new HashMap<Integer, List<CollectionBiobankDTO>>();//new ArrayList<>();
+    /**
+     * String contains Json data for JsTree view
+     */
+    private HashMap<Integer, String> jsTreeJson = new HashMap<Integer, String>();
+    /**
+     * List to store the person id who has not contacted already
+     */
+    private HashMap<Integer, List<CollectionBiobankDTO>> biobankWithoutOffer = new HashMap<Integer, List<CollectionBiobankDTO>>();//new ArrayList<>();
+    /**
+     * Biobanks that match to a query
+     */
+    private HashMap<Integer, Integer> matchingBiobanks = new HashMap<Integer, Integer>();
+    /**
+     * The list of BIOBANK ID who are related with a given query
+     */
+    private HashMap<Integer, List<Integer>> biobankWithOffer = new HashMap<Integer, List<Integer>>();
+    /**
+     * The list of offerPersonDTO's, hence it's a list of lists.
+     */
+    private HashMap<Integer, List<List<OfferPersonDTO>>> listOfSampleOffers = new HashMap<Integer, List<List<OfferPersonDTO>>>();//new ArrayList<>();
+
+    // END Collection Assostiations
+    //---------------------------------
 
     //region properties
     public List<QueryRecord> getQueries() {
@@ -89,6 +127,9 @@ public class AdminDebugBean implements Serializable {
     public void loadQueries() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueries(config);
+            for(QueryRecord queryRecord : queries) {
+                setupCollections(config, queryRecord.getId());
+            }
             users = new HashMap<Integer, PersonRecord>();
             for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
@@ -98,4 +139,99 @@ public class AdminDebugBean implements Serializable {
             e.printStackTrace();
         }
     }
+
+    private void setupCollections(Config config, Integer queryId) {
+        matchingBiobankCollection.put(queryId, new ArrayList<CollectionBiobankDTO>());
+        biobankWithoutOffer.put(queryId, new ArrayList<CollectionBiobankDTO>());
+        listOfSampleOffers.put(queryId, new ArrayList<List<OfferPersonDTO>>());
+
+        setBiobankWithOffer(queryId, DbUtil.getOfferMakers(config, queryId));
+
+        for (int i = 0; i < biobankWithOffer.get(queryId).size(); ++i) {
+            List<OfferPersonDTO> offerPersonDTO;
+            offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(queryId).get(i));
+            listOfSampleOffers.get(queryId).add(offerPersonDTO);
+        }
+
+        matchingBiobankCollection.put(queryId, DbUtil.getCollectionsForQuery(config, queryId));
+        setMatchingBiobanks(queryId, ObjectToJson.getUniqueBiobanks(matchingBiobankCollection.get(queryId)).size());
+        /**
+         * This is done to remove the repitition of biobanks in the list because of multiple collection
+         */
+        int reachable = 0;
+        int unreachable = 0;
+        for (int j = 0; j < matchingBiobankCollection.get(queryId).size(); j++) {
+            if (!getBiobankWithoutOffer(queryId).contains(matchingBiobankCollection.get(queryId).get(j)) ) {
+                if (!biobankWithOffer.get(queryId).contains(matchingBiobankCollection.get(queryId).get(j).getBiobank().getId())) {
+                    biobankWithoutOffer.get(queryId).add(matchingBiobankCollection.get(queryId).get(j));
+                }
+            }
+
+            // Check if Collection is available
+            if(matchingBiobankCollection.get(queryId).get(j).isContacable()) {
+                reachable++;
+            } else {
+                unreachable++;
+            }
+        }
+        setReachableCollections(queryId,"(" + reachable + " Collections reachable, " + unreachable + " Collections unreachable)");
+
+        /**
+         * Convert matchingBiobankCollection in the JSON format for Tree View
+         */
+        setJsTreeJson(queryId, ObjectToJson.getJsonTree(matchingBiobankCollection.get(queryId)));
+    }
+
+    public List<CollectionBiobankDTO> getBiobankWithoutOffer(Integer queryId) {
+        return biobankWithoutOffer.get(queryId);
+    }
+
+    public void setBiobankWithoutOffer(Integer queryId, List<CollectionBiobankDTO> copyList) {
+        this.biobankWithoutOffer.put(queryId, copyList);
+    }
+
+    public String getJsTreeJson(Integer queryId) {
+        return jsTreeJson.get(queryId);
+    }
+
+    public void setJsTreeJson(Integer queryId, String jsTreeJson) {
+        this.jsTreeJson.put(queryId, jsTreeJson);
+    }
+
+    public int getMatchingBiobanks(Integer queryId) {
+        return matchingBiobanks.get(queryId);
+    }
+
+    public void setMatchingBiobanks(Integer queryId, int matchingBiobanks) {
+        this.matchingBiobanks.put(queryId, matchingBiobanks);
+    }
+
+    public String getReachableCollections(Integer queryId) {
+        String return_value = reachableCollections.get(queryId);
+        if(return_value == null) {
+            return "";
+        }
+        return return_value;
+    }
+
+    public void setReachableCollections(Integer queryId, String reachableCollections) {
+        this.reachableCollections.put(queryId, reachableCollections);
+    }
+
+    public List<CollectionBiobankDTO> getMatchingBiobankCollection(Integer queryId) {
+        return matchingBiobankCollection.get(queryId);
+    }
+
+    public void setMatchingBiobankCollection(Integer queryId, List<CollectionBiobankDTO> matchingBiobankCollection) {
+        this.matchingBiobankCollection.put(queryId, matchingBiobankCollection);
+    }
+
+    public List<Integer> getBiobankWithOffer(Integer queryId) {
+        return biobankWithOffer.get(queryId);
+    }
+
+    public void setBiobankWithOffer(Integer queryId, List<Integer> biobankWithOffer) {
+        this.biobankWithOffer.put(queryId, biobankWithOffer);
+    }
+
 }
