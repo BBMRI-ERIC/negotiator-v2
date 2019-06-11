@@ -56,8 +56,8 @@
 				<h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<h:inputTextarea id="commentText" value="#{commentBean.comment}"
 						styleClass="form-control" rows="5"
-						validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 500 characters ">
-						<f:validateLength for="commentText" minimum="1" maximum="500" />
+						validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 1000000 characters ">
+						<f:validateLength for="commentText" minimum="1" maximum="1000000" />
 						<h:messages id="commentValidationMessage" for="commentText"
 							style="color:red" showSummary="true" showDetails="false" />
 					</h:inputTextarea>					
@@ -74,8 +74,8 @@
                 <h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'true'}">
                     <h:inputTextarea id="offerCommentText" value="#{offerBean.offerComment}"
                         styleClass="form-control" rows="5"
-                        validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 500 characters ">
-                        <f:validateLength for="offerCommentText" minimum="1" maximum="500" />
+                        validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 1000000 characters ">
+                        <f:validateLength for="offerCommentText" minimum="1" maximum="1000000" />
                         <h:messages id="offerCommentValidationMessage" for="offerCommentText"
                             style="color:red" showSummary="true" showDetails="false" />
                     </h:inputTextarea>
