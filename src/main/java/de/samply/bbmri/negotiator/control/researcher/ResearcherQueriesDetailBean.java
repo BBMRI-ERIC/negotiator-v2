@@ -159,7 +159,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * The list of BIOBANK ID who are related with a given query
      */
-    private List<Integer> biobankWithOffer;
+    private List<Integer> biobankWithOffer = new ArrayList<Integer>();
 
     /**
      * The list of offerPersonDTO's, hence it's a list of lists.
@@ -187,6 +187,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
             /**
              * This is done to remove the repitition of biobanks in the list because of multiple collection
              */
+            List<Integer> list = new ArrayList<Integer>();
+
             int reachable = 0;
             int unreachable = 0;
             for (int j = 0; j < matchingBiobankCollection.size(); j++) {
@@ -195,6 +197,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
                         biobankWithoutOffer.add(matchingBiobankCollection.get(j));
                     }
                 }
+
+                list.add(matchingBiobankCollection.get(j).getBiobank().getId());
+
 
                 // Check if Collection is available
                 if(matchingBiobankCollection.get(j).isContacable()) {
@@ -233,6 +238,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println("--->>> biobankWithOffer: " + biobankWithOffer.size());
+        System.out.println("--->>> matchingBiobankCollection: " + matchingBiobankCollection.size());
 
         /**
          * Convert matchingBiobankCollection in the JSON format for Tree View
@@ -441,6 +449,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     public List<CollectionBiobankDTO> getMatchingBiobankCollection() {
+        System.out.println("--->>> get matchingBiobankCollection: " + matchingBiobankCollection.size());
         return matchingBiobankCollection;
     }
 
@@ -449,6 +458,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     public List<Integer> getBiobankWithOffer() {
+        System.out.println("--->>> get biobankWithOffer: " + biobankWithOffer.size());
         return biobankWithOffer;
     }
 

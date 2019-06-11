@@ -58,6 +58,8 @@ public class DirectorySynchronizeTask extends TimerTask {
 
     @Override
     public void run() {
+        //TODO: Add Networks: https://directory.bbmri-eric.eu/api/v2/eu_bbmri_eric_networks
+
         try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
             negotiatorConfig_ = NegotiatorConfig.get().getNegotiator();
             int biobanks = 0;

@@ -38,7 +38,7 @@
 
         <database.server>localhost</database.server>
         <database.port>5432</database.port>
-        <database.name>negotiator</database.name>
+        <database.name>negotiator-live</database.name>
         <database.username>postgres</database.username>
         <database.password>DaVinci</database.password>
         <!--<database.password>0bpCP58yTJnNQmKqO9mX</database.password>-->
@@ -300,13 +300,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.5</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.postgis/postgis-jdbc -->
-        <dependency>
-            <groupId>org.postgis</groupId>
-            <artifactId>postgis-jdbc</artifactId>
-            <version>1.3.3</version>
+            <scope>runtime</scope>
         </dependency>
 
     </dependencies>
