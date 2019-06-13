@@ -41,16 +41,21 @@
 </composite:interface>
 
 <composite:implementation>
+
+    <h:outputStylesheet name="css/collapsible.css" />
+
     <h:panelGroup layout="block" styleClass="panel panel-default" style="border-color: #ddd">
 
         <h:panelGroup layout="block" styleClass="panel-heading">
 
             #{cc.attrs.person.authName}
             <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
-                <h:outputText value=", Collection: "/>
-                <ui:repeat value="#{cc.attrs.collections}" var="collection" varStatus="loop">
-                    <h:outputText value="#{collection.name}"/> #{!loop.last ? ', ' : ''}
-                </ui:repeat>
+                <i class="fa fa-plus-square-o collapsible"></i> <!-- fa fa-minus-square-o -->
+                <h:panelGroup layout="block" styleClass="panel-content-collapsible">
+                    <ui:repeat value="#{cc.attrs.collections}" var="collection" varStatus="loop">
+                        <h:outputText value="#{collection.name}"/> #{!loop.last ? ', ' : ''}
+                    </ui:repeat>
+                </h:panelGroup>
             </ui:fragment>
             <h:panelGroup styleClass="pull-right">
                 <h:outputText value="#{cc.attrs.comment.commentTime}">
