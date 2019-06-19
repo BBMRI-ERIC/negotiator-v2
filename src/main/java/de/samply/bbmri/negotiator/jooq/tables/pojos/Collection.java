@@ -106,7 +106,7 @@ public class Collection implements Serializable {
 	public String getBiobankName() {
 		String biobankname = "";
 		try (Config config = ConfigFactory.get()) {
-			biobankname = DbUtil.getBiobankName(config, getBiobankId(), getDirectoryId());
+			biobankname = DbUtil.getBiobankName(config, getBiobankId(), getListOfDirectoriesId());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
