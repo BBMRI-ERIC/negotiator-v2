@@ -784,6 +784,13 @@ public class DbUtil {
                 .fetchOne();
     }
 
+    public static String getBiobankName(Config config, int biobankId, String directoryId) {
+        return config.dsl().selectFrom(Tables.BIOBANK)
+                .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryId))
+                .and(Tables.BIOBANK.ID.eq(biobankId))
+                .fetchOne().getName();
+    }
+
     /**
      * Returns a list of all biobanks relevant to this query and this biobank owner
      */

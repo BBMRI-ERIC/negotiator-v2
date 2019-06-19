@@ -1,35 +1,21 @@
-.collapsible {
-    background-color: #777;
-    color: white;
+.affiliation-collapsible-minus, .affiliation-collapsible-plus {
     cursor: pointer;
-    padding: 18px;
-    width: 100%;
-    border: none;
-    text-align: left;
-    outline: none;
-    font-size: 15px;
 }
 
-.active, .collapsible:hover {
-    background-color: #555;
+.affiliation-collapsible-minus:hover, .affiliation-collapsible-plus:hover {
+    background-color: #c6c6c6;
+    border-radius: 3px;
 }
 
-.collapsible:after {
-    content: '\002B';
-    color: white;
-    font-weight: bold;
-    float: right;
-    margin-left: 5px;
+.affiliation-collapsible-minus {
+    display: none;
 }
 
-.active:after {
-    content: "\2212";
+.affiliation-collapsible-plus {
+    display: inline;
 }
 
-.panel-content-collapsible {
-    padding: 0 18px;
-    max-height: 0;
+.affiliation-collapsible-content {
+    display: none;
     overflow: hidden;
-    transition: max-height 0.2s ease-out;
-    background-color: #f1f1f1;
 }
