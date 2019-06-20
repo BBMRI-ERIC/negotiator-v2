@@ -1,0 +1,21 @@
+.affiliation-collapsible-minus, .affiliation-collapsible-plus {
+    cursor: pointer;
+}
+
+.affiliation-collapsible-minus:hover, .affiliation-collapsible-plus:hover {
+    background-color: #c6c6c6;
+    border-radius: 3px;
+}
+
+.affiliation-collapsible-minus {
+    display: none;
+}
+
+.affiliation-collapsible-plus {
+    display: inline;
+}
+
+.affiliation-collapsible-content {
+    display: none;
+    overflow: hidden;
+}
