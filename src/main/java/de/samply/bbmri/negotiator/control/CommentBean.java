@@ -62,12 +62,12 @@ public class CommentBean implements Serializable {
             DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment);
             config.commit();
 
-            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment);
+            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment, userBean.getUserRealName());
             notifier.sendEmailNotificationToBiobankers(userBean.getUserId());
             if (userBean.getBiobankOwner()){
                 /* Send notification to the query owner if a biobanker made a comment
                  */
-                notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment);
+                notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment, userBean.getUserRealName());
                 notifier.sendEmailNotificationToQueryOwner();
             }
 
