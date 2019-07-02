@@ -1,0 +1,28 @@
+{delpackage Notification}
+{namespace samply.mailing}
+
+/**
+ * Main content for query added notification mail.
+ * @param? locale The locale of the mail
+ * @param? name The locale of the mail
+ * @param? queryName The name of the mail
+ * @param? url The url of the query
+ * @param? researcher Name of the researcher for the Private negotiation
+ */
+{deltemplate maincontent}
+    {switch $locale}
+        {case 'de', 'de_DE'}
+            A new comment has been added from {$researcher} to the private negotiation for the query "{$queryName}".
+            {\n}To read and react to that, please use the following link:
+            {\n}{\n}
+            {$url}
+
+
+        {default}
+            A new comment has been added from {$researcher} to the private negotiation for the query "{$queryName}".
+            {\n}To read and react to that, please use the following link:
+            {\n}{\n}
+            {$url}
+
+    {/switch}
+{/deltemplate}

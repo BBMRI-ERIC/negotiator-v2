@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.control;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -40,6 +41,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 @ManagedBean
@@ -86,6 +88,17 @@ public class OfferBean implements Serializable {
             if (userBean.getBiobankOwner()) {
                 OfferEmailNotifier notifier = new OfferEmailNotifier(query, getQueryUrl(query.getId()), biobankName);
                 notifier.sendEmailNotification();
+            } else {
+                try {
+                    List<Person> collectioncontacts = DbUtil.getPersonsContactsForBiobank(config, offerFrom);
+                    for (Person collectioncontact : collectioncontacts) {
+                        OfferResponseEmailNotification notifier = new OfferResponseEmailNotification(query, getQueryUrl(query.getId()), collectioncontact);
+                        notifier.sendEmailNotification();
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error getting Biobank Contacts for notification offerID: " + offerFrom);
+                    e.printStackTrace();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

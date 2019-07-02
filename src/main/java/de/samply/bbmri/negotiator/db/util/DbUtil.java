@@ -942,6 +942,17 @@ public class DbUtil {
           return config.map(record, NegotiatorDTO.class);
     }
 
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForBiobank(Config config, Integer biobankId) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.BIOBANK)
+                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .where(Tables.BIOBANK.ID.eq(biobankId))
+                .fetch();
+        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
+    }
+
     /*
      * Return query owner
      */
