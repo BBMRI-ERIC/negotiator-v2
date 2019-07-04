@@ -103,8 +103,16 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{queryDto.commentCount > 0}">
+                                        <i class="glyphicon glyphicon-bullhorn"></i>
                                         <h:outputText title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
                                                       value="#{queryDto.commentCount}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{queryDto.privateNegotiationCount > 0}">
+                                        <i class="glyphicon glyphicon-tower"></i>
+                                        <h:outputText
+                                                title="#{queryDto.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}"
+                                                value="   #{queryDto.privateNegotiationCount}" />
                                     </h:panelGroup>
 
                                 </h:panelGroup>

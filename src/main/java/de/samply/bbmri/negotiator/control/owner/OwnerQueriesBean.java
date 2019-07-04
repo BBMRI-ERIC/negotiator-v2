@@ -29,6 +29,7 @@ package de.samply.bbmri.negotiator.control.owner;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -47,6 +48,8 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import org.jooq.Record;
+import org.jooq.Result;
 
 /**
  * Manages the query view for owners
@@ -179,6 +182,11 @@ public class OwnerQueriesBean implements Serializable {
 
 			    queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
 					        flagFilter);
+
+				for (int i = 0; i < queries.size(); ++i) {
+					getPrivateNegotiationCountAndTime(i);
+				}
+
 				sortQueries();
 
 			} catch (SQLException e) {
@@ -186,6 +194,17 @@ public class OwnerQueriesBean implements Serializable {
 			}
 		}
 		return queries;
+	}
+
+	public void getPrivateNegotiationCountAndTime(int index){
+		try(Config config = ConfigFactory.get()) {
+			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
+			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+		} catch (SQLException e) {
+			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
+			e.printStackTrace();
+		}
 	}
 
 	/**

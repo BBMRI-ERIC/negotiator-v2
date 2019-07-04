@@ -84,12 +84,20 @@
 									</h:link>
 
                                		<h:panelGroup styleClass="pull-right"
-										rendered="#{item.commentCount > 0}">
+										rendered="#{item.commentCount > 0 or item.privateNegotiationCount > 0}">
 
-										<h:panelGroup styleClass="badge queryNumberResponsesBadge">
+										<h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.commentCount > 0}">
+											<i class="glyphicon glyphicon-bullhorn"></i>
 											<h:outputText
 												title="#{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-												value="#{item.commentCount}" />
+												value="   #{item.commentCount}" />
+										</h:panelGroup>
+
+										<h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{item.privateNegotiationCount > 0}">
+											<i class="glyphicon glyphicon-tower"></i>
+											<h:outputText
+													title="#{item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}"
+													value="   #{item.privateNegotiationCount}" />
 										</h:panelGroup>
 
 										<h:outputText value="#{item.lastCommentTime}"

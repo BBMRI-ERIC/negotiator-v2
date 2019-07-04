@@ -310,6 +310,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
                 for (int i = 0; i < queries.size(); ++i) {
                     getCommentCountAndTime(i);
+                    getPrivateNegotiationCountAndTime(i);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -325,6 +326,17 @@ public class ResearcherQueriesDetailBean implements Serializable {
             queries.get(index).setCommentCount((int) result.get(0).getValue("comment_count"));
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
         } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getPrivateNegotiationCountAndTime(int index){
+        try(Config config = ConfigFactory.get()) {
+            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId());
+            queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
+            queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+        } catch (SQLException e) {
+            System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
             e.printStackTrace();
         }
     }

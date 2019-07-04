@@ -1297,6 +1297,29 @@ public class DbUtil {
         return result;
     }
 
+    public static Result<Record> getPrivateNegotiationCountAndTimeForResearcher(Config config, Integer queryId){
+        Result<Record> result = config.dsl()
+                .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .from(Tables.OFFER)
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .fetch();
+        return result;
+    }
+
+    public static Result<Record> getPrivateNegotiationCountAndTimeForBiobanker(Config config, Integer queryId, Integer personId){
+        Result<Record> result = config.dsl()
+                .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .from(Tables.OFFER)
+                .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT))
+                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId)).fetch();
+        return result;
+    }
+
 
     /**
      * Gets a list of Persons who are responsible for a given collection
