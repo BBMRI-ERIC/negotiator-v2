@@ -801,6 +801,22 @@ public class DbUtil {
         return biobankname;
     }
 
+    public static String getBiobankName(Config config, int biobankId) {
+        String biobankname = "";
+        try {
+            BiobankRecord biobankRecord = config.dsl().selectFrom(Tables.BIOBANK)
+                    .where(Tables.BIOBANK.ID.eq(biobankId))
+                    .fetchOne();
+            if(biobankRecord != null) {
+                biobankname = biobankRecord.getName();
+            }
+        } catch (Exception ex) {
+
+        }
+
+        return biobankname;
+    }
+
     /**
      * Returns a list of all biobanks relevant to this query and this biobank owner
      */
@@ -924,6 +940,17 @@ public class DbUtil {
                 .where (Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and (Tables.FLAGGED_QUERY.FLAG.eq(flag))))
                 .fetch();
           return config.map(record, NegotiatorDTO.class);
+    }
+
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForBiobank(Config config, Integer biobankId) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.BIOBANK)
+                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .where(Tables.BIOBANK.ID.eq(biobankId))
+                .fetch();
+        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
     }
 
     /*
@@ -1267,6 +1294,29 @@ public class DbUtil {
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .fetch();
 
+        return result;
+    }
+
+    public static Result<Record> getPrivateNegotiationCountAndTimeForResearcher(Config config, Integer queryId){
+        Result<Record> result = config.dsl()
+                .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .from(Tables.OFFER)
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .fetch();
+        return result;
+    }
+
+    public static Result<Record> getPrivateNegotiationCountAndTimeForBiobanker(Config config, Integer queryId, Integer personId){
+        Result<Record> result = config.dsl()
+                .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .from(Tables.OFFER)
+                .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT))
+                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId)).fetch();
         return result;
     }
 

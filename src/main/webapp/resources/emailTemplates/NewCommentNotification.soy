@@ -8,19 +8,23 @@
  * @param? queryName The name of the query
  * @param? comment The comment made on the query
  * @param? url The url of the query the comment is added to
+ * @param? commentPoster The Person submitted the comment
+ * @param? dateOfComment Date when the comment was posted
  */
 {deltemplate maincontent}
     {switch $locale}
         {case 'de', 'de_DE'}
-           A new comment has been added to the query "{$queryName}".
-           {\n}Comment made is: "{$comment}"
+           A new comment has been added from {$commentPoster} at {$dateOfComment} to the query "{$queryName}".
+           {\n}Comment made is:
+           {\n} "{$comment}"
            {\n}To view or add comments, please use the following link:
            {\n}{\n}
             {$url}
 
         {default}
-			A new comment has been added to the query "{$queryName}".
-			{\n}Comment made is: "{$comment}"
+			A new comment has been added from {$commentPoster} at {$dateOfComment} to the query "{$queryName}".
+			{\n}Comment made is:
+			{\n} "{$comment}"
 			{\n}To view or add comments, please use the following link:
 			{\n}{\n}
             {$url}

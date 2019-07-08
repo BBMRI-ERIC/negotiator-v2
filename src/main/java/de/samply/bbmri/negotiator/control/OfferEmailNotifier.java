@@ -44,9 +44,12 @@ public class OfferEmailNotifier {
 
     private final String url;
 
-    public OfferEmailNotifier(Query query, String url) {
+    private final String biobankName;
+
+    public OfferEmailNotifier(Query query, String url, String biobankName) {
         this.query = query;
         this.url = url;
+        this.biobankName = biobankName;
     }
 
     /**
@@ -58,7 +61,7 @@ public class OfferEmailNotifier {
         builder.addTemplateFile("NewOfferNotification.soy", "Notification");
 
         Notification notification = new Notification();
-        notification.setSubject("Sample Availability");
+        notification.setSubject("Sample or data availability update");
 
         try(Config config = ConfigFactory.get()) {
             Person researcher = config.map(config.dsl().selectFrom(Tables.PERSON)
@@ -66,6 +69,7 @@ public class OfferEmailNotifier {
 
             notification.addAddressee(researcher);
             notification.addParameter("queryName", query.getTitle());
+            notification.addParameter("biobankName", biobankName);
             notification.addParameter("url", url);
             notification.setLocale("de");
 

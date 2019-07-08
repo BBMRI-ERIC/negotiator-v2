@@ -7,21 +7,19 @@
  * @param? name The locale of the mail
  * @param? queryName The name of the mail
  * @param? url The url of the query
- * @param? biobankName Name of the biobank for the Private negotiation
+ * @param? researcher Name of the researcher for the Private negotiation
  */
 {deltemplate maincontent}
     {switch $locale}
         {case 'de', 'de_DE'}
-           A biobank "{$biobankName}" indicated samply or data availability or communicated some other confidential communication to you
-           for the query "{$queryName}".
-           {\n}To read and react to that, please use the following link:
-           {\n}{\n}
+            A new comment has been added from {$researcher} to the private negotiation for the query "{$queryName}".
+            {\n}To read and react to that, please use the following link:
+            {\n}{\n}
             {$url}
 
 
         {default}
-            A biobank "{$biobankName}" indicated samply or data availability or communicated some other confidential communication to you
-            for the query "{$queryName}".
+            A new comment has been added from {$researcher} to the private negotiation for the query "{$queryName}".
             {\n}To read and react to that, please use the following link:
             {\n}{\n}
             {$url}

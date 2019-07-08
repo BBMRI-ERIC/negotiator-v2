@@ -39,6 +39,9 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @ManagedBean
 @ViewScoped
@@ -62,12 +65,12 @@ public class CommentBean implements Serializable {
             DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment);
             config.commit();
 
-            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment);
+            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()));
             notifier.sendEmailNotificationToBiobankers(userBean.getUserId());
             if (userBean.getBiobankOwner()){
                 /* Send notification to the query owner if a biobanker made a comment
                  */
-                notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment);
+                notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()));
                 notifier.sendEmailNotificationToQueryOwner();
             }
 

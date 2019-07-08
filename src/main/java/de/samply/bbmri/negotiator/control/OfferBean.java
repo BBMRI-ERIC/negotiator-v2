@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.control;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -40,6 +41,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 @ManagedBean
@@ -72,12 +74,31 @@ public class OfferBean implements Serializable {
             DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
 
+            String biobankName = "";
+            try {
+                biobankName = DbUtil.getBiobankName(config, offerFrom);
+            } catch (Exception e) {
+                System.err.println("Error getting Biobank Name from offer ID: " + offerFrom);
+                e.printStackTrace();
+            }
+
             /**
              * Send notifications only, if a biobanker makes an offer
              */
             if (userBean.getBiobankOwner()) {
-                OfferEmailNotifier notifier = new OfferEmailNotifier(query, getQueryUrl(query.getId()));
+                OfferEmailNotifier notifier = new OfferEmailNotifier(query, getQueryUrl(query.getId()), biobankName);
                 notifier.sendEmailNotification();
+            } else {
+                try {
+                    List<Person> collectioncontacts = DbUtil.getPersonsContactsForBiobank(config, offerFrom);
+                    for (Person collectioncontact : collectioncontacts) {
+                        OfferResponseEmailNotification notifier = new OfferResponseEmailNotification(query, getQueryUrl(query.getId()), collectioncontact);
+                        notifier.sendEmailNotification();
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error getting Biobank Contacts for notification offerID: " + offerFrom);
+                    e.printStackTrace();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

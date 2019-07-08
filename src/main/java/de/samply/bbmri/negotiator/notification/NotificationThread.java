@@ -63,6 +63,7 @@ public class NotificationThread extends Thread {
                 email.setSubject(notification.getSubject());
                 email.addAddressee(person.getAuthEmail());
                 email.setBuilder(builder);
+                logger.debug("Notification body: " + builder.getText(notification.getParameters()));
                 MailUtil.sendEmail(email);
             }
 
