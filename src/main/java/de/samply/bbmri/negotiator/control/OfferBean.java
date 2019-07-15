@@ -92,7 +92,7 @@ public class OfferBean implements Serializable {
                 try {
                     List<Person> collectioncontacts = DbUtil.getPersonsContactsForBiobank(config, offerFrom);
                     for (Person collectioncontact : collectioncontacts) {
-                        OfferResponseEmailNotification notifier = new OfferResponseEmailNotification(query, getQueryUrl(query.getId()), collectioncontact);
+                        OfferResponseEmailNotification notifier = new OfferResponseEmailNotification(query, getQueryUrlBiobanker(query.getId()), collectioncontact);
                         notifier.sendEmailNotification();
                     }
                 } catch (Exception e) {
@@ -120,6 +120,14 @@ public class OfferBean implements Serializable {
         return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
                 context.getRequestServerPort(), context.getRequestContextPath(),
                 "/researcher/detail.xhtml?queryId=" + queryId);
+    }
+
+    public String getQueryUrlBiobanker(Integer queryId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + queryId);
     }
 
     public UserBean getUserBean() {
