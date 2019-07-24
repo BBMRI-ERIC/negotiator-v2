@@ -11,12 +11,18 @@ import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
+import de.samply.bbmri.negotiator.jooq.tables.Network;
+import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
+import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
 import de.samply.bbmri.negotiator.jooq.tables.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection;
 import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import javax.annotation.Generated;
@@ -71,6 +77,21 @@ public class Tables {
 	public static final ListOfDirectories LIST_OF_DIRECTORIES = de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories.LIST_OF_DIRECTORIES;
 
 	/**
+	 * The table public.network
+	 */
+	public static final Network NETWORK = de.samply.bbmri.negotiator.jooq.tables.Network.NETWORK;
+
+	/**
+	 * The table public.network_biobank_link
+	 */
+	public static final NetworkBiobankLink NETWORK_BIOBANK_LINK = de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink.NETWORK_BIOBANK_LINK;
+
+	/**
+	 * The table public.network_collection_link
+	 */
+	public static final NetworkCollectionLink NETWORK_COLLECTION_LINK = de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink.NETWORK_COLLECTION_LINK;
+
+	/**
 	 * table to store private conversation made on a query between two people(owner and researcher)
 	 */
 	public static final Offer OFFER = de.samply.bbmri.negotiator.jooq.tables.Offer.OFFER;
@@ -96,9 +117,24 @@ public class Tables {
 	public static final QueryAttachment QUERY_ATTACHMENT = de.samply.bbmri.negotiator.jooq.tables.QueryAttachment.QUERY_ATTACHMENT;
 
 	/**
+	 * The table public.query_attachment_private
+	 */
+	public static final QueryAttachmentPrivate QUERY_ATTACHMENT_PRIVATE = de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE;
+
+	/**
 	 * Table for connecting queries with collections
 	 */
 	public static final QueryCollection QUERY_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.QueryCollection.QUERY_COLLECTION;
+
+	/**
+	 * The table public.query_lifecycle_biobank
+	 */
+	public static final QueryLifecycleBiobank QUERY_LIFECYCLE_BIOBANK = de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank.QUERY_LIFECYCLE_BIOBANK;
+
+	/**
+	 * The table public.query_lifecycle_collection
+	 */
+	public static final QueryLifecycleCollection QUERY_LIFECYCLE_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION;
 
 	/**
 	 * The table public.schema_version

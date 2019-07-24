@@ -54,6 +54,11 @@ public class Sequences {
 	public static final Sequence<Long> LIST_OF_DIRECTORIES_ID_SEQ = new SequenceImpl<Long>("list_of_directories_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>public.network_id_seq</code>
+	 */
+	public static final Sequence<Long> NETWORK_ID_SEQ = new SequenceImpl<Long>("network_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>public.offer_id_seq</code>
 	 */
 	public static final Sequence<Long> OFFER_ID_SEQ = new SequenceImpl<Long>("offer_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -67,6 +72,11 @@ public class Sequences {
 	 * The sequence <code>public.query_attachment_id_seq</code>
 	 */
 	public static final Sequence<Long> QUERY_ATTACHMENT_ID_SEQ = new SequenceImpl<Long>("query_attachment_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>public.query_attachment_private_id_seq</code>
+	 */
+	public static final Sequence<Long> QUERY_ATTACHMENT_PRIVATE_ID_SEQ = new SequenceImpl<Long>("query_attachment_private_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>public.query_id_seq</code>
