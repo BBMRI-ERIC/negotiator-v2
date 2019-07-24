@@ -127,14 +127,10 @@ public class AdminDebugBean implements Serializable {
     public void loadQueries() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueries(config);
-            for(QueryRecord queryRecord : queries) {
-                setupCollections(config, queryRecord.getId());
-            }
             users = new HashMap<Integer, PersonRecord>();
             for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
             }
-
         } catch(SQLException e) {
             e.printStackTrace();
         }
