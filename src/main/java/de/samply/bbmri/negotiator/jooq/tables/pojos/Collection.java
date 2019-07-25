@@ -4,16 +4,7 @@
 package de.samply.bbmri.negotiator.jooq.tables.pojos;
 
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.model.NegotiatorDTO;
-
 import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.List;
 
 import javax.annotation.Generated;
 
@@ -101,15 +92,5 @@ public class Collection implements Serializable {
 
 	public void setListOfDirectoriesId(Integer listOfDirectoriesId) {
 		this.listOfDirectoriesId = listOfDirectoriesId;
-	}
-
-	public String getBiobankName() {
-		String biobankname = "";
-		try (Config config = ConfigFactory.get()) {
-			biobankname = DbUtil.getBiobankName(config, getBiobankId(), getListOfDirectoriesId());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return biobankname;
 	}
 }

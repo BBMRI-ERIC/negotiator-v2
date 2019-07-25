@@ -11,12 +11,18 @@ import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
+import de.samply.bbmri.negotiator.jooq.tables.Network;
+import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
+import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
 import de.samply.bbmri.negotiator.jooq.tables.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection;
 import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import java.util.ArrayList;
@@ -43,7 +49,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -1910692251;
+	private static final long serialVersionUID = -1673446289;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -72,9 +78,11 @@ public class Public extends SchemaImpl {
 			Sequences.CONNECTOR_LOG_ID_SEQ,
 			Sequences.JSON_QUERY_ID_SEQ,
 			Sequences.LIST_OF_DIRECTORIES_ID_SEQ,
+			Sequences.NETWORK_ID_SEQ,
 			Sequences.OFFER_ID_SEQ,
 			Sequences.PERSON_ID_SEQ,
 			Sequences.QUERY_ATTACHMENT_ID_SEQ,
+			Sequences.QUERY_ATTACHMENT_PRIVATE_ID_SEQ,
 			Sequences.QUERY_ID_SEQ);
 	}
 
@@ -94,12 +102,18 @@ public class Public extends SchemaImpl {
 			FlaggedQuery.FLAGGED_QUERY,
 			JsonQuery.JSON_QUERY,
 			ListOfDirectories.LIST_OF_DIRECTORIES,
+			Network.NETWORK,
+			NetworkBiobankLink.NETWORK_BIOBANK_LINK,
+			NetworkCollectionLink.NETWORK_COLLECTION_LINK,
 			Offer.OFFER,
 			Person.PERSON,
 			PersonCollection.PERSON_COLLECTION,
 			Query.QUERY,
 			QueryAttachment.QUERY_ATTACHMENT,
+			QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE,
 			QueryCollection.QUERY_COLLECTION,
+			QueryLifecycleBiobank.QUERY_LIFECYCLE_BIOBANK,
+			QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION,
 			SchemaVersion.SCHEMA_VERSION);
 	}
 }
