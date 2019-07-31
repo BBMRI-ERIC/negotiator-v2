@@ -10,7 +10,7 @@
       xmlns:composite="http://xmlns.jcp.org/jsf/composite">
 
 <composite:interface>
-    <composite:attribute name="bean" required="true"/>
+    <composite:attribute name="cc.attrs.queryBean" required="true"/>
 </composite:interface>
 
 <composite:implementation>
@@ -24,18 +24,18 @@
             <label class="input-group-btn"> <h:panelGroup
                     class="btn btn-default">
                 <h:outputText value="#{label['querydetail.action.browse']}" />
-                <h:inputFile id="file" value="#{queryBean.file}"
-                             validator="#{queryBean.validateFile}"
+                <h:inputFile id="file" value="#{cc.attrs.queryBean.file}"
+                             validator="#{cc.attrs.queryBean.validateFile}"
                              onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
                              style="display: none;" />
             </h:panelGroup> <h:commandButton id="uploadBtn" value="Upload"
-                                             action="#{queryBean.uploadAttachment}"
+                                             action="#{cc.attrs.queryBean.uploadAttachment}"
                                              styleClass="btn btn-primary disabled" />
             </label>
         </h:panelGroup>
         <h:panelGroup layout="block">
             <ul>
-                <ui:repeat value="#{queryBean.msgs}" var="msgs">
+                <ui:repeat value="#{cc.attrs.queryBean.msgs}" var="msgs">
                     <li>
                         <h:outputText id="uploadMessages" value="#{msgs.detail}" style="#{msgs.summary == 'Upload Failed' ? 'color: red' : 'color: green'}" />
                     </li>
@@ -53,39 +53,3 @@
 
 </html>
 
-<!-- Upload the attachments for a query -->
-        <!--
-        <h:panelGroup layout="block" style="margin-top: 0px;" >
-        <h:panelGroup class="input-group" layout="block">
-            <input placeholder="#{label['attachmentview.placeholder']}" type="text"
-                   class="form-control" readonly="readonly"
-                   onclick="$('#uploadform\\:file').click();" />
-
-            <label class="input-group-btn"> <h:panelGroup
-                    class="btn btn-default">
-                <h:outputText value="#{label['querydetail.action.browse']}" />
-                <h:inputFile id="file" value="#{queryBean.file}"
-                             validator="#{queryBean.validateFile}"
-                             onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
-                             style="display: none;" />
-            </h:panelGroup> <h:commandButton id="uploadBtn" value="Upload"
-                                             action="#{queryBean.uploadAttachment}"
-                                             styleClass="btn btn-primary disabled" />
-            </label>
-        </h:panelGroup>
-        <h:panelGroup layout="block">
-            <ul>
-                <ui:repeat value="#{queryBean.msgs}" var="msgs">
-                    <li>
-                        <h:outputText id="uploadMessages" value="#{msgs.detail}" style="#{msgs.summary == 'Upload Failed' ? 'color: red' : 'color: green'}" />
-                    </li>
-                </ui:repeat>
-            </ul>
-        </h:panelGroup>
-        <h:outputScript>
-            $(function() {
-            initializeFileUpload();
-            });
-        </h:outputScript>
-        </h:panelGroup>
-       -->

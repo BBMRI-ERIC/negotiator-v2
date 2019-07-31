@@ -273,39 +273,8 @@
                         </h:outputScript>
 
 							<!-- Upload the attachments for a query -->
-							<h:panelGroup layout="block" style="margin-top: 0px;" >
-								<h:panelGroup class="input-group" layout="block">
-									<input placeholder="#{label['attachmentview.placeholder']}" type="text"
-                                           class="form-control" readonly="readonly"
-                                            onclick="$('#uploadform\\:file').click();" />
+							<bbmricc:fileUpload bean="#{queryBean}" />
 
-									<label class="input-group-btn"> <h:panelGroup
-											class="btn btn-default">
-											<h:outputText value="#{label['querydetail.action.browse']}" />
-											<h:inputFile id="file" value="#{queryBean.file}"
-												validator="#{queryBean.validateFile}"
-												onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
-												style="display: none;" />
-										</h:panelGroup> <h:commandButton id="uploadBtn" value="Upload"
-											action="#{queryBean.uploadAttachment}"
-											styleClass="btn btn-primary disabled" />
-									</label>
-								</h:panelGroup>
-								<h:panelGroup layout="block">
-									<ul>
-										<ui:repeat value="#{queryBean.msgs}" var="msgs">
-											<li>
-												<h:outputText id="uploadMessages" value="#{msgs.detail}" style="#{msgs.summary == 'Upload Failed' ? 'color: red' : 'color: green'}" />
-											</li>
-										</ui:repeat>
-									</ul>
-								</h:panelGroup>
-								<h:outputScript>
-			                        $(function() {
-			                            initializeFileUpload();
-			                        });
-			                    </h:outputScript>
-							</h:panelGroup>
 
 
 
