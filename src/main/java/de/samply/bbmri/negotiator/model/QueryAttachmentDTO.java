@@ -31,6 +31,7 @@ public class QueryAttachmentDTO {
     private int queryId;
     private int id;
     private String attachment;
+    private String fileType;
    
     public int getQueryId() {
         return queryId;
@@ -42,7 +43,6 @@ public class QueryAttachmentDTO {
     public int getId() {
         return id;
     }
-
     public void setId(int id) {
         this.id = id;
     }
@@ -53,4 +53,7 @@ public class QueryAttachmentDTO {
     public void setAttachment(String attachment) {
         this.attachment = attachment;
     }
+
+    public String getFileType() { return fileType; }
+    public void setFileType(String fileType) { this.fileType = fileType; }
 }

@@ -152,6 +152,11 @@ public class QueryBean implements Serializable {
     private HashMap<String, String> attachmentMap = null;
 
     /**
+     * Map of saved filename and attachment types of attachments
+     */
+    private HashMap<String, String> attachmentTypeMap = null;
+
+    /**
      * temporal var to store attachment name to be deleted for confirmation dialog
      */
     private String toRemoveAttachment = null;
@@ -478,15 +483,7 @@ public class QueryBean implements Serializable {
            if (file.getSize() > MAX_UPLOAD_SIZE) {
                msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed", "The given file was too big." +
                        " Maximum size allowed is: "+MAX_UPLOAD_SIZE/1024/1024+" MB"));
-           }
-
-           if (!"application/pdf".equals(file.getContentType())) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed", "The uploaded file was not " +
-                       "a PDF file."));
-           }
-
-
-           try {
+           } try {
                if (FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
                    msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed",
                            "The uploaded file triggered a virus warning and therefore has not been accepted."));
@@ -676,7 +673,8 @@ public class QueryBean implements Serializable {
      */
     public HashMap<String, String> getAttachmentMap() {
         if(attachmentMap == null) {
-            attachmentMap = new HashMap<>();
+            attachmentMap = new HashMap<String, String>();
+            attachmentTypeMap = new HashMap<String, String>();
             for(QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
                 String uploadName = "query_" + getId() + "_file_" + att.getId();
@@ -690,9 +688,21 @@ public class QueryBean implements Serializable {
                 uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
 
                 attachmentMap.put(uploadName, att.getAttachment());
+                attachmentTypeMap.put(uploadName, att.getFileType());
             }
         }
         return attachmentMap;
+    }
+
+    public String getAttachmentType(String uploadName) {
+        if(attachmentTypeMap == null) {
+            getAttachmentMap();
+        }
+        String fileType = "other...";
+        if(attachmentTypeMap.containsKey(uploadName)) {
+            fileType = attachmentTypeMap.get(uploadName);
+        }
+        return fileType;
     }
 
     public Part getFile() {
