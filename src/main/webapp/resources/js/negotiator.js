@@ -59,6 +59,7 @@ function createViewState(form, viewState) {
 function initializeFileUpload() {
     // We can attach the `fileselect` event to all file inputs on the page
     $(document).on('change', ':file', function() {
+        alert("all file inputs");
         var input = $(this),
             numFiles = input.get(0).files ? input.get(0).files.length : 1,
             label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
@@ -68,7 +69,7 @@ function initializeFileUpload() {
     // We can watch for our custom `fileselect` event like this
     $(document).ready( function() {
         $(':file').on('fileselect', function(event, numFiles, label) {
-
+            alert("custom fileselect event");
             var input = $(this).parents('.input-group').find(':text'),
                 log = numFiles > 1 ? numFiles + ' files selected' : label;
 

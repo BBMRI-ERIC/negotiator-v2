@@ -30,6 +30,7 @@
 				xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 				xmlns:f="http://xmlns.jcp.org/jsf/core"
 				xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+				xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
 				template="../components/default.xhtml">
 
 	<f:metadata>
@@ -273,7 +274,7 @@
                         </h:outputScript>
 
 							<!-- Upload the attachments for a query -->
-							<bbmricc:fileUpload bean="#{queryBean}" />
+							<bbmricc:fileUpload queryBean="#{queryBean}" />
 
 
 

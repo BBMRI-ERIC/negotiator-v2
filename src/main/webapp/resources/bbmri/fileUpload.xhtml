@@ -10,7 +10,7 @@
       xmlns:composite="http://xmlns.jcp.org/jsf/composite">
 
 <composite:interface>
-    <composite:attribute name="cc.attrs.queryBean" required="true"/>
+    <composite:attribute name="queryBean" required="true"/>
 </composite:interface>
 
 <composite:implementation>
@@ -18,17 +18,23 @@
     <h:panelGroup layout="block" style="margin-top: 0px;" >
         <h:panelGroup class="input-group" layout="block">
             <input placeholder="#{label['attachmentview.placeholder']}" type="text"
-                   class="form-control" readonly="readonly"
+                   class="form-control" style="width: 80%;" readonly="readonly"
                    onclick="$('#uploadform\\:file').click();" />
 
-            <label class="input-group-btn"> <h:panelGroup
-                    class="btn btn-default">
-                <h:outputText value="#{label['querydetail.action.browse']}" />
-                <h:inputFile id="file" value="#{cc.attrs.queryBean.file}"
-                             validator="#{cc.attrs.queryBean.validateFile}"
-                             onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
-                             style="display: none;" />
-            </h:panelGroup> <h:commandButton id="uploadBtn" value="Upload"
+            <h:selectOneMenu value="#{cc.attrs.queryBean.filetype}" class="form-control" style="width: 20%;height: 2rem;">
+                <f:selectItem itemValue="other" itemLabel="other" />
+                <f:selectItem itemValue="mta" itemLabel="MTA" />
+            </h:selectOneMenu>
+
+            <label class="input-group-btn"> +
+                <h:panelGroup class="btn btn-default">
+                    <h:outputText value="#{label['querydetail.action.browse']}" />
+                    <h:inputFile id="file" value="#{cc.attrs.queryBean.file}"
+                                 validator="#{cc.attrs.queryBean.validateFile}"
+                                 onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
+                                 style="display: none;" />
+                </h:panelGroup>
+                <h:commandButton id="uploadBtn" value="Upload"
                                              action="#{cc.attrs.queryBean.uploadAttachment}"
                                              styleClass="btn btn-primary disabled" />
             </label>

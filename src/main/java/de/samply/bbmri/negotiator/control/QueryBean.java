@@ -162,6 +162,11 @@ public class QueryBean implements Serializable {
    private Part file;
 
     /**
+     * Query attachment upload file type.
+     */
+    private String filetype;
+
+    /**
      * String containing ethics code, if available.
      */
     private String ethicsVote;
@@ -696,6 +701,14 @@ public class QueryBean implements Serializable {
 
     public void setFile(Part file) {
         this.file = file;
+    }
+
+    public String getFiletype() {
+        return filetype;
+    }
+
+    public void setFilefiletype(String filetype) {
+        this.filetype = filetype;
     }
 
     public SessionBean getSessionBean() {
