@@ -100,4 +100,11 @@ public class OfferDao extends DAOImpl<OfferRecord, de.samply.bbmri.negotiator.jo
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Offer> fetchByText(String... values) {
 		return fetch(Offer.OFFER.TEXT, values);
 	}
+
+	/**
+	 * Fetch records that have <code>attachment IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Offer> fetchByAttachment(Boolean... values) {
+		return fetch(Offer.OFFER.ATTACHMENT, values);
+	}
 }

@@ -77,4 +77,18 @@ public class QueryAttachmentDao extends DAOImpl<QueryAttachmentRecord, de.samply
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachment> fetchByAttachment(String... values) {
 		return fetch(QueryAttachment.QUERY_ATTACHMENT.ATTACHMENT, values);
 	}
+
+	/**
+	 * Fetch records that have <code>file_type IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachment> fetchByFileType(String... values) {
+		return fetch(QueryAttachment.QUERY_ATTACHMENT.FILE_TYPE, values);
+	}
+
+	/**
+	 * Fetch records that have <code>comment_id IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachment> fetchByCommentId(Integer... values) {
+		return fetch(QueryAttachment.QUERY_ATTACHMENT.COMMENT_ID, values);
+	}
 }

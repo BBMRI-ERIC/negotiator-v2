@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachmentPrivate implements Serializable {
 
-	private static final long serialVersionUID = 1119172497;
+	private static final long serialVersionUID = -766456779;
 
 	private Integer   id;
 	private Integer   queryId;
@@ -31,6 +31,8 @@ public class QueryAttachmentPrivate implements Serializable {
 	private Integer   biobankInPrivateChat;
 	private Timestamp attachmentTime;
 	private String    attachment;
+	private String    fileType;
+	private Integer   offerId;
 
 	public QueryAttachmentPrivate() {}
 
@@ -41,6 +43,8 @@ public class QueryAttachmentPrivate implements Serializable {
 		this.biobankInPrivateChat = value.biobankInPrivateChat;
 		this.attachmentTime = value.attachmentTime;
 		this.attachment = value.attachment;
+		this.fileType = value.fileType;
+		this.offerId = value.offerId;
 	}
 
 	public QueryAttachmentPrivate(
@@ -49,7 +53,9 @@ public class QueryAttachmentPrivate implements Serializable {
 		Integer   personId,
 		Integer   biobankInPrivateChat,
 		Timestamp attachmentTime,
-		String    attachment
+		String    attachment,
+		String    fileType,
+		Integer   offerId
 	) {
 		this.id = id;
 		this.queryId = queryId;
@@ -57,6 +63,8 @@ public class QueryAttachmentPrivate implements Serializable {
 		this.biobankInPrivateChat = biobankInPrivateChat;
 		this.attachmentTime = attachmentTime;
 		this.attachment = attachment;
+		this.fileType = fileType;
+		this.offerId = offerId;
 	}
 
 	public Integer getId() {
@@ -105,5 +113,21 @@ public class QueryAttachmentPrivate implements Serializable {
 
 	public void setAttachment(String attachment) {
 		this.attachment = attachment;
+	}
+
+	public String getFileType() {
+		return this.fileType;
+	}
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
+	}
+
+	public Integer getOfferId() {
+		return this.offerId;
+	}
+
+	public void setOfferId(Integer offerId) {
+		this.offerId = offerId;
 	}
 }

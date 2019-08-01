@@ -22,11 +22,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachment implements Serializable {
 
-	private static final long serialVersionUID = -65557294;
+	private static final long serialVersionUID = 1579727258;
 
 	private Integer id;
 	private Integer queryId;
 	private String  attachment;
+	private String  fileType;
+	private Integer commentId;
 
 	public QueryAttachment() {}
 
@@ -34,16 +36,22 @@ public class QueryAttachment implements Serializable {
 		this.id = value.id;
 		this.queryId = value.queryId;
 		this.attachment = value.attachment;
+		this.fileType = value.fileType;
+		this.commentId = value.commentId;
 	}
 
 	public QueryAttachment(
 		Integer id,
 		Integer queryId,
-		String  attachment
+		String  attachment,
+		String  fileType,
+		Integer commentId
 	) {
 		this.id = id;
 		this.queryId = queryId;
 		this.attachment = attachment;
+		this.fileType = fileType;
+		this.commentId = commentId;
 	}
 
 	public Integer getId() {
@@ -68,5 +76,21 @@ public class QueryAttachment implements Serializable {
 
 	public void setAttachment(String attachment) {
 		this.attachment = attachment;
+	}
+
+	public String getFileType() {
+		return this.fileType;
+	}
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
+	}
+
+	public Integer getCommentId() {
+		return this.commentId;
+	}
+
+	public void setCommentId(Integer commentId) {
+		this.commentId = commentId;
 	}
 }
