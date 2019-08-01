@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachmentPrivateRecord extends UpdatableRecordImpl<QueryAttachmentPrivateRecord> implements Record8<Integer, Integer, Integer, Integer, Timestamp, String, String, Integer> {
 
-	private static final long serialVersionUID = 659403465;
+	private static final long serialVersionUID = 145579696;
 
 	/**
 	 * Setter for <code>public.query_attachment_private.id</code>.
@@ -117,16 +117,16 @@ public class QueryAttachmentPrivateRecord extends UpdatableRecordImpl<QueryAttac
 	}
 
 	/**
-	 * Setter for <code>public.query_attachment_private.file_type</code>.
+	 * Setter for <code>public.query_attachment_private.attachment_type</code>.
 	 */
-	public void setFileType(String value) {
+	public void setAttachmentType(String value) {
 		setValue(6, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_attachment_private.file_type</code>.
+	 * Getter for <code>public.query_attachment_private.attachment_type</code>.
 	 */
-	public String getFileType() {
+	public String getAttachmentType() {
 		return (String) getValue(6);
 	}
 
@@ -229,7 +229,7 @@ public class QueryAttachmentPrivateRecord extends UpdatableRecordImpl<QueryAttac
 	 */
 	@Override
 	public Field<String> field7() {
-		return QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE.FILE_TYPE;
+		return QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT_TYPE;
 	}
 
 	/**
@@ -293,7 +293,7 @@ public class QueryAttachmentPrivateRecord extends UpdatableRecordImpl<QueryAttac
 	 */
 	@Override
 	public String value7() {
-		return getFileType();
+		return getAttachmentType();
 	}
 
 	/**
@@ -363,7 +363,7 @@ public class QueryAttachmentPrivateRecord extends UpdatableRecordImpl<QueryAttac
 	 */
 	@Override
 	public QueryAttachmentPrivateRecord value7(String value) {
-		setFileType(value);
+		setAttachmentType(value);
 		return this;
 	}
 
@@ -406,7 +406,7 @@ public class QueryAttachmentPrivateRecord extends UpdatableRecordImpl<QueryAttac
 	/**
 	 * Create a detached, initialised QueryAttachmentPrivateRecord
 	 */
-	public QueryAttachmentPrivateRecord(Integer id, Integer queryId, Integer personId, Integer biobankInPrivateChat, Timestamp attachmentTime, String attachment, String fileType, Integer offerId) {
+	public QueryAttachmentPrivateRecord(Integer id, Integer queryId, Integer personId, Integer biobankInPrivateChat, Timestamp attachmentTime, String attachment, String attachmentType, Integer offerId) {
 		super(QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE);
 
 		setValue(0, id);
@@ -415,7 +415,7 @@ public class QueryAttachmentPrivateRecord extends UpdatableRecordImpl<QueryAttac
 		setValue(3, biobankInPrivateChat);
 		setValue(4, attachmentTime);
 		setValue(5, attachment);
-		setValue(6, fileType);
+		setValue(6, attachmentType);
 		setValue(7, offerId);
 	}
 }

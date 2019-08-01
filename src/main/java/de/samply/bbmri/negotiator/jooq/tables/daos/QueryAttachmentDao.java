@@ -79,10 +79,10 @@ public class QueryAttachmentDao extends DAOImpl<QueryAttachmentRecord, de.samply
 	}
 
 	/**
-	 * Fetch records that have <code>file_type IN (values)</code>
+	 * Fetch records that have <code>attachment_type IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachment> fetchByFileType(String... values) {
-		return fetch(QueryAttachment.QUERY_ATTACHMENT.FILE_TYPE, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachment> fetchByAttachmentType(String... values) {
+		return fetch(QueryAttachment.QUERY_ATTACHMENT.ATTACHMENT_TYPE, values);
 	}
 
 	/**

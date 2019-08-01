@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachmentPrivate implements Serializable {
 
-	private static final long serialVersionUID = -766456779;
+	private static final long serialVersionUID = -1267449007;
 
 	private Integer   id;
 	private Integer   queryId;
@@ -31,7 +31,7 @@ public class QueryAttachmentPrivate implements Serializable {
 	private Integer   biobankInPrivateChat;
 	private Timestamp attachmentTime;
 	private String    attachment;
-	private String    fileType;
+	private String    attachmentType;
 	private Integer   offerId;
 
 	public QueryAttachmentPrivate() {}
@@ -43,7 +43,7 @@ public class QueryAttachmentPrivate implements Serializable {
 		this.biobankInPrivateChat = value.biobankInPrivateChat;
 		this.attachmentTime = value.attachmentTime;
 		this.attachment = value.attachment;
-		this.fileType = value.fileType;
+		this.attachmentType = value.attachmentType;
 		this.offerId = value.offerId;
 	}
 
@@ -54,7 +54,7 @@ public class QueryAttachmentPrivate implements Serializable {
 		Integer   biobankInPrivateChat,
 		Timestamp attachmentTime,
 		String    attachment,
-		String    fileType,
+		String    attachmentType,
 		Integer   offerId
 	) {
 		this.id = id;
@@ -63,7 +63,7 @@ public class QueryAttachmentPrivate implements Serializable {
 		this.biobankInPrivateChat = biobankInPrivateChat;
 		this.attachmentTime = attachmentTime;
 		this.attachment = attachment;
-		this.fileType = fileType;
+		this.attachmentType = attachmentType;
 		this.offerId = offerId;
 	}
 
@@ -115,12 +115,12 @@ public class QueryAttachmentPrivate implements Serializable {
 		this.attachment = attachment;
 	}
 
-	public String getFileType() {
-		return this.fileType;
+	public String getAttachmentType() {
+		return this.attachmentType;
 	}
 
-	public void setFileType(String fileType) {
-		this.fileType = fileType;
+	public void setAttachmentType(String attachmentType) {
+		this.attachmentType = attachmentType;
 	}
 
 	public Integer getOfferId() {

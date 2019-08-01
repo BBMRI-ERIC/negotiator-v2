@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachmentPrivate extends TableImpl<QueryAttachmentPrivateRecord> {
 
-	private static final long serialVersionUID = -620407162;
+	private static final long serialVersionUID = -1013271905;
 
 	/**
 	 * The reference instance of <code>public.query_attachment_private</code>
@@ -81,9 +81,9 @@ public class QueryAttachmentPrivate extends TableImpl<QueryAttachmentPrivateReco
 	public final TableField<QueryAttachmentPrivateRecord, String> ATTACHMENT = createField("attachment", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.query_attachment_private.file_type</code>.
+	 * The column <code>public.query_attachment_private.attachment_type</code>.
 	 */
-	public final TableField<QueryAttachmentPrivateRecord, String> FILE_TYPE = createField("file_type", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "");
+	public final TableField<QueryAttachmentPrivateRecord, String> ATTACHMENT_TYPE = createField("attachment_type", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "");
 
 	/**
 	 * The column <code>public.query_attachment_private.offer_id</code>.

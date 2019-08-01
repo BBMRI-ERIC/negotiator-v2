@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachmentRecord extends UpdatableRecordImpl<QueryAttachmentRecord> implements Record5<Integer, Integer, String, String, Integer> {
 
-	private static final long serialVersionUID = -1304942011;
+	private static final long serialVersionUID = 830965100;
 
 	/**
 	 * Setter for <code>public.query_attachment.id</code>.
@@ -73,16 +73,16 @@ public class QueryAttachmentRecord extends UpdatableRecordImpl<QueryAttachmentRe
 	}
 
 	/**
-	 * Setter for <code>public.query_attachment.file_type</code>.
+	 * Setter for <code>public.query_attachment.attachment_type</code>.
 	 */
-	public void setFileType(String value) {
+	public void setAttachmentType(String value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_attachment.file_type</code>.
+	 * Getter for <code>public.query_attachment.attachment_type</code>.
 	 */
-	public String getFileType() {
+	public String getAttachmentType() {
 		return (String) getValue(3);
 	}
 
@@ -161,7 +161,7 @@ public class QueryAttachmentRecord extends UpdatableRecordImpl<QueryAttachmentRe
 	 */
 	@Override
 	public Field<String> field4() {
-		return QueryAttachment.QUERY_ATTACHMENT.FILE_TYPE;
+		return QueryAttachment.QUERY_ATTACHMENT.ATTACHMENT_TYPE;
 	}
 
 	/**
@@ -201,7 +201,7 @@ public class QueryAttachmentRecord extends UpdatableRecordImpl<QueryAttachmentRe
 	 */
 	@Override
 	public String value4() {
-		return getFileType();
+		return getAttachmentType();
 	}
 
 	/**
@@ -244,7 +244,7 @@ public class QueryAttachmentRecord extends UpdatableRecordImpl<QueryAttachmentRe
 	 */
 	@Override
 	public QueryAttachmentRecord value4(String value) {
-		setFileType(value);
+		setAttachmentType(value);
 		return this;
 	}
 
@@ -284,13 +284,13 @@ public class QueryAttachmentRecord extends UpdatableRecordImpl<QueryAttachmentRe
 	/**
 	 * Create a detached, initialised QueryAttachmentRecord
 	 */
-	public QueryAttachmentRecord(Integer id, Integer queryId, String attachment, String fileType, Integer commentId) {
+	public QueryAttachmentRecord(Integer id, Integer queryId, String attachment, String attachmentType, Integer commentId) {
 		super(QueryAttachment.QUERY_ATTACHMENT);
 
 		setValue(0, id);
 		setValue(1, queryId);
 		setValue(2, attachment);
-		setValue(3, fileType);
+		setValue(3, attachmentType);
 		setValue(4, commentId);
 	}
 }

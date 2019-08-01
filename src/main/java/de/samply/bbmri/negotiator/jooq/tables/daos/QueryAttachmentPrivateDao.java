@@ -101,10 +101,10 @@ public class QueryAttachmentPrivateDao extends DAOImpl<QueryAttachmentPrivateRec
 	}
 
 	/**
-	 * Fetch records that have <code>file_type IN (values)</code>
+	 * Fetch records that have <code>attachment_type IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachmentPrivate> fetchByFileType(String... values) {
-		return fetch(QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE.FILE_TYPE, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachmentPrivate> fetchByAttachmentType(String... values) {
+		return fetch(QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT_TYPE, values);
 	}
 
 	/**
