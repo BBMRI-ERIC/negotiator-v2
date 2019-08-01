@@ -11,7 +11,7 @@ ALTER TABLE query_attachment_private
     ADD COLUMN offer_id INTEGER DEFAULT 0;
 
 ALTER TABLE offer
-    ADD COLUMN attachment boolean DEFAULT 0;
+    ADD COLUMN attachment boolean DEFAULT true;
 
 ALTER TABLE comment
-    ADD COLUMN attachment boolean DEFAULT 0;
+    ADD COLUMN attachment boolean DEFAULT true;
