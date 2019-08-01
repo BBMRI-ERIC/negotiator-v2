@@ -319,6 +319,14 @@ a:hover {
     width: 5%;
 }
 
+.query-detail-attachments-table-attachment-type, .query-detail-attachments-table-attachment-type-header {
+    width: 30%;
+}
+
+.query-detail-attachments-table-attachment-name, .query-detail-attachments-table-attachment-name-header {
+    width: 70%;
+}
+
 .attachment-links {
     margin: 5px 5px 5px 5px; 
 }

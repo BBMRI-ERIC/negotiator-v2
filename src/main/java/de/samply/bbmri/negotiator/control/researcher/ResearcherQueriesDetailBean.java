@@ -132,6 +132,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private HashMap<String, String> attachmentMap = null;
 
     /**
+     * Map of saved filename and attachment types of attachments
+     */
+    private HashMap<String, String> attachmentTypeMap = null;
+
+    /**
      * Query attachment upload
      */
     private Part file;
@@ -438,6 +443,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public HashMap<String, String> getAttachmentMap() {
         if (attachmentMap == null) {
             attachmentMap = new HashMap<>();
+            attachmentTypeMap = new HashMap<String, String>();
             for (QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
                 String uploadName = "query_" + queryId + "_file_" + att.getId();
@@ -451,9 +457,21 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
 
                 attachmentMap.put(uploadName, att.getAttachment());
+                attachmentTypeMap.put(uploadName, att.getAttachmentType());
             }
         }
         return attachmentMap;
+    }
+
+    public String getAttachmentType(String uploadName) {
+        /*if(attachmentTypeMap == null) {
+            getAttachmentMap();
+        }*/
+        String attachmentType = "other...";
+        if(attachmentTypeMap.containsKey(uploadName)) {
+            attachmentType = attachmentTypeMap.get(uploadName);
+        }
+        return attachmentType;
     }
 
     public List<QueryAttachmentDTO> getAttachments() {
