@@ -818,6 +818,16 @@ public class DbUtil {
         return biobankname;
     }
 
+    // Create Script to collect all biobanknames for a query
+    public static List<BiobankRecord> getBiobanks(Config config) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.BIOBANK))
+                    .from(Tables.BIOBANK)
+                    .orderBy(Tables.BIOBANK.ID)
+                    .fetch();
+
+        return config.map(record, BiobankRecord.class);
+    }
+
     /**
      * Returns a list of all biobanks relevant to this query and this biobank owner
      */

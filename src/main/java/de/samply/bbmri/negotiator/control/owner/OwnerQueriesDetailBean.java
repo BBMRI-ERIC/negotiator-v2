@@ -54,6 +54,7 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import de.samply.bbmri.negotiator.util.DataCache;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -127,6 +128,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 */
 	private HashMap<String, String> attachmentMap = null;
 
+	private HashMap<Integer, String> biobankNames = null;
+
 	/**
      * The list of offers(private comments) for the selected query
      */
@@ -141,6 +144,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 * The list of offerPersonDTO's, hence it's a list of lists.
 	 */
 	private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
+
+	private DataCache dataCache = DataCache.getInstance();
+
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
@@ -454,6 +460,10 @@ public class OwnerQueriesDetailBean implements Serializable {
         }
         return attachmentMap;
     }
+
+	public String getBiobankName(Integer biobankId) {
+		return dataCache.getBiobankName(biobankId);
+	}
 
 	/**
 	 * Tell the negotiator to expect results for the selected query from the connector

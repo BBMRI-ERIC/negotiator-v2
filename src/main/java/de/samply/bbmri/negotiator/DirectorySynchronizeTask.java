@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.TimerTask;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import de.samply.bbmri.negotiator.util.DataCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +78,8 @@ public class DirectorySynchronizeTask extends TimerTask {
                 }
             }
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, "Biobanks: " + biobanks + ", Collections: " + collections);
+            DataCache dataCache = DataCache.getInstance();
+            dataCache.createUpdateBiobankList();
         } catch (Exception e) {
             logger.error("Synchronization of directories failed", e);
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());

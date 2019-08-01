@@ -38,6 +38,7 @@
     <composite:attribute name="comment" required="true"/>
     <composite:attribute name="person" required="true"/>
     <composite:attribute name="collections" />
+    <composite:attribute name="ownerQueriesDetailBean" />
 </composite:interface>
 
 <composite:implementation>
@@ -69,7 +70,7 @@
             <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
                 <h:panelGroup layout="block" styleClass="collapse affiliation-collapsible-content">
                     <ui:repeat value="#{cc.attrs.collections}" var="collection" varStatus="loop">
-                        <h:outputText escape="false" value="#{collection.biobankName} - #{collection.name} (#{collection.directoryId}) "/><br />
+                        <h:outputText escape="false" value="#{ownerQueriesDetailBean.getBiobankName(collection.biobankId)} - #{collection.name} (#{collection.directoryId}) "/><br />
                     </ui:repeat>
                 </h:panelGroup>
             </ui:fragment>
