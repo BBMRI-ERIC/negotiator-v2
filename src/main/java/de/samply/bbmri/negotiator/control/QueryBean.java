@@ -93,9 +93,7 @@ public class QueryBean implements Serializable {
    private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
    private Integer jsonQueryId;
 
-
-
-    private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
+   private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
@@ -441,7 +439,7 @@ public class QueryBean implements Serializable {
                 setId(record.getId());
             }
 
-            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName);
+            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName, filetype);
             if (fileId == null) {
                 // something went wrong in db
                 config.rollback();
@@ -717,7 +715,7 @@ public class QueryBean implements Serializable {
         return filetype;
     }
 
-    public void setFilefiletype(String filetype) {
+    public void setFiletype(String filetype) {
         this.filetype = filetype;
     }
 
