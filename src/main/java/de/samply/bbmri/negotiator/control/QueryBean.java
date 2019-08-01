@@ -167,7 +167,7 @@ public class QueryBean implements Serializable {
     /**
      * Query attachment upload file type.
      */
-    private String filetype;
+    private String attachmentType;
 
     /**
      * String containing ethics code, if available.
@@ -439,7 +439,7 @@ public class QueryBean implements Serializable {
                 setId(record.getId());
             }
 
-            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName, filetype);
+            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName, attachmentType);
             if (fileId == null) {
                 // something went wrong in db
                 config.rollback();
@@ -686,7 +686,7 @@ public class QueryBean implements Serializable {
                 uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
 
                 attachmentMap.put(uploadName, att.getAttachment());
-                attachmentTypeMap.put(uploadName, att.getFileType());
+                attachmentTypeMap.put(uploadName, att.getAttachmentType());
             }
         }
         return attachmentMap;
@@ -696,11 +696,11 @@ public class QueryBean implements Serializable {
         if(attachmentTypeMap == null) {
             getAttachmentMap();
         }
-        String fileType = "other...";
+        String attachmentType = "other...";
         if(attachmentTypeMap.containsKey(uploadName)) {
-            fileType = attachmentTypeMap.get(uploadName);
+            attachmentType = attachmentTypeMap.get(uploadName);
         }
-        return fileType;
+        return attachmentType;
     }
 
     public Part getFile() {
@@ -711,12 +711,12 @@ public class QueryBean implements Serializable {
         this.file = file;
     }
 
-    public String getFiletype() {
-        return filetype;
+    public String getAttachmentType() {
+        return attachmentType;
     }
 
-    public void setFiletype(String filetype) {
-        this.filetype = filetype;
+    public void setAttachmentType(String attachmentType) {
+        this.attachmentType = attachmentType;
     }
 
     public SessionBean getSessionBean() {
