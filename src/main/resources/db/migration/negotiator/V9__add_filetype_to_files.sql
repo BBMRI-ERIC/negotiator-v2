@@ -1,8 +1,8 @@
 ALTER TABLE query_attachment
-    ADD COLUMN file_type character varying DEFAULT 'other';
+    ADD COLUMN attachment_type character varying DEFAULT 'other';
 
 ALTER TABLE query_attachment_private
-    ADD COLUMN file_type character varying DEFAULT 'other';
+    ADD COLUMN attachment_type character varying DEFAULT 'other';
 
 ALTER TABLE query_attachment
     ADD COLUMN comment_id INTEGER DEFAULT 0;
