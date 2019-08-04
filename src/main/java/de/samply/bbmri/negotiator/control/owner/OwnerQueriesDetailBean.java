@@ -32,9 +32,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
@@ -144,6 +146,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 * A boolean that specifies if a non-confidential view must be rendered for a non-confidential biobanker(for connector) and vise versa
 	 */
 	private boolean nonConfidential = true;
+
+    /**
+     * Query attachment upload file type.
+     */
+    private String attachmentType;
+
+    /**
+     * Query attachment upload.
+     */
+    private Part file;
+
+    /**
+     * List of faces messages
+     */
+    private List<FacesMessage> msgs = new ArrayList<>();
 
 	/**
 	 * The list of offerPersonDTO's, hence it's a list of lists.
@@ -469,9 +486,6 @@ public class OwnerQueriesDetailBean implements Serializable {
     }
 
 	public String getAttachmentType(String uploadName) {
-        /*if(attachmentTypeMap == null) {
-            getAttachmentMap();
-        }*/
 		String attachmentType = "other...";
 		if(attachmentTypeMap.containsKey(uploadName)) {
 			attachmentType = attachmentTypeMap.get(uploadName);
@@ -539,4 +553,28 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void setListOfSampleOffers(List<List<OfferPersonDTO>> listOfSampleOffers) {
 		this.listOfSampleOffers = listOfSampleOffers;
 	}
+
+    public Part getFile() {
+        return file;
+    }
+
+    public void setFile(Part file) {
+        this.file = file;
+    }
+
+    public List<FacesMessage> getMsgs() {
+        return msgs;
+    }
+
+    public void setMsgs(List<FacesMessage> msgs) {
+        this.msgs = msgs;
+    }
+
+    public String getAttachmentType() {
+        return attachmentType;
+    }
+
+    public void setAttachmentType(String attachmentType) {
+        this.attachmentType = attachmentType;
+    }
 }

@@ -51,7 +51,6 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.helper.QuerySearchHelper;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -70,10 +69,7 @@ import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
 
@@ -188,7 +184,6 @@ public class QueryBean implements Serializable {
     * Initializes this bean by registering email notification observer
     */
    public void initialize() {
-       System.out.println("initialize: " + id + " - " + jsonQueryId);
        try(Config config = ConfigFactory.get()) {
            /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
            if(id != null)
@@ -200,20 +195,10 @@ public class QueryBean implements Serializable {
                 * Save query title and text temporarily when a file is being uploaded.
                 */
                if(sessionBean.isSaveTransientState() == false){
-                   queryTitle = queryRecord.getTitle();
-                   queryText = queryRecord.getText();
-                   queryRequestDescription = queryRecord.getRequestDescription();
-                   if(jsonQueryId == null) {
-                       jsonQuery = queryRecord.getJsonText();
-                   } else {
-                       jsonQuery = generateJsonQuery(DbUtil.getJsonQuery(config, jsonQueryId));
-                   }
-                   ethicsVote = queryRecord.getEthicsVote();
+                   getSavedValuesFromDatabaseObject(config, queryRecord);
                }else {
-                   /**
-                    * Get the values of the fields before page was refreshed - for file upload or changing query from directory
-                    */
-                   getSavedValues();
+                    // Get the values of the fields before page was refreshed - for file upload or changing query from directory
+                   getSavedValuesFromSessionBean();
                }
                qtoken = queryRecord.getNegotiatorToken();
                setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
@@ -224,17 +209,50 @@ public class QueryBean implements Serializable {
                // Add Token to query String
                searchJsonQuery = searchJsonQuery.replace("\"URL\"", "\"token\":\"" + UUID.randomUUID().toString().replace("-", "") + "\",\"URL\"");
                jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
-               System.out.println("jsonQuery: " + jsonQuery);
            }
            logger.debug("jsonQuery: " + jsonQuery);
            QueryDTO queryDTO = Directory.getQueryDTO(jsonQuery);
-           System.out.println("Size of SearchQueries: " + queryDTO.getSearchQueries().size());
            searchQueries = new ArrayList<QuerySearchDTO>(queryDTO.getSearchQueries());
        }
        catch (Exception e) {
            logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
        }
    }
+
+    private void getSavedValuesFromDatabaseObject(Config config, QueryRecord queryRecord) {
+        queryTitle = queryRecord.getTitle();
+        queryText = queryRecord.getText();
+        queryRequestDescription = queryRecord.getRequestDescription();
+        if(jsonQueryId == null) {
+            jsonQuery = queryRecord.getJsonText();
+        } else {
+            jsonQuery = generateJsonQuery(DbUtil.getJsonQuery(config, jsonQueryId));
+        }
+        ethicsVote = queryRecord.getEthicsVote();
+    }
+
+    /**
+     * Gets values from session bean that are saved before page is refreshed - for file upload or changing query from directory.
+     */
+    public void getSavedValuesFromSessionBean() {
+        queryTitle = sessionBean.getTransientQueryTitle();
+        queryText = sessionBean.getTransientQueryText();
+        queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
+        ethicsVote = sessionBean.getTransientEthicsCode();
+
+        if (jsonQueryId != null) {
+            try (Config config = ConfigFactory.get()) {
+                String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+                jsonQuery = generateJsonQuery(searchJsonQuery);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            jsonQuery = sessionBean.getTransientQueryJson();
+        }
+        clearEditChanges();
+
+    }
 
     public List<ListOfDirectoriesRecord> getDirectories() {
         try(Config config = ConfigFactory.get()) {
@@ -331,30 +349,6 @@ public class QueryBean implements Serializable {
         }
     }
 
-   /**
-    * Gets values from session bean that are saved before page is refreshed - for file upload or changing query from directory.
-    */
-   public void getSavedValues() {
-       queryTitle = sessionBean.getTransientQueryTitle();
-       queryText = sessionBean.getTransientQueryText();
-       queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
-       ethicsVote = sessionBean.getTransientEthicsCode();
-
-       if (jsonQueryId != null) {
-           try (Config config = ConfigFactory.get()) {
-               //TODO: Kleines Query
-               String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-               jsonQuery = generateJsonQuery(searchJsonQuery);
-           } catch (SQLException e) {
-               e.printStackTrace();
-           }
-       } else {
-           jsonQuery = sessionBean.getTransientQueryJson();
-       }
-       clearEditChanges();
-
-   }
-
     /**
      * Generate the JSON including the new search query String
      * @param searchJsonQuery
@@ -426,7 +420,7 @@ public class QueryBean implements Serializable {
         if (file == null)
             return "";
 
-        String originalFileName = FileUtil.getFileName(file);
+        String originalFileName = FileUtil.getOriginalFileNameFromPart(file);
         Integer fileId;
         String uploadName;
 
@@ -447,7 +441,7 @@ public class QueryBean implements Serializable {
             }
             // XXX: this needs to match the pattern in FileServlet.doGet and
             // ResearcherQueriesDetailBean.getAttachmentMap
-            uploadName = "query_" + getId() + "_file_" + fileId + ".pdf";
+            uploadName = FileUtil.getStorageFileName(getId(), fileId, originalFileName);
             if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
                 if (mode.equals("edit")) {
                     saveEditChangesTemporarily();

@@ -38,6 +38,7 @@
 	<composite:attribute name="offer" required="false" />
 	<composite:attribute name="makeOffer" required="false" default="false"  />
 	<composite:attribute name="rendered" required="false" />
+	<composite:attribute name="ownerQueriesDetailBean" />
 </composite:interface>
 
 <composite:implementation>
@@ -61,6 +62,15 @@
 						<h:messages id="commentValidationMessage" for="commentText"
 							style="color:red" showSummary="true" showDetails="false" />
 					</h:inputTextarea>
+					<!-- Attachments for a query -->
+					<h:panelGroup layout="block">
+
+						<!-- Uploaded attachments for a query -->
+						<bbmricc:fileUploaderDisplay queryBean="#{ownerQueriesDetailBean}" />
+						<!-- Upload the attachments for a query -->
+						<bbmricc:fileUpload queryBean="#{ownerQueriesDetailBean}" />
+
+					</h:panelGroup>
 				</h:panelGroup>	
 
 				<h:panelGroup layout="block" styleClass="pull-right"  style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'false'}">

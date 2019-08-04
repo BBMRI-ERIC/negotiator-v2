@@ -78,7 +78,7 @@ public class FileUtil {
      * @param filePart
      * @return
      */
-    public static String getFileName(Part filePart) {
+    public static String getOriginalFileNameFromPart(Part filePart) {
         String header = filePart.getHeader("content-disposition");
         for(String headerPart : header.split(";")) {
             if(headerPart.trim().startsWith("filename")){
@@ -86,6 +86,12 @@ public class FileUtil {
             }
         }
         return null;
+    }
+
+    public static String getStorageFileName(Integer queryId, Integer fileId, String originalFileName) {
+        String[] splitFilename = originalFileName.split("\\.");
+        String fileExtension = splitFilename[splitFilename.length - 1];
+        return "query_" + queryId + "_file_" + fileId + "." + fileExtension;
     }
 
     /**
