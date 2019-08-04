@@ -512,15 +512,17 @@ public class QueryBean implements Serializable {
 
        //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
        // patterngrops 1: queryID, 2: fileID, 3: fileName
-       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_salt_(.*)");
+       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_salt_(.*)");
        Matcher matcher = pattern.matcher(attachment);
 
        String fileID = null;
        String queryID = null;
+       String fileExtension = null;
        logger.debug("Wanting to remove file "+attachment);
        if(matcher.find()) {
            queryID = matcher.group(1);
            fileID = matcher.group(2);
+           fileExtension = matcher.group(3);
            logger.debug("Pattern matched and found file ID = "+fileID+" for query "+queryID);
        }
 
@@ -548,7 +550,8 @@ public class QueryBean implements Serializable {
            config.commit();
 
            String filePath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
-           File file = new File(filePath, URLDecoder.decode(attachment, "UTF-8"));
+           String filename = FileUtil.getStorageFileName(queryIdInteger, fileIdInteger, fileExtension);
+           File file = new File(filePath, filename);
            logger.debug("Deleting physical file "+file.getAbsolutePath());
 
            file.delete();
@@ -556,8 +559,6 @@ public class QueryBean implements Serializable {
                saveEditChangesTemporarily();
            }
        } catch (SQLException e) {
-           e.printStackTrace();
-       } catch(UnsupportedEncodingException e) {
            e.printStackTrace();
        }
        return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
