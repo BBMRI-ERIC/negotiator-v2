@@ -41,6 +41,7 @@ import javax.servlet.http.Part;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
@@ -468,12 +469,12 @@ public class OwnerQueriesDetailBean implements Serializable {
 			attachmentTypeMap = new HashMap<String, String>();
             for(QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
-                String uploadName = "query_" + queryId + "_file_" + att.getId();
+                String uploadName = FileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
 
                 Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
                 uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
-                        uploadName) + ".pdf";
+                        uploadName) + ".download";
 
 
                 uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());

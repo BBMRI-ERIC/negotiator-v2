@@ -88,8 +88,8 @@ public class FileUtil {
         return null;
     }
 
-    public static String getStorageFileName(Integer queryId, Integer fileId, String originalFileName) {
-        String[] splitFilename = originalFileName.split("\\.");
+    public static String getStorageFileName(Integer queryId, Integer fileId, String fileName) {
+        String[] splitFilename = fileName.split("\\.");
         String fileExtension = splitFilename[splitFilename.length - 1];
         return "query_" + queryId + "_file_" + fileId + "." + fileExtension;
     }

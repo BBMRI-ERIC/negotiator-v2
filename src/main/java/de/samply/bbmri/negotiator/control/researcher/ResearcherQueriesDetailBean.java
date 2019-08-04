@@ -39,8 +39,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.ServletUtil;
+import de.samply.bbmri.negotiator.*;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
@@ -53,8 +52,6 @@ import org.jooq.Result;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
@@ -446,12 +443,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
             attachmentTypeMap = new HashMap<String, String>();
             for (QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
-                String uploadName = "query_" + queryId + "_file_" + att.getId();
+                String uploadName = FileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
 
                 Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
                 uploadName = uploadName + "_salt_" + DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
-                        uploadName) + ".pdf";
+                        uploadName) + ".download";
 
 
                 uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());

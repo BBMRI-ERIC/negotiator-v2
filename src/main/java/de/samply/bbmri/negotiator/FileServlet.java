@@ -91,12 +91,12 @@ public class FileServlet extends HttpServlet {
 
         //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
         // patterngrops 1: queryID, 2: fileID, 3: fileName
-        Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_salt_(.*)\\.pdf$");
+        Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_salt_(.*)\\.download$");
         Matcher matcher = pattern.matcher(requestedFile);
         String filenameSalt = null;
 
         if(matcher.find()) {
-            filenameSalt = matcher.group(3);
+            filenameSalt = matcher.group(4);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
             return;
@@ -110,10 +110,11 @@ public class FileServlet extends HttpServlet {
 
         String queryId = matcher.group(1);
         String fileId = matcher.group(2);
+        String fileExtension = matcher.group(3);
         Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
         // check if the salt fits
-        String trueFileName = "query_" + queryId + "_file_" + fileId;
+        String trueFileName = FileUtil.getStorageFileName(Integer.parseInt(queryId), Integer.parseInt(fileId), fileExtension);
         String saltCheck = DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
                 trueFileName);
 
@@ -123,7 +124,7 @@ public class FileServlet extends HttpServlet {
         }
 
         /* Decode the file name (might contain spaces and on) and prepare file object.  */
-        File file = new File(filePath, URLDecoder.decode(trueFileName + ".pdf", "UTF-8"));
+        File file = new File(filePath, URLDecoder.decode(trueFileName, "UTF-8"));
 
         /* Check if file actually exists in filesystem.  */
         if (!file.exists()) {

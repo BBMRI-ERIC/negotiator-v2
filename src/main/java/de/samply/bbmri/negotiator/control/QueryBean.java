@@ -669,12 +669,11 @@ public class QueryBean implements Serializable {
             attachmentTypeMap = new HashMap<String, String>();
             for(QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
-                String uploadName = "query_" + getId() + "_file_" + att.getId();
+                String uploadName = FileUtil.getStorageFileName(getId(), att.getId(), att.getAttachment());
 
                 Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
-                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
-                        uploadName) + ".pdf";
+                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() + uploadName) + ".download";
 
 
                 uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
