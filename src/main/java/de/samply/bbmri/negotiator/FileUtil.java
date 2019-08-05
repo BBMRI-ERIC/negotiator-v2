@@ -30,9 +30,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 
+import de.samply.bbmri.negotiator.helper.MessageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,5 +127,23 @@ public class FileUtil {
             logger.error("Error while scanning file: ", e);
             throw e;
         }
+    }
+
+    public static List<FacesMessage> validateFile(Part file, int max_upload_size) throws ValidatorException{
+        if(file != null) {
+            List<FacesMessage> msgs = new ArrayList<FacesMessage>();
+            if (file.getSize() > max_upload_size) {
+                msgs.addAll(MessageHelper.generateValidateFileMessages(max_upload_size));
+            }
+            try {
+                if (FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
+                    msgs.addAll(MessageHelper.generateValidateFileMessages("checkVirusClamAVTriggeredVirusWarning"));
+                }
+            } catch (Exception e) {
+                msgs.addAll(MessageHelper.generateValidateFileMessages(e.getMessage()));
+            }
+            return msgs;
+        }
+        return null;
     }
 }
