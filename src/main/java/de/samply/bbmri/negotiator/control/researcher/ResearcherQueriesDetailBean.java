@@ -139,6 +139,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private Part file;
 
     /**
+     * Query attachment upload file type.
+     */
+    private String attachmentType;
+
+    /**
      * The structured query object
      */
     private String humanReadableQuery = null;
@@ -233,16 +238,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
                 ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
-                //TODO: Human readable need rework
                 setHumanReadableQuery(queryDTO.getHumanReadable());
-                //setHumanReadableQuery("TODO");
             }
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
-        System.out.println("--->>> biobankWithOffer: " + biobankWithOffer.size());
-        System.out.println("--->>> matchingBiobankCollection: " + matchingBiobankCollection.size());
 
         /**
          * Convert matchingBiobankCollection in the JSON format for Tree View
@@ -426,6 +427,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setFile(Part file) {
         this.file = file;
+    }
+
+    public String getAttachmentType() {
+        return attachmentType;
+    }
+
+    public void setAttachmentType(String attachmentType) {
+        this.attachmentType = attachmentType;
     }
 
     public void setAttachments(List<QueryAttachmentDTO> attachments) {
