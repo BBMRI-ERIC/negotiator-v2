@@ -116,7 +116,8 @@ public class FileUtil {
          * something is very wrong and do not continue.
          */
         try {
-            return !ClamAVClient.isCleanReply(cl.scan(inputStream));
+            byte[] reply = cl.scan(inputStream);
+            return !ClamAVClient.isCleanReply(reply);
         } catch (Exception e) {
             logger.error("Error while scanning file: ", e);
             throw e;
