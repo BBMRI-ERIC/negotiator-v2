@@ -467,23 +467,12 @@ public class QueryBean implements Serializable {
     */
    public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
        //clear message list every time a new file is selected for validation
-       msgs.clear();
+       FileUtil fileUtil = new FileUtil();
        Part file = (Part)value;
-       if(file != null) {
-           if (file.getSize() > MAX_UPLOAD_SIZE) {
-               msgs.addAll(MessageHelper.generateValidateFileMessages(MAX_UPLOAD_SIZE));
-           }
-           try {
-               if (FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
-                   msgs.addAll(MessageHelper.generateValidateFileMessages("checkVirusClamAVTriggeredVirusWarning"));
-               }
-           } catch (Exception e) {
-               msgs.addAll(MessageHelper.generateValidateFileMessages(e.getMessage()));
-           }
+       msgs = fileUtil.validateFile(file, MAX_UPLOAD_SIZE);
 
-           if (!msgs.isEmpty()) {
-               throw new ValidatorException(msgs);
-           }
+       if (msgs != null && !msgs.isEmpty()) {
+           throw new ValidatorException(msgs);
        }
    }
 
@@ -585,6 +574,14 @@ public class QueryBean implements Serializable {
                 context.getRequestServerPort(), context.getRequestContextPath(),
                 "/owner/detail.xhtml?queryId=" + getId());
     }
+
+    /*
+     * File Upload code block
+     */
+
+    /*
+     * Common Getter / Setter for bean
+     */
 
 	public String getQueryTitle() {
 		return queryTitle;
