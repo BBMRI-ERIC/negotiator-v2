@@ -105,7 +105,7 @@ public class FileUtil {
      * @param inputStream the fileinputstream that will be checked for viruses
      * @return true, if a virus has been found. False otherwise
      */
-    public static boolean checkVirusClamAV(Negotiator config, InputStream inputStream) throws IOException {
+    public boolean checkVirusClamAV(Negotiator config, InputStream inputStream) throws IOException {
         /**
          * If there is no clamav configured, return false and do not check for viruses
          */
@@ -129,14 +129,14 @@ public class FileUtil {
         }
     }
 
-    public static List<FacesMessage> validateFile(Part file, int max_upload_size) throws ValidatorException{
+    public List<FacesMessage> validateFile(Part file, int max_upload_size) throws ValidatorException{
         if(file != null) {
             List<FacesMessage> msgs = new ArrayList<FacesMessage>();
             if (file.getSize() > max_upload_size) {
                 msgs.addAll(MessageHelper.generateValidateFileMessages(max_upload_size));
             }
             try {
-                if (FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
+                if (checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
                     msgs.addAll(MessageHelper.generateValidateFileMessages("checkVirusClamAVTriggeredVirusWarning"));
                 }
             } catch (Exception e) {
