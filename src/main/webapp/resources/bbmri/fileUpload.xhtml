@@ -11,6 +11,7 @@
 
 <composite:interface>
     <composite:attribute name="queryBean" required="true"/>
+    <composite:attribute name="fileUploadBean" required="true"/>
 </composite:interface>
 
 <composite:implementation>
@@ -34,7 +35,7 @@
                 <h:panelGroup class="btn btn-default">
                     <h:outputText value="#{label['querydetail.action.browse']}" />
                     <h:inputFile id="file" value="#{cc.attrs.queryBean.file}"
-                                 validator="#{cc.attrs.queryBean.validateFile}"
+                                 validator="#{cc.attrs.fileUploadBean.validateFile}"
                                  onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
                                  style="display: none;" />
                 </h:panelGroup>

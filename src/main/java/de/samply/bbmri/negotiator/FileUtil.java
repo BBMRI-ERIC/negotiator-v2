@@ -129,7 +129,7 @@ public class FileUtil {
         }
     }
 
-    public List<FacesMessage> validateFile(Part file, int max_upload_size) throws ValidatorException{
+    public List<FacesMessage> validateFile(Part file, int max_upload_size) throws ValidatorException {
         if(file != null) {
             List<FacesMessage> msgs = new ArrayList<FacesMessage>();
             if (file.getSize() > max_upload_size) {

@@ -49,6 +49,7 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.helper.MessageHelper;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
@@ -81,10 +82,6 @@ public class QueryBean implements Serializable {
 
    private static final long serialVersionUID = -611428463046308071L;
 
-   /**
-    * Query attachment upload
-    */
-   private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
    private Integer jsonQueryId;
 
    private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
@@ -97,6 +94,9 @@ public class QueryBean implements Serializable {
     */
    @ManagedProperty(value = "#{sessionBean}")
    private SessionBean sessionBean;
+
+    @ManagedProperty(value = "#{fileUploadBean}")
+    private FileUploadBean fileUploadBean;
 
    /**
     * The query id if user is in the edit mode.
@@ -132,36 +132,6 @@ public class QueryBean implements Serializable {
     * The token sent to directory for authentication.
     */
    private String qtoken;
-
-   /**
-    * List of all the attachments for a given query
-    */
-   private List<QueryAttachmentDTO> attachments;
-
-    /**
-     * Map of saved filename and realname of attachments
-     */
-    private HashMap<String, String> attachmentMap = null;
-
-    /**
-     * Map of saved filename and attachment types of attachments
-     */
-    private HashMap<String, String> attachmentTypeMap = null;
-
-    /**
-     * temporal var to store attachment name to be deleted for confirmation dialog
-     */
-    private String toRemoveAttachment = null;
-
-    /**
-    * Query attachment upload.
-    */
-   private Part file;
-
-    /**
-     * Query attachment upload file type.
-     */
-    private String attachmentType;
 
     /**
      * String containing ethics code, if available.
@@ -411,143 +381,6 @@ public class QueryBean implements Serializable {
    }
 
    /**
-    * Uploads and stores content of file from provided input stream
- * @throws IOException
-    */
-    public String uploadAttachment() throws IOException {
-        if (file == null)
-            return "";
-
-        String originalFileName = FileUtil.getOriginalFileNameFromPart(file);
-        Integer fileId;
-        String uploadName;
-
-        try (Config config = ConfigFactory.get()) {
-            if (id == null) {
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, ethicsVote, userBean.getUserId()
-                        , false);
-                config.commit();
-                setId(record.getId());
-            }
-
-            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName, attachmentType);
-            if (fileId == null) {
-                // something went wrong in db
-                config.rollback();
-                return "";
-            }
-            // XXX: this needs to match the pattern in FileServlet.doGet and
-            // ResearcherQueriesDetailBean.getAttachmentMap
-            uploadName = FileUtil.getStorageFileName(getId(), fileId, originalFileName);
-            if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
-                if (mode.equals("edit")) {
-                    saveEditChangesTemporarily();
-                }
-                config.commit();
-            } else {
-                // something went wrong saving the file to disk
-                config.rollback();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "";
-        }
-
-        return "/researcher/newQuery?queryId=" + getId() + "&faces-redirect=true";
-    }
-
-   /**
-    * Validates uploaded file to be of correct size, content type and format
-    * @param ctx
-    * @param comp
-    * @param value
-    * @throws IOException
-    */
-   public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
-       //clear message list every time a new file is selected for validation
-       FileUtil fileUtil = new FileUtil();
-       Part file = (Part)value;
-       msgs = fileUtil.validateFile(file, MAX_UPLOAD_SIZE);
-
-       if (msgs != null && !msgs.isEmpty()) {
-           throw new ValidatorException(msgs);
-       }
-   }
-
-    public void setToRemoveAttachment(String filename) {
-        this.toRemoveAttachment = filename;
-    }
-
-    /**
-    * Removes an attachment from the given query
-    */
-   public String removeAttachment() {
-
-        String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
-       // reset it
-       toRemoveAttachment = null;
-
-       if(attachment == null)
-           return "";
-
-       //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
-       // patterngrops 1: queryID, 2: fileID, 3: fileName
-       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_salt_(.*)");
-       Matcher matcher = pattern.matcher(attachment);
-
-       String fileID = null;
-       String queryID = null;
-       String fileExtension = null;
-       logger.debug("Wanting to remove file "+attachment);
-       if(matcher.find()) {
-           queryID = matcher.group(1);
-           fileID = matcher.group(2);
-           fileExtension = matcher.group(3);
-           logger.debug("Pattern matched and found file ID = "+fileID+" for query "+queryID);
-       }
-
-       Integer fileIdInteger = null;
-       Integer queryIdInteger = null;
-       try {
-           fileIdInteger = Integer.parseInt(fileID);
-           queryIdInteger = Integer.parseInt(queryID);
-           logger.debug("Integer version of fileID = "+fileIdInteger+" and queryID = "+queryIdInteger);
-       } catch(NumberFormatException e) {
-           FacesContext context = FacesContext.getCurrentInstance();
-           context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File could not be deleted",
-                   "The uploaded file could not be deleted due to some unforseen error.") );
-           return "";
-       }
-
-       if(queryIdInteger != id) {
-           logger.error("QueryID of file "+queryIdInteger+" does not match QueryID "+id+" of this bean.");
-           return "";
-       }
-
-       logger.debug("Removing file "+attachment+" with ID "+fileIdInteger);
-       try (Config config = ConfigFactory.get()) {
-           DbUtil.deleteQueryAttachmentRecord(config, getId(), fileIdInteger);
-           config.commit();
-
-           String filePath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
-           String filename = FileUtil.getStorageFileName(queryIdInteger, fileIdInteger, fileExtension);
-           File file = new File(filePath, filename);
-           logger.debug("Deleting physical file "+file.getAbsolutePath());
-
-           file.delete();
-           if (mode.equals("edit")) {
-               saveEditChangesTemporarily();
-           }
-       } catch (SQLException e) {
-           e.printStackTrace();
-       }
-       return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
-   }
-
-
-   /**
     * Build url to be able to navigate to the query with id=queryId
     *
     * @param queryId
@@ -578,49 +411,110 @@ public class QueryBean implements Serializable {
     /*
      * File Upload code block
      */
+    //-----------------------------------------------------------------------------------------
 
-    /*
-     * Common Getter / Setter for bean
+    /**
+     * Query attachment upload
      */
+    private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
 
-	public String getQueryTitle() {
-		return queryTitle;
-	}
+    /**
+     * List of all the attachments for a given query
+     */
+    private List<QueryAttachmentDTO> attachments;
 
-	public void setQueryTitle(String queryTitle) {
-		this.queryTitle = queryTitle;
-	}
+    /**
+     * Map of saved filename and realname of attachments
+     */
+    private HashMap<String, String> attachmentMap = null;
 
-    public Integer getId() {
-        return id;
+    /**
+     * Map of saved filename and attachment types of attachments
+     */
+    private HashMap<String, String> attachmentTypeMap = null;
+
+    /**
+     * temporal var to store attachment name to be deleted for confirmation dialog
+     */
+    private String toRemoveAttachment = null;
+
+
+
+    /**
+     * Query attachment upload file type.
+     */
+    private String attachmentType;
+
+
+
+    public void setToRemoveAttachment(String filename) {
+        this.toRemoveAttachment = filename;
     }
 
-    public void setId(Integer id) {
-        this.id =id;
-    }
+    /**
+     * Removes an attachment from the given query
+     */
+    public String removeAttachment() {
 
-    public UserBean getUserBean() {
-        return userBean;
-    }
+        String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
+        // reset it
+        toRemoveAttachment = null;
 
-    public void setUserBean(UserBean userBean) {
-        this.userBean = userBean;
-    }
+        if(attachment == null)
+            return "";
 
-    public String getQueryText() {
-        return queryText;
-    }
+        //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
+        // patterngrops 1: queryID, 2: fileID, 3: fileName
+        Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_salt_(.*)");
+        Matcher matcher = pattern.matcher(attachment);
 
-    public void setQueryText(String queryText) {
-        this.queryText = queryText;
-    }
+        String fileID = null;
+        String queryID = null;
+        String fileExtension = null;
+        logger.debug("Wanting to remove file "+attachment);
+        if(matcher.find()) {
+            queryID = matcher.group(1);
+            fileID = matcher.group(2);
+            fileExtension = matcher.group(3);
+            logger.debug("Pattern matched and found file ID = "+fileID+" for query "+queryID);
+        }
 
-    public String getMode() {
-        return mode;
-    }
+        Integer fileIdInteger = null;
+        Integer queryIdInteger = null;
+        try {
+            fileIdInteger = Integer.parseInt(fileID);
+            queryIdInteger = Integer.parseInt(queryID);
+            logger.debug("Integer version of fileID = "+fileIdInteger+" and queryID = "+queryIdInteger);
+        } catch(NumberFormatException e) {
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File could not be deleted",
+                    "The uploaded file could not be deleted due to some unforseen error.") );
+            return "";
+        }
 
-    public void setMode(String mode) {
-        this.mode = mode;
+        if(queryIdInteger != id) {
+            logger.error("QueryID of file "+queryIdInteger+" does not match QueryID "+id+" of this bean.");
+            return "";
+        }
+
+        logger.debug("Removing file "+attachment+" with ID "+fileIdInteger);
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.deleteQueryAttachmentRecord(config, getId(), fileIdInteger);
+            config.commit();
+
+            String filePath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
+            String filename = FileUtil.getStorageFileName(queryIdInteger, fileIdInteger, fileExtension);
+            File file = new File(filePath, filename);
+            logger.debug("Deleting physical file "+file.getAbsolutePath());
+
+            file.delete();
+            if (mode.equals("edit")) {
+                saveEditChangesTemporarily();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
     }
 
     public List<QueryAttachmentDTO> getAttachments() {
@@ -668,12 +562,53 @@ public class QueryBean implements Serializable {
         return attachmentType;
     }
 
-    public Part getFile() {
-        return file;
-    }
+    /**
+     * Uploads and stores content of file from provided input stream
+     * @throws IOException
+     */
+    public String uploadAttachment() throws IOException {
+        Part file = null;
+        if (file == null)
+            return "";
 
-    public void setFile(Part file) {
-        this.file = file;
+        String originalFileName = FileUtil.getOriginalFileNameFromPart(file);
+        Integer fileId;
+        String uploadName;
+
+        try (Config config = ConfigFactory.get()) {
+            if (id == null) {
+                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                        jsonQuery, ethicsVote, userBean.getUserId(),
+                        false);
+                config.commit();
+                setId(record.getId());
+            }
+
+            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName, attachmentType);
+            if (fileId == null) {
+                // something went wrong in db
+                config.rollback();
+                return "";
+            }
+            // XXX: this needs to match the pattern in FileServlet.doGet and
+            // ResearcherQueriesDetailBean.getAttachmentMap
+            uploadName = FileUtil.getStorageFileName(getId(), fileId, originalFileName);
+            if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
+                if (mode.equals("edit")) {
+                    saveEditChangesTemporarily();
+                }
+                config.commit();
+            } else {
+                // something went wrong saving the file to disk
+                config.rollback();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
+        }
+
+        return "/researcher/newQuery?queryId=" + getId() + "&faces-redirect=true";
     }
 
     public String getAttachmentType() {
@@ -684,12 +619,65 @@ public class QueryBean implements Serializable {
         this.attachmentType = attachmentType;
     }
 
+    //-----------------------------------------------------------------------------------------
+    /*
+     * Common Getter / Setter for bean
+     */
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
+
     public SessionBean getSessionBean() {
         return sessionBean;
     }
 
     public void setSessionBean(SessionBean sessionBean) {
         this.sessionBean = sessionBean;
+    }
+
+    public FileUploadBean getFileUploadBean() {
+        return fileUploadBean;
+    }
+
+    public void setFileUploadBean(FileUploadBean fileUploadBean) {
+        this.fileUploadBean = fileUploadBean;
+    }
+
+	public String getQueryTitle() {
+		return queryTitle;
+	}
+
+	public void setQueryTitle(String queryTitle) {
+		this.queryTitle = queryTitle;
+	}
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id =id;
+    }
+
+    public String getQueryText() {
+        return queryText;
+    }
+
+    public void setQueryText(String queryText) {
+        this.queryText = queryText;
+    }
+
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
     public Integer getJsonQueryId() {

@@ -60,6 +60,13 @@ public class Negotiator implements Serializable {
     private String uploadFileSalt;
 
     /**
+     * Maximum file size for uploaded attachments in Byte
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private int maxUploadFileSize;
+
+    /**
      * The Molgenis resource name for the biobanks
      */
     @XmlElement
@@ -348,6 +355,14 @@ public class Negotiator implements Serializable {
 
     public void setUploadFileSalt(String uploadFileSalt) {
         this.uploadFileSalt = uploadFileSalt;
+    }
+
+    public int getMaxUploadFileSize() {
+        return maxUploadFileSize;
+    }
+
+    public void setMaxUploadFileSize(int maxUploadFileSize) {
+        this.maxUploadFileSize = maxUploadFileSize;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
