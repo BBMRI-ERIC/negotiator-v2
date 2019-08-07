@@ -63,7 +63,6 @@ public class Negotiator implements Serializable {
      * Maximum file size for uploaded attachments in Byte
      */
     @XmlElement
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     private int maxUploadFileSize;
 
     /**

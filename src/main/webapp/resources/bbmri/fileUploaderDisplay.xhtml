@@ -16,10 +16,10 @@
 
 <composite:implementation>
     <!-- Using h:dataTable to display attachments -->
-    <h:dataTable value="#{queryBean.attachmentMap.entrySet().toArray()}" var="attachment"
+    <h:dataTable value="#{fileUploadBean.attachmentMap.entrySet().toArray()}" var="attachment"
                  columnClasses="column1,column2,column3" style="margin-top: 0px;"
                  class="table-striped table-bordered table-responsive table-fullwidth"
-                 rendered="#{queryBean.attachments.size() > 0}">
+                 rendered="#{fileUploadBean.attachments.size() > 0}">
 
         <h:column>
             <h:outputLink value="../attachment/#{attachment.key}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
@@ -37,7 +37,7 @@
         </h:column>
 
         <h:column>
-            #{queryBean.getAttachmentType(attachment.key)}
+            #{fileUploadBean.getAttachmentType(attachment.key)}
         </h:column>
 
         <h:column>

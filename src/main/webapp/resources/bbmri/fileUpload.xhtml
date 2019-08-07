@@ -22,7 +22,7 @@
                    class="form-control" style="width: 80%;" readonly="readonly"
                    onclick="$('#uploadform\\:file').click();" />
 
-            <h:selectOneMenu value="#{cc.attrs.queryBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">
+            <h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">
                 <f:selectItem itemValue="other" itemLabel="other" />
                 <f:selectItem itemValue="Project Description" itemLabel="Project Description" />
                 <f:selectItem itemValue="Request Description" itemLabel="Request Description" />
@@ -34,7 +34,7 @@
             <label class="input-group-btn"> +
                 <h:panelGroup class="btn btn-default">
                     <h:outputText value="#{label['querydetail.action.browse']}" />
-                    <h:inputFile id="file" value="#{cc.attrs.queryBean.file}"
+                    <h:inputFile id="file" value="#{cc.attrs.fileUploadBean.file}"
                                  validator="#{cc.attrs.fileUploadBean.validateFile}"
                                  onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
                                  style="display: none;" />
@@ -46,7 +46,7 @@
         </h:panelGroup>
         <h:panelGroup layout="block">
             <ul>
-                <ui:repeat value="#{cc.attrs.queryBean.msgs}" var="msgs">
+                <ui:repeat value="#{cc.attrs.fileUploadBean.msgs}" var="msgs">
                     <li>
                         <h:outputText id="uploadMessages" value="#{msgs.detail}" style="#{msgs.summary == 'Upload Failed' ? 'color: red' : 'color: green'}" />
                     </li>

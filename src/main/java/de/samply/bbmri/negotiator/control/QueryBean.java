@@ -169,7 +169,7 @@ public class QueryBean implements Serializable {
                    getSavedValuesFromSessionBean();
                }
                qtoken = queryRecord.getNegotiatorToken();
-               setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
+
            }
            else{
                setMode("newQuery");
@@ -414,39 +414,54 @@ public class QueryBean implements Serializable {
     //-----------------------------------------------------------------------------------------
 
     /**
-     * Query attachment upload
+     * Uploads and stores content of file from provided input stream
+     * @throws IOException
      */
-    private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
+    public String uploadAttachment() throws IOException {
+        if (!fileUploadBean.isFileToUpload())
+            return "";
 
-    /**
-     * List of all the attachments for a given query
-     */
-    private List<QueryAttachmentDTO> attachments;
+        try (Config config = ConfigFactory.get()) {
+            if (id == null) {
+                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                        jsonQuery, ethicsVote, userBean.getUserId(),
+                        false);
+                config.commit();
+                setId(record.getId());
+            }
+            boolean fileCreationSuccessful = fileUploadBean.createFile();
+            if(fileCreationSuccessful) {
+                if (mode.equals("edit")) {
+                    saveEditChangesTemporarily();
+                }
+            } else {
+                config.rollback();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
+        }
+        return "/researcher/newQuery?queryId=" + getId() + "&faces-redirect=true";
+    }
 
-    /**
-     * Map of saved filename and realname of attachments
-     */
-    private HashMap<String, String> attachmentMap = null;
 
-    /**
-     * Map of saved filename and attachment types of attachments
-     */
-    private HashMap<String, String> attachmentTypeMap = null;
+
+
+
+
+
+
+
+
+
 
     /**
      * temporal var to store attachment name to be deleted for confirmation dialog
      */
+    // TODO: Refector
     private String toRemoveAttachment = null;
 
-
-
-    /**
-     * Query attachment upload file type.
-     */
-    private String attachmentType;
-
-
-
+    // TODO: Refector
     public void setToRemoveAttachment(String filename) {
         this.toRemoveAttachment = filename;
     }
@@ -454,6 +469,7 @@ public class QueryBean implements Serializable {
     /**
      * Removes an attachment from the given query
      */
+    // TODO: Refector
     public String removeAttachment() {
 
         String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
@@ -517,107 +533,8 @@ public class QueryBean implements Serializable {
         return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
     }
 
-    public List<QueryAttachmentDTO> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<QueryAttachmentDTO> attachments) {
-        this.attachments = attachments;
-    }
-
-    /**
-     * Lazyloaded map of saved filenames and original filenames
-     * @return
-     */
-    public HashMap<String, String> getAttachmentMap() {
-        if(attachmentMap == null) {
-            attachmentMap = new HashMap<String, String>();
-            attachmentTypeMap = new HashMap<String, String>();
-            for(QueryAttachmentDTO att : attachments) {
-                //XXX: this pattern needs to match
-                String uploadName = FileUtil.getStorageFileName(getId(), att.getId(), att.getAttachment());
-
-                Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
-
-                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() + uploadName) + ".download";
 
 
-                uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
-
-                attachmentMap.put(uploadName, att.getAttachment());
-                attachmentTypeMap.put(uploadName, att.getAttachmentType());
-            }
-        }
-        return attachmentMap;
-    }
-
-    public String getAttachmentType(String uploadName) {
-        if(attachmentTypeMap == null) {
-            getAttachmentMap();
-        }
-        String attachmentType = "other...";
-        if(attachmentTypeMap.containsKey(uploadName)) {
-            attachmentType = attachmentTypeMap.get(uploadName);
-        }
-        return attachmentType;
-    }
-
-    /**
-     * Uploads and stores content of file from provided input stream
-     * @throws IOException
-     */
-    public String uploadAttachment() throws IOException {
-        Part file = null;
-        if (file == null)
-            return "";
-
-        String originalFileName = FileUtil.getOriginalFileNameFromPart(file);
-        Integer fileId;
-        String uploadName;
-
-        try (Config config = ConfigFactory.get()) {
-            if (id == null) {
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, ethicsVote, userBean.getUserId(),
-                        false);
-                config.commit();
-                setId(record.getId());
-            }
-
-            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName, attachmentType);
-            if (fileId == null) {
-                // something went wrong in db
-                config.rollback();
-                return "";
-            }
-            // XXX: this needs to match the pattern in FileServlet.doGet and
-            // ResearcherQueriesDetailBean.getAttachmentMap
-            uploadName = FileUtil.getStorageFileName(getId(), fileId, originalFileName);
-            if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
-                if (mode.equals("edit")) {
-                    saveEditChangesTemporarily();
-                }
-                config.commit();
-            } else {
-                // something went wrong saving the file to disk
-                config.rollback();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "";
-        }
-
-        return "/researcher/newQuery?queryId=" + getId() + "&faces-redirect=true";
-    }
-
-    public String getAttachmentType() {
-        return attachmentType;
-    }
-
-    public void setAttachmentType(String attachmentType) {
-        this.attachmentType = attachmentType;
-    }
 
     //-----------------------------------------------------------------------------------------
     /*
@@ -662,6 +579,7 @@ public class QueryBean implements Serializable {
 
     public void setId(Integer id) {
         this.id =id;
+        fileUploadBean.setupQuery(id);
     }
 
     public String getQueryText() {
@@ -701,14 +619,6 @@ public class QueryBean implements Serializable {
 
     public void setEthicsVote(String ethicsVote) {
         this.ethicsVote = ethicsVote;
-    }
-
-    public List<FacesMessage> getMsgs() {
-        return msgs;
-    }
-
-    public void setMsgs(List<FacesMessage> msgs) {
-        this.msgs = msgs;
     }
 
     public String getQtoken() { return qtoken; }

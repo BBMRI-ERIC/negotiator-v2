@@ -12,7 +12,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.faces.application.FacesMessage;
 import javax.servlet.http.Part;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalMatchers.or;
@@ -30,6 +33,8 @@ public class FileUploadTest {
     FileUtil fileUtil;
     @Mock
     Negotiator negotiator;
+    @Mock
+    Part file;
 
     @Test
     @DisplayName("Test File validation no file supplyed by servlet")
@@ -40,6 +45,22 @@ public class FileUploadTest {
         when(negotiator.getMaxUploadFileSize()).thenReturn(512*1024*1024);
         try {
             fileUploadBean.validateFile(null, null, null);
+        } catch (Exception e) {
+            fail("validateFile throw an Exception");
+        }
+    }
+
+    @Test
+    @DisplayName("Test File validation with valid file")
+    @Disabled
+    void testValidFileSupplyed() {
+        mock(FileUtil.class);
+        lenient().when(fileUtil.validateFile((Part)any(), anyInt())).thenReturn(new ArrayList<FacesMessage>());
+        mock(Negotiator.class);
+        when(negotiator.getMaxUploadFileSize()).thenReturn(512*1024*1024);
+        mock(Part.class);
+        try {
+            fileUploadBean.validateFile(null, null, file);
         } catch (Exception e) {
             fail("validateFile throw an Exception");
         }
