@@ -5,10 +5,13 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.control.QueryBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -33,15 +36,19 @@ import java.util.regex.Pattern;
 @ViewScoped
 public class FileUploadBean implements Serializable {
 
+    private static Logger logger = LoggerFactory.getLogger(FileUploadBean.class);
+
     List<FacesMessage> msgs = null;
     Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
     private Integer queryId = null;
+    private FileUtil fileUtil = new FileUtil();
 
     private Part file;
     private String attachmentType;
     private List<QueryAttachmentDTO> attachments;
     private HashMap<String, String> attachmentMap = null;
     private HashMap<String, String> attachmentTypeMap = null;
+    private String toRemoveAttachment = null;
 
     /**
      * Inits the state.
@@ -57,12 +64,11 @@ public class FileUploadBean implements Serializable {
         }
     }
 
-    /*
+    /**
      * File Upload
      */
     public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
         //clear message list every time a new file is selected for validation
-        FileUtil fileUtil = new FileUtil();
         Part file = (Part)value;
 
         msgs = fileUtil.validateFile(file, negotiator.getMaxUploadFileSize());
@@ -73,21 +79,20 @@ public class FileUploadBean implements Serializable {
     }
 
     public boolean createFile() {
-
         if(queryId == null) {
             return false;
         }
 
         try (Config config = ConfigFactory.get()) {
-            String originalFileName = FileUtil.getOriginalFileNameFromPart(file);
+            String originalFileName = fileUtil.getOriginalFileNameFromPart(file);
             Integer fileId = DbUtil.insertQueryAttachmentRecord(config, queryId, originalFileName, attachmentType);
             if (fileId == null) {
                 // something went wrong in db
                 config.rollback();
                 return false;
             }
-            String storageFileName = FileUtil.getStorageFileName(queryId, fileId, originalFileName);
-            if (FileUtil.saveQueryAttachment(file, storageFileName) != null) {
+            String storageFileName = fileUtil.getStorageFileName(queryId, fileId, originalFileName);
+            if (fileUtil.saveQueryAttachment(file, storageFileName) != null) {
                 config.commit();
                 return true;
             } else {
@@ -99,6 +104,61 @@ public class FileUploadBean implements Serializable {
             e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * Delete Files
+     */
+    public boolean removeAttachment() {
+
+        String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
+        // reset it
+        toRemoveAttachment = null;
+
+        if(attachment == null)
+            return false;
+
+        Pattern pattern = fileUtil.getStorageNamePattern();
+        Matcher matcher = pattern.matcher(attachment);
+        String fileID = null;
+        String queryID = null;
+        String fileExtension = null;
+
+        if(matcher.find()) {
+            queryID = matcher.group(1);
+            fileID = matcher.group(2);
+            fileExtension = matcher.group(3);
+        }
+
+        Integer fileIdInteger = null;
+        Integer queryIdInteger = null;
+        try {
+            fileIdInteger = Integer.parseInt(fileID);
+            queryIdInteger = Integer.parseInt(queryID);
+        } catch(NumberFormatException e) {
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File could not be deleted",
+                    "The uploaded file could not be deleted due to some unforseen error.") );
+            return false;
+        }
+
+        if(queryIdInteger != queryId) {
+            logger.error("QueryID of file "+queryIdInteger+" does not match QueryID "+queryId+" of this bean.");
+            return false;
+        }
+
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.deleteQueryAttachmentRecord(config, queryId, fileIdInteger);
+            config.commit();
+
+            String filePath = negotiator.getAttachmentPath();
+            String filename = fileUtil.getStorageFileName(queryIdInteger, fileIdInteger, fileExtension);
+            File file = new File(filePath, filename);
+            file.delete();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     /**
@@ -129,13 +189,13 @@ public class FileUploadBean implements Serializable {
     }
 
     private String generateUploadFileName(QueryAttachmentDTO att) {
-        String uploadName = FileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
+        String uploadName = fileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
         uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiator.getUploadFileSalt() + uploadName) + ".download";
         uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
         return uploadName;
     }
 
-    /*
+    /**
      * Setter and Getter
      */
     public Part getFile() {
@@ -183,5 +243,9 @@ public class FileUploadBean implements Serializable {
 
     public void setMsgs(List<FacesMessage> msgs) {
         this.msgs = msgs;
+    }
+
+    public void setToRemoveAttachment(String filename) {
+        this.toRemoveAttachment = filename;
     }
 }

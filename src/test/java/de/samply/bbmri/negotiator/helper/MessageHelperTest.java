@@ -58,6 +58,18 @@ public class MessageHelperTest {
     }
 
     @Test
+    @DisplayName("Test File could not be deleted")
+    void testFileCouldNotBeDeleted() {
+        List<FacesMessage> facesMessages = MessageHelper.generateValidateFileMessages("fileCouldNotBeDeleted");
+        for(FacesMessage facesMessage : facesMessages) {
+            assertEquals("ERROR 2", facesMessage.getSeverity().toString());
+            assertEquals("File could not be deleted", facesMessage.getSummary());
+            assertEquals("The uploaded file could not be deleted due to some unforseen error.", facesMessage.getDetail());
+        }
+    }
+
+
+    @Test
     @DisplayName("Test DefaultException")
     void testDefaultExceptionMsge() {
         List<FacesMessage> facesMessages = MessageHelper.generateValidateFileMessages("");

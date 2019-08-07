@@ -68,6 +68,7 @@ public class FileServlet extends HttpServlet {
     }
 
     @Override
+    // TODO: Refector
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
@@ -114,7 +115,8 @@ public class FileServlet extends HttpServlet {
         Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
         // check if the salt fits
-        String trueFileName = FileUtil.getStorageFileName(Integer.parseInt(queryId), Integer.parseInt(fileId), fileExtension);
+        FileUtil fileUtil = new FileUtil();
+        String trueFileName = fileUtil.getStorageFileName(Integer.parseInt(queryId), Integer.parseInt(fileId), fileExtension);
         String saltCheck = DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
                 trueFileName);
 

@@ -15,15 +15,18 @@ public class MessageHelper {
         }
 
         if (antiVirusException.contains(AntiVirusExceptionEnum.antiVirusMessageType.ConnectException.text())){
-
             msges.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,"Upload Failed",
                     "Connection refused. Please report the problem."));
         }
 
         if (antiVirusException.contains("checkVirusClamAVTriggeredVirusWarning")){
-
             msges.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,"Upload Failed",
                     "The uploaded file triggered a virus warning and therefore has not been accepted."));
+        }
+
+        if (antiVirusException.contains("fileCouldNotBeDeleted")){
+            msges.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,"File could not be deleted",
+                    "The uploaded file could not be deleted due to some unforseen error."));
         }
 
         if(msges.isEmpty()) {

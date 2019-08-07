@@ -444,97 +444,16 @@ public class QueryBean implements Serializable {
         return "/researcher/newQuery?queryId=" + getId() + "&faces-redirect=true";
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * temporal var to store attachment name to be deleted for confirmation dialog
-     */
-    // TODO: Refector
-    private String toRemoveAttachment = null;
-
-    // TODO: Refector
-    public void setToRemoveAttachment(String filename) {
-        this.toRemoveAttachment = filename;
-    }
-
-    /**
-     * Removes an attachment from the given query
-     */
-    // TODO: Refector
     public String removeAttachment() {
-
-        String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
-        // reset it
-        toRemoveAttachment = null;
-
-        if(attachment == null)
-            return "";
-
-        //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
-        // patterngrops 1: queryID, 2: fileID, 3: fileName
-        Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_salt_(.*)");
-        Matcher matcher = pattern.matcher(attachment);
-
-        String fileID = null;
-        String queryID = null;
-        String fileExtension = null;
-        logger.debug("Wanting to remove file "+attachment);
-        if(matcher.find()) {
-            queryID = matcher.group(1);
-            fileID = matcher.group(2);
-            fileExtension = matcher.group(3);
-            logger.debug("Pattern matched and found file ID = "+fileID+" for query "+queryID);
-        }
-
-        Integer fileIdInteger = null;
-        Integer queryIdInteger = null;
-        try {
-            fileIdInteger = Integer.parseInt(fileID);
-            queryIdInteger = Integer.parseInt(queryID);
-            logger.debug("Integer version of fileID = "+fileIdInteger+" and queryID = "+queryIdInteger);
-        } catch(NumberFormatException e) {
-            FacesContext context = FacesContext.getCurrentInstance();
-            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File could not be deleted",
-                    "The uploaded file could not be deleted due to some unforseen error.") );
+        boolean fileDeleted = fileUploadBean.removeAttachment();
+        if(!fileDeleted) {
             return "";
         }
-
-        if(queryIdInteger != id) {
-            logger.error("QueryID of file "+queryIdInteger+" does not match QueryID "+id+" of this bean.");
-            return "";
-        }
-
-        logger.debug("Removing file "+attachment+" with ID "+fileIdInteger);
-        try (Config config = ConfigFactory.get()) {
-            DbUtil.deleteQueryAttachmentRecord(config, getId(), fileIdInteger);
-            config.commit();
-
-            String filePath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
-            String filename = FileUtil.getStorageFileName(queryIdInteger, fileIdInteger, fileExtension);
-            File file = new File(filePath, filename);
-            logger.debug("Deleting physical file "+file.getAbsolutePath());
-
-            file.delete();
-            if (mode.equals("edit")) {
-                saveEditChangesTemporarily();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (mode.equals("edit")) {
+            saveEditChangesTemporarily();
         }
         return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
     }
-
-
-
 
     //-----------------------------------------------------------------------------------------
     /*

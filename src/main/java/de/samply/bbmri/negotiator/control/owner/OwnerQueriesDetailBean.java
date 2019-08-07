@@ -463,13 +463,15 @@ public class OwnerQueriesDetailBean implements Serializable {
      * Lazyloaded map of saved filenames and original filenames
      * @return
      */
+    //TODO: Refector
     public HashMap<String, String> getAttachmentMap() {
         if(attachmentMap == null) {
             attachmentMap = new HashMap<>();
 			attachmentTypeMap = new HashMap<String, String>();
             for(QueryAttachmentDTO att : attachments) {
                 //XXX: this pattern needs to match
-                String uploadName = FileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
+				FileUtil fileUtil = new FileUtil();
+                String uploadName = fileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
 
                 Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 

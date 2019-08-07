@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.validator.ValidatorException;
@@ -61,7 +62,7 @@ public class FileUtil {
      * @param file file
      * @return name of persisted file
      */
-    public static String saveQueryAttachment(Part file, String fileName) {
+    public String saveQueryAttachment(Part file, String fileName) {
         String uploadPath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
         File uploadDir = new File(uploadPath);
         uploadDir.mkdirs();
@@ -83,7 +84,7 @@ public class FileUtil {
      * @param filePart
      * @return
      */
-    public static String getOriginalFileNameFromPart(Part filePart) {
+    public String getOriginalFileNameFromPart(Part filePart) {
         String header = filePart.getHeader("content-disposition");
         for(String headerPart : header.split(";")) {
             if(headerPart.trim().startsWith("filename")){
@@ -93,10 +94,14 @@ public class FileUtil {
         return null;
     }
 
-    public static String getStorageFileName(Integer queryId, Integer fileId, String fileName) {
+    public String getStorageFileName(Integer queryId, Integer fileId, String fileName) {
         String[] splitFilename = fileName.split("\\.");
         String fileExtension = splitFilename[splitFilename.length - 1];
         return "query_" + queryId + "_file_" + fileId + "." + fileExtension;
+    }
+
+    public Pattern getStorageNamePattern() {
+        return Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_salt_(.*)");
     }
 
     /**

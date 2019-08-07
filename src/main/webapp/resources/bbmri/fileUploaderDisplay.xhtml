@@ -44,7 +44,7 @@
             <!--   Remove an attachment -->
             <h:commandLink
                     styleClass="confirm-delete"
-                    action="#{queryBean.setToRemoveAttachment(attachment.key)}"
+                    action="#{fileUploadBean.setToRemoveAttachment(attachment.key)}"
                     title="#{label['attachmentview.tooltip.attachmentDelete']}: #{attachment.value}">
                 <i class="fa fa-times attachment-delete-links" aria-hidden="true" />
                 <f:ajax onevent="showConfirmDialog"/>
