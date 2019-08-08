@@ -45,7 +45,7 @@
 
 	<h:panelGroup layout="block" styleClass="col-md-12" rendered="#{cc.attrs.rendered}">
 
-		<h:form id="myform">
+		<h:form id="uploadform" enctype="multipart/form-data">
 
 			<h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
 
@@ -58,20 +58,20 @@
 					<h:inputTextarea id="commentText" value="#{commentBean.comment}"
 						styleClass="form-control" rows="5"
 						validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 1000000 characters ">
-						<f:validateLength for="commentText" minimum="1" maximum="1000000" />
+						<f:validateLength for="commentText" minimum="0" maximum="1000000" />
 						<h:messages id="commentValidationMessage" for="commentText"
 							style="color:red" showSummary="true" showDetails="false" />
 					</h:inputTextarea>
-					<!-- Attachments for a query -->
-					<h:panelGroup layout="block">
+				</h:panelGroup>
+				<!-- Attachments for a query -->
+				<h:panelGroup layout="block">
 
-						<!-- Uploaded attachments for a query -->
-						<bbmricc:fileUploaderDisplay queryBean="#{ownerQueriesDetailBean}" />
-						<!-- Upload the attachments for a query -->
-						<bbmricc:fileUpload queryBean="#{ownerQueriesDetailBean}" />
+					<!-- Uploaded attachments for a query -->
+					<bbmricc:fileUploaderDisplay queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
+					<!-- Upload the attachments for a query -->
+					<bbmricc:fileUpload queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
 
-					</h:panelGroup>
-				</h:panelGroup>	
+				</h:panelGroup>
 
 				<h:panelGroup layout="block" styleClass="pull-right"  style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<h:commandButton

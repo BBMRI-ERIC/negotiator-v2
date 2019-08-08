@@ -42,8 +42,10 @@ import javax.servlet.http.Part;
 import de.samply.bbmri.negotiator.*;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
+import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -74,6 +76,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
+
+    @ManagedProperty(value = "#{fileUploadBean}")
+    private FileUploadBean fileUploadBean;
+
     /**
      * String contains Json data for JsTree view
      */
@@ -186,8 +192,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i));
                 listOfSampleOffers.add(offerPersonDTO);
             }
-
-            setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
 
             matchingBiobankCollection = DbUtil.getCollectionsForQuery(config, queryId);
             setMatchingBiobanks(ObjectToJson.getUniqueBiobanks(matchingBiobankCollection).size());
@@ -369,6 +373,55 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
     }
 
+    /*
+     * File Upload code block
+     */
+    public String uploadAttachment() throws IOException {
+        if (!fileUploadBean.isFileToUpload())
+            return "";
+
+        boolean fileCreationSuccessful = fileUploadBean.createFile();
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public String removeAttachment() {
+        boolean fileDeleted = fileUploadBean.removeAttachment();
+        if(!fileDeleted) {
+            return "";
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    /*
+     * Getter / Setter for bean
+     */
+
+    public SessionBean getSessionBean() {
+        return sessionBean;
+    }
+
+    public void setSessionBean(SessionBean sessionBean) {
+        this.sessionBean = sessionBean;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
+
+    public FileUploadBean getFileUploadBean() {
+        return fileUploadBean;
+    }
+
+    public void setFileUploadBean(FileUploadBean fileUploadBean) {
+        this.fileUploadBean = fileUploadBean;
+    }
+
     public void setQueries(List<QueryStatsDTO> queries) {
         this.queries = queries;
     }
@@ -379,6 +432,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setQueryId(int queryId) {
         this.queryId = queryId;
+        fileUploadBean.setupQuery(queryId);
     }
 
     public Query getSelectedQuery() {
@@ -397,14 +451,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.comments = comments;
     }
 
-    public UserBean getUserBean() {
-        return userBean;
-    }
-
-    public void setUserBean(UserBean userBean) {
-        this.userBean = userBean;
-    }
-
     public String getCommentText() {
         return commentText;
     }
@@ -419,71 +465,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setHumanReadableQuery(String humanReadableQuery) {
         this.humanReadableQuery = humanReadableQuery;
-    }
-
-    public Part getFile() {
-        return file;
-    }
-
-    public void setFile(Part file) {
-        this.file = file;
-    }
-
-    public String getAttachmentType() {
-        return attachmentType;
-    }
-
-    public void setAttachmentType(String attachmentType) {
-        this.attachmentType = attachmentType;
-    }
-
-    public void setAttachments(List<QueryAttachmentDTO> attachments) {
-        this.attachments = attachments;
-    }
-
-    /**
-     * Lazyloaded map of saved filenames and original filenames
-     *
-     * @return  Hash map of upload name with file salt and the uploaded file
-     */
-    //TODO: Refector
-    public HashMap<String, String> getAttachmentMap() {
-        if (attachmentMap == null) {
-            attachmentMap = new HashMap<>();
-            attachmentTypeMap = new HashMap<String, String>();
-            for (QueryAttachmentDTO att : attachments) {
-                //XXX: this pattern needs to match
-                FileUtil fileUtil = new FileUtil();
-                String uploadName = fileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
-
-                Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
-
-                uploadName = uploadName + "_salt_" + DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
-                        uploadName) + ".download";
-
-
-                uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
-
-                attachmentMap.put(uploadName, att.getAttachment());
-                attachmentTypeMap.put(uploadName, att.getAttachmentType());
-            }
-        }
-        return attachmentMap;
-    }
-
-    public String getAttachmentType(String uploadName) {
-        /*if(attachmentTypeMap == null) {
-            getAttachmentMap();
-        }*/
-        String attachmentType = "other...";
-        if(attachmentTypeMap.containsKey(uploadName)) {
-            attachmentType = attachmentTypeMap.get(uploadName);
-        }
-        return attachmentType;
-    }
-
-    public List<QueryAttachmentDTO> getAttachments() {
-        return attachments;
     }
 
     public List<CollectionBiobankDTO> getMatchingBiobankCollection() {
@@ -511,15 +492,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public void setListOfSampleOffers(List<List<OfferPersonDTO>> listOfSampleOffers) {
         this.listOfSampleOffers = listOfSampleOffers;
     }
-
-    public SessionBean getSessionBean() {
-        return sessionBean;
-    }
-
-    public void setSessionBean(SessionBean sessionBean) {
-        this.sessionBean = sessionBean;
-    }
-
 
     public Integer getOfferResearcher() { return offerResearcher; }
 

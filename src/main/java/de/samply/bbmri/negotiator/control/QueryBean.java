@@ -411,12 +411,6 @@ public class QueryBean implements Serializable {
     /*
      * File Upload code block
      */
-    //-----------------------------------------------------------------------------------------
-
-    /**
-     * Uploads and stores content of file from provided input stream
-     * @throws IOException
-     */
     public String uploadAttachment() throws IOException {
         if (!fileUploadBean.isFileToUpload())
             return "";
@@ -455,9 +449,8 @@ public class QueryBean implements Serializable {
         return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
     }
 
-    //-----------------------------------------------------------------------------------------
     /*
-     * Common Getter / Setter for bean
+     * Getter / Setter for bean
      */
 
     public UserBean getUserBean() {

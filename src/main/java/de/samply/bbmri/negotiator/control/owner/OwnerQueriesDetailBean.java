@@ -36,6 +36,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,6 +47,7 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
@@ -80,6 +82,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	@ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
+
+	@ManagedProperty(value = "#{fileUploadBean}")
+	private FileUploadBean fileUploadBean;
 
 	/**
 	 * The structured query object
@@ -391,6 +396,55 @@ public class OwnerQueriesDetailBean implements Serializable {
 		}
 	}
 
+	/*
+	 * File Upload code block
+	 */
+	public String uploadAttachment() throws IOException {
+		if (!fileUploadBean.isFileToUpload())
+			return "";
+
+		boolean fileCreationSuccessful = fileUploadBean.createFile();
+		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+				+ "?includeViewParams=true&faces-redirect=true";
+	}
+
+	public String removeAttachment() {
+		boolean fileDeleted = fileUploadBean.removeAttachment();
+		if(!fileDeleted) {
+			return "";
+		}
+		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+				+ "?includeViewParams=true&faces-redirect=true";
+	}
+
+	/*
+	 * Getter / Setter for bean
+	 */
+
+	public SessionBean getSessionBean() {
+		return sessionBean;
+	}
+
+	public void setSessionBean(SessionBean sessionBean) {
+		this.sessionBean = sessionBean;
+	}
+
+	public UserBean getUserBean() {
+		return userBean;
+	}
+
+	public void setUserBean(UserBean userBean) {
+		this.userBean = userBean;
+	}
+
+	public FileUploadBean getFileUploadBean() {
+		return fileUploadBean;
+	}
+
+	public void setFileUploadBean(FileUploadBean fileUploadBean) {
+		this.fileUploadBean = fileUploadBean;
+	}
+
 	public void setQueries(List<OwnerQueryStatsDTO> queries) {
 		this.queries = queries;
 	}
@@ -401,6 +455,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setQueryId(int queryId) {
 		this.queryId = queryId;
+		fileUploadBean.setupQuery(queryId);
 	}
 
 	public Query getSelectedQuery() {
@@ -419,28 +474,12 @@ public class OwnerQueriesDetailBean implements Serializable {
 		this.comments = comments;
 	}
 
-	public UserBean getUserBean() {
-		return userBean;
-	}
-
-	public void setUserBean(UserBean userBean) {
-		this.userBean = userBean;
-	}
-
 	public String getCommentText() {
 		return commentText;
 	}
 
 	public void setCommentText(String commentText) {
 		this.commentText = commentText;
-	}
-
-	public SessionBean getSessionBean() {
-		return sessionBean;
-	}
-
-	public void setSessionBean(SessionBean sessionBean) {
-		this.sessionBean = sessionBean;
 	}
 
 	public Flag getFlagFilter() {
@@ -457,35 +496,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 
     public void setAssociatedBiobanks(List<BiobankRecord> associatedBiobanks) {
         this.associatedBiobanks = associatedBiobanks;
-    }
-
-    /**
-     * Lazyloaded map of saved filenames and original filenames
-     * @return
-     */
-    //TODO: Refector
-    public HashMap<String, String> getAttachmentMap() {
-        if(attachmentMap == null) {
-            attachmentMap = new HashMap<>();
-			attachmentTypeMap = new HashMap<String, String>();
-            for(QueryAttachmentDTO att : attachments) {
-                //XXX: this pattern needs to match
-				FileUtil fileUtil = new FileUtil();
-                String uploadName = fileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
-
-                Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
-
-                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
-                        uploadName) + ".download";
-
-
-                uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
-
-                attachmentMap.put(uploadName, att.getAttachment());
-				attachmentTypeMap.put(uploadName, att.getAttachmentType());
-            }
-        }
-        return attachmentMap;
     }
 
 	public String getAttachmentType(String uploadName) {

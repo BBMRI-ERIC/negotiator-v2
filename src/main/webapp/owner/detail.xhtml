@@ -86,7 +86,7 @@
 
                 <bbmricc:queryDetailData bean="#{ownerQueriesDetailBean}" />
 
-                <bbmricc:queryDetailAttachments bean="#{ownerQueriesDetailBean}" />
+                <bbmricc:queryDetailAttachments queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
 
                 <ui:fragment
                     rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
