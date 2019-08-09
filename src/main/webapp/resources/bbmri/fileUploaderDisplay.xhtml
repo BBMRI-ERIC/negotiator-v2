@@ -10,7 +10,7 @@
       xmlns:composite="http://xmlns.jcp.org/jsf/composite">
 
 <composite:interface>
-    <composite:attribute name="queryBean" required="true"/>
+    <composite:attribute name="componentQueryBean" required="true"/>
     <composite:attribute name="fileUploadBean" required="true"/>
 </composite:interface>
 
@@ -64,7 +64,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <h:commandButton action="#{queryBean.removeAttachment()}"
+                    <h:commandButton action="#{componentQueryBean.removeAttachment()}"
                                      value="Yes" styleClass="btn btn-danger btn-ok"
                                      title="#{label['attachmentview.tooltip.attachmentDelete']}">
                     </h:commandButton>

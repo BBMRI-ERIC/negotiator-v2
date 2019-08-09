@@ -5,9 +5,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.control.QueryBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -24,8 +22,6 @@ import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -55,13 +51,6 @@ public class FileUploadBean implements Serializable {
      */
     @PostConstruct
     public void init() {
-        try(Config config = ConfigFactory.get()) {
-            if(queryId != null) {
-                setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -79,13 +68,17 @@ public class FileUploadBean implements Serializable {
     }
 
     public boolean createFile() {
+        return createFile(0);
+    }
+
+    public boolean createFile(int commentId) {
         if(queryId == null) {
             return false;
         }
 
         try (Config config = ConfigFactory.get()) {
             String originalFileName = fileUtil.getOriginalFileNameFromPart(file);
-            Integer fileId = DbUtil.insertQueryAttachmentRecord(config, queryId, originalFileName, attachmentType);
+            Integer fileId = DbUtil.insertQueryAttachmentRecord(config, queryId, originalFileName, attachmentType, commentId);
             if (fileId == null) {
                 // something went wrong in db
                 config.rollback();

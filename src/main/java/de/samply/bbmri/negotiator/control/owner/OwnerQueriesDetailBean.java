@@ -126,21 +126,6 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     private List<BiobankRecord> associatedBiobanks;
 
-    /**
-     * The list of attachments associated with a certain query.
-     */
-    private List<QueryAttachmentDTO> attachments;
-
-	/**
-	 * Map of saved filename and realname of attachments
-	 */
-	private HashMap<String, String> attachmentMap = null;
-
-    /**
-     * Map of saved filename and attachment types of attachments
-     */
-    private HashMap<String, String> attachmentTypeMap = null;
-
 	private HashMap<Integer, String> biobankNames = null;
 
 	/**
@@ -152,21 +137,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 * A boolean that specifies if a non-confidential view must be rendered for a non-confidential biobanker(for connector) and vise versa
 	 */
 	private boolean nonConfidential = true;
-
-    /**
-     * Query attachment upload file type.
-     */
-    private String attachmentType;
-
-    /**
-     * Query attachment upload.
-     */
-    private Part file;
-
-    /**
-     * List of faces messages
-     */
-    private List<FacesMessage> msgs = new ArrayList<>();
 
 	/**
 	 * The list of offerPersonDTO's, hence it's a list of lists.
@@ -191,11 +161,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 			}
 
             /**
-             * Get all the attachments for selected query.
-             */
-            setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
-
-            /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
             for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
@@ -208,10 +173,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 				RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
 				ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
 				QueryDTO queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
-				//TODO: Human readable need rework
-				//setHumanReadableQuery(queryDTO.getHumanReadable());
 				setHumanReadableQuery(queryDTO.getHumanReadable());
-				//setHumanReadableQuery("TODO");
 			} else {
 
             	/*
@@ -498,14 +460,6 @@ public class OwnerQueriesDetailBean implements Serializable {
         this.associatedBiobanks = associatedBiobanks;
     }
 
-	public String getAttachmentType(String uploadName) {
-		String attachmentType = "other...";
-		if(attachmentTypeMap.containsKey(uploadName)) {
-			attachmentType = attachmentTypeMap.get(uploadName);
-		}
-		return attachmentType;
-	}
-
 	public String getBiobankName(Integer biobankId) {
 		return dataCache.getBiobankName(biobankId);
 	}
@@ -525,14 +479,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-    }
-
-    public List<QueryAttachmentDTO> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<QueryAttachmentDTO> attachments) {
-        this.attachments = attachments;
     }
 
     public List<OfferPersonDTO> getOfferPersonDTO() {
@@ -566,28 +512,4 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void setListOfSampleOffers(List<List<OfferPersonDTO>> listOfSampleOffers) {
 		this.listOfSampleOffers = listOfSampleOffers;
 	}
-
-    public Part getFile() {
-        return file;
-    }
-
-    public void setFile(Part file) {
-        this.file = file;
-    }
-
-    public List<FacesMessage> getMsgs() {
-        return msgs;
-    }
-
-    public void setMsgs(List<FacesMessage> msgs) {
-        this.msgs = msgs;
-    }
-
-    public String getAttachmentType() {
-        return attachmentType;
-    }
-
-    public void setAttachmentType(String attachmentType) {
-        this.attachmentType = attachmentType;
-    }
 }

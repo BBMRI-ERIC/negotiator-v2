@@ -125,31 +125,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private List<CommentPersonDTO> comments;
 
     /**
-     * List of attachments
-     */
-    private List<QueryAttachmentDTO> attachments;
-
-    /**
-     * Map of saved filename and realname of attachments
-     */
-    private HashMap<String, String> attachmentMap = null;
-
-    /**
-     * Map of saved filename and attachment types of attachments
-     */
-    private HashMap<String, String> attachmentTypeMap = null;
-
-    /**
-     * Query attachment upload
-     */
-    private Part file;
-
-    /**
-     * Query attachment upload file type.
-     */
-    private String attachmentType;
-
-    /**
      * The structured query object
      */
     private String humanReadableQuery = null;
@@ -532,7 +507,4 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public void setReachableCollections(String reachableCollections) {
         this.reachableCollections = reachableCollections;
     }
-
-
-
 }

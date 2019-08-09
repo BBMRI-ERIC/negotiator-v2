@@ -10,13 +10,14 @@
       xmlns:composite="http://xmlns.jcp.org/jsf/composite">
 
 <composite:interface>
-    <composite:attribute name="queryBean" required="true"/>
+    <composite:attribute name="componentQueryBean" required="true"/>
     <composite:attribute name="fileUploadBean" required="true"/>
 </composite:interface>
 
 <composite:implementation>
 
     <h:panelGroup layout="block" style="margin-top: 0px;" >
+
         <h:panelGroup class="input-group" layout="block">
             <input placeholder="#{label['attachmentview.placeholder']}" type="text"
                    class="form-control" style="width: 80%;" readonly="readonly"
@@ -40,7 +41,7 @@
                                  style="display: none;" />
                 </h:panelGroup>
                 <h:commandButton id="uploadBtn" value="Upload"
-                                             action="#{cc.attrs.queryBean.uploadAttachment}"
+                                             action="#{cc.attrs.componentQueryBean.uploadAttachment}"
                                              styleClass="btn btn-primary disabled" />
             </label>
         </h:panelGroup>

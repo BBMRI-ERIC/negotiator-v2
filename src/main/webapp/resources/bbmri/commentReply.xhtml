@@ -35,10 +35,11 @@
 
 <composite:interface>
 	<composite:attribute name="query" required="true" />
+	<composite:attribute name="componentQueryBean" required="true" />
+    <composite:attribute name="fileUploadBean" required="true" />
 	<composite:attribute name="offer" required="false" />
 	<composite:attribute name="makeOffer" required="false" default="false"  />
 	<composite:attribute name="rendered" required="false" />
-	<composite:attribute name="ownerQueriesDetailBean" />
 </composite:interface>
 
 <composite:implementation>
@@ -67,9 +68,9 @@
 				<h:panelGroup layout="block">
 
 					<!-- Uploaded attachments for a query -->
-					<bbmricc:fileUploaderDisplay queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
+					<bbmricc:fileUploaderDisplay componentQueryBean="#{cc.attrs.componentQueryBean}" fileUploadBean="#{cc.attrs.fileUploadBean}" />
 					<!-- Upload the attachments for a query -->
-					<bbmricc:fileUpload queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
+					<bbmricc:fileUpload componentQueryBean="#{cc.attrs.componentQueryBean}" fileUploadBean="#{cc.attrs.fileUploadBean}" />
 
 				</h:panelGroup>
 
