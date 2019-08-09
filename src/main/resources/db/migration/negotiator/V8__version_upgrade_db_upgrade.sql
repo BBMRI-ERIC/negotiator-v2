@@ -48,3 +48,52 @@ CREATE TABLE query_lifecycle_collection (
     "status" CHARACTER VARYING(255),
     "lifecycle_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL
 );
+
+ALTER TABLE query_attachment
+    ADD COLUMN attachment_type character varying DEFAULT 'other';
+
+ALTER TABLE query_attachment_private
+    ADD COLUMN attachment_type character varying DEFAULT 'other';
+
+ALTER TABLE query_attachment_private
+    ADD COLUMN offer_id INTEGER DEFAULT 0;
+
+ALTER TABLE offer
+    ADD COLUMN attachment boolean DEFAULT true;
+
+ALTER TABLE comment
+    ADD COLUMN attachment boolean DEFAULT true;
+
+CREATE TABLE public.query_attachment_comment
+(
+    id serial NOT NULL,
+    query_id integer NOT NULL,
+    attachment text NOT NULL,
+    attachment_type character varying DEFAULT 'other'::character varying,
+    comment_id integer DEFAULT 0,
+    CONSTRAINT query_attachment_pkey PRIMARY KEY (id),
+    CONSTRAINT query_attachment_query_id_fkey FOREIGN KEY (query_id)
+        REFERENCES public.query (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+    WITH (
+        OIDS = FALSE
+    )
+    TABLESPACE pg_default;
+
+ALTER TABLE public.query_attachment_comment
+    OWNER to saher;
+COMMENT ON TABLE public.query_attachment_comment
+    IS 'Table for queries that have one or more attachments uploaded.';
+
+COMMENT ON COLUMN public.query_attachment_comment.query_id
+    IS 'This column is a foreign key here, taken from query table';
+
+COMMENT ON COLUMN public.query_attachment_comment.attachment
+    IS 'The name of the attached file stored in file system, not including the directory';
+
+CREATE INDEX "queryIdIndexQueryAttachment"
+    ON public.query_attachment_comment USING btree
+        (query_id)
+    TABLESPACE pg_default;
