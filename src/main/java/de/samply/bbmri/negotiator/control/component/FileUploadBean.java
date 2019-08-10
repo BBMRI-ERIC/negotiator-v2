@@ -41,6 +41,7 @@ public class FileUploadBean implements Serializable {
 
     private Part file;
     private String attachmentType;
+    private String attachmentContext;
     private List<QueryAttachmentDTO> attachments;
     private HashMap<String, String> attachmentMap = null;
     private HashMap<String, String> attachmentTypeMap = null;
@@ -67,11 +68,15 @@ public class FileUploadBean implements Serializable {
         }
     }
 
-    public boolean createFile() {
-        return createFile(0);
+    public boolean createPrivateFile() {
+        return createPublicFile(0);
     }
 
-    public boolean createFile(int commentId) {
+    public boolean createPublicFile() {
+        return createPublicFile(0);
+    }
+
+    public boolean createPublicFile(int commentId) {
         if(queryId == null) {
             return false;
         }
@@ -210,6 +215,10 @@ public class FileUploadBean implements Serializable {
     public void setAttachmentType(String attachmentType) {
         this.attachmentType = attachmentType;
     }
+
+    public String getAttachmentContext() { return attachmentContext; }
+
+    public void setAttachmentContext(String attachmentContext) { this.attachmentContext = attachmentContext; }
 
     public void setupQuery(Integer queryId) {
         this.queryId = queryId;

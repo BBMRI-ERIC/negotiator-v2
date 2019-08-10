@@ -26,36 +26,26 @@
 
 package de.samply.bbmri.negotiator.control;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.validator.ValidatorException;
-import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
-import de.samply.bbmri.negotiator.helper.MessageHelper;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,12 +54,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.FileUtil;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
 
 
@@ -423,7 +410,7 @@ public class QueryBean implements Serializable {
                 config.commit();
                 setId(record.getId());
             }
-            boolean fileCreationSuccessful = fileUploadBean.createFile();
+            boolean fileCreationSuccessful = fileUploadBean.createPublicFile();
             if(fileCreationSuccessful) {
                 if (mode.equals("edit")) {
                     saveEditChangesTemporarily();

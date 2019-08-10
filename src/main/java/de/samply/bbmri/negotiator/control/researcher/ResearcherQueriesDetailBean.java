@@ -37,18 +37,13 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.*;
-import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -355,7 +350,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
         if (!fileUploadBean.isFileToUpload())
             return "";
 
-        boolean fileCreationSuccessful = fileUploadBean.createFile();
+        boolean fileCreationSuccessful = fileUploadBean.createPublicFile();
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
     }

@@ -32,19 +32,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.FileUtil;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
@@ -56,11 +51,9 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.slf4j.Logger;
@@ -365,7 +358,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 		if (!fileUploadBean.isFileToUpload())
 			return "";
 
-		boolean fileCreationSuccessful = fileUploadBean.createFile();
+		boolean fileCreationSuccessful = fileUploadBean.createPublicFile();
 		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
