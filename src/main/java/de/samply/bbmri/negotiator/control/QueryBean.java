@@ -410,7 +410,7 @@ public class QueryBean implements Serializable {
                 config.commit();
                 setId(record.getId());
             }
-            boolean fileCreationSuccessful = fileUploadBean.createPublicFile();
+            boolean fileCreationSuccessful = fileUploadBean.createQueryAttachment();
             if(fileCreationSuccessful) {
                 if (mode.equals("edit")) {
                     saveEditChangesTemporarily();

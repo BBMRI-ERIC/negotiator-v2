@@ -350,7 +350,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
         if (!fileUploadBean.isFileToUpload())
             return "";
 
-        boolean fileCreationSuccessful = fileUploadBean.createPublicFile();
+        boolean fileCreationSuccessful = fileUploadBean.createQueryAttachment();
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
     }

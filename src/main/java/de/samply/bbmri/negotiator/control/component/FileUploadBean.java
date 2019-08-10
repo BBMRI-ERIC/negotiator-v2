@@ -68,22 +68,22 @@ public class FileUploadBean implements Serializable {
         }
     }
 
-    public boolean createPrivateFile() {
-        return createPublicFile(0);
+    public boolean createPrivateAttachment() {
+        return false;
     }
 
-    public boolean createPublicFile() {
-        return createPublicFile(0);
+    public boolean createCommentAttachment() {
+        return false;
     }
 
-    public boolean createPublicFile(int commentId) {
+    public boolean createQueryAttachment() {
         if(queryId == null) {
             return false;
         }
 
         try (Config config = ConfigFactory.get()) {
             String originalFileName = fileUtil.getOriginalFileNameFromPart(file);
-            Integer fileId = DbUtil.insertQueryAttachmentRecord(config, queryId, originalFileName, attachmentType, commentId);
+            Integer fileId = DbUtil.insertQueryAttachmentRecord(config, queryId, originalFileName, attachmentType);
             if (fileId == null) {
                 // something went wrong in db
                 config.rollback();

@@ -461,12 +461,11 @@ public class DbUtil {
      * @return the ID of the inserted attachment
      * @throws SQLException
      */
-    public static Integer insertQueryAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType, Integer commentId) {
+    public static Integer insertQueryAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType) {
         Result<QueryAttachmentRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
                 .set(Tables.QUERY_ATTACHMENT.ATTACHMENT, attachment)
                 .set(Tables.QUERY_ATTACHMENT.QUERY_ID, queryId)
                 .set(Tables.QUERY_ATTACHMENT.ATTACHMENT_TYPE, attachmentType)
-                .set(Tables.QUERY_ATTACHMENT.COMMENT_ID, commentId)
                 .returning(Tables.QUERY_ATTACHMENT.ID)
                 .fetch();
 
