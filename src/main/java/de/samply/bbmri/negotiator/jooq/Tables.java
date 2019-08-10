@@ -19,6 +19,7 @@ import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
 import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank;
@@ -115,6 +116,11 @@ public class Tables {
 	 * Table for queries that have one or more attachments uploaded.
 	 */
 	public static final QueryAttachment QUERY_ATTACHMENT = de.samply.bbmri.negotiator.jooq.tables.QueryAttachment.QUERY_ATTACHMENT;
+
+	/**
+	 * Table for queries that have one or more attachments uploaded.
+	 */
+	public static final QueryAttachmentComment QUERY_ATTACHMENT_COMMENT = de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment.QUERY_ATTACHMENT_COMMENT;
 
 	/**
 	 * The table public.query_attachment_private

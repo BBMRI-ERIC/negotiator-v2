@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachment extends TableImpl<QueryAttachmentRecord> {
 
-	private static final long serialVersionUID = -282512107;
+	private static final long serialVersionUID = -249535213;
 
 	/**
 	 * The reference instance of <code>public.query_attachment</code>
@@ -69,11 +69,6 @@ public class QueryAttachment extends TableImpl<QueryAttachmentRecord> {
 	 * The column <code>public.query_attachment.attachment_type</code>.
 	 */
 	public final TableField<QueryAttachmentRecord, String> ATTACHMENT_TYPE = createField("attachment_type", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "");
-
-	/**
-	 * The column <code>public.query_attachment.comment_id</code>.
-	 */
-	public final TableField<QueryAttachmentRecord, Integer> COMMENT_ID = createField("comment_id", org.jooq.impl.SQLDataType.INTEGER.defaulted(true), this, "");
 
 	/**
 	 * Create a <code>public.query_attachment</code> table reference

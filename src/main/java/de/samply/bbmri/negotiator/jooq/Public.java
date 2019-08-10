@@ -19,6 +19,7 @@ import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
 import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank;
@@ -49,7 +50,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -1673446289;
+	private static final long serialVersionUID = -1685882464;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -81,6 +82,7 @@ public class Public extends SchemaImpl {
 			Sequences.NETWORK_ID_SEQ,
 			Sequences.OFFER_ID_SEQ,
 			Sequences.PERSON_ID_SEQ,
+			Sequences.QUERY_ATTACHMENT_COMMENT_ID_SEQ,
 			Sequences.QUERY_ATTACHMENT_ID_SEQ,
 			Sequences.QUERY_ATTACHMENT_PRIVATE_ID_SEQ,
 			Sequences.QUERY_ID_SEQ);
@@ -110,6 +112,7 @@ public class Public extends SchemaImpl {
 			PersonCollection.PERSON_COLLECTION,
 			Query.QUERY,
 			QueryAttachment.QUERY_ATTACHMENT,
+			QueryAttachmentComment.QUERY_ATTACHMENT_COMMENT,
 			QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE,
 			QueryCollection.QUERY_COLLECTION,
 			QueryLifecycleBiobank.QUERY_LIFECYCLE_BIOBANK,
