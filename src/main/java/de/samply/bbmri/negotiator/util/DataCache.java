@@ -21,7 +21,9 @@ public class DataCache {
 
     public static DataCache getInstance() {
         if(dataCache == null) {
-            dataCache = new DataCache();
+            synchronized (DataCache.class) {
+                dataCache = new DataCache();
+            }
         }
         return dataCache;
     }
