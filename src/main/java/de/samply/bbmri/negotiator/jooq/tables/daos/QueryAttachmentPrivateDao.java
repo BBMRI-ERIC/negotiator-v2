@@ -106,11 +106,4 @@ public class QueryAttachmentPrivateDao extends DAOImpl<QueryAttachmentPrivateRec
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachmentPrivate> fetchByAttachmentType(String... values) {
 		return fetch(QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT_TYPE, values);
 	}
-
-	/**
-	 * Fetch records that have <code>offer_id IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.QueryAttachmentPrivate> fetchByOfferId(Integer... values) {
-		return fetch(QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE.OFFER_ID, values);
-	}
 }

@@ -29,6 +29,7 @@ CREATE TABLE query_attachment_private (
     "biobank_in_private_chat" INTEGER NOT NULL,
     "attachment_time" TIMESTAMP WITHOUT TIME ZONE DEFAULT NULL,
     "attachment" TEXT NOT NULL,
+    attachment_type character varying DEFAULT 'other',
     PRIMARY KEY ("id")
 );
 
@@ -51,12 +52,6 @@ CREATE TABLE query_lifecycle_collection (
 
 ALTER TABLE query_attachment
     ADD COLUMN attachment_type character varying DEFAULT 'other';
-
-ALTER TABLE query_attachment_private
-    ADD COLUMN attachment_type character varying DEFAULT 'other';
-
-ALTER TABLE query_attachment_private
-    ADD COLUMN offer_id INTEGER DEFAULT 0;
 
 ALTER TABLE offer
     ADD COLUMN attachment boolean DEFAULT true;

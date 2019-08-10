@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachmentPrivate implements Serializable {
 
-	private static final long serialVersionUID = -1267449007;
+	private static final long serialVersionUID = -2054065296;
 
 	private Integer   id;
 	private Integer   queryId;
@@ -32,7 +32,6 @@ public class QueryAttachmentPrivate implements Serializable {
 	private Timestamp attachmentTime;
 	private String    attachment;
 	private String    attachmentType;
-	private Integer   offerId;
 
 	public QueryAttachmentPrivate() {}
 
@@ -44,7 +43,6 @@ public class QueryAttachmentPrivate implements Serializable {
 		this.attachmentTime = value.attachmentTime;
 		this.attachment = value.attachment;
 		this.attachmentType = value.attachmentType;
-		this.offerId = value.offerId;
 	}
 
 	public QueryAttachmentPrivate(
@@ -54,8 +52,7 @@ public class QueryAttachmentPrivate implements Serializable {
 		Integer   biobankInPrivateChat,
 		Timestamp attachmentTime,
 		String    attachment,
-		String    attachmentType,
-		Integer   offerId
+		String    attachmentType
 	) {
 		this.id = id;
 		this.queryId = queryId;
@@ -64,7 +61,6 @@ public class QueryAttachmentPrivate implements Serializable {
 		this.attachmentTime = attachmentTime;
 		this.attachment = attachment;
 		this.attachmentType = attachmentType;
-		this.offerId = offerId;
 	}
 
 	public Integer getId() {
@@ -121,13 +117,5 @@ public class QueryAttachmentPrivate implements Serializable {
 
 	public void setAttachmentType(String attachmentType) {
 		this.attachmentType = attachmentType;
-	}
-
-	public Integer getOfferId() {
-		return this.offerId;
-	}
-
-	public void setOfferId(Integer offerId) {
-		this.offerId = offerId;
 	}
 }
