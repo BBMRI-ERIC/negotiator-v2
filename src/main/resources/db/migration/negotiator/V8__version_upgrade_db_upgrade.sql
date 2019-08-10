@@ -71,8 +71,8 @@ CREATE TABLE public.query_attachment_comment
     attachment text NOT NULL,
     attachment_type character varying DEFAULT 'other'::character varying,
     comment_id integer DEFAULT 0,
-    CONSTRAINT query_attachment_pkey PRIMARY KEY (id),
-    CONSTRAINT query_attachment_query_id_fkey FOREIGN KEY (query_id)
+    CONSTRAINT query_attachment_comment_pkey PRIMARY KEY (id),
+    CONSTRAINT query_attachment_comment_query_id_fkey FOREIGN KEY (query_id)
         REFERENCES public.query (id) MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
@@ -93,7 +93,7 @@ COMMENT ON COLUMN public.query_attachment_comment.query_id
 COMMENT ON COLUMN public.query_attachment_comment.attachment
     IS 'The name of the attached file stored in file system, not including the directory';
 
-CREATE INDEX "queryIdIndexQueryAttachment"
+CREATE INDEX "queryIdIndexQueryAttachmentComment"
     ON public.query_attachment_comment USING btree
         (query_id)
     TABLESPACE pg_default;
