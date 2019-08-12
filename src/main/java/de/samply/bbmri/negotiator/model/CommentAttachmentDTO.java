@@ -1,6 +1,6 @@
 package de.samply.bbmri.negotiator.model;
 
-public class CommentAttachmentDTO extends QueryAttachmentDTO {
+public class CommentAttachmentDTO extends AttachmentDTO {
     private int commentId;
 
     public int getCommentId() {

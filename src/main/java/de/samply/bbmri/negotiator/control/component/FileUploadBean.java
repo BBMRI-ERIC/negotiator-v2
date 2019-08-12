@@ -5,7 +5,10 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.model.AttachmentDTO;
+import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -23,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -31,6 +37,9 @@ import java.util.regex.Pattern;
 @ManagedBean
 @ViewScoped
 public class FileUploadBean implements Serializable {
+
+    @ManagedProperty(value = "#{userBean}")
+    private UserBean userBean;
 
     private static Logger logger = LoggerFactory.getLogger(FileUploadBean.class);
 
@@ -43,7 +52,9 @@ public class FileUploadBean implements Serializable {
     private String attachmentType;
     private String attachmentContext;
     private List<QueryAttachmentDTO> attachments;
+    private List<PrivateAttachmentDTO> privateAttachments;
     private HashMap<String, String> attachmentMap = null;
+    private HashMap<String, String> privateAttachmentMap = null;
     private HashMap<String, String> attachmentTypeMap = null;
     private String toRemoveAttachment = null;
 
@@ -57,7 +68,7 @@ public class FileUploadBean implements Serializable {
     /**
      * File Upload
      */
-    public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
+    public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws ValidatorException {
         //clear message list every time a new file is selected for validation
         Part file = (Part)value;
 
@@ -68,22 +79,41 @@ public class FileUploadBean implements Serializable {
         }
     }
 
-    public boolean createPrivateAttachment() {
+    public boolean createQueryAttachmentComment() {
+        if(queryId == null) {
+            return false;
+        }
         return false;
     }
 
-    public boolean createCommentAttachment() {
-        return false;
+    public boolean createQueryAttachmentPrivate(Integer offerFromBiobank) {
+        if(queryId == null) {
+            return false;
+        }
+        PrivateAttachmentDTO fileDTO = new PrivateAttachmentDTO();
+        fileDTO.setQueryId(queryId);
+        fileDTO.setAttachmentType(attachmentType);
+        fileDTO.setAttachment_time(new Timestamp(System.currentTimeMillis()));
+        fileDTO.setBiobank_in_private_chat(offerFromBiobank);
+        fileDTO.setPersonId(userBean.getUserId());
+        return createQueryAttachment(fileDTO);
     }
 
     public boolean createQueryAttachment() {
         if(queryId == null) {
             return false;
         }
+        QueryAttachmentDTO fileDTO = new QueryAttachmentDTO();
+        fileDTO.setQueryId(queryId);
+        fileDTO.setAttachmentType(attachmentType);
+        return createQueryAttachment(fileDTO);
+    }
 
+    private boolean createQueryAttachment(AttachmentDTO fileDTO) {
         try (Config config = ConfigFactory.get()) {
             String originalFileName = fileUtil.getOriginalFileNameFromPart(file);
-            Integer fileId = DbUtil.insertQueryAttachmentRecord(config, queryId, originalFileName, attachmentType);
+            fileDTO.setAttachment(originalFileName);
+            Integer fileId = DbUtil.insertQueryAttachmentRecord(config, fileDTO);
             if (fileId == null) {
                 // something went wrong in db
                 config.rollback();
@@ -113,8 +143,9 @@ public class FileUploadBean implements Serializable {
         // reset it
         toRemoveAttachment = null;
 
-        if(attachment == null)
+        if(attachment == null) {
             return false;
+        }
 
         Pattern pattern = fileUtil.getStorageNamePattern();
         Matcher matcher = pattern.matcher(attachment);
@@ -128,8 +159,8 @@ public class FileUploadBean implements Serializable {
             fileExtension = matcher.group(3);
         }
 
-        Integer fileIdInteger = null;
-        Integer queryIdInteger = null;
+        Integer fileIdInteger;
+        Integer queryIdInteger;
         try {
             fileIdInteger = Integer.parseInt(fileID);
             queryIdInteger = Integer.parseInt(queryID);
@@ -162,14 +193,40 @@ public class FileUploadBean implements Serializable {
     /**
      * File Display
      */
+    public HashMap<String, String> getAttachmentMap(String scope) {
+        if(scope.equals("queryAttachment")) {
+            return getAttachmentMap();
+        } else if(scope.equals("privateAttachment")) {
+            return getPrivateAttachmentMap();
+        }
+        return null;
+    }
+
+    public HashMap<String, String> getPrivateAttachmentMap() {
+        if(privateAttachmentMap == null) {
+            privateAttachmentMap = new HashMap<String, String>();
+            if(attachmentTypeMap == null) {
+                attachmentTypeMap = new HashMap<String, String>();
+            }
+            for(PrivateAttachmentDTO privateAttachment : privateAttachments) {
+                String uploadName = generateUploadFileName(privateAttachment);
+                privateAttachmentMap.put(uploadName, privateAttachment.getAttachment());
+                attachmentTypeMap.put(uploadName, privateAttachment.getAttachmentType());
+            }
+        }
+        return privateAttachmentMap;
+    }
+
     public HashMap<String, String> getAttachmentMap() {
         if(attachmentMap == null) {
             attachmentMap = new HashMap<String, String>();
-            attachmentTypeMap = new HashMap<String, String>();
-            for(QueryAttachmentDTO att : attachments) {
-                String uploadName = generateUploadFileName(att);
-                attachmentMap.put(uploadName, att.getAttachment());
-                attachmentTypeMap.put(uploadName, att.getAttachmentType());
+            if(attachmentTypeMap == null) {
+                attachmentTypeMap = new HashMap<String, String>();
+            }
+            for(QueryAttachmentDTO attachment : attachments) {
+                String uploadName = generateUploadFileName(attachment);
+                attachmentMap.put(uploadName, attachment.getAttachment());
+                attachmentTypeMap.put(uploadName, attachment.getAttachmentType());
             }
         }
         return attachmentMap;
@@ -186,8 +243,8 @@ public class FileUploadBean implements Serializable {
         return attachmentType;
     }
 
-    private String generateUploadFileName(QueryAttachmentDTO att) {
-        String uploadName = fileUtil.getStorageFileName(queryId, att.getId(), att.getAttachment());
+    private String generateUploadFileName(AttachmentDTO attachment) {
+        String uploadName = fileUtil.getStorageFileName(queryId, attachment.getId(), attachment.getAttachment());
         uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiator.getUploadFileSalt() + uploadName) + ".download";
         uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
         return uploadName;
@@ -225,6 +282,7 @@ public class FileUploadBean implements Serializable {
         try(Config config = ConfigFactory.get()) {
             if(queryId != null) {
                 setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
+                setPrivateAttachments(DbUtil.getPrivateAttachmentRecords(config, queryId));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -239,6 +297,14 @@ public class FileUploadBean implements Serializable {
         this.attachments = attachments;
     }
 
+    public List<PrivateAttachmentDTO> getPrivateAttachments() {
+        return privateAttachments;
+    }
+
+    public void setPrivateAttachments(List<PrivateAttachmentDTO> privateAttachments) {
+        this.privateAttachments = privateAttachments;
+    }
+
     public List<FacesMessage> getMsgs() {
         return msgs;
     }
@@ -249,5 +315,13 @@ public class FileUploadBean implements Serializable {
 
     public void setToRemoveAttachment(String filename) {
         this.toRemoveAttachment = filename;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
     }
 }

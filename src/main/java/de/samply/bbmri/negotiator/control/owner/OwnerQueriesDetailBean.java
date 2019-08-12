@@ -363,6 +363,15 @@ public class OwnerQueriesDetailBean implements Serializable {
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
+	public String uploadAttachmentPrivate(Integer offerFromBiobank) throws IOException {
+		if (!fileUploadBean.isFileToUpload())
+			return "";
+
+		boolean fileCreationSuccessful = fileUploadBean.createQueryAttachmentPrivate(offerFromBiobank);
+		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+				+ "?includeViewParams=true&faces-redirect=true";
+	}
+
 	public String removeAttachment() {
 		boolean fileDeleted = fileUploadBean.removeAttachment();
 		if(!fileDeleted) {

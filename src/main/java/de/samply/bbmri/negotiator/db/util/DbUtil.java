@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
@@ -476,6 +477,58 @@ public class DbUtil {
         return result.getValues(Tables.QUERY_ATTACHMENT.ID).get(0);
     }
 
+    public static Integer insertPrivateAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType, Integer personId, Integer biobank_in_private_chat, Timestamp attachment_time) {
+        Result<QueryAttachmentPrivateRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT_PRIVATE)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT, attachment)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.QUERY_ID, queryId)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT_TYPE, attachmentType)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.PERSON_ID, personId)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.BIOBANK_IN_PRIVATE_CHAT, biobank_in_private_chat)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT_TIME, attachment_time)
+                .returning(Tables.QUERY_ATTACHMENT_PRIVATE.ID)
+                .fetch();
+
+        if(result == null || result.getValues(Tables.QUERY_ATTACHMENT_PRIVATE.ID) == null || result.getValues(Tables
+                .QUERY_ATTACHMENT_PRIVATE.ID).size() < 1)
+            return null;
+
+        return result.getValues(Tables.QUERY_ATTACHMENT.ID).get(0);
+    }
+
+    public static Integer insertCommentAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType, Integer commentId) {
+        Result<QueryAttachmentCommentRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT_COMMENT)
+                .set(Tables.QUERY_ATTACHMENT_COMMENT.ATTACHMENT, attachment)
+                .set(Tables.QUERY_ATTACHMENT_COMMENT.QUERY_ID, queryId)
+                .set(Tables.QUERY_ATTACHMENT_COMMENT.ATTACHMENT_TYPE, attachmentType)
+                .set(Tables.QUERY_ATTACHMENT_COMMENT.COMMENT_ID, commentId)
+                .returning(Tables.QUERY_ATTACHMENT_COMMENT.ID)
+                .fetch();
+
+        if(result == null || result.getValues(Tables.QUERY_ATTACHMENT_COMMENT.ID) == null || result.getValues(Tables
+                .QUERY_ATTACHMENT_COMMENT.ID).size() < 1)
+            return null;
+
+        return result.getValues(Tables.QUERY_ATTACHMENT_COMMENT.ID).get(0);
+    }
+
+    public static Integer insertQueryAttachmentRecord(Config config, AttachmentDTO fileDTO) {
+        if(fileDTO.getClass().equals(QueryAttachmentDTO.class)) {
+            QueryAttachmentDTO queryFileDTO = (QueryAttachmentDTO)fileDTO;
+            return insertQueryAttachmentRecord(config, queryFileDTO.getQueryId(), queryFileDTO.getAttachment(), queryFileDTO.getAttachmentType());
+        } else if (fileDTO.getClass().equals(PrivateAttachmentDTO.class)) {
+            PrivateAttachmentDTO privateFileDTO = (PrivateAttachmentDTO)fileDTO;
+            return insertPrivateAttachmentRecord(config, privateFileDTO.getQueryId(), privateFileDTO.getAttachment(), privateFileDTO.getAttachmentType(),
+                    privateFileDTO.getPersonId(), privateFileDTO.getBiobank_in_private_chat(), privateFileDTO.getAttachment_time());
+        } else if (fileDTO.getClass().equals(CommentAttachmentDTO.class)) {
+            CommentAttachmentDTO commentFileDTO = (CommentAttachmentDTO)fileDTO;
+            return insertCommentAttachmentRecord(config, commentFileDTO.getQueryId(), commentFileDTO.getAttachment(),
+                    commentFileDTO.getAttachmentType(), commentFileDTO.getCommentId());
+        } else {
+            logger.error("Error insertQueryAttachmentRecord: No matching Attachment Class.");
+            return null;
+        }
+    }
+
 
     public static void deleteQueryAttachmentRecord(Config config, Integer queryId, Integer attachment) {
         config.dsl().delete(Tables.QUERY_ATTACHMENT)
@@ -662,6 +715,16 @@ public class DbUtil {
                 .orderBy(Tables.QUERY_ATTACHMENT.ID.asc()).fetch();
 
         return config.map(result, QueryAttachmentDTO.class);
+    }
+
+    public static List<PrivateAttachmentDTO> getPrivateAttachmentRecords(Config config, int queryId) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_ATTACHMENT_PRIVATE, "privateAttachment"))
+                .from(Tables.QUERY_ATTACHMENT_PRIVATE)
+                .where(Tables.QUERY_ATTACHMENT_PRIVATE.QUERY_ID.eq(queryId))
+                .orderBy(Tables.QUERY_ATTACHMENT_PRIVATE.ID.asc()).fetch();
+
+        return config.map(result, PrivateAttachmentDTO.class);
     }
 
     /**
@@ -1688,4 +1751,6 @@ public class DbUtil {
         br.close();
         executeSQL(connection, sb.toString());
     }
+
+
 }

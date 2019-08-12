@@ -12,14 +12,15 @@
 <composite:interface>
     <composite:attribute name="componentQueryBean" required="true"/>
     <composite:attribute name="fileUploadBean" required="true"/>
+    <composite:attribute name="scope" required="true" default="queryAttachment" />
 </composite:interface>
 
 <composite:implementation>
     <!-- Using h:dataTable to display attachments -->
-    <h:dataTable value="#{fileUploadBean.attachmentMap.entrySet().toArray()}" var="attachment"
+    <h:dataTable value="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope).entrySet().toArray()}" var="attachment"
                  columnClasses="column1,column2,column3" style="margin-top: 0px;"
                  class="table-striped table-bordered table-responsive table-fullwidth"
-                 rendered="#{fileUploadBean.attachments.size() > 0}">
+                 rendered="#{cc.attrs.fileUploadBean.attachments.size() > 0}">
 
         <h:column>
             <h:outputLink value="../attachment/#{attachment.key}" title="#{label['attachmentview.tooltip.attachmentDownload']}"
@@ -37,14 +38,14 @@
         </h:column>
 
         <h:column>
-            #{fileUploadBean.getAttachmentType(attachment.key)}
+            #{cc.attrs.fileUploadBean.getAttachmentType(attachment.key)}
         </h:column>
 
         <h:column>
             <!--   Remove an attachment -->
             <h:commandLink
                     styleClass="confirm-delete"
-                    action="#{fileUploadBean.setToRemoveAttachment(attachment.key)}"
+                    action="#{cc.attrs.fileUploadBean.setToRemoveAttachment(attachment.key)}"
                     title="#{label['attachmentview.tooltip.attachmentDelete']}: #{attachment.value}">
                 <i class="fa fa-times attachment-delete-links" aria-hidden="true" />
                 <f:ajax onevent="showConfirmDialog"/>

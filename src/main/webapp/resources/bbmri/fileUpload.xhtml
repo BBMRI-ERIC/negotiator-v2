@@ -12,6 +12,8 @@
 <composite:interface>
     <composite:attribute name="componentQueryBean" required="true"/>
     <composite:attribute name="fileUploadBean" required="true"/>
+    <composite:attribute name="isOffer" required="false" default="false"  />
+    <composite:attribute name="offer" required="false" />
 </composite:interface>
 
 <composite:implementation>
@@ -40,9 +42,12 @@
                                  onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
                                  style="display: none;" />
                 </h:panelGroup>
-                <h:commandButton id="uploadBtn" value="Upload"
+                <h:commandButton id="uploadBtnPublic" value="Upload" rendered="#{cc.attrs.isOffer == 'false'}"
                                              action="#{cc.attrs.componentQueryBean.uploadAttachment}"
                                              styleClass="btn btn-primary disabled" />
+                <h:commandButton id="uploadBtnPrivate" value="Upload secret" rendered="#{cc.attrs.isOffer == 'true'}"
+                                 action="#{cc.attrs.componentQueryBean.uploadAttachmentPrivate(cc.attrs.offer)}"
+                                 styleClass="btn btn-primary disabled" />
             </label>
         </h:panelGroup>
         <h:panelGroup layout="block">

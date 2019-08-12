@@ -2,7 +2,7 @@ package de.samply.bbmri.negotiator.model;
 
 import java.sql.Timestamp;
 
-public class PrivateAttachmentDTO extends QueryAttachmentDTO {
+public class PrivateAttachmentDTO extends AttachmentDTO {
     private int personId;
     private int biobank_in_private_chat;
     private Timestamp attachment_time;
