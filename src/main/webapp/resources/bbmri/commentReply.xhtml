@@ -83,11 +83,17 @@
 
 				<!-- Attachments for a private negotiation -->
 				<h:panelGroup layout="block" rendered="#{cc.attrs.makeOffer == 'true'}">
-					<!-- Uploaded attachments for a query -->
-					<bbmricc:fileUploaderDisplay componentQueryBean="#{cc.attrs.componentQueryBean}" fileUploadBean="#{cc.attrs.fileUploadBean}" scope="privateAttachment" />
+					<!-- Uploaded attachments for a query-->
+					<bbmricc:fileUploaderDisplay componentQueryBean="#{cc.attrs.componentQueryBean}"
+												 fileUploadBean="#{cc.attrs.fileUploadBean}"
+												 scope="privateAttachment"
+												 offer="#{cc.attrs.offer}"
+												 userSelectedId="#{userBean.person.id}" />
 					<!-- Upload the attachments for a query -->
-					<bbmricc:fileUpload componentQueryBean="#{cc.attrs.componentQueryBean}" fileUploadBean="#{cc.attrs.fileUploadBean}"
-										isOffer="#{cc.attrs.makeOffer}" offer="#{cc.attrs.offer}" />
+					<bbmricc:fileUpload componentQueryBean="#{cc.attrs.componentQueryBean}"
+										fileUploadBean="#{cc.attrs.fileUploadBean}"
+										isOffer="#{cc.attrs.makeOffer}"
+										offer="#{cc.attrs.offer}" />
 
 				</h:panelGroup>
 
@@ -95,7 +101,7 @@
                     <h:inputTextarea id="offerCommentText" value="#{offerBean.offerComment}"
                         styleClass="form-control" rows="5"
                         validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 1000000 characters ">
-                        <f:validateLength for="offerCommentText" minimum="1" maximum="1000000" />
+                        <f:validateLength for="offerCommentText" minimum="0" maximum="1000000" />
                         <h:messages id="offerCommentValidationMessage" for="offerCommentText"
                             style="color:red" showSummary="true" showDetails="false" />
                     </h:inputTextarea>

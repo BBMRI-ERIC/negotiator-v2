@@ -724,7 +724,25 @@ public class DbUtil {
                 .where(Tables.QUERY_ATTACHMENT_PRIVATE.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT_PRIVATE.ID.asc()).fetch();
 
-        return config.map(result, PrivateAttachmentDTO.class);
+        List<PrivateAttachmentDTO> privateAttachmentDTOList = new ArrayList<PrivateAttachmentDTO>();
+        for (Record record : result) {
+            try {
+                PrivateAttachmentDTO privateAttachmentDTO = new PrivateAttachmentDTO();
+                privateAttachmentDTO.setId((Integer) record.getValue("privateAttachment_id"));
+                privateAttachmentDTO.setPersonId((Integer) record.getValue("privateAttachment_person_id"));
+                privateAttachmentDTO.setQueryId((Integer) record.getValue("privateAttachment_query_id"));
+                privateAttachmentDTO.setBiobank_in_private_chat((Integer) record.getValue("privateAttachment_biobank_in_private_chat"));
+                privateAttachmentDTO.setAttachment_time((Timestamp) record.getValue("privateAttachment_attachment_time"));
+                privateAttachmentDTO.setAttachment((String) record.getValue("privateAttachment_attachment"));
+                privateAttachmentDTO.setAttachmentType((String) record.getValue("privateAttachment_attachment_type"));
+                privateAttachmentDTOList.add(privateAttachmentDTO);
+            } catch (Exception ex) {
+                System.err.println("Exception converting record to PrivateAttachmentDTO");
+                ex.printStackTrace();
+            }
+        }
+
+        return privateAttachmentDTOList;
     }
 
     /**

@@ -54,7 +54,7 @@ public class FileUploadBean implements Serializable {
     private List<QueryAttachmentDTO> attachments;
     private List<PrivateAttachmentDTO> privateAttachments;
     private HashMap<String, String> attachmentMap = null;
-    private HashMap<String, String> privateAttachmentMap = null;
+    private HashMap<Integer, HashMap<String, String>> privateAttachmentMap = null;
     private HashMap<String, String> attachmentTypeMap = null;
     private String toRemoveAttachment = null;
 
@@ -193,28 +193,52 @@ public class FileUploadBean implements Serializable {
     /**
      * File Display
      */
-    public HashMap<String, String> getAttachmentMap(String scope) {
+    public HashMap<String, String> getAttachmentMap(String scope, Integer offerFrom, Integer userId) {
         if(scope.equals("queryAttachment")) {
             return getAttachmentMap();
         } else if(scope.equals("privateAttachment")) {
-            return getPrivateAttachmentMap();
+            return getPrivateAttachmentMap(offerFrom, userId);
         }
         return null;
     }
 
-    public HashMap<String, String> getPrivateAttachmentMap() {
+    public HashMap<String, String> getAttachmentMap(String scope, Integer offerFrom) {
+        if(scope.equals("queryAttachment")) {
+            return getAttachmentMap();
+        } else if(scope.equals("privateAttachment")) {
+            return getPrivateAttachmentMap(offerFrom);
+        }
+        return null;
+    }
+
+    public HashMap<String, String> getPrivateAttachmentMap(Integer offerFrom, Integer userId) {
+        HashMap<String, String> privateUserAttachments = new HashMap<String, String>();
+        for(PrivateAttachmentDTO privateAttachment : privateAttachments) {
+            if(privateAttachment.getBiobank_in_private_chat() == offerFrom && privateAttachment.getPersonId() == userId) {
+                String uploadName = generateUploadFileName(privateAttachment);
+
+                privateUserAttachments.put(uploadName, privateAttachment.getAttachment());
+            }
+        }
+        return privateUserAttachments;
+    }
+
+    public HashMap<String, String> getPrivateAttachmentMap(Integer offerFrom) {
         if(privateAttachmentMap == null) {
-            privateAttachmentMap = new HashMap<String, String>();
+            privateAttachmentMap = new HashMap<Integer, HashMap<String, String>>();
             if(attachmentTypeMap == null) {
                 attachmentTypeMap = new HashMap<String, String>();
             }
             for(PrivateAttachmentDTO privateAttachment : privateAttachments) {
                 String uploadName = generateUploadFileName(privateAttachment);
-                privateAttachmentMap.put(uploadName, privateAttachment.getAttachment());
+                if(!privateAttachmentMap.containsKey(privateAttachment.getBiobank_in_private_chat())) {
+                    privateAttachmentMap.put(privateAttachment.getBiobank_in_private_chat(), new HashMap<String, String>());
+                }
+                privateAttachmentMap.get(privateAttachment.getBiobank_in_private_chat()).put(uploadName, privateAttachment.getAttachment());
                 attachmentTypeMap.put(uploadName, privateAttachment.getAttachmentType());
             }
         }
-        return privateAttachmentMap;
+        return privateAttachmentMap.get(offerFrom);
     }
 
     public HashMap<String, String> getAttachmentMap() {

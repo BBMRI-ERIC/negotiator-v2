@@ -12,12 +12,14 @@
 <composite:interface>
     <composite:attribute name="componentQueryBean" required="true"/>
     <composite:attribute name="fileUploadBean" required="true"/>
-    <composite:attribute name="scope" required="true" default="queryAttachment" />
+    <composite:attribute name="scope" required="false" default="queryAttachment" />
+    <composite:attribute name="offer" required="false" default="-1" />
+    <composite:attribute name="userSelectedId" required="false" default="-1" />
 </composite:interface>
 
 <composite:implementation>
     <!-- Using h:dataTable to display attachments -->
-    <h:dataTable value="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope).entrySet().toArray()}" var="attachment"
+    <h:dataTable value="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer, cc.attrs.userSelectedId).entrySet().toArray()}" var="attachment"
                  columnClasses="column1,column2,column3" style="margin-top: 0px;"
                  class="table-striped table-bordered table-responsive table-fullwidth"
                  rendered="#{cc.attrs.fileUploadBean.attachments.size() > 0}">
@@ -65,7 +67,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <h:commandButton action="#{componentQueryBean.removeAttachment()}"
+                    <h:commandButton action="#{cc.attrs.componentQueryBean.removeAttachment()}"
                                      value="Yes" styleClass="btn btn-danger btn-ok"
                                      title="#{label['attachmentview.tooltip.attachmentDelete']}">
                     </h:commandButton>

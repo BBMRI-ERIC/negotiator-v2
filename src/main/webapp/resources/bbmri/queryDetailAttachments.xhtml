@@ -36,13 +36,15 @@
 <composite:interface>
     <composite:attribute name="queryBean" required="true"/>
     <composite:attribute name="fileUploadBean" required="true"/>
+    <composite:attribute name="scope" required="false" default="queryAttachment" />
+    <composite:attribute name="offer" required="false" default="-1" />
 </composite:interface>
 
 <composite:implementation>
 
     <h:panelGroup layout="block" id="queryDetailAttachments">
 
-        <h:dataTable value="#{cc.attrs.fileUploadBean.attachmentMap.entrySet().toArray()}"
+        <h:dataTable value="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer).entrySet().toArray()}"
                      var="attachment"
                      headerClass="query-detail-attachments-table-attachment-type-header,query-detail-attachments-table-attachment-name-header"
                      columnClasses="query-detail-attachments-table-attachment-type,query-detail-attachments-table-attachment-name"

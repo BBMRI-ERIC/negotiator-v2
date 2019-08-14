@@ -265,6 +265,13 @@
                                          aria-labelledby="heading#{i}">
 
                                         <div class="panel-body">
+                                            <h:panelGroup layout="block" style="padding-bottom: 20px;">
+                                                <bbmricc:queryDetailAttachments queryBean="#{researcherQueriesDetailBean}"
+                                                                                fileUploadBean="#{fileUploadBean}"
+                                                                                scope="privateAttachment"
+                                                                                offer="#{researcherQueriesDetailBean.biobankWithOffer[i-1]}" />
+
+                                            </h:panelGroup>
                                             <ui:repeat
                                                     value="#{researcherQueriesDetailBean.listOfSampleOffers[i-1]}"
                                                     var="offers">

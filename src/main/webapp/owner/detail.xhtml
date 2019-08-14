@@ -171,13 +171,20 @@
                                          aria-labelledby="heading#{i}">
 
                                         <div class="panel-body">
+                                            <h:panelGroup layout="block" style="padding-bottom: 20px;">
+                                                <bbmricc:queryDetailAttachments queryBean="#{ownerQueriesDetailBean}"
+                                                                                fileUploadBean="#{fileUploadBean}"
+                                                                                scope="privateAttachment"
+                                                                                offer="#{ownerQueriesDetailBean.associatedBiobanks[i-1].id}" />
+
+                                            </h:panelGroup>
                                             <ui:repeat
                                                     value="#{ownerQueriesDetailBean.listOfSampleOffers[i-1]}"
                                                     var="offers">
 
                                                 <bbmricc:comment comment="#{offers.offer}"
                                                                  person="#{offers.person}"
-                                                                 collections="#{offers.collections}"/>
+                                                                 collections="#{offers.collections}" />
 
                                             </ui:repeat>
 
@@ -188,7 +195,7 @@
                                             <bbmricc:commentReply makeOffer="true"
                                                                   query="#{ownerQueriesDetailBean.selectedQuery}"
                                                                   offer="#{ownerQueriesDetailBean.associatedBiobanks[i-1].id}"
-                                                                  componentQueryBean="#{researcherQueriesDetailBean}"
+                                                                  componentQueryBean="#{ownerQueriesDetailBean}"
                                                                   fileUploadBean="#{fileUploadBean}"/>
                                         </div>
                                     </div>
