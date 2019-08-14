@@ -24,7 +24,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer implements Serializable {
 
-	private static final long serialVersionUID = 1712169228;
+	private static final long serialVersionUID = 1713424993;
 
 	private Integer   id;
 	private Integer   queryId;
@@ -32,7 +32,6 @@ public class Offer implements Serializable {
 	private Integer   biobankInPrivateChat;
 	private Timestamp commentTime;
 	private String    text;
-	private Boolean   attachment;
 
 	public Offer() {}
 
@@ -43,7 +42,6 @@ public class Offer implements Serializable {
 		this.biobankInPrivateChat = value.biobankInPrivateChat;
 		this.commentTime = value.commentTime;
 		this.text = value.text;
-		this.attachment = value.attachment;
 	}
 
 	public Offer(
@@ -52,8 +50,7 @@ public class Offer implements Serializable {
 		Integer   personId,
 		Integer   biobankInPrivateChat,
 		Timestamp commentTime,
-		String    text,
-		Boolean   attachment
+		String    text
 	) {
 		this.id = id;
 		this.queryId = queryId;
@@ -61,7 +58,6 @@ public class Offer implements Serializable {
 		this.biobankInPrivateChat = biobankInPrivateChat;
 		this.commentTime = commentTime;
 		this.text = text;
-		this.attachment = attachment;
 	}
 
 	public Integer getId() {
@@ -110,13 +106,5 @@ public class Offer implements Serializable {
 
 	public void setText(String text) {
 		this.text = text;
-	}
-
-	public Boolean getAttachment() {
-		return this.attachment;
-	}
-
-	public void setAttachment(Boolean attachment) {
-		this.attachment = attachment;
 	}
 }

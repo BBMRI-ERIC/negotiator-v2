@@ -53,11 +53,11 @@ CREATE TABLE query_lifecycle_collection (
 ALTER TABLE query_attachment
     ADD COLUMN attachment_type character varying DEFAULT 'other';
 
-ALTER TABLE offer
+ALTER TABLE comment
     ADD COLUMN attachment boolean DEFAULT true;
 
 ALTER TABLE comment
-    ADD COLUMN attachment boolean DEFAULT true;
+    ADD COLUMN published boolean DEFAULT true;
 
 CREATE TABLE public.query_attachment_comment
 (
@@ -77,8 +77,6 @@ CREATE TABLE public.query_attachment_comment
     )
     TABLESPACE pg_default;
 
-ALTER TABLE public.query_attachment_comment
-    OWNER to saher;
 COMMENT ON TABLE public.query_attachment_comment
     IS 'Table for queries that have one or more attachments uploaded.';
 
