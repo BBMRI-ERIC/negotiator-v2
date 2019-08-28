@@ -101,9 +101,9 @@ public class CommentDao extends DAOImpl<CommentRecord, de.samply.bbmri.negotiato
 	}
 
 	/**
-	 * Fetch records that have <code>published IN (values)</code>
+	 * Fetch records that have <code>status IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByPublished(Boolean... values) {
-		return fetch(Comment.COMMENT.PUBLISHED, values);
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByStatus(String... values) {
+		return fetch(Comment.COMMENT.STATUS, values);
 	}
 }

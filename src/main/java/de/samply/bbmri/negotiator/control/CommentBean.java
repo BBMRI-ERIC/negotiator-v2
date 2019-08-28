@@ -85,9 +85,9 @@ public class CommentBean implements Serializable {
     public String saveComment(Query query) {
         try(Config config = ConfigFactory.get()) {
             if(commentId != null || commentId != -1) {
-                DbUtil.updateComment(config, commentId, comment, true, true);
+                DbUtil.updateComment(config, commentId, comment, "published", true);
             } else {
-                DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment, true, false);
+                DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment, "published", false);
             }
             config.commit();
 
@@ -176,7 +176,7 @@ public class CommentBean implements Serializable {
             return "";
         try (Config config = ConfigFactory.get()) {
             if(commentId == null || commentId == -1) {
-                CommentRecord record = DbUtil.addComment(config, queryId, userBean.getUserId(), comment, false, true);
+                CommentRecord record = DbUtil.addComment(config, queryId, userBean.getUserId(), comment, "saved", true);
                 config.commit();
                 setCommentId(record.getId());
             } // Update comment text

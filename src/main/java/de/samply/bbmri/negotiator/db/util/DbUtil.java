@@ -811,7 +811,7 @@ public class DbUtil {
                 .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
                 .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
-                .and(Tables.COMMENT.PUBLISHED.eq(true))
+                .and(Tables.COMMENT.STATUS.eq("published"))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 
         List<CommentPersonDTO> map = config.map(result, CommentPersonDTO.class);
@@ -863,26 +863,26 @@ public class DbUtil {
      * @param personId
      * @param comment
      */
-    public static CommentRecord addComment(Config config, int queryId, int personId, String comment, boolean published, boolean attachment) throws SQLException {
+    public static CommentRecord addComment(Config config, int queryId, int personId, String comment, String status, boolean attachment) throws SQLException {
         CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
         record.setQueryId(queryId);
         record.setPersonId(personId);
         record.setText(comment);
-        record.setPublished(published);
+        record.setStatus(status);
         record.setAttachment(attachment);
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
         return record;
     }
 
-    public static CommentRecord updateComment(Config config, int commentId, String comment, boolean published, boolean attachment) {
+    public static CommentRecord updateComment(Config config, int commentId, String comment, String status, boolean attachment) {
         CommentRecord record = config.dsl().selectFrom(Tables.COMMENT)
                 .where(Tables.COMMENT.ID.eq(commentId))
                 .fetchOne();
 
         record.setText(comment);
         record.setCommentTime(new Timestamp(new Date().getTime()));
-        record.setPublished(published);
+        record.setStatus(status);
         record.setAttachment(attachment);
 
         record.update();
@@ -1453,7 +1453,7 @@ public class DbUtil {
                 .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .from(Tables.COMMENT)
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
-                .and(Tables.COMMENT.PUBLISHED.eq(true))
+                .and(Tables.COMMENT.STATUS.eq("published"))
                 .fetch();
 
         return result;

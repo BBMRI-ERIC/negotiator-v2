@@ -57,7 +57,10 @@ ALTER TABLE comment
     ADD COLUMN attachment boolean DEFAULT false;
 
 ALTER TABLE comment
-    ADD COLUMN published boolean DEFAULT true;
+    ADD COLUMN status character varying DEFAULT 'published';
+
+COMMENT ON COLUMN public.comment.status
+    IS 'status: published, deleted, saved';
 
 CREATE TABLE public.query_attachment_comment
 (
