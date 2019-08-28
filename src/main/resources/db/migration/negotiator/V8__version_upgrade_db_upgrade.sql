@@ -54,7 +54,7 @@ ALTER TABLE query_attachment
     ADD COLUMN attachment_type character varying DEFAULT 'other';
 
 ALTER TABLE comment
-    ADD COLUMN attachment boolean DEFAULT true;
+    ADD COLUMN attachment boolean DEFAULT false;
 
 ALTER TABLE comment
     ADD COLUMN published boolean DEFAULT true;

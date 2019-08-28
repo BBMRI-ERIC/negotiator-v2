@@ -49,7 +49,7 @@
                      headerClass="query-detail-attachments-table-attachment-type-header,query-detail-attachments-table-attachment-name-header"
                      columnClasses="query-detail-attachments-table-attachment-type,query-detail-attachments-table-attachment-name"
                      class="table-striped table-bordered table-responsive table-fullwidth"
-                     rendered="#{cc.attrs.fileUploadBean.attachments.size() > 0}">
+                     rendered="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer).entrySet().size() > 0}">
 
             <h:column>
                 <f:facet name="header">Attachment Type</f:facet>

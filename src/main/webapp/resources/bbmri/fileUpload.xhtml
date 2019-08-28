@@ -14,6 +14,8 @@
     <composite:attribute name="fileUploadBean" required="true"/>
     <composite:attribute name="isOffer" required="false" default="false"  />
     <composite:attribute name="offer" required="false" />
+    <composite:attribute name="scope" required="true" default="queryAttachment" />
+    <composite:attribute name="queryId" required="false" default="-1" />
 </composite:interface>
 
 <composite:implementation>
@@ -27,8 +29,8 @@
 
             <h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">
                 <f:selectItem itemValue="other" itemLabel="other" />
-                <f:selectItem itemValue="Project Description" itemLabel="Project Description" />
-                <f:selectItem itemValue="Request Description" itemLabel="Request Description" />
+                <f:selectItem itemValue="Project Description" itemLabel="Project Description" rendered="#{cc.attrs.scope == 'queryAttachment' or cc.attrs.scope == 'commentAttachment'}" />
+                <f:selectItem itemValue="Request Description" itemLabel="Request Description" rendered="#{cc.attrs.scope == 'queryAttachment' or cc.attrs.scope == 'commentAttachment'}" />
                 <f:selectItem itemValue="Ethics Vote" itemLabel="Ethics Vote" />
                 <f:selectItem itemValue="Material Transfer Agreement" itemLabel="Material Transfer Agreement" />
                 <f:selectItem itemValue="Data Transfer Agreement" itemLabel="Data Transfer Agreement" />
@@ -42,11 +44,14 @@
                                  onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
                                  style="display: none;" />
                 </h:panelGroup>
-                <h:commandButton id="uploadBtnPublic" value="Upload" rendered="#{cc.attrs.isOffer == 'false'}"
+                <h:commandButton id="uploadBtnPublic" value="Upload" rendered="#{cc.attrs.scope == 'queryAttachment'}"
                                              action="#{cc.attrs.componentQueryBean.uploadAttachment}"
                                              styleClass="btn btn-primary disabled" />
-                <h:commandButton id="uploadBtnPrivate" value="Upload secret" rendered="#{cc.attrs.isOffer == 'true'}"
+                <h:commandButton id="uploadBtnPrivate" value="Upload secret" rendered="#{cc.attrs.scope == 'privateAttachment'}"
                                  action="#{cc.attrs.componentQueryBean.uploadAttachmentPrivate(cc.attrs.offer)}"
+                                 styleClass="btn btn-primary disabled" />
+                <h:commandButton id="uploadBtnComment" value="Upload secret" rendered="#{cc.attrs.scope == 'commentAttachment'}"
+                                 action="#{cc.attrs.componentQueryBean.uploadAttachmentComment(cc.attrs.queryId)}"
                                  styleClass="btn btn-primary disabled" />
             </label>
         </h:panelGroup>

@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
@@ -541,6 +540,8 @@ public class DbUtil {
 
     }
 
+
+
     /**
      * Update number of attachments associated with this query (existing and deleted)
      * @param numAttachments
@@ -745,6 +746,55 @@ public class DbUtil {
         return privateAttachmentDTOList;
     }
 
+    public static List<CommentAttachmentDTO> getCommentAttachmentRecords(Config config, int queryId) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "commentAttachment"))
+                .from(Tables.QUERY_ATTACHMENT_COMMENT)
+                .where(Tables.QUERY_ATTACHMENT_COMMENT.QUERY_ID.eq(queryId))
+                .orderBy(Tables.QUERY_ATTACHMENT_COMMENT.ID.asc()).fetch();
+
+        List<CommentAttachmentDTO> commentAttachmentDTOList = new ArrayList<CommentAttachmentDTO>();
+        for (Record record : result) {
+            try {
+                CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
+                commentAttachmentDTO.setId((Integer) record.getValue("commentAttachment_id"));
+                commentAttachmentDTO.setQueryId((Integer) record.getValue("commentAttachment_query_id"));
+                commentAttachmentDTO.setCommentId((Integer) record.getValue("commentAttachment_comment_id"));
+                commentAttachmentDTO.setAttachment((String) record.getValue("commentAttachment_attachment"));
+                commentAttachmentDTO.setAttachmentType((String) record.getValue("commentAttachment_attachment_type"));
+                commentAttachmentDTOList.add(commentAttachmentDTO);
+            } catch (Exception ex) {
+                System.err.println("Exception converting record to CommentAttachmentDTO");
+                ex.printStackTrace();
+            }
+        }
+
+        return commentAttachmentDTOList;
+    }
+
+    public static List<CommentAttachmentDTO> getCommentAttachments(Config config, Integer commentId) {
+        List<QueryAttachmentCommentRecord> list = config.dsl().selectFrom(Tables.QUERY_ATTACHMENT_COMMENT)
+                .where(Tables.QUERY_ATTACHMENT_COMMENT.COMMENT_ID.eq(commentId))
+                .fetch();
+
+        List<CommentAttachmentDTO> commentAttachmentList = new ArrayList<CommentAttachmentDTO>();
+        for(QueryAttachmentCommentRecord queryAttachmentCommentRecord : list) {
+            try {
+                CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
+                commentAttachmentDTO.setId(queryAttachmentCommentRecord.getId());
+                commentAttachmentDTO.setCommentId(queryAttachmentCommentRecord.getCommentId());
+                commentAttachmentDTO.setQueryId(queryAttachmentCommentRecord.getQueryId());
+                commentAttachmentDTO.setAttachment(queryAttachmentCommentRecord.getAttachment());
+                commentAttachmentDTO.setAttachmentType(queryAttachmentCommentRecord.getAttachmentType());
+                commentAttachmentList.add(commentAttachmentDTO);
+            } catch (Exception ex) {
+                System.err.println("Exception converting record to CommentAttachmentDTO");
+                ex.printStackTrace();
+            }
+        }
+        return commentAttachmentList;
+    }
+
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config
@@ -761,6 +811,7 @@ public class DbUtil {
                 .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
                 .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+                .and(Tables.COMMENT.PUBLISHED.eq(true))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 
         List<CommentPersonDTO> map = config.map(result, CommentPersonDTO.class);
@@ -812,13 +863,31 @@ public class DbUtil {
      * @param personId
      * @param comment
      */
-    public static void addComment(Config config, int queryId, int personId, String comment) throws SQLException {
+    public static CommentRecord addComment(Config config, int queryId, int personId, String comment, boolean published, boolean attachment) throws SQLException {
         CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
         record.setQueryId(queryId);
         record.setPersonId(personId);
         record.setText(comment);
+        record.setPublished(published);
+        record.setAttachment(attachment);
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
+        return record;
+    }
+
+    public static CommentRecord updateComment(Config config, int commentId, String comment, boolean published, boolean attachment) {
+        CommentRecord record = config.dsl().selectFrom(Tables.COMMENT)
+                .where(Tables.COMMENT.ID.eq(commentId))
+                .fetchOne();
+
+        record.setText(comment);
+        record.setCommentTime(new Timestamp(new Date().getTime()));
+        record.setPublished(published);
+        record.setAttachment(attachment);
+
+        record.update();
+
+        return record;
     }
 
 	/**
@@ -1384,6 +1453,7 @@ public class DbUtil {
                 .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .from(Tables.COMMENT)
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+                .and(Tables.COMMENT.PUBLISHED.eq(true))
                 .fetch();
 
         return result;
@@ -1769,6 +1839,4 @@ public class DbUtil {
         br.close();
         executeSQL(connection, sb.toString());
     }
-
-
 }

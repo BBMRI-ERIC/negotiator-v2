@@ -212,9 +212,13 @@
 					<h:panelGroup layout="block">
 
 						<!-- Uploaded attachments for a query -->
-						<bbmricc:fileUploaderDisplay componentQueryBean="#{queryBean}" fileUploadBean="#{fileUploadBean}" />
+						<bbmricc:fileUploaderDisplay componentQueryBean="#{queryBean}"
+													 fileUploadBean="#{fileUploadBean}"
+													 scope="queryAttachment"/>
 						<!-- Upload the attachments for a query -->
-						<bbmricc:fileUpload componentQueryBean="#{queryBean}" fileUploadBean="#{fileUploadBean}" />
+						<bbmricc:fileUpload componentQueryBean="#{queryBean}"
+											fileUploadBean="#{fileUploadBean}"
+											scope="queryAttachment"/>
 
 					</h:panelGroup>
                 </div>

@@ -5,9 +5,12 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentCommentRecord;
 import de.samply.bbmri.negotiator.model.AttachmentDTO;
+import de.samply.bbmri.negotiator.model.CommentAttachmentDTO;
 import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -41,6 +44,9 @@ public class FileUploadBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
+    @ManagedProperty(value = "#{sessionBean}")
+    private SessionBean sessionBean;
+
     private static Logger logger = LoggerFactory.getLogger(FileUploadBean.class);
 
     List<FacesMessage> msgs = null;
@@ -53,6 +59,7 @@ public class FileUploadBean implements Serializable {
     private String attachmentContext;
     private List<QueryAttachmentDTO> attachments;
     private List<PrivateAttachmentDTO> privateAttachments;
+    private List<CommentAttachmentDTO> commentAttachments;
     private HashMap<String, String> attachmentMap = null;
     private HashMap<Integer, HashMap<String, String>> privateAttachmentMap = null;
     private HashMap<String, String> attachmentTypeMap = null;
@@ -79,11 +86,31 @@ public class FileUploadBean implements Serializable {
         }
     }
 
-    public boolean createQueryAttachmentComment() {
+    public boolean createQueryAttachmentComment(Integer commentId) {
         if(queryId == null) {
             return false;
         }
-        return false;
+        CommentAttachmentDTO fileDTO = new CommentAttachmentDTO();
+        fileDTO.setQueryId(queryId);
+        fileDTO.setAttachmentType(attachmentType);
+        fileDTO.setCommentId(commentId);
+        String originalFileName = fileUtil.getOriginalFileNameFromPart(file);
+        fileDTO.setAttachment(originalFileName);
+        boolean creatStatus = createQueryAttachment(fileDTO);
+        if(creatStatus) {
+            if(sessionBean.getTransientCommentAttachmentMap() == null) {
+                HashMap<String, String> files = new HashMap<String, String>();
+                String uploadName = generateUploadFileName(fileDTO);
+                files.put(uploadName, fileDTO.getAttachment());
+                sessionBean.setTransientCommentAttachmentMap(files);
+            } else {
+                HashMap<String, String> files = sessionBean.getTransientCommentAttachmentMap();
+                String uploadName = generateUploadFileName(fileDTO);
+                files.put(uploadName, fileDTO.getAttachment());
+                sessionBean.setTransientCommentAttachmentMap(files);
+            }
+        }
+        return creatStatus;
     }
 
     public boolean createQueryAttachmentPrivate(Integer offerFromBiobank) {
@@ -114,6 +141,7 @@ public class FileUploadBean implements Serializable {
             String originalFileName = fileUtil.getOriginalFileNameFromPart(file);
             fileDTO.setAttachment(originalFileName);
             Integer fileId = DbUtil.insertQueryAttachmentRecord(config, fileDTO);
+            fileDTO.setId(fileId);
             if (fileId == null) {
                 // something went wrong in db
                 config.rollback();
@@ -198,17 +226,39 @@ public class FileUploadBean implements Serializable {
             return getAttachmentMap();
         } else if(scope.equals("privateAttachment")) {
             return getPrivateAttachmentMap(offerFrom, userId);
+        } else if(scope.equals("commentAttachment")) {
+            return getCommentAttachmentMap();
         }
         return null;
     }
 
-    public HashMap<String, String> getAttachmentMap(String scope, Integer offerFrom) {
+    public HashMap<String, String> getAttachmentMap(String scope, Integer scopeId) {
         if(scope.equals("queryAttachment")) {
             return getAttachmentMap();
         } else if(scope.equals("privateAttachment")) {
-            return getPrivateAttachmentMap(offerFrom);
+            return getPrivateAttachmentMap(scopeId);
+        } else if(scope.equals("commentAttachment")) {
+            return getCommentAttachmentMap(scopeId);
         }
         return null;
+    }
+
+    public HashMap<String, String> getCommentAttachmentMap() {
+        return sessionBean.getTransientCommentAttachmentMap();
+    }
+
+    public HashMap<String, String> getCommentAttachmentMap(Integer commentId) {
+        HashMap<String, String> attachments = new HashMap<String, String>();
+        try (Config config = ConfigFactory.get()) {
+            List<CommentAttachmentDTO> attachmentsList = DbUtil.getCommentAttachments(config, commentId);
+            for(CommentAttachmentDTO commentAttachmentDTO : attachmentsList) {
+                String uploadName = generateUploadFileName(commentAttachmentDTO);
+                attachments.put(uploadName, commentAttachmentDTO.getAttachment());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return attachments;
     }
 
     public HashMap<String, String> getPrivateAttachmentMap(Integer offerFrom, Integer userId) {
@@ -216,7 +266,6 @@ public class FileUploadBean implements Serializable {
         for(PrivateAttachmentDTO privateAttachment : privateAttachments) {
             if(privateAttachment.getBiobank_in_private_chat() == offerFrom && privateAttachment.getPersonId() == userId) {
                 String uploadName = generateUploadFileName(privateAttachment);
-
                 privateUserAttachments.put(uploadName, privateAttachment.getAttachment());
             }
         }
@@ -252,8 +301,16 @@ public class FileUploadBean implements Serializable {
                 attachmentMap.put(uploadName, attachment.getAttachment());
                 attachmentTypeMap.put(uploadName, attachment.getAttachmentType());
             }
+            updateAttachmentMapCommentAndPrivate();
         }
         return attachmentMap;
+    }
+
+    private void updateAttachmentMapCommentAndPrivate() {
+        for(CommentAttachmentDTO attachment : commentAttachments) {
+            String uploadName = generateUploadFileName(attachment);
+            attachmentTypeMap.put(uploadName, attachment.getAttachmentType());
+        }
     }
 
     public String getAttachmentType(String uploadName) {
@@ -277,6 +334,14 @@ public class FileUploadBean implements Serializable {
     /**
      * Setter and Getter
      */
+    public SessionBean getSessionBean() {
+        return sessionBean;
+    }
+
+    public void setSessionBean(SessionBean sessionBean) {
+        this.sessionBean = sessionBean;
+    }
+
     public Part getFile() {
         return file;
     }
@@ -307,6 +372,7 @@ public class FileUploadBean implements Serializable {
             if(queryId != null) {
                 setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
                 setPrivateAttachments(DbUtil.getPrivateAttachmentRecords(config, queryId));
+                setCommentAttachments(DbUtil.getCommentAttachmentRecords(config, queryId));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -327,6 +393,14 @@ public class FileUploadBean implements Serializable {
 
     public void setPrivateAttachments(List<PrivateAttachmentDTO> privateAttachments) {
         this.privateAttachments = privateAttachments;
+    }
+
+    public List<CommentAttachmentDTO> getCommentAttachments() {
+        return commentAttachments;
+    }
+
+    public void setCommentAttachments(List<CommentAttachmentDTO> commentAttachments) {
+        this.commentAttachments = commentAttachments;
     }
 
     public List<FacesMessage> getMsgs() {

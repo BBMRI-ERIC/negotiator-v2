@@ -39,6 +39,7 @@
         <f:viewParam name="queryId" value="#{ownerQueriesDetailBean.queryId}" />
         <f:viewParam name="flag" value="#{ownerQueriesDetailBean.flagFilter}" />
         <f:viewAction action="#{ownerQueriesDetailBean.initialize}" />
+        <f:viewAction action="#{commentBean.initialize}" />
     </f:metadata>
 
     <ui:param name="bodyClass" value="container-fluid body-nomargin" />
@@ -132,7 +133,10 @@
                                 var="comment">
 
                                 <bbmricc:comment comment="#{comment.comment}"
-                                    person="#{comment.person}" collections="#{comment.collections}" ownerQueriesDetailBean="#{ownerQueriesDetailBean}" />
+                                                 person="#{comment.person}"
+                                                 collections="#{comment.collections}"
+                                                 ownerQueriesDetailBean="#{ownerQueriesDetailBean}"
+                                                 scope="commentAttachment"/>
 
                             </ui:repeat>
 
@@ -184,7 +188,8 @@
 
                                                 <bbmricc:comment comment="#{offers.offer}"
                                                                  person="#{offers.person}"
-                                                                 collections="#{offers.collections}" />
+                                                                 collections="#{offers.collections}"
+                                                                 scope="privateAttachment" />
 
                                             </ui:repeat>
 

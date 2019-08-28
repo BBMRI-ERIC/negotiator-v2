@@ -39,6 +39,7 @@
     <composite:attribute name="person" required="true"/>
     <composite:attribute name="collections" />
     <composite:attribute name="ownerQueriesDetailBean" />
+    <composite:attribute name="scope" />
 </composite:interface>
 
 <composite:implementation>
@@ -100,6 +101,15 @@
 
             </h:panelGroup>
 
+        </h:panelGroup>
+        <h:panelGroup layout="block"  rendered="#{cc.attrs.scope == 'commentAttachment'}">
+            <h:panelGroup layout="block"  rendered="#{cc.attrs.comment.attachment == true}">
+                <bbmricc:queryDetailAttachments
+                                            queryBean="#{researcherQueriesDetailBean}"
+                                            fileUploadBean="#{fileUploadBean}"
+                                            scope="commentAttachment"
+                                            offer="#{cc.attrs.comment.id}" />
+            </h:panelGroup>
         </h:panelGroup>
 
     </h:panelGroup>

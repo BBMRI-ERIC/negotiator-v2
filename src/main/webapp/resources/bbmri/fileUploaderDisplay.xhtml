@@ -22,7 +22,7 @@
     <h:dataTable value="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer, cc.attrs.userSelectedId).entrySet().toArray()}" var="attachment"
                  columnClasses="column1,column2,column3" style="margin-top: 0px;"
                  class="table-striped table-bordered table-responsive table-fullwidth"
-                 rendered="#{cc.attrs.fileUploadBean.attachments.size() > 0}">
+                 rendered="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer, cc.attrs.userSelectedId).entrySet().size() > 0}">
 
         <h:column>
             <h:outputLink value="../attachment/#{attachment.key}" title="#{label['attachmentview.tooltip.attachmentDownload']}"

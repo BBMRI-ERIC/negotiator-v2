@@ -38,6 +38,7 @@
         <f:viewParam name="queryId"
                      value="#{researcherQueriesDetailBean.queryId}"/>
         <f:viewAction action="#{researcherQueriesDetailBean.initialize}"/>
+        <f:viewAction action="#{commentBean.initialize}" />
     </f:metadata>
 
     <!-- Queries detail page for the owner -->
@@ -184,7 +185,9 @@
                                        var="comment">
 
                                 <bbmricc:comment comment="#{comment.comment}"
-                                                 person="#{comment.person}" collections="#{comment.collections}"/>
+                                                 person="#{comment.person}"
+                                                 collections="#{comment.collections}"
+                                                 scope="commentAttachment"/>
 
                             </ui:repeat>
 
@@ -278,7 +281,8 @@
 
                                                 <bbmricc:comment comment="#{offers.offer}"
                                                                  person="#{offers.person}"
-                                                                 collections="#{offers.collections}"/>
+                                                                 collections="#{offers.collections}"
+                                                                 scope="privateAttachment"/>
 
                                             </ui:repeat>
 

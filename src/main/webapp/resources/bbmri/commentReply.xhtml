@@ -63,13 +63,19 @@
 						<h:messages id="commentValidationMessage" for="commentText"
 							style="color:red" showSummary="true" showDetails="false" />
 					</h:inputTextarea>
-				</h:panelGroup>
+                    <h:inputHidden id="commentId" value="#{commentBean.commentId}" />
+                </h:panelGroup>
 				<!-- Attachments for a query comment -->
 				<h:panelGroup layout="block" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<!-- Uploaded attachments for a query -->
-					<bbmricc:fileUploaderDisplay componentQueryBean="#{cc.attrs.componentQueryBean}" fileUploadBean="#{cc.attrs.fileUploadBean}" scope="queryAttachment" />
+					<bbmricc:fileUploaderDisplay componentQueryBean="#{cc.attrs.componentQueryBean}"
+												 fileUploadBean="#{cc.attrs.fileUploadBean}"
+												 scope="commentAttachment" />
 					<!-- Upload the attachments for a query -->
-					<bbmricc:fileUpload componentQueryBean="#{cc.attrs.componentQueryBean}" fileUploadBean="#{cc.attrs.fileUploadBean}" />
+					<bbmricc:fileUpload componentQueryBean="#{commentBean}"
+										fileUploadBean="#{cc.attrs.fileUploadBean}"
+										scope="commentAttachment"
+                                        queryId="#{cc.attrs.query.id}" />
 
 				</h:panelGroup>
 
@@ -93,7 +99,8 @@
 					<bbmricc:fileUpload componentQueryBean="#{cc.attrs.componentQueryBean}"
 										fileUploadBean="#{cc.attrs.fileUploadBean}"
 										isOffer="#{cc.attrs.makeOffer}"
-										offer="#{cc.attrs.offer}" />
+										offer="#{cc.attrs.offer}"
+										scope="privateAttachment"/>
 
 				</h:panelGroup>
 
