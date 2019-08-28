@@ -84,9 +84,13 @@ public class CommentBean implements Serializable {
      */
     public String saveComment(Query query) {
         try(Config config = ConfigFactory.get()) {
-            if(commentId != null || commentId != -1) {
+            if(commentId != null && commentId != -1) {
                 DbUtil.updateComment(config, commentId, comment, "published", true);
             } else {
+                if(comment.isEmpty()) {
+                    return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                            + "?includeViewParams=true&faces-redirect=true";
+                }
                 DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment, "published", false);
             }
             config.commit();
@@ -170,7 +174,6 @@ public class CommentBean implements Serializable {
         sessionBean.setTransientCommentAttachmentMap(null);
     }
 
-    //TODO: Implement Problem no query
     public String uploadAttachmentComment(Integer queryId) {
         if (!fileUploadBean.isFileToUpload())
             return "";
