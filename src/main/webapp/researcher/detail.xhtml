@@ -187,7 +187,8 @@
                                 <bbmricc:comment comment="#{comment.comment}"
                                                  person="#{comment.person}"
                                                  collections="#{comment.collections}"
-                                                 scope="commentAttachment"/>
+                                                 scope="commentAttachment"
+                                                 commentComponent="#{commentBean}"/>
 
                             </ui:repeat>
 
@@ -282,7 +283,8 @@
                                                 <bbmricc:comment comment="#{offers.offer}"
                                                                  person="#{offers.person}"
                                                                  collections="#{offers.collections}"
-                                                                 scope="privateAttachment"/>
+                                                                 scope="privateAttachment"
+                                                                 commentComponent="#{offerBean}"/>
 
                                             </ui:repeat>
 

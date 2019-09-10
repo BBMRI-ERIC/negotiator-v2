@@ -64,6 +64,7 @@ public class FileUploadBean implements Serializable {
     private HashMap<Integer, HashMap<String, String>> privateAttachmentMap = null;
     private HashMap<String, String> attachmentTypeMap = null;
     private String toRemoveAttachment = null;
+    private String commentAttachmentToBeRemoved = null;
 
     /**
      * Inits the state.
@@ -324,6 +325,58 @@ public class FileUploadBean implements Serializable {
         return attachmentType;
     }
 
+    public String deleteMarkedCommentAttachment() {
+        if(commentAttachmentToBeRemoved == null)
+            return "";
+        String commentAttachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(commentAttachmentToBeRemoved.getBytes()));
+
+        Pattern pattern = fileUtil.getStorageNamePattern();
+        Matcher matcher = pattern.matcher(commentAttachment);
+        String fileID = null;
+        String queryID = null;
+        String fileExtension = null;
+
+        if(matcher.find()) {
+            queryID = matcher.group(1);
+            fileID = matcher.group(2);
+            fileExtension = matcher.group(3);
+        }
+
+        Integer fileIdInteger;
+        Integer queryIdInteger;
+        try {
+            fileIdInteger = Integer.parseInt(fileID);
+            queryIdInteger = Integer.parseInt(queryID);
+        } catch(NumberFormatException e) {
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File could not be deleted",
+                    "The uploaded file could not be deleted due to some unforseen error.") );
+            return "";
+        }
+
+        if(queryIdInteger != queryId) {
+            logger.error("QueryID of file "+queryIdInteger+" does not match QueryID "+queryId+" of this bean.");
+            return "";
+        }
+
+        try (Config config = ConfigFactory.get()) {
+
+            DbUtil.deleteCommentAttachment(config, fileIdInteger);
+            config.commit();
+
+            commentAttachmentToBeRemoved = null;
+
+            String filePath = negotiator.getAttachmentPath();
+            String filename = fileUtil.getStorageFileName(queryIdInteger, fileIdInteger, fileExtension);
+            File file = new File(filePath, filename);
+            file.delete();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
     private String generateUploadFileName(AttachmentDTO attachment) {
         String uploadName = fileUtil.getStorageFileName(queryId, attachment.getId(), attachment.getAttachment());
         uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiator.getUploadFileSalt() + uploadName) + ".download";
@@ -414,6 +467,8 @@ public class FileUploadBean implements Serializable {
     public void setToRemoveAttachment(String filename) {
         this.toRemoveAttachment = filename;
     }
+
+    public void setCommentAttachmentToBeRemoved(String commentAttachmentId) { this.commentAttachmentToBeRemoved = commentAttachmentId; }
 
     public UserBean getUserBean() {
         return userBean;

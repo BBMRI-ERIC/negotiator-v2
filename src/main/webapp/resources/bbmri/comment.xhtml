@@ -40,6 +40,7 @@
     <composite:attribute name="collections" />
     <composite:attribute name="ownerQueriesDetailBean" />
     <composite:attribute name="scope" />
+    <composite:attribute name="commentComponent" />
 </composite:interface>
 
 <composite:implementation>
@@ -63,10 +64,51 @@
             </h:panelGroup>
             <!-- Date of comment -->
             <h:panelGroup styleClass="pull-right">
-                <h:outputText value="#{cc.attrs.comment.commentTime}">
-                    <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>
-                </h:outputText>
+                <h:form id="deleteComment" enctype="multipart/form-data">
+                    <h:outputText value="#{cc.attrs.comment.commentTime}">
+                        <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>
+                    </h:outputText>
+
+                    <h:commandLink
+                            styleClass="confirm-delete"
+                            action="#{cc.attrs.commentComponent.setCommentToBeRemove(cc.attrs.comment.id)}"
+                            title="#{label['comment.tootltip.delete']}"
+                            rendered="#{cc.attrs.comment.personId == userBean.person.id}">
+                        <i class="glyphicon glyphicon-trash"></i>
+                        <f:ajax onevent="showConfirmDialogComment"/>
+                    </h:commandLink>
+
+                    <div class="modal fade" id="modal-from-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    #{label['comment.dialog.deleteHeader']}
+                                </div>
+                                <div class="modal-body">
+                                    #{label['comment.dialog.deleteMsg']}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <h:commandButton action="#{cc.attrs.commentComponent.deleteMarkedComment()}"
+                                                     value="Yes" styleClass="btn btn-danger btn-ok"
+                                                     title="#{label['comment.tootltip.delete']}">
+                                    </h:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h:outputScript>
+                        function showConfirmDialogComment(data) {
+                            if(data.status == "success") {
+                                $('#modal-from-dom').modal('show');
+                            }
+                        }
+                    </h:outputScript>
+
+                </h:form>
             </h:panelGroup>
+
             <!-- Collapsable Affliation-->
             <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
                 <h:panelGroup layout="block" styleClass="collapse affiliation-collapsible-content">
@@ -108,7 +150,8 @@
                                             queryBean="#{researcherQueriesDetailBean}"
                                             fileUploadBean="#{fileUploadBean}"
                                             scope="commentAttachment"
-                                            offer="#{cc.attrs.comment.id}" />
+                                            offer="#{cc.attrs.comment.id}"
+                                            delete="#{cc.attrs.comment.personId == userBean.person.id}"/>
             </h:panelGroup>
         </h:panelGroup>
 

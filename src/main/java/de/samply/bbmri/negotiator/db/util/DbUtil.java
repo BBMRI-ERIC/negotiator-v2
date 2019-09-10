@@ -532,15 +532,21 @@ public class DbUtil {
     public static void deleteQueryAttachmentRecord(Config config, Integer queryId, Integer attachment) {
         config.dsl().delete(Tables.QUERY_ATTACHMENT)
             .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
-            .and(Tables.QUERY_ATTACHMENT.ID.eq(attachment)).execute();
+            .and(Tables.QUERY_ATTACHMENT.ID.eq(attachment))
+            .execute();
 
         config.dsl().update(Tables.QUERY)
-        .set(Tables.QUERY.NUM_ATTACHMENTS, Tables.QUERY.NUM_ATTACHMENTS.sub(1))
-        .where(Tables.QUERY.ID.eq(queryId)).execute();
+            .set(Tables.QUERY.NUM_ATTACHMENTS, Tables.QUERY.NUM_ATTACHMENTS.sub(1))
+            .where(Tables.QUERY.ID.eq(queryId))
+            .execute();
 
     }
 
-
+    public static void deleteCommentAttachment(Config config, Integer commentAttachmentId) {
+        config.dsl().delete(Tables.QUERY_ATTACHMENT_COMMENT)
+                .where(Tables.QUERY_ATTACHMENT_COMMENT.ID.eq(commentAttachmentId))
+                .execute();
+    }
 
     /**
      * Update number of attachments associated with this query (existing and deleted)
@@ -888,6 +894,14 @@ public class DbUtil {
         record.update();
 
         return record;
+    }
+
+    public static void markeCommentDeleted(Config config, int commentId) {
+        CommentRecord record = config.dsl().selectFrom(Tables.COMMENT)
+                .where(Tables.COMMENT.ID.eq(commentId))
+                .fetchOne();
+        record.setStatus("deleted");
+        record.update();
     }
 
 	/**

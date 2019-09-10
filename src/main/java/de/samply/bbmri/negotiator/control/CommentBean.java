@@ -33,7 +33,6 @@ import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -42,7 +41,6 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -63,6 +61,7 @@ public class CommentBean implements Serializable {
 
     private String comment;
     private Integer commentId;
+    private Integer commentToRemove;
 
     public void initialize() {
         if(sessionBean.isSaveTransientState() == true) {
@@ -197,6 +196,20 @@ public class CommentBean implements Serializable {
                 + "?includeViewParams=true&faces-redirect=true";
     }
 
+    public String deleteMarkedComment() {
+        if(commentToRemove == null)
+            return "";
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.markeCommentDeleted(config, commentToRemove);
+            config.commit();
+            commentToRemove = null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
     public UserBean getUserBean() {
         return userBean;
     }
@@ -219,6 +232,10 @@ public class CommentBean implements Serializable {
 
     public void setFileUploadBean(FileUploadBean fileUploadBean) {
         this.fileUploadBean = fileUploadBean;
+    }
+
+    public void setCommentToBeRemove(Integer collectionId) {
+        this.commentToRemove = collectionId;
     }
 
     public String getComment() {
