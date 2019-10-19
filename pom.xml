@@ -45,6 +45,7 @@
         <database.server>localhost</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
+        <!--<database.name>neg-20190910</database.name>-->
         <database.username>postgres</database.username>
         <database.password>DaVinci</database.password>
         <!--<database.password>0bpCP58yTJnNQmKqO9mX</database.password>-->

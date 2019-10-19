@@ -38,6 +38,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.validation.constraints.Null;
 
 import org.jooq.Record;
 import org.jooq.Result;
@@ -153,6 +154,10 @@ public class ResearcherQueriesBean implements Serializable {
     public List<QueryStatsDTO> getQueries() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+            if(queries == null) {
+                System.err.println("#################>  DEBUGG: queries == null");
+            }
+            System.err.println("#################>  DEBUGG: " + queries.size());
 
             for (int i = 0; i < queries.size(); ++i) {
                 getCommentCountAndTime(i);
