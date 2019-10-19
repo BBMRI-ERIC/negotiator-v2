@@ -98,6 +98,9 @@ public class Perun {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
 
+                logger.info("-->BUG0000068--> Perun mapping ID: {}", mapping.getId());
+                logger.info("-->BUG0000068--> Perun mapping Name: {}", mapping.getName());
+
                 DbUtil.savePerunMapping(config, mapping);
             }
             logger.info("Synchronizing user collection mapping with Perun finished");
