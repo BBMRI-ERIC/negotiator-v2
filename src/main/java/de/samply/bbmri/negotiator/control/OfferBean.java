@@ -52,10 +52,9 @@ public class OfferBean implements Serializable {
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
-
     private String offerComment;
-
     private Integer offerFrom;
+    private Integer privateCommentToRemove = null;
 
 
     @PostConstruct
@@ -128,6 +127,24 @@ public class OfferBean implements Serializable {
         return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
                 context.getRequestServerPort(), context.getRequestContextPath(),
                 "/owner/detail.xhtml?queryId=" + queryId);
+    }
+
+    public void setCommentToBeRemove(Integer commentId) {
+        this.privateCommentToRemove = commentId;
+    }
+
+    public String deleteMarkedComment() {
+        if(privateCommentToRemove == null)
+            return "";
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.markePrivateCommentDeleted(config, privateCommentToRemove);
+            config.commit();
+            privateCommentToRemove = null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
     }
 
     public UserBean getUserBean() {

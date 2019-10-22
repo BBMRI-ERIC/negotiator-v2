@@ -78,30 +78,11 @@
                         <f:ajax onevent="showConfirmDialogComment"/>
                     </h:commandLink>
 
-                    <div class="modal fade" id="modal-from-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    #{label['comment.dialog.deleteHeader']}
-                                </div>
-                                <div class="modal-body">
-                                    #{label['comment.dialog.deleteMsg']}
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                                    <h:commandButton action="#{cc.attrs.commentComponent.deleteMarkedComment()}"
-                                                     value="Yes" styleClass="btn btn-danger btn-ok"
-                                                     title="#{label['comment.tootltip.delete']}">
-                                    </h:commandButton>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <h:outputScript>
                         function showConfirmDialogComment(data) {
                             if(data.status == "success") {
-                                $('#modal-from-dom').modal('show');
+                                $('#modal-from-comment-dom').modal('show');
                             }
                         }
                     </h:outputScript>
@@ -156,6 +137,7 @@
         </h:panelGroup>
 
     </h:panelGroup>
+
 </composite:implementation>
 
 </html>

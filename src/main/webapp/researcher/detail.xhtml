@@ -179,6 +179,7 @@
                     </ul>
 
                     <div class="tab-content">
+                        <!-- Comment Tab -->
                         <div id="comments" class="tab-pane fade in active">
 
                             <ui:repeat value="#{researcherQueriesDetailBean.comments}"
@@ -200,6 +201,7 @@
                                     query="#{researcherQueriesDetailBean.selectedQuery}" componentQueryBean="#{researcherQueriesDetailBean}" fileUploadBean="#{fileUploadBean}"/>
                         </div>
 
+                        <!-- Private Negotiation -->
                         <div id="sampleAvailability" class="tab-pane fade">
 
                             <!--    Dropdown menu using Select2         -->
@@ -302,6 +304,26 @@
                                 </div>
 
                             </c:forEach>
+
+                            <div class="modal fade" id="modal-from-comment-dom" style="z-index: 100000;" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            #{label['comment.dialog.deleteHeader']}
+                                        </div>
+                                        <div class="modal-body">
+                                            #{label['comment.dialog.deleteMsg']}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                            <h:commandButton action="#{offerBean.deleteMarkedComment()}"
+                                                             value="Yes" styleClass="btn btn-danger btn-ok"
+                                                             title="#{label['comment.tootltip.delete']}">
+                                            </h:commandButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
 
                         </div>

@@ -904,6 +904,10 @@ public class DbUtil {
         record.update();
     }
 
+    public static void markePrivateCommentDeleted(Config config, int commentId) {
+
+    }
+
 	/**
 	 * Returns a list of all fields for the given table with the given prefix. e.g.
 	 * "user"."name" with prefix "query_author" would result in "query_author_name", so that

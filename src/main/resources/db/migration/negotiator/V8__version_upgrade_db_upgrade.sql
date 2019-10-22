@@ -59,6 +59,9 @@ ALTER TABLE comment
 ALTER TABLE comment
     ADD COLUMN status character varying DEFAULT 'published';
 
+ALTER TABLE offer
+    ADD COLUMN status character varying DEFAULT 'published';
+
 COMMENT ON COLUMN public.comment.status
     IS 'status: published, deleted, saved';
 
