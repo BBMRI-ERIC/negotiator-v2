@@ -53,7 +53,7 @@
         <h:panelGroup layout="block" styleClass="panel-heading">
             <h:panelGroup>
                 <!-- Discussion Name of User -->
-                #{cc.attrs.person.authName}
+                #{cc.attrs.person.authName}#{cc.attrs.scope}
                 <h:panelGroup>
                     <!-- Collapseable Icon to open affliliation -->
                     <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
@@ -69,23 +69,40 @@
                         <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>
                     </h:outputText>
 
-                    <h:commandLink
-                            styleClass="confirm-delete"
-                            action="#{cc.attrs.commentComponent.setCommentToBeRemove(cc.attrs.comment.id)}"
-                            title="#{label['comment.tootltip.delete']}"
-                            rendered="#{cc.attrs.comment.personId == userBean.person.id}">
-                        <i class="glyphicon glyphicon-trash"></i>
-                        <f:ajax onevent="showConfirmDialogComment"/>
-                    </h:commandLink>
-
-
-                    <h:outputScript>
-                        function showConfirmDialogComment(data) {
-                            if(data.status == "success") {
-                                $('#modal-from-comment-dom').modal('show');
+                    <ui:fragment rendered="#{cc.attrs.scope == 'commentAttachment'}">
+                        <h:commandLink
+                                styleClass="confirm-delete"
+                                action="#{commentBean.setCommentToBeRemove(cc.attrs.comment.id)}"
+                                title="#{label['comment.tootltip.delete']}"
+                                rendered="#{cc.attrs.comment.personId == userBean.person.id}">
+                            <i class="glyphicon glyphicon-trash"></i>
+                            <f:ajax onevent="showConfirmDialogPublicComment"/>
+                        </h:commandLink>
+                        <h:outputScript>
+                            function showConfirmDialogPublicComment(data) {
+                                if(data.status == "success") {
+                                    $('#modal-from-public-comment-dom').modal('show');
+                                }
                             }
-                        }
-                    </h:outputScript>
+                        </h:outputScript>
+                    </ui:fragment>
+                    <ui:fragment rendered="#{cc.attrs.scope == 'privateAttachment'}">
+                        <h:commandLink
+                                styleClass="confirm-delete"
+                                action="#{offerBean.setCommentToBeRemove(cc.attrs.comment.id)}"
+                                title="#{label['comment.tootltip.delete']}"
+                                rendered="#{cc.attrs.comment.personId == userBean.person.id}">
+                            <i class="glyphicon glyphicon-trash"></i>
+                            <f:ajax onevent="showConfirmDialogPrivateComment"/>
+                        </h:commandLink>
+                        <h:outputScript>
+                            function showConfirmDialogPrivateComment(data) {
+                                if(data.status == "success") {
+                                    $('#modal-from-private-comment-dom').modal('show');
+                                }
+                            }
+                        </h:outputScript>
+                    </ui:fragment>
 
                 </h:form>
             </h:panelGroup>

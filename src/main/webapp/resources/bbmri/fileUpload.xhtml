@@ -41,18 +41,18 @@
                     <h:outputText value="#{label['querydetail.action.browse']}" />
                     <h:inputFile id="file" value="#{cc.attrs.fileUploadBean.file}"
                                  validator="#{cc.attrs.fileUploadBean.validateFile}"
-                                 onchange="$('#uploadform\\:uploadBtn').removeClass('disabled');"
+                                 onchange="$('.activateUploadbtn').removeClass('disabled');"
                                  style="display: none;" />
                 </h:panelGroup>
                 <h:commandButton id="uploadBtnPublic" value="Upload" rendered="#{cc.attrs.scope == 'queryAttachment'}"
                                              action="#{cc.attrs.componentQueryBean.uploadAttachment}"
-                                             styleClass="btn btn-primary disabled" />
+                                             styleClass="btn btn-primary disabled activateUploadbtn" />
                 <h:commandButton id="uploadBtnPrivate" value="Upload secret" rendered="#{cc.attrs.scope == 'privateAttachment'}"
                                  action="#{cc.attrs.componentQueryBean.uploadAttachmentPrivate(cc.attrs.offer)}"
-                                 styleClass="btn btn-primary disabled" />
+                                 styleClass="btn btn-primary disabled activateUploadbtn" />
                 <h:commandButton id="uploadBtnComment" value="Upload secret" rendered="#{cc.attrs.scope == 'commentAttachment'}"
                                  action="#{cc.attrs.componentQueryBean.uploadAttachmentComment(cc.attrs.queryId)}"
-                                 styleClass="btn btn-primary disabled" />
+                                 styleClass="btn btn-primary disabled activateUploadbtn" />
             </label>
         </h:panelGroup>
         <h:panelGroup layout="block">

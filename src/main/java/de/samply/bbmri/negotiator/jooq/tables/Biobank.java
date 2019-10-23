@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Biobank extends TableImpl<BiobankRecord> {
 
-	private static final long serialVersionUID = -2009611783;
+	private static final long serialVersionUID = -995634222;
 
 	/**
 	 * The reference instance of <code>public.biobank</code>
@@ -73,6 +73,11 @@ public class Biobank extends TableImpl<BiobankRecord> {
 	 * The column <code>public.biobank.list_of_directories_id</code>. The directorie Id where the biobank belongs to
 	 */
 	public final TableField<BiobankRecord, Integer> LIST_OF_DIRECTORIES_ID = createField("list_of_directories_id", org.jooq.impl.SQLDataType.INTEGER, this, "The directorie Id where the biobank belongs to");
+
+	/**
+	 * The column <code>public.biobank.tmpid</code>.
+	 */
+	public final TableField<BiobankRecord, Integer> TMPID = createField("tmpid", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>public.biobank</code> table reference

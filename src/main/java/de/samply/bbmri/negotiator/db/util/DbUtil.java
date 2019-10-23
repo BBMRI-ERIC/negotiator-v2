@@ -548,6 +548,12 @@ public class DbUtil {
                 .execute();
     }
 
+    public static void deletePrivateCommentAttachment(Config config, Integer privateCommentAttachmentId) {
+        config.dsl().delete(Tables.QUERY_ATTACHMENT_PRIVATE)
+                .where(Tables.QUERY_ATTACHMENT_PRIVATE.ID.eq(privateCommentAttachmentId))
+                .execute();
+    }
+
     /**
      * Update number of attachments associated with this query (existing and deleted)
      * @param numAttachments
@@ -858,6 +864,7 @@ public class DbUtil {
         record.setPersonId(personId);
         record.setBiobankInPrivateChat(biobankInPrivateChat);
         record.setText(comment);
+        record.setStatus("published");
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
     }
@@ -905,7 +912,11 @@ public class DbUtil {
     }
 
     public static void markePrivateCommentDeleted(Config config, int commentId) {
-
+        OfferRecord record = config.dsl().selectFrom(Tables.OFFER)
+                .where(Tables.OFFER.ID.eq(commentId))
+                .fetchOne();
+        record.setStatus("deleted");
+        record.update();
     }
 
 	/**
@@ -1459,6 +1470,7 @@ public class DbUtil {
                 .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT.eq(biobankInPrivateChat))
+                .and(Tables.OFFER.STATUS.eq("published"))
                 .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
 
         List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
@@ -1503,6 +1515,7 @@ public class DbUtil {
                 .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
                 .from(Tables.OFFER)
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .and(Tables.OFFER.STATUS.eq("published"))
                 .fetch();
         return result;
     }
@@ -1516,6 +1529,7 @@ public class DbUtil {
                 .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
                 .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .and(Tables.OFFER.STATUS.eq("published"))
                 .and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId)).fetch();
         return result;
     }

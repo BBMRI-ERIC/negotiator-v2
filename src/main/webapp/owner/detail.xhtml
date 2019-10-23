@@ -190,7 +190,8 @@
                                                 <bbmricc:comment comment="#{offers.offer}"
                                                                  person="#{offers.person}"
                                                                  collections="#{offers.collections}"
-                                                                 scope="privateAttachment" />
+                                                                 scope="privateAttachment"
+                                                                 commentComponent="#{commentBean}"/>
 
                                             </ui:repeat>
 
@@ -209,7 +210,73 @@
                             </c:forEach>
                         </div>
                     </div>
+
                 </h:panelGroup>
+
+                <h:form id="deleteComment" enctype="multipart/form-data">
+
+
+                    <div class="modal fade" id="modal-from-delete-file-confirm-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    Confirm file deletion
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete this file?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <h:commandButton action="#{researcherQueriesDetailBean.removeAttachment()}"
+                                                     value="Yes" styleClass="btn btn-danger btn-ok"
+                                                     title="#{label['attachmentview.tooltip.attachmentDelete']}">
+                                    </h:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modal-from-public-comment-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    #{label['comment.dialog.deleteHeader']}
+                                </div>
+                                <div class="modal-body">
+                                    #{label['comment.dialog.deleteMsg']}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <h:commandButton action="#{commentBean.deleteMarkedComment()}"
+                                                     value="Yes" styleClass="btn btn-danger btn-ok"
+                                                     title="#{label['comment.tootltip.delete']}">
+                                    </h:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" id="modal-from-private-comment-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    #{label['comment.dialog.deleteHeader']}
+                                </div>
+                                <div class="modal-body">
+                                    #{label['comment.dialog.deleteMsg']}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                    <h:commandButton action="#{offerBean.deleteMarkedComment()}"
+                                                     value="Yes" styleClass="btn btn-danger btn-ok"
+                                                     title="#{label['comment.tootltip.delete']}">
+                                    </h:commandButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </h:form>
 
                 <h:outputScript>
                     $(function() {

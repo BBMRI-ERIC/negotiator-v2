@@ -37,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer extends TableImpl<OfferRecord> {
 
-	private static final long serialVersionUID = -922595301;
+	private static final long serialVersionUID = 347926530;
 
 	/**
 	 * The reference instance of <code>public.offer</code>
@@ -81,6 +81,11 @@ public class Offer extends TableImpl<OfferRecord> {
 	 * The column <code>public.offer.text</code>. Text of the comment.
 	 */
 	public final TableField<OfferRecord, String> TEXT = createField("text", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "Text of the comment.");
+
+	/**
+	 * The column <code>public.offer.status</code>.
+	 */
+	public final TableField<OfferRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
 	/**
 	 * Create a <code>public.offer</code> table reference

@@ -64,6 +64,7 @@ public class FileUploadBean implements Serializable {
     private HashMap<Integer, HashMap<String, String>> privateAttachmentMap = null;
     private HashMap<String, String> attachmentTypeMap = null;
     private String toRemoveAttachment = null;
+    private String toRemoveAttachmentScope = null;
     private String commentAttachmentToBeRemoved = null;
 
     /**
@@ -169,8 +170,10 @@ public class FileUploadBean implements Serializable {
     public boolean removeAttachment() {
 
         String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
+        String fileScope = this.toRemoveAttachmentScope;
         // reset it
         toRemoveAttachment = null;
+        toRemoveAttachmentScope = null;
 
         if(attachment == null) {
             return false;
@@ -206,7 +209,13 @@ public class FileUploadBean implements Serializable {
         }
 
         try (Config config = ConfigFactory.get()) {
-            DbUtil.deleteQueryAttachmentRecord(config, queryId, fileIdInteger);
+            if(fileScope.equals("queryAttachment")) {
+                DbUtil.deleteQueryAttachmentRecord(config, queryId, fileIdInteger);
+            } else if(fileScope.equals("privateAttachment")) {
+                DbUtil.deletePrivateCommentAttachment(config, fileIdInteger);
+            } else if(fileScope.equals("commentAttachment")) {
+                DbUtil.deleteCommentAttachment(config, fileIdInteger);
+            }
             config.commit();
 
             String filePath = negotiator.getAttachmentPath();
@@ -464,8 +473,9 @@ public class FileUploadBean implements Serializable {
         this.msgs = msgs;
     }
 
-    public void setToRemoveAttachment(String filename) {
+    public void setToRemoveAttachment(String filename, String scope) {
         this.toRemoveAttachment = filename;
+        this.toRemoveAttachmentScope = scope;
     }
 
     public void setCommentAttachmentToBeRemoved(String commentAttachmentId) { this.commentAttachmentToBeRemoved = commentAttachmentId; }
