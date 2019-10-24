@@ -29,11 +29,6 @@ public class Sequences {
 	public static final Sequence<Long> BIOBANK_ID_SEQ = new SequenceImpl<Long>("biobank_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
-	 * The sequence <code>public.biobank_tmpid_seq</code>
-	 */
-	public static final Sequence<Long> BIOBANK_TMPID_SEQ = new SequenceImpl<Long>("biobank_tmpid_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-	/**
 	 * The sequence <code>public.collection_id_seq</code>
 	 */
 	public static final Sequence<Long> COLLECTION_ID_SEQ = new SequenceImpl<Long>("collection_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

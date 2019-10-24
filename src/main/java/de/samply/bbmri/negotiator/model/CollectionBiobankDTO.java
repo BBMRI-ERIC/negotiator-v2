@@ -51,7 +51,9 @@ public class CollectionBiobankDTO implements Serializable {
      */
     private Collection collection;
 
-    public Biobank getBiobank() { return biobank; }
+    public Biobank getBiobank() {
+        return biobank;
+    }
 
     public void setBiobank(Biobank biobank) {
         this.biobank = biobank;

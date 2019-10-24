@@ -83,7 +83,9 @@ public class CommentBean implements Serializable {
      */
     public String saveComment(Query query) {
         try(Config config = ConfigFactory.get()) {
-            if(commentId != null && commentId != -1) {
+            if(commentId != null && commentId != -1 && commentId != 0) {
+                System.out.println("commentId: " + commentId);
+                System.out.println("comment: " + comment);
                 DbUtil.updateComment(config, commentId, comment, "published", true);
             } else {
                 if(comment.isEmpty()) {
@@ -177,7 +179,7 @@ public class CommentBean implements Serializable {
         if (!fileUploadBean.isFileToUpload())
             return "";
         try (Config config = ConfigFactory.get()) {
-            if(commentId == null || commentId == -1) {
+            if(commentId == null || commentId == -1 || commentId == 0) {
                 CommentRecord record = DbUtil.addComment(config, queryId, userBean.getUserId(), comment, "saved", true);
                 config.commit();
                 setCommentId(record.getId());

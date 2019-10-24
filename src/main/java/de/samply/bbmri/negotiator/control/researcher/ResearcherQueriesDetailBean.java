@@ -43,6 +43,7 @@ import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.*;
+import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -148,6 +149,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The list of offerPersonDTO's, hence it's a list of lists.
      */
     private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
+    private DataCache dataCache = DataCache.getInstance();
 
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
@@ -371,6 +373,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
         }
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public String getBiobankNameFromCache(Integer biobankId) {
+        return dataCache.getBiobankName(biobankId);
     }
 
     /*

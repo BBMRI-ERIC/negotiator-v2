@@ -22,14 +22,13 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Biobank implements Serializable {
 
-	private static final long serialVersionUID = -2087721309;
+	private static final long serialVersionUID = -83008390;
 
 	private Integer id;
 	private String  name;
 	private String  description;
 	private String  directoryId;
 	private Integer listOfDirectoriesId;
-	private Integer tmpid;
 
 	public Biobank() {}
 
@@ -39,7 +38,6 @@ public class Biobank implements Serializable {
 		this.description = value.description;
 		this.directoryId = value.directoryId;
 		this.listOfDirectoriesId = value.listOfDirectoriesId;
-		this.tmpid = value.tmpid;
 	}
 
 	public Biobank(
@@ -47,15 +45,13 @@ public class Biobank implements Serializable {
 		String  name,
 		String  description,
 		String  directoryId,
-		Integer listOfDirectoriesId,
-		Integer tmpid
+		Integer listOfDirectoriesId
 	) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.directoryId = directoryId;
 		this.listOfDirectoriesId = listOfDirectoriesId;
-		this.tmpid = tmpid;
 	}
 
 	public Integer getId() {
@@ -96,13 +92,5 @@ public class Biobank implements Serializable {
 
 	public void setListOfDirectoriesId(Integer listOfDirectoriesId) {
 		this.listOfDirectoriesId = listOfDirectoriesId;
-	}
-
-	public Integer getTmpid() {
-		return this.tmpid;
-	}
-
-	public void setTmpid(Integer tmpid) {
-		this.tmpid = tmpid;
 	}
 }

@@ -91,11 +91,4 @@ public class BiobankDao extends DAOImpl<BiobankRecord, de.samply.bbmri.negotiato
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank> fetchByListOfDirectoriesId(Integer... values) {
 		return fetch(Biobank.BIOBANK.LIST_OF_DIRECTORIES_ID, values);
 	}
-
-	/**
-	 * Fetch records that have <code>tmpid IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank> fetchByTmpid(Integer... values) {
-		return fetch(Biobank.BIOBANK.TMPID, values);
-	}
 }
