@@ -246,23 +246,9 @@
                                           <div id="heading#{i}" class="panel-heading " data-toggle="collapse" data-target="#hh#{i}">
                                             <h4 class="panel-title">
 
-                                                <c:forEach var="j" begin="1" end="#{researcherQueriesDetailBean.matchingBiobankCollection.size()}">
-                                                    <c:if test="#{(j-1 le researcherQueriesDetailBean.matchingBiobankCollection.size()) and  (j-1 ge 0)}">
-                                                        <c:if test="#{(i-1 le researcherQueriesDetailBean.biobankWithOffer.size()) and  (i-1 ge 0)}">
-                                                            <div style="display:none;">
-                                                                <h:outputText value="#{i}" /><br />
-                                                                <h:outputText value="#{j}" /><br />
-                                                                <h:outputText value="#{researcherQueriesDetailBean.biobankWithOffer.get(i-1)}" /><br />
-                                                                <h:outputText value="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.id}" /><br />
-                                                                <h:outputText value="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.name}" /><br />
-                                                            </div>
-                                                            <c:if test="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.id==researcherQueriesDetailBean.biobankWithOffer.get(i-1)}">
-
-                                                                <c:set var="biobankName" value="#{researcherQueriesDetailBean.matchingBiobankCollection.get(j-1).biobank.name}"/>
-                                                            </c:if>
-                                                        </c:if>
-                                                    </c:if>
-                                                </c:forEach>
+                                                <c:if test="#{(i-1 le researcherQueriesDetailBean.biobankWithOffer.size()) and  (i-1 ge 0)}">
+                                                    <c:set var="biobankName" value="#{researcherQueriesDetailBean.getBiobankNameFromCache(researcherQueriesDetailBean.biobankWithOffer.get(i-1))}"/>
+                                                </c:if>
                                                 <a>#{biobankName}</a>
                                             </h4>
                                           </div>

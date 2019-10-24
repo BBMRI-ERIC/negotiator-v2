@@ -45,6 +45,9 @@ public class DataCache {
     }
 
     public String getBiobankName(Integer biobankId) {
+        if(biobankNames_ == null) {
+            createUpdateBiobankList();
+        }
         if(biobankNames_.containsKey(biobankId)) {
             return biobankNames_.get(biobankId);
         }
