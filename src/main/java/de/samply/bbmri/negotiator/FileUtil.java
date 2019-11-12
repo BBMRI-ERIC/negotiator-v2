@@ -101,7 +101,7 @@ public class FileUtil {
     }
 
     public Pattern getStorageNamePattern() {
-        return Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_salt_(.*)");
+        return Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_scope_(\\w*)_salt_(.*)");
     }
 
     /**

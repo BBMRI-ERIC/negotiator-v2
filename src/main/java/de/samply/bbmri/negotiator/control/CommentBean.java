@@ -92,9 +92,12 @@ public class CommentBean implements Serializable {
                     return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                             + "?includeViewParams=true&faces-redirect=true";
                 }
-                DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment, "published", false);
+                CommentRecord record = DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment, "published", false);
+                commentId = record.getId();
             }
             config.commit();
+
+            uploadAttachmentComment(commentId);
 
             clearEditChanges();
             clearFileChanges();
@@ -173,6 +176,7 @@ public class CommentBean implements Serializable {
 
     public void clearFileChanges() {
         sessionBean.setTransientCommentAttachmentMap(null);
+        fileUploadBean.setCommentAttachments(null);
     }
 
     public String uploadAttachmentComment(Integer queryId) {
@@ -183,7 +187,9 @@ public class CommentBean implements Serializable {
                 CommentRecord record = DbUtil.addComment(config, queryId, userBean.getUserId(), comment, "saved", true);
                 config.commit();
                 setCommentId(record.getId());
-            } // Update comment text
+            } else {
+                DbUtil.updateComment(config, commentId, comment, "published", true);
+            }
             boolean fileCreationSuccessful = fileUploadBean.createQueryAttachmentComment(getCommentId());
             if(fileCreationSuccessful) {
                 saveEditChangesTemporarily();

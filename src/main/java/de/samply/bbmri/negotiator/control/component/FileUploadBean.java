@@ -102,12 +102,12 @@ public class FileUploadBean implements Serializable {
         if(creatStatus) {
             if(sessionBean.getTransientCommentAttachmentMap() == null) {
                 HashMap<String, String> files = new HashMap<String, String>();
-                String uploadName = generateUploadFileName(fileDTO);
+                String uploadName = generateUploadFileName(fileDTO, "commentAttachment");
                 files.put(uploadName, fileDTO.getAttachment());
                 sessionBean.setTransientCommentAttachmentMap(files);
             } else {
                 HashMap<String, String> files = sessionBean.getTransientCommentAttachmentMap();
-                String uploadName = generateUploadFileName(fileDTO);
+                String uploadName = generateUploadFileName(fileDTO, "commentAttachment");
                 files.put(uploadName, fileDTO.getAttachment());
                 sessionBean.setTransientCommentAttachmentMap(files);
             }
@@ -184,11 +184,13 @@ public class FileUploadBean implements Serializable {
         String fileID = null;
         String queryID = null;
         String fileExtension = null;
+        String fileNameScope = null;
 
         if(matcher.find()) {
             queryID = matcher.group(1);
             fileID = matcher.group(2);
             fileExtension = matcher.group(3);
+            fileNameScope = matcher.group(4);
         }
 
         Integer fileIdInteger;
@@ -262,7 +264,7 @@ public class FileUploadBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
             List<CommentAttachmentDTO> attachmentsList = DbUtil.getCommentAttachments(config, commentId);
             for(CommentAttachmentDTO commentAttachmentDTO : attachmentsList) {
-                String uploadName = generateUploadFileName(commentAttachmentDTO);
+                String uploadName = generateUploadFileName(commentAttachmentDTO, "commentAttachment");
                 attachments.put(uploadName, commentAttachmentDTO.getAttachment());
             }
         } catch (SQLException e) {
@@ -275,7 +277,7 @@ public class FileUploadBean implements Serializable {
         HashMap<String, String> privateUserAttachments = new HashMap<String, String>();
         for(PrivateAttachmentDTO privateAttachment : privateAttachments) {
             if(privateAttachment.getBiobank_in_private_chat() == offerFrom && privateAttachment.getPersonId() == userId) {
-                String uploadName = generateUploadFileName(privateAttachment);
+                String uploadName = generateUploadFileName(privateAttachment, "privateAttachment");
                 privateUserAttachments.put(uploadName, privateAttachment.getAttachment());
             }
         }
@@ -289,7 +291,7 @@ public class FileUploadBean implements Serializable {
                 attachmentTypeMap = new HashMap<String, String>();
             }
             for(PrivateAttachmentDTO privateAttachment : privateAttachments) {
-                String uploadName = generateUploadFileName(privateAttachment);
+                String uploadName = generateUploadFileName(privateAttachment, "privateAttachment");
                 if(!privateAttachmentMap.containsKey(privateAttachment.getBiobank_in_private_chat())) {
                     privateAttachmentMap.put(privateAttachment.getBiobank_in_private_chat(), new HashMap<String, String>());
                 }
@@ -301,13 +303,16 @@ public class FileUploadBean implements Serializable {
     }
 
     public HashMap<String, String> getAttachmentMap() {
+        if(attachments == null) {
+            return new HashMap<String, String>();
+        }
         if(attachmentMap == null) {
             attachmentMap = new HashMap<String, String>();
             if(attachmentTypeMap == null) {
                 attachmentTypeMap = new HashMap<String, String>();
             }
             for(QueryAttachmentDTO attachment : attachments) {
-                String uploadName = generateUploadFileName(attachment);
+                String uploadName = generateUploadFileName(attachment, "queryAttachment");
                 attachmentMap.put(uploadName, attachment.getAttachment());
                 attachmentTypeMap.put(uploadName, attachment.getAttachmentType());
             }
@@ -318,7 +323,7 @@ public class FileUploadBean implements Serializable {
 
     private void updateAttachmentMapCommentAndPrivate() {
         for(CommentAttachmentDTO attachment : commentAttachments) {
-            String uploadName = generateUploadFileName(attachment);
+            String uploadName = generateUploadFileName(attachment, "commentAttachment");
             attachmentTypeMap.put(uploadName, attachment.getAttachmentType());
         }
     }
@@ -344,11 +349,13 @@ public class FileUploadBean implements Serializable {
         String fileID = null;
         String queryID = null;
         String fileExtension = null;
+        String fileNameScope = null;
 
         if(matcher.find()) {
             queryID = matcher.group(1);
             fileID = matcher.group(2);
             fileExtension = matcher.group(3);
+            fileNameScope = matcher.group(4);
         }
 
         Integer fileIdInteger;
@@ -386,9 +393,9 @@ public class FileUploadBean implements Serializable {
                 + "?includeViewParams=true&faces-redirect=true";
     }
 
-    private String generateUploadFileName(AttachmentDTO attachment) {
+    private String generateUploadFileName(AttachmentDTO attachment, String scope) {
         String uploadName = fileUtil.getStorageFileName(queryId, attachment.getId(), attachment.getAttachment());
-        uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiator.getUploadFileSalt() + uploadName) + ".download";
+        uploadName = uploadName + "_scope_" + scope + "_salt_"+ DigestUtils.sha256Hex(negotiator.getUploadFileSalt() + uploadName) + ".download";
         uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
         return uploadName;
     }

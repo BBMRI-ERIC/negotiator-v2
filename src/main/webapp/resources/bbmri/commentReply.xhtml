@@ -65,6 +65,7 @@
 					</h:inputTextarea>
                     <h:inputHidden id="commentId" value="#{commentBean.commentId}" />
                 </h:panelGroup>
+
 				<!-- Attachments for a query comment -->
 				<h:panelGroup layout="block" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<!-- Uploaded attachments for a query -->
@@ -87,6 +88,16 @@
 						styleClass="btn btn-primary" />
 				</h:panelGroup>
 
+                <h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'true'}">
+                    <h:inputTextarea id="offerCommentText" value="#{offerBean.offerComment}"
+                        styleClass="form-control" rows="5"
+                        validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 1000000 characters ">
+                        <f:validateLength for="offerCommentText" minimum="0" maximum="1000000" />
+                        <h:messages id="offerCommentValidationMessage" for="offerCommentText"
+                            style="color:red" showSummary="true" showDetails="false" />
+                    </h:inputTextarea>
+				</h:panelGroup>
+
 				<!-- Attachments for a private negotiation -->
 				<h:panelGroup layout="block" rendered="#{cc.attrs.makeOffer == 'true'}">
 					<!-- Uploaded attachments for a query-->
@@ -102,16 +113,6 @@
 										offer="#{cc.attrs.offer}"
 										scope="privateAttachment"/>
 
-				</h:panelGroup>
-
-                <h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'true'}">
-                    <h:inputTextarea id="offerCommentText" value="#{offerBean.offerComment}"
-                        styleClass="form-control" rows="5"
-                        validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 1000000 characters ">
-                        <f:validateLength for="offerCommentText" minimum="0" maximum="1000000" />
-                        <h:messages id="offerCommentValidationMessage" for="offerCommentText"
-                            style="color:red" showSummary="true" showDetails="false" />
-                    </h:inputTextarea>
 				</h:panelGroup>
 
 				<h:panelGroup layout="block" style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'true'}">
