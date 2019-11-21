@@ -46,8 +46,6 @@
 
     <h:panelGroup layout="block" id="queryDetailAttachments">
 
-        <c:set var="usersFiles" value="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer, userBean.person.id)}" />
-
         <h:dataTable value="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer).entrySet().toArray()}"
                      var="attachment"
                      headerClass="query-detail-attachments-table-attachment-type-header,query-detail-attachments-table-attachment-name-header"
@@ -78,39 +76,10 @@
 
 
 
-            <h:column>
+            <h:column rendered="#{cc.attrs.delete}">
                 <f:facet name="header">Delete File</f:facet>
 
-                <h:panelGroup>
-                <c:set var="userdelete" value="false" />
-                <c:if test="#{cc.attrs.delete == false}">
-                    <c:if test="#{usersFiles != null}">
-                        <c:if test="#{usersFiles.containsKey(attachment.key)}">
-                            #{userdelete}<br/><br/>
-                            <c:set var="userdelete" value="true" />
-                        </c:if>
-                    </c:if>
-                </c:if>
-                    <c:set var="keytest" value="#{attachment.key}" />
-
-                #{userdelete}<br/><br/>|#{attachment.key}|<br/><br/>
-                    <c:forEach var="orly" items="${usersFiles.keySet()}"  varStatus="status" >
-                        <c:if test="#{keytest.toString().equalsIgnoreCase(keytest.toString())}">
-                            ----------------
-                        </c:if>
-                        ~
-                        <c:forEach varStatus="chindex" begin="0" end="#{orly.length()-1}">
-                            <c:if test="#{attachment.key.charAt(chindex.index) != orly.charAt(chindex.index)}">
-                                |#{Integer.parseInt(String.valueOf(attachment.key.charAt(chindex.index)))} = #{Integer.parseInt(String.valueOf(orly.charAt(chindex.index)))}|
-                            </c:if>
-                        </c:forEach>
-                        ~
-                        |#{orly}|#{keytest}|
-                        <br/>
-                    </c:forEach>
-                </h:panelGroup>
-
-                <h:panelGroup rendered="#{cc.attrs.delete or userdelete}">
+                <h:panelGroup rendered="#{cc.attrs.delete}">
                     <h:form id="deleteCommentAttachment" enctype="multipart/form-data">
                         <h:commandLink
                                 styleClass="confirm-delete"
