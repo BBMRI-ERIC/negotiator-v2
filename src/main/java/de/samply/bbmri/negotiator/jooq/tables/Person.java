@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = 1964948606;
+	private static final long serialVersionUID = 754798798;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -78,6 +78,11 @@ public class Person extends TableImpl<PersonRecord> {
 	 * The column <code>public.person.is_admin</code>. boolean if the person is an admin
 	 */
 	public final TableField<PersonRecord, Boolean> IS_ADMIN = createField("is_admin", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "boolean if the person is an admin");
+
+	/**
+	 * The column <code>public.person.organization</code>.
+	 */
+	public final TableField<PersonRecord, String> ORGANIZATION = createField("organization", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
 	/**
 	 * Create a <code>public.person</code> table reference
