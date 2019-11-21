@@ -127,7 +127,7 @@
                                    styleClass="form-control-static"/>
                 </h:panelGroup>
 
-                <bbmricc:queryDetailAttachments queryBean="#{researcherQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
+                <bbmricc:queryDetailAttachments queryBean="#{researcherQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" delete="true"/>
 
                 <h:panelGroup styleClass="row" layout="block">
 
@@ -264,7 +264,7 @@
                                                 <bbmricc:queryDetailAttachments queryBean="#{researcherQueriesDetailBean}"
                                                                                 fileUploadBean="#{fileUploadBean}"
                                                                                 scope="privateAttachment"
-                                                                                offer="#{researcherQueriesDetailBean.biobankWithOffer[i-1]}" />
+                                                                                offer="#{researcherQueriesDetailBean.biobankWithOffer[i-1]}" delete="false" />
 
                                             </h:panelGroup>
                                             <ui:repeat
