@@ -30,6 +30,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
 >
 
@@ -120,6 +121,15 @@
 
         <h4>#{label['queryview.title.requestdescription']}</h4>
         <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.requestDescription}</p>
+
+        <h4>#{label['queryview.title.requesterDetails']}</h4>
+        <c:set var="requesterDetails" value="#{cc.attrs.bean.getUserDataForResearcher(cc.attrs.bean.selectedQuery.researcherId)}" />
+        <c:if test="#{requesterDetails != Null}">
+            <p class="pre-wrap">#{requesterDetails.authName}</p>
+            <p class="pre-wrap">#{requesterDetails.authEmail}</p>
+            <p class="pre-wrap">#{requesterDetails.organization}</p>
+        </c:if>
+
 
 
         <h4>#{label['queryview.title.ethicsVote']}</h4>

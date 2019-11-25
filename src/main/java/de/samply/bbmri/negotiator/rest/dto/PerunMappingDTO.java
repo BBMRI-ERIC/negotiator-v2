@@ -43,6 +43,9 @@ public class PerunMappingDTO implements Serializable {
     private String name;
 
     @XmlElement
+    private String directory;
+
+    @XmlElement
     private Collection<PerunMemberDTO> members;
 
     public String getName() {
@@ -51,6 +54,14 @@ public class PerunMappingDTO implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDirectory() {
+        return directory;
+    }
+
+    public void setDirectory(String directory) {
+        this.directory = directory;
     }
 
     public String getId() {

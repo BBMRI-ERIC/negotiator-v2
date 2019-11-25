@@ -94,6 +94,11 @@ public class DbUtil {
         return config.map(record, ListOfDirectoriesRecord.class);
     }
 
+    public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) {
+        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
+        return config.map(record, ListOfDirectoriesRecord.class);
+    }
+
     /**
      * Edits/Updates directory.
      * @param config database configuration
@@ -1328,14 +1333,15 @@ public class DbUtil {
     }
 
     /**
-     * Returns the list of collections which the given user is responsible for.
+     * Returns the list of collections which the specified collectionId.
      * @param config the current configuration
      * @param collectionId the person ID
      * @return
      */
-    public static List<CollectionRecord> getCollections(Config config, String collectionId) {
+    public static List<CollectionRecord> getCollections(Config config, String collectionId, int listOfDirectoriesId) {
         return config.map(config.dsl().selectFrom(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
+                .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoriesId))
                 .fetch(), CollectionRecord.class);
     }
 
@@ -1355,6 +1361,7 @@ public class DbUtil {
 
         personRecord.setAuthEmail(personDTO.getMail());
         personRecord.setAuthName(personDTO.getDisplayName());
+        personRecord.setOrganization(personDTO.getOrganization());
         personRecord.store();
     }
 
@@ -1366,14 +1373,17 @@ public class DbUtil {
     public static void savePerunMapping(Config config, PerunMappingDTO mapping) {
         DSLContext dsl = config.dsl();
 
-        String collectionId = mapping.getName().replaceAll(":Representatives$", "");
+        String collectionId = mapping.getName();
 
-        List<CollectionRecord> collections = getCollections(config, collectionId);
+        ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectory(config, mapping.getDirectory());
+        List<CollectionRecord> collections = getCollections(config, collectionId, listOfDirectoriesRecord.getId());
 
         for(CollectionRecord collection : collections) {
             if(collection != null) {
                 logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
-                dsl.deleteFrom(Tables.PERSON_COLLECTION).where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).execute();
+                dsl.deleteFrom(Tables.PERSON_COLLECTION)
+                        .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId()))
+                        .execute();
 
                 for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
                     logger.info("-->BUG0000068--> Perun mapping Members: {}", member.getUserId());

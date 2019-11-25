@@ -42,6 +42,7 @@ import de.samply.bbmri.negotiator.*;
 import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
@@ -516,5 +517,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setReachableCollections(String reachableCollections) {
         this.reachableCollections = reachableCollections;
+    }
+
+    public Person getUserDataForResearcher(Integer researcherId) {
+        Person requester = this.userBean.getPerson();
+        return requester;
     }
 }

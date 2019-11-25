@@ -514,4 +514,16 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void setListOfSampleOffers(List<List<OfferPersonDTO>> listOfSampleOffers) {
 		this.listOfSampleOffers = listOfSampleOffers;
 	}
+
+	public Person getUserDataForResearcher(Integer researcherId) {
+    	if(selectedQuery != null) {
+			try (Config config = ConfigFactory.get()) {
+				Person requester = DbUtil.getPersonDetails(config, researcherId);
+				return requester;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+    	return null;
+	}
 }

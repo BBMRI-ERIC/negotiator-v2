@@ -29,11 +29,11 @@
 				xmlns:h="http://xmlns.jcp.org/jsf/html"
 				xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 				xmlns:f="http://xmlns.jcp.org/jsf/core"
+				xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
 				xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
 				template="../components/default.xhtml">
 
 	<!-- Queries page for the researcher -->
-
 
 	<ui:param name="bodyClass" value="container body-nomargin" />
 
@@ -45,12 +45,63 @@
 		<h:panelGroup layout="block" styleClass="col-md-12">
 
 			<h:panelGroup layout="block" styleClass="col-md-12">
-				<h:outputLink
-						value="#{researcherQueriesBean.createQueryNegotiator()}"
-						styleClass="btn btn-primary"
-						title="#{label['queryview.tooltip.createNewQuery']}">
-					#{label['queryview.title.createNewQuery']}
-				</h:outputLink>
+				<style>
+					.searchparametertooltip {
+						background-color: #004275;
+						border-radius: 10px;
+						display: inline-block;
+						position: relative;
+						font-weight: bold;
+						color: #fff;
+						padding: 6px 12px;
+						margin-bottom: 0;
+						font-size: 14px;
+						line-height: 1.42857143;
+						text-align: center;
+						white-space: nowrap;
+						vertical-align: middle;
+						cursor: pointer;
+					}
+
+					.searchparametertooltip .searchparametertooltiparea {
+						visibility: hidden;
+						background-color: #F5F5F5;
+						color: #eee;
+						text-align: center;
+						border-radius: 6px;
+						padding: 10px;
+						margin: 10px;
+						top: 20px;
+						right: -56px;
+						border: 1px;
+						border-color: #004275;
+						border-style: solid;
+
+						/* Position the tooltip */
+						position: absolute;
+						z-index: 100;
+					}
+
+					.searchparametertooltip:hover .searchparametertooltiparea {
+						visibility: visible;
+					}
+
+					.searchparametertooltip .searchparametertooltiparea .searchparametertooltipareabtn {
+						margin: 5px;
+					}
+				</style>
+				<span class="searchparametertooltip">#{label['queryview.title.createNewQuery']}
+					<span class="searchparametertooltiparea">
+						<ui:repeat value="#{directoryBean.directories}" var="directory">
+							<h:form>
+								<h:commandLink action="#{queryBean.addSearchParameters(directory.restUrl)}"	styleClass="btn btn-primary searchparametertooltipareabtn"
+											   title="#{directory.name}">
+									#{directory.name}
+								</h:commandLink>
+							</h:form>
+						</ui:repeat>
+					</span>
+				</span>
 			</h:panelGroup>
 
 			<h:panelGroup
