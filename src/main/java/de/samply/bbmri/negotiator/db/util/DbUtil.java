@@ -1901,4 +1901,13 @@ public class DbUtil {
         br.close();
         executeSQL(connection, sb.toString());
     }
+
+    /*
+     * Get request staus for lifecycle
+     */
+    public static void getRequestStatus(Config config, Integer requestId) {
+        config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
+                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
+                .fetchAny();
+    }
 }

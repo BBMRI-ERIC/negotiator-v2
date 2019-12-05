@@ -87,6 +87,10 @@
 
                 <bbmricc:queryDetailData bean="#{ownerQueriesDetailBean}" />
 
+                <h:panelGroup>
+                    <bbmricc:lifecycleStatusDetails queryBean="#{ownerQueriesDetailBean}" />
+                </h:panelGroup>
+
                 <bbmricc:queryDetailAttachments queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
 
                 <ui:fragment

@@ -72,6 +72,7 @@
 
                 </h:form>
             </ui:fragment>
+
             <!-- queryboxes END -->
 
         </h:panelGroup>
@@ -125,6 +126,10 @@
                         layout="block">
                     <h:outputLabel value="#{label['queryview.title.nocollections']}"
                                    styleClass="form-control-static"/>
+                </h:panelGroup>
+
+                <h:panelGroup>
+                    <bbmricc:lifecycleStatusDetails queryBean="#{researcherQueriesDetailBean}" />
                 </h:panelGroup>
 
                 <bbmricc:queryDetailAttachments queryBean="#{researcherQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" delete="false"/>
@@ -244,6 +249,7 @@
 
                                 <div class="panel panel-default deco-none" >
                                           <div id="heading#{i}" class="panel-heading " data-toggle="collapse" data-target="#hh#{i}">
+
                                             <h4 class="panel-title">
 
                                                 <c:if test="#{(i-1 le researcherQueriesDetailBean.biobankWithOffer.size()) and  (i-1 ge 0)}">

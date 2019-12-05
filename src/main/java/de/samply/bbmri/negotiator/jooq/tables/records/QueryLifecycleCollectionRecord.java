@@ -29,7 +29,7 @@ import org.jooq.impl.TableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryLifecycleCollectionRecord extends TableRecordImpl<QueryLifecycleCollectionRecord> implements Record5<Integer, Integer, Integer, String, Timestamp> {
 
-	private static final long serialVersionUID = 968088626;
+	private static final long serialVersionUID = 826604306;
 
 	/**
 	 * Setter for <code>public.query_lifecycle_collection.query_id</code>.
@@ -60,16 +60,16 @@ public class QueryLifecycleCollectionRecord extends TableRecordImpl<QueryLifecyc
 	}
 
 	/**
-	 * Setter for <code>public.query_lifecycle_collection.biobank_id</code>.
+	 * Setter for <code>public.query_lifecycle_collection.collection_id</code>.
 	 */
-	public void setBiobankId(Integer value) {
+	public void setCollectionId(Integer value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_lifecycle_collection.biobank_id</code>.
+	 * Getter for <code>public.query_lifecycle_collection.collection_id</code>.
 	 */
-	public Integer getBiobankId() {
+	public Integer getCollectionId() {
 		return (Integer) getValue(2);
 	}
 
@@ -142,7 +142,7 @@ public class QueryLifecycleCollectionRecord extends TableRecordImpl<QueryLifecyc
 	 */
 	@Override
 	public Field<Integer> field3() {
-		return QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION.BIOBANK_ID;
+		return QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID;
 	}
 
 	/**
@@ -182,7 +182,7 @@ public class QueryLifecycleCollectionRecord extends TableRecordImpl<QueryLifecyc
 	 */
 	@Override
 	public Integer value3() {
-		return getBiobankId();
+		return getCollectionId();
 	}
 
 	/**
@@ -224,7 +224,7 @@ public class QueryLifecycleCollectionRecord extends TableRecordImpl<QueryLifecyc
 	 */
 	@Override
 	public QueryLifecycleCollectionRecord value3(Integer value) {
-		setBiobankId(value);
+		setCollectionId(value);
 		return this;
 	}
 
@@ -273,12 +273,12 @@ public class QueryLifecycleCollectionRecord extends TableRecordImpl<QueryLifecyc
 	/**
 	 * Create a detached, initialised QueryLifecycleCollectionRecord
 	 */
-	public QueryLifecycleCollectionRecord(Integer queryId, Integer personId, Integer biobankId, String status, Timestamp lifecycleTime) {
+	public QueryLifecycleCollectionRecord(Integer queryId, Integer personId, Integer collectionId, String status, Timestamp lifecycleTime) {
 		super(QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION);
 
 		setValue(0, queryId);
 		setValue(1, personId);
-		setValue(2, biobankId);
+		setValue(2, collectionId);
 		setValue(3, status);
 		setValue(4, lifecycleTime);
 	}

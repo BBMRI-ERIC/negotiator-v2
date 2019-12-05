@@ -30,7 +30,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryLifecycleCollection extends TableImpl<QueryLifecycleCollectionRecord> {
 
-	private static final long serialVersionUID = -1406366454;
+	private static final long serialVersionUID = -699156164;
 
 	/**
 	 * The reference instance of <code>public.query_lifecycle_collection</code>
@@ -56,9 +56,9 @@ public class QueryLifecycleCollection extends TableImpl<QueryLifecycleCollection
 	public final TableField<QueryLifecycleCollectionRecord, Integer> PERSON_ID = createField("person_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.query_lifecycle_collection.biobank_id</code>.
+	 * The column <code>public.query_lifecycle_collection.collection_id</code>.
 	 */
-	public final TableField<QueryLifecycleCollectionRecord, Integer> BIOBANK_ID = createField("biobank_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<QueryLifecycleCollectionRecord, Integer> COLLECTION_ID = createField("collection_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>public.query_lifecycle_collection.status</code>.

@@ -23,11 +23,11 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryLifecycleCollection implements Serializable {
 
-	private static final long serialVersionUID = -1345025188;
+	private static final long serialVersionUID = 1013276630;
 
 	private Integer   queryId;
 	private Integer   personId;
-	private Integer   biobankId;
+	private Integer   collectionId;
 	private String    status;
 	private Timestamp lifecycleTime;
 
@@ -36,7 +36,7 @@ public class QueryLifecycleCollection implements Serializable {
 	public QueryLifecycleCollection(QueryLifecycleCollection value) {
 		this.queryId = value.queryId;
 		this.personId = value.personId;
-		this.biobankId = value.biobankId;
+		this.collectionId = value.collectionId;
 		this.status = value.status;
 		this.lifecycleTime = value.lifecycleTime;
 	}
@@ -44,13 +44,13 @@ public class QueryLifecycleCollection implements Serializable {
 	public QueryLifecycleCollection(
 		Integer   queryId,
 		Integer   personId,
-		Integer   biobankId,
+		Integer   collectionId,
 		String    status,
 		Timestamp lifecycleTime
 	) {
 		this.queryId = queryId;
 		this.personId = personId;
-		this.biobankId = biobankId;
+		this.collectionId = collectionId;
 		this.status = status;
 		this.lifecycleTime = lifecycleTime;
 	}
@@ -71,12 +71,12 @@ public class QueryLifecycleCollection implements Serializable {
 		this.personId = personId;
 	}
 
-	public Integer getBiobankId() {
-		return this.biobankId;
+	public Integer getCollectionId() {
+		return this.collectionId;
 	}
 
-	public void setBiobankId(Integer biobankId) {
-		this.biobankId = biobankId;
+	public void setCollectionId(Integer collectionId) {
+		this.collectionId = collectionId;
 	}
 
 	public String getStatus() {
