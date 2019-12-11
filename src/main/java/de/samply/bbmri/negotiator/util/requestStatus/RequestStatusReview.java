@@ -6,13 +6,17 @@ import java.util.Date;
 
 public class RequestStatusReview implements RequestStatus {
 
-    private String status = "under_review";
+    private String status = null; // under_review, rejected, approved
     private String statusType = "review";
     private String statusText = "Request under review";
     private Date statusDate = null;
 
     public RequestStatusReview(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatus_date();
+        status = requestStatus.getStatus();
+        if(status == null) {
+            status = "under_review";
+        }
     }
 
     @Override

@@ -7,6 +7,7 @@ public class RequestStatusDTO implements Serializable {
     Integer id;
     Integer query_id;
     String status;
+    String status_type;
     Date status_date;
     Integer status_user_id;
 
@@ -32,6 +33,14 @@ public class RequestStatusDTO implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getStatus_type() {
+        return status_type;
+    }
+
+    public void setStatus_type(String status_type) {
+        this.status_type = status_type;
     }
 
     public Date getStatus_date() {

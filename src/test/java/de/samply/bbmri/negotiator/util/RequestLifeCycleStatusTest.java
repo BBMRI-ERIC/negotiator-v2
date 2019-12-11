@@ -27,6 +27,8 @@ public class RequestLifeCycleStatusTest {
     RequestLifeCycleStatus requestLifeCycleStatus = null;
     @Mock
     RequestStatusDTO requestStatusCreate;
+    @Mock
+    RequestStatusDTO requestStatusReview;
 
     @BeforeEach
     void setUp() {
@@ -44,8 +46,8 @@ public class RequestLifeCycleStatusTest {
     void testStatusCreateRequestStatus() {
         List<RequestStatusDTO> initRequestStatusList = new ArrayList<RequestStatusDTO>();
         initRequestStatusList.add(requestStatusCreate);
-        when(requestStatusCreate.getStatus()).thenReturn("created");
+        when(requestStatusCreate.getStatus_type()).thenReturn("created");
         requestLifeCycleStatus.initialise(initRequestStatusList);
-        assertEquals(requestStatusCreate.getStatus(), requestLifeCycleStatus.getStatus().getStatusType());
+        assertEquals(requestStatusCreate.getStatus_type(), requestLifeCycleStatus.getStatus().getStatusType());
     }
 }

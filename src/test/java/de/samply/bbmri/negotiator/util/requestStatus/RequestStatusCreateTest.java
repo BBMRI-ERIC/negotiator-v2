@@ -38,7 +38,7 @@ public class RequestStatusCreateTest {
 
     @BeforeEach
     void setUp() {
-        Mockito.lenient().when(requestStatusCreateDTO.getStatus()).thenReturn("created");
+        Mockito.lenient().when(requestStatusCreateDTO.getStatus_type()).thenReturn("created");
         Mockito.lenient().when(requestStatusCreateDTO.getStatus_date()).thenReturn(testDate);
         requestStatusCreate = new RequestStatusCreate(requestStatusCreateDTO);
     }

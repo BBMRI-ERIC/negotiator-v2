@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @DisplayName("Test RequestStatus review request.")
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +38,7 @@ public class RequestStatusReviewTest {
 
     @BeforeEach
     void setUp() {
-        Mockito.lenient().when(requestStatusReviewDTO.getStatus()).thenReturn("review");
+        Mockito.lenient().when(requestStatusReviewDTO.getStatus_type()).thenReturn("review");
         Mockito.lenient().when(requestStatusReviewDTO.getStatus_date()).thenReturn(null);
         requestStatusReview = new RequestStatusReview(requestStatusReviewDTO);
     }
@@ -64,5 +65,30 @@ public class RequestStatusReviewTest {
     @DisplayName("Test status for reviewed: under_review")
     void testStatusUnderReview() {
         assertEquals("under_review", requestStatusReview.getStatus());
+        assertEquals("Request under review", requestStatusReview.getStatusText());
+        assertEquals("review", requestStatusReview.getStatusType());
+        assertNull(requestStatusReview.getStatusDate());
+    }
+
+    @Test
+    @DisplayName("Test status for reviewed: rejected")
+    void testStatusRejected() {
+        Mockito.lenient().when(requestStatusReviewDTO.getStatus()).thenReturn("rejected");
+        Mockito.lenient().when(requestStatusReviewDTO.getStatus_date()).thenReturn(testDate);
+        requestStatusReview = new RequestStatusReview(requestStatusReviewDTO);
+        assertEquals("rejected", requestStatusReview.getStatus());
+        assertEquals(testDate, requestStatusReview.getStatusDate());
+        assertEquals("review", requestStatusReview.getStatusType());
+    }
+
+    @Test
+    @DisplayName("Test status for reviewed: approved")
+    void testStatusApproved() {
+        Mockito.lenient().when(requestStatusReviewDTO.getStatus()).thenReturn("approved");
+        Mockito.lenient().when(requestStatusReviewDTO.getStatus_date()).thenReturn(testDate);
+        requestStatusReview = new RequestStatusReview(requestStatusReviewDTO);
+        assertEquals("approved", requestStatusReview.getStatus());
+        assertEquals(testDate, requestStatusReview.getStatusDate());
+        assertEquals("review", requestStatusReview.getStatusType());
     }
 }
