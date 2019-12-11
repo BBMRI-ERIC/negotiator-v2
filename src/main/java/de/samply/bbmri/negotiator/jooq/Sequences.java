@@ -87,4 +87,9 @@ public class Sequences {
 	 * The sequence <code>public.query_id_seq</code>
 	 */
 	public static final Sequence<Long> QUERY_ID_SEQ = new SequenceImpl<Long>("query_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>public.request_status_id_seq</code>
+	 */
+	public static final Sequence<Long> REQUEST_STATUS_ID_SEQ = new SequenceImpl<Long>("request_status_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 }

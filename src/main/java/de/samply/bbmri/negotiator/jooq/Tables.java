@@ -24,6 +24,7 @@ import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
 import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank;
 import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection;
+import de.samply.bbmri.negotiator.jooq.tables.RequestStatus;
 import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import javax.annotation.Generated;
@@ -141,6 +142,11 @@ public class Tables {
 	 * The table public.query_lifecycle_collection
 	 */
 	public static final QueryLifecycleCollection QUERY_LIFECYCLE_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION;
+
+	/**
+	 * The table public.request_status
+	 */
+	public static final RequestStatus REQUEST_STATUS = de.samply.bbmri.negotiator.jooq.tables.RequestStatus.REQUEST_STATUS;
 
 	/**
 	 * The table public.schema_version

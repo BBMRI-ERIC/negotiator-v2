@@ -82,8 +82,8 @@ class EmailBuilderTest {
     void testGetTextForNewCommentNotificationSoyParameterMissing() {
         String text = "Dear Sir or Madam,\n" +
                 "\n" +
-                "A new comment has been added to the query \"A long blabla test query name string\".\n" +
-                "Comment made is: \"null\"\n" +
+                "A new comment has been added from null at null to the query \"A long blabla test query name string\".\n" +
+                "Comment made is:\n \"null\"\n" +
                 "To view or add comments, please use the following link:\n" +
                 "\n" +
                 "null\n" +
@@ -103,8 +103,8 @@ class EmailBuilderTest {
     void testGetTextForNewCommentNotificationSoy() {
         String text = "Dear Sir or Madam,\n" +
                 "\n" +
-                "A new comment has been added to the query \"A long blabla test query name string\".\n" +
-                "Comment made is: \"Comment\"\n" +
+                "A new comment has been added from null at null to the query \"A long blabla test query name string\".\n" +
+                "Comment made is:\n \"Comment\"\n" +
                 "To view or add comments, please use the following link:\n" +
                 "\n" +
                 "http://this.goes.nowhere/really.nowhere.html\n" +
@@ -126,8 +126,8 @@ class EmailBuilderTest {
     void testGetTextForNewOfferNotificationSoy() {
         String text = "Dear Sir or Madam,\n" +
                 "\n" +
-                "A biobank has shown samply availability for the query \"A long blabla test query name string\".\n" +
-                "To start negotiating, please use the following link:\n" +
+                "A biobank \"null\" indicated samply or data availability or communicated some other confidential communication to you for the query \"A long blabla test query name string\".\n" +
+                "To read and react to that, please use the following link:\n" +
                 "\n" +
                 "http://this.goes.nowhere/really.nowhere.html\n" +
                 "\n" +

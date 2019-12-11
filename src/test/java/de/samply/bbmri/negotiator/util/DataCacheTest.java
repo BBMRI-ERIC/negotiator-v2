@@ -28,8 +28,9 @@ import static org.junit.Assert.*;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @DisplayName("Test DataCache")
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(DataCache.class)
+@ExtendWith(MockitoExtension.class)
+//@RunWith(PowerMockRunner.class)
+//@PrepareForTest(DataCache.class)
 public class DataCacheTest {
 
     @Mock
