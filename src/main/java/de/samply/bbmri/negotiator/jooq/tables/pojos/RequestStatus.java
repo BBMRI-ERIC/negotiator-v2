@@ -23,13 +23,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class RequestStatus implements Serializable {
 
-	private static final long serialVersionUID = -910212351;
+	private static final long serialVersionUID = 1094360940;
 
 	private Integer   id;
 	private Integer   queryId;
 	private String    status;
 	private Timestamp statusDate;
 	private Integer   statusUserId;
+	private String    statusType;
 
 	public RequestStatus() {}
 
@@ -39,6 +40,7 @@ public class RequestStatus implements Serializable {
 		this.status = value.status;
 		this.statusDate = value.statusDate;
 		this.statusUserId = value.statusUserId;
+		this.statusType = value.statusType;
 	}
 
 	public RequestStatus(
@@ -46,13 +48,15 @@ public class RequestStatus implements Serializable {
 		Integer   queryId,
 		String    status,
 		Timestamp statusDate,
-		Integer   statusUserId
+		Integer   statusUserId,
+		String    statusType
 	) {
 		this.id = id;
 		this.queryId = queryId;
 		this.status = status;
 		this.statusDate = statusDate;
 		this.statusUserId = statusUserId;
+		this.statusType = statusType;
 	}
 
 	public Integer getId() {
@@ -93,5 +97,13 @@ public class RequestStatus implements Serializable {
 
 	public void setStatusUserId(Integer statusUserId) {
 		this.statusUserId = statusUserId;
+	}
+
+	public String getStatusType() {
+		return this.statusType;
+	}
+
+	public void setStatusType(String statusType) {
+		this.statusType = statusType;
 	}
 }

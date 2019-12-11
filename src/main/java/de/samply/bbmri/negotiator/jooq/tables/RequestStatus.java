@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class RequestStatus extends TableImpl<RequestStatusRecord> {
 
-	private static final long serialVersionUID = -753092027;
+	private static final long serialVersionUID = 2012252554;
 
 	/**
 	 * The reference instance of <code>public.request_status</code>
@@ -74,6 +74,11 @@ public class RequestStatus extends TableImpl<RequestStatusRecord> {
 	 * The column <code>public.request_status.status_user_id</code>.
 	 */
 	public final TableField<RequestStatusRecord, Integer> STATUS_USER_ID = createField("status_user_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+
+	/**
+	 * The column <code>public.request_status.status_type</code>.
+	 */
+	public final TableField<RequestStatusRecord, String> STATUS_TYPE = createField("status_type", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
 	/**
 	 * Create a <code>public.request_status</code> table reference

@@ -92,4 +92,11 @@ public class RequestStatusDao extends DAOImpl<RequestStatusRecord, de.samply.bbm
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.RequestStatus> fetchByStatusUserId(Integer... values) {
 		return fetch(RequestStatus.REQUEST_STATUS.STATUS_USER_ID, values);
 	}
+
+	/**
+	 * Fetch records that have <code>status_type IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.RequestStatus> fetchByStatusType(String... values) {
+		return fetch(RequestStatus.REQUEST_STATUS.STATUS_TYPE, values);
+	}
 }
