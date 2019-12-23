@@ -62,12 +62,19 @@ public class RequestStatusReviewTest {
     }
 
     @Test
+    @DisplayName("Test status rejected text for reviewed not set.")
+    void testStatusRejectedText() {
+        assertEquals(null, requestStatusReview.getStatusRejectedText());
+    }
+
+    @Test
     @DisplayName("Test status for reviewed: under_review")
     void testStatusUnderReview() {
         assertEquals("under_review", requestStatusReview.getStatus());
         assertEquals("Request under review", requestStatusReview.getStatusText());
         assertEquals("review", requestStatusReview.getStatusType());
         assertNull(requestStatusReview.getStatusDate());
+        assertEquals(null, requestStatusReview.getStatusRejectedText());
     }
 
     @Test
@@ -75,10 +82,12 @@ public class RequestStatusReviewTest {
     void testStatusRejected() {
         Mockito.lenient().when(requestStatusReviewDTO.getStatus()).thenReturn("rejected");
         Mockito.lenient().when(requestStatusReviewDTO.getStatus_date()).thenReturn(testDate);
+        Mockito.lenient().when(requestStatusReviewDTO.getStatus_json()).thenReturn("{\"statusRejectedText\": \"Not a project that can be supported by BBMRI-ERIC.\"}");
         requestStatusReview = new RequestStatusReview(requestStatusReviewDTO);
         assertEquals("rejected", requestStatusReview.getStatus());
         assertEquals(testDate, requestStatusReview.getStatusDate());
         assertEquals("review", requestStatusReview.getStatusType());
+        assertEquals("Not a project that can be supported by BBMRI-ERIC.", requestStatusReview.getStatusRejectedText());
     }
 
     @Test
@@ -90,5 +99,6 @@ public class RequestStatusReviewTest {
         assertEquals("approved", requestStatusReview.getStatus());
         assertEquals(testDate, requestStatusReview.getStatusDate());
         assertEquals("review", requestStatusReview.getStatusType());
+        assertEquals(null, requestStatusReview.getStatusRejectedText());
     }
 }
