@@ -9,7 +9,7 @@ CREATE TABLE public.request_status
     status_type character varying,
     status_date timestamp without time zone,
     status_user_id integer,
-    status_json jsonb,
+    status_json text,
     PRIMARY KEY (id)
 )
     WITH (

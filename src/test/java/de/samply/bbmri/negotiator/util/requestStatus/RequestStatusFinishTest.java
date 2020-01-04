@@ -37,8 +37,8 @@ public class RequestStatusFinishTest {
 
     @BeforeEach
     void setUp() {
-        Mockito.lenient().when(requestStatusFinishDTO.getStatus_type()).thenReturn("finish");
-        Mockito.lenient().when(requestStatusFinishDTO.getStatus_date()).thenReturn(null);
+        Mockito.lenient().when(requestStatusFinishDTO.getStatusType()).thenReturn("finish");
+        Mockito.lenient().when(requestStatusFinishDTO.getStatusDate()).thenReturn(null);
         requestStatusFinish = new RequestStatusFinish(requestStatusFinishDTO);
     }
 
@@ -63,7 +63,7 @@ public class RequestStatusFinishTest {
     @Test
     @DisplayName("Test status date for finisehd.")
     void testStatusDateDate() {
-        Mockito.lenient().when(requestStatusFinishDTO.getStatus_date()).thenReturn(testDate);
+        Mockito.lenient().when(requestStatusFinishDTO.getStatusDate()).thenReturn(testDate);
         assertEquals(testDate, requestStatusFinish.getStatusDate());
     }
 }

@@ -38,8 +38,8 @@ public class RequestStatusCreateTest {
 
     @BeforeEach
     void setUp() {
-        Mockito.lenient().when(requestStatusCreateDTO.getStatus_type()).thenReturn("created");
-        Mockito.lenient().when(requestStatusCreateDTO.getStatus_date()).thenReturn(testDate);
+        Mockito.lenient().when(requestStatusCreateDTO.getStatusType()).thenReturn("created");
+        Mockito.lenient().when(requestStatusCreateDTO.getStatusDate()).thenReturn(testDate);
         requestStatusCreate = new RequestStatusCreate(requestStatusCreateDTO);
     }
 
@@ -65,5 +65,12 @@ public class RequestStatusCreateTest {
     @DisplayName("Test status for created.")
     void testStatus() {
         assertEquals("created", requestStatusCreate.getStatus());
+    }
+
+    @Test
+    @DisplayName("Test check allowed next status.")
+    void testCheckAllowedNextStatus() {
+        assertEquals(true, requestStatusCreate.checkAllowedNextStatus("review"));
+        assertEquals(false, requestStatusCreate.checkAllowedNextStatus("creat"));
     }
 }

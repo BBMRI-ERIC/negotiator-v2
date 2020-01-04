@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
@@ -48,6 +49,7 @@ import de.samply.share.model.bbmri.BbmriResult;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
+import org.jooq.tools.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1910,4 +1912,41 @@ public class DbUtil {
                 .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
                 .fetchAny();
     }
+
+    /*
+     * Save request status for lifecycle
+     */
+    public static RequestStatusDTO saveUpdateRequestStatus(Integer requestStatusId, Integer query_id, String status, String status_type, JSONObject status_json, Date status_date, Integer status_user_id) {
+        RequestStatusRecord requestStatus = null;
+        try (Config config = ConfigFactory.get()) {
+            if(requestStatusId == null) {
+                requestStatus = config.dsl().newRecord(Tables.REQUEST_STATUS);
+                requestStatus.setQueryId(query_id);
+                requestStatus.setStatus(status);
+                requestStatus.setStatusType(status_type);
+                requestStatus.setStatusJson(status_json);
+                requestStatus.setStatusDate(new Timestamp(status_date.getTime()));
+                requestStatus.setStatusUserId(status_user_id);
+                requestStatus.store();
+                config.commit();
+            } else {
+                config.dsl().update(Tables.REQUEST_STATUS)
+                        .set(Tables.REQUEST_STATUS.QUERY_ID, query_id)
+                        .set(Tables.REQUEST_STATUS.STATUS, status)
+                        .set(Tables.REQUEST_STATUS.STATUS_TYPE, status_type)
+                        .set(Tables.REQUEST_STATUS.STATUS_JSON, status_json)
+                        .set(Tables.REQUEST_STATUS.STATUS_DATE, new Timestamp(status_date.getTime()))
+                        .set(Tables.REQUEST_STATUS.STATUS_USER_ID, status_user_id).where(Tables.REQUEST_STATUS.ID.eq(requestStatusId)).execute();
+                config.commit();
+                requestStatus = config.dsl().selectFrom(Tables.REQUEST_STATUS)
+                        .where(Tables.REQUEST_STATUS.ID.eq(requestStatusId)).fetchOne();
+            }
+            return config.map(requestStatus, RequestStatusDTO.class);
+        } catch (SQLException e) {
+            System.err.println("ERROR saving/updating Request Status.");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

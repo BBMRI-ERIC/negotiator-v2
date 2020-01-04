@@ -24,7 +24,7 @@ public class RequestStatusDTO implements Serializable {
         return query_id;
     }
 
-    public void setQuery_id(Integer query_id) {
+    public void setQueryId(Integer query_id) {
         this.query_id = query_id;
     }
 
@@ -36,35 +36,35 @@ public class RequestStatusDTO implements Serializable {
         this.status = status;
     }
 
-    public String getStatus_type() {
+    public String getStatusType() {
         return status_type;
     }
 
-    public void setStatus_type(String status_type) {
+    public void setStatusType(String status_type) {
         this.status_type = status_type;
     }
 
-    public String getStatus_json() {
+    public String getStatusJson() {
         return status_json;
     }
 
-    public void setStatus_json(String status_json) {
+    public void setStatusJson(String status_json) {
         this.status_json = status_json;
     }
 
-    public Date getStatus_date() {
+    public Date getStatusDate() {
         return status_date;
     }
 
-    public void setStatus_date(Date status_date) {
+    public void setStatusDate(Date status_date) {
         this.status_date = status_date;
     }
 
-    public Integer getStatus_user_id() {
+    public Integer getStatusUserId() {
         return status_user_id;
     }
 
-    public void setStatus_user_id(Integer status_user_id) {
+    public void setStatusUserId(Integer status_user_id) {
         this.status_user_id = status_user_id;
     }
 }

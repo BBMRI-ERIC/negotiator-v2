@@ -1,19 +1,28 @@
 package de.samply.bbmri.negotiator.util;
 
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.requestStatus.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
 
 public class RequestLifeCycleStatus {
+    private static Logger logger = LoggerFactory.getLogger(RequestLifeCycleStatus.class);
+
     private TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
     private RequestStatus requesterAbandonedRequest = null;
+    private Integer query_id = null;
 
-    public RequestLifeCycleStatus() {
-
+    public RequestLifeCycleStatus(Integer query_id) {
+        this.query_id = query_id;
     }
 
     public void initialise(List<RequestStatusDTO> requestStatusDTOList) {
@@ -32,17 +41,22 @@ public class RequestLifeCycleStatus {
         return statusTree.lastEntry().getValue();
     }
 
+    public void createStatus(Integer status_user_id) {
+        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, "created", "created", null, new Date(), status_user_id);
+        requestStatusFactory(requestStatusDTO);
+    }
+
     private void requestStatusFactory(RequestStatusDTO requestStatus) {
-        if(requestStatus.getStatus_type().equals("created")) {
+        if(requestStatus.getStatusType().equals("created")) {
             RequestStatus status = new RequestStatusCreate(requestStatus);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(requestStatus.getStatus_type().equals("review")) {
+        } else if(requestStatus.getStatusType().equals("review")) {
             RequestStatus status = new RequestStatusReview(requestStatus);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(requestStatus.getStatus_type().equals("start")) {
+        } else if(requestStatus.getStatusType().equals("start")) {
             RequestStatus status = new RequestStatusStart(requestStatus);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(requestStatus.getStatus_type().equals("abandoned")) {
+        } else if(requestStatus.getStatusType().equals("abandoned")) {
             RequestStatus status = new RequestStatusAbandoned(requestStatus);
             requesterAbandonedRequest = status;
             statusTree.put(getIndex(status.getStatusDate()), status);
@@ -55,5 +69,13 @@ public class RequestLifeCycleStatus {
         }
         Long index = statusDate.getTime();
         return index;
+    }
+
+    public void nextStatus(String review) {
+        if(getStatus().checkAllowedNextStatus(review)) {
+
+        } else {
+            //TODO: ERROR
+        }
     }
 }

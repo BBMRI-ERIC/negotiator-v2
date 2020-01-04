@@ -38,8 +38,8 @@ public class RequestStatusReviewTest {
 
     @BeforeEach
     void setUp() {
-        Mockito.lenient().when(requestStatusReviewDTO.getStatus_type()).thenReturn("review");
-        Mockito.lenient().when(requestStatusReviewDTO.getStatus_date()).thenReturn(null);
+        Mockito.lenient().when(requestStatusReviewDTO.getStatusType()).thenReturn("review");
+        Mockito.lenient().when(requestStatusReviewDTO.getStatusDate()).thenReturn(null);
         requestStatusReview = new RequestStatusReview(requestStatusReviewDTO);
     }
 
@@ -81,8 +81,8 @@ public class RequestStatusReviewTest {
     @DisplayName("Test status for reviewed: rejected")
     void testStatusRejected() {
         Mockito.lenient().when(requestStatusReviewDTO.getStatus()).thenReturn("rejected");
-        Mockito.lenient().when(requestStatusReviewDTO.getStatus_date()).thenReturn(testDate);
-        Mockito.lenient().when(requestStatusReviewDTO.getStatus_json()).thenReturn("{\"statusRejectedText\": \"Not a project that can be supported by BBMRI-ERIC.\"}");
+        Mockito.lenient().when(requestStatusReviewDTO.getStatusDate()).thenReturn(testDate);
+        Mockito.lenient().when(requestStatusReviewDTO.getStatusJson()).thenReturn("{\"statusRejectedText\": \"Not a project that can be supported by BBMRI-ERIC.\"}");
         requestStatusReview = new RequestStatusReview(requestStatusReviewDTO);
         assertEquals("rejected", requestStatusReview.getStatus());
         assertEquals(testDate, requestStatusReview.getStatusDate());
@@ -94,7 +94,7 @@ public class RequestStatusReviewTest {
     @DisplayName("Test status for reviewed: approved")
     void testStatusApproved() {
         Mockito.lenient().when(requestStatusReviewDTO.getStatus()).thenReturn("approved");
-        Mockito.lenient().when(requestStatusReviewDTO.getStatus_date()).thenReturn(testDate);
+        Mockito.lenient().when(requestStatusReviewDTO.getStatusDate()).thenReturn(testDate);
         requestStatusReview = new RequestStatusReview(requestStatusReviewDTO);
         assertEquals("approved", requestStatusReview.getStatus());
         assertEquals(testDate, requestStatusReview.getStatusDate());

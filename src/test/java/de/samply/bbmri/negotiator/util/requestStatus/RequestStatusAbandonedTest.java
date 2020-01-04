@@ -36,8 +36,8 @@ public class RequestStatusAbandonedTest {
 
     @BeforeEach
     void setUp() {
-        Mockito.lenient().when(requestStatusAbandonedDTO.getStatus_type()).thenReturn("abandoned");
-        Mockito.lenient().when(requestStatusAbandonedDTO.getStatus_date()).thenReturn(null);
+        Mockito.lenient().when(requestStatusAbandonedDTO.getStatusType()).thenReturn("abandoned");
+        Mockito.lenient().when(requestStatusAbandonedDTO.getStatusDate()).thenReturn(null);
         requestStatusAbandoned = new RequestStatusAbandoned(requestStatusAbandonedDTO);
     }
 
@@ -62,7 +62,7 @@ public class RequestStatusAbandonedTest {
     @Test
     @DisplayName("Test status date for abandoned.")
     void testStatusDateDate() {
-        Mockito.lenient().when(requestStatusAbandonedDTO.getStatus_date()).thenReturn(testDate);
+        Mockito.lenient().when(requestStatusAbandonedDTO.getStatusDate()).thenReturn(testDate);
         assertEquals(testDate, requestStatusAbandoned.getStatusDate());
     }
 }

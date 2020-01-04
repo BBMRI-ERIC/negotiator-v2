@@ -46,6 +46,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +76,8 @@ public class QueryBean implements Serializable {
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
+
+   private RequestLifeCycleStatus requestLifeCycleStatus;
 
    /**
     * Session bean use to store transient edit query values
@@ -143,6 +146,7 @@ public class QueryBean implements Serializable {
            /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
            if(id != null)
            {
+               requestLifeCycleStatus = new RequestLifeCycleStatus(id);
                setMode("edit");
                QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
 
@@ -242,7 +246,6 @@ public class QueryBean implements Serializable {
     * Saves the newly created or edited query in the database.
     */
    public String saveQuery() throws SQLException {
-       // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
            if(id != null) {
@@ -254,6 +257,9 @@ public class QueryBean implements Serializable {
                        jsonQuery, ethicsVote, userBean.getUserId(),
                        true);
                config.commit();
+               requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
+               requestLifeCycleStatus.createStatus(userBean.getUserId());
+               requestLifeCycleStatus.nextStatus("review");
                return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
            }
        } catch (IOException e) {
@@ -454,6 +460,14 @@ public class QueryBean implements Serializable {
 
     public void setSessionBean(SessionBean sessionBean) {
         this.sessionBean = sessionBean;
+    }
+
+    public RequestLifeCycleStatus getRequestLifeCycleStatus() {
+        return requestLifeCycleStatus;
+    }
+
+    public void setRequestLifeCycleStatus(RequestLifeCycleStatus requestLifeCycleStatus) {
+        this.requestLifeCycleStatus = requestLifeCycleStatus;
     }
 
     public FileUploadBean getFileUploadBean() {

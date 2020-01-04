@@ -5,7 +5,9 @@ import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class RequestStatusReview implements RequestStatus {
 
@@ -14,14 +16,15 @@ public class RequestStatusReview implements RequestStatus {
     private String statusText = "Request under review";
     private Date statusDate = null;
     private String statusRejectedText = null;
+    private List allowedNextStatus = Arrays.asList("start");
 
     public RequestStatusReview(RequestStatusDTO requestStatus) {
-        statusDate = requestStatus.getStatus_date();
+        statusDate = requestStatus.getStatusDate();
         status = requestStatus.getStatus();
         if(status == null) {
             status = "under_review";
         } else if(status.equals("rejected")) {
-            statusRejectedText = getStatusRejectedTextFromJson(requestStatus.getStatus_json());
+            statusRejectedText = getStatusRejectedTextFromJson(requestStatus.getStatusJson());
         }
     }
 
@@ -60,5 +63,10 @@ public class RequestStatusReview implements RequestStatus {
             e.printStackTrace();
         }
         return returnText;
+    }
+
+    @Override
+    public boolean checkAllowedNextStatus(String review) {
+        return allowedNextStatus.contains(review);
     }
 }
