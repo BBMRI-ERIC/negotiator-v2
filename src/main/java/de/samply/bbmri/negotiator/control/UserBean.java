@@ -115,6 +115,11 @@ public class UserBean implements Serializable {
 	private Boolean researcher = false;
 
 	/**
+	 * If the user is a BBMRI-ERIC reviewer or not.
+	 */
+	private Boolean reviewer = false;
+
+	/**
 	 * ID of the Location (only biobank owners)
 	 */
 	private Biobank biobank = null;
@@ -350,6 +355,7 @@ public class UserBean implements Serializable {
 			refreshToken = null;
 			biobankOwner = false;
 			researcher = false;
+			reviewer = false;
 			return;
 		}
 
@@ -747,6 +753,16 @@ public class UserBean implements Serializable {
 
 	public void setResearcher(Boolean researcher) {
 		this.researcher = researcher;
+	}
+
+	public Boolean getReviewer() {
+		//TODO: Chenge
+		return true;
+		//return reviewer;
+	}
+
+	public void setReviewer(Boolean reviewer) {
+		this.reviewer = reviewer;
 	}
 
 	public Boolean hasNewQueryRedirectURL() {

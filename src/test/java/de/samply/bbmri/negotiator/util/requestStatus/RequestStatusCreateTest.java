@@ -12,7 +12,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -73,4 +75,12 @@ public class RequestStatusCreateTest {
         assertEquals(true, requestStatusCreate.checkAllowedNextStatus("review"));
         assertEquals(false, requestStatusCreate.checkAllowedNextStatus("creat"));
     }
+
+    @Test
+    @DisplayName("Test check all allowed next status.")
+    void testAllowedNextStatusList() {
+        List allowedNextStatus = Arrays.asList("review");
+        assertEquals(allowedNextStatus, requestStatusCreate.getAllowedNextStatus());
+    }
+
 }

@@ -1,6 +1,6 @@
 # Negotiator
 
-This is the BBMRI negotiator
+This is the BBMRI-ERIC negotiator.
 
 ## Links (MITRO related)
 

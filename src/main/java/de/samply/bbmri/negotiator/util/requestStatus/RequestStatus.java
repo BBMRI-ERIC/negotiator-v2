@@ -9,5 +9,5 @@ public interface RequestStatus {
     String getStatusType();
     String getStatusText();
     boolean checkAllowedNextStatus(String review);
-    //List getAllowedNextStatus(); // For Testing?
+    List getAllowedNextStatus();
 }

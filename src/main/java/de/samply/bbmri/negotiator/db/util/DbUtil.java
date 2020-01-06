@@ -1949,4 +1949,65 @@ public class DbUtil {
         return null;
     }
 
+    public static HashMap<String, String> getOpenRequests() {
+        HashMap<String, String> returnlist = new HashMap<String, String>();
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CASE WHEN status ILIKE 'rejected' THEN 'rejected'\n" +
+                    "WHEN status ILIKE 'review' THEN 'review'\n" +
+                    "ELSE 'approved' END statuscase, COUNT(*)\n" +
+                    "\tFROM public.request_status\n" +
+                    "\tWHERE (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
+                    "\tFROM public.request_status GROUP BY query_id) GROUP BY statuscase;");
+            Result<Record> result = resultQuery.fetch();
+            for(Record record : result) {
+                returnlist.put( record.getValue(0).toString(), record.getValue(1).toString() );
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return returnlist;
+    }
+
+    public static HashMap<String, String> getRequeststoReview() {
+        HashMap<String, String> returnlist = new HashMap<String, String>();
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT *\n" +
+                    "\tFROM public.request_status\n" +
+                    "\tWHERE status ILIKE 'review' AND (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
+                    "\tFROM public.request_status GROUP BY query_id) ORDER BY status_date;");
+            Result<Record> result = resultQuery.fetch();
+            for(Record record : result) {
+                returnlist.put( record.getValue(0).toString(), record.getValue(1).toString() );
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return returnlist;
+    }
+
+    /*
+    public static String getFullListForAPI(Config config) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jd))) AS varchar) AS directories FROM (\n" +
+                "SELECT json_build_object('name', name, 'url', url, 'description', description, 'Biobanks',\t\t\t\t\t\t \n" +
+                "(SELECT array_to_json(array_agg(row_to_json(jb))) FROM \n" +
+                "\t(SELECT directory_id, name,\n" +
+                "\t (SELECT array_to_json(array_agg(row_to_json(jc))) FROM\n" +
+                "\t (SELECT directory_id, name\n" +
+                "\t FROM public.collection c WHERE c.list_of_directories_id = b.list_of_directories_id AND c.biobank_id = b.id) jc) AS collections \n" +
+                "\t FROM public.biobank b WHERE b.list_of_directories_id = d.id) jb)) AS directory\t\t\t\t\t\t \n" +
+                "\tFROM public.list_of_directories d\n" +
+                ") jd;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+
+            //PGobject jsonObject = record.getValue(0);
+            return (String)record.getValue(0);
+        }
+        return "ERROR";
+    }
+     */
+
 }

@@ -41,4 +41,9 @@ public class RequestStatusFinish implements RequestStatus {
     public boolean checkAllowedNextStatus(String review) {
         return allowedNextStatus.contains(review);
     }
+
+    @Override
+    public List getAllowedNextStatus() {
+        return null;
+    }
 }
