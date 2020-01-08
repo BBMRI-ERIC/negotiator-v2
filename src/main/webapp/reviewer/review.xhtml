@@ -60,36 +60,57 @@
             </h:panelGroup>
         </h:panelGroup>
 
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>Larry</td>
-                <td>the Bird</td>
-                <td>@twitter</td>
-            </tr>
-            </tbody>
-        </table>
+        <h:panelGroup styleClass="col-md-4" >
+            <div class="panel panel-danger">
+                <div class="panel-heading">Count</div>
+                <div class="panel-body">#{reviewBean.queryRecordList.size()}|
+
+                    <ui:repeat value="#{reviewBean.queryRecordList}" var="queryRecord">
+                        #{queryRecord.getId()}
+                        #{queryRecord.text}
+                    </ui:repeat>c
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <h:panelGroup styleClass="row" layout="block">
+            <c:if test="#{reviewBean.queryRecordList.size() eq 0}">
+                <h:panelGroup styleClass="col-md-12" >
+                    <div class="panel panel-success">
+                        <div class="panel-body">
+                            <h4 class="text-success"><span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>    No pending requests.</h4>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </c:if>
+            <c:if test="#{reviewBean.queryRecordList.size() > 0}">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Creation Time</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Researcher</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Ethics Vote</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ui:repeat value="#{reviewBean.queryRecordList}" var="queryRecord">
+                            <tr>
+                                <th scope="row">#{queryRecord.id}</th>
+                                <td>#{queryRecord.title}</td>
+                                <td>#{queryRecord.queryCreationTime}</td>
+                                <td>#{queryRecord.text}</td>
+                                <td>#{reviewBean.getUserName(query.getResearcherId())}</td>
+                                <td>#{queryRecord.ethicsVote}</td>
+                            </tr>
+                        </ui:repeat>c
+                    </tbody>
+                </table>
+            </c:if>
+        </h:panelGroup>
 
     </ui:define>
 

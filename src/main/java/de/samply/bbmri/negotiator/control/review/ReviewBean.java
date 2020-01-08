@@ -4,6 +4,9 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -11,8 +14,10 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @ManagedBean
 @ViewScoped
@@ -26,10 +31,13 @@ public class ReviewBean implements Serializable {
     private int approvedRequests = 0;
     private int rejectedRequests = 0;
     private List reviewRequest;
+    private HashMap<Integer, RequestLifeCycleStatus> requestStatusList = new HashMap<Integer, RequestLifeCycleStatus>();
+    private List<QueryRecord> queryRecordList = new ArrayList<QueryRecord>();
 
     @PostConstruct
     public void init() {
         collectLifecycleStatistic();
+        createRequestStatusQueriesToReview();
     }
 
     private void collectLifecycleStatistic() {
@@ -43,8 +51,22 @@ public class ReviewBean implements Serializable {
         if (requestsList.containsKey("approved")) {
             approvedRequests = Integer.parseInt(requestsList.get("approved"));
         }
+    }
 
-        DbUtil.getRequeststoReview();
+    private void createRequestStatusQueriesToReview() {
+        List<RequestStatusDTO> requestlist = DbUtil.getRequestStatusDTOToReview();
+        try (Config config = ConfigFactory.get()) {
+            for(RequestStatusDTO request : requestlist) {
+                if(!requestStatusList.containsKey(request.getQuery_id())) {
+                    requestStatusList.put(request.getQuery_id(), new RequestLifeCycleStatus(request.getQuery_id()));
+                    queryRecordList.add(DbUtil.getQueryFromId(config, request.getQuery_id()));
+                }
+                requestStatusList.get(request.getQuery_id()).initialise(requestlist);
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting Query Record.");
+            e.printStackTrace();
+        }
     }
 
     public List getListOfRequestsToReview() {
@@ -69,5 +91,14 @@ public class ReviewBean implements Serializable {
 
     public void setUserBean(UserBean userBean) {
         this.userBean = userBean;
+    }
+
+    public List<QueryRecord> getQueryRecordList() {
+        return queryRecordList;
+    }
+
+    //TODO: Add user data to Request
+    public String getUserName(Integer id) {
+        return users.get(id).getAuthName();
     }
 }

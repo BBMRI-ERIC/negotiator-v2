@@ -31,6 +31,10 @@ public class RequestLifeCycleStatus {
         }
     }
 
+    public void initialise(RequestStatusDTO requestStatusDTO) {
+        requestStatusFactory(requestStatusDTO);
+    }
+
     public RequestStatus getStatus() {
         if(statusTree.size() == 0) {
             return null;

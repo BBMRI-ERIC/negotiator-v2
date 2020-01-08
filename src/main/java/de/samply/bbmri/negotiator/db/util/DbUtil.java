@@ -1969,25 +1969,39 @@ public class DbUtil {
         return returnlist;
     }
 
-    public static HashMap<String, String> getRequeststoReview() {
-        HashMap<String, String> returnlist = new HashMap<String, String>();
+    public static List<RequestStatusDTO> getRequestStatusDTOToReview() {
         try (Config config = ConfigFactory.get()) {
-            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT *\n" +
-                    "\tFROM public.request_status\n" +
-                    "\tWHERE status ILIKE 'review' AND (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
-                    "\tFROM public.request_status GROUP BY query_id) ORDER BY status_date;");
-            Result<Record> result = resultQuery.fetch();
-            for(Record record : result) {
-                returnlist.put( record.getValue(0).toString(), record.getValue(1).toString() );
-            }
+            Result<Record> fetch = config.dsl().resultQuery("SELECT * FROM public.request_status WHERE query_id IN \n" +
+                    "(SELECT query_id\n" +
+                    "FROM public.request_status\n" +
+                    "WHERE status ILIKE 'review' AND (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
+                    "FROM public.request_status GROUP BY query_id) ORDER BY status_date) ORDER BY query_id, status_date;").fetch();
+            return config.map(fetch, RequestStatusDTO.class);
         } catch (SQLException e) {
             System.err.println("ERROR getting open Request Status.");
             e.printStackTrace();
         }
-        return returnlist;
+        return null;
     }
 
     /*
+    public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId, Set<String> filters) {
+
+        Result<Record> fetch = config.dsl()
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(Tables.PERSON, "query_author"))
+                .from(Tables.QUERY)
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
+                .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
+                .where(condition)
+                .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
+
+        return config.map(fetch, QueryStatsDTO.class);
+    }
+
+
     public static String getFullListForAPI(Config config) {
         ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jd))) AS varchar) AS directories FROM (\n" +
                 "SELECT json_build_object('name', name, 'url', url, 'description', description, 'Biobanks',\t\t\t\t\t\t \n" +
