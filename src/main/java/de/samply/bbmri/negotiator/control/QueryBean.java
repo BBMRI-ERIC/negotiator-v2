@@ -255,11 +255,11 @@ public class QueryBean implements Serializable {
            } else {
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                        jsonQuery, ethicsVote, userBean.getUserId(),
-                       true);
+                       true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization());
                config.commit();
                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
                requestLifeCycleStatus.createStatus(userBean.getUserId());
-               requestLifeCycleStatus.nextStatus("review");
+               requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
                return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
            }
        } catch (IOException e) {
@@ -412,7 +412,7 @@ public class QueryBean implements Serializable {
             if (id == null) {
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(),
-                        false);
+                        false, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization());
                 config.commit();
                 setId(record.getId());
             }

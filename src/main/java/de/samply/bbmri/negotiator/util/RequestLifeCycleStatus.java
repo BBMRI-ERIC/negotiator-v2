@@ -67,6 +67,11 @@ public class RequestLifeCycleStatus {
         }
     }
 
+    private RequestStatusDTO createRequestStatusInDB(String status, String statusType, String status_json, Integer status_user_id) {
+        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, status, statusType, status_json, new Date(), status_user_id);
+        return requestStatusDTO;
+    }
+
     private Long getIndex(Date statusDate) {
         if(statusDate == null) {
             return Long.MAX_VALUE;
@@ -75,11 +80,22 @@ public class RequestLifeCycleStatus {
         return index;
     }
 
-    public void nextStatus(String review) {
-        if(getStatus().checkAllowedNextStatus(review)) {
-
+    public void nextStatus(String status, String statusType, String status_json, Integer status_user_id) {
+        if(getStatus().checkAllowedNextStatus(statusType)) {
+            RequestStatusDTO requestStatusDTO = createRequestStatusInDB(status, statusType, status_json, status_user_id);
+            requestStatusFactory(requestStatusDTO);
         } else {
-            //TODO: ERROR
+            System.err.println("ERROR: Request Status, wrong next status Provided.");
+            System.err.println("Status is: " + getStatus().getStatusType() + " - " + getStatus().getStatus());
+            System.err.println("Requeste Status is: " + statusType + " - " + status + " ( allowed: " + getAllowedNextStatusErrorString(getStatus().getAllowedNextStatus()) + ")");
         }
+    }
+
+    private String getAllowedNextStatusErrorString(List allowedNextStatus) {
+        String returnvalue = "";
+        for(Object value : allowedNextStatus) {
+            returnvalue += value + " ";
+        }
+        return returnvalue;
     }
 }

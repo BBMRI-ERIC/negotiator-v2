@@ -1173,7 +1173,7 @@ public class DbUtil {
      */
     public static QueryRecord saveQuery(Config config, String title,
                                         String text, String requestDescription, String jsonText, String ethicsVote, int researcherId,
-                                        Boolean validQuery) throws SQLException, IOException {
+                                        Boolean validQuery, String researcher_name, String researcher_email, String researcher_organization) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
         queryRecord.setJsonText(jsonText);
@@ -1186,6 +1186,9 @@ public class DbUtil {
         queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
         queryRecord.setNumAttachments(0);
         queryRecord.setValidQuery(validQuery);
+        queryRecord.setResearcherName(researcher_name);
+        queryRecord.setResearcherEmail(researcher_email);
+        queryRecord.setResearcherOrganization(researcher_organization);
         queryRecord.store();
 
         /**
@@ -1916,7 +1919,7 @@ public class DbUtil {
     /*
      * Save request status for lifecycle
      */
-    public static RequestStatusDTO saveUpdateRequestStatus(Integer requestStatusId, Integer query_id, String status, String status_type, JSONObject status_json, Date status_date, Integer status_user_id) {
+    public static RequestStatusDTO saveUpdateRequestStatus(Integer requestStatusId, Integer query_id, String status, String status_type, String status_json, Date status_date, Integer status_user_id) {
         RequestStatusRecord requestStatus = null;
         try (Config config = ConfigFactory.get()) {
             if(requestStatusId == null) {
@@ -1953,7 +1956,7 @@ public class DbUtil {
         HashMap<String, String> returnlist = new HashMap<String, String>();
         try (Config config = ConfigFactory.get()) {
             ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CASE WHEN status ILIKE 'rejected' THEN 'rejected'\n" +
-                    "WHEN status ILIKE 'review' THEN 'review'\n" +
+                    "WHEN status ILIKE 'under_review' THEN 'review'\n" +
                     "ELSE 'approved' END statuscase, COUNT(*)\n" +
                     "\tFROM public.request_status\n" +
                     "\tWHERE (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
@@ -1974,7 +1977,7 @@ public class DbUtil {
             Result<Record> fetch = config.dsl().resultQuery("SELECT * FROM public.request_status WHERE query_id IN \n" +
                     "(SELECT query_id\n" +
                     "FROM public.request_status\n" +
-                    "WHERE status ILIKE 'review' AND (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
+                    "WHERE status ILIKE 'under_review' AND (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
                     "FROM public.request_status GROUP BY query_id) ORDER BY status_date) ORDER BY query_id, status_date;").fetch();
             return config.map(fetch, RequestStatusDTO.class);
         } catch (SQLException e) {

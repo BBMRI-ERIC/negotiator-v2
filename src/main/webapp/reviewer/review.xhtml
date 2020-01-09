@@ -60,18 +60,6 @@
             </h:panelGroup>
         </h:panelGroup>
 
-        <h:panelGroup styleClass="col-md-4" >
-            <div class="panel panel-danger">
-                <div class="panel-heading">Count</div>
-                <div class="panel-body">#{reviewBean.queryRecordList.size()}|
-
-                    <ui:repeat value="#{reviewBean.queryRecordList}" var="queryRecord">
-                        #{queryRecord.getId()}
-                        #{queryRecord.text}
-                    </ui:repeat>c
-                </div>
-            </div>
-        </h:panelGroup>
 
         <h:panelGroup styleClass="row" layout="block">
             <c:if test="#{reviewBean.queryRecordList.size() eq 0}">
@@ -94,6 +82,7 @@
                             <th scope="col">Researcher</th>
                             <th scope="col">Description</th>
                             <th scope="col">Ethics Vote</th>
+                            <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -103,10 +92,12 @@
                                 <td>#{queryRecord.title}</td>
                                 <td>#{queryRecord.queryCreationTime}</td>
                                 <td>#{queryRecord.text}</td>
-                                <td>#{reviewBean.getUserName(query.getResearcherId())}</td>
+                                <td>#{queryRecord.researcherName}<br/>#{queryRecord.researcherEmail}<br/>#{queryRecord.researcherOrganization}</td>
+                                <td>#{queryRecord.requestDescription}</td>
                                 <td>#{queryRecord.ethicsVote}</td>
+                                <td><button class="btn btn-success"><i class="glyphicon glyphicon-ok"></i> Approve</button>  <button class="btn btn-danger"><i class="fa fa-close"></i> Reject</button></td>
                             </tr>
-                        </ui:repeat>c
+                        </ui:repeat>
                     </tbody>
                 </table>
             </c:if>

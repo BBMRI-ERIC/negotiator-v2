@@ -96,9 +96,4 @@ public class ReviewBean implements Serializable {
     public List<QueryRecord> getQueryRecordList() {
         return queryRecordList;
     }
-
-    //TODO: Add user data to Request
-    public String getUserName(Integer id) {
-        return "";//users.get(id).getAuthName();
-    }
 }

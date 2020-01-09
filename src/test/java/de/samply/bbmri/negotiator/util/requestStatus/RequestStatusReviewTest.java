@@ -107,7 +107,7 @@ public class RequestStatusReviewTest {
     @Test
     @DisplayName("Test check all allowed next status.")
     void testAllowedNextStatusList() {
-        List allowedNextStatus = Arrays.asList("start", "abandoned");
+        List allowedNextStatus = Arrays.asList("start", "abandoned", "under_review");
         assertEquals(allowedNextStatus, requestStatusReview.getAllowedNextStatus());
     }
 }

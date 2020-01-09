@@ -16,7 +16,7 @@ public class RequestStatusReview implements RequestStatus {
     private String statusText = "Request under review";
     private Date statusDate = null;
     private String statusRejectedText = null;
-    private List allowedNextStatus = Arrays.asList("start", "abandoned");
+    private List allowedNextStatus = Arrays.asList("start", "abandoned", "under_review");
 
     public RequestStatusReview(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
