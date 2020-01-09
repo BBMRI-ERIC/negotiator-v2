@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = 1632306161;
+	private static final long serialVersionUID = -1395365062;
 
 	private Integer   id;
 	private String    title;
@@ -38,6 +38,9 @@ public class Query implements Serializable {
 	private String    requestDescription;
 	private String    ethicsVote;
 	private Timestamp negotiationStartedTime;
+	private String    researcherName;
+	private String    researcherEmail;
+	private String    researcherOrganization;
 
 	public Query() {}
 
@@ -55,6 +58,9 @@ public class Query implements Serializable {
 		this.requestDescription = value.requestDescription;
 		this.ethicsVote = value.ethicsVote;
 		this.negotiationStartedTime = value.negotiationStartedTime;
+		this.researcherName = value.researcherName;
+		this.researcherEmail = value.researcherEmail;
+		this.researcherOrganization = value.researcherOrganization;
 	}
 
 	public Query(
@@ -70,7 +76,10 @@ public class Query implements Serializable {
 		Boolean   validQuery,
 		String    requestDescription,
 		String    ethicsVote,
-		Timestamp negotiationStartedTime
+		Timestamp negotiationStartedTime,
+		String    researcherName,
+		String    researcherEmail,
+		String    researcherOrganization
 	) {
 		this.id = id;
 		this.title = title;
@@ -85,6 +94,9 @@ public class Query implements Serializable {
 		this.requestDescription = requestDescription;
 		this.ethicsVote = ethicsVote;
 		this.negotiationStartedTime = negotiationStartedTime;
+		this.researcherName = researcherName;
+		this.researcherEmail = researcherEmail;
+		this.researcherOrganization = researcherOrganization;
 	}
 
 	public Integer getId() {
@@ -189,5 +201,29 @@ public class Query implements Serializable {
 
 	public void setNegotiationStartedTime(Timestamp negotiationStartedTime) {
 		this.negotiationStartedTime = negotiationStartedTime;
+	}
+
+	public String getResearcherName() {
+		return this.researcherName;
+	}
+
+	public void setResearcherName(String researcherName) {
+		this.researcherName = researcherName;
+	}
+
+	public String getResearcherEmail() {
+		return this.researcherEmail;
+	}
+
+	public void setResearcherEmail(String researcherEmail) {
+		this.researcherEmail = researcherEmail;
+	}
+
+	public String getResearcherOrganization() {
+		return this.researcherOrganization;
+	}
+
+	public void setResearcherOrganization(String researcherOrganization) {
+		this.researcherOrganization = researcherOrganization;
 	}
 }

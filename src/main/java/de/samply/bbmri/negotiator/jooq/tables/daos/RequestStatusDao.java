@@ -103,7 +103,7 @@ public class RequestStatusDao extends DAOImpl<RequestStatusRecord, de.samply.bbm
 	/**
 	 * Fetch records that have <code>status_json IN (values)</code>
 	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.RequestStatus> fetchByStatusJson(Object... values) {
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.RequestStatus> fetchByStatusJson(String... values) {
 		return fetch(RequestStatus.REQUEST_STATUS.STATUS_JSON, values);
 	}
 }
