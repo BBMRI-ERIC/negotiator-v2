@@ -99,6 +99,6 @@ public class ReviewBean implements Serializable {
 
     //TODO: Add user data to Request
     public String getUserName(Integer id) {
-        return users.get(id).getAuthName();
+        return "";//users.get(id).getAuthName();
     }
 }
