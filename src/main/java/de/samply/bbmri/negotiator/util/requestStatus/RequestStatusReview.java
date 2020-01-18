@@ -16,7 +16,7 @@ public class RequestStatusReview implements RequestStatus {
     private String statusText = "Request under review";
     private Date statusDate = null;
     private String statusRejectedText = null;
-    private List allowedNextStatus = Arrays.asList("start", "abandoned", "under_review");
+    private List allowedNextStatus = Arrays.asList("waitingstart", "abandoned", "approved", "rejected");
 
     public RequestStatusReview(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
@@ -66,12 +66,12 @@ public class RequestStatusReview implements RequestStatus {
     }
 
     @Override
-    public boolean checkAllowedNextStatus(String review) {
-        return allowedNextStatus.contains(review);
+    public boolean checkAllowedNextStatus(String status) {
+        return allowedNextStatus.contains(status);
     }
 
     @Override
     public List getAllowedNextStatus() {
-        return null;
+        return allowedNextStatus;
     }
 }

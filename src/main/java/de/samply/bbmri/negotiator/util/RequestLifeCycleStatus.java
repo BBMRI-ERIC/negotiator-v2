@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,14 @@ public class RequestLifeCycleStatus {
 
     public RequestLifeCycleStatus(Integer query_id) {
         this.query_id = query_id;
+    }
+
+    public void initialise() {
+        try(Config config = ConfigFactory.get()) {
+            initialise(DbUtil.getRequestStatus(config, query_id));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void initialise(List<RequestStatusDTO> requestStatusDTOList) {
@@ -81,7 +90,7 @@ public class RequestLifeCycleStatus {
     }
 
     public void nextStatus(String status, String statusType, String status_json, Integer status_user_id) {
-        if(getStatus().checkAllowedNextStatus(statusType)) {
+        if(getStatus().checkAllowedNextStatus(status)) {
             RequestStatusDTO requestStatusDTO = createRequestStatusInDB(status, statusType, status_json, status_user_id);
             requestStatusFactory(requestStatusDTO);
         } else {

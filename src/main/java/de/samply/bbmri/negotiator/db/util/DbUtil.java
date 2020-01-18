@@ -46,6 +46,7 @@ import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
 import de.samply.share.model.bbmri.BbmriResult;
+import org.apache.commons.collections.ArrayStack;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -1910,10 +1911,11 @@ public class DbUtil {
     /*
      * Get request staus for lifecycle
      */
-    public static void getRequestStatus(Config config, Integer requestId) {
-        config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
-                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
-                .fetchAny();
+    public static List<RequestStatusDTO> getRequestStatus(Config config, Integer requestId) {
+        Result<RequestStatusRecord> fetch = config.dsl().selectFrom(Tables.REQUEST_STATUS)
+                .where(Tables.REQUEST_STATUS.QUERY_ID.eq(requestId))
+                .fetch();
+        return config.map(fetch, RequestStatusDTO.class);
     }
 
     /*
@@ -1987,44 +1989,27 @@ public class DbUtil {
         return null;
     }
 
-    /*
-    public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId, Set<String> filters) {
-
-        Result<Record> fetch = config.dsl()
-                .select(getFields(Tables.QUERY, "query"))
-                .select(getFields(Tables.PERSON, "query_author"))
-                .from(Tables.QUERY)
-                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
-                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
-                .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
-                .where(condition)
-                .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
-                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
-
-        return config.map(fetch, QueryStatsDTO.class);
-    }
-
-
-    public static String getFullListForAPI(Config config) {
-        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jd))) AS varchar) AS directories FROM (\n" +
-                "SELECT json_build_object('name', name, 'url', url, 'description', description, 'Biobanks',\t\t\t\t\t\t \n" +
-                "(SELECT array_to_json(array_agg(row_to_json(jb))) FROM \n" +
-                "\t(SELECT directory_id, name,\n" +
-                "\t (SELECT array_to_json(array_agg(row_to_json(jc))) FROM\n" +
-                "\t (SELECT directory_id, name\n" +
-                "\t FROM public.collection c WHERE c.list_of_directories_id = b.list_of_directories_id AND c.biobank_id = b.id) jc) AS collections \n" +
-                "\t FROM public.biobank b WHERE b.list_of_directories_id = d.id) jb)) AS directory\t\t\t\t\t\t \n" +
-                "\tFROM public.list_of_directories d\n" +
-                ") jd;");
-        Result<Record> result = resultQuery.fetch();
-        for(Record record : result) {
-            System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
-
-            //PGobject jsonObject = record.getValue(0);
-            return (String)record.getValue(0);
+    public static int getNumberOfInitializedQueries() {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> fetch = config.dsl().resultQuery("SELECT COUNT(*) FROM public.json_query;").fetch();
+            for(Record record : fetch) {
+                return Integer.parseInt(record.getValue(0).toString());
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
         }
-        return "ERROR";
+        return 0;
     }
-     */
 
+    public static List<QueryRecord> getNumberOfQueries() {
+        List<QueryRecord> returnList = new ArrayList();
+        try (Config config = ConfigFactory.get()) {
+            return config.dsl().selectFrom(Tables.QUERY).fetch();
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return returnList;
+    }
 }

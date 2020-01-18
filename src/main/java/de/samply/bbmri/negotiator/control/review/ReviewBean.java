@@ -12,6 +12,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -67,6 +68,19 @@ public class ReviewBean implements Serializable {
             System.err.println("ERROR getting Query Record.");
             e.printStackTrace();
         }
+    }
+
+    public String approveRequest(Integer queryRecordId) {
+        requestStatusList.get(queryRecordId).nextStatus("approved", "review", null, userBean.getUserId());
+        requestStatusList.get(queryRecordId).nextStatus("waitingstart", "start", null, userBean.getUserId());
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public String rejectRequest(Integer queryRecordId) {
+        requestStatusList.get(queryRecordId).nextStatus("rejected", "review", "{'statusRejectedText':'rejected'}", userBean.getUserId());
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
     }
 
     public List getListOfRequestsToReview() {

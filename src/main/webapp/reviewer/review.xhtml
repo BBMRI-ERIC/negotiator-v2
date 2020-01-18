@@ -95,7 +95,19 @@
                                 <td>#{queryRecord.researcherName}<br/>#{queryRecord.researcherEmail}<br/>#{queryRecord.researcherOrganization}</td>
                                 <td>#{queryRecord.requestDescription}</td>
                                 <td>#{queryRecord.ethicsVote}</td>
-                                <td><button class="btn btn-success"><i class="glyphicon glyphicon-ok"></i> Approve</button>  <button class="btn btn-danger"><i class="fa fa-close"></i> Reject</button></td>
+                                <td>
+                                    <h:form id="approveRequest">
+                                        <h:commandButton action="#{reviewBean.approveRequest(queryRecord.id)}"
+                                                         value="Approve"
+                                                         title="Approve"
+                                                         styleClass="btn btn-success" />
+                                        <h:commandButton action="#{reviewBean.rejectRequest(queryRecord.id)}"
+                                                         value="Reject"
+                                                         title="Reject"
+                                                         styleClass="btn btn-danger" />
+                                    </h:form>
+                                </td>
+
                             </tr>
                         </ui:repeat>
                     </tbody>

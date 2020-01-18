@@ -12,7 +12,7 @@ public class RequestStatusCreate implements RequestStatus {
     private String statusType = "created";
     private String statusText = "Request created";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("review");
+    private List allowedNextStatus = Arrays.asList("under_review");
 
     public RequestStatusCreate(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();

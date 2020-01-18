@@ -8,12 +8,14 @@ import java.util.List;
 
 public class RequestStatusStart implements RequestStatus {
 
+    private String status = null;
     private String statusType = "start";
     private String statusText = "Start Negotiation";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("review");
+    private List allowedNextStatus = Arrays.asList("started");
 
     public RequestStatusStart(RequestStatusDTO requestStatus) {
+        status = requestStatus.getStatus();
         statusDate = requestStatus.getStatusDate();
     }
 
@@ -24,7 +26,7 @@ public class RequestStatusStart implements RequestStatus {
 
     @Override
     public String getStatus() {
-        return null;
+        return status;
     }
 
     @Override
@@ -44,6 +46,6 @@ public class RequestStatusStart implements RequestStatus {
 
     @Override
     public List getAllowedNextStatus() {
-        return null;
+        return allowedNextStatus;
     }
 }

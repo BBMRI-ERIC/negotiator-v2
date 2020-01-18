@@ -46,6 +46,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -152,6 +153,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
     private DataCache dataCache = DataCache.getInstance();
 
+    private RequestLifeCycleStatus requestLifeCycleStatus = null;
+
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
@@ -217,6 +220,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
                 setHumanReadableQuery(queryDTO.getHumanReadable());
             }
+            requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+            requestLifeCycleStatus.initialise();
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -522,5 +527,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public Person getUserDataForResearcher(Integer researcherId) {
         Person requester = this.userBean.getPerson();
         return requester;
+    }
+
+    public RequestLifeCycleStatus getRequestLifeCycleStatus() {
+        return requestLifeCycleStatus;
     }
 }

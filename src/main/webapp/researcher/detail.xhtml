@@ -154,17 +154,24 @@
                     <h:panelGroup styleClass="col-md-12" >
                         <h:panelGroup styleClass="col-md-4" >
                         </h:panelGroup>
-                        <h:panelGroup styleClass="col-md-4" >
+                        <h:panelGroup styleClass="col-md-4" rendered="#{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().status.equals('waitingstart')}">
                             <h:form id="form">
                                 <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                                <!--rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime == null}"-->
                                 <h:commandButton id="startNegotiation"
-                                                 rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime == null}"
+
                                                  value="#{label['querydetail.action.startNegotiation.buttonText']}"
                                                  action="#{researcherQueriesDetailBean.startNegotiation()}"
                                                  title="#{label['querydetail.tooltip.startNegotiation']}"
                                                  styleClass="btn btn-primary" style="margin-top: 40px"/>
                             </h:form>
 
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-4" rendered="#{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().status.equals('rejected')}">
+                            <h2>The request was rejected by BBMRI-ERIC.</h2>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-4" rendered="#{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().status.equals('under_review')}">
+                            <h2>Request is under review by BBMRI-ERIC.</h2>
                         </h:panelGroup>
                         <h:panelGroup styleClass="col-md-4" >
                         </h:panelGroup>
