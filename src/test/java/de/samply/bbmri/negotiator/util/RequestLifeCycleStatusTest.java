@@ -92,6 +92,32 @@ public class RequestLifeCycleStatusTest {
     }
 
     @Test
+    @DisplayName("Test get Lifercycle Status for created requests with alternative initialise.")
+    void testStatusCreateRequestStatusAlternativeInitialise() {
+        when(requestStatusCreate.getStatusType()).thenReturn("created");
+        when(requestStatusCreate.getStatusDate()).thenReturn(testRequestStatusCreateDate);
+        requestLifeCycleStatus.initialise(requestStatusCreate);
+        assertEquals(requestStatusCreate.getStatusType(), requestLifeCycleStatus.getStatus().getStatusType());
+        assertEquals(testRequestStatusCreateDate, requestLifeCycleStatus.getStatus().getStatusDate());
+    }
+
+    @Test
+    @DisplayName("Test get Lifercycle Status for review requests: under_review with alternative initialise.")
+    void testStatusReviewUnderReviewRequestStatusAlternativeInitialise() {
+        when(requestStatusCreate.getStatusType()).thenReturn("created");
+        when(requestStatusCreate.getStatusDate()).thenReturn(testRequestStatusCreateDate);
+
+        when(requestStatusReview.getStatusType()).thenReturn("review");
+        when(requestStatusReview.getStatusDate()).thenReturn(null);
+
+        requestLifeCycleStatus.initialise(requestStatusReview);
+        requestLifeCycleStatus.initialise(requestStatusCreate);
+        assertEquals(requestStatusReview.getStatusType(), requestLifeCycleStatus.getStatus().getStatusType());
+        assertEquals("under_review", requestLifeCycleStatus.getStatus().getStatus());
+        assertNull(requestLifeCycleStatus.getStatus().getStatusDate());
+    }
+
+    @Test
     @DisplayName("Test get Lifercycle Status for review requests: approved.")
     void testStatusReviewApprovedRequestStatus() {
         List<RequestStatusDTO> initRequestStatusList = new ArrayList<RequestStatusDTO>();

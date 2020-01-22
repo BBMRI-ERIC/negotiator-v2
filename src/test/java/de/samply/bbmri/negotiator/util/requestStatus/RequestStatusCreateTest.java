@@ -72,14 +72,14 @@ public class RequestStatusCreateTest {
     @Test
     @DisplayName("Test check allowed next status.")
     void testCheckAllowedNextStatus() {
-        assertEquals(true, requestStatusCreate.checkAllowedNextStatus("review"));
+        assertEquals(true, requestStatusCreate.checkAllowedNextStatus("under_review"));
         assertEquals(false, requestStatusCreate.checkAllowedNextStatus("creat"));
     }
 
     @Test
     @DisplayName("Test check all allowed next status.")
     void testAllowedNextStatusList() {
-        List allowedNextStatus = Arrays.asList("review");
+        List allowedNextStatus = Arrays.asList("under_review");
         assertEquals(allowedNextStatus, requestStatusCreate.getAllowedNextStatus());
     }
 
