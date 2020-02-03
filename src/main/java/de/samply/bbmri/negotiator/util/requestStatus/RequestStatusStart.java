@@ -12,7 +12,7 @@ public class RequestStatusStart implements RequestStatus {
     private String statusType = "start";
     private String statusText = "Start Negotiation";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("started");
+    private List allowedNextStatus = Arrays.asList("started", "abandoned");
 
     public RequestStatusStart(RequestStatusDTO requestStatus) {
         status = requestStatus.getStatus();
@@ -47,5 +47,10 @@ public class RequestStatusStart implements RequestStatus {
     @Override
     public List getAllowedNextStatus() {
         return allowedNextStatus;
+    }
+
+    @Override
+    public String getTableRow() {
+        return "<tr><td>" + statusDate + "</td><td>start</td><td></td><td></tr>";
     }
 }

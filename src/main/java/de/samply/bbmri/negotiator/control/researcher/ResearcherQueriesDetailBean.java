@@ -243,6 +243,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public String startNegotiation() {
         try (Config config = ConfigFactory.get()) {
             DbUtil.startNegotiation(config, selectedQuery.getId());
+            requestLifeCycleStatus.nextStatus("started", "start", null, userBean.getUserId());
+
             //Send out email notifications once the researcher starts negotiation.
             sendEmailsToPotentialBiobankers();
         } catch (SQLException e) {
@@ -383,6 +385,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public String getBiobankNameFromCache(Integer biobankId) {
         return dataCache.getBiobankName(biobankId);
+    }
+
+    public void abandonRequest() {
+        requestLifeCycleStatus.nextStatus("abandoned", "abandoned", null, userBean.getUserId());
     }
 
     /*

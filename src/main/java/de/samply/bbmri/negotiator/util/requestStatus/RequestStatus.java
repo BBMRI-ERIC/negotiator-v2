@@ -10,4 +10,5 @@ public interface RequestStatus {
     String getStatusText();
     boolean checkAllowedNextStatus(String review);
     List<String> getAllowedNextStatus();
+    String getTableRow();
 }

@@ -1915,7 +1915,23 @@ public class DbUtil {
         Result<RequestStatusRecord> fetch = config.dsl().selectFrom(Tables.REQUEST_STATUS)
                 .where(Tables.REQUEST_STATUS.QUERY_ID.eq(requestId))
                 .fetch();
-        return config.map(fetch, RequestStatusDTO.class);
+        List<RequestStatusDTO> returnList = new ArrayList<RequestStatusDTO>();
+        for(RequestStatusRecord requestStatusRecord : fetch) {
+            returnList.add(mapRequestStatusDTO(requestStatusRecord));
+        }
+        return returnList;
+    }
+
+    private static RequestStatusDTO mapRequestStatusDTO(RequestStatusRecord requestStatusRecord) {
+        RequestStatusDTO requestStatusDTO = new RequestStatusDTO();
+        requestStatusDTO.setId(requestStatusRecord.getId());
+        requestStatusDTO.setQueryId(requestStatusRecord.getQueryId());
+        requestStatusDTO.setStatus(requestStatusRecord.getStatus());
+        requestStatusDTO.setStatusDate(requestStatusRecord.getStatusDate());
+        requestStatusDTO.setStatusType(requestStatusRecord.getStatusType());
+        requestStatusDTO.setStatusJson(requestStatusRecord.getStatusJson());
+        requestStatusDTO.setStatusUserId(requestStatusRecord.getStatusUserId());
+        return requestStatusDTO;
     }
 
     /*
@@ -1946,7 +1962,7 @@ public class DbUtil {
                 requestStatus = config.dsl().selectFrom(Tables.REQUEST_STATUS)
                         .where(Tables.REQUEST_STATUS.ID.eq(requestStatusId)).fetchOne();
             }
-            return config.map(requestStatus, RequestStatusDTO.class);
+            return mapRequestStatusDTO(requestStatus);
         } catch (SQLException e) {
             System.err.println("ERROR saving/updating Request Status.");
             e.printStackTrace();

@@ -46,4 +46,9 @@ public class RequestStatusFinish implements RequestStatus {
     public List getAllowedNextStatus() {
         return null;
     }
+
+    @Override
+    public String getTableRow() {
+        return "<tr><td>" + statusDate + "</td><td>finish</td><td></td><td></tr>";
+    }
 }

@@ -38,6 +38,7 @@ public class RequestStatusStartTest {
     @BeforeEach
     void setUp() {
         Mockito.lenient().when(requestStatusStartDTO.getStatusType()).thenReturn("start");
+        Mockito.lenient().when(requestStatusStartDTO.getStatus()).thenReturn("waitingstart");
         Mockito.lenient().when(requestStatusStartDTO.getStatusDate()).thenReturn(null);
         requestStatusStart = new RequestStatusStart(requestStatusStartDTO);
     }
@@ -58,6 +59,12 @@ public class RequestStatusStartTest {
     @DisplayName("Test status date for start.")
     void testStatusDateNull() {
         assertEquals(null, requestStatusStart.getStatusDate());
+    }
+
+    @Test
+    @DisplayName("Test status for start.")
+    void testStatusSatus() {
+        assertEquals("waitingstart", requestStatusStart.getStatus());
     }
 
     @Test

@@ -107,4 +107,17 @@ public class RequestLifeCycleStatus {
         }
         return returnvalue;
     }
+
+    public String toHistoryTable() {
+        String htmldable = "<table class=\"table table-striped\"><thead><tr>\n" +
+                "<th scope=\"col\">Date</th>\n" +
+                "<th scope=\"col\">Status</th>\n" +
+                "<th scope=\"col\">Info</th>\n" +
+                "</tr></thead><tbody>";
+        for(Long statusid : statusTree.keySet()) {
+            htmldable += statusTree.get(statusid).getTableRow();
+        }
+        htmldable += "</tbody></table>";
+        return htmldable;
+    }
 }

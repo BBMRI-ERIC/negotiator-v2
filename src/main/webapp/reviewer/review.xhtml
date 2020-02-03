@@ -32,6 +32,10 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 template="../components/default.xhtml">
 
+    <f:metadata>
+        <f:viewAction action="#{reviewBean.initialize}" />
+    </f:metadata>
+
     <ui:param name="bodyClass" value="container body-nomargin"/>
 
     <ui:define name="body">
@@ -78,9 +82,9 @@
                             <th scope="col">#</th>
                             <th scope="col">Title</th>
                             <th scope="col">Creation Time</th>
-                            <th scope="col">Description</th>
                             <th scope="col">Researcher</th>
-                            <th scope="col">Description</th>
+                            <th scope="col">Project Description</th>
+                            <th scope="col">Request Description</th>
                             <th scope="col">Ethics Vote</th>
                             <th scope="col">Status</th>
                         </tr>
@@ -91,12 +95,15 @@
                                 <th scope="row">#{queryRecord.id}</th>
                                 <td>#{queryRecord.title}</td>
                                 <td>#{queryRecord.queryCreationTime}</td>
-                                <td>#{queryRecord.text}</td>
                                 <td>#{queryRecord.researcherName}<br/>#{queryRecord.researcherEmail}<br/>#{queryRecord.researcherOrganization}</td>
+                                <td>#{queryRecord.text}</td>
                                 <td>#{queryRecord.requestDescription}</td>
                                 <td>#{queryRecord.ethicsVote}</td>
                                 <td>
-                                    <h:form id="approveRequest">
+                                    <h:form id="approveRequest" enctype="multipart/form-data">
+                                        <h:inputTextarea id="reviewcomment" value="#{reviewBean.reviewComment}"
+                                                         styleClass="form-control" rows="5">
+                                        </h:inputTextarea>
                                         <h:commandButton action="#{reviewBean.approveRequest(queryRecord.id)}"
                                                          value="Approve"
                                                          title="Approve"

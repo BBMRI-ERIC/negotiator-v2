@@ -11,7 +11,7 @@ public class RequestStatusAbandoned implements RequestStatus {
     private String statusType = "abandoned";
     private String statusText = "Negotiation abandoned";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("review");
+    private List allowedNextStatus = Arrays.asList();
 
     public RequestStatusAbandoned(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
@@ -24,7 +24,7 @@ public class RequestStatusAbandoned implements RequestStatus {
 
     @Override
     public String getStatus() {
-        return null;
+        return "abandoned";
     }
 
     @Override
@@ -45,5 +45,10 @@ public class RequestStatusAbandoned implements RequestStatus {
     @Override
     public List getAllowedNextStatus() {
         return null;
+    }
+
+    @Override
+    public String getTableRow() {
+        return "<tr><td>" + statusDate + "</td><td>abandoned</td><td></td><td></tr>";
     }
 }

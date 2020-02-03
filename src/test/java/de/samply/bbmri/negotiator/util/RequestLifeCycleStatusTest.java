@@ -153,7 +153,7 @@ public class RequestLifeCycleStatusTest {
         requestLifeCycleStatus.initialise(initRequestStatusList);
         assertEquals(requestStatusReview.getStatusType(), requestLifeCycleStatus.getStatus().getStatusType());
         assertEquals(requestStatusReview.getStatus(), requestLifeCycleStatus.getStatus().getStatus());
-        assertEquals("Not a project that can be supported by BBMRI-ERIC.", ((RequestStatusReview)requestLifeCycleStatus.getStatus()).getStatusRejectedText());
+        assertEquals("Not a project that can be supported by BBMRI-ERIC.", requestLifeCycleStatus.getStatus().getStatusText());
         assertEquals(testRequestStatusReviewDate, requestLifeCycleStatus.getStatus().getStatusDate());
     }
 

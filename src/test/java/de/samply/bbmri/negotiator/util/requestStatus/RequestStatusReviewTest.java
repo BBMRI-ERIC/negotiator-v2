@@ -64,19 +64,12 @@ public class RequestStatusReviewTest {
     }
 
     @Test
-    @DisplayName("Test status rejected text for reviewed not set.")
-    void testStatusRejectedText() {
-        assertEquals(null, requestStatusReview.getStatusRejectedText());
-    }
-
-    @Test
     @DisplayName("Test status for reviewed: under_review")
     void testStatusUnderReview() {
         assertEquals("under_review", requestStatusReview.getStatus());
         assertEquals("Request under review", requestStatusReview.getStatusText());
         assertEquals("review", requestStatusReview.getStatusType());
         assertNull(requestStatusReview.getStatusDate());
-        assertEquals(null, requestStatusReview.getStatusRejectedText());
     }
 
     @Test
@@ -89,7 +82,7 @@ public class RequestStatusReviewTest {
         assertEquals("rejected", requestStatusReview.getStatus());
         assertEquals(testDate, requestStatusReview.getStatusDate());
         assertEquals("review", requestStatusReview.getStatusType());
-        assertEquals("Not a project that can be supported by BBMRI-ERIC.", requestStatusReview.getStatusRejectedText());
+        assertEquals("Not a project that can be supported by BBMRI-ERIC.", requestStatusReview.getStatusText());
     }
 
     @Test
@@ -97,11 +90,12 @@ public class RequestStatusReviewTest {
     void testStatusApproved() {
         Mockito.lenient().when(requestStatusReviewDTO.getStatus()).thenReturn("approved");
         Mockito.lenient().when(requestStatusReviewDTO.getStatusDate()).thenReturn(testDate);
+        Mockito.lenient().when(requestStatusReviewDTO.getStatusJson()).thenReturn("{\"statusApprovedText\": \"Request approved.\"}");
         requestStatusReview = new RequestStatusReview(requestStatusReviewDTO);
         assertEquals("approved", requestStatusReview.getStatus());
         assertEquals(testDate, requestStatusReview.getStatusDate());
         assertEquals("review", requestStatusReview.getStatusType());
-        assertEquals(null, requestStatusReview.getStatusRejectedText());
+        assertEquals("Request approved.", requestStatusReview.getStatusText());
     }
 
     @Test

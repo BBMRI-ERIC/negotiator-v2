@@ -15,7 +15,6 @@ public class RequestStatusReview implements RequestStatus {
     private String statusType = "review";
     private String statusText = "Request under review";
     private Date statusDate = null;
-    private String statusRejectedText = null;
     private List allowedNextStatus = Arrays.asList("waitingstart", "abandoned", "approved", "rejected");
 
     public RequestStatusReview(RequestStatusDTO requestStatus) {
@@ -24,7 +23,9 @@ public class RequestStatusReview implements RequestStatus {
         if(status == null) {
             status = "under_review";
         } else if(status.equals("rejected")) {
-            statusRejectedText = getStatusRejectedTextFromJson(requestStatus.getStatusJson());
+            statusText = getStatusTextFromJson(requestStatus.getStatusJson(), "statusRejectedText");
+        } else if(status.equals("approved")) {
+            statusText = getStatusTextFromJson(requestStatus.getStatusJson(), "statusApprovedText");
         }
     }
 
@@ -48,16 +49,15 @@ public class RequestStatusReview implements RequestStatus {
         return statusText;
     }
 
-    public String getStatusRejectedText() {
-        return statusRejectedText;
-    }
-
-    private String getStatusRejectedTextFromJson(String statusJsonString) {
+    private String getStatusTextFromJson(String statusJsonString, String jsonKey) {
         String returnText = "";
+        if(statusJsonString == null) {
+            return returnText;
+        }
         try {
             JSONObject statusJson = (JSONObject)new JSONParser().parse(statusJsonString);
-            if(statusJson.containsKey("statusRejectedText")) {
-                returnText = statusJson.get("statusRejectedText").toString();
+            if(statusJson.containsKey(jsonKey)) {
+                returnText = statusJson.get(jsonKey).toString();
             }
         } catch (ParseException e) {
             e.printStackTrace();
@@ -73,5 +73,10 @@ public class RequestStatusReview implements RequestStatus {
     @Override
     public List getAllowedNextStatus() {
         return allowedNextStatus;
+    }
+
+    @Override
+    public String getTableRow() {
+        return "<tr><td>" + statusDate + "</td><td>review</td><td></td><td></tr>";
     }
 }

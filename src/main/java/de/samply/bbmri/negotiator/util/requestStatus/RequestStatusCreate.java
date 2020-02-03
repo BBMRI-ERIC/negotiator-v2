@@ -47,4 +47,9 @@ public class RequestStatusCreate implements RequestStatus {
     public List getAllowedNextStatus() {
         return allowedNextStatus;
     }
+
+    @Override
+    public String getTableRow() {
+        return "<tr><td>" + statusDate + "</td><td>created</td><td></td><td></tr>";
+    }
 }

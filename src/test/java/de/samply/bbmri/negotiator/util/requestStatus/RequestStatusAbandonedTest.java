@@ -65,4 +65,11 @@ public class RequestStatusAbandonedTest {
         Mockito.lenient().when(requestStatusAbandonedDTO.getStatusDate()).thenReturn(testDate);
         assertEquals(testDate, requestStatusAbandoned.getStatusDate());
     }
+
+    @Test
+    @DisplayName("Test html row creation for abandoned.")
+    void testStatusCreateHtmlRow() {
+        Mockito.lenient().when(requestStatusAbandonedDTO.getStatusDate()).thenReturn(testDate);
+        assertEquals("<tr><td>24-05-2001</td><td>abandoned</td><td></td><td></tr>", requestStatusAbandoned.getTableRow());
+    }
 }

@@ -34,11 +34,16 @@ public class ReviewBean implements Serializable {
     private List reviewRequest;
     private HashMap<Integer, RequestLifeCycleStatus> requestStatusList = new HashMap<Integer, RequestLifeCycleStatus>();
     private List<QueryRecord> queryRecordList = new ArrayList<QueryRecord>();
+    private String reviewComment = "";
 
     @PostConstruct
     public void init() {
         collectLifecycleStatistic();
         createRequestStatusQueriesToReview();
+    }
+
+    public void initialize() {
+
     }
 
     private void collectLifecycleStatistic() {
@@ -71,14 +76,14 @@ public class ReviewBean implements Serializable {
     }
 
     public String approveRequest(Integer queryRecordId) {
-        requestStatusList.get(queryRecordId).nextStatus("approved", "review", null, userBean.getUserId());
+        requestStatusList.get(queryRecordId).nextStatus("approved", "review", "{\"statusApprovedText\":\"" + reviewComment + "\"}", userBean.getUserId());
         requestStatusList.get(queryRecordId).nextStatus("waitingstart", "start", null, userBean.getUserId());
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
     }
 
     public String rejectRequest(Integer queryRecordId) {
-        requestStatusList.get(queryRecordId).nextStatus("rejected", "review", "{'statusRejectedText':'rejected'}", userBean.getUserId());
+        requestStatusList.get(queryRecordId).nextStatus("rejected", "review", "{\"statusRejectedText\":\"" + reviewComment + "\"}", userBean.getUserId());
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
     }
@@ -109,5 +114,13 @@ public class ReviewBean implements Serializable {
 
     public List<QueryRecord> getQueryRecordList() {
         return queryRecordList;
+    }
+
+    public String getReviewComment() {
+        return reviewComment;
+    }
+
+    public void setReviewComment(String reviewComment) {
+        this.reviewComment = reviewComment;
     }
 }

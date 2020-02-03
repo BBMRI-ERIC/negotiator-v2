@@ -169,7 +169,7 @@
 					<h:inputText id="title" value="#{queryBean.queryTitle}"
 						styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
 						validatorMessage="#{label['error.invalidTitleLength']}">
-						<f:validateLength for="title" minimum="5" maximum="250" />
+						<f:validateLength for="title" maximum="250" />
 					</h:inputText>
 					<h:message for="title" style="color:red" styleClass="pre-wrap" />
 
@@ -180,7 +180,7 @@
 					<h:inputTextarea id="description" value="#{queryBean.queryText}"
 						styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.text']}"
 						validatorMessage="#{label['error.invalidDescriptionLength']}">
-						<f:validateLength for="description" minimum="5" maximum="6000" />
+						<f:validateLength for="description" maximum="6000" />
 					</h:inputTextarea>
 					<h:message for="description" style="color:red"
 						styleClass="pre-wrap" />
@@ -193,7 +193,7 @@
 									 styleClass="form-control" rows="5"
                                      pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
 									 validatorMessage="#{label['error.invalidDescriptionLength']}">
-						<f:validateLength for="requestdescription" minimum="5" maximum="6000" />							<!-- LENGTH Increased -->
+						<f:validateLength for="requestdescription" maximum="6000" />							<!-- LENGTH Increased -->
 					</h:inputTextarea>
 					<h:message for="requestdescription" style="color:red"
 							   styleClass="pre-wrap" />
