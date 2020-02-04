@@ -3,6 +3,7 @@ package de.samply.bbmri.negotiator.util;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.requestStatus.*;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -19,6 +21,7 @@ public class RequestLifeCycleStatus {
     private static Logger logger = LoggerFactory.getLogger(RequestLifeCycleStatus.class);
 
     private TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
+    private HashMap<Integer, CollectionLifeCycleStatus> collectionStatusList = null;
     private RequestStatus requesterAbandonedRequest = null;
     private Integer query_id = null;
 
@@ -59,8 +62,27 @@ public class RequestLifeCycleStatus {
         requestStatusFactory(requestStatusDTO);
     }
 
-    public void contactCollectionRepresentatives() {
+    public void initialiseCollectionStatus() {
+        if(collectionStatusList == null) {
+            collectionStatusList = new HashMap<Integer, CollectionLifeCycleStatus>();
+        }
+        try(Config config = ConfigFactory.get()) {
+            List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtil.getCollectionsForQuery(config, query_id);
+            for(CollectionBiobankDTO collectionBiobankDTO : collectionBiobankDTOList) {
+                collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId()));
+                collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).initialise();
+            }
+        } catch (Exception e) {
+            logger.error("ERROR-NG-0000003: Error getting collections for query. queryis:" + query_id);
+            e.printStackTrace();
+        }
+        //TODO: Load list of collections for request
+    }
 
+    public void contactCollectionRepresentatives() {
+        if(collectionStatusList == null) {
+            initialiseCollectionStatus();
+        }
     }
 
     private void requestStatusFactory(RequestStatusDTO requestStatus) {

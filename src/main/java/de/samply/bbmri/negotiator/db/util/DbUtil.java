@@ -1922,11 +1922,6 @@ public class DbUtil {
         return returnList;
     }
 
-    public static List<Collection> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
-        //TODO: Implement methode
-        return null;
-    }
-
     private static RequestStatusDTO mapRequestStatusDTO(RequestStatusRecord requestStatusRecord) {
         RequestStatusDTO requestStatusDTO = new RequestStatusDTO();
         requestStatusDTO.setId(requestStatusRecord.getId());
@@ -1937,6 +1932,31 @@ public class DbUtil {
         requestStatusDTO.setStatusJson(requestStatusRecord.getStatusJson());
         requestStatusDTO.setStatusUserId(requestStatusRecord.getStatusUserId());
         return requestStatusDTO;
+    }
+
+    public static List<CollectionRequestStatusDTO> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
+        Result<QueryLifecycleCollectionRecord> fetch = config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
+                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
+                .and(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID.eq(collectionId))
+                .fetch();
+        List<CollectionRequestStatusDTO> returnList = new ArrayList<CollectionRequestStatusDTO>();
+        for(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord : fetch) {
+            returnList.add(mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
+        }
+        return null;
+    }
+
+    private static CollectionRequestStatusDTO mapCollectionRequestStatusDTO(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord) {
+        CollectionRequestStatusDTO collectionRequestStatusDTO = new CollectionRequestStatusDTO();
+        collectionRequestStatusDTO.setId(queryLifecycleCollectionRecord.getId());
+        collectionRequestStatusDTO.setQueryId(queryLifecycleCollectionRecord.getQueryId());
+        collectionRequestStatusDTO.setCollectionId(queryLifecycleCollectionRecord.getCollectionId());
+        collectionRequestStatusDTO.setStatus(queryLifecycleCollectionRecord.getStatus());
+        collectionRequestStatusDTO.setStatusDate(queryLifecycleCollectionRecord.getStatusDate());
+        collectionRequestStatusDTO.setStatusType(queryLifecycleCollectionRecord.getStatusType());
+        collectionRequestStatusDTO.setStatusJson(queryLifecycleCollectionRecord.getStatusJson());
+        collectionRequestStatusDTO.setStatusUserId(queryLifecycleCollectionRecord.getStatusUserId());
+        return collectionRequestStatusDTO;
     }
 
     /*

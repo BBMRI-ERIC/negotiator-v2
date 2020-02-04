@@ -52,7 +52,7 @@ public class RequestStatusReviewTest {
     }
 
     @Test
-    @DisplayName("Test status type reviewed.")
+    @DisplayName("Test status text reviewed.")
     void testStatusTextCreated() {
         assertEquals("Request under review", requestStatusReview.getStatusText());
     }
