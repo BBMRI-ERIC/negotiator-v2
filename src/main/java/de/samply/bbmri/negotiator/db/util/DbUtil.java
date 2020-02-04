@@ -1922,6 +1922,11 @@ public class DbUtil {
         return returnList;
     }
 
+    public static List<Collection> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
+        //TODO: Implement methode
+        return null;
+    }
+
     private static RequestStatusDTO mapRequestStatusDTO(RequestStatusRecord requestStatusRecord) {
         RequestStatusDTO requestStatusDTO = new RequestStatusDTO();
         requestStatusDTO.setId(requestStatusRecord.getId());

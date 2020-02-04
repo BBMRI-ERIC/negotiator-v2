@@ -16,7 +16,7 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
-@DisplayName("Test RequestStatus start request.")
+@DisplayName("Test RequestStatus request.")
 @ExtendWith(MockitoExtension.class)
 public class RequestStatusStartTest {
 
