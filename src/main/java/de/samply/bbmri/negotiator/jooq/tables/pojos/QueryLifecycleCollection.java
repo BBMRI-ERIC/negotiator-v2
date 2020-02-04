@@ -23,36 +23,48 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryLifecycleCollection implements Serializable {
 
-	private static final long serialVersionUID = 1013276630;
+	private static final long serialVersionUID = -984475509;
 
 	private Integer   queryId;
-	private Integer   personId;
+	private Integer   statusUserId;
 	private Integer   collectionId;
 	private String    status;
-	private Timestamp lifecycleTime;
+	private Timestamp statusDate;
+	private Integer   id;
+	private String    statusType;
+	private String    statusJson;
 
 	public QueryLifecycleCollection() {}
 
 	public QueryLifecycleCollection(QueryLifecycleCollection value) {
 		this.queryId = value.queryId;
-		this.personId = value.personId;
+		this.statusUserId = value.statusUserId;
 		this.collectionId = value.collectionId;
 		this.status = value.status;
-		this.lifecycleTime = value.lifecycleTime;
+		this.statusDate = value.statusDate;
+		this.id = value.id;
+		this.statusType = value.statusType;
+		this.statusJson = value.statusJson;
 	}
 
 	public QueryLifecycleCollection(
 		Integer   queryId,
-		Integer   personId,
+		Integer   statusUserId,
 		Integer   collectionId,
 		String    status,
-		Timestamp lifecycleTime
+		Timestamp statusDate,
+		Integer   id,
+		String    statusType,
+		String    statusJson
 	) {
 		this.queryId = queryId;
-		this.personId = personId;
+		this.statusUserId = statusUserId;
 		this.collectionId = collectionId;
 		this.status = status;
-		this.lifecycleTime = lifecycleTime;
+		this.statusDate = statusDate;
+		this.id = id;
+		this.statusType = statusType;
+		this.statusJson = statusJson;
 	}
 
 	public Integer getQueryId() {
@@ -63,12 +75,12 @@ public class QueryLifecycleCollection implements Serializable {
 		this.queryId = queryId;
 	}
 
-	public Integer getPersonId() {
-		return this.personId;
+	public Integer getStatusUserId() {
+		return this.statusUserId;
 	}
 
-	public void setPersonId(Integer personId) {
-		this.personId = personId;
+	public void setStatusUserId(Integer statusUserId) {
+		this.statusUserId = statusUserId;
 	}
 
 	public Integer getCollectionId() {
@@ -87,11 +99,35 @@ public class QueryLifecycleCollection implements Serializable {
 		this.status = status;
 	}
 
-	public Timestamp getLifecycleTime() {
-		return this.lifecycleTime;
+	public Timestamp getStatusDate() {
+		return this.statusDate;
 	}
 
-	public void setLifecycleTime(Timestamp lifecycleTime) {
-		this.lifecycleTime = lifecycleTime;
+	public void setStatusDate(Timestamp statusDate) {
+		this.statusDate = statusDate;
+	}
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getStatusType() {
+		return this.statusType;
+	}
+
+	public void setStatusType(String statusType) {
+		this.statusType = statusType;
+	}
+
+	public String getStatusJson() {
+		return this.statusJson;
+	}
+
+	public void setStatusJson(String statusJson) {
+		this.statusJson = statusJson;
 	}
 }
