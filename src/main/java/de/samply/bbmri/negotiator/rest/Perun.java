@@ -1,9 +1,11 @@
 package de.samply.bbmri.negotiator.rest;
 
+import java.io.BufferedReader;
 import java.sql.SQLException;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -12,6 +14,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.json.HTTP;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +88,7 @@ public class Perun {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postMapping(Collection<PerunMappingDTO> mappings, @Context HttpServletRequest request) {
         logger.debug("Checking perun authentication");
+
         Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
         AuthenticationService.authenticate(request, negotiator.getPerunUsername(), negotiator.getPerunPassword());
 
