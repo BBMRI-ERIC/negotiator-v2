@@ -1995,6 +1995,41 @@ public class DbUtil {
         return null;
     }
 
+    public static CollectionRequestStatusDTO saveUpdateCollectionRequestStatus(Integer collectionRequestStatusId, Integer query_id, Integer collection_id, String status, String status_type, String status_json, Date status_date, Integer status_user_id) {
+        QueryLifecycleCollectionRecord collectionRequestStatus = null;
+        try (Config config = ConfigFactory.get()) {
+            if(collectionRequestStatusId == null) {
+                collectionRequestStatus = config.dsl().newRecord(Tables.QUERY_LIFECYCLE_COLLECTION);
+                collectionRequestStatus.setQueryId(query_id);
+                collectionRequestStatus.setCollectionId(collection_id);
+                collectionRequestStatus.setStatus(status);
+                collectionRequestStatus.setStatusType(status_type);
+                collectionRequestStatus.setStatusJson(status_json);
+                collectionRequestStatus.setStatusDate(new Timestamp(status_date.getTime()));
+                collectionRequestStatus.setStatusUserId(status_user_id);
+                collectionRequestStatus.store();
+                config.commit();
+            } else {
+                config.dsl().update(Tables.QUERY_LIFECYCLE_COLLECTION)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID, query_id)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID, collection_id)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS, status)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_TYPE, status_type)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_JSON, status_json)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_DATE, new Timestamp(status_date.getTime()))
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_USER_ID, status_user_id).where(Tables.QUERY_LIFECYCLE_COLLECTION.ID.eq(collectionRequestStatusId)).execute();
+                config.commit();
+                collectionRequestStatus = config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
+                        .where(Tables.QUERY_LIFECYCLE_COLLECTION.ID.eq(collectionRequestStatusId)).fetchOne();
+            }
+            return mapCollectionRequestStatusDTO(collectionRequestStatus);
+        } catch (SQLException e) {
+            System.err.println("ERROR saving/updating Request Status.");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static HashMap<String, String> getOpenRequests() {
         HashMap<String, String> returnlist = new HashMap<String, String>();
         try (Config config = ConfigFactory.get()) {

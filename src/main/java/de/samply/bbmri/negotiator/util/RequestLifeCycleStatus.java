@@ -76,12 +76,17 @@ public class RequestLifeCycleStatus {
             logger.error("ERROR-NG-0000003: Error getting collections for query. queryis:" + query_id);
             e.printStackTrace();
         }
-        //TODO: Load list of collections for request
     }
 
-    public void contactCollectionRepresentatives() {
+    public void contactCollectionRepresentatives(Integer userId) {
         if(collectionStatusList == null) {
             initialiseCollectionStatus();
+        }
+        //TODO: Contact Biobanks
+        for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
+            CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
+            //TODO: Send mail notification
+            collectionLifeCycleStatus.nextStatus("contact", "contact", "{JSON With details}", userId);
         }
     }
 
@@ -120,7 +125,7 @@ public class RequestLifeCycleStatus {
             RequestStatusDTO requestStatusDTO = createRequestStatusInDB(status, statusType, status_json, status_user_id);
             requestStatusFactory(requestStatusDTO);
         } else {
-            System.err.println("ERROR: Request Status, wrong next status Provided.");
+            System.err.println("ERROR-NG-0000005: Request Status, wrong next status Provided.");
             System.err.println("Status is: " + getStatus().getStatusType() + " - " + getStatus().getStatus());
             System.err.println("Requeste Status is: " + statusType + " - " + status + " ( allowed: " + getAllowedNextStatusErrorString(getStatus().getAllowedNextStatus()) + ")");
         }

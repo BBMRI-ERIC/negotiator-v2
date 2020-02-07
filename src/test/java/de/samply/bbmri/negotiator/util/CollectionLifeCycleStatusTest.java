@@ -7,4 +7,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("Test Collection RequestStatus request.")
 @ExtendWith(MockitoExtension.class)
 public class CollectionLifeCycleStatusTest {
+
+
 }
