@@ -1371,52 +1371,57 @@ public class DbUtil {
      * @param mapping
      */
     public static void savePerunMapping(Config config, PerunMappingDTO mapping) {
-        DSLContext dsl = config.dsl();
+        try {
+            DSLContext dsl = config.dsl();
 
-        String collectionId = mapping.getName();
+            String collectionId = mapping.getName();
 
-        ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectory(config, mapping.getDirectory());
-        List<CollectionRecord> collections = getCollections(config, collectionId, listOfDirectoriesRecord.getId());
+            ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectory(config, mapping.getDirectory());
+            List<CollectionRecord> collections = getCollections(config, collectionId, listOfDirectoriesRecord.getId());
 
-        for(CollectionRecord collection : collections) {
-            if(collection != null) {
-                logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
-                dsl.deleteFrom(Tables.PERSON_COLLECTION)
-                        .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId()))
-                        .execute();
+            for (CollectionRecord collection : collections) {
+                if (collection != null) {
+                    logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
+                    dsl.deleteFrom(Tables.PERSON_COLLECTION)
+                            .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId()))
+                            .execute();
 
-                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                    logger.info("-->BUG0000068--> Perun mapping Members: {}", member.getUserId());
-                    PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
+                    for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                        logger.info("-->BUG0000068--> Perun mapping Members: {}", member.getUserId());
+                        PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
 
-                    try {
-                        config.commit();
-                        if (personRecord != null) {
-                            PersonCollectionRecord personCollectionRecordExists = dsl.selectFrom(Tables.PERSON_COLLECTION)
-                                    .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).
-                                            and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personRecord.getId())).fetchOne();
-                            if (personCollectionRecordExists == null) {
-                                logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
-                                PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
-                                personCollectionRecord.setCollectionId(collection.getId());
-                                personCollectionRecord.setPersonId(personRecord.getId());
-                                personCollectionRecord.store();
-                                config.commit();
-                            } else {
-                                logger.info("-->BUG0000068--> Perun mapping Members alredy exists: COLLECTION_ID - {} PERSON_ID - {}", collection.getId(), personRecord.getId());
-                            }
-                        }
-                    } catch (Exception ex) {
-                        System.err.println("-->BUG0000068--> savePerunMapping");
-                        ex.printStackTrace();
                         try {
-                            config.rollback();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
+                            config.commit();
+                            if (personRecord != null) {
+                                PersonCollectionRecord personCollectionRecordExists = dsl.selectFrom(Tables.PERSON_COLLECTION)
+                                        .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).
+                                                and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personRecord.getId())).fetchOne();
+                                if (personCollectionRecordExists == null) {
+                                    logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
+                                    PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
+                                    personCollectionRecord.setCollectionId(collection.getId());
+                                    personCollectionRecord.setPersonId(personRecord.getId());
+                                    personCollectionRecord.store();
+                                    config.commit();
+                                } else {
+                                    logger.info("-->BUG0000068--> Perun mapping Members alredy exists: COLLECTION_ID - {} PERSON_ID - {}", collection.getId(), personRecord.getId());
+                                }
+                            }
+                        } catch (Exception ex) {
+                            System.err.println("-->BUG0000068--> savePerunMapping inner");
+                            ex.printStackTrace();
+                            /*try {
+                                config.rollback();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }*/
                         }
                     }
                 }
             }
+        } catch (Exception ex) {
+            System.err.println("-->BUG0000105--> savePerunMapping outer");
+            ex.printStackTrace();
         }
     }
 

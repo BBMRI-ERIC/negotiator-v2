@@ -3,6 +3,7 @@ package de.samply.bbmri.negotiator.rest;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +41,7 @@ public class Perun {
      * The logger for all perun rest endpoints
      */
     private static final Logger logger = LoggerFactory.getLogger(Perun.class);
+    private HashMap<String, Integer> mapping_updates_collections = new HashMap<String, Integer>();
 
     /**
      * Accepts a list of perun users and puts them into the database
@@ -94,27 +96,6 @@ public class Perun {
 
         logger.info("Synchronizing user collection mapping from Perun");
 
-        /*try (FileWriter writer = new FileWriter("/tmp/perun_app.log");
-             BufferedWriter bw = new BufferedWriter(writer)) {
-
-            bw.write("ID;NAME/collectionId;Directory;IDs\n");
-            for(PerunMappingDTO mapping : mappings) {
-                String row = "";
-                row += mapping.getId()+";";
-                row += mapping.getName()+";";
-                row += mapping.getDirectory()+";";
-                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                    row += member.getUserId() + ",";
-                }
-                bw.write(row+"\n");
-            }
-
-        } catch (IOException e) {
-            System.err.format("IOException: %s%n", e);
-        }*/
-
-
-
         try(Config config = ConfigFactory.get()) {
             for(PerunMappingDTO mapping : mappings) {
                 if(StringUtil.isEmpty(mapping.getId()) || StringUtil.isEmpty(mapping.getName())) {
@@ -123,17 +104,24 @@ public class Perun {
                     NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, "No ID or name: " + mapping.getId());
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
-
-                logger.info("-->BUG0000068--> Perun mapping ID: {}", mapping.getId());
-                logger.info("-->BUG0000068--> Perun mapping Name: {}", mapping.getName());
-
+                logger.info("-->INFO00001--> Directory: {} CollectionID: {}", mapping.getDirectory(), mapping.getName());
+                if(mapping.getDirectory().equals("BBMRI-ERIC Directory")) {
+                    String text = "";
+                    for(PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                        text += member.getUserId() + " ";
+                    }
+                    logger.info("-->INFO00002--> Directory: {} CollectionID: {} -> {}", mapping.getDirectory(), mapping.getName(), text);
+                }
+                updateCollectionMappingCount(mapping.getDirectory());
                 DbUtil.savePerunMapping(config, mapping);
             }
             logger.info("Synchronizing user collection mapping with Perun finished");
+            String satusUpdateString = generateSatusUpdateString();
+            logger.info("-->INFO00002" + satusUpdateString);
             config.commit();
 
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING,
-                    "Mappings: " + mappings.size());
+                    satusUpdateString);
 
             return Response.ok().build();
         } catch (SQLException e) {
@@ -142,6 +130,21 @@ public class Perun {
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, e.getMessage());
             return Response.serverError().build();
         }
+    }
+
+    private void updateCollectionMappingCount(String directory) {
+        if(!mapping_updates_collections.containsKey(directory)) {
+            mapping_updates_collections.put(directory, 0);
+        }
+        mapping_updates_collections.put(directory, mapping_updates_collections.get(directory) + 1);
+    }
+
+    private String generateSatusUpdateString() {
+        String msg = "Mappings: <br>";
+        for(String key : mapping_updates_collections.keySet()) {
+            msg += key + ": " + mapping_updates_collections.get(key) + "<br>";
+        }
+        return msg;
     }
 
 }
