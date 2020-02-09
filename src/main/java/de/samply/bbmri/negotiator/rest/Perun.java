@@ -1,9 +1,11 @@
 package de.samply.bbmri.negotiator.rest;
 
+import java.io.*;
 import java.sql.SQLException;
 import java.util.Collection;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -12,6 +14,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.json.HTTP;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +93,27 @@ public class Perun {
         AuthenticationService.authenticate(request, negotiator.getPerunUsername(), negotiator.getPerunPassword());
 
         logger.info("Synchronizing user collection mapping from Perun");
+
+        /*try (FileWriter writer = new FileWriter("/tmp/perun_app.log");
+             BufferedWriter bw = new BufferedWriter(writer)) {
+
+            bw.write("ID;NAME/collectionId;Directory;IDs\n");
+            for(PerunMappingDTO mapping : mappings) {
+                String row = "";
+                row += mapping.getId()+";";
+                row += mapping.getName()+";";
+                row += mapping.getDirectory()+";";
+                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                    row += member.getUserId() + ",";
+                }
+                bw.write(row+"\n");
+            }
+
+        } catch (IOException e) {
+            System.err.format("IOException: %s%n", e);
+        }*/
+
+
 
         try(Config config = ConfigFactory.get()) {
             for(PerunMappingDTO mapping : mappings) {
