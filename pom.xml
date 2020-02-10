@@ -46,8 +46,8 @@
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <!--<database.name>neg-20190910</database.name>-->
-        <database.username>postgres</database.username>
-        <database.password>0bpCP58yTJnNQmKqO9mX</database.password>
+        <database.username>negotiator</database.username>
+        <database.password>negotiator</database.password>
         <!--<database.password>0bpCP58yTJnNQmKqO9mX</database.password>-->
 
         <timestamp>${maven.build.timestamp}</timestamp>

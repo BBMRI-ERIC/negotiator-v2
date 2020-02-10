@@ -51,7 +51,8 @@
                     title="#{label['queryview.queryitem.datetime.creation']}"
                     value="#{cc.attrs.bean.selectedQuery.queryCreationTime}">
                 <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
-            </h:outputText>
+            </h:outputText><br/>
+            RequestID: #{cc.attrs.bean.selectedQuery.id}
         </h:panelGroup>
         <!--        Function for the show more button        -->
         <h4>#{label['queryview.title.text']}</h4>

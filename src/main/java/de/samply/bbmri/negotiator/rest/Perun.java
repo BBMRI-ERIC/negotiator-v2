@@ -104,20 +104,19 @@ public class Perun {
                     NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, "No ID or name: " + mapping.getId());
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
-                logger.info("-->INFO00001--> Directory: {} CollectionID: {}", mapping.getDirectory(), mapping.getName());
-                if(mapping.getDirectory().equals("BBMRI-ERIC Directory")) {
+
+                logger.debug("-->INFO00001--> Directory: {} CollectionID: {}", mapping.getDirectory(), mapping.getName());
                     String text = "";
                     for(PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
                         text += member.getUserId() + " ";
                     }
-                    logger.info("-->INFO00002--> Directory: {} CollectionID: {} -> {}", mapping.getDirectory(), mapping.getName(), text);
-                }
+                    logger.debug("-->INFO00002--> Directory: {} CollectionID: {} -> {}", mapping.getDirectory(), mapping.getName(), text);
                 updateCollectionMappingCount(mapping.getDirectory());
                 DbUtil.savePerunMapping(config, mapping);
             }
             logger.info("Synchronizing user collection mapping with Perun finished");
             String satusUpdateString = generateSatusUpdateString();
-            logger.info("-->INFO00002" + satusUpdateString);
+            logger.debug("-->INFO00002" + satusUpdateString);
             config.commit();
 
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING,
@@ -140,11 +139,10 @@ public class Perun {
     }
 
     private String generateSatusUpdateString() {
-        String msg = "Mappings: <br>";
+        String msg = "Mappings: \n";
         for(String key : mapping_updates_collections.keySet()) {
-            msg += key + ": " + mapping_updates_collections.get(key) + "<br>";
+            msg += key + ": " + mapping_updates_collections.get(key) + "\n";
         }
         return msg;
     }
-
 }

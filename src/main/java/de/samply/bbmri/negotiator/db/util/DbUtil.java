@@ -90,13 +90,25 @@ public class DbUtil {
      * @return
      */
     public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) {
-        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
-        return config.map(record, ListOfDirectoriesRecord.class);
+        try {
+            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
+            return config.map(record, ListOfDirectoriesRecord.class);
+        } catch (IllegalArgumentException e) {
+            logger.error("No Directory Entry found for ID: " + listOfDirectoryId);
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) {
-        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
-        return config.map(record, ListOfDirectoriesRecord.class);
+        try {
+            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
+            return config.map(record, ListOfDirectoriesRecord.class);
+        } catch (IllegalArgumentException e) {
+            logger.error("No Directory Entry found for DirectoryName: " + directoryName);
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
