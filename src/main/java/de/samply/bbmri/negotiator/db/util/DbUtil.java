@@ -658,7 +658,40 @@ public class DbUtil {
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return config.map(fetch, QueryStatsDTO.class);
+        return mapRecordResultQueryStatsDTOList(fetch);
+    }
+
+    private static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> records) {
+        List<QueryStatsDTO> result = new ArrayList<QueryStatsDTO>();
+        for(Record record : records) {
+            QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
+            query.setId((Integer) record.getValue("query_id"));
+            query.setTitle((String) record.getValue("query_title"));
+            query.setText((String) record.getValue("query_text"));
+            query.setQueryXml((String) record.getValue("query_query_xml"));
+            query.setQueryCreationTime((Timestamp) record.getValue("query_query_creation_time"));
+            query.setResearcherId((Integer) record.getValue("query_researcher_id"));
+            query.setJsonText((String) record.getValue("query_json_text"));
+            query.setNumAttachments((Integer) record.getValue("query_num_attachments"));
+            query.setNegotiatorToken((String) record.getValue("query_negotiator_token"));
+            query.setValidQuery((Boolean) record.getValue("query_valid_query"));
+            query.setRequestDescription((String) record.getValue("query_request_description"));
+            query.setEthicsVote((String) record.getValue("query_ethics_vote"));
+            query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
+            queryAuthor.setId((Integer) record.getValue("query_author_id"));
+            queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
+            queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
+            queryAuthor.setAuthEmail((String) record.getValue("query_author_auth_email"));
+            queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
+            queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
+            queryAuthor.setOrganization((String) record.getValue("query_author_organization"));
+            queryStatsDTO.setQuery(query);
+            queryStatsDTO.setQueryAuthor(queryAuthor);
+            result.add(queryStatsDTO);
+        }
+        return result;
     }
 
     /**
