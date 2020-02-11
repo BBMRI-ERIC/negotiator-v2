@@ -93,13 +93,25 @@ public class DbUtil {
      * @return
      */
     public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) {
-        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
-        return config.map(record, ListOfDirectoriesRecord.class);
+        try {
+            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
+            return config.map(record, ListOfDirectoriesRecord.class);
+        } catch (IllegalArgumentException e) {
+            logger.error("No Directory Entry found for ID: " + listOfDirectoryId);
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) {
-        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
-        return config.map(record, ListOfDirectoriesRecord.class);
+        try {
+            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
+            return config.map(record, ListOfDirectoriesRecord.class);
+        } catch (IllegalArgumentException e) {
+            logger.error("No Directory Entry found for DirectoryName: " + directoryName);
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -649,7 +661,40 @@ public class DbUtil {
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return config.map(fetch, QueryStatsDTO.class);
+        return mapRecordResultQueryStatsDTOList(fetch);
+    }
+
+    private static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> records) {
+        List<QueryStatsDTO> result = new ArrayList<QueryStatsDTO>();
+        for(Record record : records) {
+            QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
+            query.setId((Integer) record.getValue("query_id"));
+            query.setTitle((String) record.getValue("query_title"));
+            query.setText((String) record.getValue("query_text"));
+            query.setQueryXml((String) record.getValue("query_query_xml"));
+            query.setQueryCreationTime((Timestamp) record.getValue("query_query_creation_time"));
+            query.setResearcherId((Integer) record.getValue("query_researcher_id"));
+            query.setJsonText((String) record.getValue("query_json_text"));
+            query.setNumAttachments((Integer) record.getValue("query_num_attachments"));
+            query.setNegotiatorToken((String) record.getValue("query_negotiator_token"));
+            query.setValidQuery((Boolean) record.getValue("query_valid_query"));
+            query.setRequestDescription((String) record.getValue("query_request_description"));
+            query.setEthicsVote((String) record.getValue("query_ethics_vote"));
+            query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
+            queryAuthor.setId((Integer) record.getValue("query_author_id"));
+            queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
+            queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
+            queryAuthor.setAuthEmail((String) record.getValue("query_author_auth_email"));
+            queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
+            queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
+            queryAuthor.setOrganization((String) record.getValue("query_author_organization"));
+            queryStatsDTO.setQuery(query);
+            queryStatsDTO.setQueryAuthor(queryAuthor);
+            result.add(queryStatsDTO);
+        }
+        return result;
     }
 
     /**
@@ -1377,52 +1422,57 @@ public class DbUtil {
      * @param mapping
      */
     public static void savePerunMapping(Config config, PerunMappingDTO mapping) {
-        DSLContext dsl = config.dsl();
+        try {
+            DSLContext dsl = config.dsl();
 
-        String collectionId = mapping.getName();
+            String collectionId = mapping.getName();
 
-        ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectory(config, mapping.getDirectory());
-        List<CollectionRecord> collections = getCollections(config, collectionId, listOfDirectoriesRecord.getId());
+            ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectory(config, mapping.getDirectory());
+            List<CollectionRecord> collections = getCollections(config, collectionId, listOfDirectoriesRecord.getId());
 
-        for(CollectionRecord collection : collections) {
-            if(collection != null) {
-                logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
-                dsl.deleteFrom(Tables.PERSON_COLLECTION)
-                        .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId()))
-                        .execute();
+            for (CollectionRecord collection : collections) {
+                if (collection != null) {
+                    logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
+                    dsl.deleteFrom(Tables.PERSON_COLLECTION)
+                            .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId()))
+                            .execute();
 
-                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                    logger.info("-->BUG0000068--> Perun mapping Members: {}", member.getUserId());
-                    PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
+                    for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                        logger.info("-->BUG0000068--> Perun mapping Members: {}", member.getUserId());
+                        PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
 
-                    try {
-                        config.commit();
-                        if (personRecord != null) {
-                            PersonCollectionRecord personCollectionRecordExists = dsl.selectFrom(Tables.PERSON_COLLECTION)
-                                    .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).
-                                            and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personRecord.getId())).fetchOne();
-                            if (personCollectionRecordExists == null) {
-                                logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
-                                PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
-                                personCollectionRecord.setCollectionId(collection.getId());
-                                personCollectionRecord.setPersonId(personRecord.getId());
-                                personCollectionRecord.store();
-                                config.commit();
-                            } else {
-                                logger.info("-->BUG0000068--> Perun mapping Members alredy exists: COLLECTION_ID - {} PERSON_ID - {}", collection.getId(), personRecord.getId());
-                            }
-                        }
-                    } catch (Exception ex) {
-                        System.err.println("-->BUG0000068--> savePerunMapping");
-                        ex.printStackTrace();
                         try {
-                            config.rollback();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
+                            config.commit();
+                            if (personRecord != null) {
+                                PersonCollectionRecord personCollectionRecordExists = dsl.selectFrom(Tables.PERSON_COLLECTION)
+                                        .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).
+                                                and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personRecord.getId())).fetchOne();
+                                if (personCollectionRecordExists == null) {
+                                    logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
+                                    PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
+                                    personCollectionRecord.setCollectionId(collection.getId());
+                                    personCollectionRecord.setPersonId(personRecord.getId());
+                                    personCollectionRecord.store();
+                                    config.commit();
+                                } else {
+                                    logger.info("-->BUG0000068--> Perun mapping Members alredy exists: COLLECTION_ID - {} PERSON_ID - {}", collection.getId(), personRecord.getId());
+                                }
+                            }
+                        } catch (Exception ex) {
+                            System.err.println("-->BUG0000068--> savePerunMapping inner");
+                            ex.printStackTrace();
+                            /*try {
+                                config.rollback();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }*/
                         }
                     }
                 }
             }
+        } catch (Exception ex) {
+            System.err.println("-->BUG0000105--> savePerunMapping outer");
+            ex.printStackTrace();
         }
     }
 

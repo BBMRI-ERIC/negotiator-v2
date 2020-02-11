@@ -1,11 +1,10 @@
 package de.samply.bbmri.negotiator.rest;
 
-import java.io.BufferedReader;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,8 +13,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.json.HTTP;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +36,7 @@ public class Perun {
      * The logger for all perun rest endpoints
      */
     private static final Logger logger = LoggerFactory.getLogger(Perun.class);
+    private HashMap<String, Integer> mapping_updates_collections = new HashMap<String, Integer>();
 
     /**
      * Accepts a list of perun users and puts them into the database
@@ -88,7 +86,6 @@ public class Perun {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postMapping(Collection<PerunMappingDTO> mappings, @Context HttpServletRequest request) {
         logger.debug("Checking perun authentication");
-
         Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
         AuthenticationService.authenticate(request, negotiator.getPerunUsername(), negotiator.getPerunPassword());
 
@@ -103,16 +100,22 @@ public class Perun {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
 
-                logger.info("-->BUG0000068--> Perun mapping ID: {}", mapping.getId());
-                logger.info("-->BUG0000068--> Perun mapping Name: {}", mapping.getName());
-
+                logger.debug("-->INFO00001--> Directory: {} CollectionID: {}", mapping.getDirectory(), mapping.getName());
+                    String text = "";
+                    for(PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                        text += member.getUserId() + " ";
+                    }
+                    logger.debug("-->INFO00002--> Directory: {} CollectionID: {} -> {}", mapping.getDirectory(), mapping.getName(), text);
+                updateCollectionMappingCount(mapping.getDirectory());
                 DbUtil.savePerunMapping(config, mapping);
             }
             logger.info("Synchronizing user collection mapping with Perun finished");
+            String satusUpdateString = generateSatusUpdateString();
+            logger.debug("-->INFO00002" + satusUpdateString);
             config.commit();
 
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING,
-                    "Mappings: " + mappings.size());
+                    satusUpdateString);
 
             return Response.ok().build();
         } catch (SQLException e) {
@@ -123,4 +126,18 @@ public class Perun {
         }
     }
 
+    private void updateCollectionMappingCount(String directory) {
+        if(!mapping_updates_collections.containsKey(directory)) {
+            mapping_updates_collections.put(directory, 0);
+        }
+        mapping_updates_collections.put(directory, mapping_updates_collections.get(directory) + 1);
+    }
+
+    private String generateSatusUpdateString() {
+        String msg = "Mappings: \n";
+        for(String key : mapping_updates_collections.keySet()) {
+            msg += key + ": " + mapping_updates_collections.get(key) + "\n";
+        }
+        return msg;
+    }
 }
