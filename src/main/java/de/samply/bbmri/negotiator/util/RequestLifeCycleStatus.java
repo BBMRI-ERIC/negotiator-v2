@@ -83,6 +83,7 @@ public class RequestLifeCycleStatus {
             initialiseCollectionStatus();
         }
         //TODO: Contact Biobanks
+        //DbUtil.getPotentialNegotiators()-> mapp to collections
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
             //TODO: Send mail notification
