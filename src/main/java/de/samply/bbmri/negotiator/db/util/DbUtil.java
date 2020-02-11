@@ -1185,6 +1185,15 @@ public class DbUtil {
           return config.map(record, NegotiatorDTO.class);
     }
 
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollection(Config config, Integer collectionId) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.PERSON_COLLECTION)
+                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
+                .fetch();
+        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
+    }
+
     public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForBiobank(Config config, Integer biobankId) {
         Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
                 .from(Tables.BIOBANK)
@@ -1364,6 +1373,16 @@ public class DbUtil {
                                 .join(Tables.PERSON_COLLECTION)
                                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                                 .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
+                )).fetch(), Collection.class);
+    }
+
+    public static List<Collection> getCollections(Config config) {
+        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
+                .where(Tables.COLLECTION.ID.in(
+                        config.dsl().select(Tables.COLLECTION.ID)
+                                .from(Tables.COLLECTION)
+                                .join(Tables.PERSON_COLLECTION)
+                                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 )).fetch(), Collection.class);
     }
 

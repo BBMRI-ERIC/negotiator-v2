@@ -3,7 +3,9 @@ package de.samply.bbmri.negotiator.util;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
+import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.requestStatus.*;
 import org.slf4j.Logger;
@@ -24,6 +26,7 @@ public class RequestLifeCycleStatus {
     private HashMap<Integer, CollectionLifeCycleStatus> collectionStatusList = null;
     private RequestStatus requesterAbandonedRequest = null;
     private Integer query_id = null;
+    private DataCache dataCache = DataCache.getInstance();
 
     public RequestLifeCycleStatus(Integer query_id) {
         this.query_id = query_id;
@@ -86,8 +89,16 @@ public class RequestLifeCycleStatus {
         //DbUtil.getPotentialNegotiators()-> mapp to collections
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
-            //TODO: Send mail notification
-            collectionLifeCycleStatus.nextStatus("contact", "contact", "{JSON With details}", userId);
+            CollectionContactsDTO collectionContactsDTO = dataCache.getCollectionContacts(collectionStatusListKey);
+            List<Person> contact = collectionContactsDTO.getContacts();
+            if(contact == null) {
+                collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
+                //TODO: Contact BBMRI-ERIC with collections not reachable
+            } else {
+                //TODO: Add JSON Data.
+                collectionLifeCycleStatus.nextStatus("contact", "contact", "{JSON With details}", userId);
+                //TODO: Contact Persons.
+            }
         }
     }
 

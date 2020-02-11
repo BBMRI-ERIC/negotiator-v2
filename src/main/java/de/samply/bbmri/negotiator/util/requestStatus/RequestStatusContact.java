@@ -12,7 +12,7 @@ public class RequestStatusContact implements RequestStatus {
     private String statusType = "contact";
     private String statusText = "Collection representatives not contacted yet.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList();
+    private List allowedNextStatus = Arrays.asList("contacted", "notreachable");
 
     public RequestStatusContact(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
@@ -35,7 +35,14 @@ public class RequestStatusContact implements RequestStatus {
 
     @Override
     public String getStatusText() {
-        return statusText;
+        if(status == null) {
+            return statusText;
+        } else if (status.equals("contacted")) {
+            return "Collection representatives contacted.";
+        } else if (status.equals("notreachable")) {
+            return "Collection representatives not reachable, BBMRI-ERIC has been informed.";
+        }
+        return "ERROR";
     }
 
     @Override

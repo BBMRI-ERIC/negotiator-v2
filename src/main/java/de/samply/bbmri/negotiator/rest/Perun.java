@@ -13,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.samply.bbmri.negotiator.util.DataCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,6 +117,10 @@ public class Perun {
 
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING,
                     satusUpdateString);
+
+            logger.info("Updating Collection Contact Cache.");
+            DataCache cache = DataCache.getInstance();
+            cache.createUpdateCollectionPersons();
 
             return Response.ok().build();
         } catch (SQLException e) {
