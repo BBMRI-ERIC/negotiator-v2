@@ -21,10 +21,12 @@ public class CollectionLifeCycleStatus {
     private RequestStatus colectionAbandonedRequest = null;
     private Integer query_id = null;
     private Integer collection_id = null;
+    private String collectionReadableID = null;
 
-    public CollectionLifeCycleStatus(Integer query_id, Integer collection_id) {
+    public CollectionLifeCycleStatus(Integer query_id, Integer collection_id, String collectionReadableID) {
         this.query_id = query_id;
         this.collection_id = collection_id;
+        this.collectionReadableID = collectionReadableID;
     }
 
     public void initialise() {
@@ -96,5 +98,9 @@ public class CollectionLifeCycleStatus {
             returnvalue += value + " ";
         }
         return returnvalue;
+    }
+
+    public String getCollectionReadableID() {
+        return collectionReadableID;
     }
 }

@@ -39,7 +39,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import de.samply.bbmri.negotiator.*;
-import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
+import de.samply.bbmri.negotiator.notification.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
@@ -244,7 +244,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
             DbUtil.startNegotiation(config, selectedQuery.getId());
             requestLifeCycleStatus.nextStatus("started", "start", null, userBean.getUserId());
-
+            requestLifeCycleStatus.setQuery(selectedQuery);
+            requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
             //Send out email notifications once the researcher starts negotiation.
             sendEmailsToPotentialBiobankers();
         } catch (SQLException e) {

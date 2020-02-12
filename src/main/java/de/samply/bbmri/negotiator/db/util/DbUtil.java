@@ -394,14 +394,14 @@ public class DbUtil {
     /**
      * Get title and text of a query.
      * @param config JOOQ configuration
-     * @param id the query id for which the edit description started
+     * @param queryId the query id for which the edit description started
      * @return QueryRecord object
      * @throws SQLException
      */
-    public static QueryRecord getQueryFromId(Config config, Integer id) {
+    public static QueryRecord getQueryFromId(Config config, Integer queryId) {
         Record result = config.dsl()
                 .selectFrom(Tables.QUERY)
-                .where(Tables.QUERY.ID.eq(id))
+                .where(Tables.QUERY.ID.eq(queryId))
                 .fetchOne();
 
         return config.map(result, QueryRecord.class);

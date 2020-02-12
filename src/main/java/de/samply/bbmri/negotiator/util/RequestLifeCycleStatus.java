@@ -1,23 +1,27 @@
 package de.samply.bbmri.negotiator.util;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
+import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import de.samply.bbmri.negotiator.notification.BbmriEricUnreachableCollectionsNotification;
+import de.samply.bbmri.negotiator.notification.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.util.requestStatus.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 public class RequestLifeCycleStatus {
     private static Logger logger = LoggerFactory.getLogger(RequestLifeCycleStatus.class);
@@ -27,6 +31,7 @@ public class RequestLifeCycleStatus {
     private RequestStatus requesterAbandonedRequest = null;
     private Integer query_id = null;
     private DataCache dataCache = DataCache.getInstance();
+    private Query query = null;
 
     public RequestLifeCycleStatus(Integer query_id) {
         this.query_id = query_id;
@@ -72,7 +77,7 @@ public class RequestLifeCycleStatus {
         try(Config config = ConfigFactory.get()) {
             List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtil.getCollectionsForQuery(config, query_id);
             for(CollectionBiobankDTO collectionBiobankDTO : collectionBiobankDTOList) {
-                collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId()));
+                collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId(), collectionBiobankDTO.getCollection().getCollectionReadableID()));
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).initialise();
             }
         } catch (Exception e) {
@@ -81,24 +86,40 @@ public class RequestLifeCycleStatus {
         }
     }
 
-    public void contactCollectionRepresentatives(Integer userId) {
+    public void contactCollectionRepresentatives(Integer userId, String accessUrl) {
         if(collectionStatusList == null) {
             initialiseCollectionStatus();
         }
-        //TODO: Contact Biobanks
-        //DbUtil.getPotentialNegotiators()-> mapp to collections
+        Map<Integer, NegotiatorDTO> mailrecipients = new HashMap<Integer, NegotiatorDTO>();
+        HashSet<String> notreachable = new HashSet<String>();
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
             CollectionContactsDTO collectionContactsDTO = dataCache.getCollectionContacts(collectionStatusListKey);
-            List<Person> contact = collectionContactsDTO.getContacts();
-            if(contact == null) {
+            List<Person> contacts = collectionContactsDTO.getContacts();
+            if(contacts == null) {
                 collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
-                //TODO: Contact BBMRI-ERIC with collections not reachable
+                notreachable.add(collectionLifeCycleStatus.getCollectionReadableID());
             } else {
-                //TODO: Add JSON Data.
-                collectionLifeCycleStatus.nextStatus("contact", "contact", "{JSON With details}", userId);
-                //TODO: Contact Persons.
+                JsonArray contactJsonArray = new JsonArray();
+                for(Person contact : contacts) {
+                    NegotiatorDTO negotiatorDTO = new NegotiatorDTO();
+                    negotiatorDTO.setPerson(contact);
+                    mailrecipients.put(contact.getId(), negotiatorDTO);
+                    JsonObject person = new JsonObject();
+                    person.addProperty("AuthName", contact.getAuthName());
+                    person.addProperty("AuthEmail", contact.getAuthEmail());
+                    person.addProperty("ID", contact.getId());
+                    person.addProperty("Organization", contact.getOrganization());
+                    contactJsonArray.add(person);
+                }
+                JsonObject statusJson = new JsonObject();
+                statusJson.add("contacted", contactJsonArray);
+                collectionLifeCycleStatus.nextStatus("contacted", "contact", statusJson.toString(), userId);
             }
+        }
+        QueryEmailNotifier notifier = new QueryEmailNotifier((List<NegotiatorDTO>) mailrecipients.values(), accessUrl, query);
+        if(notreachable.size() > 1) {
+            BbmriEricUnreachableCollectionsNotification bbmrinotifier = new BbmriEricUnreachableCollectionsNotification(notreachable, accessUrl, query);
         }
     }
 
@@ -162,5 +183,44 @@ public class RequestLifeCycleStatus {
         }
         htmldable += "</tbody></table>";
         return htmldable;
+    }
+
+    private Query getQueryFromDb() {
+        try (Config config = ConfigFactory.get()) {
+            QueryRecord queryRecord = DbUtil.getQueryFromId(config, query_id);
+            Query query = new Query();
+            query.setId(queryRecord.getId());
+            query.setTitle(queryRecord.getTitle());
+            query.setText(queryRecord.getText());
+            query.setQueryXml(queryRecord.getQueryXml());
+            query.setQueryCreationTime(queryRecord.getQueryCreationTime());
+            query.setResearcherId(queryRecord.getResearcherId());
+            query.setJsonText(queryRecord.getJsonText());
+            query.setNumAttachments(queryRecord.getNumAttachments());
+            query.setNegotiatorToken(queryRecord.getNegotiatorToken());
+            query.setValidQuery(queryRecord.getValidQuery());
+            query.setRequestDescription(queryRecord.getRequestDescription());
+            query.setEthicsVote(queryRecord.getEthicsVote());
+            query.setNegotiationStartedTime(queryRecord.getNegotiationStartedTime());
+            query.setResearcherEmail(queryRecord.getResearcherEmail());
+            query.setResearcherEmail(queryRecord.getResearcherEmail());
+            query.setResearcherOrganization(queryRecord.getResearcherOrganization());
+            return query;
+        } catch (Exception e) {
+            logger.error("ERROR-NG-0000008: Error getting query. queryId:" + query_id);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Query getQuery() {
+        if(query == null) {
+            getQueryFromDb();
+        }
+        return query;
+    }
+
+    public void setQuery(Query query) {
+        this.query = query;
     }
 }

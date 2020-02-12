@@ -43,6 +43,8 @@ import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.notification.OfferEmailNotifier;
+import de.samply.bbmri.negotiator.notification.OfferResponseEmailNotification;
 
 @ManagedBean
 @ViewScoped

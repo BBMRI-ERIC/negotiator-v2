@@ -24,7 +24,7 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.control;
+package de.samply.bbmri.negotiator.notification;
 
 import de.samply.bbmri.mailing.EmailBuilder;
 import de.samply.bbmri.negotiator.Config;

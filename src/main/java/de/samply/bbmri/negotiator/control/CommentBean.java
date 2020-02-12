@@ -33,6 +33,7 @@ import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import de.samply.bbmri.negotiator.notification.CommentEmailNotifier;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;

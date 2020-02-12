@@ -24,7 +24,7 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.control;
+package de.samply.bbmri.negotiator.notification;
 
 import java.sql.SQLException;
 import java.util.List;
