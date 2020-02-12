@@ -3,7 +3,7 @@ package de.samply.bbmri.negotiator.notification;
 import de.samply.bbmri.mailing.EmailBuilder;
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.model.NegotiatorDTO;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 
 import java.util.HashSet;
 
@@ -27,17 +27,17 @@ public class BbmriEricUnreachableCollectionsNotification {
         notification.setSubject("Subject: " + query.getTitle()   + ", collections not reachable.");
         notification.addParameter("queryName", query.getTitle());
         notification.addParameter("url", url);
-        String collectionsString = "";
+        StringBuilder collectionsString = new StringBuilder();
         for(String collectionReadableId : notreachable) {
-            collectionsString += collectionReadableId + "\n";
+            collectionsString.append(collectionReadableId).append("\n");
         }
-        notification.addParameter("collections", collectionsString);
+        notification.addParameter("collections", collectionsString.toString());
         notification.setLocale("de");
 
-        //TODO: Send to Admin/BBMRI-ERIC User group
-        for(NegotiatorDTO negotiator : negotiators) {
-            notification.addAddressee(negotiator.getPerson());
-        }
+        Person person = new Person();
+        person.setAuthEmail("negotiator@helpdesk.bbmri-eric.eu");
+        person.setAuthName("Helpdesk");
+        notification.addAddressee(person);
 
         NotificationThread thread = new NotificationThread(builder, notification);
         thread.start();
