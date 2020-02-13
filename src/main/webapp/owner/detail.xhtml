@@ -100,12 +100,41 @@
                         <hr></hr>
                     </div>
 
-                    <b>#{label['querydetail.owner.associatedbiobanks']}</b>
+                    <h:panelGroup styleClass="row" layout="block" style="background-color: aquamarine;">
 
-                    <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
-                               var="biobank" varStatus="loop">
-                        #{biobank.name}#{!loop.last ? ', ' : ''}
-                    </ui:repeat>
+                        <!-- LifeCycle Menu -->
+                        <div class="dropdown" style="float: right">
+                            <button class="btn btn-secondary dropdown-toggle"
+                                    type="button"
+                                    id="dropdownMenuButton"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">
+                                <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -160px;">
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-from-request-history" style="margin: 10px;">
+                                    #{label['queryview.lifecycle.requestHistory.title']}
+                                </button>
+                                <h:button action="#{researcherQueriesDetailBean.abandonRequest()}"
+                                          value="#{label['queryviewbiobanker.lifecycle.abandonRequest.title']}"
+                                          title="#{label['queryviewbiobanker.lifecycle.abandonRequest.tooltip']}"
+                                          styleClass="btn btn-danger" style="margin: 10px;">
+                                </h:button>
+
+                            </div>
+                        </div>
+
+                        <h:panelGroup styleClass="col-md-10 btn-toolbar" layout="block">
+                            <b>#{label['querydetail.owner.associatedbiobanks']}</b>
+
+                            <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
+                                       var="biobank" varStatus="loop">
+                                #{biobank.name}#{!loop.last ? ', ' : ''}
+                            </ui:repeat>
+                        </h:panelGroup>
+
+                    </h:panelGroup>
 
                 </ui:fragment>
 

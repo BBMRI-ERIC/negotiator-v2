@@ -247,7 +247,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             requestLifeCycleStatus.setQuery(selectedQuery);
             requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
             //Send out email notifications once the researcher starts negotiation.
-            sendEmailsToPotentialBiobankers();
+            //sendEmailsToPotentialBiobankers();
         } catch (SQLException e) {
             e.printStackTrace();
         }
