@@ -1325,22 +1325,25 @@ public class DbUtil {
          *
          * Those are not processing heavy SQL statements, IMHO it's fine.
          */
+        try {
+            if (queryDto.getFlag() == null || queryDto.getFlag() == Flag.UNFLAGGED) {
+                FlaggedQueryRecord newFlag = config.dsl().newRecord(Tables.FLAGGED_QUERY);
+                newFlag.setFlag(flag);
+                newFlag.setPersonId(userId);
+                newFlag.setQueryId(queryDto.getQuery().getId());
 
-        if(queryDto.getFlag() == null || queryDto.getFlag() == Flag.UNFLAGGED) {
-            FlaggedQueryRecord newFlag = config.dsl().newRecord(Tables.FLAGGED_QUERY);
-            newFlag.setFlag(flag);
-            newFlag.setPersonId(userId);
-            newFlag.setQueryId(queryDto.getQuery().getId());
-
-            newFlag.store();
-        } else if(queryDto.getFlag() == flag) {
-            config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-                    .and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userId)).execute();
-        } else {
-            config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
-                    .where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userId))
-                    .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-                    .execute();
+                newFlag.store();
+            } else if (queryDto.getFlag() == flag) {
+                config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
+                        .and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userId)).execute();
+            } else {
+                config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
+                        .where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userId))
+                        .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
+                        .execute();
+            }
+        } catch (Exception e) {
+            System.err.println("ERROR: flagQuery(Config, OwnerQueryStatsDTO, Flag, int)");
         }
     }
 
