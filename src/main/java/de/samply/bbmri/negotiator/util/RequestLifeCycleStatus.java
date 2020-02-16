@@ -28,6 +28,7 @@ public class RequestLifeCycleStatus {
 
     private TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
     private HashMap<Integer, CollectionLifeCycleStatus> collectionStatusList = null;
+    private HashMap<Integer, HashSet<Integer>> biobankCollectionLink = null;
     private RequestStatus requesterAbandonedRequest = null;
     private Integer query_id = null;
     private DataCache dataCache = DataCache.getInstance();
@@ -74,16 +75,31 @@ public class RequestLifeCycleStatus {
         if(collectionStatusList == null) {
             collectionStatusList = new HashMap<Integer, CollectionLifeCycleStatus>();
         }
+        if(biobankCollectionLink == null) {
+            biobankCollectionLink = new HashMap<Integer, HashSet<Integer>>();
+        }
         try(Config config = ConfigFactory.get()) {
             List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtil.getCollectionsForQuery(config, query_id);
             for(CollectionBiobankDTO collectionBiobankDTO : collectionBiobankDTOList) {
+                setBiobankCollectionLink(collectionBiobankDTO.getBiobank().getId(), collectionBiobankDTO.getCollection().getId());
                 collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId(), collectionBiobankDTO.getCollection().getCollectionReadableID()));
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).initialise();
+                collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).setCollectionBiobankDTO(collectionBiobankDTO);
+                CollectionContactsDTO collectionContactsDTO = dataCache.getCollectionContacts(collectionBiobankDTO.getCollection().getId());
+                List<Person> contacts = collectionContactsDTO.getContacts();
+                collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).setContacts(contacts);
             }
         } catch (Exception e) {
             logger.error("ERROR-NG-0000003: Error getting collections for query. queryis:" + query_id);
             e.printStackTrace();
         }
+    }
+
+    private void setBiobankCollectionLink(Integer biobankId, Integer CollectionId) {
+        if(!biobankCollectionLink.containsKey(biobankId)) {
+            biobankCollectionLink.put(biobankId, new HashSet<Integer>());
+        }
+        biobankCollectionLink.get(biobankId).add(CollectionId);
     }
 
     public void contactCollectionRepresentatives(Integer userId, String accessUrl) {
@@ -94,8 +110,7 @@ public class RequestLifeCycleStatus {
         HashSet<String> notreachable = new HashSet<String>();
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
-            CollectionContactsDTO collectionContactsDTO = dataCache.getCollectionContacts(collectionStatusListKey);
-            List<Person> contacts = collectionContactsDTO.getContacts();
+            List<Person> contacts = collectionLifeCycleStatus.getContacts();
             if(contacts == null) {
                 collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
                 notreachable.add(collectionLifeCycleStatus.getCollectionReadableID());
@@ -222,5 +237,14 @@ public class RequestLifeCycleStatus {
 
     public void setQuery(Query query) {
         this.query = query;
+    }
+
+    public List<CollectionLifeCycleStatus> getCollectionsForBiobank(Integer biobankId) {
+        List<CollectionLifeCycleStatus> returnList = new ArrayList<CollectionLifeCycleStatus>();
+        HashSet<Integer> collectionIds = biobankCollectionLink.get(biobankId);
+        for(Integer collectionId : collectionIds) {
+            returnList.add(collectionStatusList.get(collectionId));
+        }
+        return returnList;
     }
 }

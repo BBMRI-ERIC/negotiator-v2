@@ -3,6 +3,9 @@ package de.samply.bbmri.negotiator.util;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
+import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.requestStatus.RequestStatus;
@@ -22,6 +25,8 @@ public class CollectionLifeCycleStatus {
     private Integer query_id = null;
     private Integer collection_id = null;
     private String collectionReadableID = null;
+    private List<Person> contacts = null;
+    private CollectionBiobankDTO collectionBiobankDTO = null;
 
     public CollectionLifeCycleStatus(Integer query_id, Integer collection_id, String collectionReadableID) {
         this.query_id = query_id;
@@ -102,5 +107,21 @@ public class CollectionLifeCycleStatus {
 
     public String getCollectionReadableID() {
         return collectionReadableID;
+    }
+
+    public List<Person> getContacts() {
+        return contacts;
+    }
+
+    public void setContacts(List<Person> contacts) {
+        this.contacts = contacts;
+    }
+
+    public void setCollectionBiobankDTO(CollectionBiobankDTO collectionBiobankDTO) {
+        this.collectionBiobankDTO = collectionBiobankDTO;
+    }
+
+    public String getCollectionName() {
+        return collectionBiobankDTO.getCollection().getName();
     }
 }

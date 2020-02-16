@@ -1205,6 +1205,18 @@ public class DbUtil {
         return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
     }
 
+    //TODO: IMPLEMENT
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollectionsInQuery(Config config, Integer queryId) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.COLLECTION)
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .fetch();
+        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
+    }
+
     /*
      * Return query owner
      */

@@ -54,6 +54,7 @@ import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
+import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.slf4j.Logger;
@@ -138,6 +139,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private DataCache dataCache = DataCache.getInstance();
 
+	private RequestLifeCycleStatus requestLifeCycleStatus = null;
+
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
@@ -200,7 +203,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 					return null;
 				}
             }
-
+			requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+			requestLifeCycleStatus.initialise();
+			requestLifeCycleStatus.initialiseCollectionStatus();
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -525,5 +530,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 			}
 		}
     	return null;
+	}
+
+	public RequestLifeCycleStatus getRequestLifeCycleStatus() {
+		return requestLifeCycleStatus;
 	}
 }
