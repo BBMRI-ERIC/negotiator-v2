@@ -29,6 +29,8 @@ package de.samply.bbmri.negotiator.notification;
 import de.samply.bbmri.mailing.EmailBuilder;
 import de.samply.bbmri.mailing.OutgoingEmail;
 import de.samply.bbmri.negotiator.MailUtil;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +53,7 @@ public class NotificationThread extends Thread {
     @Override
     public void run() {
         try {
+            Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
             logger.debug("Notification thread started");
             for(Person person : notification.getAddressees()) {
                 OutgoingEmail email = new OutgoingEmail();
@@ -61,7 +64,11 @@ public class NotificationThread extends Thread {
 
                 email.putParameter("name", person.getAuthName());
                 email.setSubject(notification.getSubject());
-                email.addAddressee(person.getAuthEmail());
+                if(!negotiator.isDevelopmentServer()) {
+                    email.addAddressee(person.getAuthEmail());
+                } else {
+                    email.addAddressee("negotiator.testmail@google.com");
+                }
                 email.setBuilder(builder);
                 logger.debug("Notification body: " + builder.getText(notification.getParameters()));
                 MailUtil.sendEmail(email);

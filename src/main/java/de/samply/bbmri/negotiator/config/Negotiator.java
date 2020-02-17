@@ -171,6 +171,9 @@ public class Negotiator implements Serializable {
     @XmlElement
     private int clamavPort;
 
+    @XmlElement
+    private boolean developmentServer;
+
     /**
      * The list of collections, that will be faked.
      */
@@ -362,6 +365,14 @@ public class Negotiator implements Serializable {
 
     public void setMaxUploadFileSize(int maxUploadFileSize) {
         this.maxUploadFileSize = maxUploadFileSize;
+    }
+
+    public boolean isDevelopmentServer() {
+        return developmentServer;
+    }
+
+    public void setDevelopmentServer(boolean developmentServer) {
+        this.developmentServer = developmentServer;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)
