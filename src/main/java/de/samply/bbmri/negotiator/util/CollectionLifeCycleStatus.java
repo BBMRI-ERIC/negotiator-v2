@@ -64,7 +64,7 @@ public class CollectionLifeCycleStatus {
     }
 
     public void nextStatus(String status, String statusType, String status_json, Integer status_user_id) {
-        if(getStatus().checkAllowedNextStatus(status)) {
+        if(getStatus() == null && statusType.equalsIgnoreCase("contact") || getStatus().checkAllowedNextStatus(status)) {
             CollectionRequestStatusDTO collectionRequestStatusDTO = createCollectionRequestStatusInDB(status, statusType, status_json, status_user_id);
             collectionRequestStatusFactory(collectionRequestStatusDTO);
         } else {

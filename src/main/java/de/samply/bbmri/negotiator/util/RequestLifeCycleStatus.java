@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RequestLifeCycleStatus {
     private static Logger logger = LoggerFactory.getLogger(RequestLifeCycleStatus.class);
@@ -86,7 +87,12 @@ public class RequestLifeCycleStatus {
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).initialise();
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).setCollectionBiobankDTO(collectionBiobankDTO);
                 CollectionContactsDTO collectionContactsDTO = dataCache.getCollectionContacts(collectionBiobankDTO.getCollection().getId());
-                List<Person> contacts = collectionContactsDTO.getContacts();
+                List<Person> contacts = null;
+                if(collectionContactsDTO != null) {
+                    contacts = collectionContactsDTO.getContacts();
+                } else {
+                    contacts = new ArrayList<Person>();
+                }
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).setContacts(contacts);
             }
         } catch (Exception e) {
@@ -111,7 +117,7 @@ public class RequestLifeCycleStatus {
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
             List<Person> contacts = collectionLifeCycleStatus.getContacts();
-            if(contacts == null) {
+            if(contacts == null || contacts.size() == 0) {
                 collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
                 notreachable.add(collectionLifeCycleStatus.getCollectionReadableID());
             } else {
@@ -132,7 +138,7 @@ public class RequestLifeCycleStatus {
                 collectionLifeCycleStatus.nextStatus("contacted", "contact", statusJson.toString(), userId);
             }
         }
-        QueryEmailNotifier notifier = new QueryEmailNotifier((List<NegotiatorDTO>) mailrecipients.values(), accessUrl, query);
+        QueryEmailNotifier notifier = new QueryEmailNotifier(new ArrayList<NegotiatorDTO>(mailrecipients.values()), accessUrl, query);
         if(notreachable.size() > 1) {
             BbmriEricUnreachableCollectionsNotification bbmrinotifier = new BbmriEricUnreachableCollectionsNotification(notreachable, accessUrl, query);
         }
