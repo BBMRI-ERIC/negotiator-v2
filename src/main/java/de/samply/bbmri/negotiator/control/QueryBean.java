@@ -296,7 +296,9 @@ public class QueryBean implements Serializable {
          * Add token if an existing query is being edited. Else the user is still in the process of creating a
          * query and it has not been saved in the Query table hence no token is used.
          */
-        if(mode.equals("edit")) {
+        if(mode == null) {
+            externalContext.redirect(url);
+        } else if(mode.equals("edit")) {
             saveEditChangesTemporarily();
             externalContext.redirect(url + "?nToken=" + qtoken + "__search__");
         }else{
