@@ -88,10 +88,6 @@
 
                 <bbmricc:queryDetailData bean="#{ownerQueriesDetailBean}" />
 
-                <h:panelGroup>
-                    <bbmricc:lifecycleStatusDetails queryBean="#{ownerQueriesDetailBean}" />
-                </h:panelGroup>
-
                 <bbmricc:queryDetailAttachments queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
 
                 <h:panelGroup layout="block"
@@ -104,12 +100,12 @@
                             <div class="card">
                                 <div class="card-header" id="headingTwo">
                                     <h5 class="mb-0">
-                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.name.replace(' ', '')}" aria-expanded="false" aria-controls="collapseTwo">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
                                             #{biobank.name}
                                         </button>
                                     </h5>
                                 </div>
-                                <div id="collapseLifecycleBiobank#{biobank.name.replace(' ', '')}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                     <div class="card-body">
                                         <!-- TODO: Collection table with select -->
                                         <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"

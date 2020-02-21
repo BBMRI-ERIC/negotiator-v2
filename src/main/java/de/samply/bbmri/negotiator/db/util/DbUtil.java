@@ -2027,7 +2027,7 @@ public class DbUtil {
         for(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord : fetch) {
             returnList.add(mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
         }
-        return null;
+        return returnList;
     }
 
     private static CollectionRequestStatusDTO mapCollectionRequestStatusDTO(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord) {
