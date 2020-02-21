@@ -87,13 +87,6 @@ public class RequestLifeCycleStatus {
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).initialise();
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).setCollectionBiobankDTO(collectionBiobankDTO);
                 CollectionContactsDTO collectionContactsDTO = dataCache.getCollectionContacts(collectionBiobankDTO.getCollection().getId());
-                List<Person> contacts = null;
-                if(collectionContactsDTO != null) {
-                    contacts = collectionContactsDTO.getContacts();
-                } else {
-                    contacts = new ArrayList<Person>();
-                }
-                collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).setContacts(contacts);
             }
         } catch (Exception e) {
             logger.error("ERROR-NG-0000003: Error getting collections for query. queryis:" + query_id);

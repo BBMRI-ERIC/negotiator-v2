@@ -16,6 +16,7 @@ public class RequestStatusContact implements RequestStatus {
 
     public RequestStatusContact(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
+        status = collectionRequestStatusDTO.getStatus();
     }
 
     @Override

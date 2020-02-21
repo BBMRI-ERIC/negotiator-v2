@@ -37,10 +37,15 @@ public class CollectionLifeCycleStatus {
     public void initialise() {
         try(Config config = ConfigFactory.get()) {
             initialise(DbUtil.getCollectionRequestStatus(config, query_id, collection_id));
+            initialiseContacts(DbUtil.getPersonsContactsForCollection(config, collection_id));
         } catch (Exception e) {
             logger.error("ERROR-NG-0000001: Error initialising CollectionLifeCycleStatus::initialise() from database.");
             e.printStackTrace();
         }
+    }
+
+    public void initialiseContacts(List<Person> personsContactsForCollection) {
+        contacts = personsContactsForCollection;
     }
 
     public void initialise(List<CollectionRequestStatusDTO> collectionRequestStatusDTOList) {
@@ -111,10 +116,6 @@ public class CollectionLifeCycleStatus {
 
     public List<Person> getContacts() {
         return contacts;
-    }
-
-    public void setContacts(List<Person> contacts) {
-        this.contacts = contacts;
     }
 
     public void setCollectionBiobankDTO(CollectionBiobankDTO collectionBiobankDTO) {
