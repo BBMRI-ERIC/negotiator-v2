@@ -178,6 +178,10 @@ public class RequestLifeCycleStatus {
         }
     }
 
+    public void nextStatus(String status, String statusType, String status_json, Integer status_user_id, Integer collectionId) {
+        collectionStatusList.get(collectionId).nextStatus(status, statusType, status_json, status_user_id);
+    }
+
     private String getAllowedNextStatusErrorString(List allowedNextStatus) {
         String returnvalue = "";
         for(Object value : allowedNextStatus) {

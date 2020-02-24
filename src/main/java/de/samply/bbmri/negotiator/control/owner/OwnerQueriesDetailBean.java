@@ -53,6 +53,7 @@ import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import de.samply.bbmri.negotiator.util.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 import org.jooq.Record;
@@ -354,6 +355,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
 			e.printStackTrace();
 		}
+	}
+
+	public String updateCollectionLifecycleStatus(String status, String statusType, Integer collectionId) {
+		requestLifeCycleStatus.nextStatus(status, statusType, null, userBean.getUserId(), collectionId);
+		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+				+ "?includeViewParams=true&faces-redirect=true";
+	}
+
+	public String updateCollectionLifecycleStatusByBiobank(String status, String statusType, Integer biobankId) {
+		List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
+		for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
+			updateCollectionLifecycleStatus(status, statusType, collectionLifeCycleStatus.getCollectionId());
+		}
+		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
 	/*
