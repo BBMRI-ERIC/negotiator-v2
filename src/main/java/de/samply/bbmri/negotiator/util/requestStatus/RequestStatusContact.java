@@ -13,6 +13,7 @@ public class RequestStatusContact implements RequestStatus {
     private String statusText = "Collection representatives not contacted yet.";
     private Date statusDate = null;
     private List allowedNextStatus = Arrays.asList("contacted", "notreachable");
+    private List allowedNextStatusBiobanker = Arrays.asList("sample_data_available_accessible", "sample_data_available_not_accessible", "sample_data_not_available_collecatable", "sample_data_not_available", "not_interrested");
 
     public RequestStatusContact(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
@@ -54,6 +55,11 @@ public class RequestStatusContact implements RequestStatus {
     @Override
     public List<String> getAllowedNextStatus() {
         return allowedNextStatus;
+    }
+
+    @Override
+    public List<String> getNextStatusForBiobankers() {
+        return allowedNextStatusBiobanker;
     }
 
     @Override

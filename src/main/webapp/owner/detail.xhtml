@@ -107,12 +107,19 @@
                                 </div>
                                 <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                     <div class="card-body">
-                                        <!-- TODO: Collection table with select -->
-                                        <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
-                                                   var="collectionStatus" varStatus="loop">
-                                            <bbmribiobankercc:lifecycleCollectionStatus
-                                                    collectionLifeCycleStatus="#{collectionStatus}" />
-                                        </ui:repeat>
+
+                                        <div class="container">
+                                            <div class="row">
+                                                <!-- TODO: Collection table with select -->
+                                                <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
+                                                           var="collectionStatus" varStatus="loop">
+                                                    <h:form>
+                                                        <bbmribiobankercc:lifecycleCollectionStatus
+                                                                collectionLifeCycleStatus="#{collectionStatus}" />
+                                                    </h:form>
+                                                </ui:repeat>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

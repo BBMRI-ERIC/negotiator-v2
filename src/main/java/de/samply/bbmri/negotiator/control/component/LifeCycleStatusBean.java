@@ -21,6 +21,10 @@ public class LifeCycleStatusBean implements Serializable {
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
+    private String selectedNextQuery;
+
+    private Integer numberOfSamplesAvailable;
+
     private static Logger logger = LoggerFactory.getLogger(LifeCycleStatusBean.class);
 
     /**
@@ -51,5 +55,21 @@ public class LifeCycleStatusBean implements Serializable {
 
     public void setUserBean(UserBean userBean) {
         this.userBean = userBean;
+    }
+
+    public String getSelectedNextQuery() {
+        return selectedNextQuery;
+    }
+
+    public void setSelectedNextQuery(String selectedNextQuery) {
+        this.selectedNextQuery = selectedNextQuery;
+    }
+
+    public Integer getNumberOfSamplesAvailable() {
+        return numberOfSamplesAvailable;
+    }
+
+    public void setNumberOfSamplesAvailable(Integer numberOfSamplesAvailable) {
+        this.numberOfSamplesAvailable = numberOfSamplesAvailable;
     }
 }

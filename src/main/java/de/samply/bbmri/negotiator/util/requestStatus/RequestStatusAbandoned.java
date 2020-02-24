@@ -48,6 +48,11 @@ public class RequestStatusAbandoned implements RequestStatus {
     }
 
     @Override
+    public List<String> getNextStatusForBiobankers() {
+        return Arrays.asList();
+    }
+
+    @Override
     public String getTableRow() {
         return "<tr><td>" + statusDate + "</td><td>abandoned</td><td></td><td></tr>";
     }
