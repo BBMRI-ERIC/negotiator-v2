@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+      xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri">
+
+<composite:interface>
+    <composite:attribute name="collectionLifeCycleStatus" required="true"/>
+    <composite:attribute name="collectionId" required="true"/>
+    <composite:attribute name="biobankId" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+
+    <div class="col-sm-3 col-lg-3">#{cc.attrs.collectionLifeCycleStatus.collectionName}</div>
+    <div class="col-sm-3 col-lg-3">
+        #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}
+    </div>
+    <div class="col-sm-4 col-lg-4">
+        <!--<h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">-->
+        #{label['lifecycleCollectionSataus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
+        <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
+                         class="form-control"
+                         style="width: 100%;height: 2rem;"
+                         value="#{researcherQueriesDetailBean.nextCollectionLifecycleStatusStatus}"
+                         onchange="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(this);"
+                         onload="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(this);">
+            <f:selectItems value="#{cc.attrs.collectionLifeCycleStatus.status.nextStatusForBiobankers}" var="nextStatus"
+                           itemLabel="#{label[nextStatus]}" itemValue="#{nextStatus}" />
+        </h:selectOneMenu>
+
+        <h:outputScript>
+            function showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(data) {
+
+            }
+        </h:outputScript>
+
+    </div>
+    <div class="col-sm-2 col-lg-2">
+        <h:commandButton action="#{researcherQueriesDetailBean.updateCollectionLifecycleStatus(cc.attrs.collectionId)}"
+                         value="#{label['lifecycleCollectionSataus.button.applyChanges.title']}"
+                         styleClass="btn btn-primary"
+                         title="#{label['lifecycleCollectionSataus.button.applyChanges.title']}">
+        </h:commandButton>
+        <h:commandButton action="#{researcherQueriesDetailBean.updateCollectionLifecycleStatusByBiobank(cc.attrs.biobankId)}"
+                         value="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}"
+                         styleClass="btn btn-info"
+                         style="white-space: normal;"
+                         title="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}">
+        </h:commandButton>
+    </div>
+
+</composite:implementation>
+
+</html>

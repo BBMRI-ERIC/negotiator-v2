@@ -31,6 +31,7 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+                xmlns:bbmriresearchercc="http://xmlns.jcp.org/jsf/composite/bbmriresearcher"
                 template="../components/default.xhtml"
 >
 
@@ -127,10 +128,6 @@
                                    styleClass="form-control-static"/>
                 </h:panelGroup>
 
-                <h:panelGroup>
-                    <bbmricc:lifecycleStatusDetails queryBean="#{researcherQueriesDetailBean}" />
-                </h:panelGroup>
-
                 <bbmricc:queryDetailAttachments queryBean="#{researcherQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" delete="false"/>
 
                 <h:panelGroup styleClass="row" layout="block" style="background-color: aquamarine;">
@@ -169,6 +166,45 @@
                         </div>
                     </h:panelGroup>
 
+                </h:panelGroup>
+
+                <h:panelGroup layout="block"
+                              style="background-color: yellowgreen;border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
+                              rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}">
+                    <b>#{label['querydetail.owner.associatedbiobanks']}</b>
+                    <ui:repeat value="#{researcherQueriesDetailBean.matchingBiobankCollection}"
+                               var="biobank" varStatus="loop">
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header" id="headingTwo">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
+                                            #{biobank.name}
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                    <div class="card-body">
+
+                                        <div class="container" style="width: 100%;">
+                                            <div class="row">
+                                                <!-- TODO: Collection table with select -->
+                                                <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
+                                                           var="collectionStatus" varStatus="loop">
+                                                    <h:form>
+                                                        <bbmriresearchercc:lifecycleCollectionStatus
+                                                                collectionLifeCycleStatus="#{collectionStatus}"
+                                                                collectionId="#{collectionStatus.collectionId}"
+                                                                biobankId="#{biobank.id}" />
+                                                    </h:form>
+                                                </ui:repeat>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ui:repeat>
                 </h:panelGroup>
 
                 <h:outputScript>

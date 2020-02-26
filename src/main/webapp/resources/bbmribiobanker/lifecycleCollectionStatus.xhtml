@@ -46,11 +46,19 @@
 
         <div id="numberOfAvailableSamples" style="display: none;">
             #{label['lifecycleCollectionSataus.nuberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
-            <h:inputText id="title" value="#{ownerQueriesDetailBean.numberOfSamplesAvailable}"
+            <h:inputText id="numberOfAvailableSamples" value="#{ownerQueriesDetailBean.numberOfSamplesAvailable}"
                           styleClass="form-control"
-                          pt:placeholder="#{label['queryview.placeholder.title']}"
+                          pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailableSamples']}"
                           validatorMessage="#{label['error.invalidTitleLength']}" >
             </h:inputText>
+        </div>
+        <div id="indicateAccessConditions" style="display: none;">
+            #{label['lifecycleCollectionSataus.nuberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
+            <h:inputTextarea id="indicateAccessConditions" value="#{ownerQueriesDetailBean.indicateAccessConditions}"
+                         styleClass="form-control"
+                         pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.indicateAccessConditions']}"
+                         validatorMessage="#{label['error.invalidTitleLength']}" >
+            </h:inputTextarea>
         </div>
         <h:outputScript>
             function showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(data) {
@@ -58,6 +66,11 @@
                     $("#numberOfAvailableSamples").show();
                 } else {
                     $("#numberOfAvailableSamples").hide();
+                }
+                if(data.value == 'accessConditions.indicateAccessConditions') {
+                    $("#indicateAccessConditions").show();
+                } else {
+                    $("#indicateAccessConditions").hide();
                 }
             }
         </h:outputScript>

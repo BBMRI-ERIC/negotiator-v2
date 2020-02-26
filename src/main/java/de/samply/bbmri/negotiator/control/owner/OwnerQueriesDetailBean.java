@@ -144,6 +144,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private String nextCollectionLifecycleStatusStatus;
 	private Integer numberOfSamplesAvailable;
+	private String indicateAccessConditions;
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -369,14 +370,20 @@ public class OwnerQueriesDetailBean implements Serializable {
 		if(statusType.equalsIgnoreCase("notselected")) {
 			return "";
 		}
-		String status_json = null;
-		if(numberOfSamplesAvailable != null) {
-			status_json = "{\"numberAvaiableSamples\":\"" + numberOfSamplesAvailable + "\"}";
-		}
 
-		requestLifeCycleStatus.nextStatus(status, statusType, status_json, userBean.getUserId(), collectionId);
+		requestLifeCycleStatus.nextStatus(status, statusType, createStatusJson(), userBean.getUserId(), collectionId);
 		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
 				+ "?includeViewParams=true&faces-redirect=true";
+	}
+
+	private String createStatusJson() {
+		if(numberOfSamplesAvailable != null) {
+			return "{\"numberAvaiableSamples\":\"" + numberOfSamplesAvailable + "\"}";
+		}
+		if(indicateAccessConditions != null) {
+			return "{\"indicateAccessConditions\":\"" + indicateAccessConditions + "\"}";
+		}
+		return null;
 	}
 
 	public String updateCollectionLifecycleStatusByBiobank(Integer biobankId) {
@@ -582,5 +589,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setNumberOfSamplesAvailable(Integer numberOfSamplesAvailable) {
 		this.numberOfSamplesAvailable = numberOfSamplesAvailable;
+	}
+
+	public String getIndicateAccessConditions() {
+		return indicateAccessConditions;
+	}
+
+	public void setIndicateAccessConditions(String indicateAccessConditions) {
+		this.indicateAccessConditions = indicateAccessConditions;
 	}
 }
