@@ -142,6 +142,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private RequestLifeCycleStatus requestLifeCycleStatus = null;
 
+	private String nextCollectionLifecycleStatusStatus;
+	private Integer numberOfSamplesAvailable;
+
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
@@ -357,16 +360,29 @@ public class OwnerQueriesDetailBean implements Serializable {
 		}
 	}
 
-	public String updateCollectionLifecycleStatus(String status, String statusType, Integer collectionId) {
-		requestLifeCycleStatus.nextStatus(status, statusType, null, userBean.getUserId(), collectionId);
+	public String updateCollectionLifecycleStatus(Integer collectionId) {
+		if(nextCollectionLifecycleStatusStatus == null || nextCollectionLifecycleStatusStatus.length() == 0) {
+			return "";
+		}
+		String status = nextCollectionLifecycleStatusStatus.split("\\.")[1];
+		String statusType = nextCollectionLifecycleStatusStatus.split("\\.")[0];
+		if(statusType.equalsIgnoreCase("notselected")) {
+			return "";
+		}
+		String status_json = null;
+		if(numberOfSamplesAvailable != null) {
+			status_json = "{\"numberAvaiableSamples\":\"" + numberOfSamplesAvailable + "\"}";
+		}
+
+		requestLifeCycleStatus.nextStatus(status, statusType, status_json, userBean.getUserId(), collectionId);
 		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
-	public String updateCollectionLifecycleStatusByBiobank(String status, String statusType, Integer biobankId) {
+	public String updateCollectionLifecycleStatusByBiobank(Integer biobankId) {
 		List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
 		for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
-			updateCollectionLifecycleStatus(status, statusType, collectionLifeCycleStatus.getCollectionId());
+			updateCollectionLifecycleStatus(collectionLifeCycleStatus.getCollectionId());
 		}
 		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
 				+ "?includeViewParams=true&faces-redirect=true";
@@ -550,5 +566,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public RequestLifeCycleStatus getRequestLifeCycleStatus() {
 		return requestLifeCycleStatus;
+	}
+
+	public String getNextCollectionLifecycleStatusStatus() {
+		return nextCollectionLifecycleStatusStatus;
+	}
+
+	public void setNextCollectionLifecycleStatusStatus(String nextCollectionLifecycleStatusStatus) {
+		this.nextCollectionLifecycleStatusStatus = nextCollectionLifecycleStatusStatus;
+	}
+
+	public Integer getNumberOfSamplesAvailable() {
+		return numberOfSamplesAvailable;
+	}
+
+	public void setNumberOfSamplesAvailable(Integer numberOfSamplesAvailable) {
+		this.numberOfSamplesAvailable = numberOfSamplesAvailable;
 	}
 }

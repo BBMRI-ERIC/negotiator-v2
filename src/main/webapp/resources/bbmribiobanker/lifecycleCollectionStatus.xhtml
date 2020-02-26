@@ -11,6 +11,8 @@
 
 <composite:interface>
     <composite:attribute name="collectionLifeCycleStatus" required="true"/>
+    <composite:attribute name="collectionId" required="true"/>
+    <composite:attribute name="biobankId" required="true"/>
 </composite:interface>
 
 <composite:implementation>
@@ -26,46 +28,51 @@
     </div>-->
 
     <div class="col-sm-3 col-lg-3">#{cc.attrs.collectionLifeCycleStatus.collectionName}</div>
-    <div class="col-sm-5 col-lg-5">
+    <div class="col-sm-3 col-lg-3">
+        #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}
+    </div>
+    <div class="col-sm-4 col-lg-4">
         <!--<h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">-->
         #{label['lifecycleCollectionSataus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
-        <h:selectOneMenu class="form-control" style="width: 100%;height: 2rem;" value="#{lifeCycleStatusBean.selectedNextQuery}">
+        <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
+                         class="form-control"
+                         style="width: 100%;height: 2rem;"
+                         value="#{ownerQueriesDetailBean.nextCollectionLifecycleStatusStatus}"
+                         onchange="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(this);"
+                         onload="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(this);">
             <f:selectItems value="#{cc.attrs.collectionLifeCycleStatus.status.nextStatusForBiobankers}" var="nextStatus"
                            itemLabel="#{label[nextStatus]}" itemValue="#{nextStatus}" />
         </h:selectOneMenu>
 
-        <!--w#{lifeCycleStatusBean.selectedNextQuery}w
+        <div id="numberOfAvailableSamples" style="display: none;">
+            #{label['lifecycleCollectionSataus.nuberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
+            <h:inputText id="title" value="#{ownerQueriesDetailBean.numberOfSamplesAvailable}"
+                          styleClass="form-control"
+                          pt:placeholder="#{label['queryview.placeholder.title']}"
+                          validatorMessage="#{label['error.invalidTitleLength']}" >
+            </h:inputText>
+        </div>
+        <h:outputScript>
+            function showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(data) {
+                if(data.value == 'availability.sample_data_available_accessible') {
+                    $("#numberOfAvailableSamples").show();
+                } else {
+                    $("#numberOfAvailableSamples").hide();
+                }
+            }
+        </h:outputScript>
 
-        <h:panelGroup rendered="#{lifeCycleStatusBean.selectedNextQuery == 'sample_data_available_accessible'}">
-            <p>sample_data_available_accessible</p>
-        </h:panelGroup>
-        <h:panelGroup rendered="#{lifeCycleStatusBean.selectedNextQuery == 'sample_data_available_not_accessible'}">
-            <p>sample_data_available_not_accessible</p>
-        </h:panelGroup>
-        <h:panelGroup rendered="#{lifeCycleStatusBean.selectedNextQuery == 'sample_data_not_available_collecatable'}">
-            <p>sample_data_not_available_collecatable</p>
-        </h:panelGroup>
-        <h:panelGroup rendered="#{lifeCycleStatusBean.selectedNextQuery == 'sample_data_not_available'}">
-            <p>sample_data_not_available</p>
-        </h:panelGroup>
-        <h:panelGroup>
-            <p>asdasdas dasd ada asd as</p>
-        </h:panelGroup>-->
     </div>
     <div class="col-sm-2 col-lg-2">
-        #{label['lifecycleCollectionSataus.nuberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
-        <h:inputText id="title" value="#{lifeCycleStatusBean.numberOfSamplesAvailable}"
-                     styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
-                     validatorMessage="#{label['error.invalidTitleLength']}">
-        </h:inputText>
-    </div>
-    <div class="col-sm-2 col-lg-2">
-        <h:commandButton action="#{researcherQueriesDetailBean.removeAttachment()}"
-                                           value="#{label['lifecycleCollectionSataus.button.applyChanges.title']}" styleClass="btn btn-primary"
-                                           title="#{label['lifecycleCollectionSataus.button.applyChanges.title']}">
+        <h:commandButton action="#{ownerQueriesDetailBean.updateCollectionLifecycleStatus(cc.attrs.collectionId)}"
+                         value="#{label['lifecycleCollectionSataus.button.applyChanges.title']}"
+                         styleClass="btn btn-primary"
+                         title="#{label['lifecycleCollectionSataus.button.applyChanges.title']}">
         </h:commandButton>
-        <h:commandButton action="#{researcherQueriesDetailBean.removeAttachment()}"
-                         value="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}" styleClass="btn btn-info"
+        <h:commandButton action="#{ownerQueriesDetailBean.updateCollectionLifecycleStatusByBiobank(cc.attrs.biobankId)}"
+                         value="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}"
+                         styleClass="btn btn-info"
+                         style="white-space: normal;"
                          title="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}">
         </h:commandButton>
     </div>

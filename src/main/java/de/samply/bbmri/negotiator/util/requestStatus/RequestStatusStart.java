@@ -55,6 +55,11 @@ public class RequestStatusStart implements RequestStatus {
     }
 
     @Override
+    public List<String> getNextStatusForResearchers() {
+        return Arrays.asList();
+    }
+
+    @Override
     public String getTableRow() {
         return "<tr><td>null</td><td>start</td><td></td><td></tr>";
     }

@@ -81,6 +81,11 @@ public class RequestStatusReview implements RequestStatus {
     }
 
     @Override
+    public List<String> getNextStatusForResearchers() {
+        return Arrays.asList();
+    }
+
+    @Override
     public String getTableRow() {
         return "<tr><td>" + statusDate + "</td><td>review</td><td></td><td></tr>";
     }

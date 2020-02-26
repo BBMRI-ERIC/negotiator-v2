@@ -10,6 +10,7 @@ public interface RequestStatus {
     String getStatusText();
     boolean checkAllowedNextStatus(String review);
     List<String> getAllowedNextStatus();
-    public List<String> getNextStatusForBiobankers();
+    List<String> getNextStatusForBiobankers();
+    List<String> getNextStatusForResearchers();
     String getTableRow();
 }

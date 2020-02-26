@@ -9,6 +9,7 @@ import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.requestStatus.RequestStatus;
+import de.samply.bbmri.negotiator.util.requestStatus.RequestStatusAvailability;
 import de.samply.bbmri.negotiator.util.requestStatus.RequestStatusContact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,9 @@ public class CollectionLifeCycleStatus {
     private void collectionRequestStatusFactory(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         if(collectionRequestStatusDTO.getStatusType().equals("contact")) {
             RequestStatus status = new RequestStatusContact(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } if(collectionRequestStatusDTO.getStatusType().equals("availability")) {
+            RequestStatus status = new RequestStatusAvailability(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else {
             logger.error("ERROR-NG-0000002: Error status type \"" + collectionRequestStatusDTO.getStatusType() + "\" not" +
