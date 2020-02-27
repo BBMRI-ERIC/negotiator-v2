@@ -242,6 +242,14 @@ public class RequestLifeCycleStatus {
         this.query = query;
     }
 
+    public List<Integer> getBiobankIds() {
+        List<Integer> returnList = new ArrayList<Integer>();
+        for(Integer biobankId : biobankCollectionLink.keySet()) {
+            returnList.add(biobankId);
+        }
+        return returnList;
+    }
+
     public List<CollectionLifeCycleStatus> getCollectionsForBiobank(Integer biobankId) {
         List<CollectionLifeCycleStatus> returnList = new ArrayList<CollectionLifeCycleStatus>();
         HashSet<Integer> collectionIds = biobankCollectionLink.get(biobankId);

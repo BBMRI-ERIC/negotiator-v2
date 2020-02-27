@@ -44,6 +44,7 @@ import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
+import de.samply.bbmri.negotiator.util.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
 import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
@@ -154,6 +155,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private DataCache dataCache = DataCache.getInstance();
 
     private RequestLifeCycleStatus requestLifeCycleStatus = null;
+    private String nextCollectionLifecycleStatusStatus;
+    private String offer;
 
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
@@ -222,6 +225,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             }
             requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
             requestLifeCycleStatus.initialise();
+            requestLifeCycleStatus.initialiseCollectionStatus();
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -352,6 +356,37 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
                 context.getRequestServerPort(), context.getRequestContextPath(),
                 "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
+    }
+
+    public String updateCollectionLifecycleStatus(Integer collectionId) {
+        if(nextCollectionLifecycleStatusStatus == null || nextCollectionLifecycleStatusStatus.length() == 0) {
+            return "";
+        }
+        String status = nextCollectionLifecycleStatusStatus.split("\\.")[1];
+        String statusType = nextCollectionLifecycleStatusStatus.split("\\.")[0];
+        if(statusType.equalsIgnoreCase("notselected")) {
+            return "";
+        }
+
+        requestLifeCycleStatus.nextStatus(status, statusType, createStatusJson(), userBean.getUserId(), collectionId);
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    private String createStatusJson() {
+        if(offer != null && offer.length() > 0) {
+            return "{\"offer\":\"" + offer + "\"}";
+        }
+        return null;
+    }
+
+    public String updateCollectionLifecycleStatusByBiobank(Integer biobankId) {
+        List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
+        for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
+            updateCollectionLifecycleStatus(collectionLifeCycleStatus.getCollectionId());
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
     }
 
     /*
@@ -536,7 +571,21 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return requester;
     }
 
+    public String getOffer() { return this.offer; }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
+
     public RequestLifeCycleStatus getRequestLifeCycleStatus() {
         return requestLifeCycleStatus;
+    }
+
+    public String getNextCollectionLifecycleStatusStatus() {
+        return nextCollectionLifecycleStatusStatus;
+    }
+
+    public void setNextCollectionLifecycleStatusStatus(String nextCollectionLifecycleStatusStatus) {
+        this.nextCollectionLifecycleStatusStatus = nextCollectionLifecycleStatusStatus;
     }
 }

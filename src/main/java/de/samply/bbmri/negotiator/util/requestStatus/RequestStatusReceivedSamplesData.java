@@ -6,19 +6,17 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusAccepptCondition implements RequestStatus {
+public class RequestStatusReceivedSamplesData implements RequestStatus {
 
     private String status = null;
-    private String statusType = "accepptConditions";
-    private String statusText = "Acceppt Access Condition indicated for collection and select for further work.";
+    private String statusType = "receivedSamples";
+    private String statusText = "Samples/Data received.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("not_interrested", "signed");
+    private List allowedNextStatus = Arrays.asList("not_interrested", "end");
+    private List allowedNextStatusBiobanker = Arrays.asList("abandoned.not_interrested");
+    private List allowedNextStatusResearcher = Arrays.asList("notselected.notselected", "endOfProject.end");
 
-    private List allowedNextStatusBiobanker = Arrays.asList("notselected.notselected", "mtaSigned.signed", "abandoned.not_interrested");
-
-    private List allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interrested");
-
-    public RequestStatusAccepptCondition(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusReceivedSamplesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
     }

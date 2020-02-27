@@ -168,34 +168,35 @@
 
                 </h:panelGroup>
 
+
                 <h:panelGroup layout="block"
                               style="background-color: yellowgreen;border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
                               rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}">
-                    <b>#{label['querydetail.owner.associatedbiobanks']}</b>
-                    <ui:repeat value="#{researcherQueriesDetailBean.matchingBiobankCollection}"
-                               var="biobank" varStatus="loop">
+                    <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
+                    <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.biobankIds}"
+                               var="biobankId" varStatus="loop">
                         <div id="accordion">
                             <div class="card">
                                 <div class="card-header" id="headingTwo">
                                     <h5 class="mb-0">
-                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
-                                            #{biobank.name}
+                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobankId}" aria-expanded="false" aria-controls="collapseTwo">
+                                            #{researcherQueriesDetailBean.getBiobankNameFromCache(biobankId)}
                                         </button>
                                     </h5>
                                 </div>
-                                <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                <div id="collapseLifecycleBiobank#{biobankId}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                     <div class="card-body">
 
                                         <div class="container" style="width: 100%;">
                                             <div class="row">
                                                 <!-- TODO: Collection table with select -->
-                                                <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
+                                                <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId)}"
                                                            var="collectionStatus" varStatus="loop">
                                                     <h:form>
                                                         <bbmriresearchercc:lifecycleCollectionStatus
                                                                 collectionLifeCycleStatus="#{collectionStatus}"
                                                                 collectionId="#{collectionStatus.collectionId}"
-                                                                biobankId="#{biobank.id}" />
+                                                                biobankId="#{biobankId}" />
                                                     </h:form>
                                                 </ui:repeat>
                                             </div>

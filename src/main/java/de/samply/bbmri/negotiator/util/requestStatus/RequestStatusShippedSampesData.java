@@ -5,34 +5,25 @@ import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusAvailability implements RequestStatus {
+public class RequestStatusShippedSampesData implements RequestStatus {
 
     private String status = null;
-    private String statusType = "availability";
-    private String statusText = "Collection has availability not specified yet.";
+    private String statusType = "shippedSamples";
+    private String statusText = "Shipped Samples/Data.";
     private Date statusDate = null;
-    private List<String> allowedNextStatus = Arrays.asList("not_interrested", "indicateAccessConditions");
-    private List<String> allowedNextStatusBiobanker = new ArrayList<String>();
-    private List<String> allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interrested");
+    private List allowedNextStatus = Arrays.asList("not_interrested", "received");
+    private List allowedNextStatusBiobanker = Arrays.asList("abandoned.not_interrested");
+    private List allowedNextStatusResearcher = Arrays.asList("notselected.notselected", "receivedSamples.received");
 
-    public RequestStatusAvailability(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusShippedSampesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
-        allowedNextStatusBiobanker.add("notselected.notselected");
-        if(status.equalsIgnoreCase("sample_data_available_accessible")) {
-            allowedNextStatusBiobanker.add("accessConditions.indicateAccessConditions");
-        }
-        allowedNextStatusBiobanker.add("abandoned.sample_data_available_accessible");
-        if(status.equals("indicateAccessConditions")) {
-            String numberAvaiableSamples = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiableSamples");
-            if(numberAvaiableSamples != null && numberAvaiableSamples.length() > 0) {
-                statusText = "Number of avaiable Samples: " + numberAvaiableSamples;
-            }
+        if(status.equals("shipped")) {
+            statusText = "Shipped Number: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "shippedNumber");
         }
     }
 
@@ -53,10 +44,7 @@ public class RequestStatusAvailability implements RequestStatus {
 
     @Override
     public String getStatusText() {
-        if(status == null) {
-            return statusText;
-        }
-        return "ERROR";
+        return statusText;
     }
 
     @Override

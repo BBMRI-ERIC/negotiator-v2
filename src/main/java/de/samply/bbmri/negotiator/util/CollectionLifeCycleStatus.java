@@ -8,9 +8,7 @@ import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
-import de.samply.bbmri.negotiator.util.requestStatus.RequestStatus;
-import de.samply.bbmri.negotiator.util.requestStatus.RequestStatusAvailability;
-import de.samply.bbmri.negotiator.util.requestStatus.RequestStatusContact;
+import de.samply.bbmri.negotiator.util.requestStatus.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,8 +82,29 @@ public class CollectionLifeCycleStatus {
         if(collectionRequestStatusDTO.getStatusType().equals("contact")) {
             RequestStatus status = new RequestStatusContact(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } if(collectionRequestStatusDTO.getStatusType().equals("availability")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals("availability")) {
             RequestStatus status = new RequestStatusAvailability(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals("accessConditions")) {
+            RequestStatus status = new RequestStatusAccessConditions(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals("accepptConditions")) {
+            RequestStatus status = new RequestStatusAccepptCondition(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals("mtaSigned")) {
+            RequestStatus status = new RequestStatusMTASigned(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals("shippedSamples")) {
+            RequestStatus status = new RequestStatusShippedSampesData(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals("receivedSamples")) {
+            RequestStatus status = new RequestStatusReceivedSamplesData(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals("endOfProject")) {
+            RequestStatus status = new RequestStatusEndOfProject(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals("dataReturnOffer")) {
+            RequestStatus status = new RequestStatusDataReturnOffer(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else {
             logger.error("ERROR-NG-0000002: Error status type \"" + collectionRequestStatusDTO.getStatusType() + "\" not" +

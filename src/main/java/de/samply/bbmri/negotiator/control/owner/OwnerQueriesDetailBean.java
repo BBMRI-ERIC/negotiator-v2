@@ -145,6 +145,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private String nextCollectionLifecycleStatusStatus;
 	private Integer numberOfSamplesAvailable;
 	private String indicateAccessConditions;
+	private String shippedNumber;
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -380,8 +381,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 		if(numberOfSamplesAvailable != null) {
 			return "{\"numberAvaiableSamples\":\"" + numberOfSamplesAvailable + "\"}";
 		}
-		if(indicateAccessConditions != null) {
+		if(indicateAccessConditions != null && indicateAccessConditions.length() > 0) {
 			return "{\"indicateAccessConditions\":\"" + indicateAccessConditions + "\"}";
+		}
+		if(shippedNumber != null && shippedNumber.length() > 0) {
+			return "{\"shippedNumber\":\"" + shippedNumber + "\"}";
 		}
 		return null;
 	}
@@ -597,5 +601,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setIndicateAccessConditions(String indicateAccessConditions) {
 		this.indicateAccessConditions = indicateAccessConditions;
+	}
+
+	public String getShippedNumber() {
+		return shippedNumber;
+	}
+
+	public void setShippedNumber(String shippedNumber) {
+		this.shippedNumber = shippedNumber;
 	}
 }

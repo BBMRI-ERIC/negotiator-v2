@@ -29,7 +29,8 @@
 
     <div class="col-sm-3 col-lg-3">#{cc.attrs.collectionLifeCycleStatus.collectionName}</div>
     <div class="col-sm-3 col-lg-3">
-        #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}
+        #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
+        <span style="font-size: 12px; font-style: italic;">#{cc.attrs.collectionLifeCycleStatus.status.statusText}</span>
     </div>
     <div class="col-sm-4 col-lg-4">
         <!--<h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">-->
@@ -48,16 +49,21 @@
             #{label['lifecycleCollectionSataus.nuberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
             <h:inputText id="numberOfAvailableSamples" value="#{ownerQueriesDetailBean.numberOfSamplesAvailable}"
                           styleClass="form-control"
-                          pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailableSamples']}"
-                          validatorMessage="#{label['error.invalidTitleLength']}" >
+                          pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailableSamples']}">
             </h:inputText>
         </div>
         <div id="indicateAccessConditions" style="display: none;">
-            #{label['lifecycleCollectionSataus.nuberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
+            #{label['lifecycleCollectionSataus.indicateAccessConditions.title']} <i class="fa fa-pencil-square-o" />
             <h:inputTextarea id="indicateAccessConditions" value="#{ownerQueriesDetailBean.indicateAccessConditions}"
                          styleClass="form-control"
-                         pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.indicateAccessConditions']}"
-                         validatorMessage="#{label['error.invalidTitleLength']}" >
+                         pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.indicateAccessConditions']}">
+            </h:inputTextarea>
+        </div>
+        <div id="shippedNumber" style="display: none;">
+            #{label['lifecycleCollectionSataus.shippedNumber.title']} <i class="fa fa-pencil-square-o" />
+            <h:inputTextarea id="shippedNumber" value="#{ownerQueriesDetailBean.shippedNumber}"
+                             styleClass="form-control"
+                             pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.shippedNumber']}">
             </h:inputTextarea>
         </div>
         <h:outputScript>
@@ -71,6 +77,11 @@
                     $("#indicateAccessConditions").show();
                 } else {
                     $("#indicateAccessConditions").hide();
+                }
+                if(data.value == 'shippedSamples.shipped') {
+                    $("#shippedNumber").show();
+                } else {
+                    $("#shippedNumber").hide();
                 }
             }
         </h:outputScript>

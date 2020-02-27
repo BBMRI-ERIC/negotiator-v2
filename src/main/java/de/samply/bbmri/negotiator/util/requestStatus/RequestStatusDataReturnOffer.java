@@ -10,29 +10,35 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusAvailability implements RequestStatus {
+public class RequestStatusDataReturnOffer implements RequestStatus {
 
     private String status = null;
-    private String statusType = "availability";
-    private String statusText = "Collection has availability not specified yet.";
+    private String statusType = "dataReturnOffer";
+    private String statusText = "Offer for data return.";
     private Date statusDate = null;
-    private List<String> allowedNextStatus = Arrays.asList("not_interrested", "indicateAccessConditions");
+    private List<String> allowedNextStatus = new ArrayList<String>();
     private List<String> allowedNextStatusBiobanker = new ArrayList<String>();
-    private List<String> allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interrested");
+    private List<String> allowedNextStatusResearcher = new ArrayList<String>();
 
-    public RequestStatusAvailability(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusDataReturnOffer(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
-        allowedNextStatusBiobanker.add("notselected.notselected");
-        if(status.equalsIgnoreCase("sample_data_available_accessible")) {
-            allowedNextStatusBiobanker.add("accessConditions.indicateAccessConditions");
+        if(status == null) {
+            allowedNextStatus.add("not_interrested");
+            allowedNextStatusBiobanker.add("notselected.notselected");
+            allowedNextStatusBiobanker.add("abandoned.not_interrested");
+            allowedNextStatusResearcher.add("notselected.watingForResponse");
         }
-        allowedNextStatusBiobanker.add("abandoned.sample_data_available_accessible");
-        if(status.equals("indicateAccessConditions")) {
-            String numberAvaiableSamples = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiableSamples");
-            if(numberAvaiableSamples != null && numberAvaiableSamples.length() > 0) {
-                statusText = "Number of avaiable Samples: " + numberAvaiableSamples;
-            }
+        if(status.equals("offer")) {
+            statusText = "Data return offer: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "offer");
+            allowedNextStatus.add("not_interrested");
+            allowedNextStatus.add("accepted");
+            allowedNextStatus.add("rejected");
+            allowedNextStatusBiobanker.add("notselected.notselected");
+            allowedNextStatusBiobanker.add("dataReturnOffer.accepted");
+            allowedNextStatusBiobanker.add("dataReturnOffer.rejected");
+            allowedNextStatusBiobanker.add("abandoned.not_interrested");
+            allowedNextStatusResearcher.add("notselected.watingForResponse");
         }
     }
 
@@ -53,10 +59,7 @@ public class RequestStatusAvailability implements RequestStatus {
 
     @Override
     public String getStatusText() {
-        if(status == null) {
-            return statusText;
-        }
-        return "ERROR";
+        return statusText;
     }
 
     @Override
