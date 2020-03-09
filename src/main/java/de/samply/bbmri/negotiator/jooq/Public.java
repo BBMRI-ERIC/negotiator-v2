@@ -24,6 +24,7 @@ import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
 import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank;
 import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection;
+import de.samply.bbmri.negotiator.jooq.tables.RequestStatus;
 import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -1685882464;
+	private static final long serialVersionUID = -1204839950;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -85,7 +86,9 @@ public class Public extends SchemaImpl {
 			Sequences.QUERY_ATTACHMENT_COMMENT_ID_SEQ,
 			Sequences.QUERY_ATTACHMENT_ID_SEQ,
 			Sequences.QUERY_ATTACHMENT_PRIVATE_ID_SEQ,
-			Sequences.QUERY_ID_SEQ);
+			Sequences.QUERY_ID_SEQ,
+			Sequences.QUERY_LIFECYCLE_COLLECTION_ID_SEQ,
+			Sequences.REQUEST_STATUS_ID_SEQ);
 	}
 
 	@Override
@@ -117,6 +120,7 @@ public class Public extends SchemaImpl {
 			QueryCollection.QUERY_COLLECTION,
 			QueryLifecycleBiobank.QUERY_LIFECYCLE_BIOBANK,
 			QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION,
+			RequestStatus.REQUEST_STATUS,
 			SchemaVersion.SCHEMA_VERSION);
 	}
 }

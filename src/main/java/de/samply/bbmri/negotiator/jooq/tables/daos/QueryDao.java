@@ -155,4 +155,25 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByNegotiationStartedTime(Timestamp... values) {
 		return fetch(Query.QUERY.NEGOTIATION_STARTED_TIME, values);
 	}
+
+	/**
+	 * Fetch records that have <code>researcher_name IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByResearcherName(String... values) {
+		return fetch(Query.QUERY.RESEARCHER_NAME, values);
+	}
+
+	/**
+	 * Fetch records that have <code>researcher_email IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByResearcherEmail(String... values) {
+		return fetch(Query.QUERY.RESEARCHER_EMAIL, values);
+	}
+
+	/**
+	 * Fetch records that have <code>researcher_organization IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByResearcherOrganization(String... values) {
+		return fetch(Query.QUERY.RESEARCHER_ORGANIZATION, values);
+	}
 }

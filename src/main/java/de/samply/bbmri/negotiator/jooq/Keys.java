@@ -20,6 +20,8 @@ import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
 import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection;
+import de.samply.bbmri.negotiator.jooq.tables.RequestStatus;
 import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
@@ -36,7 +38,9 @@ import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentCommentReco
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentPrivateRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryLifecycleCollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.RequestStatusRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.SchemaVersionRecord;
 
 import javax.annotation.Generated;
@@ -78,6 +82,8 @@ public class Keys {
 	public static final Identity<QueryAttachmentRecord, Integer> IDENTITY_QUERY_ATTACHMENT = Identities0.IDENTITY_QUERY_ATTACHMENT;
 	public static final Identity<QueryAttachmentCommentRecord, Integer> IDENTITY_QUERY_ATTACHMENT_COMMENT = Identities0.IDENTITY_QUERY_ATTACHMENT_COMMENT;
 	public static final Identity<QueryAttachmentPrivateRecord, Integer> IDENTITY_QUERY_ATTACHMENT_PRIVATE = Identities0.IDENTITY_QUERY_ATTACHMENT_PRIVATE;
+	public static final Identity<QueryLifecycleCollectionRecord, Integer> IDENTITY_QUERY_LIFECYCLE_COLLECTION = Identities0.IDENTITY_QUERY_LIFECYCLE_COLLECTION;
+	public static final Identity<RequestStatusRecord, Integer> IDENTITY_REQUEST_STATUS = Identities0.IDENTITY_REQUEST_STATUS;
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
@@ -101,6 +107,8 @@ public class Keys {
 	public static final UniqueKey<QueryAttachmentCommentRecord> QUERY_ATTACHMENT_COMMENT_PKEY = UniqueKeys0.QUERY_ATTACHMENT_COMMENT_PKEY;
 	public static final UniqueKey<QueryAttachmentPrivateRecord> QUERY_ATTACHMENT_PRIVATE_PKEY = UniqueKeys0.QUERY_ATTACHMENT_PRIVATE_PKEY;
 	public static final UniqueKey<QueryCollectionRecord> QUERY_COLLECTION_PKEY = UniqueKeys0.QUERY_COLLECTION_PKEY;
+	public static final UniqueKey<QueryLifecycleCollectionRecord> QUERY_LIFECYCLE_COLLECTION_PKEY = UniqueKeys0.QUERY_LIFECYCLE_COLLECTION_PKEY;
+	public static final UniqueKey<RequestStatusRecord> REQUEST_STATUS_PKEY = UniqueKeys0.REQUEST_STATUS_PKEY;
 	public static final UniqueKey<SchemaVersionRecord> SCHEMA_VERSION_PK = UniqueKeys0.SCHEMA_VERSION_PK;
 
 	// -------------------------------------------------------------------------
@@ -141,6 +149,8 @@ public class Keys {
 		public static Identity<QueryAttachmentRecord, Integer> IDENTITY_QUERY_ATTACHMENT = createIdentity(QueryAttachment.QUERY_ATTACHMENT, QueryAttachment.QUERY_ATTACHMENT.ID);
 		public static Identity<QueryAttachmentCommentRecord, Integer> IDENTITY_QUERY_ATTACHMENT_COMMENT = createIdentity(QueryAttachmentComment.QUERY_ATTACHMENT_COMMENT, QueryAttachmentComment.QUERY_ATTACHMENT_COMMENT.ID);
 		public static Identity<QueryAttachmentPrivateRecord, Integer> IDENTITY_QUERY_ATTACHMENT_PRIVATE = createIdentity(QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE, QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE.ID);
+		public static Identity<QueryLifecycleCollectionRecord, Integer> IDENTITY_QUERY_LIFECYCLE_COLLECTION = createIdentity(QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION, QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION.ID);
+		public static Identity<RequestStatusRecord, Integer> IDENTITY_REQUEST_STATUS = createIdentity(RequestStatus.REQUEST_STATUS, RequestStatus.REQUEST_STATUS.ID);
 	}
 
 	private static class UniqueKeys0 extends AbstractKeys {
@@ -162,6 +172,8 @@ public class Keys {
 		public static final UniqueKey<QueryAttachmentCommentRecord> QUERY_ATTACHMENT_COMMENT_PKEY = createUniqueKey(QueryAttachmentComment.QUERY_ATTACHMENT_COMMENT, QueryAttachmentComment.QUERY_ATTACHMENT_COMMENT.ID);
 		public static final UniqueKey<QueryAttachmentPrivateRecord> QUERY_ATTACHMENT_PRIVATE_PKEY = createUniqueKey(QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE, QueryAttachmentPrivate.QUERY_ATTACHMENT_PRIVATE.ID);
 		public static final UniqueKey<QueryCollectionRecord> QUERY_COLLECTION_PKEY = createUniqueKey(QueryCollection.QUERY_COLLECTION, QueryCollection.QUERY_COLLECTION.QUERY_ID, QueryCollection.QUERY_COLLECTION.COLLECTION_ID);
+		public static final UniqueKey<QueryLifecycleCollectionRecord> QUERY_LIFECYCLE_COLLECTION_PKEY = createUniqueKey(QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION, QueryLifecycleCollection.QUERY_LIFECYCLE_COLLECTION.ID);
+		public static final UniqueKey<RequestStatusRecord> REQUEST_STATUS_PKEY = createUniqueKey(RequestStatus.REQUEST_STATUS, RequestStatus.REQUEST_STATUS.ID);
 		public static final UniqueKey<SchemaVersionRecord> SCHEMA_VERSION_PK = createUniqueKey(SchemaVersion.SCHEMA_VERSION, SchemaVersion.SCHEMA_VERSION.INSTALLED_RANK);
 	}
 

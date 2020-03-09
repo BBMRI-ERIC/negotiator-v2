@@ -4,16 +4,21 @@
 package de.samply.bbmri.negotiator.jooq.tables;
 
 
+import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryLifecycleCollectionRecord;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.Identity;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 
 
@@ -30,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryLifecycleCollection extends TableImpl<QueryLifecycleCollectionRecord> {
 
-	private static final long serialVersionUID = -1406366454;
+	private static final long serialVersionUID = -1873885348;
 
 	/**
 	 * The reference instance of <code>public.query_lifecycle_collection</code>
@@ -51,14 +56,14 @@ public class QueryLifecycleCollection extends TableImpl<QueryLifecycleCollection
 	public final TableField<QueryLifecycleCollectionRecord, Integer> QUERY_ID = createField("query_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.query_lifecycle_collection.person_id</code>.
+	 * The column <code>public.query_lifecycle_collection.status_user_id</code>.
 	 */
-	public final TableField<QueryLifecycleCollectionRecord, Integer> PERSON_ID = createField("person_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<QueryLifecycleCollectionRecord, Integer> STATUS_USER_ID = createField("status_user_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.query_lifecycle_collection.biobank_id</code>.
+	 * The column <code>public.query_lifecycle_collection.collection_id</code>.
 	 */
-	public final TableField<QueryLifecycleCollectionRecord, Integer> BIOBANK_ID = createField("biobank_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
+	public final TableField<QueryLifecycleCollectionRecord, Integer> COLLECTION_ID = createField("collection_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
 	 * The column <code>public.query_lifecycle_collection.status</code>.
@@ -66,9 +71,24 @@ public class QueryLifecycleCollection extends TableImpl<QueryLifecycleCollection
 	public final TableField<QueryLifecycleCollectionRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
 	/**
-	 * The column <code>public.query_lifecycle_collection.lifecycle_time</code>.
+	 * The column <code>public.query_lifecycle_collection.status_date</code>.
 	 */
-	public final TableField<QueryLifecycleCollectionRecord, Timestamp> LIFECYCLE_TIME = createField("lifecycle_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+	public final TableField<QueryLifecycleCollectionRecord, Timestamp> STATUS_DATE = createField("status_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+	/**
+	 * The column <code>public.query_lifecycle_collection.id</code>.
+	 */
+	public final TableField<QueryLifecycleCollectionRecord, Integer> ID = createField("id", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaulted(true), this, "");
+
+	/**
+	 * The column <code>public.query_lifecycle_collection.status_type</code>.
+	 */
+	public final TableField<QueryLifecycleCollectionRecord, String> STATUS_TYPE = createField("status_type", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+	/**
+	 * The column <code>public.query_lifecycle_collection.status_json</code>.
+	 */
+	public final TableField<QueryLifecycleCollectionRecord, String> STATUS_JSON = createField("status_json", org.jooq.impl.SQLDataType.CLOB, this, "");
 
 	/**
 	 * Create a <code>public.query_lifecycle_collection</code> table reference
@@ -90,6 +110,30 @@ public class QueryLifecycleCollection extends TableImpl<QueryLifecycleCollection
 
 	private QueryLifecycleCollection(String alias, Table<QueryLifecycleCollectionRecord> aliased, Field<?>[] parameters) {
 		super(alias, Public.PUBLIC, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Identity<QueryLifecycleCollectionRecord, Integer> getIdentity() {
+		return Keys.IDENTITY_QUERY_LIFECYCLE_COLLECTION;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public UniqueKey<QueryLifecycleCollectionRecord> getPrimaryKey() {
+		return Keys.QUERY_LIFECYCLE_COLLECTION_PKEY;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<UniqueKey<QueryLifecycleCollectionRecord>> getKeys() {
+		return Arrays.<UniqueKey<QueryLifecycleCollectionRecord>>asList(Keys.QUERY_LIFECYCLE_COLLECTION_PKEY);
 	}
 
 	/**
