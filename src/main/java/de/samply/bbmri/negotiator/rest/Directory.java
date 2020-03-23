@@ -146,7 +146,22 @@ public class Directory {
                 QueryRecord queryRecord = DbUtil.getQuery(config, qTocken);
 
                 if(queryRecord == null) {
-                    throw new NotFoundException();
+                    /**
+                     * Create the json_query object itself and store it in the database.
+                     */
+                    JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
+                    jsonQueryRecord.setJsonText(queryString);
+                    System.out.println("queryString: " + queryString);
+                    jsonQueryRecord.store();
+                    config.commit();
+
+                    CreateQueryResultDTO result = new CreateQueryResultDTO();
+
+                    String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
+
+                    result.setRedirectUri(builder);
+
+                    return Response.created(new URI(builder)).entity(result).build();
                 }
 
                 /**

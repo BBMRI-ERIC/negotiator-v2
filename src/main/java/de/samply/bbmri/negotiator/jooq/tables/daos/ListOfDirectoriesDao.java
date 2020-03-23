@@ -140,4 +140,11 @@ public class ListOfDirectoriesDao extends DAOImpl<ListOfDirectoriesRecord, de.sa
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories> fetchBySyncActive(Boolean... values) {
 		return fetch(ListOfDirectories.LIST_OF_DIRECTORIES.SYNC_ACTIVE, values);
 	}
+
+	/**
+	 * Fetch records that have <code>directory_prefix IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories> fetchByDirectoryPrefix(String... values) {
+		return fetch(ListOfDirectories.LIST_OF_DIRECTORIES.DIRECTORY_PREFIX, values);
+	}
 }

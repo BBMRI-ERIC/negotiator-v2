@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ListOfDirectories extends TableImpl<ListOfDirectoriesRecord> {
 
-	private static final long serialVersionUID = -1013502880;
+	private static final long serialVersionUID = -2013662111;
 
 	/**
 	 * The reference instance of <code>public.list_of_directories</code>
@@ -108,6 +108,11 @@ public class ListOfDirectories extends TableImpl<ListOfDirectoriesRecord> {
 	 * The column <code>public.list_of_directories.sync_active</code>.
 	 */
 	public final TableField<ListOfDirectoriesRecord, Boolean> SYNC_ACTIVE = createField("sync_active", org.jooq.impl.SQLDataType.BOOLEAN, this, "");
+
+	/**
+	 * The column <code>public.list_of_directories.directory_prefix</code>.
+	 */
+	public final TableField<ListOfDirectoriesRecord, String> DIRECTORY_PREFIX = createField("directory_prefix", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
 	/**
 	 * Create a <code>public.list_of_directories</code> table reference

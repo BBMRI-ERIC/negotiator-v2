@@ -1430,6 +1430,15 @@ public class DbUtil {
                 .fetch(), CollectionRecord.class);
     }
 
+    public static List<CollectionRecord> getCollections(Config config, String collectionId, String directoryName) {
+        return config.map(config.dsl().select(getFields(Tables.COLLECTION))
+                .from(Tables.COLLECTION)
+                .join(Tables.LIST_OF_DIRECTORIES).on(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
+                .and(Tables.LIST_OF_DIRECTORIES.DIRECTORY_PREFIX.eq(directoryName))
+                .fetch(), CollectionRecord.class);
+    }
+
     /**
      * Saves the given Perun User into the database or updates the user, if he already exists
      * @param config
@@ -1461,8 +1470,7 @@ public class DbUtil {
 
             String collectionId = mapping.getName();
 
-            ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectory(config, mapping.getDirectory());
-            List<CollectionRecord> collections = getCollections(config, collectionId, listOfDirectoriesRecord.getId());
+            List<CollectionRecord> collections = getCollections(config, collectionId, mapping.getDirectory());
 
             for (CollectionRecord collection : collections) {
                 if (collection != null) {
@@ -1728,17 +1736,33 @@ public class DbUtil {
         return queries;
     }
 
+    /*
+    SELECT CAST(array_to_json(array_agg(row_to_json(jsond))) AS varchar) AS directories FROM (
+        SELECT json_build_object('name', d2.name, 'url', d2.url, 'description', d2.description, 'Biobanks',
+            (SELECT array_to_json(array_agg(row_to_json(jsonb))) FROM (
+                SELECT directory_id, name, (
+                    SELECT array_to_json(array_agg(row_to_json(jsonc))) FROM (
+                        SELECT directory_id, name FROM public.collection c WHERE c.biobank_id = b.id
+                    ) AS jsonc
+                ) AS collections
+                FROM public.biobank b WHERE b.list_of_directories_id = d.id
+            ) AS jsonb)) AS directory
+        FROM public.list_of_directories d LEFT JOIN public.list_of_directories d2 ON d2.name = d.directory_prefix
+    ) AS jsond;
+     */
     public static String getFullListForAPI(Config config) {
-        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jd))) AS varchar) AS directories FROM (\n" +
-                "SELECT json_build_object('name', name, 'url', url, 'description', description, 'Biobanks',\t\t\t\t\t\t \n" +
-                "(SELECT array_to_json(array_agg(row_to_json(jb))) FROM \n" +
-                "\t(SELECT directory_id, name,\n" +
-                "\t (SELECT array_to_json(array_agg(row_to_json(jc))) FROM\n" +
-                "\t (SELECT directory_id, name\n" +
-                "\t FROM public.collection c WHERE c.list_of_directories_id = b.list_of_directories_id AND c.biobank_id = b.id) jc) AS collections \n" +
-                "\t FROM public.biobank b WHERE b.list_of_directories_id = d.id) jb)) AS directory\t\t\t\t\t\t \n" +
-                "\tFROM public.list_of_directories d\n" +
-                ") jd;");
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsond))) AS varchar) AS directories FROM ( " +
+                "SELECT json_build_object('name', d2.name, 'url', d2.url, 'description', d2.description, 'Biobanks', " +
+                "(SELECT array_to_json(array_agg(row_to_json(jsonb))) FROM ( " +
+                "SELECT directory_id, name, ( " +
+                "SELECT array_to_json(array_agg(row_to_json(jsonc))) FROM ( " +
+                "SELECT directory_id, name FROM public.collection c WHERE c.biobank_id = b.id " +
+                ") AS jsonc " +
+                ") AS collections " +
+                "FROM public.biobank b WHERE b.list_of_directories_id = d.id " +
+                ") AS jsonb)) AS directory " +
+                "FROM public.list_of_directories d LEFT JOIN public.list_of_directories d2 ON d2.name = d.directory_prefix " +
+                ") AS jsond;");
         Result<Record> result = resultQuery.fetch();
         for(Record record : result) {
             System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
