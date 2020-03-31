@@ -91,6 +91,9 @@ public class OfferBean implements Serializable {
                 try {
                     List<Person> collectioncontacts = DbUtil.getPersonsContactsForBiobank(config, offerFrom);
                     for (Person collectioncontact : collectioncontacts) {
+                        if(userBean.getPerson().getId() == collectioncontact.getId()) {
+                            continue;
+                        }
                         OfferResponseEmailNotification notifier = new OfferResponseEmailNotification(query, getQueryUrlBiobanker(query.getId()), collectioncontact);
                         notifier.sendEmailNotification();
                     }

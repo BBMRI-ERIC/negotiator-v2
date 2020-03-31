@@ -102,12 +102,12 @@ public class CommentBean implements Serializable {
             clearEditChanges();
             clearFileChanges();
 
-            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()));
+            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()), userBean.getPerson());
             notifier.sendEmailNotificationToBiobankers(userBean.getUserId());
             if (userBean.getBiobankOwner()){
                 /* Send notification to the query owner if a biobanker made a comment
                  */
-                notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()));
+                notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()), userBean.getPerson());
                 notifier.sendEmailNotificationToQueryOwner();
             }
 
