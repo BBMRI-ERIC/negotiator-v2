@@ -32,6 +32,7 @@ import java.util.Observer;
 
 import de.samply.bbmri.mailing.EmailBuilder;
 import de.samply.bbmri.negotiator.MailUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.notification.Notification;
@@ -46,10 +47,13 @@ public class QueryEmailNotifier {
 
     private Query query;
 
-    public QueryEmailNotifier(List<NegotiatorDTO> negotiators, String url, Query query) {
+    private Person exclude_sender;
+
+    public QueryEmailNotifier(List<NegotiatorDTO> negotiators, String url, Query query, Person exclude_sender) {
         this.negotiators = negotiators;
         this.url = url;
         this.query = query;
+        this.exclude_sender = exclude_sender;
     }
 
     /**
@@ -66,6 +70,9 @@ public class QueryEmailNotifier {
         notification.setLocale("de");
 
         for(NegotiatorDTO negotiator : negotiators) {
+            if(negotiator.getPerson().getId() == exclude_sender.getId()) {
+                continue;
+            }
             notification.addAddressee(negotiator.getPerson());
         }
 

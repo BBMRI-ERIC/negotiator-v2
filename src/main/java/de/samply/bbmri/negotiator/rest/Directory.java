@@ -179,7 +179,12 @@ public class Directory {
 
                 result.setRedirectUri(builder);
 
-                return Response.accepted(result).location(new URI(builder)).build();
+                return Response.accepted(result)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                        .header("Access-Control-Allow-Credentials", "true")
+                        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                        .location(new URI(builder)).build();
             }
         } catch (IOException | URISyntaxException e) {
             System.err.println("-------Error API");

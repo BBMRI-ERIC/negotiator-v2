@@ -35,7 +35,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.tables.Person;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.notification.Notification;
@@ -61,7 +61,9 @@ public class CommentEmailNotifier {
 
     private Flag flagFilter = Flag.UNFLAGGED;
 
-    public CommentEmailNotifier(Query query, String url, String comment, String commentPoster, String dateOfComment) {
+    private Person exclude_perso;
+
+    public CommentEmailNotifier(Query query, String url, String comment, String commentPoster, String dateOfComment, Person exclude_person) {
         this.query = query;
         this.url = url;
         if(comment.length() > 20) {
@@ -70,8 +72,8 @@ public class CommentEmailNotifier {
         this.comment = comment;
         this.commentPoster = commentPoster;
         this.dateOfComment = dateOfComment;
+        this.exclude_perso = exclude_perso;
     }
-
 
     /**
      * Sends notification email to biobankers(except the one who made the comment) when a new comment gets added to a query
@@ -87,6 +89,10 @@ public class CommentEmailNotifier {
                 buildNotification(notification);
 
                 for (NegotiatorDTO negotiator : negotiators) {
+                    // Don't send mail when user created the comment
+                    if(negotiator.getPerson().getId() == exclude_perso.getId()) {
+                        continue;
+                    }
                     notification.addAddressee(negotiator.getPerson());
                 }
                 NotificationThread thread = new NotificationThread(builder, notification);
@@ -110,6 +116,12 @@ public class CommentEmailNotifier {
             buildNotification(notification);
 
             NegotiatorDTO queryOwner = DbUtil.getQueryOwner(config, query.getId());
+
+            // Don't send mail when user created the comment
+            if(queryOwner.getPerson().getId() == exclude_perso.getId()) {
+                return;
+            }
+
             notification.addAddressee(queryOwner.getPerson());
 
             NotificationThread thread = new NotificationThread(builder, notification);
