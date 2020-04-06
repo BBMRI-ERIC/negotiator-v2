@@ -20,6 +20,7 @@ public class DashboardBean implements Serializable {
     private UserBean userBean;
 
     private Integer queriesInitialized = 0;
+    private String requestLast7days = 0 + "/" + 0;
     private List<QueryRecord> queryRecords;
 
     @PostConstruct
@@ -30,6 +31,7 @@ public class DashboardBean implements Serializable {
     private void collectDataStatistik() {
         queriesInitialized = DbUtil.getNumberOfInitializedQueries();
         queryRecords = DbUtil.getNumberOfQueries();
+        requestLast7days = DbUtil.getNumberOfQueriesLast7Days();
     }
 
     public Integer getQueriesInitialized() {
@@ -38,6 +40,10 @@ public class DashboardBean implements Serializable {
 
     public Integer getNumberOfRequests() {
         return queryRecords.size();
+    }
+
+    public String getNumberOfRequestsLast7Days() {
+        return requestLast7days;
     }
 
     public UserBean getUserBean() {

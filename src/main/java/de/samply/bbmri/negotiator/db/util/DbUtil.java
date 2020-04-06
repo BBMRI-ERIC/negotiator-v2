@@ -2186,6 +2186,26 @@ public class DbUtil {
         return 0;
     }
 
+    public static String getNumberOfQueriesLast7Days() {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> fetch = config.dsl().resultQuery("SELECT COUNT(*) FROM public.query WHERE query_creation_time > current_date - interval '7 days';").fetch();
+            int querys_created = 0;
+            for(Record record : fetch) {
+                querys_created = Integer.parseInt(record.getValue(0).toString());
+            }
+            Result<Record> fetch_json_query = config.dsl().resultQuery("SELECT COUNT(*) FROM public.json_query WHERE query_create_time > current_date - interval '7 days';").fetch();
+            int querys_initialized = 0;
+            for(Record record : fetch_json_query) {
+                querys_initialized = Integer.parseInt(record.getValue(0).toString());
+            }
+            return querys_created + "/" + querys_initialized;
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return 0 + "/" + 0;
+    }
+
     public static List<QueryRecord> getNumberOfQueries() {
         List<QueryRecord> returnList = new ArrayList();
         try (Config config = ConfigFactory.get()) {

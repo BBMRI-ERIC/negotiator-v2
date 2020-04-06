@@ -56,6 +56,13 @@ public class QueryEmailNotifier {
         this.exclude_sender = exclude_sender;
     }
 
+    public QueryEmailNotifier(List<NegotiatorDTO> negotiators, String url, Query query) {
+        this.negotiators = negotiators;
+        this.url = url;
+        this.query = query;
+        this.exclude_sender = null;
+    }
+
     /**
      * Sends notification email after a query gets created and is ready to be negotiated on
      */
@@ -70,7 +77,7 @@ public class QueryEmailNotifier {
         notification.setLocale("de");
 
         for(NegotiatorDTO negotiator : negotiators) {
-            if(negotiator.getPerson().getId() == exclude_sender.getId()) {
+            if(exclude_sender != null & negotiator.getPerson().getId() == exclude_sender.getId()) {
                 continue;
             }
             notification.addAddressee(negotiator.getPerson());
