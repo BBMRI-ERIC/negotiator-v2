@@ -37,6 +37,11 @@
 
     <ui:define name="body" >
 
+        <!--<script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+        <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+
         <style>
             .blink_me {
                 animation: blinker 2s linear infinite;
@@ -59,6 +64,8 @@
         <h:panelGroup layout="block" styleClass="row">
             <h3>Dashboard</h3>
         </h:panelGroup>
+
+        <!-- Request review  -->
 
         <h:panelGroup layout="block" styleClass="row">
             <div class="card bg-light border-light">
@@ -91,6 +98,8 @@
             </div>
         </h:panelGroup>
 
+        <!-- Requests initialized and created -->
+
         <h:panelGroup layout="block" styleClass="row">
             <div class="card bg-light border-light">
                 <div class="card-header negotiator-dashboard-card-header">
@@ -119,8 +128,79 @@
                         </div>
                     </div>
                 </div>
+
+                <canvas id="dashboardRequestLineChart"></canvas>
+
             </div>
+
+
+
+            <h:outputScript>
+                /* chart.js chart examples */
+
+                // chart colors
+                var colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
+
+                var jsonfile = {
+                    "jsonarray": [{
+                        "name": "Joe",
+                        "age": 12
+                    }, {
+                        "name": "Tom",
+                        "age": 14
+                    }]
+                };
+
+                var labels = jsonfile.jsonarray.map(function(e) {
+                    return e.name;
+                });
+                var data = jsonfile.jsonarray.map(function(e) {
+                    return e.age;
+                });
+
+                /* large line chart */
+                var chLine = document.getElementById("dashboardRequestLineChart");
+                var chartData = {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: 'transparent',
+                        borderColor: colors[0],
+                        borderWidth: 4,
+                        pointBackgroundColor: colors[0]
+                    },
+                        {
+                            data: [639, 465, 493, 478, 589, 632, 674],
+                            backgroundColor: colors[3],
+                            borderColor: colors[1],
+                            borderWidth: 4,
+                            pointBackgroundColor: colors[1]
+                        }]
+                };
+
+                if (chLine) {
+                    new Chart(chLine, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: false
+                                    }
+                                }]
+                            },
+                            legend: {
+                                display: false
+                            }
+                        }
+                    });
+                }
+            </h:outputScript>
+
         </h:panelGroup>
+
+
 
     </ui:define>
 
