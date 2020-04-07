@@ -142,7 +142,12 @@ public class Directory {
 
                 result.setRedirectUri(builder);
 
-                return Response.created(new URI(builder)).entity(result).build();
+                return Response.created(new URI(builder)).entity(result)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                        .header("Access-Control-Allow-Credentials", "true")
+                        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                        .build();
             } else {
                 // get the id of the query from the structure, the compleat token is still in the request
                 String qTocken = querySearchDTO.getToken().replaceAll("__search__.*", "");
@@ -164,7 +169,12 @@ public class Directory {
 
                     result.setRedirectUri(builder);
 
-                    return Response.created(new URI(builder)).entity(result).build();
+                    return Response.created(new URI(builder)).entity(result)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                            .header("Access-Control-Allow-Credentials", "true")
+                            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                            .build();
                 }
 
                 /**
