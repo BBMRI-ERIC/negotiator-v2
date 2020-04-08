@@ -41,6 +41,7 @@
         <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+        <script src="cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
 
         <style>
             .blink_me {
@@ -100,7 +101,7 @@
 
         <!-- Requests initialized and created -->
 
-        <h:panelGroup layout="block" styleClass="row">
+        <h:panelGroup layout="block" styleClass="row" style="margin-top: 10px;">
             <div class="card bg-light border-light">
                 <div class="card-header negotiator-dashboard-card-header">
                     #{label['dashboard.header.requests']}
@@ -129,7 +130,7 @@
                     </div>
                 </div>
 
-                <canvas id="dashboardRequestLineChart"></canvas>
+                <canvas id="dashboardRequestLineChart" style="padding: 25px;"></canvas>
 
             </div>
 
@@ -142,20 +143,17 @@
                 var colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
 
                 var jsonfile = {
-                    "jsonarray": [{
-                        "name": "Joe",
-                        "age": 12
-                    }, {
-                        "name": "Tom",
-                        "age": 14
-                    }]
+                    "jsonarray": #{dashboardBean.dataRequestLineGraph}
                 };
 
                 var labels = jsonfile.jsonarray.map(function(e) {
-                    return e.name;
+                    return e.creation_date;
                 });
-                var data = jsonfile.jsonarray.map(function(e) {
-                    return e.age;
+                var data_created = jsonfile.jsonarray.map(function(e) {
+                    return e.created_count;
+                });
+                var data_initialized = jsonfile.jsonarray.map(function(e) {
+                return e.initialized_count;
                 });
 
                 /* large line chart */
@@ -163,14 +161,16 @@
                 var chartData = {
                     labels: labels,
                     datasets: [{
-                        data: data,
+                        label: 'Requests created',
+                        data: data_created,
                         backgroundColor: 'transparent',
                         borderColor: colors[0],
                         borderWidth: 4,
                         pointBackgroundColor: colors[0]
                     },
                         {
-                            data: [639, 465, 493, 478, 589, 632, 674],
+                            label: 'Negotiation initialized',
+                            data: data_initialized,
                             backgroundColor: colors[3],
                             borderColor: colors[1],
                             borderWidth: 4,
@@ -191,13 +191,41 @@
                                 }]
                             },
                             legend: {
-                                display: false
+                                display: true
                             }
                         }
                     });
                 }
             </h:outputScript>
 
+        </h:panelGroup>
+
+        <!-- Table of Searches -->
+
+        <h:panelGroup layout="block" styleClass="row" style="margin-top: 10px;">
+            <div class="card bg-light border-light">
+                <div class="card-header negotiator-dashboard-card-header">
+                    #{label['dashboard.header.search']}
+                </div>
+
+                <div class="card-body container" style="padding: 5px;">
+                    <table id="example" class="display" width="100%"></table>
+                </div>
+            </div>
+
+            <h:outputScript>
+                var dataSet =#{dashboardBean.humanReadableStatisticsData}
+
+                $(document).ready(function() {
+                    $('#example').DataTable( {
+                        data: dataSet,
+                        columns: [
+                            { "data": "readable", title: "Search" },
+                            { "data": "count", title: "Count" }
+                        ]
+                    } );
+                } );
+            </h:outputScript>
         </h:panelGroup>
 
 

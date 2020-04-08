@@ -22,6 +22,8 @@ public class DashboardBean implements Serializable {
     private Integer queriesInitialized = 0;
     private String requestLast7days = 0 + "/" + 0;
     private List<QueryRecord> queryRecords;
+    private String requestLineGraph;
+    private String humanReadableStatisticsData;
 
     @PostConstruct
     public void init() {
@@ -32,6 +34,8 @@ public class DashboardBean implements Serializable {
         queriesInitialized = DbUtil.getNumberOfInitializedQueries();
         queryRecords = DbUtil.getNumberOfQueries();
         requestLast7days = DbUtil.getNumberOfQueriesLast7Days();
+        requestLineGraph = DbUtil.getDataForDashboardRequestLineGraph();
+        humanReadableStatisticsData = DbUtil.getHumanReadableStatistics();
     }
 
     public Integer getQueriesInitialized() {
@@ -44,6 +48,14 @@ public class DashboardBean implements Serializable {
 
     public String getNumberOfRequestsLast7Days() {
         return requestLast7days;
+    }
+
+    public String getDataRequestLineGraph() {
+        return requestLineGraph;
+    }
+
+    public String getHumanReadableStatisticsData() {
+        return humanReadableStatisticsData;
     }
 
     public UserBean getUserBean() {

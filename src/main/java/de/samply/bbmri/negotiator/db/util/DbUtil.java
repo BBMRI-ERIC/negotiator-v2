@@ -2216,4 +2216,45 @@ public class DbUtil {
         }
         return returnList;
     }
+
+    public static String getDataForDashboardRequestLineGraph() {
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM\n" +
+                    "(SELECT CASE WHEN created_query.creation_date IS NOT null THEN created_query.creation_date WHEN initialized_query.creation_date IS NOT null \n" +
+                    "THEN initialized_query.creation_date ELSE '2020-01-01'::date END creation_date, created_query.created_count, initialized_query. initialized_count FROM\n" +
+                    "(SELECT DATE(query_creation_time) creation_date, COUNT(*) created_count FROM public.query GROUP BY DATE(query_creation_time)) created_query FULL OUTER JOIN \n" +
+                    "(SELECT DATE(query_create_time) creation_date, COUNT(*) initialized_count FROM public.json_query GROUP BY DATE(query_create_time)) initialized_query \n" +
+                    "ON created_query.creation_date = initialized_query.creation_date ORDER BY creation_date) jsonc;");
+            Result<Record> result = resultQuery.fetch();
+            for(Record record : result) {
+                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+
+                //PGobject jsonObject = record.getValue(0);
+                return (String)record.getValue(0);
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return "ERROR";
+    }
+
+    public static String getHumanReadableStatistics() {
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM \n" +
+                    "(SELECT (json_array_elements((q.json_text::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable, " +
+                    "COUNT(*) FROM query q GROUP BY readable) jsonc;");
+            Result<Record> result = resultQuery.fetch();
+            for(Record record : result) {
+                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+
+                //PGobject jsonObject = record.getValue(0);
+                return (String)record.getValue(0);
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return "ERROR";
+    }
 }
