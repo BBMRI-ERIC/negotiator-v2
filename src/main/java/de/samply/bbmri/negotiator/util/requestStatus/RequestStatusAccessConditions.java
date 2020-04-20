@@ -17,7 +17,7 @@ public class RequestStatusAccessConditions implements RequestStatus {
     private Date statusDate = null;
     private List allowedNextStatus = Arrays.asList("not_interrested", "selectAndAcceppt");
 
-    private List allowedNextStatusBiobanker = Arrays.asList("abandoned.not_interrested");
+    private List allowedNextStatusBiobanker = Arrays.asList("notselected.watingForResponseFromResearcher", "abandoned.not_interrested");
 
     private List allowedNextStatusResearcher = Arrays.asList("accepptConditions.selectAndAcceppt", "abandoned.not_interrested");
 

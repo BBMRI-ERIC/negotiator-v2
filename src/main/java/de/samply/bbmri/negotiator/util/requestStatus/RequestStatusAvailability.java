@@ -27,8 +27,8 @@ public class RequestStatusAvailability implements RequestStatus {
         if(status.equalsIgnoreCase("sample_data_available_accessible")) {
             allowedNextStatusBiobanker.add("accessConditions.indicateAccessConditions");
         }
-        allowedNextStatusBiobanker.add("abandoned.sample_data_available_accessible");
-        if(status.equals("indicateAccessConditions")) {
+        allowedNextStatusBiobanker.add("abandoned.not_interrested");
+        if(status.equals("sample_data_available_accessible")) {
             String numberAvaiableSamples = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiableSamples");
             if(numberAvaiableSamples != null && numberAvaiableSamples.length() > 0) {
                 statusText = "Number of avaiable Samples: " + numberAvaiableSamples;
@@ -53,7 +53,7 @@ public class RequestStatusAvailability implements RequestStatus {
 
     @Override
     public String getStatusText() {
-        if(status == null) {
+        if(status.equals("sample_data_available_accessible")) {
             return statusText;
         }
         return "ERROR";

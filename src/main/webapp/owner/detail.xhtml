@@ -113,12 +113,10 @@
                                                 <!-- TODO: Collection table with select -->
                                                 <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
                                                            var="collectionStatus" varStatus="loop">
-                                                    <h:form>
-                                                        <bbmribiobankercc:lifecycleCollectionStatus
+                                                    <bbmribiobankercc:lifecycleCollectionStatus
                                                                 collectionLifeCycleStatus="#{collectionStatus}"
                                                                 collectionId="#{collectionStatus.collectionId}"
                                                                 biobankId="#{biobank.id}" />
-                                                    </h:form>
                                                 </ui:repeat>
                                             </div>
                                         </div>

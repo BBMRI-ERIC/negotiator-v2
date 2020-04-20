@@ -732,6 +732,7 @@ public class DbUtil {
     	}
 
         condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+        //condition = condition.and(Tables.QUERY.ID.in());
 
     	Result<Record> fetch = config.dsl()
 				.select(getFields(Tables.QUERY, "query"))
@@ -760,7 +761,10 @@ public class DbUtil {
     			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
 
-    			.where(condition)
+                .join(Tables.REQUEST_STATUS, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.REQUEST_STATUS.QUERY_ID))
+
+    			.where(condition).and(Tables.REQUEST_STATUS.STATUS.eq("started"))
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 

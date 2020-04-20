@@ -362,6 +362,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 		}
 	}
 
+	public void updateCollectionLifecycleStatus() {
+		System.out.println("Now");
+	}
+
 	public String updateCollectionLifecycleStatus(Integer collectionId) {
 		if(nextCollectionLifecycleStatusStatus == null || nextCollectionLifecycleStatusStatus.length() == 0) {
 			return "";
