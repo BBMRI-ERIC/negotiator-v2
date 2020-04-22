@@ -35,6 +35,8 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.notification.Notification;
 import de.samply.bbmri.negotiator.notification.NotificationThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 
@@ -45,6 +47,9 @@ public class OfferEmailNotifier {
     private final String url;
 
     private final String biobankName;
+
+    private static Logger logger = LoggerFactory.getLogger(OfferEmailNotifier.class);
+    private static Logger mail_logger = LoggerFactory.getLogger("de.samply.bbmri.negotiator");
 
     public OfferEmailNotifier(Query query, String url, String biobankName) {
         this.query = query;
@@ -63,6 +68,9 @@ public class OfferEmailNotifier {
         Notification notification = new Notification();
         notification.setSubject("Sample or data availability update");
 
+        logger.debug("Sample or data availability update");
+        mail_logger.info("Sample or data availability update");
+
         try(Config config = ConfigFactory.get()) {
             Person researcher = config.map(config.dsl().selectFrom(Tables.PERSON)
                     .where(Tables.PERSON.ID.eq(query.getResearcherId())).fetchOne(), Person.class);
@@ -72,6 +80,9 @@ public class OfferEmailNotifier {
             notification.addParameter("biobankName", biobankName);
             notification.addParameter("url", url);
             notification.setLocale("de");
+
+            logger.debug("Sample or data availability update " + query.getTitle() + " -> " + researcher);
+            mail_logger.info("Sample or data availability update " + query.getTitle() + " -> " + researcher);
 
             NotificationThread thread = new NotificationThread(builder, notification);
             thread.start();

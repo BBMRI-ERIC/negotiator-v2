@@ -42,6 +42,7 @@ public class NotificationThread extends Thread {
     private final EmailBuilder builder;
 
     private static Logger logger = LoggerFactory.getLogger(NotificationThread.class);
+    private static Logger mail_logger = LoggerFactory.getLogger("de.samply.bbmri.negotiator");
 
     public NotificationThread(EmailBuilder builder, Notification notification) {
         this.builder = builder;
@@ -52,8 +53,12 @@ public class NotificationThread extends Thread {
     public void run() {
         try {
             logger.debug("Notification thread started");
+            mail_logger.info("Notification thread started");
             for(Person person : notification.getAddressees()) {
                 OutgoingEmail email = new OutgoingEmail();
+
+                logger.debug("Notification thread: " + notification.getSubject() + " -> " + person.getAuthEmail());
+                mail_logger.info("Notification thread: " + notification.getSubject() + " -> " + person.getAuthEmail());
 
                 for(Map.Entry<String, String> parameters : notification.getParameters().entrySet()) {
                     email.putParameter(parameters.getKey(), parameters.getValue());
@@ -64,12 +69,16 @@ public class NotificationThread extends Thread {
                 email.addAddressee(person.getAuthEmail());
                 email.setBuilder(builder);
                 logger.debug("Notification body: " + builder.getText(notification.getParameters()));
+                mail_logger.info("Notification body: " + builder.getText(notification.getParameters()));
                 MailUtil.sendEmail(email);
             }
 
             logger.debug("Notification thread finished");
+            mail_logger.info("Notification thread finished");
         } catch (Exception e) {
             logger.error("Exception in notification thread");
+            mail_logger.info("Exception in notification thread");
+            mail_logger.info(e.getMessage());
             e.printStackTrace();
         }
     }
