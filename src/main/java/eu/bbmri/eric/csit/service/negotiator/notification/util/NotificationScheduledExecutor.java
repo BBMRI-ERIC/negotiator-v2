@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.TimerTask;
@@ -27,6 +26,7 @@ public class NotificationScheduledExecutor extends TimerTask {
                 String status = sendMailNotification(mailNotificationRecord.getEmailAddress(), mailNotificationRecord.getSubject(), mailNotificationRecord.getBody());
                 updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
             }
+            config.commit();
         } catch (Exception ex) {
             logger.error("4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000030: Error in NotificationScheduledExecutor sending mails.");
             logger.error("context", ex);

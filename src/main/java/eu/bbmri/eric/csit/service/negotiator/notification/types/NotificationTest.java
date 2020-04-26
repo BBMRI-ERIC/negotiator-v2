@@ -35,7 +35,7 @@ public class NotificationTest extends Notification {
                 String status = sendMailNotification(emailAddress, subject, body);
                 updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
             }
-
+            config.commit();
         } catch (Exception ex) {
             logger.error("b9e5a6aa1e9b-NotificationTest ERROR-NG-0000024: Error in NotificationTest.");
             logger.error(ex.getMessage());

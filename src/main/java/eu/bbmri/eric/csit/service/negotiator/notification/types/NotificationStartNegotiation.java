@@ -34,6 +34,7 @@ public class NotificationStartNegotiation extends Notification {
             String subject = "[BBMRI-ERIC Negotiator] Request has been added: " + queryRecord.getTitle();
             createMailBodyBuilder("START_NEGOTIATION_NOTIFICATION.soy");
             prepareNotificationPerUser(config, emailAddressesAndNames, subject);
+            config.commit();
         } catch (Exception ex) {
             logger.error("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000012: Error in NotificationStartNegotiation.");
             logger.error("context", ex);

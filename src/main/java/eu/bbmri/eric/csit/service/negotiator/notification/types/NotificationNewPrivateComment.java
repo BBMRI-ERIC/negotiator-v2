@@ -59,6 +59,7 @@ public class NotificationNewPrivateComment extends Notification {
                 prepareNotificationForResearcher(config, subject);
             }
             prepareNotificationPerUser(config, emailAddressesAndNames, subject);
+            config.commit();
         } catch (Exception ex) {
             logger.error("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000025: Error in NotificationNewPrivateComment.");
             logger.error("context", ex);

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -37,8 +38,10 @@ public abstract class Notification extends Thread {
 
     }
 
-    protected MailNotificationRecord saveNotificationToDatabase(Config config, String emailAddress, String subject, String body) {
-        return DbUtil.addNotificationEntry(config, emailAddress, notificationRecord.getNotificationId(), notificationRecord.getPersonId(), "created", subject, body);
+    protected MailNotificationRecord saveNotificationToDatabase(Config config, String emailAddress, String subject, String body) throws SQLException {
+        MailNotificationRecord mailNotificationRecord = DbUtil.addNotificationEntry(config, emailAddress, notificationRecord.getNotificationId(), notificationRecord.getPersonId(), "created", subject, body);
+        config.commit();
+        return mailNotificationRecord;
     }
 
     protected String sendMailNotification(String recipient, String subject, String body) {
@@ -51,8 +54,9 @@ public abstract class Notification extends Thread {
         }
     }
 
-    protected void updateNotificationInDatabase(Config config, Integer mailNotificationRecordId, String status) {
+    protected void updateNotificationInDatabase(Config config, Integer mailNotificationRecordId, String status) throws SQLException {
         DbUtil.updateNotificationEntryStatus(config, mailNotificationRecordId, status);
+        config.commit();
     }
 
     protected boolean checkSendNotificationImmediatelyForUser(String emailAddress, Integer noteficationType) {

@@ -12,11 +12,6 @@
             <name>DKFZ Maven Repository</name>
             <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
         </repository>
-        <repository>
-            <id>dkfz-repo1-release</id>
-            <name>DKFZ Maven Repository</name>
-            <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
-        </repository>
     </repositories>
 
     <parent>
@@ -362,19 +357,12 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
-            <artifactId>annotations-java5</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
+            <artifactId>annotations</artifactId>
+            <version>19.0.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations-java5</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
-        </dependency>
-
 
     </dependencies>
 

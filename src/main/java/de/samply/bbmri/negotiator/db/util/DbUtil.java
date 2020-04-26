@@ -73,10 +73,12 @@ public class DbUtil {
      * @return
      */
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
-        Result<ListOfDirectoriesRecord> record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
-
-        List<ListOfDirectoriesRecord> test = config.map(record, ListOfDirectoriesRecord.class);
-        return config.map(record, ListOfDirectoriesRecord.class);
+        Result<ListOfDirectoriesRecord> records = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
+        List<ListOfDirectoriesRecord> retuirnList = new ArrayList<ListOfDirectoriesRecord>();
+        for(ListOfDirectoriesRecord record : records) {
+            retuirnList.add(record);
+        }
+        return retuirnList;
     }
 
     /**

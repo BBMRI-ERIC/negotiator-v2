@@ -56,6 +56,7 @@ public class NotificationNewPublicComment extends Notification {
                 prepareNotificationForResearcher(config, subject);
             }
             prepareNotificationPerUser(config, emailAddressesAndNames, subject);
+            config.commit();
         } catch (Exception ex) {
             logger.error("7fb9050532fa-NotificationNewPublicComment ERROR-NG-0000023: Error in NotificationNewPublicComment.");
             logger.error("context", ex);
