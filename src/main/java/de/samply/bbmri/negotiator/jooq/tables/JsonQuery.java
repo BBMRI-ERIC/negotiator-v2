@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -34,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class JsonQuery extends TableImpl<JsonQueryRecord> {
 
-	private static final long serialVersionUID = 83169908;
+	private static final long serialVersionUID = 1542162793;
 
 	/**
 	 * The reference instance of <code>public.json_query</code>
@@ -58,6 +59,16 @@ public class JsonQuery extends TableImpl<JsonQueryRecord> {
 	 * The column <code>public.json_query.json_text</code>. text of query in json format
 	 */
 	public final TableField<JsonQueryRecord, String> JSON_TEXT = createField("json_text", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "text of query in json format");
+
+	/**
+	 * The column <code>public.json_query.query_create_time</code>.
+	 */
+	public final TableField<JsonQueryRecord, Timestamp> QUERY_CREATE_TIME = createField("query_create_time", org.jooq.impl.SQLDataType.TIMESTAMP.defaulted(true), this, "");
+
+	/**
+	 * The column <code>public.json_query.query_id</code>.
+	 */
+	public final TableField<JsonQueryRecord, Integer> QUERY_ID = createField("query_id", org.jooq.impl.SQLDataType.INTEGER.defaulted(true), this, "");
 
 	/**
 	 * Create a <code>public.json_query</code> table reference
