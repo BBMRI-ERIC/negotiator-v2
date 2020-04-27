@@ -1,27 +1,25 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.types;
 
+import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NotificationTest extends Notification {
 
-    private String threadName;
-    private Integer requestId;
+    private static Logger logger = LoggerFactory.getLogger(NotificationTest.class);
 
-    public NotificationTest(String name, Integer requestId) {
-        threadName = name;
+    private Integer requestId;
+    private NotificationRecord notificationRecord;
+    private Integer personId;
+
+    public NotificationTest(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
         this.requestId = requestId;
-        System.out.println("Creating " +  threadName + " " + requestId);
         start();
     }
 
     @Override
     public void run() {
-        System.out.println("Running " +  threadName + " " + requestId);
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Done " +  threadName + " " + requestId);
+
     }
 }

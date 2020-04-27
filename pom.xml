@@ -13,9 +13,9 @@
             <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
         </repository>
         <repository>
-            <id>dkfz-repo1-snapshot</id>
+            <id>dkfz-repo1-release</id>
             <name>DKFZ Maven Repository</name>
-            <url>https://maven.samply.de/nexus/content/repositories/oss-snapshots/</url>
+            <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
         </repository>
     </repositories>
 
@@ -122,6 +122,13 @@
             <artifactId>mail</artifactId>
             <version>1.5.0-b01</version>
         </dependency>
+
+
+        <!--<dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.6.2</version>
+        </dependency>-->
 
         <dependency>
             <groupId>javax.xml.bind</groupId>

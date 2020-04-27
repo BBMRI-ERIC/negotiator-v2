@@ -40,16 +40,16 @@ public class AdminEmailBean implements Serializable {
      * @return
      */
     public String sendEmail() {
-        NotificationService.sendNotification(NotificationType.TEST_NOTIFICATION, 2, null);
-        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 3, null);
-        NotificationService.sendNotification(NotificationType.TEST_NOTIFICATION, 4, null);
-        NotificationService.sendNotification(NotificationType.TEST_NOTIFICATION, 5, null);
+        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 7, null, 6);
+        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 12, null, 6);
+        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 13, null, 6);
+        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 14, null, 6);
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 6, null);
+        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 11, null, 6);
 
 
         return null;
