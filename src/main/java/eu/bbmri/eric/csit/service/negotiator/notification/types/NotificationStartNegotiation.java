@@ -49,7 +49,7 @@ public class NotificationStartNegotiation extends Notification {
                     updateNotificationInoDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
                 }
             } catch (Exception ex) {
-                logger.error("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000015: Error creating notification for " + emailAddress + ".");
+                logger.error("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000015: Error creating a notification for " + emailAddress + ".");
                 ex.printStackTrace();
             }
         }
