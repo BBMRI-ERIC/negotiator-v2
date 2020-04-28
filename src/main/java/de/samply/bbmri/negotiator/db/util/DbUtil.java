@@ -2022,7 +2022,33 @@ public class DbUtil {
         return record;
     }
 
+    public static MailNotificationRecord updateNotificationEntryStatus(Config config, Integer mailNotificationRecordId, String status) {
+        config.dsl().update(Tables.MAIL_NOTIFICATION)
+                .set(Tables.MAIL_NOTIFICATION.STATUS, status)
+                .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(new Date().getTime()))
+                .where(Tables.MAIL_NOTIFICATION.MAIL_NOTIFICATION_ID)
+    }
+
     /*
+
+
+    try {config.dsl().update(Tables.LIST_OF_DIRECTORIES)
+                .set(Tables.LIST_OF_DIRECTORIES.NAME, name)
+                .set(Tables.LIST_OF_DIRECTORIES.DESCRIPTION, description)
+                .set(Tables.LIST_OF_DIRECTORIES.URL, url)
+                .set(Tables.LIST_OF_DIRECTORIES.USERNAME, username)
+                .set(Tables.LIST_OF_DIRECTORIES.PASSWORD, password)
+                .set(Tables.LIST_OF_DIRECTORIES.REST_URL, restUrl)
+                .set(Tables.LIST_OF_DIRECTORIES.API_USERNAME, apiUsername)
+                .set(Tables.LIST_OF_DIRECTORIES.API_PASSWORD, apiPassword)
+                .set(Tables.LIST_OF_DIRECTORIES.RESOURCE_BIOBANKS, resourceBiobanks)
+                .set(Tables.LIST_OF_DIRECTORIES.RESOURCE_COLLECTIONS, resourceCollections)
+                .set(Tables.LIST_OF_DIRECTORIES.SYNC_ACTIVE, sync_active)
+                .where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).execute();
+            config.commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId, Flag flag, int userId) {
 
 .select(Tables.QUERY.NEGOTIATION_STARTED_TIME)
