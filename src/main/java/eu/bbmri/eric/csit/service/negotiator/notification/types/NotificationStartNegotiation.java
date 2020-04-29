@@ -5,16 +5,20 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationStartNegotiation extends Notification {
 
     private static Logger logger = LoggerFactory.getLogger(NotificationStartNegotiation.class);
+    private QueryRecord queryRecord;
 
     public NotificationStartNegotiation(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
         logger.info("74d87f9648e5-NotificationStartNegotiation created for requestID: " + requestId);
@@ -28,7 +32,10 @@ public class NotificationStartNegotiation extends Notification {
     public void run() {
         try(Config config = ConfigFactory.get()) {
             List<String> emailAddresses = getCandidateEmailAddresses(config);
-            prepareNotificationPerUser(config, emailAddresses);
+            getQuery(config);
+            String subject = "";
+            createMailBodyBuilder("START_NEGOTIATION_NOTIFICATION.soy");
+            prepareNotificationPerUser(config, emailAddresses, subject);
         } catch (Exception ex) {
             logger.error("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000012: Error in NotificationStartNegotiation.");
             ex.printStackTrace();
@@ -40,13 +47,24 @@ public class NotificationStartNegotiation extends Notification {
         return emailList;
     }
 
-    private void prepareNotificationPerUser(Config config, List<String> emailAddresses) {
+    private void getQuery(Config config) {
+        QueryRecord queryRecord = DbUtil.getQueryFromId(config, requestId);
+
+    }
+
+    private void prepareNotificationPerUser(Config config, List<String> emailAddresses, String subject) {
         for(String emailAddress : emailAddresses) {
             try {
-                MailNotificationRecord mailNotificationRecord = saveNotificationToDatabase(config, emailAddress, personId, subject, body);
+                Map<String, String> parameters = new HashMap<String, String>();
+                parameters.put("queryName", queryRecord.getTitle());
+                //parameters.put("url", url);
+                //parameters.put("name", name);
+                String body = getMailBody(parameters);
+
+                MailNotificationRecord mailNotificationRecord = saveNotificationToDatabase(config, emailAddress, subject, body);
                 if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.START_NEGOTIATION_NOTIFICATION)) {
-                    String status = sendMailNotification(emailAddress);
-                    updateNotificationInoDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
+                    String status = sendMailNotification(emailAddress, subject, body);
+                    updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
                 }
             } catch (Exception ex) {
                 logger.error("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000015: Error creating a notification for " + emailAddress + ".");

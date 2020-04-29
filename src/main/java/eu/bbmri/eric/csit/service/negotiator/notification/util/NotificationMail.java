@@ -57,7 +57,7 @@ public class NotificationMail {
             message.setSubject(subject);
 
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            mimeBodyPart.setContent(body, "text/html; charset=utf-8");
+            mimeBodyPart.setContent(body, "text/plain; charset=utf-8");
 
 
             Multipart multipart = new MimeMultipart();

@@ -1,0 +1,50 @@
+{namespace eu.negotiator.mailing}
+
+/**
+ * Define Greeting for Mail
+ * @param? name The name of the person.
+ * @param? title The title of the person.
+ * @param? locale The locale of the mail
+ */
+{deltemplate greeting}
+    {switch $locale}
+        {default}
+            Dear{sp}
+            {if $name}
+                {if $title}
+                    {$title}
+                {else}
+                    Mr/Mrs
+                {/if}
+                {sp}{$name}
+            {else}
+                Sir or Madam
+            {/if}
+    {/switch},
+{/deltemplate}
+
+/**
+ * The footer of the mail
+ * @param? locale The locale of the mail
+ */
+{deltemplate footer}
+    {switch $locale}
+        {default}
+            Yours sincerely{\n}
+            The BBMRI-ERIC Team{\n}
+    {/switch}
+{/deltemplate}
+
+/**
+ * Negotiator main Template
+ * @param? name The name of the addressed person.
+ * @param? title The title of the addressed person.
+ * @param? locale The locale of the mail
+ */
+{template .mail}
+    {delcall greeting allowemptydefault="false" data="all" /}{\n}{\n}
+
+    {delcall maincontent allowemptydefault="false" data="all" /}{\n}{\n}
+
+    {delcall footer allowemptydefault="true" data="all" /}
+{/template}

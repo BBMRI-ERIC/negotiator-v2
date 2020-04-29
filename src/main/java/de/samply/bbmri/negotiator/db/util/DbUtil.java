@@ -2010,9 +2010,10 @@ public class DbUtil {
         return addressList;
     }
 
-    public static MailNotificationRecord addNotificationEntry(Config config, String emailAddress, Integer notificationId, String status, String subject, String body) {
+    public static MailNotificationRecord addNotificationEntry(Config config, String emailAddress, Integer notificationId, Integer personId, String status, String subject, String body) {
         MailNotificationRecord record = config.dsl().newRecord(Tables.MAIL_NOTIFICATION);
         record.setNotificationId(notificationId);
+        record.setPersonId(personId);
         record.setCreateDate(new Timestamp(new Date().getTime()));
         record.setEmailAddress(emailAddress);
         record.setStatus(status);
@@ -2022,66 +2023,16 @@ public class DbUtil {
         return record;
     }
 
-    public static MailNotificationRecord updateNotificationEntryStatus(Config config, Integer mailNotificationRecordId, String status) {
-        config.dsl().update(Tables.MAIL_NOTIFICATION)
-                .set(Tables.MAIL_NOTIFICATION.STATUS, status)
-                .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(new Date().getTime()))
-                .where(Tables.MAIL_NOTIFICATION.MAIL_NOTIFICATION_ID)
-    }
-
-    /*
-
-
-    try {config.dsl().update(Tables.LIST_OF_DIRECTORIES)
-                .set(Tables.LIST_OF_DIRECTORIES.NAME, name)
-                .set(Tables.LIST_OF_DIRECTORIES.DESCRIPTION, description)
-                .set(Tables.LIST_OF_DIRECTORIES.URL, url)
-                .set(Tables.LIST_OF_DIRECTORIES.USERNAME, username)
-                .set(Tables.LIST_OF_DIRECTORIES.PASSWORD, password)
-                .set(Tables.LIST_OF_DIRECTORIES.REST_URL, restUrl)
-                .set(Tables.LIST_OF_DIRECTORIES.API_USERNAME, apiUsername)
-                .set(Tables.LIST_OF_DIRECTORIES.API_PASSWORD, apiPassword)
-                .set(Tables.LIST_OF_DIRECTORIES.RESOURCE_BIOBANKS, resourceBiobanks)
-                .set(Tables.LIST_OF_DIRECTORIES.RESOURCE_COLLECTIONS, resourceCollections)
-                .set(Tables.LIST_OF_DIRECTORIES.SYNC_ACTIVE, sync_active)
-                .where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).execute();
+    public static void updateNotificationEntryStatus(Config config, Integer mailNotificationRecordId, String status) {
+        try {
+            config.dsl().update(Tables.MAIL_NOTIFICATION)
+                    .set(Tables.MAIL_NOTIFICATION.STATUS, status)
+                    .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(new Date().getTime()))
+                    .where(Tables.MAIL_NOTIFICATION.MAIL_NOTIFICATION_ID.eq(mailNotificationRecordId)).execute();
             config.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch(Exception ex) {
+            logger.error("ERROR-NG-0000016: Error updating mail notification state for mailNotificationRecordId " + mailNotificationRecordId);
+            ex.printStackTrace();
         }
-    public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId, Flag flag, int userId) {
-
-.select(Tables.QUERY.NEGOTIATION_STARTED_TIME)
-                .from(Tables.QUERY)
-                .where(Tables.QUERY.VALID_QUERY.eq(true))
-                .and (Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull())
-                .orderBy(Tables.QUERY.NEGOTIATION_STARTED_TIME.asc())
-                .fetchAny();
-
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.QUERY_COLLECTION)
-                .join(Tables.COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .and (Tables.PERSON.ID.notEqual(userId))
-                .and (Tables.PERSON.ID.notIn (
-                        config.dsl().select(Tables.FLAGGED_QUERY.PERSON_ID)
-                        .from(Tables.FLAGGED_QUERY)
-                .where (Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and (Tables.FLAGGED_QUERY.FLAG.eq(flag))))
-                .fetch();
-          return config.map(record, NegotiatorDTO.class);
     }
-
-    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForBiobank(Config config, Integer biobankId) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.BIOBANK)
-                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
-                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.BIOBANK.ID.eq(biobankId))
-                .fetch();
-        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
-    }
-     */
 }
