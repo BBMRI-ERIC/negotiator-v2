@@ -46,6 +46,8 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -239,7 +241,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
             DbUtil.startNegotiation(config, selectedQuery.getId());
             //Send out email notifications once the researcher starts negotiation.
-            sendEmailsToPotentialBiobankers();
+            NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, selectedQuery.getId(), null, userBean.getUserId());
+            //sendEmailsToPotentialBiobankers();
         } catch (SQLException e) {
             e.printStackTrace();
         }

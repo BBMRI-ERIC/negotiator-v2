@@ -32,12 +32,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
@@ -1993,18 +1988,18 @@ public class DbUtil {
         return record;
     }
 
-    public static List<String> getStartNotificationEmailAddresses(Config config, Integer queryId) {
-        Result<Record1<String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL)
+    public static Map<String, String> getStartNotificationEmailAddresses(Config config, Integer queryId) {
+        Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                 .from(Tables.PERSON)
                 .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                 .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                 .fetch();
-        List<String> addressList = new ArrayList<String>();
-        for(Record1<String> record1 : record) {
-            if(!addressList.contains(record1.value1())) {
-                addressList.add(record1.value1());
+        Map<String, String> addressList = new HashMap<>();
+        for(Record2<String, String> record1 : record) {
+            if(!addressList.containsKey(record1.value1())) {
+                addressList.put(record1.value1(), record1.value2());
             }
         }
         return addressList;
