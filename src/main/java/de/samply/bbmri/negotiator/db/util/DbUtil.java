@@ -1988,23 +1988,6 @@ public class DbUtil {
         return record;
     }
 
-    public static Map<String, String> getStartNotificationEmailAddresses(Config config, Integer queryId) {
-        Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
-                .from(Tables.PERSON)
-                .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
-                .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .fetch();
-        Map<String, String> addressList = new HashMap<>();
-        for(Record2<String, String> record1 : record) {
-            if(!addressList.containsKey(record1.value1())) {
-                addressList.put(record1.value1(), record1.value2());
-            }
-        }
-        return addressList;
-    }
-
     public static MailNotificationRecord addNotificationEntry(Config config, String emailAddress, Integer notificationId, Integer personId, String status, String subject, String body) {
         MailNotificationRecord record = config.dsl().newRecord(Tables.MAIL_NOTIFICATION);
         record.setNotificationId(notificationId);
@@ -2030,4 +2013,59 @@ public class DbUtil {
             ex.printStackTrace();
         }
     }
+
+    public static Map<String, String> getStartNotificationEmailAddresses(Config config, Integer queryId) {
+        Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
+                .from(Tables.PERSON)
+                .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .fetch();
+        Map<String, String> addressList = new HashMap<>();
+        for(Record2<String, String> record1 : record) {
+            if(!addressList.containsKey(record1.value1())) {
+                addressList.put(record1.value1(), record1.value2());
+            }
+        }
+        return addressList;
+    }
+
+    public static Map<String, String> getPublicCommentEmailAddresses(Config config, Integer queryId) {
+        Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
+                .from(Tables.PERSON)
+                .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .fetch();
+        Map<String, String> addressList = new HashMap<>();
+        for(Record2<String, String> record1 : record) {
+            if(!addressList.containsKey(record1.value1())) {
+                addressList.put(record1.value1(), record1.value2());
+            }
+        }
+        return addressList;
+    }
+
+    public static CommentRecord getPrivateComment(Config config, Integer commentId) {
+        Record record = config.dsl()
+                .selectFrom(Tables.COMMENT)
+                .where(Tables.COMMENT.ID.eq(commentId))
+                .fetchOne();
+        return mapCommentRecord(record);
+    }
+
+    private static CommentRecord mapCommentRecord(Record record) {
+        CommentRecord commentRecord = new CommentRecord();
+        commentRecord.setAttachment((boolean)record.getValue("attachment"));
+        commentRecord.setCommentTime((Timestamp)record.getValue("comment_time"));
+        commentRecord.setId((Integer)record.getValue("id"));
+        commentRecord.setPersonId((Integer)record.getValue("person_id"));
+        commentRecord.setQueryId((Integer)record.getValue("query_id"));
+        commentRecord.setStatus((String)record.getValue("status"));
+        commentRecord.setText((String)record.getValue("text"));
+        return commentRecord;
+    }
+
 }

@@ -30,6 +30,9 @@ public class NotificationService {
             case NotificationType.START_NEGOTIATION_NOTIFICATION:
                 new NotificationStartNegotiation(notificationRecord, requestId, personId);
                 break;
+            case NotificationType.PUBLIC_COMMAND_NOTIFICATION:
+                new NotificationNewPublicComment(notificationRecord, requestId, personId, commentId);
+                break;
             case NotificationType.TEST_NOTIFICATION:
                 String emailAddress = "robert.reihs@bbmri-eric.eu";
                 if(parameters.containsKey("emailAddress")) {
@@ -38,6 +41,7 @@ public class NotificationService {
                 new NotificationTest(notificationRecord, emailAddress);
                 break;
             default:
+                logger.error("23afa6c4695a-NotificationService ERROR-NG-0000022: Notification type not defined.");
         }
     }
 

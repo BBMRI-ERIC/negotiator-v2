@@ -6,6 +6,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -28,6 +29,8 @@ public abstract class Notification extends Thread {
     protected Integer requestId;
     protected NotificationRecord notificationRecord;
     protected Integer personId;
+    protected Integer commentId;
+    protected QueryRecord queryRecord;
 
     @Override
     public void run() {
@@ -88,5 +91,9 @@ public abstract class Notification extends Thread {
         }
         mailBodyRenderer.setData(parameters);
         return mailBodyRenderer.render();
+    }
+
+    protected void getQuery(Config config) {
+        queryRecord = DbUtil.getQueryFromId(config, requestId);
     }
 }

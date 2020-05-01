@@ -6,7 +6,6 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
@@ -18,7 +17,6 @@ import java.util.Map;
 public class NotificationStartNegotiation extends Notification {
 
     private static Logger logger = LoggerFactory.getLogger(NotificationStartNegotiation.class);
-    private QueryRecord queryRecord;
 
     public NotificationStartNegotiation(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
         logger.info("74d87f9648e5-NotificationStartNegotiation created for requestID: {}", requestId);
@@ -31,9 +29,9 @@ public class NotificationStartNegotiation extends Notification {
     @Override
     public void run() {
         try(Config config = ConfigFactory.get()) {
-            Map<String, String> emailAddressesAndNames = getCandidateEmailAddresses(config);
+            Map<String, String> emailAddressesAndNames = getCandidateEmailAddressesAndNames(config);
             getQuery(config);
-            String subject = queryRecord.getTitle() + " negotiation has been added.";
+            String subject = "[BBMRI-ERIC Negotiator] Request has been added: " + queryRecord.getTitle();
             createMailBodyBuilder("START_NEGOTIATION_NOTIFICATION.soy");
             prepareNotificationPerUser(config, emailAddressesAndNames, subject);
         } catch (Exception ex) {
@@ -42,12 +40,8 @@ public class NotificationStartNegotiation extends Notification {
         }
     }
 
-    private Map<String, String> getCandidateEmailAddresses(Config config) {
+    private Map<String, String> getCandidateEmailAddressesAndNames(Config config) {
         return DbUtil.getStartNotificationEmailAddresses(config, requestId);
-    }
-
-    private void getQuery(Config config) {
-        queryRecord = DbUtil.getQueryFromId(config, requestId);
     }
 
     private void prepareNotificationPerUser(Config config, Map<String, String> emailAddressesAndNames, String subject) {

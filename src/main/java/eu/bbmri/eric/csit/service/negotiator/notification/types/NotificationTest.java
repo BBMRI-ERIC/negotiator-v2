@@ -37,7 +37,7 @@ public class NotificationTest extends Notification {
             }
 
         } catch (Exception ex) {
-            logger.error("b9e5a6aa1e9b-NotificationTest ERROR-NG-0000012: Error in NotificationStartNegotiation.");
+            logger.error("b9e5a6aa1e9b-NotificationTest ERROR-NG-0000024: Error in NotificationTest.");
             logger.error(ex.getMessage());
             logger.error("context", ex);
         }

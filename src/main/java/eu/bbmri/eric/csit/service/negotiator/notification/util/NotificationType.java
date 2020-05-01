@@ -20,6 +20,8 @@ public abstract class NotificationType {
                 return "START_NEGOTIATION_NOTIFICATION";
             case NotificationType.TEST_NOTIFICATION:
                 return "TEST_NOTIFICATION";
+            case NotificationType.PUBLIC_COMMAND_NOTIFICATION:
+                return "PUBLIC_COMMAND_NOTIFICATION";
             default:
                 return "ERROR-NG-0000010: ERROR: Type Not defined";
         }
