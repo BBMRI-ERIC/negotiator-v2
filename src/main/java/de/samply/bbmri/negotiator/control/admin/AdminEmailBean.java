@@ -2,8 +2,14 @@ package de.samply.bbmri.negotiator.control.admin;
 
 import de.samply.bbmri.mailing.EmailBuilder;
 import de.samply.bbmri.mailing.OutgoingEmail;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
@@ -11,7 +17,9 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -25,6 +33,9 @@ public class AdminEmailBean implements Serializable {
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
+
+    List<NotificationRecord> notificationRecords;
+    Map<Integer, String> userNotificationData;
 
     /**
      * The email address entered by the user.
@@ -63,4 +74,35 @@ public class AdminEmailBean implements Serializable {
     public void setUserBean(UserBean userBean) {
         this.userBean = userBean;
     }
+
+    public void loadNotifications() {
+        try(Config config = ConfigFactory.get()) {
+            notificationRecords = DbUtil.getNotificationRecords(config);
+            userNotificationData = new HashMap<>();
+            for(MailNotificationRecord mailNotificationRecord : DbUtil.getMailNotificationRecords(config)) {
+                if (!userNotificationData.containsKey(mailNotificationRecord.getNotificationId())) {
+                    userNotificationData.put(mailNotificationRecord.getNotificationId(), mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus());
+                } else {
+                    userNotificationData.put(mailNotificationRecord.getNotificationId(), userNotificationData.get(mailNotificationRecord.getNotificationId()) + "<br>" +
+                            mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus());
+                }
+            }
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<NotificationRecord> getNotificationRecords() {
+        return notificationRecords;
+    }
+
+    public void setNotificationRecords(List<NotificationRecord> notificationRecords) {
+        this.notificationRecords = notificationRecords;
+    }
+
+    public String getUserData(Integer notificationRecordId) {
+        return userNotificationData.get(notificationRecordId);
+    }
+
 }

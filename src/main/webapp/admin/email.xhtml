@@ -28,6 +28,7 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+				xmlns:f="http://xmlns.jcp.org/jsf/core"
                 template="default.xhtml">
 
 	<ui:param name="bodyClass" value="container"/>
@@ -57,6 +58,43 @@
 				</div>
 			</div>
 		</h:form>
+
+		<h3>List of Notifications:</h3>
+		<h:form styleClass="form-horizontal">
+			<h:commandButton action="#{adminEmailBean.loadNotifications()}" value="Load Notifications"
+							 styleClass="btn btn-default"/>
+		</h:form>
+
+		<h:dataTable rendered="#{adminEmailBean.notificationRecords.size() > 0}" value="#{adminEmailBean.notificationRecords}" var="notificationRecord">
+			<h:column>
+				<f:facet name="header">Id</f:facet>
+				#{notificationRecord.getNotificationId()}
+			</h:column>
+			<h:column>
+				<f:facet name="header">QueryId</f:facet>
+				#{notificationRecord.getQueryId()}
+			</h:column>
+			<h:column>
+				<f:facet name="header">CommentId</f:facet>
+				#{notificationRecord.getCommentId()}
+			</h:column>
+			<h:column>
+				<f:facet name="header">PersonId</f:facet>
+				#{notificationRecord.getPersonId()}
+			</h:column>
+			<h:column>
+				<f:facet name="header">NotificationType</f:facet>
+				#{notificationRecord.getNotificationType()}
+			</h:column>
+			<h:column>
+				<f:facet name="header">CreateDate</f:facet>
+				#{notificationRecord.getCreateDate()}
+			</h:column>
+			<h:column>
+				<f:facet name="header">User Email/success</f:facet>
+				#{adminEmailBean.getUserData(notificationRecord.getNotificationId())}
+			</h:column>
+		</h:dataTable>
 
 	</ui:define>
 

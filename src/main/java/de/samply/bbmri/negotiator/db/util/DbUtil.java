@@ -1989,6 +1989,17 @@ public class DbUtil {
         return record;
     }
 
+    public static List<NotificationRecord> getNotificationRecords(Config config) {
+        Result<NotificationRecord> records = config.dsl()
+                .selectFrom(Tables.NOTIFICATION)
+                .fetch();
+        List<NotificationRecord> returnRecords = new ArrayList<>();
+        for(NotificationRecord record : records) {
+            returnRecords.add(record);
+        }
+        return returnRecords;
+    }
+
     public static MailNotificationRecord addNotificationEntry(Config config, String emailAddress, Integer notificationId, Integer personId, String status, String subject, String body) {
         MailNotificationRecord record = config.dsl().newRecord(Tables.MAIL_NOTIFICATION);
         record.setNotificationId(notificationId);
@@ -2000,6 +2011,17 @@ public class DbUtil {
         record.setBody(body);
         record.store();
         return record;
+    }
+
+    public static List<MailNotificationRecord> getMailNotificationRecords(Config config) {
+        Result<MailNotificationRecord> records = config.dsl()
+                .selectFrom(Tables.MAIL_NOTIFICATION)
+                .fetch();
+        List<MailNotificationRecord> returnRecords = new ArrayList<>();
+        for(MailNotificationRecord record : records) {
+            returnRecords.add(record);
+        }
+        return returnRecords;
     }
 
     public static void updateNotificationEntryStatus(Config config, Integer mailNotificationRecordId, String status) {
