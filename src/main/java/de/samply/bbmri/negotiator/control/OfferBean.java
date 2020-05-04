@@ -28,7 +28,9 @@ package de.samply.bbmri.negotiator.control;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -43,6 +45,9 @@ import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
 @ManagedBean
 @ViewScoped
@@ -70,7 +75,7 @@ public class OfferBean implements Serializable {
      */
     public String saveOffer(Query query, Integer offerFrom ) {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
+            OfferRecord offerRecord = DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
 
             String biobankName = "";
@@ -81,27 +86,9 @@ public class OfferBean implements Serializable {
                 e.printStackTrace();
             }
 
-            /**
-             * Send notifications only, if a biobanker makes an offer
-             */
-            if (userBean.getBiobankOwner()) {
-                OfferEmailNotifier notifier = new OfferEmailNotifier(query, getQueryUrl(query.getId()), biobankName);
-                notifier.sendEmailNotification();
-            } else {
-                try {
-                    List<Person> collectioncontacts = DbUtil.getPersonsContactsForBiobank(config, offerFrom);
-                    for (Person collectioncontact : collectioncontacts) {
-                        if(userBean.getPerson().getId() == collectioncontact.getId()) {
-                            continue;
-                        }
-                        OfferResponseEmailNotification notifier = new OfferResponseEmailNotification(query, getQueryUrlBiobanker(query.getId()), collectioncontact);
-                        notifier.sendEmailNotification();
-                    }
-                } catch (Exception e) {
-                    System.err.println("Error getting Biobank Contacts for notification offerID: " + offerFrom);
-                    e.printStackTrace();
-                }
-            }
+            Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put("biobankName", biobankName);
+            NotificationService.sendNotification(NotificationType.PRIVATE_COMMAND_NOTIFICATION, query.getId(), offerRecord.getId(), userBean.getUserId(), parameters);
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -47,29 +47,6 @@ public class AdminEmailBean implements Serializable {
      * @return
      */
     public String sendEmail() {
-        /*NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 7, null, 6);
-        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 12, null, 6);
-        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 13, null, 6);
-        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 14, null, 6);
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, 11, null, 6);
-
-*/
-        /*EmailBuilder builder = MailUtil.initializeBuilder();
-        builder.addTemplateFile("emailTest.soy", "Notification");
-
-        OutgoingEmail mail = new OutgoingEmail();
-        mail.addAddressee(emailAddress);
-        mail.setSubject("Negotiator Test Email");
-        mail.setBuilder(builder);
-
-        MailUtil.sendEmail(mail);
-        emailAddress = "";*/
-
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("emailAddress", emailAddress);
         NotificationService.sendNotification(NotificationType.TEST_NOTIFICATION, -1, null, userBean.getUserId(), parameters);

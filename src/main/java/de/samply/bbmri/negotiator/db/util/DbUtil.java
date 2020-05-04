@@ -906,7 +906,7 @@ public class DbUtil {
      * @param comment
      * @param biobankInPrivateChat biobank id
      */
-    public static void addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
+    public static OfferRecord addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
         OfferRecord record = config.dsl().newRecord(Tables.OFFER);
         record.setQueryId(queryId);
         record.setPersonId(personId);
@@ -915,6 +915,7 @@ public class DbUtil {
         record.setStatus("published");
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
+        return record;
     }
 
 
@@ -2048,12 +2049,36 @@ public class DbUtil {
         return addressList;
     }
 
-    public static CommentRecord getPrivateComment(Config config, Integer commentId) {
+    public static Map<String, String> getPrivateCommentBiobankEmailAddresses(Config config, Integer biobankId) {
+        Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
+                .from(Tables.PERSON)
+                .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(Tables.COLLECTION.BIOBANK_ID.eq(biobankId))
+                .fetch();
+        Map<String, String> addressList = new HashMap<>();
+        for(Record2<String, String> record1 : record) {
+            if(!addressList.containsKey(record1.value1())) {
+                addressList.put(record1.value1(), record1.value2());
+            }
+        }
+        return addressList;
+    }
+
+    public static CommentRecord getPublicComment(Config config, Integer commentId) {
         Record record = config.dsl()
                 .selectFrom(Tables.COMMENT)
                 .where(Tables.COMMENT.ID.eq(commentId))
                 .fetchOne();
         return mapCommentRecord(record);
+    }
+
+    public static OfferRecord getPrivateComment(Config config, Integer commentId) {
+        Record record = config.dsl()
+                .selectFrom(Tables.OFFER)
+                .where(Tables.OFFER.ID.eq(commentId))
+                .fetchOne();
+        return mapOfferRecord(record);
     }
 
     private static CommentRecord mapCommentRecord(Record record) {
@@ -2066,6 +2091,18 @@ public class DbUtil {
         commentRecord.setStatus((String)record.getValue("status"));
         commentRecord.setText((String)record.getValue("text"));
         return commentRecord;
+    }
+
+    private static OfferRecord mapOfferRecord(Record record) {
+        OfferRecord offerRecord = new OfferRecord();
+        offerRecord.setId((Integer)record.getValue("id"));
+        offerRecord.setQueryId((Integer)record.getValue("query_id"));
+        offerRecord.setPersonId((Integer)record.getValue("person_id"));
+        offerRecord.setBiobankInPrivateChat((Integer)record.getValue("biobank_in_private_chat"));
+        offerRecord.setCommentTime((Timestamp)record.getValue("comment_time"));
+        offerRecord.setText((String)record.getValue("text"));
+        offerRecord.setStatus((String)record.getValue("status"));
+        return offerRecord;
     }
 
 }

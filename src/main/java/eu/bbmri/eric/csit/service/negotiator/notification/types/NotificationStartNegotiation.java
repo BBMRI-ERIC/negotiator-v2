@@ -30,7 +30,7 @@ public class NotificationStartNegotiation extends Notification {
     public void run() {
         try(Config config = ConfigFactory.get()) {
             Map<String, String> emailAddressesAndNames = getCandidateEmailAddressesAndNames(config);
-            getQuery(config);
+            setQuery(config);
             String subject = "[BBMRI-ERIC Negotiator] Request has been added: " + queryRecord.getTitle();
             createMailBodyBuilder("START_NEGOTIATION_NOTIFICATION.soy");
             prepareNotificationPerUser(config, emailAddressesAndNames, subject);

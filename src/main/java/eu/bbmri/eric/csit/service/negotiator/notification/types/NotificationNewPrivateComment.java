@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
@@ -17,21 +18,23 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NotificationNewPublicComment extends Notification {
+public class NotificationNewPrivateComment extends Notification {
 
-    private static Logger logger = LoggerFactory.getLogger(NotificationNewPublicComment.class);
+    private static Logger logger = LoggerFactory.getLogger(NotificationNewPrivateComment.class);
 
     private String commenterName;
     private String commenterEmailAddresse;
-    private CommentRecord commentRecord;
+    private String biobankName;
+    private OfferRecord commentRecord;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
-    public NotificationNewPublicComment(NotificationRecord notificationRecord, Integer requestId, Integer personId, Integer commentId) {
-        logger.info("7fb9050532fa-NotificationNewPublicComment created for commentId: {}", commentId);
+    public NotificationNewPrivateComment(NotificationRecord notificationRecord, Integer requestId, Integer personId, Integer commentId, String biobankName) {
+        logger.info("0efe4b414a2c-NotificationNewPrivateComment created for commentId: {}", commentId);
         this.requestId = requestId;
         this.notificationRecord = notificationRecord;
         this.personId = personId;
         this.commentId = commentId;
+        this.biobankName = biobankName;
         start();
     }
 
@@ -42,7 +45,7 @@ public class NotificationNewPublicComment extends Notification {
             setResearcherContact(config);
             setCommenterContact(config);
             setComment(config);
-            Map<String, String> emailAddressesAndNames = getBiobanksEmailAddressesAndNames(config);
+            Map<String, String> emailAddressesAndNames = getBiobankEmailAddressesAndNames(config);
             if(emailAddressesAndNames.containsKey(researcherEmailAddresse)) {
                 emailAddressesAndNames.remove(researcherEmailAddresse);
             }
@@ -50,20 +53,16 @@ public class NotificationNewPublicComment extends Notification {
                 emailAddressesAndNames.remove(commenterEmailAddresse);
             }
 
-            String subject = "[BBMRI-ERIC Negotiator] New comment on request: " + queryRecord.getTitle();
-            createMailBodyBuilder("PUBLIC_COMMAND_NOTIFICATION.soy");
+            String subject = "[BBMRI-ERIC Negotiator] New private comment on request: " + queryRecord.getTitle();
+            createMailBodyBuilder("PRIVATE_COMMAND_NOTIFICATION.soy");
             if(!commenterEmailAddresse.equals(researcherEmailAddresse)) {
                 prepareNotificationForResearcher(config, subject);
             }
             prepareNotificationPerUser(config, emailAddressesAndNames, subject);
         } catch (Exception ex) {
-            logger.error("7fb9050532fa-NotificationNewPublicComment ERROR-NG-0000023: Error in NotificationNewPublicComment.");
+            logger.error("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000025: Error in NotificationNewPrivateComment.");
             logger.error("context", ex);
         }
-    }
-
-    private Map<String, String> getBiobanksEmailAddressesAndNames(Config config) {
-        return DbUtil.getPublicCommentEmailAddresses(config, requestId);
     }
 
     private void setCommenterContact(Config config) {
@@ -73,7 +72,11 @@ public class NotificationNewPublicComment extends Notification {
     }
 
     private void setComment(Config config) {
-        commentRecord = DbUtil.getPublicComment(config, commentId);
+        commentRecord = DbUtil.getPrivateComment(config, commentId);
+    }
+
+    private Map<String, String> getBiobankEmailAddressesAndNames(Config config) {
+        return DbUtil.getPrivateCommentBiobankEmailAddresses(config, commentRecord.getBiobankInPrivateChat());
     }
 
     private void prepareNotificationForResearcher(Config config, String subject) {
@@ -87,7 +90,7 @@ public class NotificationNewPublicComment extends Notification {
                 updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
             }
         } catch (Exception ex) {
-            logger.error(String.format("7fb9050532fa-NotificationNewPublicComment ERROR-NG-0000020: Error creating a notification for researcher %s.", researcherEmailAddresse));
+            logger.error(String.format("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000026: Error creating a notification for researcher %s.", researcherEmailAddresse));
             logger.error("context", ex);
         }
     }
@@ -106,7 +109,7 @@ public class NotificationNewPublicComment extends Notification {
                     updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
                 }
             } catch (Exception ex) {
-                logger.error(String.format("7fb9050532fa-NotificationNewPublicComment ERROR-NG-0000021: Error creating a notification for %s.", emailAddress));
+                logger.error(String.format("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000027: Error creating a notification for %s.", emailAddress));
                 logger.error("context", ex);
             }
         }
@@ -119,17 +122,10 @@ public class NotificationNewPublicComment extends Notification {
         parameters.put("name", contactName);
         parameters.put("commentPoster", commenterName);
         parameters.put("dateOfComment", simpleDateFormat.format(commentRecord.getCommentTime()));
-        parameters.put("comment", formatCommentText(commentRecord.getText()));
-        return parameters;
-    }
-
-    private String formatCommentText(String comment) {
-        Integer index = 0;
-        index = comment.indexOf(" ", 20);
-        if(index == -1) {
-            index = comment.length();
+        if(!biobankName.equals("")) {
+            parameters.put("biobankName", biobankName);
         }
-        return comment.substring(0, index) + "...";
+        return parameters;
     }
 
 }

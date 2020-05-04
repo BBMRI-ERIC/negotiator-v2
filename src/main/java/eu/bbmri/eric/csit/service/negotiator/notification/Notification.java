@@ -4,16 +4,14 @@ import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,6 +29,8 @@ public abstract class Notification extends Thread {
     protected Integer personId;
     protected Integer commentId;
     protected QueryRecord queryRecord;
+    protected String researcherName;
+    protected String researcherEmailAddresse;
 
     @Override
     public void run() {
@@ -74,7 +74,7 @@ public abstract class Notification extends Thread {
             SoyFileSet soyFileSet = builder.build();
             SoyTofu soyTofu = soyFileSet.compileToTofu();
             mailBodyRenderer = soyTofu.newRenderer("eu.negotiator.mailing.mail");
-            Set delegatePackageNames = new HashSet<String>();
+            Set<String> delegatePackageNames = new HashSet<>();
             delegatePackageNames.add("Notification");
             mailBodyRenderer.setActiveDelegatePackageNames(delegatePackageNames);
         } catch (Exception ex) {
@@ -93,7 +93,14 @@ public abstract class Notification extends Thread {
         return mailBodyRenderer.render();
     }
 
-    protected void getQuery(Config config) {
+    protected void setQuery(Config config) {
         queryRecord = DbUtil.getQueryFromId(config, requestId);
     }
+
+    protected void setResearcherContact(Config config) {
+        Person researcher = DbUtil.getPersonDetails(config, queryRecord.getResearcherId());
+        researcherName = researcher.getAuthName();
+        researcherEmailAddresse = researcher.getAuthEmail();
+    }
+
 }

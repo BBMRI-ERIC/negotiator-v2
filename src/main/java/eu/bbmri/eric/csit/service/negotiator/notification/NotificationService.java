@@ -9,17 +9,20 @@ import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationService {
     private static Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
+    private NotificationService() {}
+
     public static void sendNotification(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
-        sendNotification(notificationType, requestId, commentId, personId, null);
+        sendNotification(notificationType, requestId, commentId, personId, new HashMap<String, String>());
     }
 
     public static void sendNotification(Integer notificationType, Integer requestId, Integer commentId, Integer personId, Map<String, String> parameters) {
-        logger.info("23afa6c4695a-NotificationService: " + notificationType + " requestID: " + requestId + " commentID: " + commentId);
+        logger.info("23afa6c4695a-NotificationService: %d requestID: %d commentID: %d", notificationType, requestId, commentId);
 
         NotificationRecord notificationRecord = createNotificationEntry(notificationType, requestId, commentId, personId);
         if(notificationRecord == null) {
@@ -32,6 +35,13 @@ public class NotificationService {
                 break;
             case NotificationType.PUBLIC_COMMAND_NOTIFICATION:
                 new NotificationNewPublicComment(notificationRecord, requestId, personId, commentId);
+                break;
+            case NotificationType.PRIVATE_COMMAND_NOTIFICATION:
+                String biobankName = "";
+                if(parameters.containsKey("biobankName")) {
+                    biobankName = parameters.get("biobankName");
+                }
+                new NotificationNewPrivateComment(notificationRecord, requestId, personId, commentId, biobankName);
                 break;
             case NotificationType.TEST_NOTIFICATION:
                 String emailAddress = "robert.reihs@bbmri-eric.eu";
@@ -52,7 +62,7 @@ public class NotificationService {
             return notificationRecord;
         } catch (Exception ex) {
             logger.error("23afa6c4695a-NotificationService ERROR-NG-0000009: Create Notification Entry.");
-            ex.printStackTrace();
+            logger.error("context", ex);
         }
         return null;
     }
