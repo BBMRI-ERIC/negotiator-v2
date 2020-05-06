@@ -81,10 +81,10 @@ public class AdminEmailBean implements Serializable {
             userNotificationData = new HashMap<>();
             for(MailNotificationRecord mailNotificationRecord : DbUtil.getMailNotificationRecords(config)) {
                 if (!userNotificationData.containsKey(mailNotificationRecord.getNotificationId())) {
-                    userNotificationData.put(mailNotificationRecord.getNotificationId(), mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus());
+                    userNotificationData.put(mailNotificationRecord.getNotificationId(), mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 } else {
                     userNotificationData.put(mailNotificationRecord.getNotificationId(), userNotificationData.get(mailNotificationRecord.getNotificationId()) + "<br>" +
-                            mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus());
+                            mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 }
             }
 
