@@ -2024,6 +2024,18 @@ public class DbUtil {
         return returnRecords;
     }
 
+    public static List<MailNotificationRecord> getPendingNotifications(Config config) {
+        Result<MailNotificationRecord> records = config.dsl()
+                .selectFrom(Tables.MAIL_NOTIFICATION)
+                .where(Tables.MAIL_NOTIFICATION.STATUS.notEqual("success"))
+                .fetch();
+        List<MailNotificationRecord> returnRecords = new ArrayList<>();
+        for(MailNotificationRecord record : records) {
+            returnRecords.add(record);
+        }
+        return returnRecords;
+    }
+
     public static void updateNotificationEntryStatus(Config config, Integer mailNotificationRecordId, String status) {
         try {
             config.dsl().update(Tables.MAIL_NOTIFICATION)

@@ -1,5 +1,5 @@
 package eu.bbmri.eric.csit.service.negotiator.notification;
 
-public class NotificationServiceTest {
+public class NotificationStartNegotiationTest {
 
 }
