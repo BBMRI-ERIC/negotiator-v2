@@ -57,9 +57,20 @@ public class NotificationScheduledExecutor extends TimerTask {
 
     public long getDelay(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("HHmmss");
-        //System.out.println(formatter.format(date));
-        //long delay = Duration.between(date_now, tomorrowStart).toMillis();
-        return 0;
+        Integer time = Integer.parseInt(formatter.format(date));
+        long noon = 12*3600000L;
+
+        long hour = (int) (time / 10000) * 3600000L;
+        long minute = ((int) (time / 100) - (int) (time / 10000) * 100) * 60000L;
+        long secound = (time - ((int) (time / 10000)) * 10000 - ((int) (time / 100) - (int) (time / 10000) * 100) * 100) * 1000L;
+
+        if(120000-time < 0) {
+            noon +=  24*3600000L;
+        }
+
+        long millisecounds = noon - (hour + minute + secound);
+
+        return millisecounds;
     }
 
     public long getInterval() {
