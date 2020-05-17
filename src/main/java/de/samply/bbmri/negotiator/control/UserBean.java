@@ -50,8 +50,8 @@ import de.samply.bbmri.auth.client.InvalidTokenException;
 import de.samply.bbmri.auth.client.jwt.JWTAccessToken;
 import de.samply.bbmri.auth.client.jwt.JWTIDToken;
 import de.samply.bbmri.auth.client.jwt.JWTRefreshToken;
-import de.samply.bbmri.auth.rest.Scope;
-import de.samply.bbmri.auth.utils.OAuth2ClientConfig;
+import eu.bbmri.eric.csit.service.negotiator.authentication.rest.Scope;
+import eu.bbmri.eric.csit.service.negotiator.authentication.utils.OAuth2ClientConfig;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
@@ -246,7 +246,7 @@ public class UserBean implements Serializable {
 
         return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
                 request.getServerName(), request.getServerPort(), request.getContextPath(),
-                requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
+                requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
     }
 
 
@@ -286,7 +286,7 @@ public class UserBean implements Serializable {
 
 		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
-				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
+				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
 	}
 
     /**
@@ -315,7 +315,7 @@ public class UserBean implements Serializable {
 
         String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
-				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.GROUPNAMES);
+				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
 
 		return returnURL;
     }
