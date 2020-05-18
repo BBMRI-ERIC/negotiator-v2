@@ -1980,6 +1980,7 @@ public class DbUtil {
         executeSQL(connection, sb.toString());
     }
 
+    //TODO: delete
     public static NotificationRecord addNotificationEntry(Config config, Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
         NotificationRecord record = config.dsl().newRecord(Tables.NOTIFICATION);
         record.setQueryId(requestId);
@@ -1991,6 +1992,7 @@ public class DbUtil {
         return record;
     }
 
+    //TODO: delete
     public static List<NotificationRecord> getNotificationRecords(Config config) {
         Result<NotificationRecord> records = config.dsl()
                 .selectFrom(Tables.NOTIFICATION)
@@ -2002,6 +2004,7 @@ public class DbUtil {
         return returnRecords;
     }
 
+    //TODO: delete
     public static MailNotificationRecord addNotificationEntry(Config config, String emailAddress, Integer notificationId, Integer personId, String status, String subject, String body) {
         MailNotificationRecord record = config.dsl().newRecord(Tables.MAIL_NOTIFICATION);
         record.setNotificationId(notificationId);
@@ -2015,6 +2018,7 @@ public class DbUtil {
         return record;
     }
 
+    //TODO: delete
     public static List<MailNotificationRecord> getMailNotificationRecords(Config config) {
         Result<MailNotificationRecord> records = config.dsl()
                 .selectFrom(Tables.MAIL_NOTIFICATION)
@@ -2026,6 +2030,7 @@ public class DbUtil {
         return returnRecords;
     }
 
+    //TODO: delete
     public static List<MailNotificationRecord> getPendingNotifications(Config config) {
         Result<MailNotificationRecord> records = config.dsl()
                 .selectFrom(Tables.MAIL_NOTIFICATION)
@@ -2038,6 +2043,7 @@ public class DbUtil {
         return returnRecords;
     }
 
+    //TODO: delete
     public static void updateNotificationEntryStatus(Config config, Integer mailNotificationRecordId, String status) {
         try {
             config.dsl().update(Tables.MAIL_NOTIFICATION)
@@ -2051,6 +2057,7 @@ public class DbUtil {
         }
     }
 
+    //TODO: delete
     public static Map<String, String> getStartNotificationEmailAddresses(Config config, Integer queryId) {
         Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                 .from(Tables.PERSON)
@@ -2068,6 +2075,7 @@ public class DbUtil {
         return addressList;
     }
 
+    //TODO: delete
     public static Map<String, String> getPublicCommentEmailAddresses(Config config, Integer queryId) {
         Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                 .from(Tables.PERSON)
@@ -2085,6 +2093,7 @@ public class DbUtil {
         return addressList;
     }
 
+    //TODO: delete
     public static Map<String, String> getPrivateCommentBiobankEmailAddresses(Config config, Integer biobankId) {
         Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                 .from(Tables.PERSON)

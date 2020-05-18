@@ -39,6 +39,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.samply.bbmri.negotiator.db.util.Migration;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNotification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationScheduledExecutor;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.flywaydb.core.api.FlywayException;
