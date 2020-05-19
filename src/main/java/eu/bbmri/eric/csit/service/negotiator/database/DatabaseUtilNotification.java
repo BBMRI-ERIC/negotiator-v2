@@ -1,6 +1,5 @@
 package eu.bbmri.eric.csit.service.negotiator.database;
 
-import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
@@ -22,14 +21,14 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
 
-public class DbUtilNotification {
+public class DatabaseUtilNotification {
 
     @Resource(name="jdbc/postgres")
     private DataSource dataSource;
 
-    private static Logger logger = LoggerFactory.getLogger(DbUtilNotification.class);
+    private static Logger logger = LoggerFactory.getLogger(DatabaseUtilNotification.class);
 
-    public DbUtilNotification() {
+    public DatabaseUtilNotification() {
         try {
             Context initContext = new InitialContext();
             Context context = (Context) initContext.lookup("java:comp/env");
