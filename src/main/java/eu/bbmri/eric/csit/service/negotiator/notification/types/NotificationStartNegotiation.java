@@ -41,7 +41,7 @@ public class NotificationStartNegotiation extends Notification {
     }
 
     private Map<String, String> getCandidateEmailAddressesAndNames() {
-        return databaseUtilNotification.getEmailAddressesForQuery(requestId);
+        return databaseUtil.getDatabaseUtilNotification().getEmailAddressesForQuery(requestId);
     }
 
     private void prepareNotificationPerUser(Map<String, String> emailAddressesAndNames, String subject) {

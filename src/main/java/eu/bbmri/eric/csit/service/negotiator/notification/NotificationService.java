@@ -4,6 +4,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtilNotification;
 import eu.bbmri.eric.csit.service.negotiator.notification.types.*;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
@@ -17,7 +18,7 @@ public class NotificationService {
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     private NotificationService() {}
-    private static final DatabaseUtilNotification databaseUtilNotification = new DatabaseUtilNotification();
+    private static final DatabaseUtil databaseUtil = new DatabaseUtil();
 
     public static void sendNotification(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
         sendNotification(notificationType, requestId, commentId, personId, new HashMap<String, String>());
@@ -59,7 +60,7 @@ public class NotificationService {
 
     private static NotificationRecord createNotificationEntry(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
         try {
-            NotificationRecord notificationRecord = databaseUtilNotification.addNotificationEntry(notificationType, requestId, commentId, personId);
+            NotificationRecord notificationRecord = databaseUtil.getDatabaseUtilNotification().addNotificationEntry(notificationType, requestId, commentId, personId);
             return notificationRecord;
         } catch (Exception ex) {
             logger.error("23afa6c4695a-NotificationService ERROR-NG-0000009: Create Notification Entry.");

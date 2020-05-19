@@ -10,6 +10,8 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
+import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtilNotification;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
@@ -76,10 +78,11 @@ public class AdminEmailBean implements Serializable {
     }
 
     public void loadNotifications() {
-        try(Config config = ConfigFactory.get()) {
-            notificationRecords = DbUtil.getNotificationRecords(config);
+        try {
+            DatabaseUtil databaseUtil = new DatabaseUtil();
+            notificationRecords = databaseUtil.getDatabaseUtilNotification().getNotificationRecords();
             userNotificationData = new HashMap<>();
-            for(MailNotificationRecord mailNotificationRecord : DbUtil.getMailNotificationRecords(config)) {
+            for(MailNotificationRecord mailNotificationRecord : databaseUtil.getDatabaseUtilNotification().getMailNotificationRecords()) {
                 if (!userNotificationData.containsKey(mailNotificationRecord.getNotificationId())) {
                     userNotificationData.put(mailNotificationRecord.getNotificationId(), mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 } else {
@@ -87,8 +90,7 @@ public class AdminEmailBean implements Serializable {
                             mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 }
             }
-
-        } catch(SQLException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
     }

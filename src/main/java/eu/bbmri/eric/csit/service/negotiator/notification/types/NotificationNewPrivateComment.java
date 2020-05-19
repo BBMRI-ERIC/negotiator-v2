@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
@@ -61,17 +62,17 @@ public class NotificationNewPrivateComment extends Notification {
     }
 
     private void setCommenterContact() {
-        Person commenter = DbUtil.getPersonDetails(personId);
+        PersonRecord commenter = databaseUtil.getDatabaseUtilPerson().getPerson(personId);
         commenterName = commenter.getAuthName();
         commenterEmailAddresse = commenter.getAuthEmail();
     }
 
     private void setComment() {
-        commentRecord = DbUtil.getPrivateComment(commentId);
+        commentRecord = databaseUtil.getDatabaseUtilRequest().getPrivateComment(commentId);
     }
 
     private Map<String, String> getBiobankEmailAddressesAndNames() {
-        return databaseUtilNotification.getBiobankEmailAddresses(commentRecord.getBiobankInPrivateChat());
+        return databaseUtil.getDatabaseUtilNotification().getBiobankEmailAddresses(commentRecord.getBiobankInPrivateChat());
     }
 
     private void prepareNotificationForResearcher(String subject) {

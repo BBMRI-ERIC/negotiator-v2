@@ -23,19 +23,12 @@ import java.util.*;
 
 public class DatabaseUtilNotification {
 
-    @Resource(name="jdbc/postgres")
     private DataSource dataSource;
 
     private static Logger logger = LoggerFactory.getLogger(DatabaseUtilNotification.class);
 
-    public DatabaseUtilNotification() {
-        try {
-            Context initContext = new InitialContext();
-            Context context = (Context) initContext.lookup("java:comp/env");
-            dataSource = (DataSource) context.lookup("jdbc/postgres");
-        } catch (NamingException ex) {
-            throw new ExceptionInInitializerError("882e8cb6-DbUtilNotification: dataSource not initialized");
-        }
+    public DatabaseUtilNotification(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public NotificationRecord addNotificationEntry(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {

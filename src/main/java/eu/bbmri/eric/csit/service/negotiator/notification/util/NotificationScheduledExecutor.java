@@ -5,6 +5,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtilNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ import java.util.TimerTask;
 public class NotificationScheduledExecutor extends TimerTask {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationScheduledExecutor.class);
-    private final DatabaseUtilNotification databaseUtilNotification = new DatabaseUtilNotification();
+    private final DatabaseUtil databaseUtil = new DatabaseUtil();
 
     @Override
     public void run() {
@@ -35,11 +36,11 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     private List<MailNotificationRecord> getNotSendNotifications() {
-        return databaseUtilNotification.getPendingNotifications();
+        return databaseUtil.getDatabaseUtilNotification().getPendingNotifications();
     }
 
     private void updateNotificationInDatabase(Integer mailNotificationRecordId, String status) {
-        databaseUtilNotification.updateMailNotificationEntryStatus(mailNotificationRecordId, status);
+        databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(mailNotificationRecordId, status);
     }
 
     private String sendMailNotification(String recipient, String subject, String body) {

@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.database;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
@@ -18,20 +19,28 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 
 public class DatabaseUtilRequest {
-    @Resource(name="jdbc/postgres")
+
     private DataSource dataSource;
 
     private static Logger logger = LoggerFactory.getLogger(DatabaseUtilRequest.class);
     private DatabaseModelMapper databaseModelMapper = new DatabaseModelMapper();
 
-    public DatabaseUtilRequest() {
-        try {
-            Context initContext = new InitialContext();
-            Context context = (Context) initContext.lookup("java:comp/env");
-            dataSource = (DataSource) context.lookup("jdbc/postgres");
-        } catch (NamingException ex) {
-            throw new ExceptionInInitializerError("483d162f-DbUtilRequest: dataSource not initialized");
+    public DatabaseUtilRequest(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public QueryRecord getQuery(Integer queryId) {
+        try (Connection conn = dataSource.getConnection()) {
+            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+            Record record = database.selectFrom(Tables.QUERY)
+                    .where(Tables.QUERY.ID.eq(queryId))
+                    .fetchOne();
+            return databaseModelMapper.map(record, QueryRecord.class);
+        } catch (Exception ex) {
+            logger.error("483d162f-DbUtilRequest ERROR-NG-0000039: Error get query with queryId: {}.", queryId);
+            logger.error("context", ex);
         }
+        return null;
     }
 
     public CommentRecord getPublicComment(Integer commentId) {
