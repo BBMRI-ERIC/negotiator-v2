@@ -33,6 +33,8 @@ import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -102,14 +104,17 @@ public class CommentBean implements Serializable {
             clearEditChanges();
             clearFileChanges();
 
+            NotificationService.sendNotification(NotificationType.PUBLIC_COMMAND_NOTIFICATION, query.getId(), commentId, userBean.getUserId(), null);
+
+            /*
             CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()), userBean.getPerson());
             notifier.sendEmailNotificationToBiobankers(userBean.getUserId());
             if (userBean.getBiobankOwner()){
-                /* Send notification to the query owner if a biobanker made a comment
-                 */
+                // Send notification to the query owner if a biobanker made a comment
                 notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()), userBean.getPerson());
                 notifier.sendEmailNotificationToQueryOwner();
             }
+            */
 
         } catch (SQLException e) {
             e.printStackTrace();

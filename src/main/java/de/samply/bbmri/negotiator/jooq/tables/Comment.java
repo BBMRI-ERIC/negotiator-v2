@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment extends TableImpl<CommentRecord> {
 
-	private static final long serialVersionUID = 1462299556;
+	private static final long serialVersionUID = 919470725;
 
 	/**
 	 * The reference instance of <code>public.comment</code>
@@ -82,9 +82,9 @@ public class Comment extends TableImpl<CommentRecord> {
 	public final TableField<CommentRecord, Boolean> ATTACHMENT = createField("attachment", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "");
 
 	/**
-	 * The column <code>public.comment.status</code>.
+	 * The column <code>public.comment.status</code>. status: published, deleted, saved
 	 */
-	public final TableField<CommentRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR.length(255).defaulted(true), this, "");
+	public final TableField<CommentRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "status: published, deleted, saved");
 
 	/**
 	 * Create a <code>public.comment</code> table reference

@@ -60,6 +60,13 @@ public class Negotiator implements Serializable {
     private String uploadFileSalt;
 
     /**
+     * Negotiator base url
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String negotiatorUrl;
+
+    /**
      * Maximum file size for uploaded attachments in Byte
      */
     @XmlElement
@@ -362,6 +369,17 @@ public class Negotiator implements Serializable {
 
     public void setMaxUploadFileSize(int maxUploadFileSize) {
         this.maxUploadFileSize = maxUploadFileSize;
+    }
+
+    public String getNegotiatorUrl() {
+        if(negotiatorUrl == null) {
+            return "https://negotiator.bbmri-eric.eu/";
+        }
+        return negotiatorUrl;
+    }
+
+    public void setNegotiatorUrl(String negotiatorUrl) {
+        this.negotiatorUrl = negotiatorUrl;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

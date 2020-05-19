@@ -23,14 +23,14 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class RequestStatus implements Serializable {
 
-	private static final long serialVersionUID = -748966759;
+	private static final long serialVersionUID = 1711876281;
 
 	private Integer   id;
 	private Integer   queryId;
 	private String    status;
+	private String    statusType;
 	private Timestamp statusDate;
 	private Integer   statusUserId;
-	private String    statusType;
 	private String    statusJson;
 
 	public RequestStatus() {}
@@ -39,9 +39,9 @@ public class RequestStatus implements Serializable {
 		this.id = value.id;
 		this.queryId = value.queryId;
 		this.status = value.status;
+		this.statusType = value.statusType;
 		this.statusDate = value.statusDate;
 		this.statusUserId = value.statusUserId;
-		this.statusType = value.statusType;
 		this.statusJson = value.statusJson;
 	}
 
@@ -49,17 +49,17 @@ public class RequestStatus implements Serializable {
 		Integer   id,
 		Integer   queryId,
 		String    status,
+		String    statusType,
 		Timestamp statusDate,
 		Integer   statusUserId,
-		String    statusType,
 		String    statusJson
 	) {
 		this.id = id;
 		this.queryId = queryId;
 		this.status = status;
+		this.statusType = statusType;
 		this.statusDate = statusDate;
 		this.statusUserId = statusUserId;
-		this.statusType = statusType;
 		this.statusJson = statusJson;
 	}
 
@@ -87,6 +87,14 @@ public class RequestStatus implements Serializable {
 		this.status = status;
 	}
 
+	public String getStatusType() {
+		return this.statusType;
+	}
+
+	public void setStatusType(String statusType) {
+		this.statusType = statusType;
+	}
+
 	public Timestamp getStatusDate() {
 		return this.statusDate;
 	}
@@ -101,14 +109,6 @@ public class RequestStatus implements Serializable {
 
 	public void setStatusUserId(Integer statusUserId) {
 		this.statusUserId = statusUserId;
-	}
-
-	public String getStatusType() {
-		return this.statusType;
-	}
-
-	public void setStatusType(String statusType) {
-		this.statusType = statusType;
 	}
 
 	public String getStatusJson() {

@@ -2,11 +2,27 @@ package de.samply.bbmri.negotiator.control.admin;
 
 import de.samply.bbmri.mailing.EmailBuilder;
 import de.samply.bbmri.mailing.OutgoingEmail;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.MailUtil;
+import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
+import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtilNotification;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Sends an email to the given address.
@@ -16,6 +32,12 @@ import java.io.Serializable;
 public class AdminEmailBean implements Serializable {
 
     private static final long serialVersionUID = 5862457490440582338L;
+
+    @ManagedProperty(value = "#{userBean}")
+    private UserBean userBean;
+
+    List<NotificationRecord> notificationRecords;
+    Map<Integer, String> userNotificationData;
 
     /**
      * The email address entered by the user.
@@ -38,17 +60,51 @@ public class AdminEmailBean implements Serializable {
      * @return
      */
     public String sendEmail() {
-        EmailBuilder builder = MailUtil.initializeBuilder();
-        builder.addTemplateFile("emailTest.soy", "Notification");
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("emailAddress", emailAddress);
+        NotificationService.sendNotification(NotificationType.TEST_NOTIFICATION, -1, null, userBean.getUserId(), parameters);
 
-        OutgoingEmail mail = new OutgoingEmail();
-        mail.addAddressee(emailAddress);
-        mail.setSubject("Negotiator Test Email");
-        mail.setBuilder(builder);
-
-        MailUtil.sendEmail(mail);
         emailAddress = "";
 
         return null;
     }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
+
+    public void loadNotifications() {
+        try {
+            DatabaseUtil databaseUtil = new DatabaseUtil();
+            notificationRecords = databaseUtil.getDatabaseUtilNotification().getNotificationRecords();
+            userNotificationData = new HashMap<>();
+            for(MailNotificationRecord mailNotificationRecord : databaseUtil.getDatabaseUtilNotification().getMailNotificationRecords()) {
+                if (!userNotificationData.containsKey(mailNotificationRecord.getNotificationId())) {
+                    userNotificationData.put(mailNotificationRecord.getNotificationId(), mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
+                } else {
+                    userNotificationData.put(mailNotificationRecord.getNotificationId(), userNotificationData.get(mailNotificationRecord.getNotificationId()) + "<br>" +
+                            mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
+                }
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<NotificationRecord> getNotificationRecords() {
+        return notificationRecords;
+    }
+
+    public void setNotificationRecords(List<NotificationRecord> notificationRecords) {
+        this.notificationRecords = notificationRecords;
+    }
+
+    public String getUserData(Integer notificationRecordId) {
+        return userNotificationData.get(notificationRecordId);
+    }
+
 }
