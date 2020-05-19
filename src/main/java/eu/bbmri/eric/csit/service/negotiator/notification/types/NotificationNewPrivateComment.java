@@ -5,7 +5,6 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
@@ -20,13 +19,13 @@ import java.util.Map;
 
 public class NotificationNewPrivateComment extends Notification {
 
-    private static Logger logger = LoggerFactory.getLogger(NotificationNewPrivateComment.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotificationNewPrivateComment.class);
 
     private String commenterName;
     private String commenterEmailAddresse;
-    private String biobankName;
+    private final String biobankName;
     private OfferRecord commentRecord;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+    private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
     public NotificationNewPrivateComment(NotificationRecord notificationRecord, Integer requestId, Integer personId, Integer commentId, String biobankName) {
         logger.info("0efe4b414a2c-NotificationNewPrivateComment created for commentId: {}", commentId);
@@ -40,55 +39,50 @@ public class NotificationNewPrivateComment extends Notification {
 
     @Override
     public void run() {
-        try (Config config = ConfigFactory.get()) {
-            setQuery(config);
-            setResearcherContact(config);
-            setCommenterContact(config);
-            setComment(config);
-            Map<String, String> emailAddressesAndNames = getBiobankEmailAddressesAndNames(config);
-            if(emailAddressesAndNames.containsKey(researcherEmailAddresse)) {
-                emailAddressesAndNames.remove(researcherEmailAddresse);
-            }
-            if(emailAddressesAndNames.containsKey(commenterEmailAddresse)) {
-                emailAddressesAndNames.remove(commenterEmailAddresse);
-            }
+        try {
+            setQuery();
+            setResearcherContact();
+            setCommenterContact();
+            setComment();
+            Map<String, String> emailAddressesAndNames = getBiobankEmailAddressesAndNames();
+            emailAddressesAndNames.remove(researcherEmailAddresse);
+            emailAddressesAndNames.remove(commenterEmailAddresse);
 
             String subject = "[BBMRI-ERIC Negotiator] New private comment on request: " + queryRecord.getTitle();
             createMailBodyBuilder("PRIVATE_COMMAND_NOTIFICATION.soy");
             if(!commenterEmailAddresse.equals(researcherEmailAddresse)) {
-                prepareNotificationForResearcher(config, subject);
+                prepareNotificationForResearcher(subject);
             }
-            prepareNotificationPerUser(config, emailAddressesAndNames, subject);
-            config.commit();
+            prepareNotificationPerUser(emailAddressesAndNames, subject);
         } catch (Exception ex) {
             logger.error("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000025: Error in NotificationNewPrivateComment.");
             logger.error("context", ex);
         }
     }
 
-    private void setCommenterContact(Config config) {
-        Person commenter = DbUtil.getPersonDetails(config, personId);
+    private void setCommenterContact() {
+        Person commenter = DbUtil.getPersonDetails(personId);
         commenterName = commenter.getAuthName();
         commenterEmailAddresse = commenter.getAuthEmail();
     }
 
-    private void setComment(Config config) {
-        commentRecord = DbUtil.getPrivateComment(config, commentId);
+    private void setComment() {
+        commentRecord = DbUtil.getPrivateComment(commentId);
     }
 
-    private Map<String, String> getBiobankEmailAddressesAndNames(Config config) {
-        return DbUtil.getPrivateCommentBiobankEmailAddresses(config, commentRecord.getBiobankInPrivateChat());
+    private Map<String, String> getBiobankEmailAddressesAndNames() {
+        return databaseUtilNotification.getBiobankEmailAddresses(commentRecord.getBiobankInPrivateChat());
     }
 
-    private void prepareNotificationForResearcher(Config config, String subject) {
+    private void prepareNotificationForResearcher(String subject) {
         try {
             String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId;
             String body = getMailBody(getSoyParameters(url, researcherName));
 
-            MailNotificationRecord mailNotificationRecord = saveNotificationToDatabase(config, researcherEmailAddresse, subject, body);
+            MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.PUBLIC_COMMAND_NOTIFICATION)) {
                 String status = sendMailNotification(researcherEmailAddresse, subject, body);
-                updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
+                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
             }
         } catch (Exception ex) {
             logger.error(String.format("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000026: Error creating a notification for researcher %s.", researcherEmailAddresse));
@@ -96,7 +90,7 @@ public class NotificationNewPrivateComment extends Notification {
         }
     }
 
-    private void prepareNotificationPerUser(Config config, Map<String, String> emailAddressesAndNames, String subject) {
+    private void prepareNotificationPerUser(Map<String, String> emailAddressesAndNames, String subject) {
         String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/owner/detail.xhtml?queryId=" + requestId;
         for(Map.Entry<String, String> contact : emailAddressesAndNames.entrySet()) {
             String emailAddress = contact.getKey();
@@ -104,10 +98,10 @@ public class NotificationNewPrivateComment extends Notification {
             try {
                 String body = getMailBody(getSoyParameters(url, contactName));
 
-                MailNotificationRecord mailNotificationRecord = saveNotificationToDatabase(config, emailAddress, subject, body);
+                MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
                 if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.PUBLIC_COMMAND_NOTIFICATION)) {
                     String status = sendMailNotification(emailAddress, subject, body);
-                    updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
+                    updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
                 }
             } catch (Exception ex) {
                 logger.error(String.format("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000027: Error creating a notification for %s.", emailAddress));

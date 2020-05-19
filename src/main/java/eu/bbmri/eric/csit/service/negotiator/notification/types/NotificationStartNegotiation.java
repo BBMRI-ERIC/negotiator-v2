@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class NotificationStartNegotiation extends Notification {
 
-    private static Logger logger = LoggerFactory.getLogger(NotificationStartNegotiation.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotificationStartNegotiation.class);
 
     public NotificationStartNegotiation(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
         logger.info("74d87f9648e5-NotificationStartNegotiation created for requestID: {}", requestId);
@@ -28,24 +28,23 @@ public class NotificationStartNegotiation extends Notification {
 
     @Override
     public void run() {
-        try(Config config = ConfigFactory.get()) {
-            Map<String, String> emailAddressesAndNames = getCandidateEmailAddressesAndNames(config);
-            setQuery(config);
+        try {
+            Map<String, String> emailAddressesAndNames = getCandidateEmailAddressesAndNames();
+            setQuery();
             String subject = "[BBMRI-ERIC Negotiator] Request has been added: " + queryRecord.getTitle();
             createMailBodyBuilder("START_NEGOTIATION_NOTIFICATION.soy");
-            prepareNotificationPerUser(config, emailAddressesAndNames, subject);
-            config.commit();
+            prepareNotificationPerUser(emailAddressesAndNames, subject);
         } catch (Exception ex) {
             logger.error("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000012: Error in NotificationStartNegotiation.");
             logger.error("context", ex);
         }
     }
 
-    private Map<String, String> getCandidateEmailAddressesAndNames(Config config) {
-        return DbUtil.getStartNotificationEmailAddresses(config, requestId);
+    private Map<String, String> getCandidateEmailAddressesAndNames() {
+        return databaseUtilNotification.getEmailAddressesForQuery(requestId);
     }
 
-    private void prepareNotificationPerUser(Config config, Map<String, String> emailAddressesAndNames, String subject) {
+    private void prepareNotificationPerUser(Map<String, String> emailAddressesAndNames, String subject) {
         String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/owner/detail.xhtml?queryId=" + requestId;
         for(Map.Entry<String, String> contact : emailAddressesAndNames.entrySet()) {
             String emailAddress = contact.getKey();
@@ -57,10 +56,10 @@ public class NotificationStartNegotiation extends Notification {
                 parameters.put("name", contactName);
                 String body = getMailBody(parameters);
 
-                MailNotificationRecord mailNotificationRecord = saveNotificationToDatabase(config, emailAddress, subject, body);
+                MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
                 if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.START_NEGOTIATION_NOTIFICATION)) {
                     String status = sendMailNotification(emailAddress, subject, body);
-                    updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
+                    updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
                 }
             } catch (Exception ex) {
                 logger.error(String.format("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000015: Error creating a notification for %s.", emailAddress));

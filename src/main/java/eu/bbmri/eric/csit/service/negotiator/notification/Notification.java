@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtilNotification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +21,12 @@ import java.util.Set;
 
 public abstract class Notification extends Thread {
 
-    private static Logger abstractLogger = LoggerFactory.getLogger(Notification.class);
-    private String mainMailTemplate = "NegotiatorMainMailTemplate.soy";
-    private File templateFolder = new File(getClass().getClassLoader().getResource("mailTemplate").getPath());
+    private static final Logger abstractLogger = LoggerFactory.getLogger(Notification.class);
+    private final String mainMailTemplate = "NegotiatorMainMailTemplate.soy";
+    private final File templateFolder = new File(getClass().getClassLoader().getResource("mailTemplate").getPath());
     private SoyTofu.Renderer mailBodyRenderer;
 
+    protected DatabaseUtilNotification databaseUtilNotification = new DatabaseUtilNotification();
     protected Integer requestId;
     protected NotificationRecord notificationRecord;
     protected Integer personId;
@@ -38,9 +40,8 @@ public abstract class Notification extends Thread {
 
     }
 
-    protected MailNotificationRecord saveNotificationToDatabase(Config config, String emailAddress, String subject, String body) throws SQLException {
-        MailNotificationRecord mailNotificationRecord = DbUtil.addNotificationEntry(config, emailAddress, notificationRecord.getNotificationId(), notificationRecord.getPersonId(), "created", subject, body);
-        config.commit();
+    protected MailNotificationRecord saveMailNotificationToDatabase(String emailAddress, String subject, String body) throws SQLException {
+        MailNotificationRecord mailNotificationRecord = databaseUtilNotification.addMailNotificationEntry(emailAddress, notificationRecord.getNotificationId(), notificationRecord.getPersonId(), "created", subject, body);
         return mailNotificationRecord;
     }
 
@@ -54,8 +55,8 @@ public abstract class Notification extends Thread {
         }
     }
 
-    protected void updateNotificationInDatabase(Config config, Integer mailNotificationRecordId, String status) throws SQLException {
-        DbUtil.updateNotificationEntryStatus(config, mailNotificationRecordId, status);
+    protected void updateMailNotificationInDatabase(Integer mailNotificationRecordId, String status) throws SQLException {
+        databaseUtilNotification.updateMailNotificationEntryStatus(mailNotificationRecordId, status);
         config.commit();
     }
 
@@ -97,11 +98,13 @@ public abstract class Notification extends Thread {
         return mailBodyRenderer.render();
     }
 
-    protected void setQuery(Config config) {
+    protected void setQuery() {
+        //TODO: Refector
         queryRecord = DbUtil.getQueryFromId(config, requestId);
     }
 
-    protected void setResearcherContact(Config config) {
+    protected void setResearcherContact() {
+        //TODO: Refector
         Person researcher = DbUtil.getPersonDetails(config, queryRecord.getResearcherId());
         researcherName = researcher.getAuthName();
         researcherEmailAddresse = researcher.getAuthEmail();

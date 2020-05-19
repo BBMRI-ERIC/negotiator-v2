@@ -13,9 +13,9 @@ import java.util.HashMap;
 
 public class NotificationTest extends Notification {
 
-    private static Logger logger = LoggerFactory.getLogger(NotificationTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotificationTest.class);
 
-    private String emailAddress;
+    private final String emailAddress;
 
     public NotificationTest(NotificationRecord notificationRecord, String emailAddress) {
         this.emailAddress = emailAddress;
@@ -25,17 +25,16 @@ public class NotificationTest extends Notification {
 
     @Override
     public void run() {
-        try(Config config = ConfigFactory.get()) {
+        try {
             String subject = "Negotiator Test Email";
             createMailBodyBuilder("TEST_NOTIFICATION.soy");
             String body = getMailBody(new HashMap<String, String>());
 
-            MailNotificationRecord mailNotificationRecord = saveNotificationToDatabase(config, emailAddress, subject, body);
+            MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
             if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.TEST_NOTIFICATION)) {
                 String status = sendMailNotification(emailAddress, subject, body);
-                updateNotificationInDatabase(config, mailNotificationRecord.getMailNotificationId(), status);
+                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
             }
-            config.commit();
         } catch (Exception ex) {
             logger.error("b9e5a6aa1e9b-NotificationTest ERROR-NG-0000024: Error in NotificationTest.");
             logger.error(ex.getMessage());
