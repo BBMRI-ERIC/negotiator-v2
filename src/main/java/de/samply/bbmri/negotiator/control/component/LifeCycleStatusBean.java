@@ -43,7 +43,7 @@ public class LifeCycleStatusBean implements Serializable {
         return "";
     }
 
-    public void processing(){
+    public void processing(Integer isder){
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Now 0");
     }
 

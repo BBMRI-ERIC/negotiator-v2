@@ -20,7 +20,7 @@
     <h:form id="user-form">
         <h:panelGrid columns="1">
 
-            <h:commandButton value="Submit" actionListener="#{lifeCycleStatusBean.processing}">
+            <h:commandButton value="Submit" actionListener="#{lifeCycleStatusBean.processing(12345)}">
                 <f:ajax render="@form" onevent="alert('dada');" />
             </h:commandButton>
 
@@ -29,7 +29,7 @@
 
     <img src="https://lh3.googleusercontent.com/proxy/_Cyv3JxXInYbpHbMjLimzxEi6aKi0JsO5qvrYMlcjEfDrTXRGARlbSyL30PFpLQgnfgFdSEQoJJdWTex_Jx5bqkBEJDiOe0KYJJiIf_Di4CH9riUsA"
          id="spinner"
-         style="display: none; width: 30py;"
+         style="display: none; width: 30px;"
          alt=""/>
 
     <!--<div class="col-sm">
