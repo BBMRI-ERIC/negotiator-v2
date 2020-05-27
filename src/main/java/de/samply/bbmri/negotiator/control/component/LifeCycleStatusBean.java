@@ -2,6 +2,7 @@ package de.samply.bbmri.negotiator.control.component;
 
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.control.formhelper.RequestCycleBiobankerUpdateStatusForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @ManagedBean
 @RequestScoped
@@ -29,6 +32,8 @@ public class LifeCycleStatusBean implements Serializable {
     private String indicateAccessConditions;
     private String shippedNumber;
 
+    private List<RequestCycleBiobankerUpdateStatusForm> requestCycleBiobankerUpdateStatusForms;
+
 
     private static Logger logger = LoggerFactory.getLogger(LifeCycleStatusBean.class);
 
@@ -42,6 +47,8 @@ public class LifeCycleStatusBean implements Serializable {
     public String getStatusCssClass() {
         return "";
     }
+
+    //https://stackoverflow.com/questions/12808878/hform-within-uirepeat-not-entirely-working-only-the-last-hform-is-proc
 
     public void processing(Integer isder){
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Now 0");
@@ -118,5 +125,18 @@ public class LifeCycleStatusBean implements Serializable {
 
     public void setShippedNumber(String shippedNumber) {
         this.shippedNumber = shippedNumber;
+    }
+
+    public List<RequestCycleBiobankerUpdateStatusForm> getRequestCycleBiobankerUpdateStatusForms() {
+        if(requestCycleBiobankerUpdateStatusForms == null) {
+            requestCycleBiobankerUpdateStatusForms = new ArrayList<RequestCycleBiobankerUpdateStatusForm>();
+            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(null, null, null, null));
+            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(null, null, null, null));
+            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(null, null, null, null));
+            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(null, null, null, null));
+            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(null, null, null, null));
+            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(null, null, null, null));
+        }
+        return requestCycleBiobankerUpdateStatusForms;
     }
 }

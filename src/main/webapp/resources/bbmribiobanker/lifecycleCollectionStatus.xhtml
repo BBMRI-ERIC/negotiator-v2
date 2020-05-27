@@ -130,6 +130,9 @@
                                  style="white-space: normal;"
                                  title="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}">
                 </h:commandButton>
+                <h:commandButton value="Submit2" actionListener="#{lifeCycleStatusBean.processing(12345)}">
+                    <f:ajax render="@form" onevent="alert('dada');" />
+                </h:commandButton>
             </div>
         </h:form>
 
