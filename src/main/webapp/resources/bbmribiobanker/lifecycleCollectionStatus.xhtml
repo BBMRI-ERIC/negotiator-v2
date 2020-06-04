@@ -104,52 +104,9 @@
                 </h:outputScript>
 
             </div>
-            <!--<div class="col-sm-2 col-lg-2">
-                <h:commandButton value="Submit" actionListener="#{lifeCycleStatusBean.processing}">
-                    <f:ajax render="@form" onevent="alert('dada');" />
-                </h:commandButton>
-                <h:commandButton actionListener="#{lifeCycleStatusBean.updateCollectionLifecycleStatus(cc.attrs.biobankId)}"
-                                 value="#{label['lifecycleCollectionSataus.button.applyChanges.title']}"
-                                 styleClass="btn btn-primary"
-                                 title="#{label['lifecycleCollectionSataus.button.applyChanges.title']}">
-                    <f:ajax render="@form" onevent="alert('dada');" />
-                </h:commandButton>
-                <h:commandButton action="#{lifeCycleStatusBean.updateCollectionLifecycleStatusByBiobank(cc.attrs.biobankId)}"
-                                 value="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}"
-                                 styleClass="btn btn-info"
-                                 style="white-space: normal;"
-                                 title="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}">
-                </h:commandButton>
-                <h:commandButton value="Submit2" actionListener="#{lifeCycleStatusBean.processing(12345)}">
-                    <f:ajax render="@form" onevent="alert('dada');" />
-                </h:commandButton>
-            </div>-->
+
         </h:form>
 
 </composite:implementation>
 
 </html>
-
-<!--
-<h:form>
-<h:selectOneMenu value="#{bean.item}">
-    <f:selectItem itemLabel="Select..." />
-    <f:selectItem itemValue="one" />
-    <f:selectItem itemValue="two" />
-    <f:selectItem itemValue="three" />
-    <f:ajax render="@form" />
-</h:selectOneMenu>
-
-<h:panelGroup rendered="#{bean.item == 'one'}">
-    <p>This will be shown if the selected item equals to "one".</p>
-</h:panelGroup>
-
-<h:panelGroup rendered="#{bean.item == 'two'}">
-    <p>This will be shown if the selected item equals to "two".</p>
-</h:panelGroup>
-
-<h:panelGroup rendered="#{bean.item == 'three'}">
-    <p>This will be shown if the selected item equals to "three".</p>
-</h:panelGroup>
-</h:form>
--->

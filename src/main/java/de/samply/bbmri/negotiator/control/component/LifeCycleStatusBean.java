@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ManagedBean
-@RequestScoped
+@ViewScoped
 public class LifeCycleStatusBean implements Serializable {
+
+    private static final long serialVersionUID = 9L;
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -39,11 +41,8 @@ public class LifeCycleStatusBean implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(LifeCycleStatusBean.class);
 
-    /**
-     * Inits the state.
-     */
-    @PostConstruct
-    public void init() {
+    public void initialize() {
+        testVar = "5";
     }
 
     public String getStatusCssClass() {
@@ -51,14 +50,6 @@ public class LifeCycleStatusBean implements Serializable {
     }
 
     //https://stackoverflow.com/questions/12808878/hform-within-uirepeat-not-entirely-working-only-the-last-hform-is-proc
-
-    /*public void processing(RequestCycleBiobankerUpdateStatusForm requestCycleBiobankerUpdateStatusForm, Integer id, Boolean biobank, String shippedNumber){
-        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Now -1");
-    }
-
-    public void processing(RequestCycleBiobankerUpdateStatusForm requestCycleBiobankerUpdateStatusForm){
-        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Now 0");
-    }*/
 
     public void updateCollectionLifecycleStatus() {
         System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Now 1");

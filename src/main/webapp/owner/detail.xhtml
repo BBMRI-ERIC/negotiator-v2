@@ -42,6 +42,7 @@
         <f:viewParam name="flag" value="#{ownerQueriesDetailBean.flagFilter}" />
         <f:viewAction action="#{ownerQueriesDetailBean.initialize}" />
         <f:viewAction action="#{commentBean.initialize}" />
+        <f:viewAction action="#{lifeCycleStatusBean.initialize}" />
     </f:metadata>
 
     <ui:param name="bodyClass" value="container-fluid body-nomargin" />
@@ -95,10 +96,16 @@
                               style="background-color: aquamarine;border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
                               rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
-                    <h:form id="lifeCycleStatusBeanUpdateStatusForm">
+                    <h:form id="lifeCycleStatusBeanUpdateStatusForm" enctype="multipart/form-data">
+
+                        <h:inputText id="numberOfAvailableSamples" value="#{lifeCycleStatusBean.testVar}"
+                                     styleClass="form-control"
+                                     pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailableSamples']}">
+                        </h:inputText>
+
                         <h:commandButton style="" id="lifeCycleStatusBeanUpdateStatusFormLink"
                                          action="#{lifeCycleStatusBean.updateCollectionLifecycleStatus()}">
-                            <f:ajax/>test
+                            <f:ajax execute="@form" render="@form" />
                         </h:commandButton>
                     </h:form>
 
@@ -106,62 +113,13 @@
 
                     <script type="text/javascript" >
                         function invokeCommandLink() {
+                            var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfAvailableSamples").value = "jajaja";
                             var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
                             jsfcommandButton.click();
                         }
                     </script>
 
                     <b>#{label['querydetail.owner.associatedbiobanks']}</b>
-                    <!--
-                    <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
-                               var="biobank" varStatus="loop">
-                        <div id="accordion">
-                            <div class="card">
-                                <div class="card-header" id="headingTwo">
-                                    <h5 class="mb-0">
-                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
-                                            #{biobank.name}
-                                        </button>
-                                    </h5>
-                                </div>
-                                <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-
-                                    <div class="card-body">
-                                        <div class="container" style="width: 100%;">
-                                            <div class="row">
-
-                                                <c:forEach items="${lifeCycleStatusBean.requestCycleBiobankerUpdateStatusForms}" var="item">
-                                                    <h:form>
-                                                        <h:inputText id="collectionId" value="#{item.collectionId}"/>
-                                                        <h:inputText id="nextCollectionLifecycleStatusStatus" value="#{item.nextCollectionLifecycleStatusStatus}"/>
-                                                        <h:inputText id="numberOfSamplesAvailable" value="#{item.numberOfSamplesAvailable}"/>
-                                                        <h:inputText id="indicateAccessConditions" value="#{item.indicateAccessConditions}"/>
-                                                        <h:inputText id="shippedNumber" value="#{item.shippedNumber}"/>
-
-                                                        <h:commandButton value="Update" action="#{lifeCycleStatusBean.processing(item)}"><f:ajax render="@form" /></h:commandButton>
-                                                        <h:commandButton value="Submit" actionListener="#{lifeCycleStatusBean.processing(item, collectionStatus.collectionId, true, item.shippedNumber)}">
-                                                        </h:commandButton>
-                                                    </h:form>
-                                                </c:forEach>
-
-                                            </div>
-                                            <div class="row">
-
-                                                <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
-                                                           var="collectionStatus" varStatus="loop">
-                                                    <bbmribiobankercc:lifecycleCollectionStatus
-                                                                collectionLifeCycleStatus="#{collectionStatus}"
-                                                                collectionId="#{collectionStatus.collectionId}"
-                                                                biobankId="#{biobank.id}" />
-                                                </ui:repeat>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ui:repeat>
-                    -->
                 </h:panelGroup>
 
                 <h:form styleClass="form-horizontal" style="width: 100%; margin-top: 10px;">
