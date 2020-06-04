@@ -17,16 +17,6 @@
 
 <composite:implementation>
 
-    <h:form id="user-form">
-        <h:panelGrid columns="1">
-
-            <h:commandButton value="Submit" actionListener="#{lifeCycleStatusBean.processing(12345)}">
-                <f:ajax render="@form" onevent="alert('dada');" />
-            </h:commandButton>
-
-        </h:panelGrid>
-    </h:form>
-
     <img src="https://lh3.googleusercontent.com/proxy/_Cyv3JxXInYbpHbMjLimzxEi6aKi0JsO5qvrYMlcjEfDrTXRGARlbSyL30PFpLQgnfgFdSEQoJJdWTex_Jx5bqkBEJDiOe0KYJJiIf_Di4CH9riUsA"
          id="spinner"
          style="display: none; width: 30px;"
@@ -114,7 +104,7 @@
                 </h:outputScript>
 
             </div>
-            <div class="col-sm-2 col-lg-2">
+            <!--<div class="col-sm-2 col-lg-2">
                 <h:commandButton value="Submit" actionListener="#{lifeCycleStatusBean.processing}">
                     <f:ajax render="@form" onevent="alert('dada');" />
                 </h:commandButton>
@@ -133,7 +123,7 @@
                 <h:commandButton value="Submit2" actionListener="#{lifeCycleStatusBean.processing(12345)}">
                     <f:ajax render="@form" onevent="alert('dada');" />
                 </h:commandButton>
-            </div>
+            </div>-->
         </h:form>
 
 </composite:implementation>

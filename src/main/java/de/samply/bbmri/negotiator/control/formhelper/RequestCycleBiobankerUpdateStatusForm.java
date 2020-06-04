@@ -1,12 +1,14 @@
 package de.samply.bbmri.negotiator.control.formhelper;
 
 public class RequestCycleBiobankerUpdateStatusForm {
+    private Integer collectionId;
     private String nextCollectionLifecycleStatusStatus;
     private Integer numberOfSamplesAvailable;
     private String indicateAccessConditions;
     private String shippedNumber;
 
-    public RequestCycleBiobankerUpdateStatusForm(String nextCollectionLifecycleStatusStatus, Integer numberOfSamplesAvailable, String indicateAccessConditions, String shippedNumber) {
+    public RequestCycleBiobankerUpdateStatusForm(Integer collectionId, String nextCollectionLifecycleStatusStatus, Integer numberOfSamplesAvailable, String indicateAccessConditions, String shippedNumber) {
+        this.collectionId = collectionId;
         this.nextCollectionLifecycleStatusStatus = nextCollectionLifecycleStatusStatus;
         this.numberOfSamplesAvailable = numberOfSamplesAvailable;
         this.indicateAccessConditions = indicateAccessConditions;
@@ -43,5 +45,13 @@ public class RequestCycleBiobankerUpdateStatusForm {
 
     public void setNextCollectionLifecycleStatusStatus(String nextCollectionLifecycleStatusStatus) {
         this.nextCollectionLifecycleStatusStatus = nextCollectionLifecycleStatusStatus;
+    }
+
+    public Integer getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(Integer collectionId) {
+        this.collectionId = collectionId;
     }
 }
