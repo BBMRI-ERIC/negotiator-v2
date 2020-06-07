@@ -2,7 +2,8 @@ package de.samply.bbmri.negotiator.control.component;
 
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.control.formhelper.RequestCycleBiobankerUpdateStatusForm;
+import de.samply.bbmri.negotiator.util.CollectionLifeCycleStatus;
+import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,20 +31,19 @@ public class LifeCycleStatusBean implements Serializable {
 
     private String selectedNextQuery;
 
+    private Integer collectionId;
+    private Integer biobankId;
     private String nextCollectionLifecycleStatusStatus;
     private Integer numberOfSamplesAvailable;
     private String indicateAccessConditions;
     private String shippedNumber;
 
-    private String testVar;
-
-    private List<RequestCycleBiobankerUpdateStatusForm> requestCycleBiobankerUpdateStatusForms;
-
-
     private static final Logger logger = LoggerFactory.getLogger(LifeCycleStatusBean.class);
 
+    private RequestLifeCycleStatus requestLifeCycleStatus = null;
+
     public void initialize() {
-        testVar = "5";
+        // Move to OwnerQueriesDetailBean
     }
 
     public String getStatusCssClass() {
@@ -52,19 +53,38 @@ public class LifeCycleStatusBean implements Serializable {
     //https://stackoverflow.com/questions/12808878/hform-within-uirepeat-not-entirely-working-only-the-last-hform-is-proc
 
     public void updateCollectionLifecycleStatus() {
-        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Now 1");
+        if(biobankId != null) {
+            updateBiobankStatus();
+        } else {
+            updateCollectionStatus();
+        }
     }
 
-    /*
-    public String updateCollectionLifecycleStatus(Integer collectionId) {
-        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Now 2");
-        return null;
+    private void updateBiobankStatus() {
+        List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
+        for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
+            //updateCollectionLifecycleStatus(collectionLifeCycleStatus.getCollectionId());
+        }
+        //return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+        //        + "?includeViewParams=true&faces-redirect=true";
     }
 
-    public String updateCollectionLifecycleStatusByBiobank(Integer biobankId) {
-        System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx Now 3");
-        return null;
-    }*/
+    private void updateCollectionStatus() {
+
+        if(nextCollectionLifecycleStatusStatus == null || nextCollectionLifecycleStatusStatus.length() == 0) {
+            //return "";
+        }
+        String status = nextCollectionLifecycleStatusStatus.split("\\.")[1];
+        String statusType = nextCollectionLifecycleStatusStatus.split("\\.")[0];
+        if(statusType.equalsIgnoreCase("notselected")) {
+            //return "";
+        }
+
+        //requestLifeCycleStatus.nextStatus(status, statusType, createStatusJson(), userBean.getUserId(), collectionId);
+        //return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+        //        + "?includeViewParams=true&faces-redirect=true";
+
+    }
 
     /**
      * Setter and Getter
@@ -125,28 +145,19 @@ public class LifeCycleStatusBean implements Serializable {
         this.shippedNumber = shippedNumber;
     }
 
-    public List<RequestCycleBiobankerUpdateStatusForm> getRequestCycleBiobankerUpdateStatusForms() {
-        if(requestCycleBiobankerUpdateStatusForms == null) {
-            requestCycleBiobankerUpdateStatusForms = new ArrayList<RequestCycleBiobankerUpdateStatusForm>();
-            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(10,"1", 1, "1", "1"));
-            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(11,"2", 2, "2", "2"));
-            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(12,"3", 3, "3", "3"));
-            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(13,"4", 4, "4", "4"));
-            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(14,"5", 5, "5", "5"));
-            requestCycleBiobankerUpdateStatusForms.add(new RequestCycleBiobankerUpdateStatusForm(15,"6", 6, "6", "6"));
-        }
-        return requestCycleBiobankerUpdateStatusForms;
+    public Integer getCollectionId() {
+        return collectionId;
     }
 
-    public void setRequestCycleBiobankerUpdateStatusForms(List<RequestCycleBiobankerUpdateStatusForm> requestCycleBiobankerUpdateStatusForms) {
-        this.requestCycleBiobankerUpdateStatusForms = requestCycleBiobankerUpdateStatusForms;
+    public void setCollectionId(Integer collectionId) {
+        this.collectionId = collectionId;
     }
 
-    public String getTestVar() {
-        return testVar;
+    public Integer getBiobankId() {
+        return biobankId;
     }
 
-    public void setTestVar(String testVar) {
-        this.testVar = testVar;
+    public void setBiobankId(Integer biobankId) {
+        this.biobankId = biobankId;
     }
 }

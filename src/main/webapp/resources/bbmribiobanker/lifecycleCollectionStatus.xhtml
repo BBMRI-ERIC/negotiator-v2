@@ -34,13 +34,12 @@
 
         <h:form id="status-form">
 
-            <div class="col-sm-3 col-lg-3">#{cc.attrs.collectionLifeCycleStatus.collectionName}</div>
+            <div class="col-sm-3 col-lg-3">#{cc.attrs.collectionLifeCycleStatus.collectionName} - #{cc.attrs.collectionId}</div>
             <div class="col-sm-3 col-lg-3">
                 #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
                 <span style="font-size: 12px; font-style: italic;">#{cc.attrs.collectionLifeCycleStatus.status.statusText}</span>
             </div>
-            <div class="col-sm-4 col-lg-4">
-                <!--<h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">-->
+            <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
                 #{label['lifecycleCollectionSataus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
                 <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
                                  class="form-control"
@@ -54,7 +53,7 @@
 
                 <div id="numberOfAvailableSamples#{cc.attrs.collectionId}" style="display: none;">
                     #{label['lifecycleCollectionSataus.nuberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
-                    <h:inputText id="numberOfAvailableSamples" value="#{lifeCycleStatusBean.numberOfSamplesAvailable}"
+                    <h:inputText id="numberOfAvailableSamples#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfSamplesAvailable}"
                                   styleClass="form-control"
                                   pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailableSamples']}">
                     </h:inputText>
@@ -102,6 +101,8 @@
                         }
                     }
                 </h:outputScript>
+
+                <a onclick="invokeCommandLink(#{cc.attrs.collectionId})">Anchor Link</a><br/>
 
             </div>
 
