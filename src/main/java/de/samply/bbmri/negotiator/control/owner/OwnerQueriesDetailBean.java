@@ -70,7 +70,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Logger logger = LoggerFactory.getLogger(OwnerQueriesDetailBean.class);
+	private final Logger logger = LoggerFactory.getLogger(OwnerQueriesDetailBean.class);
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -121,7 +121,7 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     private List<BiobankRecord> associatedBiobanks;
 
-	private HashMap<Integer, String> biobankNames = null;
+	private final HashMap<Integer, String> biobankNames = null;
 
 	/**
      * The list of offers(private comments) for the selected query
@@ -138,10 +138,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 */
 	private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
 
-	private DataCache dataCache = DataCache.getInstance();
+	private final DataCache dataCache = DataCache.getInstance();
 
+	/**
+	 * Lifecycle Collection Data (Form, Structure)
+	 */
 	private RequestLifeCycleStatus requestLifeCycleStatus = null;
-
+	private Integer collectionId;
+	private Integer biobankId;
 	private String nextCollectionLifecycleStatusStatus;
 	private Integer numberOfSamplesAvailable;
 	private String indicateAccessConditions;
@@ -209,9 +213,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 					return null;
 				}
             }
+            /*
+             * Initialize Lifecycle Status
+             */
+			long timeMilli = new Date().getTime();
 			requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
 			requestLifeCycleStatus.initialise();
 			requestLifeCycleStatus.initialiseCollectionStatus();
+			logger.info("Loadning Lifecycle Time: " + (new Date().getTime() -timeMilli));
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -362,8 +371,15 @@ public class OwnerQueriesDetailBean implements Serializable {
 		}
 	}
 
+	/*
+	 * Lifecycle Collection update
+	 */
 	public void updateCollectionLifecycleStatus() {
-		System.out.println("Now");
+		if(biobankId != 0) {
+			updateCollectionLifecycleStatusByBiobank(biobankId);
+		} else {
+			updateCollectionLifecycleStatus(collectionId);
+		}
 	}
 
 	public String updateCollectionLifecycleStatus(Integer collectionId) {
@@ -381,6 +397,15 @@ public class OwnerQueriesDetailBean implements Serializable {
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
+	public String updateCollectionLifecycleStatusByBiobank(Integer biobankId) {
+		List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
+		for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
+			updateCollectionLifecycleStatus(collectionLifeCycleStatus.getCollectionId());
+		}
+		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+				+ "?includeViewParams=true&faces-redirect=true";
+	}
+
 	private String createStatusJson() {
 		if(numberOfSamplesAvailable != null) {
 			return "{\"numberAvaiableSamples\":\"" + numberOfSamplesAvailable + "\"}";
@@ -392,15 +417,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 			return "{\"shippedNumber\":\"" + shippedNumber + "\"}";
 		}
 		return null;
-	}
-
-	public String updateCollectionLifecycleStatusByBiobank(Integer biobankId) {
-		List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
-		for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
-			updateCollectionLifecycleStatus(collectionLifeCycleStatus.getCollectionId());
-		}
-		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
-				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
 	/*
@@ -613,5 +629,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setShippedNumber(String shippedNumber) {
 		this.shippedNumber = shippedNumber;
+	}
+
+	public Integer getCollectionId() {
+		return collectionId;
+	}
+
+	public void setCollectionId(Integer collectionId) {
+		this.collectionId = collectionId;
+	}
+
+	public Integer getBiobankId() {
+		return biobankId;
+	}
+
+	public void setBiobankId(Integer biobankId) {
+		this.biobankId = biobankId;
 	}
 }

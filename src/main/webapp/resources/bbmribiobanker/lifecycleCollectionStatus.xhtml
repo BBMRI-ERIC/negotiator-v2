@@ -101,10 +101,12 @@
                         }
                     }
                 </h:outputScript>
-
-                <a onclick="invokeCommandLink(#{cc.attrs.collectionId})">Anchor Link</a><br/>
-
             </div>
+            <div class="col-sm-3 col-lg-3">
+                <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0)">Anchor Link</button><br/>
+                <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">Anchor Link</button>
+            </div>
+
 
         </h:form>
 
