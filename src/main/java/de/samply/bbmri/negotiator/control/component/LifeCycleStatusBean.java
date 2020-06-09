@@ -40,7 +40,7 @@ public class LifeCycleStatusBean implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger(LifeCycleStatusBean.class);
 
-    private RequestLifeCycleStatus requestLifeCycleStatus = null;
+    private final RequestLifeCycleStatus requestLifeCycleStatus = null;
 
     public void initialize() {
         // Move to OwnerQueriesDetailBean
@@ -51,40 +51,6 @@ public class LifeCycleStatusBean implements Serializable {
     }
 
     //https://stackoverflow.com/questions/12808878/hform-within-uirepeat-not-entirely-working-only-the-last-hform-is-proc
-
-    public void updateCollectionLifecycleStatus() {
-        if(biobankId != null) {
-            updateBiobankStatus();
-        } else {
-            updateCollectionStatus();
-        }
-    }
-
-    private void updateBiobankStatus() {
-        List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
-        for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
-            //updateCollectionLifecycleStatus(collectionLifeCycleStatus.getCollectionId());
-        }
-        //return FacesContext.getCurrentInstance().getViewRoot().getViewId()
-        //        + "?includeViewParams=true&faces-redirect=true";
-    }
-
-    private void updateCollectionStatus() {
-
-        if(nextCollectionLifecycleStatusStatus == null || nextCollectionLifecycleStatusStatus.length() == 0) {
-            //return "";
-        }
-        String status = nextCollectionLifecycleStatusStatus.split("\\.")[1];
-        String statusType = nextCollectionLifecycleStatusStatus.split("\\.")[0];
-        if(statusType.equalsIgnoreCase("notselected")) {
-            //return "";
-        }
-
-        //requestLifeCycleStatus.nextStatus(status, statusType, createStatusJson(), userBean.getUserId(), collectionId);
-        //return FacesContext.getCurrentInstance().getViewRoot().getViewId()
-        //        + "?includeViewParams=true&faces-redirect=true";
-
-    }
 
     /**
      * Setter and Getter

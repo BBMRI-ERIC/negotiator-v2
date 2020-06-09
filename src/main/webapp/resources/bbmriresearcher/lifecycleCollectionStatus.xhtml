@@ -22,7 +22,7 @@
         #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
         <span style="font-size: 12px; font-style: italic;">#{cc.attrs.collectionLifeCycleStatus.status.statusText}</span>
     </div>
-    <div class="col-sm-4 col-lg-4">
+    <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
         <!--<h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">-->
         #{label['lifecycleCollectionSataus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
         <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"

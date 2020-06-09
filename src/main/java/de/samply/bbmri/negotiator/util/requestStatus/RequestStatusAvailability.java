@@ -13,12 +13,12 @@ import java.util.List;
 public class RequestStatusAvailability implements RequestStatus {
 
     private String status = null;
-    private String statusType = "availability";
+    private final String statusType = "availability";
     private String statusText = "Collection has availability not specified yet.";
     private Date statusDate = null;
-    private List<String> allowedNextStatus = Arrays.asList("not_interrested", "indicateAccessConditions");
-    private List<String> allowedNextStatusBiobanker = new ArrayList<String>();
-    private List<String> allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interrested");
+    private final List<String> allowedNextStatus = Arrays.asList("not_interrested", "indicateAccessConditions");
+    private final List<String> allowedNextStatusBiobanker = new ArrayList<String>();
+    private final List<String> allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interrested");
 
     public RequestStatusAvailability(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
@@ -56,7 +56,7 @@ public class RequestStatusAvailability implements RequestStatus {
         if(status.equals("sample_data_available_accessible")) {
             return statusText;
         }
-        return "ERROR";
+        return "";
     }
 
     @Override
