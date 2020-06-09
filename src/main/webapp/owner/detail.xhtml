@@ -117,13 +117,14 @@
                             function invokeCommandLink(collectionId, biobankId) {
                                 var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
                                 var numberOfAvailableSamples = $("#numberOfAvailableSamples" + collectionId).find("input").val();
-                                var indicateAccessConditions = $("#indicateAccessConditions" + collectionId).find("input").val();
-                                var shippedNumber = $("#shippedNumber" + collectionId).find("input").val();
+                                var indicateAccessConditions = $("#indicateAccessConditions" + collectionId).find("textarea").val();
+                                var shippedNumber = $("#shippedNumber" + collectionId).find("textarea").val();
 
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfSamplesAvailable").value = numberOfAvailableSamples;
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:indicateAccessConditions").value = indicateAccessConditions;
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:shippedNumber").value = shippedNumber;
+                                alert("-" + indicateAccessConditions + "-");
 
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
