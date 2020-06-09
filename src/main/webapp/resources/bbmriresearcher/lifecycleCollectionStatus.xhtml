@@ -53,17 +53,10 @@
 
     </div>
     <div class="col-sm-2 col-lg-2">
-        <h:commandButton action="#{researcherQueriesDetailBean.updateCollectionLifecycleStatus(cc.attrs.collectionId)}"
-                         value="#{label['lifecycleCollectionSataus.button.applyChanges.title']}"
-                         styleClass="btn btn-primary"
-                         title="#{label['lifecycleCollectionSataus.button.applyChanges.title']}">
-        </h:commandButton>
-        <h:commandButton action="#{researcherQueriesDetailBean.updateCollectionLifecycleStatusByBiobank(cc.attrs.biobankId)}"
-                         value="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}"
-                         styleClass="btn btn-info"
-                         style="white-space: normal;"
-                         title="#{label['lifecycleCollectionSataus.button.applyChangesForAll.title']}">
-        </h:commandButton>
+        <div class="col-sm-2 col-lg-2">
+            <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0)">Update Collection</button>
+            <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">Update for all Collections</button>
+        </div>
     </div>
 
 </composite:implementation>

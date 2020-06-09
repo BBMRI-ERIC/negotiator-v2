@@ -80,13 +80,29 @@ public class RequestLifeCycleStatus {
             biobankCollectionLink = new HashMap<Integer, HashSet<Integer>>();
         }
         try(Config config = ConfigFactory.get()) {
+            long timeMilli1 = new Date().getTime();
             List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtil.getCollectionsForQuery(config, query_id);
+            long timeMilli2 = new Date().getTime();
+            logger.info("###############################################");
+            logger.info("Loading Query: " + (timeMilli2 -timeMilli1));
             for(CollectionBiobankDTO collectionBiobankDTO : collectionBiobankDTOList) {
+                long timeMilli3 = new Date().getTime();
                 setBiobankCollectionLink(collectionBiobankDTO.getBiobank().getId(), collectionBiobankDTO.getCollection().getId());
+                long timeMilli4 = new Date().getTime();
                 collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId(), collectionBiobankDTO.getCollection().getCollectionReadableID()));
+                long timeMilli5 = new Date().getTime();
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).initialise();
+                long timeMilli6 = new Date().getTime();
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).setCollectionBiobankDTO(collectionBiobankDTO);
+                long timeMilli7 = new Date().getTime();
                 CollectionContactsDTO collectionContactsDTO = dataCache.getCollectionContacts(collectionBiobankDTO.getCollection().getId());
+                long timeMilli8 = new Date().getTime();
+                logger.info("###############################################");
+                logger.info("Loading Data 1: " + (timeMilli4 -timeMilli3));
+                logger.info("Loading Data 2: " + (timeMilli5 -timeMilli4));
+                logger.info("Loading Data 3: " + (timeMilli6 -timeMilli5));
+                logger.info("Loading Data 4: " + (timeMilli7 -timeMilli6));
+                logger.info("Loading Data 5: " + (timeMilli8 -timeMilli7));
             }
         } catch (Exception e) {
             logger.error("ERROR-NG-0000003: Error getting collections for query. queryis:" + query_id);

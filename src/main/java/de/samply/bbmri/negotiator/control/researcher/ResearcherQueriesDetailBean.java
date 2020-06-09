@@ -59,6 +59,8 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the query detail view for owners
@@ -69,6 +71,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
+
+    private final Logger logger = LoggerFactory.getLogger(ResearcherQueriesDetailBean.class);
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -154,7 +158,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
     private DataCache dataCache = DataCache.getInstance();
 
+    /**
+     * Lifecycle Collection Data (Form, Structure)
+     */
     private RequestLifeCycleStatus requestLifeCycleStatus = null;
+    private Integer collectionId;
+    private Integer biobankId;
     private String nextCollectionLifecycleStatusStatus;
     private String offer;
 
@@ -223,9 +232,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
                 setHumanReadableQuery(queryDTO.getHumanReadable());
             }
+            /*
+             * Initialize Lifecycle Status
+             */
             requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
             requestLifeCycleStatus.initialise();
             requestLifeCycleStatus.initialiseCollectionStatus();
+
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -358,6 +371,17 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
     }
 
+    /*
+     * Lifecycle Collection update
+     */
+    public String updateCollectionLifecycleStatus() {
+        if(biobankId != 0) {
+            return updateCollectionLifecycleStatusByBiobank(biobankId);
+        } else {
+            return updateCollectionLifecycleStatus(collectionId);
+        }
+    }
+
     public String updateCollectionLifecycleStatus(Integer collectionId) {
         if(nextCollectionLifecycleStatusStatus == null || nextCollectionLifecycleStatusStatus.length() == 0) {
             return "";
@@ -373,13 +397,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 + "?includeViewParams=true&faces-redirect=true";
     }
 
-    private String createStatusJson() {
-        if(offer != null && offer.length() > 0) {
-            return "{\"offer\":\"" + offer + "\"}";
-        }
-        return null;
-    }
-
     public String updateCollectionLifecycleStatusByBiobank(Integer biobankId) {
         List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
         for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
@@ -387,6 +404,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         }
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    private String createStatusJson() {
+        if(offer != null && offer.length() > 0) {
+            return "{\"offer\":\"" + offer + "\"}";
+        }
+        return null;
     }
 
     /*
@@ -587,5 +611,21 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setNextCollectionLifecycleStatusStatus(String nextCollectionLifecycleStatusStatus) {
         this.nextCollectionLifecycleStatusStatus = nextCollectionLifecycleStatusStatus;
+    }
+
+    public Integer getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(Integer collectionId) {
+        this.collectionId = collectionId;
+    }
+
+    public Integer getBiobankId() {
+        return biobankId;
+    }
+
+    public void setBiobankId(Integer biobankId) {
+        this.biobankId = biobankId;
     }
 }

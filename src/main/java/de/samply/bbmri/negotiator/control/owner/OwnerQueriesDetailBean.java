@@ -216,11 +216,9 @@ public class OwnerQueriesDetailBean implements Serializable {
             /*
              * Initialize Lifecycle Status
              */
-			long timeMilli = new Date().getTime();
 			requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
 			requestLifeCycleStatus.initialise();
 			requestLifeCycleStatus.initialiseCollectionStatus();
-			logger.info("Loadning Lifecycle Time: " + (new Date().getTime() -timeMilli));
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -374,11 +372,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 	/*
 	 * Lifecycle Collection update
 	 */
-	public void updateCollectionLifecycleStatus() {
+	public String updateCollectionLifecycleStatus() {
 		if(biobankId != 0) {
-			updateCollectionLifecycleStatusByBiobank(biobankId);
+			return updateCollectionLifecycleStatusByBiobank(biobankId);
 		} else {
-			updateCollectionLifecycleStatus(collectionId);
+			return updateCollectionLifecycleStatus(collectionId);
 		}
 	}
 

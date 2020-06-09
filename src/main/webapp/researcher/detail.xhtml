@@ -172,6 +172,38 @@
                 <h:panelGroup layout="block"
                               style="background-color: yellowgreen;border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
                               rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}">
+
+                    <h:panelGroup style="display:none;">
+                        <h:form id="lifeCycleStatusBeanUpdateStatusForm" enctype="multipart/form-data">
+
+                            <h:inputText id="collectionId" value="#{researcherQueriesDetailBean.collectionId}"/>
+                            <h:inputText id="biobankId" value="#{researcherQueriesDetailBean.biobankId}"/>
+                            <h:inputText id="nextCollectionLifecycleStatusStatus" value="#{researcherQueriesDetailBean.nextCollectionLifecycleStatusStatus}"/>
+                            <h:inputText id="offer" value="#{researcherQueriesDetailBean.offer}"/>
+
+                            <h:commandButton style="" id="lifeCycleStatusBeanUpdateStatusFormLink"
+                                             action="#{researcherQueriesDetailBean.updateCollectionLifecycleStatus()}">
+                                <f:ajax execute="@form" render="@form" />
+                            </h:commandButton>
+                        </h:form>
+
+                        <script type="text/javascript" >
+                            function invokeCommandLink(collectionId, biobankId) {
+                                var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
+                                var offer = $("#offer" + collectionId).find("input").val();
+
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:offer").value = offer;
+
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
+
+                                var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
+                                jsfcommandButton.click();
+                            }
+                        </script>
+                    </h:panelGroup>
+
                     <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
                     <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.biobankIds}"
                                var="biobankId" varStatus="loop">
