@@ -7,7 +7,6 @@ package de.samply.bbmri.negotiator.jooq.tables.daos;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import javax.annotation.Generated;
@@ -70,19 +69,5 @@ public class JsonQueryDao extends DAOImpl<JsonQueryRecord, de.samply.bbmri.negot
 	 */
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.JsonQuery> fetchByJsonText(String... values) {
 		return fetch(JsonQuery.JSON_QUERY.JSON_TEXT, values);
-	}
-
-	/**
-	 * Fetch records that have <code>query_create_time IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.JsonQuery> fetchByQueryCreateTime(Timestamp... values) {
-		return fetch(JsonQuery.JSON_QUERY.QUERY_CREATE_TIME, values);
-	}
-
-	/**
-	 * Fetch records that have <code>query_id IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.JsonQuery> fetchByQueryId(Integer... values) {
-		return fetch(JsonQuery.JSON_QUERY.QUERY_ID, values);
 	}
 }

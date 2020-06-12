@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollection extends TableImpl<QueryCollectionRecord> {
 
-	private static final long serialVersionUID = -1579157554;
+	private static final long serialVersionUID = -1623194392;
 
 	/**
 	 * The reference instance of <code>public.query_collection</code>
@@ -61,19 +61,19 @@ public class QueryCollection extends TableImpl<QueryCollectionRecord> {
 	public final TableField<QueryCollectionRecord, Integer> COLLECTION_ID = createField("collection_id", org.jooq.impl.SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
+	 * The column <code>public.query_collection.expect_connector_result</code>.
 	 */
-	public final TableField<QueryCollectionRecord, Boolean> EXPECT_CONNECTOR_RESULT = createField("expect_connector_result", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "Column that tells the negotiator to expect results from the given connector");
+	public final TableField<QueryCollectionRecord, Boolean> EXPECT_CONNECTOR_RESULT = createField("expect_connector_result", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
 
 	/**
-	 * The column <code>public.query_collection.donors</code>. result of query: amount of donors
+	 * The column <code>public.query_collection.donors</code>.
 	 */
-	public final TableField<QueryCollectionRecord, Integer> DONORS = createField("donors", org.jooq.impl.SQLDataType.INTEGER, this, "result of query: amount of donors");
+	public final TableField<QueryCollectionRecord, Integer> DONORS = createField("donors", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
-	 * The column <code>public.query_collection.samples</code>. result of query: amount of samples
+	 * The column <code>public.query_collection.samples</code>.
 	 */
-	public final TableField<QueryCollectionRecord, Integer> SAMPLES = createField("samples", org.jooq.impl.SQLDataType.INTEGER, this, "result of query: amount of samples");
+	public final TableField<QueryCollectionRecord, Integer> SAMPLES = createField("samples", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * The column <code>public.query_collection.result_received_time</code>. the time when the result is received from the connector.

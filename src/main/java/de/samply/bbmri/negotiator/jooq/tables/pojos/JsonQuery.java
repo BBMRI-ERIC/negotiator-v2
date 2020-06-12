@@ -5,7 +5,6 @@ package de.samply.bbmri.negotiator.jooq.tables.pojos;
 
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 
 import javax.annotation.Generated;
 
@@ -23,32 +22,24 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class JsonQuery implements Serializable {
 
-	private static final long serialVersionUID = -519255132;
+	private static final long serialVersionUID = -1745305764;
 
-	private Integer   id;
-	private String    jsonText;
-	private Timestamp queryCreateTime;
-	private Integer   queryId;
+	private Integer id;
+	private String  jsonText;
 
 	public JsonQuery() {}
 
 	public JsonQuery(JsonQuery value) {
 		this.id = value.id;
 		this.jsonText = value.jsonText;
-		this.queryCreateTime = value.queryCreateTime;
-		this.queryId = value.queryId;
 	}
 
 	public JsonQuery(
-		Integer   id,
-		String    jsonText,
-		Timestamp queryCreateTime,
-		Integer   queryId
+		Integer id,
+		String  jsonText
 	) {
 		this.id = id;
 		this.jsonText = jsonText;
-		this.queryCreateTime = queryCreateTime;
-		this.queryId = queryId;
 	}
 
 	public Integer getId() {
@@ -65,21 +56,5 @@ public class JsonQuery implements Serializable {
 
 	public void setJsonText(String jsonText) {
 		this.jsonText = jsonText;
-	}
-
-	public Timestamp getQueryCreateTime() {
-		return this.queryCreateTime;
-	}
-
-	public void setQueryCreateTime(Timestamp queryCreateTime) {
-		this.queryCreateTime = queryCreateTime;
-	}
-
-	public Integer getQueryId() {
-		return this.queryId;
-	}
-
-	public void setQueryId(Integer queryId) {
-		this.queryId = queryId;
 	}
 }

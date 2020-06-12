@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = -2009514825;
+	private static final long serialVersionUID = 1743287343;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -65,11 +65,6 @@ public class Query extends TableImpl<QueryRecord> {
 	 * The column <code>public.query.text</code>. text of query
 	 */
 	public final TableField<QueryRecord, String> TEXT = createField("text", org.jooq.impl.SQLDataType.CLOB, this, "text of query");
-
-	/**
-	 * The column <code>public.query.query_xml</code>. XML version of the query
-	 */
-	public final TableField<QueryRecord, String> QUERY_XML = createField("query_xml", org.jooq.impl.SQLDataType.CLOB, this, "XML version of the query");
 
 	/**
 	 * The column <code>public.query.query_creation_time</code>. date and time of query with out time zone
@@ -102,19 +97,24 @@ public class Query extends TableImpl<QueryRecord> {
 	public final TableField<QueryRecord, Boolean> VALID_QUERY = createField("valid_query", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
 
 	/**
-	 * The column <code>public.query.request_description</code>. description of the request
+	 * The column <code>public.query.request_description</code>.
 	 */
-	public final TableField<QueryRecord, String> REQUEST_DESCRIPTION = createField("request_description", org.jooq.impl.SQLDataType.VARCHAR.length(6000), this, "description of the request");
+	public final TableField<QueryRecord, String> REQUEST_DESCRIPTION = createField("request_description", org.jooq.impl.SQLDataType.VARCHAR.length(6000), this, "");
 
 	/**
-	 * The column <code>public.query.ethics_vote</code>. ethics vote for the query
+	 * The column <code>public.query.query_xml</code>.
 	 */
-	public final TableField<QueryRecord, String> ETHICS_VOTE = createField("ethics_vote", org.jooq.impl.SQLDataType.CLOB, this, "ethics vote for the query");
+	public final TableField<QueryRecord, String> QUERY_XML = createField("query_xml", org.jooq.impl.SQLDataType.CLOB, this, "");
 
 	/**
-	 * The column <code>public.query.negotiation_started_time</code>. Time when the researcher started the negotiation for the query.
+	 * The column <code>public.query.ethics_vote</code>.
 	 */
-	public final TableField<QueryRecord, Timestamp> NEGOTIATION_STARTED_TIME = createField("negotiation_started_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "Time when the researcher started the negotiation for the query.");
+	public final TableField<QueryRecord, String> ETHICS_VOTE = createField("ethics_vote", org.jooq.impl.SQLDataType.CLOB, this, "");
+
+	/**
+	 * The column <code>public.query.negotiation_started_time</code>.
+	 */
+	public final TableField<QueryRecord, Timestamp> NEGOTIATION_STARTED_TIME = createField("negotiation_started_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
 	/**
 	 * The column <code>public.query.researcher_name</code>.

@@ -28,7 +28,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements Record7<Integer, String, String, String, byte[], Boolean, String> {
 
-	private static final long serialVersionUID = 153311637;
+	private static final long serialVersionUID = -1971189707;
 
 	/**
 	 * Setter for <code>public.person.id</code>. primary key
@@ -101,14 +101,14 @@ public class PersonRecord extends UpdatableRecordImpl<PersonRecord> implements R
 	}
 
 	/**
-	 * Setter for <code>public.person.is_admin</code>. boolean if the person is an admin
+	 * Setter for <code>public.person.is_admin</code>.
 	 */
 	public void setIsAdmin(Boolean value) {
 		setValue(5, value);
 	}
 
 	/**
-	 * Getter for <code>public.person.is_admin</code>. boolean if the person is an admin
+	 * Getter for <code>public.person.is_admin</code>.
 	 */
 	public Boolean getIsAdmin() {
 		return (Boolean) getValue(5);

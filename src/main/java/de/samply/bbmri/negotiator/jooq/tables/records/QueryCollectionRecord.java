@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollectionRecord extends UpdatableRecordImpl<QueryCollectionRecord> implements Record6<Integer, Integer, Boolean, Integer, Integer, Timestamp> {
 
-	private static final long serialVersionUID = -2088043904;
+	private static final long serialVersionUID = -1750132016;
 
 	/**
 	 * Setter for <code>public.query_collection.query_id</code>.
@@ -61,42 +61,42 @@ public class QueryCollectionRecord extends UpdatableRecordImpl<QueryCollectionRe
 	}
 
 	/**
-	 * Setter for <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
+	 * Setter for <code>public.query_collection.expect_connector_result</code>.
 	 */
 	public void setExpectConnectorResult(Boolean value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
+	 * Getter for <code>public.query_collection.expect_connector_result</code>.
 	 */
 	public Boolean getExpectConnectorResult() {
 		return (Boolean) getValue(2);
 	}
 
 	/**
-	 * Setter for <code>public.query_collection.donors</code>. result of query: amount of donors
+	 * Setter for <code>public.query_collection.donors</code>.
 	 */
 	public void setDonors(Integer value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_collection.donors</code>. result of query: amount of donors
+	 * Getter for <code>public.query_collection.donors</code>.
 	 */
 	public Integer getDonors() {
 		return (Integer) getValue(3);
 	}
 
 	/**
-	 * Setter for <code>public.query_collection.samples</code>. result of query: amount of samples
+	 * Setter for <code>public.query_collection.samples</code>.
 	 */
 	public void setSamples(Integer value) {
 		setValue(4, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_collection.samples</code>. result of query: amount of samples
+	 * Getter for <code>public.query_collection.samples</code>.
 	 */
 	public Integer getSamples() {
 		return (Integer) getValue(4);

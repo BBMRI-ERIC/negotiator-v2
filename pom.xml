@@ -385,17 +385,6 @@
                 </dependency>
             </dependencies>
         </profile>
-
-        <profile>
-            <id>maxdatabase</id>
-            <properties>
-                <database.server>steffi16</database.server>
-                <database.port>5432</database.port>
-                <database.name>negotiator4</database.name>
-                <database.username>negotiator</database.username>
-                <database.password>test123</database.password>
-            </properties>
-        </profile>
     </profiles>
 
     <build>
