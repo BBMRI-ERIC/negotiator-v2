@@ -90,7 +90,7 @@ public class CommentEmailNotifier {
 
                 for (NegotiatorDTO negotiator : negotiators) {
                     // Don't send mail when user created the comment
-                    if(negotiator.getPerson().getId() == exclude_perso.getId()) {
+                    if(negotiator == null || negotiator.getPerson() == null || exclude_perso == null || negotiator.getPerson().getId() == exclude_perso.getId()) {
                         continue;
                     }
                     notification.addAddressee(negotiator.getPerson());
@@ -118,7 +118,7 @@ public class CommentEmailNotifier {
             NegotiatorDTO queryOwner = DbUtil.getQueryOwner(config, query.getId());
 
             // Don't send mail when user created the comment
-            if(queryOwner.getPerson().getId() == exclude_perso.getId()) {
+            if(queryOwner == null || queryOwner.getPerson() == null || exclude_perso == null || queryOwner.getPerson().getId() == exclude_perso.getId()) {
                 return;
             }
 
