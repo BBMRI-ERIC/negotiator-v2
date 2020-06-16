@@ -39,16 +39,12 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import de.samply.bbmri.negotiator.*;
-import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
-import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
-import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -158,7 +154,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The list of offerPersonDTO's, hence it's a list of lists.
      */
     private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
-    private DataCache dataCache = DataCache.getInstance();
+    private final DataCache dataCache = DataCache.getInstance();
 
     /**
      * Lifecycle Collection Data (Form, Structure)
@@ -265,9 +261,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
             requestLifeCycleStatus.nextStatus("started", "start", null, userBean.getUserId());
             requestLifeCycleStatus.setQuery(selectedQuery);
             requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
-            //Send out email notifications once the researcher starts negotiation.
-            NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, selectedQuery.getId(), null, userBean.getUserId());
-            //sendEmailsToPotentialBiobankers();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -345,19 +338,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
         } catch (SQLException e) {
             System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Gets the potential biobankers and sends out the emails
-     */
-    public void sendEmailsToPotentialBiobankers() {
-        try (Config config = ConfigFactory.get()) {
-            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, 0);
-            QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(), selectedQuery, userBean.getPerson());
-            notifier.sendEmailNotification();
-        } catch (SQLException e) {
             e.printStackTrace();
         }
     }

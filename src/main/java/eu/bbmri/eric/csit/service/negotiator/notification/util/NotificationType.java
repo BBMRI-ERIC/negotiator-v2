@@ -11,6 +11,7 @@ public abstract class NotificationType {
     public static final int PUBLIC_COMMAND_NOTIFICATION = 5;
     public static final int PRIVATE_COMMAND_NOTIFICATION = 6;
     public static final int STATUS_CHANGED_NOTIFICATION = 7;
+    public static final int NOT_REACHABLE_COLLECTION_NOTIFICATION = 8;
 
     public static final int TEST_NOTIFICATION = 100;
 
@@ -30,6 +31,8 @@ public abstract class NotificationType {
                 return "PRIVATE_COMMAND_NOTIFICATION";
             case NotificationType.STATUS_CHANGED_NOTIFICATION:
                 return "STATUS_CHANGED_NOTIFICATION";
+            case NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION:
+                return "NOT_REACHABLE_COLLECTION_NOTIFICATION";
             case NotificationType.TEST_NOTIFICATION:
                 return "TEST_NOTIFICATION";
             default:

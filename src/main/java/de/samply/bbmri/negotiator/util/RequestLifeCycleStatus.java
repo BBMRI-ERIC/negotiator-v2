@@ -8,21 +8,17 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
-import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.notification.BbmriEricUnreachableCollectionsNotification;
-import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.util.requestStatus.*;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RequestLifeCycleStatus {
     private static final Logger logger = LoggerFactory.getLogger(RequestLifeCycleStatus.class);
@@ -130,9 +126,11 @@ public class RequestLifeCycleStatus {
                 collectionLifeCycleStatus.nextStatus("contacted", "contact", statusJson.toString(), userId);
             }
         }
-        QueryEmailNotifier notifier = new QueryEmailNotifier(new ArrayList<NegotiatorDTO>(mailrecipients.values()), accessUrl, query);
+        NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, query.getId(), null, userId);
         if(notreachable.size() > 1) {
+            //TODO: Replace with new notification System
             BbmriEricUnreachableCollectionsNotification bbmrinotifier = new BbmriEricUnreachableCollectionsNotification(notreachable, accessUrl, query);
+            NotificationService.sendNotification(NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION, query.getId(), null, userId, )
         }
     }
 
