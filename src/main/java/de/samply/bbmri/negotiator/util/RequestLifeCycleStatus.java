@@ -12,7 +12,7 @@ import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.notification.BbmriEricUnreachableCollectionsNotification;
-import de.samply.bbmri.negotiator.notification.QueryEmailNotifier;
+import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.util.requestStatus.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
