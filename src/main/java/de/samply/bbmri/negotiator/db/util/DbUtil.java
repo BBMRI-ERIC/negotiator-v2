@@ -32,12 +32,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
@@ -46,7 +41,7 @@ import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
 import de.samply.share.model.bbmri.BbmriResult;
-import org.apache.commons.collections.ArrayStack;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -80,10 +75,8 @@ public class DbUtil {
      * @return
      */
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
-        Result<ListOfDirectoriesRecord> record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
-
-        List<ListOfDirectoriesRecord> test = config.map(record, ListOfDirectoriesRecord.class);
-        return config.map(record, ListOfDirectoriesRecord.class);
+        Result<ListOfDirectoriesRecord> records = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
+        return config.map(records, ListOfDirectoriesRecord.class);
     }
 
     /**
@@ -732,7 +725,6 @@ public class DbUtil {
     	}
 
         condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
-        //condition = condition.and(Tables.QUERY.ID.in());
 
     	Result<Record> fetch = config.dsl()
 				.select(getFields(Tables.QUERY, "query"))
@@ -917,7 +909,7 @@ public class DbUtil {
      * @param comment
      * @param biobankInPrivateChat biobank id
      */
-    public static void addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
+    public static OfferRecord addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
         OfferRecord record = config.dsl().newRecord(Tables.OFFER);
         record.setQueryId(queryId);
         record.setPersonId(personId);
@@ -926,6 +918,7 @@ public class DbUtil {
         record.setStatus("published");
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
+        return record;
     }
 
 

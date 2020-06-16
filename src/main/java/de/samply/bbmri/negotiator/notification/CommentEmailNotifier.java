@@ -24,7 +24,7 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.notification;
+package de.samply.bbmri.negotiator.control;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -40,6 +40,8 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.notification.Notification;
 import de.samply.bbmri.negotiator.notification.NotificationThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -62,6 +64,9 @@ public class CommentEmailNotifier {
     private Flag flagFilter = Flag.UNFLAGGED;
 
     private Person exclude_perso;
+
+    private static Logger logger = LoggerFactory.getLogger(CommentEmailNotifier.class);
+    private static Logger mail_logger = LoggerFactory.getLogger("de.samply.bbmri.negotiator");
 
     public CommentEmailNotifier(Query query, String url, String comment, String commentPoster, String dateOfComment, Person exclude_person) {
         this.query = query;
@@ -89,8 +94,12 @@ public class CommentEmailNotifier {
                 buildNotification(notification);
 
                 for (NegotiatorDTO negotiator : negotiators) {
+                    logger.debug("CommentEmailNotifier: " + negotiator.getPerson().getAuthEmail());
+                    mail_logger.info("CommentEmailNotifier: " + negotiator.getPerson().getAuthEmail());
                     // Don't send mail when user created the comment
-                    if(negotiator == null || negotiator.getPerson() == null || exclude_perso == null || negotiator.getPerson().getId() == exclude_perso.getId()) {
+                    if(negotiator.getPerson() != null && exclude_perso != null && negotiator.getPerson().getId() == exclude_perso.getId()) {
+                        logger.debug("CommentEmailNotifier: " + negotiator.getPerson().getAuthEmail() + " -> exclude Sender." + negotiator.getPerson().getId() + "==" + exclude_perso.getId());
+                        mail_logger.info("CommentEmailNotifier: " + negotiator.getPerson().getAuthEmail() + " -> exclude Sender." + negotiator.getPerson().getId() + "==" + exclude_perso.getId());
                         continue;
                     }
                     notification.addAddressee(negotiator.getPerson());
@@ -117,8 +126,13 @@ public class CommentEmailNotifier {
 
             NegotiatorDTO queryOwner = DbUtil.getQueryOwner(config, query.getId());
 
+            logger.debug("CommentEmailNotifier: " + queryOwner.getPerson().getAuthEmail());
+            mail_logger.info("CommentEmailNotifier: " + queryOwner.getPerson().getAuthEmail());
+
             // Don't send mail when user created the comment
-            if(queryOwner == null || queryOwner.getPerson() == null || exclude_perso == null || queryOwner.getPerson().getId() == exclude_perso.getId()) {
+            if(queryOwner.getPerson() != null && exclude_perso != null && queryOwner.getPerson().getId() == exclude_perso.getId()) {
+                logger.debug("CommentEmailNotifier: " + queryOwner.getPerson().getAuthEmail() + " -> exclude Sender." + queryOwner.getPerson().getId() + "==" + exclude_perso.getId());
+                mail_logger.info("CommentEmailNotifier: " + queryOwner.getPerson().getAuthEmail() + " -> exclude Sender." + queryOwner.getPerson().getId() + "==" + exclude_perso.getId());
                 return;
             }
 

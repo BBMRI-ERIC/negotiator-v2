@@ -51,10 +51,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import de.samply.bbmri.auth.client.AuthClient;
-import de.samply.bbmri.auth.client.InvalidKeyException;
-import de.samply.bbmri.auth.client.InvalidTokenException;
-import de.samply.bbmri.auth.client.jwt.KeyLoader;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidKeyException;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidTokenException;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.jwt.KeyLoader;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.common.config.OAuth2Client;

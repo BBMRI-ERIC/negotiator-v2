@@ -39,7 +39,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import de.samply.bbmri.negotiator.*;
-import de.samply.bbmri.negotiator.notification.QueryEmailNotifier;
+import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
@@ -47,6 +47,8 @@ import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.util.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -264,6 +266,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             requestLifeCycleStatus.setQuery(selectedQuery);
             requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
             //Send out email notifications once the researcher starts negotiation.
+            NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, selectedQuery.getId(), null, userBean.getUserId());
             //sendEmailsToPotentialBiobankers();
         } catch (SQLException e) {
             e.printStackTrace();

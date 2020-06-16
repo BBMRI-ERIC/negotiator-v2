@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = 754798798;
+	private static final long serialVersionUID = 379909900;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -75,9 +75,9 @@ public class Person extends TableImpl<PersonRecord> {
 	public final TableField<PersonRecord, byte[]> PERSON_IMAGE = createField("person_image", org.jooq.impl.SQLDataType.BLOB, this, "image/avatar of the person");
 
 	/**
-	 * The column <code>public.person.is_admin</code>. boolean if the person is an admin
+	 * The column <code>public.person.is_admin</code>.
 	 */
-	public final TableField<PersonRecord, Boolean> IS_ADMIN = createField("is_admin", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "boolean if the person is an admin");
+	public final TableField<PersonRecord, Boolean> IS_ADMIN = createField("is_admin", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
 
 	/**
 	 * The column <code>public.person.organization</code>.

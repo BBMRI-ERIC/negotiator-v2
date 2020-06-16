@@ -24,7 +24,7 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.notification;
+package de.samply.bbmri.negotiator.control;
 
 import java.util.List;
 import java.util.Observable;
@@ -37,6 +37,8 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.notification.Notification;
 import de.samply.bbmri.negotiator.notification.NotificationThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class QueryEmailNotifier {
@@ -48,6 +50,9 @@ public class QueryEmailNotifier {
     private Query query;
 
     private Person exclude_sender;
+
+    private static Logger logger = LoggerFactory.getLogger(QueryEmailNotifier.class);
+    private static Logger mail_logger = LoggerFactory.getLogger("de.samply.bbmri.negotiator");
 
     public QueryEmailNotifier(List<NegotiatorDTO> negotiators, String url, Query query, Person exclude_sender) {
         this.negotiators = negotiators;
@@ -77,7 +82,13 @@ public class QueryEmailNotifier {
         notification.setLocale("de");
 
         for(NegotiatorDTO negotiator : negotiators) {
-            if(exclude_sender != null & negotiator.getPerson().getId() == exclude_sender.getId()) {
+
+            logger.debug("Subject: " + query.getTitle()   + " negotiation has been added. -> " + negotiator.getPerson().getAuthEmail());
+            mail_logger.info("Subject: " + query.getTitle()   + " negotiation has been added. -> " + negotiator.getPerson().getAuthEmail());
+
+            if(negotiator.getPerson().getId() == exclude_sender.getId()) {
+                logger.debug("Subject: " + query.getTitle()   + " negotiation has been added. -> " + negotiator.getPerson().getAuthEmail()+ " -> exclude Sender." + negotiator.getPerson().getId() + "==" + exclude_sender.getId());
+                mail_logger.info("Subject: " + query.getTitle()   + " negotiation has been added. -> " + negotiator.getPerson().getAuthEmail()+ " -> exclude Sender." + negotiator.getPerson().getId() + "==" + exclude_sender.getId());
                 continue;
             }
             notification.addAddressee(negotiator.getPerson());
