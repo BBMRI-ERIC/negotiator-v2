@@ -14,6 +14,8 @@ import de.samply.bbmri.negotiator.notification.BbmriEricUnreachableCollectionsNo
 import de.samply.bbmri.negotiator.util.requestStatus.*;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -101,13 +103,15 @@ public class RequestLifeCycleStatus {
             initialiseCollectionStatus();
         }
         Map<Integer, NegotiatorDTO> mailrecipients = new HashMap<Integer, NegotiatorDTO>();
-        HashSet<String> notreachable = new HashSet<String>();
+        StringBuilder collectionsString = new StringBuilder();
+        boolean notreachableCollections = false;
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
             List<Person> contacts = collectionLifeCycleStatus.getContacts();
             if(contacts == null || contacts.size() == 0) {
+                notreachableCollections = true;
                 collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
-                notreachable.add(collectionLifeCycleStatus.getCollectionReadableID());
+                collectionsString.append(collectionLifeCycleStatus.getCollectionReadableID()).append("\n");
             } else {
                 JsonArray contactJsonArray = new JsonArray();
                 for(Person contact : contacts) {
@@ -127,10 +131,10 @@ public class RequestLifeCycleStatus {
             }
         }
         NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, query.getId(), null, userId);
-        if(notreachable.size() > 1) {
-            //TODO: Replace with new notification System
-            BbmriEricUnreachableCollectionsNotification bbmrinotifier = new BbmriEricUnreachableCollectionsNotification(notreachable, accessUrl, query);
-            NotificationService.sendNotification(NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION, query.getId(), null, userId, )
+        if(notreachableCollections) {
+            Map<String, String> mailParameters = new HashMap<String, String>();
+            mailParameters.put("notreachableCollections", collectionsString.toString());
+            NotificationService.sendNotification(NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION, query.getId(), null, userId, mailParameters);
         }
     }
 

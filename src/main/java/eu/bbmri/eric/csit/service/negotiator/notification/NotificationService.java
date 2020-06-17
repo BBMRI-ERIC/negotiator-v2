@@ -46,6 +46,13 @@ public class NotificationService {
                 }
                 new NotificationNewPrivateComment(notificationRecord, requestId, personId, commentId, biobankName);
                 break;
+            case NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION:
+                String notreachableCollections = "";
+                if(parameters.containsKey("notreachableCollections")) {
+                    notreachableCollections = parameters.get("notreachableCollections");
+                }
+                new NotificationCollectionUnreachable(notificationRecord, requestId, personId, notreachableCollections);
+                break;
             case NotificationType.TEST_NOTIFICATION:
                 String emailAddress = "robert.reihs@bbmri-eric.eu";
                 if(parameters.containsKey("emailAddress")) {
