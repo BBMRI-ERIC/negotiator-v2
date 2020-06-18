@@ -1,17 +1,9 @@
 package de.samply.bbmri.negotiator.control.admin;
 
-import de.samply.bbmri.mailing.EmailBuilder;
-import de.samply.bbmri.mailing.OutgoingEmail;
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
-import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtilNotification;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
@@ -19,7 +11,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

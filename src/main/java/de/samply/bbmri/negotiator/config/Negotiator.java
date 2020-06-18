@@ -375,22 +375,11 @@ public class Negotiator implements Serializable {
     }
 
     public String getNegotiatorUrl() {
-        if(negotiatorUrl == null) {
-            return "https://negotiator.bbmri-eric.eu/";
-        }
         return negotiatorUrl;
     }
 
     public void setNegotiatorUrl(String negotiatorUrl) {
         this.negotiatorUrl = negotiatorUrl;
-    }
-
-    public boolean isDevelopmentServer() {
-        return developmentServer;
-    }
-
-    public void setDevelopmentServer(boolean developmentServer) {
-        this.developmentServer = developmentServer;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

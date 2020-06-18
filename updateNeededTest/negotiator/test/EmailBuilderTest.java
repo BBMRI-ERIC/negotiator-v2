@@ -1,6 +1,5 @@
 package de.samply.bbmri.negotiator.test;
 
-import de.samply.bbmri.negotiator.MailUtil;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.common.mailing.EmailBuilder;
 import org.apache.commons.io.FileUtils;

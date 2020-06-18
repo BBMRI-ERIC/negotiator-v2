@@ -102,18 +102,25 @@
 
                                     </h:panelGroup>
 
-                                    <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{queryDto.commentCount > 0}">
-                                        <i class="glyphicon glyphicon-bullhorn"></i>
-                                        <h:outputText title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-                                                      value="#{queryDto.commentCount}"/>
-                                    </h:panelGroup>
+                                    <div class="badge queryNumberResponsesBadge"
+                                         style='#{queryDto.commentCount == 0 ? "display:none;" : "" }'
+                                         data-toggle="tooltip"
+                                         data-placement="bottom"
+                                         title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
 
-                                    <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{queryDto.privateNegotiationCount > 0}">
+                                        <i class="glyphicon glyphicon-bullhorn"></i>
+                                        <h:outputText value="   #{queryDto.commentCount}"/>
+                                    </div>
+
+                                    <div class="badge queryNumberResponsesBadge"
+                                         style='#{queryDto.privateNegotiationCount == 0 ? "display:none;" : "" }'
+                                         data-toggle="tooltip"
+                                         data-placement="bottom"
+                                         title="#{queryDto.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+
                                         <i class="glyphicon glyphicon-tower"></i>
-                                        <h:outputText
-                                                title="#{queryDto.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}"
-                                                value="   #{queryDto.privateNegotiationCount}" />
-                                    </h:panelGroup>
+                                        <h:outputText value="   #{queryDto.privateNegotiationCount}" />
+                                    </div>
 
                                 </h:panelGroup>
                             </h:form>

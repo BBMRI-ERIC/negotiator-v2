@@ -86,20 +86,25 @@
 
                     </h:panelGroup>
 
-                    <h:panelGroup styleClass="badge queryNumberResponsesBadge"
-                                  rendered="#{cc.attrs.item.commentCount > 0}">
-                        <i class="glyphicon glyphicon-bullhorn"></i>
-                        <h:outputText
-                                title="#{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-                                value="#{cc.attrs.item.commentCount}" />
-                    </h:panelGroup>
+                    <div class="badge queryNumberResponsesBadge"
+                         style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }'
+                         data-toggle="tooltip"
+                         data-placement="bottom"
+                         title="#{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
 
-                    <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{cc.attrs.item.privateNegotiationCount > 0}">
+                        <i class="glyphicon glyphicon-bullhorn"></i>
+                        <h:outputText value="   #{cc.attrs.item.commentCount}"/>
+                    </div>
+
+                    <div class="badge queryNumberResponsesBadge"
+                         style='#{cc.attrs.item.privateNegotiationCount == 0 ? "display:none;" : "" }'
+                         data-toggle="tooltip"
+                         data-placement="bottom"
+                         title="#{cc.attrs.item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+
                         <i class="glyphicon glyphicon-tower"></i>
-                        <h:outputText
-                                title="#{cc.attrs.item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}"
-                                value="   #{cc.attrs.item.privateNegotiationCount}" />
-                    </h:panelGroup>
+                        <h:outputText value="   #{cc.attrs.item.privateNegotiationCount}" />
+                    </div>
 
                 </h:panelGroup>
 
