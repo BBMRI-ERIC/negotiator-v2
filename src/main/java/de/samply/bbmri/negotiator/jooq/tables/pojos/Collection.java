@@ -93,8 +93,4 @@ public class Collection implements Serializable {
 	public void setListOfDirectoriesId(Integer listOfDirectoriesId) {
 		this.listOfDirectoriesId = listOfDirectoriesId;
 	}
-
-    public String getCollectionReadableID() {
-		return "(" + id + ") " + directoryId + " " + name;
-    }
 }

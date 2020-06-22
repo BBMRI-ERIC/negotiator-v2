@@ -20,6 +20,8 @@ import de.samply.bbmri.negotiator.jooq.tables.NotificationSetting;
 import de.samply.bbmri.negotiator.jooq.tables.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
+import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
+import de.samply.bbmri.negotiator.jooq.tables.PersonOffer;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
@@ -125,6 +127,16 @@ public class Tables {
 	 * Table for connecting people with collections
 	 */
 	public static final PersonCollection PERSON_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.PersonCollection.PERSON_COLLECTION;
+
+	/**
+	 * The table public.person_comment
+	 */
+	public static final PersonComment PERSON_COMMENT = de.samply.bbmri.negotiator.jooq.tables.PersonComment.PERSON_COMMENT;
+
+	/**
+	 * The table public.person_offer
+	 */
+	public static final PersonOffer PERSON_OFFER = de.samply.bbmri.negotiator.jooq.tables.PersonOffer.PERSON_OFFER;
 
 	/**
 	 * query table to contain all  queries

@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements Record7<Integer, Integer, Integer, Timestamp, String, Boolean, String> {
 
-	private static final long serialVersionUID = 1482971940;
+	private static final long serialVersionUID = -1282018404;
 
 	/**
 	 * Setter for <code>public.comment.id</code>. Primary key
@@ -117,14 +117,14 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	}
 
 	/**
-	 * Setter for <code>public.comment.status</code>. status: published, deleted, saved
+	 * Setter for <code>public.comment.status</code>.
 	 */
 	public void setStatus(String value) {
 		setValue(6, value);
 	}
 
 	/**
-	 * Getter for <code>public.comment.status</code>. status: published, deleted, saved
+	 * Getter for <code>public.comment.status</code>.
 	 */
 	public String getStatus() {
 		return (String) getValue(6);

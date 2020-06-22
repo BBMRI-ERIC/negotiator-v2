@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryCollectionRecord extends UpdatableRecordImpl<QueryCollectionRecord> implements Record6<Integer, Integer, Boolean, Integer, Integer, Timestamp> {
 
-	private static final long serialVersionUID = -1750132016;
+	private static final long serialVersionUID = -2088043904;
 
 	/**
 	 * Setter for <code>public.query_collection.query_id</code>.
@@ -61,42 +61,42 @@ public class QueryCollectionRecord extends UpdatableRecordImpl<QueryCollectionRe
 	}
 
 	/**
-	 * Setter for <code>public.query_collection.expect_connector_result</code>.
+	 * Setter for <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
 	 */
 	public void setExpectConnectorResult(Boolean value) {
 		setValue(2, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_collection.expect_connector_result</code>.
+	 * Getter for <code>public.query_collection.expect_connector_result</code>. Column that tells the negotiator to expect results from the given connector
 	 */
 	public Boolean getExpectConnectorResult() {
 		return (Boolean) getValue(2);
 	}
 
 	/**
-	 * Setter for <code>public.query_collection.donors</code>.
+	 * Setter for <code>public.query_collection.donors</code>. result of query: amount of donors
 	 */
 	public void setDonors(Integer value) {
 		setValue(3, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_collection.donors</code>.
+	 * Getter for <code>public.query_collection.donors</code>. result of query: amount of donors
 	 */
 	public Integer getDonors() {
 		return (Integer) getValue(3);
 	}
 
 	/**
-	 * Setter for <code>public.query_collection.samples</code>.
+	 * Setter for <code>public.query_collection.samples</code>. result of query: amount of samples
 	 */
 	public void setSamples(Integer value) {
 		setValue(4, value);
 	}
 
 	/**
-	 * Getter for <code>public.query_collection.samples</code>.
+	 * Getter for <code>public.query_collection.samples</code>. result of query: amount of samples
 	 */
 	public Integer getSamples() {
 		return (Integer) getValue(4);

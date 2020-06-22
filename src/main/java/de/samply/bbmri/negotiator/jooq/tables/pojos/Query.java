@@ -23,11 +23,12 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = -1224318368;
+	private static final long serialVersionUID = -1395365062;
 
 	private Integer   id;
 	private String    title;
 	private String    text;
+	private String    queryXml;
 	private Timestamp queryCreationTime;
 	private Integer   researcherId;
 	private String    jsonText;
@@ -35,7 +36,6 @@ public class Query implements Serializable {
 	private String    negotiatorToken;
 	private Boolean   validQuery;
 	private String    requestDescription;
-	private String    queryXml;
 	private String    ethicsVote;
 	private Timestamp negotiationStartedTime;
 	private String    researcherName;
@@ -48,6 +48,7 @@ public class Query implements Serializable {
 		this.id = value.id;
 		this.title = value.title;
 		this.text = value.text;
+		this.queryXml = value.queryXml;
 		this.queryCreationTime = value.queryCreationTime;
 		this.researcherId = value.researcherId;
 		this.jsonText = value.jsonText;
@@ -55,7 +56,6 @@ public class Query implements Serializable {
 		this.negotiatorToken = value.negotiatorToken;
 		this.validQuery = value.validQuery;
 		this.requestDescription = value.requestDescription;
-		this.queryXml = value.queryXml;
 		this.ethicsVote = value.ethicsVote;
 		this.negotiationStartedTime = value.negotiationStartedTime;
 		this.researcherName = value.researcherName;
@@ -67,6 +67,7 @@ public class Query implements Serializable {
 		Integer   id,
 		String    title,
 		String    text,
+		String    queryXml,
 		Timestamp queryCreationTime,
 		Integer   researcherId,
 		String    jsonText,
@@ -74,7 +75,6 @@ public class Query implements Serializable {
 		String    negotiatorToken,
 		Boolean   validQuery,
 		String    requestDescription,
-		String    queryXml,
 		String    ethicsVote,
 		Timestamp negotiationStartedTime,
 		String    researcherName,
@@ -84,6 +84,7 @@ public class Query implements Serializable {
 		this.id = id;
 		this.title = title;
 		this.text = text;
+		this.queryXml = queryXml;
 		this.queryCreationTime = queryCreationTime;
 		this.researcherId = researcherId;
 		this.jsonText = jsonText;
@@ -91,7 +92,6 @@ public class Query implements Serializable {
 		this.negotiatorToken = negotiatorToken;
 		this.validQuery = validQuery;
 		this.requestDescription = requestDescription;
-		this.queryXml = queryXml;
 		this.ethicsVote = ethicsVote;
 		this.negotiationStartedTime = negotiationStartedTime;
 		this.researcherName = researcherName;
@@ -121,6 +121,14 @@ public class Query implements Serializable {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public String getQueryXml() {
+		return this.queryXml;
+	}
+
+	public void setQueryXml(String queryXml) {
+		this.queryXml = queryXml;
 	}
 
 	public Timestamp getQueryCreationTime() {
@@ -177,14 +185,6 @@ public class Query implements Serializable {
 
 	public void setRequestDescription(String requestDescription) {
 		this.requestDescription = requestDescription;
-	}
-
-	public String getQueryXml() {
-		return this.queryXml;
-	}
-
-	public void setQueryXml(String queryXml) {
-		this.queryXml = queryXml;
 	}
 
 	public String getEthicsVote() {
