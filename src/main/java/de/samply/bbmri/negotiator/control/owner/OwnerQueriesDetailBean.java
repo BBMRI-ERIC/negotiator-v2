@@ -158,7 +158,7 @@ public class OwnerQueriesDetailBean implements Serializable {
         setNonConfidential(false);
 
         try(Config config = ConfigFactory.get()) {
-            setComments(DbUtil.getComments(config, queryId));
+            setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
 
 			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 

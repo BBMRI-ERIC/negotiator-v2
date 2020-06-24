@@ -213,6 +213,10 @@ public class CommentBean implements Serializable {
                 + "?includeViewParams=true&faces-redirect=true";
     }
 
+    public void markCommentReadForUser(Integer userId, Integer commentId) {
+        System.out.println(" -#-#-#-#-#-#---> " + userId + " -> " + commentId);
+    }
+
     public UserBean getUserBean() {
         return userBean;
     }

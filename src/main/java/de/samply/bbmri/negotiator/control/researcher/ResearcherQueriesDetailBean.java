@@ -170,7 +170,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     public String initialize() {
         try(Config config = ConfigFactory.get()) {
-            setComments(DbUtil.getComments(config, queryId));
+            setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
             setBiobankWithOffer(DbUtil.getOfferMakers(config, queryId));
 
             for (int i = 0; i < biobankWithOffer.size(); ++i) {

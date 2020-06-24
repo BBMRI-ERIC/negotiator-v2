@@ -145,7 +145,7 @@ public class ResearcherQueriesBean implements Serializable {
         selectedQuery = query;
 
         try(Config config = ConfigFactory.get()) {
-            comments = DbUtil.getComments(config, selectedQuery.getId());
+            comments = DbUtil.getComments(config, selectedQuery.getId(), userBean.getUserId());
         } catch (SQLException e) {
             e.printStackTrace();
         }

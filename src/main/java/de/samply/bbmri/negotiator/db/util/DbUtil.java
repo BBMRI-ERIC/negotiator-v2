@@ -864,15 +864,17 @@ public class DbUtil {
      * @param queryId
      * @return
      */
-    public static List<CommentPersonDTO> getComments(Config config, int queryId) {
+    public static List<CommentPersonDTO> getComments(Config config, int queryId, int personId) {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.COMMENT, "comment"))
                 .select(getFields(Tables.PERSON, "person"))
                 .select(getFields(Tables.COLLECTION, "collection"))
+                .select(getFields(Tables.PERSON_COMMENT, "personcomment"))
         		.from(Tables.COMMENT)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(Tables.PERSON.ID))
                 .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
                 .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID).and(Tables.PERSON_COMMENT.PERSON_ID.eq(personId)))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .and(Tables.COMMENT.STATUS.eq("published"))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();

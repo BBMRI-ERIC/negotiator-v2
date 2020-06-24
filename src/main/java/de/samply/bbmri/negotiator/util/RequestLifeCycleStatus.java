@@ -78,7 +78,7 @@ public class RequestLifeCycleStatus {
             List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtil.getCollectionsForQuery(config, query_id);
             for(CollectionBiobankDTO collectionBiobankDTO : collectionBiobankDTOList) {
                 setBiobankCollectionLink(collectionBiobankDTO.getBiobank().getId(), collectionBiobankDTO.getCollection().getId());
-                collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId(), collectionBiobankDTO.getCollection().getCollectionReadableID()));
+                collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId(), getCollectionReadableID(collectionBiobankDTO.getCollection())));
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).initialise();
                 collectionStatusList.get(collectionBiobankDTO.getCollection().getId()).setCollectionBiobankDTO(collectionBiobankDTO);
             }
@@ -86,6 +86,10 @@ public class RequestLifeCycleStatus {
             logger.error("ERROR-NG-0000003: Error getting collections for query. queryis:" + query_id);
             e.printStackTrace();
         }
+    }
+
+    private String getCollectionReadableID(de.samply.bbmri.negotiator.jooq.tables.pojos.Collection collection) {
+        return "(" + collection.getId() + ") " + collection.getDirectoryId() + " " + collection.getName();
     }
 
     private void setBiobankCollectionLink(Integer biobankId, Integer CollectionId) {
