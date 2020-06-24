@@ -865,6 +865,21 @@ public class DbUtil {
      * @return
      */
     public static List<CommentPersonDTO> getComments(Config config, int queryId, int personId) {
+        List<CommentPersonDTO> result = new ArrayList<>();
+
+        Result<Record> commentsAndCommenter = config.dsl()
+                .select(getFields(Tables.COMMENT, "comment"))
+                .select(getFields(Tables.PERSON, "person"))
+                .from(Tables.COMMENT)
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(Tables.PERSON.ID))
+                .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+                .and(Tables.COMMENT.STATUS.eq("published"))
+                .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
+
+
+
+
+        //------------------------------------------------------------------------------
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.COMMENT, "comment"))
                 .select(getFields(Tables.PERSON, "person"))
