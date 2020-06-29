@@ -36,6 +36,7 @@ import java.util.*;
 
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
@@ -865,22 +866,52 @@ public class DbUtil {
      * @return
      */
     public static List<CommentPersonDTO> getComments(Config config, int queryId, int personId) {
+
         List<CommentPersonDTO> result = new ArrayList<>();
 
         Result<Record> commentsAndCommenter = config.dsl()
                 .select(getFields(Tables.COMMENT, "comment"))
                 .select(getFields(Tables.PERSON, "person"))
+                .select(getFields(Tables.PERSON_COMMENT, "personcomment"))
                 .from(Tables.COMMENT)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(personId)))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .and(Tables.COMMENT.STATUS.eq("published"))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
+
+        HashMap<Integer, List<Collection>> personCollections = new HashMap<>();
+
+        for(Record record : commentsAndCommenter) {
+            CommentPersonDTO commentPersonDTO = new CommentPersonDTO();
+            commentPersonDTO.setComment(config.map(record, Comment.class));
+            commentPersonDTO.getComment().setId(Integer.parseInt(record.getValue("comment_id").toString()));
+            commentPersonDTO.setPerson(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            commentPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
+            commentPersonDTO.setCommentRead(record.getValue("personcomment_read") == null || (boolean) record.getValue("personcomment_read"));
+            Integer commenterId = commentPersonDTO.getPerson().getId();
+            if(!personCollections.containsKey(commenterId)) {
+                Result<Record> collections = config.dsl()
+                        .select(getFields(Tables.COLLECTION, "collection"))
+                        .from(Tables.PERSON_COLLECTION)
+                        .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                        .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
+                        .fetch();
+                personCollections.put(commenterId, config.map(collections, Collection.class));
+            }
+            commentPersonDTO.setCollections(personCollections.get(commenterId));
+            result.add(commentPersonDTO);
+        }
+        return result;
+
+
 
 
 
 
         //------------------------------------------------------------------------------
-        Result<Record> result = config.dsl()
+        /*Result<Record> result = config.dsl()
                 .select(getFields(Tables.COMMENT, "comment"))
                 .select(getFields(Tables.PERSON, "person"))
                 .select(getFields(Tables.COLLECTION, "collection"))
@@ -896,11 +927,11 @@ public class DbUtil {
 
         List<CommentPersonDTO> map = config.map(result, CommentPersonDTO.class);
 
-        List<CommentPersonDTO> target = new ArrayList<>();
+        List<CommentPersonDTO> target = new ArrayList<>();*/
         /**
          * Now we have to do weird things, grouping them together manually
          */
-        HashMap<Integer, CommentPersonDTO> mapped = new HashMap<>();
+        /*HashMap<Integer, CommentPersonDTO> mapped = new HashMap<>();
 
         for(CommentPersonDTO dto : map) {
             if(!mapped.containsKey(dto.getComment().getId())) {
@@ -915,7 +946,7 @@ public class DbUtil {
             }
         }
 
-        return target;
+        return target;*/
     }
 
     /**

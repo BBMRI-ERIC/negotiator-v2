@@ -56,7 +56,7 @@ public class CommentPersonDTO implements Serializable {
 	 */
 	private Collection collection;
 
-	private PersonComment personComment;
+	private boolean commentRead;
 
 	/**
 	 * The list of the collection the person is responsible for
@@ -95,11 +95,11 @@ public class CommentPersonDTO implements Serializable {
 		this.collections = collections;
 	}
 
-	public PersonComment getPersonComment() {
-		return personComment;
+	public boolean getCommentRead() {
+		return commentRead;
 	}
 
-	public void setPersonComment(PersonComment personComment) {
-		this.personComment = personComment;
+	public void setCommentRead(boolean commentRead) {
+		this.commentRead = commentRead;
 	}
 }

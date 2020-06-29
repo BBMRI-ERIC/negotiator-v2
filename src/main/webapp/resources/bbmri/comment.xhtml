@@ -29,6 +29,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
       xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri" xmlns:p="http://java.sun.com/jsf/html">
@@ -41,6 +42,7 @@
     <composite:attribute name="ownerQueriesDetailBean" />
     <composite:attribute name="scope" />
     <composite:attribute name="commentComponent" />
+    <composite:attribute name="commentRead" />
 </composite:interface>
 
 <composite:implementation>
@@ -74,7 +76,8 @@
             <h:panelGroup styleClass="pull-right">
                 <h:form id="deleteComment" enctype="multipart/form-data">
 
-                    <span style="margin-right: 5px;" class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+
+                    <span style="margin-right: 5px;#{cc.attrs.commentRead ? 'display:none;': ''}" class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
 
                     <h:outputText value="#{cc.attrs.comment.commentTime}">
                         <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>
