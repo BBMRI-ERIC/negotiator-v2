@@ -72,16 +72,9 @@ public class DbUtil {
      * @param config database configuration
      * @return
      */
-    public static List<ListOfDirectoriesRecord> getDirectories(Config config) throws SQLException {
-        try {
-            Result<ListOfDirectoriesRecord> records = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
-            return config.map(records, ListOfDirectoriesRecord.class);
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
-        }
-        return new ArrayList<>();
+    public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
+        Result<ListOfDirectoriesRecord> records = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
+        return config.map(records, ListOfDirectoriesRecord.class);
     }
 
     /**
@@ -90,32 +83,24 @@ public class DbUtil {
      * @param listOfDirectoryId database id of the directory
      * @return
      */
-    public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) throws SQLException {
+    public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) {
         try {
             Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
             return config.map(record, ListOfDirectoriesRecord.class);
         } catch (IllegalArgumentException e) {
             logger.error("No Directory Entry found for ID: " + listOfDirectoryId);
             e.printStackTrace();
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
         }
         return null;
     }
 
-    public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) throws SQLException {
+    public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) {
         try {
             Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
             return config.map(record, ListOfDirectoriesRecord.class);
         } catch (IllegalArgumentException e) {
             logger.error("No Directory Entry found for DirectoryName: " + directoryName);
             e.printStackTrace();
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
         }
         return null;
     }
@@ -141,7 +126,7 @@ public class DbUtil {
      */
     public static void editDirectory(Config config, Integer listOfDirectoryId, String name, String description, String url,
                                  String username, String password, String restUrl, String apiUsername, String apiPassword,
-                                     String resourceBiobanks, String resourceCollections, boolean sync_active) throws SQLException {
+                                     String resourceBiobanks, String resourceCollections, boolean sync_active) {
         try {config.dsl().update(Tables.LIST_OF_DIRECTORIES)
                 .set(Tables.LIST_OF_DIRECTORIES.NAME, name)
                 .set(Tables.LIST_OF_DIRECTORIES.DESCRIPTION, description)
@@ -156,11 +141,9 @@ public class DbUtil {
                 .set(Tables.LIST_OF_DIRECTORIES.SYNC_ACTIVE, sync_active)
                 .where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).execute();
             config.commit();
-        } catch (Exception ex) {
-        System.out.println("DbUtil ERROR");
-        ex.printStackTrace();
-        config.close();
-    }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -181,31 +164,24 @@ public class DbUtil {
     public static ListOfDirectoriesRecord saveDirectory(Config config, String name, String description, String url,
                                             String username, String password, String restUrl, String apiUsername, String apiPassword,
                                             String resourceBiobanks, String resourceCollections, boolean sync_active) throws SQLException {
-        try {
-            ListOfDirectoriesRecord listOfDirectoriesRecord = config.dsl().newRecord(Tables.LIST_OF_DIRECTORIES);
+        ListOfDirectoriesRecord listOfDirectoriesRecord = config.dsl().newRecord(Tables.LIST_OF_DIRECTORIES);
 
-            listOfDirectoriesRecord.setName(name);
-            listOfDirectoriesRecord.setDescription(description);
-            listOfDirectoriesRecord.setUrl(url);
-            listOfDirectoriesRecord.setUsername(username);
-            listOfDirectoriesRecord.setPassword(password);
-            listOfDirectoriesRecord.setRestUrl(restUrl);
-            listOfDirectoriesRecord.setApiUsername(apiUsername);
-            listOfDirectoriesRecord.setApiPassword(apiPassword);
-            listOfDirectoriesRecord.setResourceBiobanks(resourceBiobanks);
-            listOfDirectoriesRecord.setResourceCollections(resourceCollections);
-            listOfDirectoriesRecord.setSyncActive(sync_active);
-            listOfDirectoriesRecord.store();
+        listOfDirectoriesRecord.setName(name);
+        listOfDirectoriesRecord.setDescription(description);
+        listOfDirectoriesRecord.setUrl(url);
+        listOfDirectoriesRecord.setUsername(username);
+        listOfDirectoriesRecord.setPassword(password);
+        listOfDirectoriesRecord.setRestUrl(restUrl);
+        listOfDirectoriesRecord.setApiUsername(apiUsername);
+        listOfDirectoriesRecord.setApiPassword(apiPassword);
+        listOfDirectoriesRecord.setResourceBiobanks(resourceBiobanks);
+        listOfDirectoriesRecord.setResourceCollections(resourceCollections);
+        listOfDirectoriesRecord.setSyncActive(sync_active);
+        listOfDirectoriesRecord.store();
 
-            config.commit();
+        config.commit();
 
-            return listOfDirectoriesRecord;
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
-        }
-        return null;
+        return listOfDirectoriesRecord;
     }
 
     /**
@@ -214,21 +190,14 @@ public class DbUtil {
      * @param url
      * @return
      */
-    public static ListOfDirectoriesRecord getDirectoryByUrl(Config config, String url) throws SQLException {
-        try {
-            int endindex = url.indexOf("/", 9);
-            if(endindex == -1) {
-                endindex = url.length();
-            }
-            url = url.substring(0, endindex);
-            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
-            return config.map(record, ListOfDirectoriesRecord.class);
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+    public static ListOfDirectoriesRecord getDirectoryByUrl(Config config, String url) {
+        int endindex = url.indexOf("/", 9);
+        if(endindex == -1) {
+            endindex = url.length();
         }
-        return null;
+        url = url.substring(0, endindex);
+        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
+        return config.map(record, ListOfDirectoriesRecord.class);
     }
 
     /**
@@ -236,17 +205,15 @@ public class DbUtil {
      * @param config JOOQ configuration
      * @param queryId id of the query
      */
-    public static String startNegotiation(Config config, Integer queryId) throws SQLException {
-        try {
-            config.dsl().update(Tables.QUERY)
+    public static String startNegotiation(Config config, Integer queryId){
+        config.dsl().update(Tables.QUERY)
                 .set(Tables.QUERY.NEGOTIATION_STARTED_TIME, new Timestamp(new Date().getTime()))
                 .where(Tables.QUERY.ID.eq(queryId))
                 .execute();
+        try {
             config.commit();
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return "";
     }
@@ -256,14 +223,12 @@ public class DbUtil {
      * @param config JOOQ configuration
      * @param queryId id of the query
      */
-    public static String restNegotiation(Config config, Integer queryId) throws SQLException {
+    public static String restNegotiation(Config config, Integer queryId){
+        config.dsl().execute("UPDATE query SET negotiation_started_time=null WHERE id=" + queryId + ";");
         try {
-            config.dsl().execute("UPDATE query SET negotiation_started_time=null WHERE id=" + queryId + ";");
             config.commit();
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return "";
     }
@@ -273,7 +238,7 @@ public class DbUtil {
      * @param config JOOQ configuration
      * @param result BBMRIResult object containing result
      */
-    public static Boolean saveConnectorQueryResult(Config config, BbmriResult result) throws SQLException {
+    public static Boolean saveConnectorQueryResult(Config config, BbmriResult result){
         Integer collectionId = getCollectionId(config, result.getDirectoryCollectionId());
 
         if(collectionId == null) {
@@ -301,10 +266,8 @@ public class DbUtil {
 
             config.commit();
             return true;
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         return false;
@@ -315,27 +278,20 @@ public class DbUtil {
      * @param config JOOQ configuration
      * @return Timestamp timestamp of query
      */
-    public static Timestamp getFirstQueryCreationTime(Config config) throws SQLException {
-        try {
-            Record1<Timestamp> result = config.dsl()
-                    .select(Tables.QUERY.QUERY_CREATION_TIME)
-                    .from(Tables.QUERY)
-                    .where(Tables.QUERY.VALID_QUERY.eq(true))
-                    .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc())
-                    .fetchAny();
+    public static Timestamp getFirstQueryCreationTime(Config config){
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.QUERY.QUERY_CREATION_TIME)
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.asc())
+                .fetchAny();
 
-            if (result == null){
-                return null;
-            }
-
-            Timestamp timestamp =  result.value1();
-            return timestamp;
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+        if (result == null){
+            return null;
         }
-        return null;
+
+        Timestamp timestamp =  result.value1();
+        return timestamp;
     }
 
     /**
@@ -344,40 +300,33 @@ public class DbUtil {
      * @param timestamp
      * @return List<QueryDetail> list of queries
      */
-    public static List<QueryDetail> getAllNewQueries(Config config, Timestamp timestamp) throws SQLException {
-        try {
-            Result<Record> result = config.dsl()
-                    .select(Tables.QUERY.TITLE.as("query_title"))
-                    .select(Tables.QUERY.TEXT.as("query_text"))
-                    .select(Tables.QUERY.ID.as("query_id"))
-                    .select(Tables.QUERY.QUERY_XML.as("query_xml"))
-                    .from(Tables.QUERY)
-                    .where(Tables.QUERY.VALID_QUERY.eq(true))
-                    .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
-                    .fetch();
+    public static List<QueryDetail> getAllNewQueries(Config config, Timestamp timestamp) {
+        Result<Record> result = config.dsl()
+                .select(Tables.QUERY.TITLE.as("query_title"))
+                .select(Tables.QUERY.TEXT.as("query_text"))
+                .select(Tables.QUERY.ID.as("query_id"))
+                .select(Tables.QUERY.QUERY_XML.as("query_xml"))
+                .from(Tables.QUERY)
+                .where(Tables.QUERY.VALID_QUERY.eq(true))
+                .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
+                .fetch();
 
-              // The mapper does not map the query_xml at all, why?
-    //        return config.map(result, QueryDetail.class);
+          // The mapper does not map the query_xml at all, why?
+//        return config.map(result, QueryDetail.class);
 
-            // So doing this manually
-            List<QueryDetail> queryDetails = new ArrayList<>();
-            for (Record record : result) {
-                QueryDetail queryDetail = new QueryDetail();
-                queryDetail.setQueryId(record.getValue("query_id", Integer.class));
-                queryDetail.setQueryText(record.getValue("query_text", String.class));
-                queryDetail.setQueryTitle(record.getValue("query_title", String.class));
-                queryDetail.setQueryXml(record.getValue("query_xml", String.class));
+        // So doing this manually
+        List<QueryDetail> queryDetails = new ArrayList<>();
+        for (Record record : result) {
+            QueryDetail queryDetail = new QueryDetail();
+            queryDetail.setQueryId(record.getValue("query_id", Integer.class));
+            queryDetail.setQueryText(record.getValue("query_text", String.class));
+            queryDetail.setQueryTitle(record.getValue("query_title", String.class));
+            queryDetail.setQueryXml(record.getValue("query_xml", String.class));
 
-                queryDetails.add(queryDetail);
-            }
-
-            return queryDetails;
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+            queryDetails.add(queryDetail);
         }
-        return new ArrayList<>();
+
+        return queryDetails;
     }
 
     /**
@@ -386,28 +335,21 @@ public class DbUtil {
      * @param collectionId collection id of the connector
      * @return  Timestamp of last request
      */
-    public static Timestamp getLastNewQueryTime(Config config, String collectionId) throws SQLException {
-        try {
-            Record1<Timestamp> result = config.dsl()
-                    .select(Tables.CONNECTOR_LOG.LAST_QUERY_TIME)
-                    .from(Tables.CONNECTOR_LOG)
-                    .where(Tables.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID.eq(collectionId))
-                    .and (Tables.CONNECTOR_LOG.LAST_QUERY_TIME.isNotNull())
-                    .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
-                    .fetchAny();
+    public static Timestamp getLastNewQueryTime(Config config, String collectionId) {
+        Record1<Timestamp> result = config.dsl()
+                .select(Tables.CONNECTOR_LOG.LAST_QUERY_TIME)
+                .from(Tables.CONNECTOR_LOG)
+                .where(Tables.CONNECTOR_LOG.DIRECTORY_COLLECTION_ID.eq(collectionId))
+                .and (Tables.CONNECTOR_LOG.LAST_QUERY_TIME.isNotNull())
+                .orderBy(Tables.CONNECTOR_LOG.LAST_QUERY_TIME.desc())
+                .fetchAny();
 
-            if (result == null){
-                return null;
-            }
-
-            Timestamp timestamp = result.value1();
-            return timestamp;
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+        if (result == null){
+            return null;
         }
-        return null;
+
+        Timestamp timestamp = result.value1();
+        return timestamp;
     }
 
     /**
@@ -417,7 +359,7 @@ public class DbUtil {
      * @param collectionId The collection directoryID
      * @return 1:ok, 0:error, -1:collectionId unknown
      */
-    public static int logGetQueryTime(Config config, String collectionId) throws SQLException {
+    public static int logGetQueryTime(Config config, String collectionId) {
         try { ConnectorLogRecord connectorLogRecord = config.dsl().newRecord(Tables.CONNECTOR_LOG);
               connectorLogRecord.setDirectoryCollectionId(collectionId);
               connectorLogRecord.setLastQueryTime(new Timestamp(new Date().getTime()));
@@ -435,9 +377,6 @@ public class DbUtil {
             } else {
                 e.printStackTrace();
             }
-            System.out.println("DbUtil ERROR");
-            e.printStackTrace();
-            config.close();
         }
 
         return 0;
@@ -450,20 +389,13 @@ public class DbUtil {
      * @return QueryRecord object
      * @throws SQLException
      */
-    public static QueryRecord getQueryFromId(Config config, Integer id) throws SQLException {
-        try {
-            Record result = config.dsl()
-                    .selectFrom(Tables.QUERY)
-                    .where(Tables.QUERY.ID.eq(id))
-                    .fetchOne();
+    public static QueryRecord getQueryFromId(Config config, Integer id) {
+        Record result = config.dsl()
+                .selectFrom(Tables.QUERY)
+                .where(Tables.QUERY.ID.eq(id))
+                .fetchOne();
 
-            return config.map(result, QueryRecord.class);
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
-        }
-        return null;
+        return config.map(result, QueryRecord.class);
     }
 
     /**
@@ -477,7 +409,7 @@ public class DbUtil {
      * @throws JsonParseException
      */
     public static void editQuery(Config config, String title, String text, String requestDescription,
-            String jsonText, String ethicsVote, Integer queryId) throws SQLException {
+            String jsonText, String ethicsVote, Integer queryId) {
         try {config.dsl().update(Tables.QUERY)
                 .set(Tables.QUERY.TITLE, title)
                 .set(Tables.QUERY.TEXT, text)
@@ -528,10 +460,8 @@ public class DbUtil {
             }
 
             config.commit();
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -542,26 +472,19 @@ public class DbUtil {
      * @return the ID of the inserted attachment
      * @throws SQLException
      */
-    public static Integer insertQueryAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType) throws SQLException {
-        try {
-            Result<QueryAttachmentRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
-                    .set(Tables.QUERY_ATTACHMENT.ATTACHMENT, attachment)
-                    .set(Tables.QUERY_ATTACHMENT.QUERY_ID, queryId)
-                    .set(Tables.QUERY_ATTACHMENT.ATTACHMENT_TYPE, attachmentType)
-                    .returning(Tables.QUERY_ATTACHMENT.ID)
-                    .fetch();
+    public static Integer insertQueryAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType) {
+        Result<QueryAttachmentRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
+                .set(Tables.QUERY_ATTACHMENT.ATTACHMENT, attachment)
+                .set(Tables.QUERY_ATTACHMENT.QUERY_ID, queryId)
+                .set(Tables.QUERY_ATTACHMENT.ATTACHMENT_TYPE, attachmentType)
+                .returning(Tables.QUERY_ATTACHMENT.ID)
+                .fetch();
 
-            if(result == null || result.getValues(Tables.QUERY_ATTACHMENT.ID) == null || result.getValues(Tables
-                    .QUERY_ATTACHMENT.ID).size() < 1)
-                return null;
+        if(result == null || result.getValues(Tables.QUERY_ATTACHMENT.ID) == null || result.getValues(Tables
+                .QUERY_ATTACHMENT.ID).size() < 1)
+            return null;
 
-            return result.getValues(Tables.QUERY_ATTACHMENT.ID).get(0);
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
-        }
-        return null;
+        return result.getValues(Tables.QUERY_ATTACHMENT.ID).get(0);
     }
 
     public static Integer insertPrivateAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType, Integer personId, Integer biobank_in_private_chat, Timestamp attachment_time) {
@@ -598,29 +521,22 @@ public class DbUtil {
         return result.getValues(Tables.QUERY_ATTACHMENT_COMMENT.ID).get(0);
     }
 
-    public static Integer insertQueryAttachmentRecord(Config config, AttachmentDTO fileDTO) throws SQLException {
-        try {
-            if(fileDTO.getClass().equals(QueryAttachmentDTO.class)) {
-                QueryAttachmentDTO queryFileDTO = (QueryAttachmentDTO)fileDTO;
-                return insertQueryAttachmentRecord(config, queryFileDTO.getQueryId(), queryFileDTO.getAttachment(), queryFileDTO.getAttachmentType());
-            } else if (fileDTO.getClass().equals(PrivateAttachmentDTO.class)) {
-                PrivateAttachmentDTO privateFileDTO = (PrivateAttachmentDTO)fileDTO;
-                return insertPrivateAttachmentRecord(config, privateFileDTO.getQueryId(), privateFileDTO.getAttachment(), privateFileDTO.getAttachmentType(),
-                        privateFileDTO.getPersonId(), privateFileDTO.getBiobank_in_private_chat(), privateFileDTO.getAttachment_time());
-            } else if (fileDTO.getClass().equals(CommentAttachmentDTO.class)) {
-                CommentAttachmentDTO commentFileDTO = (CommentAttachmentDTO)fileDTO;
-                return insertCommentAttachmentRecord(config, commentFileDTO.getQueryId(), commentFileDTO.getAttachment(),
-                        commentFileDTO.getAttachmentType(), commentFileDTO.getCommentId());
-            } else {
-                logger.error("Error insertQueryAttachmentRecord: No matching Attachment Class.");
-                return null;
-            }
-        } catch (Exception ex) {
-            System.out.println("DbUtil ERROR");
-            ex.printStackTrace();
-            config.close();
+    public static Integer insertQueryAttachmentRecord(Config config, AttachmentDTO fileDTO) {
+        if(fileDTO.getClass().equals(QueryAttachmentDTO.class)) {
+            QueryAttachmentDTO queryFileDTO = (QueryAttachmentDTO)fileDTO;
+            return insertQueryAttachmentRecord(config, queryFileDTO.getQueryId(), queryFileDTO.getAttachment(), queryFileDTO.getAttachmentType());
+        } else if (fileDTO.getClass().equals(PrivateAttachmentDTO.class)) {
+            PrivateAttachmentDTO privateFileDTO = (PrivateAttachmentDTO)fileDTO;
+            return insertPrivateAttachmentRecord(config, privateFileDTO.getQueryId(), privateFileDTO.getAttachment(), privateFileDTO.getAttachmentType(),
+                    privateFileDTO.getPersonId(), privateFileDTO.getBiobank_in_private_chat(), privateFileDTO.getAttachment_time());
+        } else if (fileDTO.getClass().equals(CommentAttachmentDTO.class)) {
+            CommentAttachmentDTO commentFileDTO = (CommentAttachmentDTO)fileDTO;
+            return insertCommentAttachmentRecord(config, commentFileDTO.getQueryId(), commentFileDTO.getAttachment(),
+                    commentFileDTO.getAttachmentType(), commentFileDTO.getCommentId());
+        } else {
+            logger.error("Error insertQueryAttachmentRecord: No matching Attachment Class.");
+            return null;
         }
-        return null;
     }
 
 
