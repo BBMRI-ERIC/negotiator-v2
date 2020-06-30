@@ -49,19 +49,14 @@ public class DirectorySynchronizeTask extends TimerTask {
      *
      */
     private final static Logger logger = LoggerFactory.getLogger(DirectorySynchronizeTask.class);
-
-    private Config config = null;
+    
     private Negotiator negotiatorConfig_;
-
-    public void setTestConfig(Config config) {
-        this.config = config;
-    }
 
     @Override
     public void run() {
         //TODO: Add Networks: https://directory.bbmri-eric.eu/api/v2/eu_bbmri_eric_networks
 
-        try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
+        try(Config config = ConfigFactory.get()) {
             negotiatorConfig_ = NegotiatorConfig.get().getNegotiator();
             int biobanks = 0;
             int collections = 0;
@@ -88,7 +83,7 @@ public class DirectorySynchronizeTask extends TimerTask {
 
     public int[] runDirectorySync(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String username, String password) {
         logger.info("Starting synchronization with the directory: " + directoryId + " - " + name);
-        try(Config config = (this.config!=null?this.config:ConfigFactory.get())) {
+        try(Config config = ConfigFactory.get()) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
             DirectoryClient client = new DirectoryClient(dirBaseUrl,

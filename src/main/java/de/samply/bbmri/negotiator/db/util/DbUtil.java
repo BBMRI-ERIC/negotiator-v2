@@ -1678,19 +1678,22 @@ public class DbUtil {
         List<QueryRecord> queries = new ArrayList<QueryRecord>();
         for(Record record : result) {
             QueryRecord queryRecord = new QueryRecord();
-            queryRecord.setId((Integer)record.getValue(0));
-            queryRecord.setTitle((String)record.getValue(1));
-            queryRecord.setText((String)record.getValue(2));
-            queryRecord.setQueryXml((String)record.getValue(3));
-            queryRecord.setQueryCreationTime((Timestamp)record.getValue(4));
-            queryRecord.setResearcherId((Integer)record.getValue(5));
-            queryRecord.setJsonText((String)record.getValue(6));
-            queryRecord.setNumAttachments((Integer)record.getValue(7));
-            queryRecord.setNegotiatorToken((String)record.getValue(8));
-            queryRecord.setValidQuery((Boolean)record.getValue(9));
-            queryRecord.setRequestDescription((String)record.getValue(10));
-            queryRecord.setEthicsVote((String)record.getValue(11));
-            queryRecord.setNegotiationStartedTime((Timestamp)record.getValue(12));
+            queryRecord.setId((Integer)record.getValue("id"));
+            queryRecord.setTitle((String)record.getValue("title"));
+            queryRecord.setText((String)record.getValue("text"));
+            queryRecord.setQueryXml((String)record.getValue("query_xml"));
+            queryRecord.setQueryCreationTime((Timestamp)record.getValue("query_creation_time"));
+            queryRecord.setResearcherId((Integer)record.getValue("researcher_id"));
+            queryRecord.setJsonText((String)record.getValue("json_text"));
+            queryRecord.setNumAttachments((Integer)record.getValue("num_attachments"));
+            queryRecord.setNegotiatorToken((String)record.getValue("negotiator_token"));
+            queryRecord.setValidQuery((Boolean)record.getValue("valid_query"));
+            queryRecord.setRequestDescription((String)record.getValue("request_description"));
+            queryRecord.setEthicsVote((String)record.getValue("ethics_vote"));
+            queryRecord.setNegotiationStartedTime((Timestamp)record.getValue("negotiation_started_time"));
+            queryRecord.setResearcherName((String)record.getValue("researcher_name"));
+            queryRecord.setResearcherEmail((String)record.getValue("researcher_email"));
+            queryRecord.setResearcherOrganization((String)record.getValue("researcher_organization"));
             queries.add(queryRecord);
         }
         return queries;
