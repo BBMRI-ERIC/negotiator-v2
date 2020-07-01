@@ -50,10 +50,11 @@
     <h:outputScript name="js/affiliation-collapsible.js" />
     <h:outputStylesheet name="css/collapsible.css" />
 
-    <h:panelGroup layout="block" styleClass="panel panel-default" style="border-color: #ddd">
+    <h:panelGroup onmouseover="publicCommentReadUpdate('#{cc.attrs.comment.id}');" layout="block" styleClass="panel panel-default" style="border-color: #ddd">
 
-        <h:form id="testCommentReadForm" enctype="multipart/form-data">
+        <h:form id="updateCommentRead" enctype="multipart/form-data">
             <h:commandButton value="Ajax Submit"
+                             id="updateCommentReadForComment#{cc.attrs.comment.id}"
                              action="#{commentBean.markCommentReadForUser(userBean.person.id, cc.attrs.comment.id)}">
                 <f:ajax execute="@this" render="@form" />
             </h:commandButton>

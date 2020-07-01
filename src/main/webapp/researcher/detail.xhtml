@@ -201,6 +201,11 @@
                                 var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
                                 jsfcommandButton.click();
                             }
+
+                            function publicCommentReadUpdate(commentId) {
+                                var updateCommentReadStatus = document.getElementById("updateCommentRead:updateCommentReadForComment" + commentId);
+                                updateCommentReadStatus.click();
+                            }
                         </script>
                     </h:panelGroup>
 
