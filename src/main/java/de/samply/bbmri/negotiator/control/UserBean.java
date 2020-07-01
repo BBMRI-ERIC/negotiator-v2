@@ -63,6 +63,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
+import org.jooq.util.derby.sys.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,7 @@ public class UserBean implements Serializable {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
-	private Logger logger = LoggerFactory.getLogger(UserBean.class);
+	private final Logger logger = LoggerFactory.getLogger(UserBean.class);
 
 	/**
 	 * The subjects from the dummy data.
@@ -122,7 +123,7 @@ public class UserBean implements Serializable {
 	/**
 	 * ID of the Location (only biobank owners)
 	 */
-	private Biobank biobank = null;
+	private final Biobank biobank = null;
 
 	/**
 	 * The *mapped* user ID in the database.
@@ -447,36 +448,46 @@ public class UserBean implements Serializable {
 			 * If the user hasn't been to this negotiator before, store him in the database
 			 */
 			if (person == null) {
-				person = config.dsl().newRecord(Tables.PERSON);
-				person.setAuthName(userRealName);
-				person.setAuthEmail(userEmail);
-				person.setAuthSubject(userIdentity);
+				try {
+					person = config.dsl().newRecord(Tables.PERSON);
+					person.setAuthName(userRealName);
+					person.setAuthEmail(userEmail);
+					person.setAuthSubject(userIdentity);
 
-				/**
-				 * Set the image as identicon. As long as the identity provider does not support avatars, generate an
-				 * identicon by default.
-				 */
-				person.setPersonImage(IdenticonUtil.generateIdenticon(256));
-				person.store();
-
-				isAdmin = false;
-			} else {
-				/**
-				 * Otherwise just update some fields.
-				 */
-				person.setAuthName(userRealName);
-				person.setAuthEmail(userEmail);
-
-				/**
-				 * Set the identicon, if the identity provider does not support avatars. And only if it is still null
-				 */
-				if (person.getPersonImage() == null) {
+					/**
+					 * Set the image as identicon. As long as the identity provider does not support avatars, generate an
+					 * identicon by default.
+					 */
 					person.setPersonImage(IdenticonUtil.generateIdenticon(256));
-				}
-				person.update();
+					person.store();
 
-				if(person.getIsAdmin())
-					isAdmin = true;
+					isAdmin = false;
+				} catch (Exception e) {
+					System.err.println("ERROR: Creating user.");
+					config.rollback();
+				}
+			} else {
+				try {
+					/**
+					 * Otherwise just update some fields.
+					 */
+					person.setAuthName(userRealName);
+					person.setAuthEmail(userEmail);
+
+					/**
+					 * Set the identicon, if the identity provider does not support avatars. And only if it is still null
+					 */
+					if (person.getPersonImage() == null) {
+						person.setPersonImage(IdenticonUtil.generateIdenticon(256));
+					}
+					person.update();
+
+					if (person.getIsAdmin())
+						isAdmin = true;
+				} catch (Exception e) {
+					System.err.println("ERROR: Update user.");
+					config.rollback();
+				}
 			}
 
 			loginValid = true;
@@ -495,7 +506,7 @@ public class UserBean implements Serializable {
 
 			config.get().commit();
 
-		} catch (SQLException | IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
