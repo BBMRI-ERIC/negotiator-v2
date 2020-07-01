@@ -696,67 +696,72 @@ public class DbUtil {
      * @return
      */
     public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
-    	Person queryAuthor = Tables.PERSON.as("query_author");
+        try {
+            Person queryAuthor = Tables.PERSON.as("query_author");
 
-    	Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+            Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
 
-    	if(filters != null && filters.size() > 0) {
-            Condition titleCondition = DSL.trueCondition();
-            Condition textCondition = DSL.trueCondition();
-            Condition nameCondition = DSL.trueCondition();
+            if (filters != null && filters.size() > 0) {
+                Condition titleCondition = DSL.trueCondition();
+                Condition textCondition = DSL.trueCondition();
+                Condition nameCondition = DSL.trueCondition();
 
-            for(String filter : filters) {
-                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
-    			textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
-   			    nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                for (String filter : filters) {
+                    titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                    textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                    nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                }
+                condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
             }
-    		condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
-    	}
 
-        if (flag != null && flag != Flag.UNFLAGGED) {
-            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
-        } else {
-            /**
-             * Ignored queries are never selected unless the user is in the ignored folder
-             */
-    		condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
-    	}
+            if (flag != null && flag != Flag.UNFLAGGED) {
+                condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
+            } else {
+                /**
+                 * Ignored queries are never selected unless the user is in the ignored folder
+                 */
+                condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+            }
 
-        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+            condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
 
-    	Result<Record> fetch = config.dsl()
-				.select(getFields(Tables.QUERY, "query"))
-				.select(getFields(queryAuthor, "query_author"))
-    			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
-    			.select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
-                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
-                        .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
-    			.from(Tables.QUERY)
+            Result<Record> fetch = config.dsl()
+                    .select(getFields(Tables.QUERY, "query"))
+                    .select(getFields(queryAuthor, "query_author"))
+                    .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                    .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                    .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
+                            .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
+                    .from(Tables.QUERY)
 
-    			.join(Tables.QUERY_COLLECTION, JoinType.JOIN)
-    			.on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+                    .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                    .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
 
-                .join(Tables.COLLECTION, JoinType.JOIN)
-                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                    .join(Tables.COLLECTION, JoinType.JOIN)
+                    .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
 
-                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
-                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                    .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                    .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
 
-    			.join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
+                    .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+                    .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
 
-    			.join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID))
+                    .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
+                    .on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID))
 
-    			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
+                    .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                    .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
 
-    			.where(condition)
-    			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
-    			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
+                    .where(condition)
+                    .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
+                    .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
 
-		return config.map(fetch, OwnerQueryStatsDTO.class);
+            return config.map(fetch, OwnerQueryStatsDTO.class);
+        } catch (Exception e) {
+            System.out.println("ERROR: getOwnerQueries DB Connection Problem.");
+        }
+        return new ArrayList<>();
     }
 
 

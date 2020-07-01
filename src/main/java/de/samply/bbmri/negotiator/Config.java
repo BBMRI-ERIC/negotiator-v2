@@ -91,6 +91,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
 
     @Override
     public void close() throws SQLException {
+        connectionProvider().acquire().commit();
         connectionProvider().acquire().close();
     }
 
