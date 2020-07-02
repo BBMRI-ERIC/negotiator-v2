@@ -4,16 +4,20 @@
 package de.samply.bbmri.negotiator.jooq.tables;
 
 
+import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonOfferRecord;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 
 
@@ -30,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonOffer extends TableImpl<PersonOfferRecord> {
 
-	private static final long serialVersionUID = 521256921;
+	private static final long serialVersionUID = -1142354516;
 
 	/**
 	 * The reference instance of <code>public.person_offer</code>
@@ -85,6 +89,22 @@ public class PersonOffer extends TableImpl<PersonOfferRecord> {
 
 	private PersonOffer(String alias, Table<PersonOfferRecord> aliased, Field<?>[] parameters) {
 		super(alias, Public.PUBLIC, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public UniqueKey<PersonOfferRecord> getPrimaryKey() {
+		return Keys.PERSON_OFFER_PK;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<UniqueKey<PersonOfferRecord>> getKeys() {
+		return Arrays.<UniqueKey<PersonOfferRecord>>asList(Keys.PERSON_OFFER_PK);
 	}
 
 	/**

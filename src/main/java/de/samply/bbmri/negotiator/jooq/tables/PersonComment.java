@@ -4,16 +4,20 @@
 package de.samply.bbmri.negotiator.jooq.tables;
 
 
+import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonCommentRecord;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 
 
@@ -30,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonComment extends TableImpl<PersonCommentRecord> {
 
-	private static final long serialVersionUID = 1138834833;
+	private static final long serialVersionUID = 290334659;
 
 	/**
 	 * The reference instance of <code>public.person_comment</code>
@@ -85,6 +89,22 @@ public class PersonComment extends TableImpl<PersonCommentRecord> {
 
 	private PersonComment(String alias, Table<PersonCommentRecord> aliased, Field<?>[] parameters) {
 		super(alias, Public.PUBLIC, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public UniqueKey<PersonCommentRecord> getPrimaryKey() {
+		return Keys.PERSON_COMMENT_ID;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<UniqueKey<PersonCommentRecord>> getKeys() {
+		return Arrays.<UniqueKey<PersonCommentRecord>>asList(Keys.PERSON_COMMENT_ID);
 	}
 
 	/**
