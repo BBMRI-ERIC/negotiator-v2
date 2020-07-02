@@ -63,6 +63,8 @@ import de.samply.bbmri.negotiator.rest.Directory;
 import de.samply.directory.client.dto.DirectoryBiobank;
 import de.samply.directory.client.dto.DirectoryCollection;
 
+import static org.jooq.impl.DSL.field;
+
 /**
  * The database util for basic queries.
  */
@@ -917,6 +919,33 @@ public class DbUtil {
             record.setDateRead(new Timestamp(new Date().getTime()));
             record.update();
         }
+    }
+
+
+    /*
+    SELECT person_id, 87 FROM
+((SELECT pc.person_id person_id
+	FROM public.comment com
+	JOIN query_collection qc ON com.query_id = qc.query_id
+	JOIN person_collection pc ON qc.collection_id = pc.collection_id
+	WHERE com.id = 87)
+UNION
+(SELECT q.researcher_id person_id
+	FROM public.comment com
+	JOIN query q ON com.query_id = q.id
+	WHERE com.id = 87)) sub
+GROUP BY person_id
+     */
+    public static void addCommentReadForComment(Config config, Integer commentId, Integer commenterId) {
+        config.dsl().insertInto(Tables.PERSON_COMMENT, Tables.PERSON_COMMENT.COMMENT_ID, Tables.PERSON_COMMENT.PERSON_ID)
+                .select(
+
+                        config.dsl().resultQuery(
+                        ).fetch()
+                )
+                Field<?> person_id = field("pc.person_id");
+
+        config.dsl().select()
     }
 
     /**

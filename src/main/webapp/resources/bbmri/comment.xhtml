@@ -52,7 +52,7 @@
 
     <h:panelGroup onmouseover="publicCommentReadUpdate('#{cc.attrs.comment.id}');" layout="block" styleClass="panel panel-default" style="border-color: #ddd">
 
-        <h:form id="updateCommentRead" enctype="multipart/form-data">
+        <h:form id="updateCommentRead" enctype="multipart/form-data" style="display:none;">
             <h:commandButton value="Ajax Submit"
                              styleClass="updateCommentReadForComment#{cc.attrs.comment.id}"
                              id="updateCommentReadForComment#{cc.attrs.comment.id}"
@@ -79,7 +79,7 @@
                 <h:form id="deleteComment" enctype="multipart/form-data">
 
 
-                    <span style="margin-right: 5px;#{cc.attrs.commentRead ? 'display:none;': ''}" class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                    <span style="margin-right: 5px;#{cc.attrs.commentRead ? 'display:none;': ''}" class="glyphicon glyphicon-envelope updateCommentReadForCommentShowElement#{cc.attrs.comment.id}" aria-hidden="true"></span>
 
                     <h:outputText value="#{cc.attrs.comment.commentTime}">
                         <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>

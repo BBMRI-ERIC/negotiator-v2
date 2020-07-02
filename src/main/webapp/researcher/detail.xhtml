@@ -204,9 +204,7 @@
 
                             function publicCommentReadUpdate(commentId) {
                                 var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
-                                console.log(updateCommentReadStatus[0]);
-                                var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
-                                console.log(jsfcommandButton);
+                                document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
                                 updateCommentReadStatus[0].click();
                             }
                         </script>

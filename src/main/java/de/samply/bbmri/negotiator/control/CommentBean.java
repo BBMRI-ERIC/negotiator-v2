@@ -99,6 +99,10 @@ public class CommentBean implements Serializable {
             }
             config.commit();
 
+            DbUtil.addCommentReadForComment(config, commentId, userBean.getUserId());
+
+            markCommentNotReadForUsers(config);
+
             uploadAttachmentComment(commentId);
 
             clearEditChanges();
@@ -112,6 +116,10 @@ public class CommentBean implements Serializable {
 
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    private void markCommentNotReadForUsers(Config config) {
+        userBean.getUserId();
     }
 
     /**
@@ -218,11 +226,10 @@ public class CommentBean implements Serializable {
             return;
         }
         try (Config config = ConfigFactory.get()) {
-
+            DbUtil.updateCommentReadForUser(config, userId, commentId);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(" -#-#-#-#-#-#---> " + userId + " -> " + commentId);
     }
 
     public UserBean getUserBean() {
