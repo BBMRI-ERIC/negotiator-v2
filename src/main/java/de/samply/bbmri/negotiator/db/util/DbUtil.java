@@ -904,49 +904,19 @@ public class DbUtil {
             result.add(commentPersonDTO);
         }
         return result;
+    }
 
+    public static void updateCommentReadForUser(Config config, Integer userId, Integer commentId) {
+        PersonCommentRecord record = config.dsl().selectFrom(Tables.PERSON_COMMENT)
+                .where(Tables.PERSON_COMMENT.COMMENT_ID.eq(commentId))
+                .and(Tables.PERSON_COMMENT.PERSON_ID.eq(userId))
+                .fetchOne();
 
-
-
-
-
-        //------------------------------------------------------------------------------
-        /*Result<Record> result = config.dsl()
-                .select(getFields(Tables.COMMENT, "comment"))
-                .select(getFields(Tables.PERSON, "person"))
-                .select(getFields(Tables.COLLECTION, "collection"))
-                .select(getFields(Tables.PERSON_COMMENT, "personcomment"))
-        		.from(Tables.COMMENT)
-                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID).and(Tables.PERSON_COMMENT.PERSON_ID.eq(personId)))
-                .where(Tables.COMMENT.QUERY_ID.eq(queryId))
-                .and(Tables.COMMENT.STATUS.eq("published"))
-                .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
-
-        List<CommentPersonDTO> map = config.map(result, CommentPersonDTO.class);
-
-        List<CommentPersonDTO> target = new ArrayList<>();*/
-        /**
-         * Now we have to do weird things, grouping them together manually
-         */
-        /*HashMap<Integer, CommentPersonDTO> mapped = new HashMap<>();
-
-        for(CommentPersonDTO dto : map) {
-            if(!mapped.containsKey(dto.getComment().getId())) {
-                mapped.put(dto.getComment().getId(), dto);
-
-                if(dto.getCollection() != null) {
-                    dto.getCollections().add(dto.getCollection());
-                }
-                target.add(dto);
-            } else if(dto.getCollection() != null) {
-                    mapped.get(dto.getComment().getId()).getCollections().add(dto.getCollection());
-            }
+        if(!record.getRead()) {
+            record.setRead(true);
+            record.setDateRead(new Timestamp(new Date().getTime()));
+            record.update();
         }
-
-        return target;*/
     }
 
     /**

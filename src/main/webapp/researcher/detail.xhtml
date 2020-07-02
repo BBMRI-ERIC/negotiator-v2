@@ -203,8 +203,11 @@
                             }
 
                             function publicCommentReadUpdate(commentId) {
-                                var updateCommentReadStatus = document.getElementById("updateCommentRead:updateCommentReadForComment" + commentId);
-                                updateCommentReadStatus.click();
+                                var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
+                                console.log(updateCommentReadStatus[0]);
+                                var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
+                                console.log(jsfcommandButton);
+                                updateCommentReadStatus[0].click();
                             }
                         </script>
                     </h:panelGroup>
