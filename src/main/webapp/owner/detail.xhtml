@@ -130,6 +130,12 @@
                                 var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
                                 jsfcommandButton.click();
                             }
+
+                            function publicCommentReadUpdate(commentId) {
+                                var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
+                                document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
+                                updateCommentReadStatus[0].click();
+                            }
                         </script>
                     </h:panelGroup>
 
@@ -199,7 +205,8 @@
                                                  collections="#{comment.collections}"
                                                  ownerQueriesDetailBean="#{ownerQueriesDetailBean}"
                                                  scope="commentAttachment"
-                                                 commentComponent="#{commentBean}"/>
+                                                 commentComponent="#{commentBean}"
+                                                 commentRead="#{comment.commentRead}"/>
 
                             </ui:repeat>
 

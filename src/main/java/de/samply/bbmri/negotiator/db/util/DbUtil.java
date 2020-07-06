@@ -914,38 +914,29 @@ public class DbUtil {
                 .and(Tables.PERSON_COMMENT.PERSON_ID.eq(userId))
                 .fetchOne();
 
-        if(!record.getRead()) {
+        if(record != null && !record.getRead()) {
             record.setRead(true);
             record.setDateRead(new Timestamp(new Date().getTime()));
             record.update();
         }
     }
 
-
-    /*
-    SELECT person_id, 87 FROM
-((SELECT pc.person_id person_id
-	FROM public.comment com
-	JOIN query_collection qc ON com.query_id = qc.query_id
-	JOIN person_collection pc ON qc.collection_id = pc.collection_id
-	WHERE com.id = 87)
-UNION
-(SELECT q.researcher_id person_id
-	FROM public.comment com
-	JOIN query q ON com.query_id = q.id
-	WHERE com.id = 87)) sub
-GROUP BY person_id
-     */
     public static void addCommentReadForComment(Config config, Integer commentId, Integer commenterId) {
-        config.dsl().insertInto(Tables.PERSON_COMMENT, Tables.PERSON_COMMENT.COMMENT_ID, Tables.PERSON_COMMENT.PERSON_ID)
-                .select(
+        config.dsl().resultQuery("INSERT INTO public.person_comment (person_id, comment_id, read) " +
+                "(SELECT person_id, " + commentId + ", false FROM " +
+                "((SELECT pc.person_id person_id " +
+                "FROM public.comment com " +
+                "JOIN query_collection qc ON com.query_id = qc.query_id " +
+                "JOIN person_collection pc ON qc.collection_id = pc.collection_id " +
+                "WHERE com.id = " + commentId + ") " +
+                "UNION " +
+                "(SELECT q.researcher_id person_id " +
+                "FROM public.comment com " +
+                "JOIN query q ON com.query_id = q.id " +
+                "WHERE com.id = " + commentId + ")) sub " +
+                "GROUP BY person_id)").execute();
 
-                        config.dsl().resultQuery(
-                        ).fetch()
-                )
-                Field<?> person_id = field("pc.person_id");
-
-        config.dsl().select()
+        updateCommentReadForUser(config, commentId, commenterId);
     }
 
     /**
