@@ -90,10 +90,10 @@
                          style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }'
                          data-toggle="tooltip"
                          data-placement="bottom"
-                         title="#{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
+                         title="#{cc.attrs.item.unreadCommentCount} unread comments from #{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
 
                         <i class="glyphicon glyphicon-bullhorn"></i>
-                        <h:outputText value="   #{cc.attrs.item.commentCount}"/>
+                        <h:outputText value="   #{cc.attrs.item.unreadCommentCount}/#{cc.attrs.item.commentCount}"/>
                     </div>
 
                     <div class="badge queryNumberResponsesBadge"

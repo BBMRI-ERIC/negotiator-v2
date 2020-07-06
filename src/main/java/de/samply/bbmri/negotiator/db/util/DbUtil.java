@@ -744,6 +744,7 @@ public class DbUtil {
 				.select(getFields(queryAuthor, "query_author"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
                 .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
                         .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
     			.from(Tables.QUERY)
@@ -761,13 +762,18 @@ public class DbUtil {
     			.on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
 
     			.join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID))
+    			.on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID).and(Tables.COMMENT.STATUS.eq("published")))
 
     			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
 
                 .join(Tables.REQUEST_STATUS, JoinType.JOIN)
                 .on(Tables.QUERY.ID.eq(Tables.REQUEST_STATUS.QUERY_ID))
+
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                        .and(Tables.PERSON_COMMENT.READ.eq(false)))
 
     			.where(condition).and(Tables.REQUEST_STATUS.STATUS.eq("started"))
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
