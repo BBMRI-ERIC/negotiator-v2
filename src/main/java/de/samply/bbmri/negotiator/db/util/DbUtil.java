@@ -646,18 +646,20 @@ public class DbUtil {
             condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
         }
 
-        Result<Record> fetch = config.dsl()
+        Result<Record> records = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
                 .select(getFields(Tables.PERSON, "query_author"))
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .from(Tables.QUERY)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
-                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID).and(Tables.COMMENT.STATUS.eq("published")))
                 .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
                 .where(condition)
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return mapRecordResultQueryStatsDTOList(fetch);
+        return mapRecordResultQueryStatsDTOList(records);
     }
 
     private static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> records) {
@@ -679,6 +681,7 @@ public class DbUtil {
             query.setRequestDescription((String) record.getValue("query_request_description"));
             query.setEthicsVote((String) record.getValue("query_ethics_vote"));
             query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
+            queryStatsDTO.setQuery(query);
             queryAuthor.setId((Integer) record.getValue("query_author_id"));
             queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
             queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
@@ -686,8 +689,9 @@ public class DbUtil {
             queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
             queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
             queryAuthor.setOrganization((String) record.getValue("query_author_organization"));
-            queryStatsDTO.setQuery(query);
             queryStatsDTO.setQueryAuthor(queryAuthor);
+            queryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
+            queryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
             result.add(queryStatsDTO);
         }
         return result;
