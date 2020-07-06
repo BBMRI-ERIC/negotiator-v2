@@ -651,10 +651,15 @@ public class DbUtil {
                 .select(getFields(Tables.PERSON, "query_author"))
                 .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
                 .from(Tables.QUERY)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
                 .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID).and(Tables.COMMENT.STATUS.eq("published")))
                 .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                    .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                            .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.QUERY.RESEARCHER_ID))
+                            .and(Tables.PERSON_COMMENT.READ.eq(false)))
                 .where(condition)
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
@@ -692,6 +697,7 @@ public class DbUtil {
             queryStatsDTO.setQueryAuthor(queryAuthor);
             queryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
             queryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
+            queryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
             result.add(queryStatsDTO);
         }
         return result;
@@ -940,7 +946,7 @@ public class DbUtil {
                 "WHERE com.id = " + commentId + ")) sub " +
                 "GROUP BY person_id)").execute();
 
-        updateCommentReadForUser(config, commentId, commenterId);
+        updateCommentReadForUser(config, commenterId, commentId);
     }
 
     /**
