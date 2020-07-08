@@ -203,6 +203,7 @@
                             }
 
                             function publicCommentReadUpdate(commentId) {
+                                alert("Ping");
                                 var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
                                 document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
                                 updateCommentReadStatus[0].click();
