@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ListOfDirectories implements Serializable {
 
-	private static final long serialVersionUID = 1978970356;
+	private static final long serialVersionUID = 855425719;
 
 	private Integer id;
 	private String  name;
@@ -37,6 +37,7 @@ public class ListOfDirectories implements Serializable {
 	private String  description;
 	private Boolean syncActive;
 	private String  directoryPrefix;
+	private String  resourceNetworks;
 
 	public ListOfDirectories() {}
 
@@ -54,6 +55,7 @@ public class ListOfDirectories implements Serializable {
 		this.description = value.description;
 		this.syncActive = value.syncActive;
 		this.directoryPrefix = value.directoryPrefix;
+		this.resourceNetworks = value.resourceNetworks;
 	}
 
 	public ListOfDirectories(
@@ -69,7 +71,8 @@ public class ListOfDirectories implements Serializable {
 		String  resourceCollections,
 		String  description,
 		Boolean syncActive,
-		String  directoryPrefix
+		String  directoryPrefix,
+		String  resourceNetworks
 	) {
 		this.id = id;
 		this.name = name;
@@ -84,6 +87,7 @@ public class ListOfDirectories implements Serializable {
 		this.description = description;
 		this.syncActive = syncActive;
 		this.directoryPrefix = directoryPrefix;
+		this.resourceNetworks = resourceNetworks;
 	}
 
 	public Integer getId() {
@@ -188,5 +192,13 @@ public class ListOfDirectories implements Serializable {
 
 	public void setDirectoryPrefix(String directoryPrefix) {
 		this.directoryPrefix = directoryPrefix;
+	}
+
+	public String getResourceNetworks() {
+		return this.resourceNetworks;
+	}
+
+	public void setResourceNetworks(String resourceNetworks) {
+		this.resourceNetworks = resourceNetworks;
 	}
 }
