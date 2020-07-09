@@ -98,6 +98,14 @@ public class DirectorySynchronizeTask extends TimerTask {
                         username, password);
             }
 
+            if(resourceNetworks != null) {
+                List<DirectoryNetwork> allNetworks = client.getAllNetworks();
+                logger.info("All Networks: " + allNetworks.size());
+                for(DirectoryNetwork directoryNetwork : allNetworks) {
+                    DbUtil.synchronizeNetwork(config, directoryNetwork, directoryId);
+                }
+            }
+
             List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
 
             logger.info("All Biobanks: " + allBiobanks.size());
@@ -116,14 +124,6 @@ public class DirectorySynchronizeTask extends TimerTask {
             for(DirectoryCollection dto : allCollections) {
                 logger.info("Run col: " + directoryId);
                 DbUtil.synchronizeCollection(config, dto, directoryId);
-            }
-
-            if(resourceNetworks != null) {
-                List<DirectoryNetwork> allNetworks = client.getAllNetworks();
-                logger.info("All Networks: " + allNetworks.size());
-                for(DirectoryNetwork directoryNetwork : allNetworks) {
-                    DbUtil.synchronizeNetwork(config, directoryNetwork, directoryId);
-                }
             }
 
             logger.info("Synchronization with the directory finished. Biobanks: " + allBiobanks.size() + ", Collections:" + allCollections.size());

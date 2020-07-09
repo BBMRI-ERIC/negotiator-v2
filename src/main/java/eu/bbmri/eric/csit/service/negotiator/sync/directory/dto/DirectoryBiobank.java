@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.sync.directory.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -26,6 +27,9 @@ public class DirectoryBiobank implements Serializable {
     @XmlElement
     private String description;
 
+    @XmlElement(name = "network")
+    private Collection<DirectoryNetworkLink> networkLinks;
+
     public String getId() {
         return id;
     }
@@ -48,5 +52,13 @@ public class DirectoryBiobank implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Collection<DirectoryNetworkLink> getNetworkLinks() {
+        return networkLinks;
+    }
+
+    public void setNetworkLinks(Collection<DirectoryNetworkLink> networkLinks) {
+        this.networkLinks = networkLinks;
     }
 }
