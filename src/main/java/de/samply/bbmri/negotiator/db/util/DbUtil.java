@@ -60,8 +60,8 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.rest.Directory;
-import de.samply.directory.client.dto.DirectoryBiobank;
-import de.samply.directory.client.dto.DirectoryCollection;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 
 import static org.jooq.impl.DSL.field;
 

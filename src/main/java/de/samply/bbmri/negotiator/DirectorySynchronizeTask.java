@@ -36,9 +36,9 @@ import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.directory.client.DirectoryClient;
-import de.samply.directory.client.dto.DirectoryBiobank;
-import de.samply.directory.client.dto.DirectoryCollection;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 
 /**
  * Handles the perdiodical synchonization between the directory and our negotiator.
