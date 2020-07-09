@@ -11,10 +11,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobankListing;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollectionListing;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.*;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.internal.util.Base64;
@@ -35,6 +32,7 @@ public class DirectoryClient {
      */
     private static final String DEFAULT_RESOURCE_BIOBANKS = "eu_bbmri_eric_biobanks";
     private static final String DEFAULT_RESOURCE_COLLECTIONS = "eu_bbmri_eric_collections";
+    private static final String DEFAULT_RESOURCE_NETWORKS = "eu_bbmri_eric_networks";
 
     /**
      * The logger instance
@@ -63,6 +61,8 @@ public class DirectoryClient {
      * Resource name for biobanks
      */
     private final String resourceBiobanks;
+
+    private final String resourceNetworks;
 
     /**
      * The username for the REST API
@@ -98,6 +98,13 @@ public class DirectoryClient {
                                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false))));
     }
 
+    public DirectoryClient(final String dirBaseUrl, final String resourceBiobanks, final String resourceCollections, final String resourceNetworks) {
+        this(dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks,
+                ClientBuilder.newClient(new ClientConfig(
+                        new JacksonJaxbJsonProvider()
+                                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false))));
+    }
+
     /**
      * Creates a directory client with the given directory base url and JAX-RS client.
      * @param dirBaseUrl the base URL for the directory, e.g. "https://molgenis52.gcc.rug.nl"
@@ -105,6 +112,10 @@ public class DirectoryClient {
      */
     public DirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections, Client client) {
         this(dirBaseUrl, resourceBiobanks, resourceCollections, null, null, client);
+    }
+
+    public DirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks, Client client) {
+        this(dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks, null, null, client);
     }
 
     /**
@@ -134,6 +145,34 @@ public class DirectoryClient {
         } else {
             this.resourceCollections = resourceCollections;
         }
+
+        this.resourceNetworks = null;
+    }
+
+    public DirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks,
+                           String username, String password, Client client) {
+        this.dirBaseUrl = dirBaseUrl;
+        this.client = client;
+        this.username = username;
+        this.password = password;
+
+        if(resourceBiobanks == null) {
+            this.resourceBiobanks = DEFAULT_RESOURCE_BIOBANKS;
+        } else {
+            this.resourceBiobanks = resourceBiobanks;
+        }
+
+        if(resourceCollections == null) {
+            this.resourceCollections = DEFAULT_RESOURCE_COLLECTIONS;
+        } else {
+            this.resourceCollections = resourceCollections;
+        }
+
+        if(resourceNetworks == null) {
+            this.resourceNetworks = DEFAULT_RESOURCE_NETWORKS;
+        } else {
+            this.resourceNetworks = resourceNetworks;
+        }
     }
 
     /**
@@ -147,6 +186,11 @@ public class DirectoryClient {
     public DirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections,
                            String username, String password) {
         this(dirBaseUrl, resourceBiobanks, resourceCollections, username, password, false);
+    }
+
+    public DirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks,
+                           String username, String password) {
+        this(dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks, username, password, false);
     }
 
     /**
@@ -181,6 +225,40 @@ public class DirectoryClient {
             this.resourceCollections = DEFAULT_RESOURCE_COLLECTIONS;
         } else {
             this.resourceCollections = resourceCollections;
+        }
+
+        this.resourceNetworks = null;
+    }
+
+    public DirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks,
+                           String username, String password, Boolean debugJersey) {
+        Client client = ClientBuilder.newClient(new ClientConfig(
+                new JacksonJaxbJsonProvider()
+                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)));
+        if(debugJersey)
+            client.register(new LoggingFeature());
+
+        this.dirBaseUrl = dirBaseUrl;
+        this.client = client;
+        this.username = username;
+        this.password = password;
+
+        if(resourceBiobanks == null) {
+            this.resourceBiobanks = DEFAULT_RESOURCE_BIOBANKS;
+        } else {
+            this.resourceBiobanks = resourceBiobanks;
+        }
+
+        if(resourceCollections == null) {
+            this.resourceCollections = DEFAULT_RESOURCE_COLLECTIONS;
+        } else {
+            this.resourceCollections = resourceCollections;
+        }
+
+        if(resourceNetworks == null) {
+            this.resourceNetworks = DEFAULT_RESOURCE_NETWORKS;
+        } else {
+            this.resourceNetworks = resourceNetworks;
         }
     }
 
@@ -260,6 +338,24 @@ public class DirectoryClient {
         target.addAll(listing.getCollections());
 
         return target;
+    }
+
+    public List<DirectoryNetwork> getAllNetworks() {
+        List<DirectoryNetwork> result = new ArrayList<>();
+        logger.debug("Getting all networks, first call");
+        Invocation.Builder request = getService().path(V2)
+                .path(resourceNetworks).request(MediaType.APPLICATION_JSON);
+        handleAuthorization(request);
+        DirectoryNetworkListing listing = request.get(DirectoryNetworkListing.class);
+        while(listing.getNextHref() != null) {
+            logger.debug("Not all networks retrieved, getting next Href: " + listing.getNextHref());
+            result.addAll(listing.getNetworks());
+            request = client.target(listing.getNextHref()).request(MediaType.APPLICATION_JSON);
+            handleAuthorization(request);
+            listing = request.get(DirectoryNetworkListing.class);
+        }
+        result.addAll(listing.getNetworks());
+        return result;
     }
 
     /**
