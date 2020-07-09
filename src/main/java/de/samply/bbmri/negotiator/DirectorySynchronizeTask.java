@@ -31,6 +31,7 @@ import java.util.TimerTask;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class DirectorySynchronizeTask extends TimerTask {
                 if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
                     logger.info("Synchronization with the directory: " + listOfDirectoriesRecord.getId() + " - " + listOfDirectoriesRecord.getName());
                     int[] size = runDirectorySync(listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName(), listOfDirectoriesRecord.getUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
-                            listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
+                            listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getResourceNetworks(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
                     if(size.length == 2) {
                         biobanks += size[0];
                         collections += size[1];
@@ -81,14 +82,21 @@ public class DirectorySynchronizeTask extends TimerTask {
         }
     }
 
-    public int[] runDirectorySync(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String username, String password) {
+    public int[] runDirectorySync(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks, String username, String password) {
         logger.info("Starting synchronization with the directory: " + directoryId + " - " + name);
         try(Config config = ConfigFactory.get()) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
-            DirectoryClient client = new DirectoryClient(dirBaseUrl,
-                    resourceBiobanks, resourceCollections,
-                    username, password);
+            DirectoryClient client;
+            if(resourceNetworks == null) {
+                client = new DirectoryClient(dirBaseUrl,
+                        resourceBiobanks, resourceCollections,
+                        username, password);
+            } else {
+                client = new DirectoryClient(dirBaseUrl,
+                        resourceBiobanks, resourceCollections, resourceNetworks,
+                        username, password);
+            }
 
             List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
 
@@ -108,6 +116,14 @@ public class DirectorySynchronizeTask extends TimerTask {
             for(DirectoryCollection dto : allCollections) {
                 logger.info("Run col: " + directoryId);
                 DbUtil.synchronizeCollection(config, dto, directoryId);
+            }
+
+            if(resourceNetworks != null) {
+                List<DirectoryNetwork> allNetworks = client.getAllNetworks();
+                logger.info("All Networks: " + allNetworks.size());
+                for(DirectoryNetwork directoryNetwork : allNetworks) {
+                    DbUtil.synchronizeNetwork(config, directoryNetwork, directoryId);
+                }
             }
 
             logger.info("Synchronization with the directory finished. Biobanks: " + allBiobanks.size() + ", Collections:" + allCollections.size());

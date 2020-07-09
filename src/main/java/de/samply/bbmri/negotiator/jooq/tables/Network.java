@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Network extends TableImpl<NetworkRecord> {
 
-	private static final long serialVersionUID = -1879334852;
+	private static final long serialVersionUID = -1296951899;
 
 	/**
 	 * The reference instance of <code>public.network</code>
@@ -73,6 +73,11 @@ public class Network extends TableImpl<NetworkRecord> {
 	 * The column <code>public.network.directory_id</code>.
 	 */
 	public final TableField<NetworkRecord, String> DIRECTORY_ID = createField("directory_id", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
+
+	/**
+	 * The column <code>public.network.list_of_directories_id</code>.
+	 */
+	public final TableField<NetworkRecord, Integer> LIST_OF_DIRECTORIES_ID = createField("list_of_directories_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>public.network</code> table reference

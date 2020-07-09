@@ -16,7 +16,7 @@ import java.util.List;
 @ManagedBean
 @SessionScoped
 public class DirectoryBean {
-    private Logger logger = LoggerFactory.getLogger(DirectoryBean.class);
+    private final Logger logger = LoggerFactory.getLogger(DirectoryBean.class);
 
     public List<ListOfDirectoriesRecord> getDirectories() {
         try(Config config = ConfigFactory.get()) {
@@ -30,8 +30,8 @@ public class DirectoryBean {
         return null;
     }
 
-    public void syncDirectory(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String username, String password) {
+    public void syncDirectory(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks, String username, String password) {
         DirectorySynchronizeTask directorySynchronizeTask = new DirectorySynchronizeTask();
-        directorySynchronizeTask.runDirectorySync(directoryId, name, dirBaseUrl, resourceBiobanks, resourceCollections, username, password);
+        directorySynchronizeTask.runDirectorySync(directoryId, name, dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks, username, password);
     }
 }

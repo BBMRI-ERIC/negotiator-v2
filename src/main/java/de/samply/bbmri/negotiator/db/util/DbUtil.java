@@ -43,6 +43,7 @@ import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
 import de.samply.share.model.bbmri.BbmriResult;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
@@ -1149,13 +1150,19 @@ public class DbUtil {
     /**
      * Returns the collection for the given directory ID.
      * @param config database configuration
-     * @param id directory collection ID
+     * @param directoryId directory collection ID
      * @return
      */
-    private static CollectionRecord getCollection(Config config, String id, int listOfDirectoryId) {
+    private static CollectionRecord getCollection(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.COLLECTION)
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(id))
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryId))
                 .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
+                .fetchOne();
+    }
+
+    private static NetworkRecord getNetwork(Config config, String directoryId, int listOfDirectoryId) {
+        return config.dsl().selectFrom(Tables.NETWORK)
+                .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
                 .fetchOne();
     }
 
@@ -1216,6 +1223,10 @@ public class DbUtil {
 
         record.setName(dto.getName());
         record.store();
+    }
+
+    public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int directoryId) {
+        NetworkRecord record = DbUtil.getNetwork(config, directoryNetwork.getId(), directoryId);
     }
 
     /*
