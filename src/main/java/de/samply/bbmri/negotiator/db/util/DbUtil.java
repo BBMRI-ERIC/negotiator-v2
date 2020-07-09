@@ -1163,6 +1163,7 @@ public class DbUtil {
     private static NetworkRecord getNetwork(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.NETWORK)
                 .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
+                .and(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq((listOfDirectoryId)))
                 .fetchOne();
     }
 
@@ -1225,8 +1226,23 @@ public class DbUtil {
         record.store();
     }
 
-    public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int directoryId) {
-        NetworkRecord record = DbUtil.getNetwork(config, directoryNetwork.getId(), directoryId);
+    public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int listOfDirectoriesId) {
+        NetworkRecord record = DbUtil.getNetwork(config, directoryNetwork.getId(), listOfDirectoriesId);
+        if(record == null) {
+            logger.debug("Found new network, with id {}, adding it to the database" , directoryNetwork.getId());
+            record = config.dsl().newRecord(Tables.NETWORK);
+            record.setDirectoryId(directoryNetwork.getId());
+            record.setName(directoryNetwork.getName());
+            record.setAcronym(directoryNetwork.getAcronym());
+            record.setDescription(directoryNetwork.getDescription());
+            record.setListOfDirectoriesId(listOfDirectoriesId);
+        } else {
+            record.setName(directoryNetwork.getName());
+            record.setAcronym(directoryNetwork.getAcronym());
+            record.setDescription(directoryNetwork.getDescription());
+            record.setListOfDirectoriesId(listOfDirectoriesId);
+        }
+        record.store();
     }
 
     /*
