@@ -11,5 +11,5 @@ CREATE TABLE public.person_network
 (
     person_id integer,
     network_id integer,
-    CONSTRAINT person_network PRIMARY KEY (person_id, network_id)
+    CONSTRAINT person_network_pk PRIMARY KEY (person_id, network_id)
 );
