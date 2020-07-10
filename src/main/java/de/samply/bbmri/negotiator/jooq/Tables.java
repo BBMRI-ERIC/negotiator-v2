@@ -21,6 +21,7 @@ import de.samply.bbmri.negotiator.jooq.tables.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
+import de.samply.bbmri.negotiator.jooq.tables.PersonNetwork;
 import de.samply.bbmri.negotiator.jooq.tables.PersonOffer;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
@@ -132,6 +133,11 @@ public class Tables {
 	 * The table public.person_comment
 	 */
 	public static final PersonComment PERSON_COMMENT = de.samply.bbmri.negotiator.jooq.tables.PersonComment.PERSON_COMMENT;
+
+	/**
+	 * The table public.person_network
+	 */
+	public static final PersonNetwork PERSON_NETWORK = de.samply.bbmri.negotiator.jooq.tables.PersonNetwork.PERSON_NETWORK;
 
 	/**
 	 * The table public.person_offer
