@@ -1170,60 +1170,72 @@ public class DbUtil {
     /**
      * Synchronizes the given Biobank from the directory with the Biobank in the database.
      * @param config database configuration
-     * @param dto biobank from the directory
+     * @param directoryBiobank biobank from the directory
      * @param directoryId ID of the directory the biobank belongs to
      */
-    public static void synchronizeBiobank(Config config, DirectoryBiobank dto, int directoryId) {
-        BiobankRecord record = DbUtil.getBiobank(config, dto.getId(), directoryId);
+    public static void synchronizeBiobank(Config config, DirectoryBiobank directoryBiobank, int directoryId) {
+        BiobankRecord record = DbUtil.getBiobank(config, directoryBiobank.getId(), directoryId);
 
         if(record == null) {
             /**
              * Create the location, because it doesnt exist yet
              */
-            logger.debug("Found new biobank, with id {}, adding it to the database" , dto.getId());
+            logger.debug("Found new biobank, with id {}, adding it to the database" , directoryBiobank.getId());
             record = config.dsl().newRecord(Tables.BIOBANK);
-            record.setDirectoryId(dto.getId());
+            record.setDirectoryId(directoryBiobank.getId());
         } else {
-            logger.debug("Biobank {} already exists, updating fields", dto.getId());
+            logger.debug("Biobank {} already exists, updating fields", directoryBiobank.getId());
         }
 
-        record.setDescription(dto.getDescription());
-        record.setName(dto.getName());
+        record.setDescription(directoryBiobank.getDescription());
+        record.setName(directoryBiobank.getName());
         record.setListOfDirectoriesId(directoryId);
         record.store();
+
+        updateBiobankNetworkLinks(config, directoryBiobank, directoryId);
+    }
+
+    public static void updateBiobankNetworkLinks(Config config, DirectoryBiobank directoryBiobank, int directoryId) {
+        // - Delete Links
+        // - Add Links
     }
 
     /**
      * Synchronizes the given Collection from the directory with the Collection in the database.
      * @param config database configuration
-     * @param dto collection from the directory
+     * @param directoryCollection collection from the directory
      * @param directoryId ID of the directory the collection belongs to
      */
-    public static void synchronizeCollection(Config config, DirectoryCollection dto, int directoryId) {
-        CollectionRecord record = DbUtil.getCollection(config, dto.getId(), directoryId);
+    public static void synchronizeCollection(Config config, DirectoryCollection directoryCollection, int directoryId) {
+        CollectionRecord record = DbUtil.getCollection(config, directoryCollection.getId(), directoryId);
 
         if(record == null) {
             /**
              * Create the collection, because it doesnt exist yet
              */
-            logger.debug("Found new collection, with id {}, adding it to the database" , dto.getId());
+            logger.debug("Found new collection, with id {}, adding it to the database" , directoryCollection.getId());
             record = config.dsl().newRecord(Tables.COLLECTION);
-            record.setDirectoryId(dto.getId());
+            record.setDirectoryId(directoryCollection.getId());
             record.setListOfDirectoriesId(directoryId);
         } else {
-            logger.debug("Biobank {} already exists, updating fields", dto.getId());
+            logger.debug("Biobank {} already exists, updating fields", directoryCollection.getId());
         }
 
-        if(dto.getBiobank() == null) {
+        if(directoryCollection.getBiobank() == null) {
             logger.debug("Biobank is null. A collection without a biobank?!");
         } else {
-            BiobankRecord biobankRecord = getBiobank(config, dto.getBiobank().getId(), directoryId);
+            BiobankRecord biobankRecord = getBiobank(config, directoryCollection.getBiobank().getId(), directoryId);
 
             record.setBiobankId(biobankRecord.getId());
         }
 
-        record.setName(dto.getName());
+        record.setName(directoryCollection.getName());
         record.store();
+    }
+
+    public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int directoryId) {
+        // - Delete Links
+        // - Add Links
     }
 
     public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int listOfDirectoriesId) {
