@@ -42,12 +42,11 @@ import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
 import de.samply.share.model.bbmri.BbmriResult;
-import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.jooq.tools.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
@@ -1171,10 +1169,11 @@ public class DbUtil {
      * Synchronizes the given Biobank from the directory with the Biobank in the database.
      * @param config database configuration
      * @param directoryBiobank biobank from the directory
-     * @param directoryId ID of the directory the biobank belongs to
+     * @param listOfDirectoryId ID of the directory the biobank belongs to
+     * @return
      */
-    public static void synchronizeBiobank(Config config, DirectoryBiobank directoryBiobank, int directoryId) {
-        BiobankRecord record = DbUtil.getBiobank(config, directoryBiobank.getId(), directoryId);
+    public static BiobankRecord synchronizeBiobank(Config config, DirectoryBiobank directoryBiobank, int listOfDirectoryId) {
+        BiobankRecord record = DbUtil.getBiobank(config, directoryBiobank.getId(), listOfDirectoryId);
 
         if(record == null) {
             /**
@@ -1189,25 +1188,44 @@ public class DbUtil {
 
         record.setDescription(directoryBiobank.getDescription());
         record.setName(directoryBiobank.getName());
-        record.setListOfDirectoriesId(directoryId);
+        record.setListOfDirectoriesId(listOfDirectoryId);
         record.store();
 
-        updateBiobankNetworkLinks(config, directoryBiobank, directoryId);
+        return record;
     }
 
-    public static void updateBiobankNetworkLinks(Config config, DirectoryBiobank directoryBiobank, int directoryId) {
-        // - Delete Links
-        // - Add Links
+    public static void updateBiobankNetworkLinks(Config config, DirectoryBiobank directoryBiobank, int listOfDirectoryId, int biobankId) {
+        config.dsl().deleteFrom(Tables.NETWORK_BIOBANK_LINK)
+                .where(Tables.NETWORK_BIOBANK_LINK.BIOBANK_ID.eq(biobankId))
+                .execute();
+
+        for(DirectoryNetworkLink directoryNetworkLink : directoryBiobank.getNetworkLinks()) {
+            NetworkBiobankLinkRecord record = config.dsl().newRecord(Tables.NETWORK_BIOBANK_LINK);
+            record.setBiobankId(biobankId);
+            NetworkRecord networkRecord = DbUtil.getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
+            record.setNetworkId(networkRecord.getId());
+            //record.store();
+        }
+    }
+    
+    public static List<NetworkBiobankLinkRecord> getBiobankNetworkLinks(Config config, String directoryBiobankId, int listOfDirectoryId) {
+        Result<Record> record = config.dsl().select(getFields(Tables.NETWORK_BIOBANK_LINK))
+                .from(Tables.NETWORK_BIOBANK_LINK)
+                .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.NETWORK_BIOBANK_LINK.BIOBANK_ID))
+                .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryBiobankId))
+                .and(Tables.BIOBANK.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
+                .fetch();
+        return config.map(record, NetworkBiobankLinkRecord.class);
     }
 
     /**
      * Synchronizes the given Collection from the directory with the Collection in the database.
      * @param config database configuration
      * @param directoryCollection collection from the directory
-     * @param directoryId ID of the directory the collection belongs to
+     * @param listOfDirectoryId ID of the directory the collection belongs to
      */
-    public static void synchronizeCollection(Config config, DirectoryCollection directoryCollection, int directoryId) {
-        CollectionRecord record = DbUtil.getCollection(config, directoryCollection.getId(), directoryId);
+    public static void synchronizeCollection(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId) {
+        CollectionRecord record = DbUtil.getCollection(config, directoryCollection.getId(), listOfDirectoryId);
 
         if(record == null) {
             /**
@@ -1216,7 +1234,7 @@ public class DbUtil {
             logger.debug("Found new collection, with id {}, adding it to the database" , directoryCollection.getId());
             record = config.dsl().newRecord(Tables.COLLECTION);
             record.setDirectoryId(directoryCollection.getId());
-            record.setListOfDirectoriesId(directoryId);
+            record.setListOfDirectoriesId(listOfDirectoryId);
         } else {
             logger.debug("Biobank {} already exists, updating fields", directoryCollection.getId());
         }
@@ -1224,7 +1242,7 @@ public class DbUtil {
         if(directoryCollection.getBiobank() == null) {
             logger.debug("Biobank is null. A collection without a biobank?!");
         } else {
-            BiobankRecord biobankRecord = getBiobank(config, directoryCollection.getBiobank().getId(), directoryId);
+            BiobankRecord biobankRecord = getBiobank(config, directoryCollection.getBiobank().getId(), listOfDirectoryId);
 
             record.setBiobankId(biobankRecord.getId());
         }
@@ -1233,7 +1251,7 @@ public class DbUtil {
         record.store();
     }
 
-    public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int directoryId) {
+    public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId) {
         // - Delete Links
         // - Add Links
     }
@@ -1297,7 +1315,6 @@ public class DbUtil {
         return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
     }
 
-    //TODO: IMPLEMENT
     public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollectionsInQuery(Config config, Integer queryId) {
         Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
                 .from(Tables.COLLECTION)

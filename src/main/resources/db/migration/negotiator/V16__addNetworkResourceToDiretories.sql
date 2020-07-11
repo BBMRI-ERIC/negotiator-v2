@@ -13,3 +13,9 @@ CREATE TABLE public.person_network
     network_id integer,
     CONSTRAINT person_network_pk PRIMARY KEY (person_id, network_id)
 );
+
+ALTER TABLE public.network_biobank_link
+    ADD CONSTRAINT network_biobank_link_pk PRIMARY KEY (biobank_id, network_id);
+
+ALTER TABLE public.network_collection_link
+    ADD CONSTRAINT network_collection_link_pk PRIMARY KEY (collection_id, network_id);

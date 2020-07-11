@@ -29,10 +29,10 @@ package de.samply.bbmri.negotiator;
 import java.util.List;
 import java.util.TimerTask;
 
+import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +69,7 @@ public class DirectorySynchronizeTask extends TimerTask {
                     logger.info("Synchronization with the directory: " + listOfDirectoriesRecord.getId() + " - " + listOfDirectoriesRecord.getName());
                     int[] size = runDirectorySync(listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName(), listOfDirectoriesRecord.getUrl(),
                             listOfDirectoriesRecord.getResourceBiobanks(), listOfDirectoriesRecord.getResourceCollections(),
-                            listOfDirectoriesRecord.getResourceNetworks(), true,
+                            listOfDirectoriesRecord.getResourceNetworks(), listOfDirectoriesRecord.getBbmriEricNationalNodes(),
                             listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
                     if(size.length == 3) {
                         biobanks += size[0];
@@ -100,9 +100,10 @@ public class DirectorySynchronizeTask extends TimerTask {
             }
 
             DirectoryClient client = getDirectoryClient(dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks, username, password, updateNetworks);
-            int numberOfNetworks = syncroniceNetworks(directoryId, config, client, updateNetworks);
+            int numberOfNetworks = synchronizeNetworks(directoryId, config, client, updateNetworks);
             int numberOfBiobanks = synchronizeBiobanks(directoryId, config, client, updateNetworks);
             int numberOfCollections = synchronizedCollections(directoryId, config, client, updateNetworks);
+            updateBbmriEricNationalNodes(config, directoryId, bbmriEricNationalNetworks);
 
             logger.info("Synchronization with the directory finished. Biobanks: " + numberOfBiobanks + ", Collections:" + numberOfCollections + ", Networks: " + numberOfNetworks);
             config.commit();
@@ -132,7 +133,7 @@ public class DirectorySynchronizeTask extends TimerTask {
         return client;
     }
 
-    private int syncroniceNetworks(int directoryId, Config config, DirectoryClient client, boolean updateNetworks) {
+    private int synchronizeNetworks(int directoryId, Config config, DirectoryClient client, boolean updateNetworks) {
         if(!updateNetworks) {
             return 0;
         }
@@ -150,19 +151,19 @@ public class DirectorySynchronizeTask extends TimerTask {
 
         for(DirectoryBiobank directoryBiobank : allBiobanks) {
             logger.info("Run: " + directoryId);
-            DbUtil.synchronizeBiobank(config, directoryBiobank, directoryId);
-            syncroniceBiobankNetworkLink(config, directoryBiobank, directoryId, updateNetworks);
+            BiobankRecord biobankRecord = DbUtil.synchronizeBiobank(config, directoryBiobank, directoryId);
+            syncroniceBiobankNetworkLink(config, directoryBiobank, directoryId, updateNetworks, biobankRecord);
         }
 
         logger.info("DirectoryBiobank done");
         return allBiobanks.size();
     }
 
-    private void syncroniceBiobankNetworkLink(Config config, DirectoryBiobank directoryBiobank, int directoryId, boolean updateNetworks) {
+    private void syncroniceBiobankNetworkLink(Config config, DirectoryBiobank directoryBiobank, int directoryId, boolean updateNetworks, BiobankRecord biobankRecord) {
         if(!updateNetworks) {
             return;
         }
-        DbUtil.updateBiobankNetworkLinks(config, directoryBiobank, directoryId);
+        DbUtil.updateBiobankNetworkLinks(config, directoryBiobank, directoryId, biobankRecord.getId());
     }
 
     private int synchronizedCollections(int directoryId, Config config, DirectoryClient client, boolean updateNetworks) {
@@ -185,7 +186,9 @@ public class DirectorySynchronizeTask extends TimerTask {
         DbUtil.updateCollectionNetworkLinks(config, directoryCollection, directoryId);
     }
 
-    private void updateBbmriEricNationalNodes(Config config, int directoryId) {
-
+    private void updateBbmriEricNationalNodes(Config config, int directoryId, Boolean bbmriEricNationalNetworks) {
+        if(!bbmriEricNationalNetworks) {
+            return;
+        }
     }
 }
