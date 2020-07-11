@@ -154,4 +154,11 @@ public class ListOfDirectoriesDao extends DAOImpl<ListOfDirectoriesRecord, de.sa
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories> fetchByResourceNetworks(String... values) {
 		return fetch(ListOfDirectories.LIST_OF_DIRECTORIES.RESOURCE_NETWORKS, values);
 	}
+
+	/**
+	 * Fetch records that have <code>bbmri_eric_national_nodes IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories> fetchByBbmriEricNationalNodes(Boolean... values) {
+		return fetch(ListOfDirectories.LIST_OF_DIRECTORIES.BBMRI_ERIC_NATIONAL_NODES, values);
+	}
 }

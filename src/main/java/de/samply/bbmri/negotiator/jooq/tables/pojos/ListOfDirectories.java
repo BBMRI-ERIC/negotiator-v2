@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ListOfDirectories implements Serializable {
 
-	private static final long serialVersionUID = 855425719;
+	private static final long serialVersionUID = 782410780;
 
 	private Integer id;
 	private String  name;
@@ -38,6 +38,7 @@ public class ListOfDirectories implements Serializable {
 	private Boolean syncActive;
 	private String  directoryPrefix;
 	private String  resourceNetworks;
+	private Boolean bbmriEricNationalNodes;
 
 	public ListOfDirectories() {}
 
@@ -56,6 +57,7 @@ public class ListOfDirectories implements Serializable {
 		this.syncActive = value.syncActive;
 		this.directoryPrefix = value.directoryPrefix;
 		this.resourceNetworks = value.resourceNetworks;
+		this.bbmriEricNationalNodes = value.bbmriEricNationalNodes;
 	}
 
 	public ListOfDirectories(
@@ -72,7 +74,8 @@ public class ListOfDirectories implements Serializable {
 		String  description,
 		Boolean syncActive,
 		String  directoryPrefix,
-		String  resourceNetworks
+		String  resourceNetworks,
+		Boolean bbmriEricNationalNodes
 	) {
 		this.id = id;
 		this.name = name;
@@ -88,6 +91,7 @@ public class ListOfDirectories implements Serializable {
 		this.syncActive = syncActive;
 		this.directoryPrefix = directoryPrefix;
 		this.resourceNetworks = resourceNetworks;
+		this.bbmriEricNationalNodes = bbmriEricNationalNodes;
 	}
 
 	public Integer getId() {
@@ -200,5 +204,13 @@ public class ListOfDirectories implements Serializable {
 
 	public void setResourceNetworks(String resourceNetworks) {
 		this.resourceNetworks = resourceNetworks;
+	}
+
+	public Boolean getBbmriEricNationalNodes() {
+		return this.bbmriEricNationalNodes;
+	}
+
+	public void setBbmriEricNationalNodes(Boolean bbmriEricNationalNodes) {
+		this.bbmriEricNationalNodes = bbmriEricNationalNodes;
 	}
 }

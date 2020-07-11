@@ -30,8 +30,8 @@ public class DirectoryBean {
         return null;
     }
 
-    public void syncDirectory(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks, String username, String password) {
+    public void syncDirectory(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks, boolean bbmriEricNationalNetworks, String username, String password) {
         DirectorySynchronizeTask directorySynchronizeTask = new DirectorySynchronizeTask();
-        directorySynchronizeTask.runDirectorySync(directoryId, name, dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks, username, password);
+        directorySynchronizeTask.runDirectorySync(directoryId, name, dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks, bbmriEricNationalNetworks, username, password);
     }
 }
