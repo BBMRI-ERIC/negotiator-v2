@@ -67,8 +67,10 @@ public class DirectorySynchronizeTask extends TimerTask {
             for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
                 if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
                     logger.info("Synchronization with the directory: " + listOfDirectoriesRecord.getId() + " - " + listOfDirectoriesRecord.getName());
-                    int[] size = runDirectorySync(listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName(), listOfDirectoriesRecord.getUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
-                            listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getResourceNetworks(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
+                    int[] size = runDirectorySync(listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName(), listOfDirectoriesRecord.getUrl(),
+                            listOfDirectoriesRecord.getResourceBiobanks(), listOfDirectoriesRecord.getResourceCollections(),
+                            listOfDirectoriesRecord.getResourceNetworks(), true,
+                            listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
                     if(size.length == 3) {
                         biobanks += size[0];
                         collections += size[1];
@@ -85,7 +87,9 @@ public class DirectorySynchronizeTask extends TimerTask {
         }
     }
 
-    public int[] runDirectorySync(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks, String username, String password) {
+    public int[] runDirectorySync(int directoryId, String name, String dirBaseUrl, String resourceBiobanks,
+                                  String resourceCollections, String resourceNetworks, Boolean bbmriEricNationalNetworks,
+                                  String username, String password) {
         logger.info("Starting synchronization with the directory: " + directoryId + " - " + name);
         try(Config config = ConfigFactory.get()) {
             Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
@@ -96,9 +100,9 @@ public class DirectorySynchronizeTask extends TimerTask {
             }
 
             DirectoryClient client = getDirectoryClient(dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks, username, password, updateNetworks);
-            int numberOfNetworks = syncroniceNetworks(directoryId, config, client);
-            int numberOfBiobanks = synchronizeBiobanks(directoryId, config, client);
-            int numberOfCollections = synchronizedCollections(directoryId, config, client);
+            int numberOfNetworks = syncroniceNetworks(directoryId, config, client, updateNetworks);
+            int numberOfBiobanks = synchronizeBiobanks(directoryId, config, client, updateNetworks);
+            int numberOfCollections = synchronizedCollections(directoryId, config, client, updateNetworks);
 
             logger.info("Synchronization with the directory finished. Biobanks: " + numberOfBiobanks + ", Collections:" + numberOfCollections + ", Networks: " + numberOfNetworks);
             config.commit();
@@ -113,8 +117,8 @@ public class DirectorySynchronizeTask extends TimerTask {
         }
     }
 
-    @NotNull
-    private DirectoryClient getDirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks, String username, String password, Boolean updateNetworks) {
+    private DirectoryClient getDirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections,
+                                               String resourceNetworks, String username, String password, Boolean updateNetworks) {
         DirectoryClient client;
         if(!updateNetworks) {
             client = new DirectoryClient(dirBaseUrl,
@@ -128,39 +132,60 @@ public class DirectorySynchronizeTask extends TimerTask {
         return client;
     }
 
-    @NotNull
-    private int synchronizedCollections(int directoryId, Config config, DirectoryClient client) {
-        List<DirectoryCollection> allCollections = client.getAllCollections();
-
-        logger.info("All Collections: " + allCollections.size());
-
-        for(DirectoryCollection dto : allCollections) {
-            logger.info("Run col: " + directoryId);
-            DbUtil.synchronizeCollection(config, dto, directoryId);
+    private int syncroniceNetworks(int directoryId, Config config, DirectoryClient client, boolean updateNetworks) {
+        if(!updateNetworks) {
+            return 0;
         }
-        return allCollections.size();
-    }
-
-    @NotNull
-    private int synchronizeBiobanks(int directoryId, Config config, DirectoryClient client) {
-        List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
-
-        logger.info("All Biobanks: " + allBiobanks.size());
-
-        for(DirectoryBiobank dto : allBiobanks) {
-            logger.info("Run: " + directoryId);
-            DbUtil.synchronizeBiobank(config, dto, directoryId);
-        }
-        logger.info("DirectoryBiobank done");
-        return allBiobanks.size();
-    }
-
-    private int syncroniceNetworks(int directoryId, Config config, DirectoryClient client) {
         List<DirectoryNetwork> allNetworks = client.getAllNetworks();
         logger.info("All Networks: " + allNetworks.size());
         for(DirectoryNetwork directoryNetwork : allNetworks) {
             DbUtil.synchronizeNetwork(config, directoryNetwork, directoryId);
         }
         return allNetworks.size();
+    }
+
+    private int synchronizeBiobanks(int directoryId, Config config, DirectoryClient client, boolean updateNetworks) {
+        List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
+        logger.info("All Biobanks: " + allBiobanks.size());
+
+        for(DirectoryBiobank directoryBiobank : allBiobanks) {
+            logger.info("Run: " + directoryId);
+            DbUtil.synchronizeBiobank(config, directoryBiobank, directoryId);
+            syncroniceBiobankNetworkLink(config, directoryBiobank, directoryId, updateNetworks);
+        }
+
+        logger.info("DirectoryBiobank done");
+        return allBiobanks.size();
+    }
+
+    private void syncroniceBiobankNetworkLink(Config config, DirectoryBiobank directoryBiobank, int directoryId, boolean updateNetworks) {
+        if(!updateNetworks) {
+            return;
+        }
+        DbUtil.updateBiobankNetworkLinks(config, directoryBiobank, directoryId);
+    }
+
+    private int synchronizedCollections(int directoryId, Config config, DirectoryClient client, boolean updateNetworks) {
+        List<DirectoryCollection> allCollections = client.getAllCollections();
+
+        logger.info("All Collections: " + allCollections.size());
+
+        for(DirectoryCollection directoryCollection : allCollections) {
+            logger.info("Run col: " + directoryId);
+            DbUtil.synchronizeCollection(config, directoryCollection, directoryId);
+            syncroniceCollectionNetworkLink(config, directoryCollection, directoryId, updateNetworks);
+        }
+        return allCollections.size();
+    }
+
+    private void syncroniceCollectionNetworkLink(Config config, DirectoryCollection directoryCollection, int directoryId, boolean updateNetworks) {
+        if(!updateNetworks) {
+            return;
+        }
+        DbUtil.updateCollectionNetworkLinks(config, directoryCollection, directoryId);
+    }
+
+    private void updateBbmriEricNationalNodes(Config config, int directoryId) {
+
     }
 }
