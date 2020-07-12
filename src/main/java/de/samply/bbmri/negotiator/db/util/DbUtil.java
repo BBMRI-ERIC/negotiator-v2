@@ -1204,7 +1204,7 @@ public class DbUtil {
             record.setBiobankId(biobankId);
             NetworkRecord networkRecord = DbUtil.getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
             record.setNetworkId(networkRecord.getId());
-            //record.store();
+            record.store();
         }
     }
     
@@ -1223,8 +1223,9 @@ public class DbUtil {
      * @param config database configuration
      * @param directoryCollection collection from the directory
      * @param listOfDirectoryId ID of the directory the collection belongs to
+     * @return
      */
-    public static void synchronizeCollection(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId) {
+    public static CollectionRecord synchronizeCollection(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId) {
         CollectionRecord record = DbUtil.getCollection(config, directoryCollection.getId(), listOfDirectoryId);
 
         if(record == null) {
@@ -1249,11 +1250,22 @@ public class DbUtil {
 
         record.setName(directoryCollection.getName());
         record.store();
+
+        return record;
     }
 
-    public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId) {
-        // - Delete Links
-        // - Add Links
+    public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId, int collectionId) {
+        config.dsl().deleteFrom(Tables.NETWORK_COLLECTION_LINK)
+                .where(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(collectionId))
+                .execute();
+
+        for(DirectoryNetworkLink directoryNetworkLink : directoryCollection.getNetworkLinks()) {
+            NetworkCollectionLinkRecord record = config.dsl().newRecord(Tables.NETWORK_COLLECTION_LINK);
+            record.setCollectionId(collectionId);
+            NetworkRecord networkRecord = DbUtil.getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
+            record.setNetworkId(networkRecord.getId());
+            record.store();
+        }
     }
 
     public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int listOfDirectoriesId) {
@@ -1273,6 +1285,28 @@ public class DbUtil {
             record.setListOfDirectoriesId(listOfDirectoriesId);
         }
         record.store();
+    }
+
+    public static void updateNetworkBiobankLinks(Config config, String nnacronym, String directoryIdStart) {
+        config.dsl().execute("INSERT INTO public.network_biobank_link(biobank_id, network_id) " +
+                "SELECT bio.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "FROM public.biobank bio WHERE bio.directory_id ILIKE '" + directoryIdStart + "' " +
+                "AND id NOT IN ( " +
+                "SELECT b.id FROM public.biobank b " +
+                "JOIN public.network_biobank_link nb ON nb.biobank_id = b.id " +
+                "JOIN public.network n ON nb.network_id = n.id " +
+                "WHERE n.acronym = '" + nnacronym + "')");
+    }
+
+    public static void updateNetworkCollectionLinks(Config config, String nnacronym, String directoryIdStart) {
+        config.dsl().execute("INSERT INTO public.network_collection_link(collection_id, network_id) " +
+                "SELECT col.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "FROM public.collection col WHERE col.directory_id ILIKE '" + directoryIdStart + "' " +
+                "AND id NOT IN ( " +
+                "SELECT c.id FROM public.collection c " +
+                "JOIN public.network_collection_link nc ON nc.collection_id = c.id " +
+                "JOIN public.network n ON nc.network_id = n.id " +
+                "WHERE n.acronym = '" + nnacronym + "')");
     }
 
     /*
