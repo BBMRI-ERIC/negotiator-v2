@@ -44,6 +44,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.docuverse.identicon.IdenticonUtil;
 
 import com.nimbusds.jwt.JWTClaimsSet;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
 import eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient;
 import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidKeyException;
 import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidTokenException;
@@ -84,6 +85,7 @@ public class UserBean implements Serializable {
 	 */
 	public static final String DUMMY_DATA_SUBJECT_RESEARCHER = "https://auth-dev.mitro.dkfz.de/users/8";
 	public static final String DUMMY_DATA_SUBJECT_BIOBANK_OWNER = "https://auth-dev.mitro.dkfz.de/users/7";
+	public static final String DUMMY_DATA_SUBJECT_NATIONAL_NODE_REPRESENTATIVE = "https://auth-dev.mitro.dkfz.de/users/9";
 
 	/**
 	 * The current userEmail (email). Null if the login is not valid
@@ -114,6 +116,8 @@ public class UserBean implements Serializable {
 	 * If the user is a researcher or not.
 	 */
 	private Boolean researcher = false;
+
+	private Boolean nationalNodeRepresentative = false;
 
 	/**
 	 * If the user is a BBMRI-ERIC reviewer or not.
@@ -158,6 +162,8 @@ public class UserBean implements Serializable {
 	 * The collections of this user
 	 */
 	private List<Collection> collections;
+
+	private List<Network> networks;
 
     /**
      * The identity string of the user who sudo'd another
@@ -497,8 +503,11 @@ public class UserBean implements Serializable {
 			 * Check if the user is a biobanker
 			 */
             collections = DbUtil.getCollections(config, person.getId());
-
             biobankOwner = collections.size() > 0;
+
+            // Check if user is NationalNodeRepresentative
+			networks = DbUtil.getNetworks(config, person.getId());
+			nationalNodeRepresentative = networks.size() > 0;
 
             this.person = config.map(person, Person.class);
 
@@ -795,4 +804,12 @@ public class UserBean implements Serializable {
     public void setCollections(List<Collection> collections) {
         this.collections = collections;
     }
+
+	public Boolean getNationalNodeRepresentative() {
+		return nationalNodeRepresentative;
+	}
+
+	public void setNationalNodeRepresentative(Boolean nationalNodeRepresentative) {
+		this.nationalNodeRepresentative = nationalNodeRepresentative;
+	}
 }

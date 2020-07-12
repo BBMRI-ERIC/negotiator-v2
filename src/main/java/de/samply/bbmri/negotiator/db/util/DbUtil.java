@@ -37,6 +37,7 @@ import java.util.*;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
@@ -1532,6 +1533,17 @@ public class DbUtil {
                                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                                 .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
                 )).fetch(), Collection.class);
+    }
+
+    public static List<Network> getNetworks(Config config, int userId) {
+        return config.map(config.dsl().selectFrom(Tables.NETWORK)
+                .where(Tables.COLLECTION.ID.in(
+                        config.dsl().select(Tables.NETWORK.ID)
+                                .from(Tables.NETWORK)
+                                .join(Tables.PERSON_NETWORK)
+                                .on(Tables.PERSON_NETWORK.NETWORK_ID.eq(Tables.NETWORK.ID))
+                                .where(Tables.PERSON_NETWORK.PERSON_ID.eq(userId))
+                )).fetch(), Network.class);
     }
 
     public static List<Collection> getCollections(Config config) {
