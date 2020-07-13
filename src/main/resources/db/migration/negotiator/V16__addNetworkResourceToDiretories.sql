@@ -25,7 +25,7 @@ SELECT 'BBMRI.' || substring(directory_id, 15, 2) AS name, substring(directory_i
        'BBMRI.' || substring(directory_id, 15, 2) AS acronym,
        'bbmri-eric:networkID:BBMRI.' || substring(directory_id, 15, 2) directory_id, MAX(list_of_directories_id) list_of_directories_id
 FROM public.biobank
-WHERE directory_id ILIKE 'bbmri-eric%' AND list_of_directories_id = 1
+WHERE directory_id ILIKE 'bbmri-eric%' AND list_of_directories_id = 5
   AND substring(directory_id, 15, 2) != 'FI' AND substring(directory_id, 15, 2) != 'DE'
   AND substring(directory_id, 15, 2) != 'NO' AND substring(directory_id, 15, 2) != 'PL'
   AND substring(directory_id, 15, 2) != 'CH'

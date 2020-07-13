@@ -1537,7 +1537,7 @@ public class DbUtil {
 
     public static List<Network> getNetworks(Config config, int userId) {
         return config.map(config.dsl().selectFrom(Tables.NETWORK)
-                .where(Tables.COLLECTION.ID.in(
+                .where(Tables.NETWORK.ID.in(
                         config.dsl().select(Tables.NETWORK.ID)
                                 .from(Tables.NETWORK)
                                 .join(Tables.PERSON_NETWORK)
@@ -2367,12 +2367,69 @@ public class DbUtil {
     public static List<QueryRecord> getNumberOfQueries() {
         List<QueryRecord> returnList = new ArrayList();
         try (Config config = ConfigFactory.get()) {
-            return config.dsl().selectFrom(Tables.QUERY).fetch();
+            return config.dsl().selectFrom(Tables.QUERY).orderBy(Tables.QUERY.QUERY_CREATION_TIME).fetch();
         } catch (SQLException e) {
             System.err.println("ERROR getting open Request Status.");
             e.printStackTrace();
         }
         return returnList;
+    }
+
+    public static List<QueryRecord> getNumberOfQueriesAssociatedWithNetwork(Config config, Integer networkId) {
+        Result<Record> record = config.dsl().select(getFields(Tables.QUERY))
+                .from(Tables.QUERY)
+                .join(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.QUERY_ID.eq(Tables.QUERY.ID))
+                .join(Tables.NETWORK_COLLECTION_LINK).on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                .where(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID.eq(networkId))
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME)
+                .fetch();
+        return config.map(record, QueryRecord.class);
+    }
+
+    public static Long getNumberOfBiobanksInNetwork(Config config, Integer networkId) {
+        Result<Record> result = config.dsl().resultQuery("SELECT COUNT(*) FROM network_biobank_link WHERE network_id = " + networkId + ";").fetch();
+        for(Record record : result) {
+            return (Long)record.getValue(0);
+        }
+        return 0L;
+    }
+
+    public static Long getNumberOfCollectionsInNetwork(Config config, Integer networkId) {
+        Result<Record> result = config.dsl().resultQuery("SELECT COUNT(*) FROM network_collection_link WHERE network_id = " + networkId + ";").fetch();
+        for(Record record : result) {
+            return (Long)record.getValue(0);
+        }
+        return 0L;
+    }
+
+    public static Long getNumberOfAssociatedUsersInNetwork(Config config, Integer networkId) {
+        Result<Record> result = config.dsl().resultQuery("SELECT COUNT(*) FROM (SELECT person_id FROM network_collection_link ncl " +
+                "JOIN person_collection pc ON ncl.collection_id = pc.collection_id " +
+                "WHERE network_id = " + networkId + " GROUP BY person_id) sub;").fetch();
+        for(Record record : result) {
+            return (Long)record.getValue(0);
+        }
+        return 0L;
+    }
+
+    public static String getNetworkDashboardStatiticForNetwork(Config config, Integer networkId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(subjson))) AS varchar) FROM " +
+                "(SELECT sub1.date, COUNT(sub1.id) number_of_queries, COUNT(sub2.id) number_of_network_queries FROM " +
+                "(SELECT q.id, substring(MAX(q.query_creation_time)::text, 0, 11)::date date FROM public.query q " +
+                "JOIN public.query_collection qc ON q.id = qc.query_id " +
+                "JOIN public.network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
+                "GROUP BY q.id) sub1 " +
+                "LEFT JOIN ( " +
+                "SELECT q.id, substring(MAX(q.query_creation_time)::text, 0, 11)::date date FROM public.query q " +
+                "JOIN public.query_collection qc ON q.id = qc.query_id " +
+                "JOIN public.network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
+                "WHERE ncl.network_id = 24 GROUP BY q.id) sub2 ON sub1.id = sub2.id " +
+                "GROUP BY sub1.date) subjson;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            return (String)record.getValue(0);
+        }
+        return "";
     }
 
     public static String getDataForDashboardRequestLineGraph() {

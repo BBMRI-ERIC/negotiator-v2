@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.docuverse.identicon.IdenticonUtil;
 
-import com.nimbusds.jwt.JWTClaimsSet;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
 import eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient;
 import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidKeyException;
@@ -64,7 +63,6 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
-import org.jooq.util.derby.sys.Sys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -811,5 +809,9 @@ public class UserBean implements Serializable {
 
 	public void setNationalNodeRepresentative(Boolean nationalNodeRepresentative) {
 		this.nationalNodeRepresentative = nationalNodeRepresentative;
+	}
+
+	public List<Network> getNetworks() {
+		return networks;
 	}
 }
