@@ -71,7 +71,7 @@
                 </h:panelGroup>
 
 
-                <!-- Number of Requests Start -->
+                <!-- Number of Requests Chart Start -->
                 <style>
                     #chartdiv {
                         width: 100%;
@@ -142,7 +142,38 @@
 
                     }); // end am4core.ready()
                 </h:outputScript>
-                <!-- Number of Requests END -->
+                <!-- Number of Requests Chart END -->
+
+                <!-- Table of Searches Start -->
+
+                <h:panelGroup layout="block" styleClass="row" style="margin-top: 10px;">
+                    <div class="card bg-light border-light">
+                        <div class="card-header negotiator-dashboard-card-header">
+                            #{label['dashboard.header.search']}
+                        </div>
+
+                        <div class="card-body container" style="padding: 5px;">
+                            <table id="example" class="display" width="100%"></table>
+                        </div>
+                    </div>
+
+                    <h:outputScript>
+                        var dataSet =#{networkBean.jsonHumanReadableForNetwork}
+
+                        $(document).ready(function() {
+                        $('#example').DataTable( {
+                        data: dataSet,
+                        columns: [
+                        { "data": "readable", title: "Search" },
+                        { "data": "count_all", title: "Count All" },
+                        { "data": "count_network", title: "Count #{networkBean.networkName}" }
+                        ]
+                        } );
+                        } );
+                    </h:outputScript>
+                </h:panelGroup>
+
+                <!-- Table of Searches End -->
 
             </h:panelGroup>
         </c:if>

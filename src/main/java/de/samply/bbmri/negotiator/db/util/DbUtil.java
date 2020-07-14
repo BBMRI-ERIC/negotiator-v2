@@ -2386,6 +2386,35 @@ public class DbUtil {
         return config.map(record, QueryRecord.class);
     }
 
+    public static List<CollectionRecord> getCollectionsForNetwork(Config config, Integer networkId) {
+        Result<Record> record = config.dsl().select(getFields(Tables.COLLECTION))
+                .from(Tables.COLLECTION)
+                .join(Tables.NETWORK_COLLECTION_LINK).on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID.eq(networkId))
+                .fetch();
+        return config.map(record, CollectionRecord.class);
+    }
+
+    public static String getCollectionForNetworkAsJson(Config config, Integer networkId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
+                "SELECT directory, collection_id, biobank_name, collection_name, STRING_AGG(user_name, '<br>') collection_users FROM ( " +
+                "SELECT lod.name directory, c.directory_id collection_id, b.name biobank_name, c.name collection_name, p.auth_name || ' (' || p.auth_email || ')' user_name " +
+                "FROM public.collection c " +
+                "JOIN public.network_collection_link ncl ON c.id = ncl.collection_id " +
+                "LEFT JOIN public.person_collection pc ON c.id = pc.collection_id " +
+                "LEFT JOIN public.person p ON pc.person_id = p.id " +
+                "JOIN biobank b ON c.biobank_id = b.id " +
+                "JOIN list_of_directories lod ON c.list_of_directories_id = lod.id " +
+                "WHERE ncl.network_id = " + networkId + " ) sub " +
+                "GROUP BY directory, collection_id, biobank_name, collection_name " +
+                ") jsonc;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            return (String)record.getValue(0);
+        }
+        return "";
+    }
+
     public static Long getNumberOfBiobanksInNetwork(Config config, Integer networkId) {
         Result<Record> result = config.dsl().resultQuery("SELECT COUNT(*) FROM network_biobank_link WHERE network_id = " + networkId + ";").fetch();
         for(Record record : result) {
@@ -2471,5 +2500,25 @@ public class DbUtil {
             e.printStackTrace();
         }
         return "ERROR";
+    }
+
+    public static String getHumanReadableStatisticsForNetwork(Config config, Integer networkId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
+                "SELECT sub1.readable, COUNT(*) count_all, COUNT(sub2.readable) count_network FROM ( " +
+                "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q GROUP BY q.id) sub1 " +
+                "LEFT JOIN ( " +
+                "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q " +
+                "JOIN query_collection qc ON q.id = qc.query_id " +
+                "JOIN network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
+                "WHERE network_id = " + networkId +
+                " GROUP BY q.id) sub2 " +
+                "ON sub1.readable = sub2.readable " +
+                "GROUP BY sub1.readable " +
+                ") jsonc;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            return (String)record.getValue(0);
+        }
+        return "";
     }
 }

@@ -33,6 +33,7 @@ public class NetworkBean implements Serializable {
     private Long numberOfCollections;
     private Long numberOfAssociatedUsers;
     private String jsonQueryForNetwork;
+    private String jsonHumanReadableForNetwork;
 
     @PostConstruct
     public void init() {
@@ -48,6 +49,7 @@ public class NetworkBean implements Serializable {
             numberOfBiobanks = DbUtil.getNumberOfBiobanksInNetwork(config, networkId);
             numberOfCollections = DbUtil.getNumberOfCollectionsInNetwork(config, networkId);
             numberOfAssociatedUsers = DbUtil.getNumberOfAssociatedUsersInNetwork(config, networkId);
+            jsonHumanReadableForNetwork = DbUtil.getHumanReadableStatisticsForNetwork(config, networkId);
         } catch (Exception e) {
             System.err.println("5303c8e4aa09-NetworkBean ERROR-NG-0000048: Error initializing NetworkBean.");
             e.printStackTrace();
@@ -116,5 +118,13 @@ public class NetworkBean implements Serializable {
 
     public void setNumberOfAssociatedUsers(Long numberOfAssociatedUsers) {
         this.numberOfAssociatedUsers = numberOfAssociatedUsers;
+    }
+
+    public String getJsonHumanReadableForNetwork() {
+        return jsonHumanReadableForNetwork;
+    }
+
+    public void setJsonHumanReadableForNetwork(String jsonHumanReadableForNetwork) {
+        this.jsonHumanReadableForNetwork = jsonHumanReadableForNetwork;
     }
 }

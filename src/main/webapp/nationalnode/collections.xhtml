@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+                template="../components/default.xhtml">
+
+    <f:metadata>
+        <f:viewParam name="networkName" value="#{networkCollectionsBean.networkName}" />
+        <f:viewParam name="networkId" value="#{networkCollectionsBean.networkId}" />
+        <f:viewAction action="#{networkCollectionsBean.initialize}" />
+    </f:metadata>
+
+    <ui:param name="bodyClass" value="container body-nomargin" />
+
+    <ui:define name="body">
+
+        <!-- Table of Collections Start -->
+
+        <h:panelGroup layout="block" styleClass="row" style="margin-top: 10px;">
+            <div class="card bg-light border-light">
+                <div class="card-header negotiator-dashboard-card-header">
+                    Collections for #{networkCollectionsBean.networkName}
+                </div>
+
+                <div class="card-body container" style="padding: 5px;">
+                    <table id="example" class="display" width="100%"></table>
+                </div>
+            </div>
+
+            <h:outputScript>
+                var dataSet =#{networkCollectionsBean.collectionJson}
+
+                $(document).ready(function() {
+                $('#example').DataTable( {
+                data: dataSet,
+                columns: [
+                    { "data": "directory", title: "Directory" },
+                    { "data": "collection_id", title: "CollectionId" },
+                    { "data": "biobank_name", title: "Biobank Name" },
+                    { "data": "collection_name", title: "Collection Name" },
+                    { "data": "collection_users", title: "Users" }
+                ]
+                } );
+                } );
+            </h:outputScript>
+        </h:panelGroup>
+
+        <!-- Table of Collections End -->
+
+    </ui:define>
+</ui:composition>
