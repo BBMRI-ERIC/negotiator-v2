@@ -2415,6 +2415,41 @@ public class DbUtil {
         return "";
     }
 
+    public static String getRequestsForNetworkAsJson(Config config, Integer networkId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
+                "SELECT q.id query_id, q.title query_title, b.id biobank_id, b.name biobank_name, b.directory_id biobank_directory_id, " +
+                "MAX(q.negotiation_started_time) start_time, " +
+                "LEAST(MIN(com.comment_time), MIN(o.comment_time), MIN(qlc.status_date)) response_time," +
+                "GREATEST(MAX(com.comment_time), MAX(o.comment_time), MAX(qlc_last.status_date)) last_response," +
+                "age(LEAST(MIN(com.comment_time), MIN(o.comment_time), MIN(qlc.status_date)), MAX(q.negotiation_started_time)) time_to_response," +
+                "age(GREATEST(MAX(com.comment_time), MAX(o.comment_time), MAX(qlc_last.status_date))) time_from_last_response, " +
+                "COUNT(DISTINCT c.id) number_of_collections, COUNT(DISTINCT qlc_abandoned.id) number_of_collections_abandoned," +
+                "COUNT(DISTINCT pc.person_id) number_of_persons " +
+                "FROM public.query q " +
+                "JOIN public.query_collection qc ON q.id = qc.query_id " +
+                "JOIN public.collection c ON qc.collection_id = c.id " +
+                "JOIN public.biobank b ON c.biobank_id = b.id " +
+                "LEFT JOIN public.network_biobank_link nbl ON nbl.biobank_id = b.id " +
+                "LEFT JOIN public.network_collection_link ncl ON ncl.collection_id = c.id " +
+                "LEFT JOIN public.person_collection pc ON pc.collection_id = c.id " +
+                "LEFT JOIN public.comment com ON com.person_id = pc.person_id AND q.id = com.query_id " +
+                "LEFT JOIN public.offer o ON o.biobank_in_private_chat = b.id AND q.id = o.query_id " +
+                "LEFT JOIN public.query_lifecycle_collection qlc " +
+                "ON c.id = qlc.collection_id AND q.id = qlc.query_id AND (qlc.status_type = 'abandoned' OR qlc.status_type = 'availability') " +
+                "LEFT JOIN public.query_lifecycle_collection qlc_last " +
+                "ON c.id = qlc_last.collection_id AND q.id = qlc_last.query_id " +
+                "LEFT JOIN public.query_lifecycle_collection qlc_abandoned " +
+                "ON c.id = qlc_abandoned.collection_id AND q.id = qlc_abandoned.query_id AND qlc_abandoned.status_type = 'abandoned' " +
+                "WHERE (ncl.network_id = " + networkId + " OR nbl.network_id = " + networkId + ") " +
+                "GROUP BY q.id, q.title, b.id, b.name, b.directory_id " +
+                ") jsonc;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            return (String)record.getValue(0);
+        }
+        return "";
+    }
+
     public static Long getNumberOfBiobanksInNetwork(Config config, Integer networkId) {
         Result<Record> result = config.dsl().resultQuery("SELECT COUNT(*) FROM network_biobank_link WHERE network_id = " + networkId + ";").fetch();
         for(Record record : result) {
