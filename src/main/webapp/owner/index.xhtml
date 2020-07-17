@@ -103,7 +103,7 @@
                                     </h:panelGroup>
 
                                     <div class="badge queryNumberResponsesBadge"
-                                         style='#{queryDto.commentCount == 0 ? "display:none;" : "" }'
+                                         style='#{queryDto.commentCount == 0 ? "display:none;" : "" }#{queryDto.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
                                          data-toggle="tooltip"
                                          data-placement="bottom"
                                          title="#{queryDto.unreadCommentCount} unread comments from #{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}">

@@ -87,7 +87,7 @@
                     </h:panelGroup>
 
                     <div class="badge queryNumberResponsesBadge"
-                         style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }'
+                         style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }#{cc.attrs.item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
                          data-toggle="tooltip"
                          data-placement="bottom"
                          title="#{cc.attrs.item.unreadCommentCount} unread comments from #{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">

@@ -138,7 +138,7 @@
 										rendered="#{item.commentCount > 0 or item.privateNegotiationCount > 0}">
 
 										<div class="badge queryNumberResponsesBadge"
-											 style='#{item.commentCount == 0 ? "display:none;" : "" }'
+											 style='#{item.commentCount == 0 ? "display:none;" : "" }#{item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
 											 data-toggle="tooltip"
 											 data-placement="bottom"
 											 title="#{item.unreadCommentCount} unread comments from #{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
