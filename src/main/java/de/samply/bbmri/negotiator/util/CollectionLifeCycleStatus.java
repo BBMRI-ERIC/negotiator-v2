@@ -5,10 +5,8 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
-import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
-import de.samply.bbmri.negotiator.model.RequestStatusDTO;
-import de.samply.bbmri.negotiator.util.requestStatus.*;
+import eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,6 @@
 package de.samply.bbmri.negotiator.util;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
-import de.samply.bbmri.negotiator.util.requestStatus.RequestStatusReview;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;

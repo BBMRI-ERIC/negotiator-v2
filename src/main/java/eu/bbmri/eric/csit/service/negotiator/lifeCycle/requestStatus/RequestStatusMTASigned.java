@@ -1,4 +1,4 @@
-package de.samply.bbmri.negotiator.util.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 
@@ -6,17 +6,19 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusReceivedSamplesData implements RequestStatus {
+public class RequestStatusMTASigned implements RequestStatus {
 
     private String status = null;
-    private String statusType = "receivedSamples";
-    private String statusText = "Samples/Data received.";
+    private String statusType = "mtaSigned";
+    private String statusText = "MTA and Paperwork for shipping signed.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("not_interrested", "end");
-    private List allowedNextStatusBiobanker = Arrays.asList("abandoned.not_interrested");
-    private List allowedNextStatusResearcher = Arrays.asList("notselected.notselected", "endOfProject.end");
+    private List allowedNextStatus = Arrays.asList("not_interrested", "shipped");
 
-    public RequestStatusReceivedSamplesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    private List allowedNextStatusBiobanker = Arrays.asList("notselected.notselected", "shippedSamples.shipped", "abandoned.not_interrested");
+
+    private List allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse");
+
+    public RequestStatusMTASigned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
     }

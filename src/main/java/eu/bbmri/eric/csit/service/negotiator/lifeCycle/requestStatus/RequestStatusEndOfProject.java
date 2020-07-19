@@ -1,4 +1,4 @@
-package de.samply.bbmri.negotiator.util.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 

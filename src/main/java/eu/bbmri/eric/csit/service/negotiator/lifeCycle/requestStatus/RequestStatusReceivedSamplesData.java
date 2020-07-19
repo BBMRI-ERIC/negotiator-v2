@@ -1,30 +1,24 @@
-package de.samply.bbmri.negotiator.util.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
-import org.jooq.tools.json.JSONObject;
-import org.jooq.tools.json.JSONParser;
-import org.jooq.tools.json.ParseException;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusShippedSampesData implements RequestStatus {
+public class RequestStatusReceivedSamplesData implements RequestStatus {
 
     private String status = null;
-    private String statusType = "shippedSamples";
-    private String statusText = "Shipped Samples/Data.";
+    private String statusType = "receivedSamples";
+    private String statusText = "Samples/Data received.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("not_interrested", "received");
+    private List allowedNextStatus = Arrays.asList("not_interrested", "end");
     private List allowedNextStatusBiobanker = Arrays.asList("abandoned.not_interrested");
-    private List allowedNextStatusResearcher = Arrays.asList("notselected.notselected", "receivedSamples.received");
+    private List allowedNextStatusResearcher = Arrays.asList("notselected.notselected", "endOfProject.end");
 
-    public RequestStatusShippedSampesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusReceivedSamplesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
-        if(status.equals("shipped")) {
-            statusText = "Shipped Number: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "shippedNumber");
-        }
     }
 
     @Override
@@ -70,21 +64,5 @@ public class RequestStatusShippedSampesData implements RequestStatus {
     @Override
     public String getTableRow() {
         return "<tr><td>" + statusDate + "</td><td>contacted</td><td></td><td></tr>";
-    }
-
-    private String getStatusTextFromJson(String statusJsonString, String jsonKey) {
-        String returnText = "";
-        if(statusJsonString == null) {
-            return returnText;
-        }
-        try {
-            JSONObject statusJson = (JSONObject)new JSONParser().parse(statusJsonString);
-            if(statusJson.containsKey(jsonKey)) {
-                returnText = statusJson.get(jsonKey).toString();
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return returnText;
     }
 }

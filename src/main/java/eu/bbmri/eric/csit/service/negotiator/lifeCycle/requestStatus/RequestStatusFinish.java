@@ -1,4 +1,4 @@
-package de.samply.bbmri.negotiator.util.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 
@@ -6,16 +6,14 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusStart implements RequestStatus {
+public class RequestStatusFinish implements RequestStatus {
 
-    private String status = null;
-    private String statusType = "start";
-    private String statusText = "Start Negotiation";
+    private String statusType = "finish";
+    private String statusText = "Request finished";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("started", "abandoned");
+    private List allowedNextStatus = Arrays.asList("review");
 
-    public RequestStatusStart(RequestStatusDTO requestStatus) {
-        status = requestStatus.getStatus();
+    public RequestStatusFinish(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
     }
 
@@ -26,7 +24,7 @@ public class RequestStatusStart implements RequestStatus {
 
     @Override
     public String getStatus() {
-        return status;
+        return "finished";
     }
 
     @Override
@@ -46,7 +44,7 @@ public class RequestStatusStart implements RequestStatus {
 
     @Override
     public List getAllowedNextStatus() {
-        return allowedNextStatus;
+        return null;
     }
 
     @Override
@@ -61,6 +59,6 @@ public class RequestStatusStart implements RequestStatus {
 
     @Override
     public String getTableRow() {
-        return "<tr><td>null</td><td>start</td><td></td><td></tr>";
+        return "<tr><td>" + statusDate + "</td><td>finish</td><td></td><td></tr>";
     }
 }
