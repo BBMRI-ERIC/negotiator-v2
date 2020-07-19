@@ -31,7 +31,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;

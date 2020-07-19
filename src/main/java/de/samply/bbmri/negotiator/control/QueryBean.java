@@ -46,7 +46,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
-import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

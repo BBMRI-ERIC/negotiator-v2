@@ -6,7 +6,7 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
-import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -18,7 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 @ManagedBean
 @ViewScoped

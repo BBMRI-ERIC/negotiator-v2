@@ -1,7 +1,7 @@
 package de.samply.bbmri.negotiator.util.requestStatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
-import eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus.RequestStatusAbandoned;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusAbandoned;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

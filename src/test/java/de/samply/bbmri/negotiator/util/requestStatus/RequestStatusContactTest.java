@@ -1,7 +1,7 @@
 package de.samply.bbmri.negotiator.util.requestStatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
-import eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus.RequestStatusContact;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusContact;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -73,7 +73,9 @@ public class RequestStatusContactTest {
     void testAllowedNextStatusList() {
         Mockito.lenient().when(collectionRequestStatusDTO.getStatusType()).thenReturn("contact");
         Mockito.lenient().when(collectionRequestStatusDTO.getStatusDate()).thenReturn(testDate);
-        List allowedNextStatus = Arrays.asList();
+        List allowedNextStatus = Arrays.asList("contacted", "notreachable", "sample_data_available_accessible",
+                "sample_data_available_not_accessible", "sample_data_not_available_collecatable", "sample_data_not_available",
+                "not_interested");
         assertEquals(allowedNextStatus, requestStatusContact.getAllowedNextStatus());
     }
 

@@ -1,4 +1,4 @@
-package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 
@@ -6,23 +6,19 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusContact implements RequestStatus {
+public class RequestStatusMTASigned implements RequestStatus {
 
     private String status = null;
-    private String statusType = "contact";
-    private String statusText = "Collection representatives not contacted yet.";
+    private String statusType = "mtaSigned";
+    private String statusText = "MTA and Paperwork for shipping signed.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("contacted", "notreachable", "sample_data_available_accessible",
-            "sample_data_available_not_accessible", "sample_data_not_available_collecatable", "sample_data_not_available",
-            "not_interrested");
+    private List allowedNextStatus = Arrays.asList("not_interested", "shipped");
 
-    private List allowedNextStatusBiobanker = Arrays.asList("notselected.notselected", "availability.sample_data_available_accessible",
-            "availability.sample_data_available_not_accessible", "availability.sample_data_not_available_collecatable",
-            "availability.sample_data_not_available", "abandoned.not_interrested");
+    private List allowedNextStatusBiobanker = Arrays.asList("notselected.notselected", "shippedSamples.shipped", "abandoned.not_interested");
 
     private List allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse");
 
-    public RequestStatusContact(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusMTASigned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
     }
@@ -44,14 +40,7 @@ public class RequestStatusContact implements RequestStatus {
 
     @Override
     public String getStatusText() {
-        if(status == null) {
-            return statusText;
-        } else if (status.equals("contacted")) {
-            return "Collection representatives contacted.";
-        } else if (status.equals("notreachable")) {
-            return "Collection representatives not reachable, BBMRI-ERIC has been informed.";
-        }
-        return "ERROR";
+        return statusText;
     }
 
     @Override

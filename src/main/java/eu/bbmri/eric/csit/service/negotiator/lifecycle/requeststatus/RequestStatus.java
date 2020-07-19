@@ -1,4 +1,4 @@
-package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import java.util.Date;
 import java.util.List;

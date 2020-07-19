@@ -1,43 +1,31 @@
-package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusDataReturnOffer implements RequestStatus {
+public class RequestStatusAccessConditions implements RequestStatus {
 
     private String status = null;
-    private String statusType = "dataReturnOffer";
-    private String statusText = "Offer for data return.";
+    private String statusType = "accessConditions";
+    private String statusText = "Access Condition indicated for collection.";
     private Date statusDate = null;
-    private List<String> allowedNextStatus = new ArrayList<String>();
-    private List<String> allowedNextStatusBiobanker = new ArrayList<String>();
-    private List<String> allowedNextStatusResearcher = new ArrayList<String>();
+    private List allowedNextStatus = Arrays.asList("not_interested", "selectAndAcceppt");
 
-    public RequestStatusDataReturnOffer(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    private List allowedNextStatusBiobanker = Arrays.asList("notselected.watingForResponseFromResearcher", "abandoned.not_interested");
+
+    private List allowedNextStatusResearcher = Arrays.asList("accepptConditions.selectAndAcceppt", "abandoned.not_interested");
+
+    public RequestStatusAccessConditions(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
-        if(status == null) {
-            allowedNextStatus.add("not_interrested");
-            allowedNextStatusBiobanker.add("notselected.notselected");
-            allowedNextStatusBiobanker.add("abandoned.not_interrested");
-            allowedNextStatusResearcher.add("notselected.watingForResponse");
-        }
-        if(status.equals("offer")) {
-            statusText = "Data return offer: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "offer");
-            allowedNextStatus.add("not_interrested");
-            allowedNextStatus.add("accepted");
-            allowedNextStatus.add("rejected");
-            allowedNextStatusBiobanker.add("notselected.notselected");
-            allowedNextStatusBiobanker.add("dataReturnOffer.accepted");
-            allowedNextStatusBiobanker.add("dataReturnOffer.rejected");
-            allowedNextStatusBiobanker.add("abandoned.not_interrested");
-            allowedNextStatusResearcher.add("notselected.watingForResponse");
+        if(status.equals("indicateAccessConditions")) {
+            statusText = "Access Condition: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "indicateAccessConditions");
         }
     }
 

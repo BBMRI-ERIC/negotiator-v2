@@ -2,20 +2,14 @@ package de.samply.bbmri.negotiator.control.component;
 
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.util.CollectionLifeCycleStatus;
-import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @ManagedBean
 @ViewScoped

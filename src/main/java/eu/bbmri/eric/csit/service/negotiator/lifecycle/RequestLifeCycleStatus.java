@@ -1,4 +1,4 @@
-package de.samply.bbmri.negotiator.util;
+package eu.bbmri.eric.csit.service.negotiator.lifecycle;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -10,7 +10,8 @@ import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
-import eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus.*;
+import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;

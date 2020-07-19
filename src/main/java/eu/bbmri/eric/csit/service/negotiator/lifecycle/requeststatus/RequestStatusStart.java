@@ -1,19 +1,22 @@
-package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusAbandoned implements RequestStatus {
+public class RequestStatusStart implements RequestStatus {
 
-    private String statusType = "abandoned";
-    private String statusText = "Negotiation abandoned";
+    private String status = null;
+    private String statusType = "start";
+    private String statusText = "Start Negotiation";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList();
+    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
-    public RequestStatusAbandoned(RequestStatusDTO requestStatus) {
+    public RequestStatusStart(RequestStatusDTO requestStatus) {
+        status = requestStatus.getStatus();
         statusDate = requestStatus.getStatusDate();
     }
 
@@ -24,7 +27,7 @@ public class RequestStatusAbandoned implements RequestStatus {
 
     @Override
     public String getStatus() {
-        return "abandoned";
+        return status;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class RequestStatusAbandoned implements RequestStatus {
 
     @Override
     public List getAllowedNextStatus() {
-        return null;
+        return allowedNextStatus;
     }
 
     @Override
@@ -59,6 +62,6 @@ public class RequestStatusAbandoned implements RequestStatus {
 
     @Override
     public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>abandoned</td><td></td><td></tr>";
+        return "<tr><td>null</td><td>start</td><td></td><td></tr>";
     }
 }

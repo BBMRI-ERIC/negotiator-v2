@@ -1,6 +1,7 @@
 package de.samply.bbmri.negotiator.util;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -219,6 +220,7 @@ public class RequestLifeCycleStatusTest {
         initRequestStatusList.add(requestStatusStart);
 
         when(requestStatusAbandoned.getStatusType()).thenReturn("abandoned");
+        when(requestStatusAbandoned.getStatus()).thenReturn("abandoned");
         when(requestStatusAbandoned.getStatusDate()).thenReturn(testRequestStatusAbandonedDate);
         initRequestStatusList.add(requestStatusAbandoned);
 

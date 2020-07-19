@@ -1,38 +1,29 @@
-package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusAvailability implements RequestStatus {
+public class RequestStatusShippedSampesData implements RequestStatus {
 
     private String status = null;
-    private final String statusType = "availability";
-    private String statusText = "Collection has availability not specified yet.";
+    private String statusType = "shippedSamples";
+    private String statusText = "Shipped Samples/Data.";
     private Date statusDate = null;
-    private final List<String> allowedNextStatus = Arrays.asList("not_interrested", "indicateAccessConditions");
-    private final List<String> allowedNextStatusBiobanker = new ArrayList<String>();
-    private final List<String> allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interrested");
+    private List allowedNextStatus = Arrays.asList("not_interested", "received");
+    private List allowedNextStatusBiobanker = Arrays.asList("abandoned.not_interested");
+    private List allowedNextStatusResearcher = Arrays.asList("notselected.notselected", "receivedSamples.received");
 
-    public RequestStatusAvailability(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusShippedSampesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
-        allowedNextStatusBiobanker.add("notselected.notselected");
-        if(status.equalsIgnoreCase("sample_data_available_accessible")) {
-            allowedNextStatusBiobanker.add("accessConditions.indicateAccessConditions");
-        }
-        allowedNextStatusBiobanker.add("abandoned.not_interrested");
-        if(status.equals("sample_data_available_accessible")) {
-            String numberAvaiableSamples = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiableSamples");
-            if(numberAvaiableSamples != null && numberAvaiableSamples.length() > 0) {
-                statusText = "Number of avaiable Samples: " + numberAvaiableSamples;
-            }
+        if(status.equals("shipped")) {
+            statusText = "Shipped Number: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "shippedNumber");
         }
     }
 
@@ -53,10 +44,7 @@ public class RequestStatusAvailability implements RequestStatus {
 
     @Override
     public String getStatusText() {
-        if(status.equals("sample_data_available_accessible")) {
-            return statusText;
-        }
-        return "";
+        return statusText;
     }
 
     @Override

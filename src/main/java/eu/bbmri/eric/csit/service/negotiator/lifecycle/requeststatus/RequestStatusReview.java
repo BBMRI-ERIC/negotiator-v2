@@ -1,6 +1,7 @@
-package eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus;
+package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
@@ -15,7 +16,7 @@ public class RequestStatusReview implements RequestStatus {
     private String statusType = "review";
     private String statusText = "Request under review";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("waitingstart", "abandoned", "approved", "rejected");
+    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
     public RequestStatusReview(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();

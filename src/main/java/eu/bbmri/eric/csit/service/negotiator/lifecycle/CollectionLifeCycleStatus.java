@@ -1,4 +1,4 @@
-package de.samply.bbmri.negotiator.util;
+package eu.bbmri.eric.csit.service.negotiator.lifecycle;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
@@ -6,7 +6,7 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
-import eu.bbmri.eric.csit.service.negotiator.lifeCycle.requestStatus.*;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -42,10 +42,10 @@ import de.samply.bbmri.negotiator.*;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
-import de.samply.bbmri.negotiator.util.CollectionLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
-import de.samply.bbmri.negotiator.util.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.jooq.Record;
 import org.jooq.Result;
 
