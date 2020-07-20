@@ -1,6 +1,8 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
@@ -12,14 +14,14 @@ import java.util.List;
 public class RequestStatusAccessConditions implements RequestStatus {
 
     private String status = null;
-    private String statusType = "accessConditions";
+    private String statusType = LifeCycleRequestStatusType.ACCESS_CONDITIONS;
     private String statusText = "Access Condition indicated for collection.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("not_interested", "selectAndAcceppt");
+    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
-    private List allowedNextStatusBiobanker = Arrays.asList("notselected.watingForResponseFromResearcher", "abandoned.not_interested");
+    private List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
 
-    private List allowedNextStatusResearcher = Arrays.asList("accepptConditions.selectAndAcceppt", "abandoned.not_interested");
+    private List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     public RequestStatusAccessConditions(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();

@@ -2,7 +2,7 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCylceRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -11,7 +11,7 @@ import java.util.List;
 public class RequestStatusStart implements RequestStatus {
 
     private String status = null;
-    private final String statusType = LifeCylceRequestStatusType.START;
+    private final String statusType = LifeCycleRequestStatusType.START;
     private final String statusText = "Start Negotiation";
     private Date statusDate = null;
     private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());

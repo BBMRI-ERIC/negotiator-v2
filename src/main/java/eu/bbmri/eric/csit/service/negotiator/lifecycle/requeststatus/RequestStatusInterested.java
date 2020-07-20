@@ -1,16 +1,15 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class RequestStatusInterested implements RequestStatus {
 
     private final String status = null;
-    private final String statusType = "interest";
+    private final String statusType = LifeCycleRequestStatusType.INTEREST;
     private final String statusText = "Collection is interested in the request.";
     private final Date statusDate = null;
     private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());

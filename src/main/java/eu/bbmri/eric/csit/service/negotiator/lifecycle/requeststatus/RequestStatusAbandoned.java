@@ -1,7 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCylceRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class RequestStatusAbandoned implements RequestStatus {
 
-    private final String statusType = LifeCylceRequestStatusType.ABANDONED;
+    private final String statusType = LifeCycleRequestStatusType.ABANDONED;
     private final String statusText = "Negotiation abandoned";
     private Date statusDate = null;
     private final List allowedNextStatus = Arrays.asList();

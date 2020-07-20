@@ -87,7 +87,7 @@ public class CollectionLifeCycleStatus {
             RequestStatus status = new RequestStatusAccessConditions(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else if(collectionRequestStatusDTO.getStatusType().equals("accepptConditions")) {
-            RequestStatus status = new RequestStatusAccepptCondition(collectionRequestStatusDTO);
+            RequestStatus status = new RequestStatusAcceptConditions(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else if(collectionRequestStatusDTO.getStatusType().equals("mtaSigned")) {
             RequestStatus status = new RequestStatusMTASigned(collectionRequestStatusDTO);

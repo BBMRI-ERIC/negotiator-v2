@@ -1,6 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
@@ -14,7 +15,7 @@ import java.util.List;
 public class RequestStatusAvailability implements RequestStatus {
 
     private String status = null;
-    private final String statusType = "availability";
+    private final String statusType = LifeCycleRequestStatusType.AVAILABILITY;
     private String statusText = "Collection has availability not specified yet.";
     private Date statusDate = null;
     private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
@@ -24,16 +25,13 @@ public class RequestStatusAvailability implements RequestStatus {
     public RequestStatusAvailability(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
-        allowedNextStatusBiobanker.add("notselected.notselected");
+        allowedNextStatusBiobanker.addAll(LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), this.status));
         if(status.equalsIgnoreCase("sample_data_available_accessible")) {
-            allowedNextStatusBiobanker.add("accessConditions.indicateAccessConditions");
-
             String numberAvaiableSamples = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiableSamples");
             if(numberAvaiableSamples != null && numberAvaiableSamples.length() > 0) {
                 statusText = "Number of avaiable Samples: " + numberAvaiableSamples;
             }
         }
-        allowedNextStatusBiobanker.add("abandoned.not_interested");
     }
 
     @Override

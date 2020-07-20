@@ -1,15 +1,16 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusAccepptCondition implements RequestStatus {
+public class RequestStatusAcceptConditions implements RequestStatus {
 
     private String status = null;
-    private String statusType = "accepptConditions";
+    private String statusType = LifeCycleRequestStatusType.ACCESS_CONDITIONS;
     private String statusText = "Acceppt Access Condition indicated for collection and select for further work.";
     private Date statusDate = null;
     private List allowedNextStatus = Arrays.asList("not_interested", "signed");
@@ -18,7 +19,7 @@ public class RequestStatusAccepptCondition implements RequestStatus {
 
     private List allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interested");
 
-    public RequestStatusAccepptCondition(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusAcceptConditions(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
     }

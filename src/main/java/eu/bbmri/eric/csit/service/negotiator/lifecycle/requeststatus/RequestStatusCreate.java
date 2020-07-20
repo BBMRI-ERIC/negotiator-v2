@@ -3,7 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCylceRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -12,7 +12,7 @@ import java.util.List;
 public class RequestStatusCreate implements RequestStatus {
 
     private final String status = LifeCycleRequestStatusStatus.CREATED;
-    private final String statusType = LifeCylceRequestStatusType.CREATED;
+    private final String statusType = LifeCycleRequestStatusType.CREATED;
     private final String statusText = "Request created";
     private Date statusDate = null;
     private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());

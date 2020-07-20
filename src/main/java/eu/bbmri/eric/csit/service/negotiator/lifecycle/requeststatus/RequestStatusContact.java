@@ -2,24 +2,22 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class RequestStatusContact implements RequestStatus {
 
     private String status = null;
-    private String statusType = "contact";
+    private String statusType = LifeCycleRequestStatusType.CONTACT;
     private String statusText = "Collection representatives not contacted yet.";
     private Date statusDate = null;
     private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
-    private List allowedNextStatusBiobanker = Arrays.asList("notselected.notselected", "availability.sample_data_available_accessible",
-            "availability.sample_data_available_not_accessible", "availability.sample_data_not_available_collecatable",
-            "availability.sample_data_not_available", "abandoned.not_interested");
+    private List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
 
-    private List allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse");
+    private List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     public RequestStatusContact(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
