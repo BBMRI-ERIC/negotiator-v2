@@ -1,7 +1,9 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCylceRequestStatusType;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
@@ -13,19 +15,19 @@ import java.util.List;
 public class RequestStatusReview implements RequestStatus {
 
     private String status = null; // under_review, rejected, approved
-    private String statusType = "review";
+    private final String statusType = LifeCylceRequestStatusType.REVIEW;
     private String statusText = "Request under review";
     private Date statusDate = null;
-    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
     public RequestStatusReview(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
         status = requestStatus.getStatus();
         if(status == null) {
-            status = "under_review";
-        } else if(status.equals("rejected")) {
+            status = LifeCycleRequestStatusStatus.UNDER_REVIEW;
+        } else if(status.equals(LifeCycleRequestStatusStatus.REJECTED)) {
             statusText = getStatusTextFromJson(requestStatus.getStatusJson(), "statusRejectedText");
-        } else if(status.equals("approved")) {
+        } else if(status.equals(LifeCycleRequestStatusStatus.APPROVED)) {
             statusText = getStatusTextFromJson(requestStatus.getStatusJson(), "statusApprovedText");
         }
     }

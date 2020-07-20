@@ -10,8 +10,8 @@ WHERE q.json_text IS NOT NULL AND q.json_text != '' AND
 
 UPDATE public.json_query q SET query_create_time = sub_update.new_date FROM
 (SELECT qm.id update_id, (qb.query_create_time + (qa.query_create_time - qb.query_create_time)/2) new_date FROM public.json_query qm
-JOIN public.json_query qb ON qb.id = (SELECT MAX(subqm.id) FROM public.json_query subqm WHERE subqm.id < qm.id)
-JOIN public.json_query qa ON qa.id = (SELECT MIN(subqm.id) FROM public.json_query subqm WHERE subqm.id > qm.id)
+JOIN public.json_query qb ON qb.id = (SELECT MAX(subqm.id) FROM public.json_query subqm WHERE subqm.id < qm.id AND subqm.query_create_time != qm.query_create_time)
+JOIN public.json_query qa ON qa.id = (SELECT MIN(subqm.id) FROM public.json_query subqm WHERE subqm.id > qm.id AND subqm.query_create_time != qm.query_create_time)
 WHERE qm.query_create_time = (SELECT query_create_time
 FROM public.json_query GROUP BY query_create_time ORDER BY COUNT(*) DESC LIMIT 1)
 ORDER BY qm.id) sub_update

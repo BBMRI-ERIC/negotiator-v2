@@ -1,7 +1,9 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCylceRequestStatusType;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -9,11 +11,11 @@ import java.util.List;
 
 public class RequestStatusCreate implements RequestStatus {
 
-    private String status = "created";
-    private String statusType = "created";
-    private String statusText = "Request created";
+    private final String status = LifeCycleRequestStatusStatus.CREATED;
+    private final String statusType = LifeCylceRequestStatusType.CREATED;
+    private final String statusText = "Request created";
     private Date statusDate = null;
-    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
     public RequestStatusCreate(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();

@@ -1,6 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
@@ -16,7 +17,7 @@ public class RequestStatusAvailability implements RequestStatus {
     private final String statusType = "availability";
     private String statusText = "Collection has availability not specified yet.";
     private Date statusDate = null;
-    private final List<String> allowedNextStatus = Arrays.asList("not_interested", "indicateAccessConditions");
+    private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private final List<String> allowedNextStatusBiobanker = new ArrayList<String>();
     private final List<String> allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interested");
 
@@ -26,14 +27,13 @@ public class RequestStatusAvailability implements RequestStatus {
         allowedNextStatusBiobanker.add("notselected.notselected");
         if(status.equalsIgnoreCase("sample_data_available_accessible")) {
             allowedNextStatusBiobanker.add("accessConditions.indicateAccessConditions");
-        }
-        allowedNextStatusBiobanker.add("abandoned.not_interested");
-        if(status.equals("sample_data_available_accessible")) {
+
             String numberAvaiableSamples = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiableSamples");
             if(numberAvaiableSamples != null && numberAvaiableSamples.length() > 0) {
                 statusText = "Number of avaiable Samples: " + numberAvaiableSamples;
             }
         }
+        allowedNextStatusBiobanker.add("abandoned.not_interested");
     }
 
     @Override

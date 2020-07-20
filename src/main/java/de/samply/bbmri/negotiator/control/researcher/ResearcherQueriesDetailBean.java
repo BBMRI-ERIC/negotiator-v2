@@ -267,6 +267,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
     }
 
+    public String resubmitRequest() {
+        requestLifeCycleStatus = new RequestLifeCycleStatus(selectedQuery.getId());
+        requestLifeCycleStatus.createStatus(userBean.getUserId());
+        requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+        return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
+    }
+
     /**
      * Add search filter
      */

@@ -9,52 +9,52 @@ import java.util.List;
 
 public class RequestStatusInterested implements RequestStatus {
 
-    private String status = null;
+    private final String status = null;
     private final String statusType = "interest";
-    private String statusText = "Collection is interested in the request.";
-    private Date statusDate = null;
-    private List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private final String statusText = "Collection is interested in the request.";
+    private final Date statusDate = null;
+    private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private final List<String> allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
     private final List<String> allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     @Override
     public Date getStatusDate() {
-        return null;
+        return statusDate;
     }
 
     @Override
     public String getStatus() {
-        return null;
+        return status;
     }
 
     @Override
     public String getStatusType() {
-        return null;
+        return statusType;
     }
 
     @Override
     public String getStatusText() {
-        return null;
+        return statusText;
     }
 
     @Override
     public boolean checkAllowedNextStatus(String review) {
-        return false;
+        return allowedNextStatus.contains(review);
     }
 
     @Override
     public List<String> getAllowedNextStatus() {
-        return null;
+        return allowedNextStatus;
     }
 
     @Override
     public List<String> getNextStatusForBiobankers() {
-        return null;
+        return allowedNextStatusBiobanker;
     }
 
     @Override
     public List<String> getNextStatusForResearchers() {
-        return null;
+        return allowedNextStatusResearcher;
     }
 
     @Override
