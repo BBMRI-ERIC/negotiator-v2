@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.servlet.http.Part;
 import java.io.Serializable;
 
 @ManagedBean
@@ -29,8 +30,10 @@ public class LifeCycleStatusBean implements Serializable {
     private Integer biobankId;
     private String nextCollectionLifecycleStatusStatus;
     private Integer numberOfSamplesAvailable;
+    private Integer numberOfPatientsAvailable;
     private String indicateAccessConditions;
     private String shippedNumber;
+    private Part mtaFilemulti;
 
     private static final Logger logger = LoggerFactory.getLogger(LifeCycleStatusBean.class);
 
@@ -119,5 +122,21 @@ public class LifeCycleStatusBean implements Serializable {
 
     public void setBiobankId(Integer biobankId) {
         this.biobankId = biobankId;
+    }
+
+    public Integer getNumberOfPatientsAvailable() {
+        return numberOfPatientsAvailable;
+    }
+
+    public void setNumberOfPatientsAvailable(Integer numberOfPatientsAvailable) {
+        this.numberOfPatientsAvailable = numberOfPatientsAvailable;
+    }
+
+    public Part getMtaFilemulti() {
+        return mtaFilemulti;
+    }
+
+    public void setMtaFilemulti(Part mtaFilemulti) {
+        this.mtaFilemulti = mtaFilemulti;
     }
 }

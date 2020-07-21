@@ -2,6 +2,7 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -10,14 +11,14 @@ import java.util.List;
 public class RequestStatusAcceptConditions implements RequestStatus {
 
     private String status = null;
-    private String statusType = LifeCycleRequestStatusType.ACCESS_CONDITIONS;
-    private String statusText = "Acceppt Access Condition indicated for collection and select for further work.";
+    private final String statusType = LifeCycleRequestStatusType.ACCEPT_CONDITIONS;
+    private final String statusText = "Acceppt Access Condition indicated for collection and select for further work.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("not_interested", "signed");
+    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
-    private List allowedNextStatusBiobanker = Arrays.asList("notselected.notselected", "mtaSigned.signed", "abandoned.not_interested");
+    private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
 
-    private List allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interested");
+    private final List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     public RequestStatusAcceptConditions(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();

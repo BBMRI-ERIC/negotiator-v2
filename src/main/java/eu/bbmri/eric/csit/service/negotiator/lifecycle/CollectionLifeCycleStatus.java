@@ -7,6 +7,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,10 +16,10 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class CollectionLifeCycleStatus {
-    private static Logger logger = LoggerFactory.getLogger(CollectionLifeCycleStatus.class);
+    private static final Logger logger = LoggerFactory.getLogger(CollectionLifeCycleStatus.class);
 
-    private TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
-    private RequestStatus colectionAbandonedRequest = null;
+    private final TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
+    private final RequestStatus colectionAbandonedRequest = null;
     private Integer query_id = null;
     private Integer collection_id = null;
     private String collectionReadableID = null;
@@ -77,19 +78,22 @@ public class CollectionLifeCycleStatus {
     }
 
     private void collectionRequestStatusFactory(CollectionRequestStatusDTO collectionRequestStatusDTO) {
-        if(collectionRequestStatusDTO.getStatusType().equals("contact")) {
+        if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.CONTACT)) {
             RequestStatus status = new RequestStatusContact(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals("availability")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.INTEREST)) {
+            RequestStatus status = new RequestStatusInterested(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.AVAILABILITY)) {
             RequestStatus status = new RequestStatusAvailability(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals("accessConditions")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.ACCESS_CONDITIONS)) {
             RequestStatus status = new RequestStatusAccessConditions(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals("accepptConditions")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.ACCEPT_CONDITIONS)) {
             RequestStatus status = new RequestStatusAcceptConditions(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals("mtaSigned")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.MTA_SIGNED)) {
             RequestStatus status = new RequestStatusMTASigned(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else if(collectionRequestStatusDTO.getStatusType().equals("shippedSamples")) {

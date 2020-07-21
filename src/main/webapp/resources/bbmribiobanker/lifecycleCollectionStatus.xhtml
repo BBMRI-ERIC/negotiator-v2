@@ -59,12 +59,24 @@
                                   pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailableSamples']}">
                     </h:inputText>
                 </div>
+                <div id="numberOfAvailablePatients#{cc.attrs.collectionId}" style="display: none;">
+                    #{label['lifecycleCollectionSataus.nuberAvaivablePatients.title']} <i class="fa fa-pencil-square-o" />
+                    <h:inputText id="numberOfAvailablePatients#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfPatientsAvailable}"
+                                 styleClass="form-control"
+                                 pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailablePatients']}">
+                    </h:inputText>
+                </div>
                 <div id="indicateAccessConditions#{cc.attrs.collectionId}" style="display: none;">
                     #{label['lifecycleCollectionSataus.indicateAccessConditions.title']} <i class="fa fa-pencil-square-o" />
                     <h:inputTextarea id="indicateAccessConditions" value="#{lifeCycleStatusBean.indicateAccessConditions}"
                                  styleClass="form-control"
                                  pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.indicateAccessConditions']}">
                     </h:inputTextarea>
+                </div>
+                <div id="indicateAccessConditionsMTAFile#{cc.attrs.collectionId}" style="display: none;">
+                    #{label['lifecycleCollectionSataus.indicateAccessConditions.title']} <i class="fa fa-pencil-square-o" />
+                    <h:inputFile id="mtaFilemulti" value="#{lifeCycleStatusBean.mtaFilemulti}">
+                    </h:inputFile>
                 </div>
                 <div id="shippedNumber#{cc.attrs.collectionId}" style="display: none;">
                     #{label['lifecycleCollectionSataus.shippedNumber.title']} <i class="fa fa-pencil-square-o" />
@@ -80,10 +92,20 @@
                         } else {
                             $("#numberOfAvailableSamples#{cc.attrs.collectionId}").hide();
                         }
+                        if(data.value == 'availability.sample_data_available_accessible') {
+                            $("#numberOfAvailablePatients#{cc.attrs.collectionId}").show();
+                        } else {
+                            $("#numberOfAvailablePatients#{cc.attrs.collectionId}").hide();
+                        }
                         if(data.value == 'accessConditions.indicateAccessConditions') {
                             $("#indicateAccessConditions#{cc.attrs.collectionId}").show();
                         } else {
                             $("#indicateAccessConditions#{cc.attrs.collectionId}").hide();
+                        }
+                        if(data.value == 'accessConditions.indicateAccessConditions') {
+                            $("#indicateAccessConditionsMTAFile#{cc.attrs.collectionId}").show();
+                        } else {
+                            $("#indicateAccessConditionsMTAFile#{cc.attrs.collectionId}").hide();
                         }
                         if(data.value == 'shippedSamples.shipped') {
                             $("#shippedNumber#{cc.attrs.collectionId}").show();

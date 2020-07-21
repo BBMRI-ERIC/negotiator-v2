@@ -36,6 +36,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
@@ -148,8 +149,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Integer biobankId;
 	private String nextCollectionLifecycleStatusStatus;
 	private Integer numberOfSamplesAvailable;
+	private Integer numberOfPatientsAvailable;
 	private String indicateAccessConditions;
 	private String shippedNumber;
+	private Part mtaFile;
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -405,8 +408,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 	}
 
 	private String createStatusJson() {
-		if(numberOfSamplesAvailable != null) {
-			return "{\"numberAvaiableSamples\":\"" + numberOfSamplesAvailable + "\"}";
+		if(numberOfSamplesAvailable != null || numberOfSamplesAvailable != null ) {
+			String result = "{\"numberAvaiableSamples\":\"";
+			if(numberOfSamplesAvailable != null ) {
+				result += numberOfSamplesAvailable;
+			} else {
+				result += 0;
+			}
+			result += "\", \"numberAvaiablePatients\":\"";
+			if(numberOfPatientsAvailable != null ) {
+				result += numberOfPatientsAvailable;
+			} else {
+				result += 0;
+			}
+			result += "\"}";
+			return result;
 		}
 		if(indicateAccessConditions != null && indicateAccessConditions.length() > 0) {
 			return "{\"indicateAccessConditions\":\"" + indicateAccessConditions + "\"}";
@@ -643,5 +659,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setBiobankId(Integer biobankId) {
 		this.biobankId = biobankId;
+	}
+
+	public Integer getNumberOfPatientsAvailable() {
+		return numberOfPatientsAvailable;
+	}
+
+	public void setNumberOfPatientsAvailable(Integer numberOfPatientsAvailable) {
+		this.numberOfPatientsAvailable = numberOfPatientsAvailable;
+	}
+
+	public Part getMtaFile() {
+		return mtaFile;
+	}
+
+	public void setMtaFile(Part mtaFile) {
+		this.mtaFile = mtaFile;
 	}
 }

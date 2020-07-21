@@ -1,5 +1,6 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
+import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 
@@ -8,13 +9,18 @@ import java.util.List;
 
 public class RequestStatusInterested implements RequestStatus {
 
-    private final String status = null;
+    private String status = null;
     private final String statusType = LifeCycleRequestStatusType.INTEREST;
     private final String statusText = "Collection is interested in the request.";
-    private final Date statusDate = null;
+    private Date statusDate = null;
     private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private final List<String> allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
     private final List<String> allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
+
+    public RequestStatusInterested(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+        statusDate = collectionRequestStatusDTO.getStatusDate();
+        status = collectionRequestStatusDTO.getStatus();
+    }
 
     @Override
     public Date getStatusDate() {

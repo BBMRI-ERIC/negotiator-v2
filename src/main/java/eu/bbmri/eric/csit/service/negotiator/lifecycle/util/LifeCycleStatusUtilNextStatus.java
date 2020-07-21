@@ -57,6 +57,10 @@ public class LifeCycleStatusUtilNextStatus {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_INTERESTED,
                     LifeCycleRequestStatusStatus.SELECT_AND_ACCEPT,
                     LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE);
+        } else if(requestStatusClass.equals(REQUEST_STATUS_ACCEPT_CONDITIONS)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_INTERESTED,
+                    LifeCycleRequestStatusStatus.SIGNED,
+                    LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE);
         } else {
             logger.error("a376499caaa7-LifeCycleStatusUtilNextStatus ERROR-NG-0000051: Error no AllowedNextStatus for lifecycle Class: {} not found.", requestStatusClass);
             return Arrays.asList();
@@ -70,16 +74,22 @@ public class LifeCycleStatusUtilNextStatus {
     public static List<String> getAllowedNextStatusResearcher(String requestStatusClass, String status) {
         if(requestStatusClass.equals(REQUEST_STATUS_CONTACT)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER,
-                    LifeCycleRequestStatusStatus.ABANDONED_NOT_INTERESTED);
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else if(requestStatusClass.equals(REQUEST_STATUS_INTERESTED)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER,
-                    LifeCycleRequestStatusStatus.ABANDONED_NOT_INTERESTED);
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else if(requestStatusClass.equals(REQUEST_STATUS_AVAILABILITY)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER,
-                    LifeCycleRequestStatusStatus.ABANDONED_NOT_INTERESTED);
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else if(requestStatusClass.equals(REQUEST_STATUS_ACCESS_CONDITIONS)) {
-            return Arrays.asList(LifeCycleRequestStatusStatus.SELECT_AND_ACCEPT,
-                    LifeCycleRequestStatusStatus.ABANDONED_NOT_INTERESTED);
+            return Arrays.asList(combineTypeAndStatus(LifeCycleRequestStatusType.ACCEPT_CONDITIONS, LifeCycleRequestStatusStatus.SELECT_AND_ACCEPT),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_ACCEPT_CONDITIONS)) {
+            return Arrays.asList(combineTypeAndStatus(LifeCycleRequestStatusType.ACCEPT_CONDITIONS, LifeCycleRequestStatusStatus.SELECT_AND_ACCEPT),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_ACCEPT_CONDITIONS)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER,
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else {
             logger.error("a376499caaa7-LifeCycleStatusUtilNextStatus ERROR-NG-0000052: Error no AllowedNextStatusResearcher for lifecycle Class: {} not found.", requestStatusClass);
             return Arrays.asList();
@@ -93,32 +103,40 @@ public class LifeCycleStatusUtilNextStatus {
     public static List<String> getAllowedNextStatusBiobanker(String requestStatusClass, String status) {
         if(requestStatusClass.equals(REQUEST_STATUS_CONTACT)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED,
-                    LifeCycleRequestStatusStatus.INTERESTED,
-                    LifeCycleRequestStatusStatus.ABANDONED_NOT_INTERESTED);
+                    combineTypeAndStatus(LifeCycleRequestStatusType.INTEREST, LifeCycleRequestStatusStatus.INTERESTED),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else if(requestStatusClass.equals(REQUEST_STATUS_INTERESTED)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED,
-                    LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE,
-                    LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_NOT_ACCESSIBLE,
-                    LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE_COLLECTABLE,
-                    LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE,
-                    LifeCycleRequestStatusStatus.ABANDONED_NOT_INTERESTED);
+                    combineTypeAndStatus(LifeCycleRequestStatusType.AVAILABILITY, LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.AVAILABILITY, LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_NOT_ACCESSIBLE),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.AVAILABILITY, LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE_COLLECTABLE),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.AVAILABILITY, LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else if(requestStatusClass.equals(REQUEST_STATUS_AVAILABILITY)) {
             List<String> result = new ArrayList<String>();
             result.add(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED);
             if(status.equals(LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE)) {
-                result.add(LifeCycleRequestStatusStatus.INDICATE_ACCESS_CONDITIONS);
+                result.add(combineTypeAndStatus(LifeCycleRequestStatusType.ACCESS_CONDITIONS, LifeCycleRequestStatusStatus.INDICATE_ACCESS_CONDITIONS));
             }
-            result.add(LifeCycleRequestStatusStatus.ABANDONED_NOT_INTERESTED);
-            result.add(LifeCycleRequestStatusStatus.INTERESTED);
+            result.add(combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+            result.add(combineTypeAndStatus(LifeCycleRequestStatusType.INTEREST, LifeCycleRequestStatusStatus.INTERESTED));
             return result;
         } else if(requestStatusClass.equals(REQUEST_STATUS_ACCESS_CONDITIONS)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_RESEARCHER,
-                    LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE,
-                    LifeCycleRequestStatusStatus.ABANDONED_NOT_INTERESTED);
+                    combineTypeAndStatus(LifeCycleRequestStatusType.AVAILABILITY, LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_ACCEPT_CONDITIONS)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED,
+                    combineTypeAndStatus(LifeCycleRequestStatusType.MTA_SIGNED, LifeCycleRequestStatusStatus.SIGNED),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         }  else {
             logger.error("a376499caaa7-LifeCycleStatusUtilNextStatus ERROR-NG-0000053: Error no AllowedNextStatusBiobanker for lifecycle Class: {} not found.", requestStatusClass);
             return Arrays.asList();
         }
+    }
+
+    private static String combineTypeAndStatus(String type, String status) {
+        return type + "." + status;
     }
 
 }

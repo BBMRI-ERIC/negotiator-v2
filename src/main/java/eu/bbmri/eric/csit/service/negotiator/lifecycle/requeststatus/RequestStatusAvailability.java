@@ -28,8 +28,16 @@ public class RequestStatusAvailability implements RequestStatus {
         allowedNextStatusBiobanker.addAll(LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), this.status));
         if(status.equalsIgnoreCase("sample_data_available_accessible")) {
             String numberAvaiableSamples = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiableSamples");
+            String numberOfPatientsAvailable = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiablePatients");
             if(numberAvaiableSamples != null && numberAvaiableSamples.length() > 0) {
-                statusText = "Number of avaiable Samples: " + numberAvaiableSamples;
+                statusText = "Number of available Samples: " + numberAvaiableSamples;
+            }
+            if(numberOfPatientsAvailable != null && numberOfPatientsAvailable.length() > 0) {
+                if(statusText.startsWith("Number of")) {
+                    statusText += "  -  Number of available Patients: " + numberOfPatientsAvailable;
+                } else {
+                    statusText = "Number of available Patients: " + numberOfPatientsAvailable;
+                }
             }
         }
     }

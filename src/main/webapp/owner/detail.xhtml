@@ -103,8 +103,10 @@
                             <h:inputText id="biobankId" value="#{ownerQueriesDetailBean.biobankId}"/>
                             <h:inputText id="nextCollectionLifecycleStatusStatus" value="#{ownerQueriesDetailBean.nextCollectionLifecycleStatusStatus}"/>
                             <h:inputText id="numberOfSamplesAvailable" value="#{ownerQueriesDetailBean.numberOfSamplesAvailable}"/>
+                            <h:inputText id="numberOfPatientsAvailable" value="#{ownerQueriesDetailBean.numberOfPatientsAvailable}"/>
                             <h:inputText id="indicateAccessConditions" value="#{ownerQueriesDetailBean.indicateAccessConditions}"/>
                             <h:inputText id="shippedNumber" value="#{ownerQueriesDetailBean.shippedNumber}"/>
+                            <h:inputFile id="mtaFile" value="#{lifeCycleStatusBean.mtaFilemulti}" />
 
                             <h:commandButton style="" id="lifeCycleStatusBeanUpdateStatusFormLink"
                                              action="#{ownerQueriesDetailBean.updateCollectionLifecycleStatus()}">
@@ -116,13 +118,19 @@
                             function invokeCommandLink(collectionId, biobankId) {
                                 var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
                                 var numberOfAvailableSamples = $("#numberOfAvailableSamples" + collectionId).find("input").val();
+                                var numberOfAvailablePatients = $("#numberOfAvailablePatients" + collectionId).find("input").val();
                                 var indicateAccessConditions = $("#indicateAccessConditions" + collectionId).find("textarea").val();
+                                var indicateAccessConditionsMTAFile = $("#indicateAccessConditionsMTAFile" + collectionId).find("input").val();
                                 var shippedNumber = $("#shippedNumber" + collectionId).find("textarea").val();
+
+                                alert(indicateAccessConditionsMTAFile);
 
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfSamplesAvailable").value = numberOfAvailableSamples;
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfPatientsAvailable").value = numberOfAvailablePatients;
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:indicateAccessConditions").value = indicateAccessConditions;
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:shippedNumber").value = shippedNumber;
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:mtaFile").value = indicateAccessConditionsMTAFile;
 
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
                                 document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
