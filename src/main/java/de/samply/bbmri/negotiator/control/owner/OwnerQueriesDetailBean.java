@@ -27,15 +27,19 @@
 package de.samply.bbmri.negotiator.control.owner;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -153,6 +157,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private String indicateAccessConditions;
 	private String shippedNumber;
 	private Part mtaFile;
+	private Part dtaFile;
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -375,7 +380,24 @@ public class OwnerQueriesDetailBean implements Serializable {
 	/*
 	 * Lifecycle Collection update
 	 */
+	public static Collection<Part> getAllParts(Part part) throws ServletException, IOException {
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		return request.getParts().stream().filter(p -> part.getName().equals(p.getName())).collect(Collectors.toList());
+	}
+
 	public String updateCollectionLifecycleStatus() {
+		try {
+			for (Part part : getAllParts(dtaFile)) {
+				String fileName = part.getSubmittedFileName();
+				InputStream fileContent = part.getInputStream();
+
+				// ...
+				// Do your thing with it.
+				// E.g. https://stackoverflow.com/q/14211843/157882
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		if(biobankId != 0) {
 			return updateCollectionLifecycleStatusByBiobank(biobankId);
 		} else {
@@ -675,5 +697,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setMtaFile(Part mtaFile) {
 		this.mtaFile = mtaFile;
+	}
+
+	public Part getDtaFile() {
+		return dtaFile;
+	}
+
+	public void setDtaFile(Part dtaFile) {
+		this.dtaFile = dtaFile;
 	}
 }
