@@ -336,12 +336,15 @@
                                         <span style="font-weight: bold;margin: 5px;color: #004275;">#{label['lifecycleCollectionSataus.indicateAccessConditions.title']}</span><br/>
                                         <h:inputTextarea style="width: 100%;" id="indicateAccessConditions" value="#{ownerQueriesDetailBean.indicateAccessConditions}"/><br/>
                                         <span style="font-weight: bold;margin: 5px;color: #004275;">Material Transfer Agreement (MTA)</span><br/>
-                                        <h:inputFile id="mtaFile" value="#{ownerQueriesDetailBean.mtaFile}" /><br/>
+                                        <h:inputFile id="mtaFile" value="#{ownerQueriesDetailBean.mtaFile}" pt:multiple="true" /><br/>
                                         <span style="font-weight: bold;margin: 5px;color: #004275;">Data Transfer Agreement (DTA)</span><br/>
-                                        <h:inputFile id="dtaFile" value="#{ownerQueriesDetailBean.dtaFile}" /><br/>
+                                        <h:inputFile id="dtaFile" value="#{ownerQueriesDetailBean.dtaFile}" pt:multiple="true" /><br/>
+                                        <span style="font-weight: bold;margin: 5px;color: #004275;">Other documents</span><br/>
+                                        <h:inputFile id="otherAccessFile" value="#{ownerQueriesDetailBean.otherAccessFile}" pt:multiple="true" /><br/>
 
                                         <h:commandButton id="lifeCycleStatusBeanUpdateStatusFormLink"
-                                                         action="#{ownerQueriesDetailBean.updateCollectionLifecycleStatus()}">
+                                                         action="#{ownerQueriesDetailBean.updateCollectionLifecycleStatus()}"
+                                                         style="display: none;">
                                             <f:ajax execute="@form" render="@form" />
                                         </h:commandButton>
                                     </h:form>
@@ -349,13 +352,32 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="resetNextStatusOnClose();">Close</button>
-                                    <button type="button" class="btn btn-primary">Save changes</button>
+                                    <button type="button" class="btn btn-primary"
+                                            onclick='updateAccessConditionsCollection()'>
+                                        Update Collection
+                                    </button>
+
+                                    <button type="button" class="btn btn-secondary"
+                                            onclick='updateAccessConditionsBiobank()'>
+                                        Update for all Collections
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <script type="text/javascript" >
+
+                        function updateAccessConditionsCollection() {
+                            document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = 0;
+                            var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
+                            jsfcommandButton.click();
+                        }
+
+                        function updateAccessConditionsBiobank() {
+                            var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
+                            jsfcommandButton.click();
+                        }
 
                         function resetNextStatusOnClose() {
                             var collectionId = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value;

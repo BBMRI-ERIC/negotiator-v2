@@ -158,6 +158,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private String shippedNumber;
 	private Part mtaFile;
 	private Part dtaFile;
+	private Part otherAccessFile;
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -380,14 +381,15 @@ public class OwnerQueriesDetailBean implements Serializable {
 	/*
 	 * Lifecycle Collection update
 	 */
-	public static Collection<Part> getAllParts(Part part) throws ServletException, IOException {
+	public static Collection<Part> getAllFilePartsFromMultifileUpload(Part part) throws ServletException, IOException {
+		String name = part.getName();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		return request.getParts().stream().filter(p -> part.getName().equals(p.getName())).collect(Collectors.toList());
 	}
 
 	public String updateCollectionLifecycleStatus() {
 		try {
-			for (Part part : getAllParts(dtaFile)) {
+			for (Part part : getAllFilePartsFromMultifileUpload(dtaFile)) {
 				String fileName = part.getSubmittedFileName();
 				InputStream fileContent = part.getInputStream();
 
@@ -705,5 +707,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setDtaFile(Part dtaFile) {
 		this.dtaFile = dtaFile;
+	}
+
+	public Part getOtherAccessFile() {
+		return otherAccessFile;
+	}
+
+	public void setOtherAccessFile(Part otherAccessFile) {
+		this.otherAccessFile = otherAccessFile;
 	}
 }
