@@ -27,13 +27,13 @@
 package de.samply.bbmri.negotiator.control.owner;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
@@ -45,6 +45,9 @@ import javax.servlet.http.Part;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.FileUtil;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
@@ -61,6 +64,7 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.slf4j.Logger;
@@ -75,7 +79,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private final Logger logger = LoggerFactory.getLogger(OwnerQueriesDetailBean.class);
+	private static final Logger logger = LoggerFactory.getLogger(OwnerQueriesDetailBean.class);
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -156,9 +160,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Integer numberOfPatientsAvailable;
 	private String indicateAccessConditions;
 	private String shippedNumber;
-	private Part mtaFile;
+	private Part  mtaFile;
 	private Part dtaFile;
 	private Part otherAccessFile;
+
+	private FileUtil fileUtil = new FileUtil();
+	private List<FacesMessage> fileValidationMessages = new ArrayList<>();
+	Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
@@ -336,7 +344,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 * @return unique search terms
 	 */
 	public Set<String> getFilterTerms() {
-		Set<String> filterTerms = new HashSet<String>();
+		Set<String> filterTerms = new HashSet<>();
 		for(String filters : sessionBean.getFilters()) {
 			// split by 0 or more spaces, followed by either 'and','or', comma or more spaces
 			String[] filterTermsArray = filters.split("\\s*(and|or|,)\\s*");
@@ -381,25 +389,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	/*
 	 * Lifecycle Collection update
 	 */
-	public static Collection<Part> getAllFilePartsFromMultifileUpload(Part part) throws ServletException, IOException {
-		String name = part.getName();
-		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-		return request.getParts().stream().filter(p -> part.getName().equals(p.getName())).collect(Collectors.toList());
-	}
-
 	public String updateCollectionLifecycleStatus() {
-		try {
-			for (Part part : getAllFilePartsFromMultifileUpload(dtaFile)) {
-				String fileName = part.getSubmittedFileName();
-				InputStream fileContent = part.getInputStream();
-
-				// ...
-				// Do your thing with it.
-				// E.g. https://stackoverflow.com/q/14211843/157882
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		if(biobankId != 0) {
 			return updateCollectionLifecycleStatusByBiobank(biobankId);
 		} else {
@@ -417,7 +407,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			return "";
 		}
 
-		requestLifeCycleStatus.nextStatus(status, statusType, createStatusJson(), userBean.getUserId(), collectionId);
+		requestLifeCycleStatus.nextStatus(status, statusType, createStatusJson(status), userBean.getUserId(), collectionId);
 		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
@@ -431,7 +421,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
-	private String createStatusJson() {
+	private String createStatusJson(String status) {
 		if(numberOfSamplesAvailable != null || numberOfSamplesAvailable != null ) {
 			String result = "{\"numberAvaiableSamples\":\"";
 			if(numberOfSamplesAvailable != null ) {
@@ -448,8 +438,15 @@ public class OwnerQueriesDetailBean implements Serializable {
 			result += "\"}";
 			return result;
 		}
-		if(indicateAccessConditions != null && indicateAccessConditions.length() > 0) {
-			return "{\"indicateAccessConditions\":\"" + indicateAccessConditions + "\"}";
+		if(status.equals(LifeCycleRequestStatusStatus.INDICATE_ACCESS_CONDITIONS)) {
+			String result = "{";
+			String seperatorForJason = "";
+			if (indicateAccessConditions != null && indicateAccessConditions.length() > 0) {
+				result += "\"indicateAccessConditions\":\"" + indicateAccessConditions + "\"";
+				seperatorForJason = ",";
+			}
+			result += seperatorForJason + storeFilesForAccessCondition() + "}";
+			return result;
 		}
 		if(shippedNumber != null && shippedNumber.length() > 0) {
 			return "{\"shippedNumber\":\"" + shippedNumber + "\"}";
@@ -457,23 +454,82 @@ public class OwnerQueriesDetailBean implements Serializable {
 		return null;
 	}
 
+	private String storeFilesForAccessCondition() {
+		StringBuilder result = new StringBuilder();
+		result.append("\"indicateAccessConditionFiles\":[");
+		String seperatorForJason = "";
+		try {
+			fileValidationMessages = new ArrayList<>();
+			for (Part part : getAllFilePartsFromMultifileUpload(mtaFile)) {
+				String fileId = UUID.randomUUID().toString();
+				String filename = storeFile(part, fileId);
+				result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "MTA"));
+				seperatorForJason = ",";
+			}
+			for (Part part : getAllFilePartsFromMultifileUpload(dtaFile)) {
+				String fileId = UUID.randomUUID().toString();
+				String filename = storeFile(part, fileId);
+				result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "DTA"));
+				seperatorForJason = ",";
+			}
+			for (Part part : getAllFilePartsFromMultifileUpload(otherAccessFile)) {
+				String fileId = UUID.randomUUID().toString();
+				String filename = storeFile(part, fileId);
+				result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "Other"));
+				seperatorForJason = ",";
+			}
+		} catch (Exception e) {
+			logger.error("729f8d59add2-OwnerQueriesDetailBean ERROR-NG-0000054: Error uploading files for access condition.");
+			e.printStackTrace();
+		}
+		result.append("]");
+		return result.toString();
+	}
+
+	private String createIndicateAccessConditionFilesJson(String fileId, Integer queryId, String filename, String fileType) {
+		return "{\"fileId\":\"" + fileId + "\",\"queryId\":\"" + queryId + "\",\"filename\":\"" + filename
+				+ "\",\"fileType\":\"" + fileType + "\"}";
+	}
+
+	private String storeFile(Part part, String fileId) {
+		try {
+			String originalFileName = fileUtil.getOriginalFileNameFromPart(part);
+			List<FacesMessage> errorFileMassages = fileUtil.validateFile(part, negotiator.getMaxUploadFileSize());
+			fileValidationMessages.addAll(errorFileMassages);
+			if (errorFileMassages == null || errorFileMassages.isEmpty()) {
+				String storageFileName = fileUtil.getStorageFileName(queryId, fileId, originalFileName);
+				fileUtil.saveQueryAttachment(part, storageFileName);
+			}
+			return originalFileName;
+		} catch (Exception e) {
+			logger.error("729f8d59add2-OwnerQueriesDetailBean ERROR-NG-0000055: Error uploading file.");
+			e.printStackTrace();
+			return "";
+		}
+	}
+
+	private Collection<Part> getAllFilePartsFromMultifileUpload(Part part) throws ServletException, IOException {
+		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		return request.getParts().stream().filter(p -> part.getName().equals(p.getName())).collect(Collectors.toList());
+	}
+
 	/*
 	 * File Upload code block
 	 */
-	public String uploadAttachment() throws IOException {
+	public String uploadAttachment() {
 		if (!fileUploadBean.isFileToUpload())
 			return "";
 
-		boolean fileCreationSuccessful = fileUploadBean.createQueryAttachment();
+		fileUploadBean.createQueryAttachment();
 		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
-	public String uploadAttachmentPrivate(Integer offerFromBiobank) throws IOException {
+	public String uploadAttachmentPrivate(Integer offerFromBiobank) {
 		if (!fileUploadBean.isFileToUpload())
 			return "";
 
-		boolean fileCreationSuccessful = fileUploadBean.createQueryAttachmentPrivate(offerFromBiobank);
+		fileUploadBean.createQueryAttachmentPrivate(offerFromBiobank);
 		return FacesContext.getCurrentInstance().getViewRoot().getViewId()
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
@@ -624,8 +680,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public Person getUserDataForResearcher(Integer researcherId) {
     	if(selectedQuery != null) {
 			try (Config config = ConfigFactory.get()) {
-				Person requester = DbUtil.getPersonDetails(config, researcherId);
-				return requester;
+				return DbUtil.getPersonDetails(config, researcherId);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

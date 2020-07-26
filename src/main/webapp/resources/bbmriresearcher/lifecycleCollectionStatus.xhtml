@@ -24,7 +24,7 @@
     </div>
     <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
         <!--<h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">-->
-        #{label['lifecycleCollectionSataus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
+        #{label['lifecycleCollectionStatus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
         <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
                          class="form-control"
                          style="width: 100%;height: 2rem;"
@@ -35,10 +35,10 @@
                            itemLabel="#{label[nextStatus]}" itemValue="#{nextStatus}" />
         </h:selectOneMenu>
         <div id="offer" style="display: none;">
-            #{label['lifecycleCollectionSataus.offer.title']} <i class="fa fa-pencil-square-o" />
+            #{label['lifecycleCollectionStatus.offer.title']} <i class="fa fa-pencil-square-o" />
             <h:inputTextarea id="offer" value="#{researcherQueriesDetailBean.offer}"
                              styleClass="form-control"
-                             pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.offer']}">
+                             pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.offer']}">
             </h:inputTextarea>
         </div>
         <h:outputScript>

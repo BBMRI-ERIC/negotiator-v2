@@ -333,13 +333,25 @@
                                         <h:inputText style="display: none;" id="numberOfSamplesAvailable" value="#{ownerQueriesDetailBean.numberOfSamplesAvailable}"/>
                                         <h:inputText style="display: none;" id="numberOfPatientsAvailable" value="#{ownerQueriesDetailBean.numberOfPatientsAvailable}"/>
                                         <h:inputText style="display: none;" id="shippedNumber" value="#{ownerQueriesDetailBean.shippedNumber}"/>
-                                        <span style="font-weight: bold;margin: 5px;color: #004275;">#{label['lifecycleCollectionSataus.indicateAccessConditions.title']}</span><br/>
+
+                                        <span style="font-weight: bold;margin: 5px;color: #004275;">
+                                            #{label['lifecycleCollectionStatus.indicateAccessConditions.title']}
+                                        </span><br/>
                                         <h:inputTextarea style="width: 100%;" id="indicateAccessConditions" value="#{ownerQueriesDetailBean.indicateAccessConditions}"/><br/>
-                                        <span style="font-weight: bold;margin: 5px;color: #004275;">Material Transfer Agreement (MTA)</span><br/>
+                                        <span style="font-weight: bold;margin: 5px;color: #004275;">
+                                            #{label['lifecycleCollectionStatus.indicateAccessConditions.mtaFile.title']} -
+                                            #{label['lifecycleCollectionStatus.indicateAccessConditions.fileUpload.multiple']}
+                                        </span><br/>
                                         <h:inputFile id="mtaFile" value="#{ownerQueriesDetailBean.mtaFile}" pt:multiple="true" /><br/>
-                                        <span style="font-weight: bold;margin: 5px;color: #004275;">Data Transfer Agreement (DTA)</span><br/>
+                                        <span style="font-weight: bold;margin: 5px;color: #004275;">
+                                            #{label['lifecycleCollectionStatus.indicateAccessConditions.dtaFile.title']} -
+                                            #{label['lifecycleCollectionStatus.indicateAccessConditions.fileUpload.multiple']}
+                                        </span><br/>
                                         <h:inputFile id="dtaFile" value="#{ownerQueriesDetailBean.dtaFile}" pt:multiple="true" /><br/>
-                                        <span style="font-weight: bold;margin: 5px;color: #004275;">Other documents</span><br/>
+                                        <span style="font-weight: bold;margin: 5px;color: #004275;">
+                                            #{label['lifecycleCollectionStatus.indicateAccessConditions.otherFile.title']} -
+                                            #{label['lifecycleCollectionStatus.indicateAccessConditions.fileUpload.multiple']}
+                                        </span><br/>
                                         <h:inputFile id="otherAccessFile" value="#{ownerQueriesDetailBean.otherAccessFile}" pt:multiple="true" /><br/>
 
                                         <h:commandButton id="lifeCycleStatusBeanUpdateStatusFormLink"
@@ -351,15 +363,16 @@
 
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="resetNextStatusOnClose();">Close</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="resetNextStatusOnClose();">
+                                        #{label['lifecycleCollectionStatus.form.button.close']}
+                                    </button>
                                     <button type="button" class="btn btn-primary"
                                             onclick='updateAccessConditionsCollection()'>
-                                        Update Collection
+                                        #{label['lifecycleCollectionStatus.form.button.updateCollection']}
                                     </button>
-
                                     <button type="button" class="btn btn-secondary"
                                             onclick='updateAccessConditionsBiobank()'>
-                                        Update for all Collections
+                                        #{label['lifecycleCollectionStatus.form.button.updateCollectionsBiobank']}
                                     </button>
                                 </div>
                             </div>
@@ -404,7 +417,6 @@
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfPatientsAvailable").value = numberOfAvailablePatients;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:indicateAccessConditions").value = indicateAccessConditions;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:shippedNumber").value = shippedNumber;
-                            document.getElementById("lifeCycleStatusBeanUpdateStatusForm:mtaFile").value = indicateAccessConditionsMTAFile;
 
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;

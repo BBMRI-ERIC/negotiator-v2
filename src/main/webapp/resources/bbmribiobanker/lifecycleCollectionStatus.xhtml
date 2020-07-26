@@ -41,7 +41,7 @@
                 <span style="font-size: 12px; font-style: italic;">#{cc.attrs.collectionLifeCycleStatus.status.statusText}</span>
             </div>
             <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
-                #{label['lifecycleCollectionSataus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
+                #{label['lifecycleCollectionStatus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
                 <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
                                  class="form-control"
                                  style="width: 100%;height: 2rem;"
@@ -53,24 +53,24 @@
                 </h:selectOneMenu>
 
                 <div id="numberOfAvailableSamples#{cc.attrs.collectionId}" style="display: none;">
-                    #{label['lifecycleCollectionSataus.nuberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
+                    #{label['lifecycleCollectionStatus.numberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
                     <h:inputText id="numberOfAvailableSamples#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfSamplesAvailable}"
                                   styleClass="form-control"
-                                  pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailableSamples']}">
+                                  pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailableSamples']}">
                     </h:inputText>
                 </div>
                 <div id="numberOfAvailablePatients#{cc.attrs.collectionId}" style="display: none;">
-                    #{label['lifecycleCollectionSataus.nuberAvaivablePatients.title']} <i class="fa fa-pencil-square-o" />
+                    #{label['lifecycleCollectionStatus.numberAvaivablePatients.title']} <i class="fa fa-pencil-square-o" />
                     <h:inputText id="numberOfAvailablePatients#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfPatientsAvailable}"
                                  styleClass="form-control"
-                                 pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.numberOfAvailablePatients']}">
+                                 pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailablePatients']}">
                     </h:inputText>
                 </div>
                 <div id="shippedNumber#{cc.attrs.collectionId}" style="display: none;">
-                    #{label['lifecycleCollectionSataus.shippedNumber.title']} <i class="fa fa-pencil-square-o" />
+                    #{label['lifecycleCollectionStatus.shippedNumber.title']} <i class="fa fa-pencil-square-o" />
                     <h:inputTextarea id="shippedNumber" value="#{lifeCycleStatusBean.shippedNumber}"
                                      styleClass="form-control"
-                                     pt:placeholder="#{label['lifecycleCollectionSataus.placeholder.shippedNumber']}">
+                                     pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.shippedNumber']}">
                     </h:inputTextarea>
                 </div>
                 <h:outputScript>
@@ -110,8 +110,12 @@
                 </h:outputScript>
             </div>
             <div class="col-sm-2 col-lg-2">
-                <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0)">Update Collection</button>
-                <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">Update for all Collections</button>
+                <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0)">
+                    #{label['lifecycleCollectionStatus.form.button.updateCollection']}
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">
+                    #{label['lifecycleCollectionStatus.form.button.updateCollectionsBiobank']}
+                </button>
             </div>
 
 

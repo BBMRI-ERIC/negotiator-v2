@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.helper.MessageHelper;
@@ -68,12 +67,9 @@ public class FileUtil {
         uploadDir.mkdirs();
         
         try (InputStream input = file.getInputStream()) {
-            
             Files.copy(input, new File(uploadDir, fileName).toPath());
             return fileName;
-            
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error("Couldn't save attachment ", e);
             return null;
         }
@@ -95,6 +91,12 @@ public class FileUtil {
     }
 
     public String getStorageFileName(Integer queryId, Integer fileId, String fileName) {
+        String[] splitFilename = fileName.split("\\.");
+        String fileExtension = splitFilename[splitFilename.length - 1];
+        return "query_" + queryId + "_file_" + fileId + "." + fileExtension;
+    }
+
+    public String getStorageFileName(Integer queryId, String fileId, String fileName) {
         String[] splitFilename = fileName.split("\\.");
         String fileExtension = splitFilename[splitFilename.length - 1];
         return "query_" + queryId + "_file_" + fileId + "." + fileExtension;
@@ -134,11 +136,11 @@ public class FileUtil {
         }
     }
 
-    public List<FacesMessage> validateFile(Part file, int max_upload_size) throws ValidatorException {
+    public List<FacesMessage> validateFile(Part file, int maxUploadSize) {
+        List<FacesMessage> msgs = new ArrayList<>();
         if(file != null) {
-            List<FacesMessage> msgs = new ArrayList<FacesMessage>();
-            if (file.getSize() > max_upload_size) {
-                msgs.addAll(MessageHelper.generateValidateFileMessages(max_upload_size));
+            if (file.getSize() > maxUploadSize) {
+                msgs.addAll(MessageHelper.generateValidateFileMessages(maxUploadSize));
             }
             try {
                 if (checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
@@ -147,8 +149,7 @@ public class FileUtil {
             } catch (Exception e) {
                 msgs.addAll(MessageHelper.generateValidateFileMessages(e.getMessage()));
             }
-            return msgs;
         }
-        return null;
+        return msgs;
     }
 }
