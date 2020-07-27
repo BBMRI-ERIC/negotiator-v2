@@ -2,6 +2,7 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -13,11 +14,11 @@ public class RequestStatusMTASigned implements RequestStatus {
     private final String statusType = LifeCycleRequestStatusType.MTA_SIGNED;
     private final String statusText = "MTA and Paperwork for shipping signed.";
     private Date statusDate = null;
-    private final List allowedNextStatus = Arrays.asList("not_interested", "shipped");
+    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
-    private final List allowedNextStatusBiobanker = Arrays.asList("notselected.notselected", "shippedSamples.shipped", "abandoned.not_interested");
+    private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
 
-    private final List allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse");
+    private final List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     public RequestStatusMTASigned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();

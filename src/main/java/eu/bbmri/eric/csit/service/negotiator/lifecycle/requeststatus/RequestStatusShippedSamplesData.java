@@ -1,6 +1,9 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
@@ -9,20 +12,20 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusShippedSampesData implements RequestStatus {
+public class RequestStatusShippedSamplesData implements RequestStatus {
 
     private String status = null;
-    private String statusType = "shippedSamples";
+    private String statusType = LifeCycleRequestStatusType.SHIPPED_SAMPLES;
     private String statusText = "Shipped Samples/Data.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("not_interested", "received");
-    private List allowedNextStatusBiobanker = Arrays.asList("abandoned.not_interested");
-    private List allowedNextStatusResearcher = Arrays.asList("notselected.notselected", "receivedSamples.received");
+    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
+    private List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
-    public RequestStatusShippedSampesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusShippedSamplesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
-        if(status.equals("shipped")) {
+        if(status.equals(LifeCycleRequestStatusStatus.SHIPPED)) {
             statusText = "Shipped Number: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "shippedNumber");
         }
     }

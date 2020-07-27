@@ -1,6 +1,8 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
@@ -12,33 +14,19 @@ import java.util.List;
 public class RequestStatusDataReturnOffer implements RequestStatus {
 
     private String status = null;
-    private String statusType = "dataReturnOffer";
+    private String statusType = LifeCycleRequestStatusType.DATA_RETURN_OFFER;
     private String statusText = "Offer for data return.";
     private Date statusDate = null;
-    private List<String> allowedNextStatus = new ArrayList<String>();
-    private List<String> allowedNextStatusBiobanker = new ArrayList<String>();
-    private List<String> allowedNextStatusResearcher = new ArrayList<String>();
+    private List<String> allowedNextStatus = new ArrayList<>();
+    private List<String> allowedNextStatusBiobanker = new ArrayList<>();
+    private List<String> allowedNextStatusResearcher = new ArrayList<>();
 
     public RequestStatusDataReturnOffer(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
-        if(status == null) {
-            allowedNextStatus.add("not_interested");
-            allowedNextStatusBiobanker.add("notselected.notselected");
-            allowedNextStatusBiobanker.add("abandoned.not_interested");
-            allowedNextStatusResearcher.add("notselected.watingForResponse");
-        }
-        if(status.equals("offer")) {
-            statusText = "Data return offer: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "offer");
-            allowedNextStatus.add("not_interested");
-            allowedNextStatus.add("accepted");
-            allowedNextStatus.add("rejected");
-            allowedNextStatusBiobanker.add("notselected.notselected");
-            allowedNextStatusBiobanker.add("dataReturnOffer.accepted");
-            allowedNextStatusBiobanker.add("dataReturnOffer.rejected");
-            allowedNextStatusBiobanker.add("abandoned.not_interested");
-            allowedNextStatusResearcher.add("notselected.watingForResponse");
-        }
+        allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName(), status);
+        allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), status);
+        allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName(), status);
     }
 
     @Override

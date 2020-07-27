@@ -15,4 +15,6 @@ public class LifeCycleRequestStatusType {
     public static final String MTA_SIGNED = "mtaSigned";
     public static final String SHIPPED_SAMPLES = "shippedSamples";
     public static final String RECEIVED_SAMPLES = "receivedSamples";
+    public static final String END_OF_PROJECT = "endOfProject";
+    public static final String DATA_RETURN_OFFER = "dataReturnOffer";
 }

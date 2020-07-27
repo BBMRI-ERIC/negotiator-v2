@@ -19,8 +19,8 @@ public class RequestStatusAvailability implements RequestStatus {
     private String statusText = "Collection has availability not specified yet.";
     private Date statusDate = null;
     private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
-    private final List<String> allowedNextStatusBiobanker = new ArrayList<String>();
-    private final List<String> allowedNextStatusResearcher = Arrays.asList("notselected.watingForResponse", "abandoned.not_interested");
+    private final List<String> allowedNextStatusBiobanker = new ArrayList<>();
+    private final List<String> allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
 
     public RequestStatusAvailability(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();

@@ -1,6 +1,8 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -9,12 +11,12 @@ import java.util.List;
 public class RequestStatusReceivedSamplesData implements RequestStatus {
 
     private String status = null;
-    private String statusType = "receivedSamples";
+    private String statusType = LifeCycleRequestStatusType.RECEIVED_SAMPLES;
     private String statusText = "Samples/Data received.";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("not_interested", "end");
-    private List allowedNextStatusBiobanker = Arrays.asList("abandoned.not_interested");
-    private List allowedNextStatusResearcher = Arrays.asList("notselected.notselected", "endOfProject.end");
+    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
+    private List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     public RequestStatusReceivedSamplesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();

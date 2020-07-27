@@ -22,6 +22,10 @@ public class LifeCycleRequestStatusStatus {
     public static final String SELECT_AND_ACCEPT = "selectAndAccept";
     public static final String SIGNED = "signed";
     public static final String SHIPPED = "shipped";
+    public static final String RECEIVED = "received";
+    public static final String END = "end";
+    public static final String OFFER = "offer";
+    public static final String ACCEPTED = "accepted";
 
     public static final String NOT_INTERESTED = "not_interested";
     public static final String ABANDONED = "abandoned";

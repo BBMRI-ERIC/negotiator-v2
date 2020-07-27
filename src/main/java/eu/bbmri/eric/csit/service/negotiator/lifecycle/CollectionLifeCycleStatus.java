@@ -97,7 +97,7 @@ public class CollectionLifeCycleStatus {
             RequestStatus status = new RequestStatusMTASigned(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else if(collectionRequestStatusDTO.getStatusType().equals("shippedSamples")) {
-            RequestStatus status = new RequestStatusShippedSampesData(collectionRequestStatusDTO);
+            RequestStatus status = new RequestStatusShippedSamplesData(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else if(collectionRequestStatusDTO.getStatusType().equals("receivedSamples")) {
             RequestStatus status = new RequestStatusReceivedSamplesData(collectionRequestStatusDTO);
