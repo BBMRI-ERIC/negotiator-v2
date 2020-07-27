@@ -13,4 +13,6 @@ public class LifeCycleRequestStatusType {
     public static final String ACCESS_CONDITIONS = "accessConditions";
     public static final String ACCEPT_CONDITIONS = "acceptConditions";
     public static final String MTA_SIGNED = "mtaSigned";
+    public static final String SHIPPED_SAMPLES = "shippedSamples";
+    public static final String RECEIVED_SAMPLES = "receivedSamples";
 }
