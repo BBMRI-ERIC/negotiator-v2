@@ -32,6 +32,9 @@ import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentPrivateReco
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentRecord;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.ResultQuery;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -72,12 +75,11 @@ public class FileServlet extends HttpServlet {
     @Override
     // TODO: Refector
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException
-    {
+        throws ServletException, IOException {
         /* Get requested file by path info.  */
         String requestedFile = request.getPathInfo();
 
-        if(requestedFile == null) {
+        if (requestedFile == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST); // 400
             return;
         }
@@ -94,11 +96,11 @@ public class FileServlet extends HttpServlet {
 
         //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
         // patterngrops 1: queryID, 2: fileID, 3: fileName
-        Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_scope_(\\w*)_salt_(.*)\\.download$");
+        Pattern pattern = Pattern.compile("^query_(\\d*)_file_(.*)\\.(\\w*)_scope_(\\w*)_salt_(.*)\\.download$");
         Matcher matcher = pattern.matcher(requestedFile);
         String filenameSalt = null;
 
-        if(matcher.find()) {
+        if (matcher.find()) {
             filenameSalt = matcher.group(5);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
@@ -119,7 +121,12 @@ public class FileServlet extends HttpServlet {
 
         // check if the salt fits
         FileUtil fileUtil = new FileUtil();
-        String trueFileName = fileUtil.getStorageFileName(Integer.parseInt(queryId), Integer.parseInt(fileId), fileExtension);
+        String trueFileName = "";
+        if (fileId.contains("-")) {
+            trueFileName = fileUtil.getStorageFileName(Integer.parseInt(queryId), fileId, fileExtension);
+        } else {
+            trueFileName = fileUtil.getStorageFileName(Integer.parseInt(queryId), Integer.parseInt(fileId), fileExtension);
+        }
         String saltCheck = DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
                 trueFileName);
 
@@ -154,6 +161,15 @@ public class FileServlet extends HttpServlet {
                         .ID.eq(Integer.parseInt(fileId)))
                         .fetchOneInto(Tables.QUERY_ATTACHMENT_PRIVATE);
                 downloadFileName = attachmentRecord.getAttachment();
+            } else if(fileScope.equals("lifeCycleFile")) {
+                ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT value->>'filename' FROM json_array_elements((" +
+                        "SELECT status_json::json#>'{indicateAccessConditionFiles}' " +
+                        "FROM public.query_lifecycle_collection WHERE status_json ILIKE '%3a01e502-f0a3-4186-b891-bc94b70fc951%')) " +
+                        "WHERE value::text ILIKE '%" + fileId + "%';");
+                Result<Record> result = resultQuery.fetch();
+                for(Record record : result) {
+                    downloadFileName = (String)record.getValue(0);
+                }
             }
         } catch(SQLException | NumberFormatException e) {
             e.printStackTrace();
