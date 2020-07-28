@@ -4,22 +4,21 @@ import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class RequestStatusMTASigned implements RequestStatus {
+public class RequestStatusDataReturned implements RequestStatus {
 
     private String status = null;
-    private final String statusType = LifeCycleRequestStatusType.MTA_SIGNED;
-    private final String statusText = "MTA and Paperwork for shipping signed.";
+    private final String statusType = LifeCycleRequestStatusType.DATA_RETURNED;
+    private final String statusText = "Project data returned.";
     private Date statusDate = null;
+    private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private final List<String> allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
+    private final List<String> allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
 
-    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
-    private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
-    private final List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
-
-    public RequestStatusMTASigned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+    public RequestStatusDataReturned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
     }
@@ -66,6 +65,6 @@ public class RequestStatusMTASigned implements RequestStatus {
 
     @Override
     public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>contacted</td><td></td><td></tr>";
+        return null;
     }
 }

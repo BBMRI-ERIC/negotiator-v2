@@ -26,6 +26,9 @@ public class LifeCycleRequestStatusStatus {
     public static final String END = "end";
     public static final String OFFER = "offer";
     public static final String ACCEPTED = "accepted";
+    public static final String RETURNED = "returned";
+    public static final String CONFIRMED = "confirmed";
+    public static final String REQUEST_END = "requestEnd";
 
     public static final String NOT_INTERESTED = "not_interested";
     public static final String ABANDONED = "abandoned";
@@ -33,4 +36,5 @@ public class LifeCycleRequestStatusStatus {
     public static final String NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER = "notselected.watingForResponse";
     public static final String NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_RESEARCHER = "notselected.watingForResponseFromResearcher";
     public static final String NOT_SELECTED_NOT_SELECTED = "notselected.notselected";
+    public static final String NOT_SELECTED_REQUEST_DONE = "notselected.requestDone";
 }

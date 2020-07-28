@@ -7,6 +7,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,18 +97,28 @@ public class CollectionLifeCycleStatus {
         } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.MTA_SIGNED)) {
             RequestStatus status = new RequestStatusMTASigned(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals("shippedSamples")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.SHIPPED_SAMPLES)) {
             RequestStatus status = new RequestStatusShippedSamplesData(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals("receivedSamples")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.RECEIVED_SAMPLES)) {
             RequestStatus status = new RequestStatusReceivedSamplesData(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals("endOfProject")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.END_OF_PROJECT)) {
             RequestStatus status = new RequestStatusEndOfProject(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals("dataReturnOffer")) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.DATA_RETURN_OFFER)) {
             RequestStatus status = new RequestStatusDataReturnOffer(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.DATA_RETURNED)) {
+            RequestStatus status = new RequestStatusDataReturned(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.DATA_RETURNED_CONFIRMED)) {
+            RequestStatus status = new RequestStatusDataReturnConfirmed(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+            if(collectionRequestStatusDTO.getStatus().equals(LifeCycleRequestStatusStatus.CONFIRMED)) {
+                RequestStatus status_end = new RequestStatusRequestEnd(collectionRequestStatusDTO);
+                statusTree.put(getIndex(status_end.getStatusDate()), status_end);
+            }
         } else {
             logger.error("ERROR-NG-0000002: Error status type \"" + collectionRequestStatusDTO.getStatusType() + "\" not" +
                     " implemented for collectionRequestStatus in CollectionLifeCycleStatus::collectionRequestStatusFactory(CollectionRequestStatusDTO).");

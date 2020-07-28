@@ -17,4 +17,7 @@ public class LifeCycleRequestStatusType {
     public static final String RECEIVED_SAMPLES = "receivedSamples";
     public static final String END_OF_PROJECT = "endOfProject";
     public static final String DATA_RETURN_OFFER = "dataReturnOffer";
+    public static final String DATA_RETURNED = "dataReturned";
+    public static final String DATA_RETURNED_CONFIRMED = "dataReturnedConfirmed";
+    public static final String REQUEST_DONE = "requestDone";
 }

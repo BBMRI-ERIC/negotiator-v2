@@ -24,6 +24,9 @@ public class LifeCycleStatusUtilNextStatus {
     private static final String REQUEST_STATUS_RECEIVED_SAMPLES_DATA = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusReceivedSamplesData";
     private static final String REQUEST_STATUS_END_OF_PROJECT = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusEndOfProject";
     private static final String REQUEST_STATUS_DATA_RETURN_OFFER = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusDataReturnOffer";
+    private static final String REQUEST_STATUS_DATA_RETURNED = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusDataReturned";
+    private static final String REQUEST_STATUS_DATA_RETURN_CONFIRMED = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusDataReturnConfirmed";
+    private static final String REQUEST_STATUS_REQUEST_END = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusRequestEnd";
 
     private LifeCycleStatusUtilNextStatus() {}
 
@@ -86,7 +89,16 @@ public class LifeCycleStatusUtilNextStatus {
                 return Arrays.asList(LifeCycleRequestStatusStatus.NOT_INTERESTED,
                         LifeCycleRequestStatusStatus.ACCEPTED,
                         LifeCycleRequestStatusStatus.REJECTED);
+            } else if (status.equals(LifeCycleRequestStatusStatus.ACCEPTED)) {
+                return Arrays.asList(LifeCycleRequestStatusStatus.NOT_INTERESTED,
+                        LifeCycleRequestStatusStatus.OFFER,
+                        LifeCycleRequestStatusStatus.RETURNED);
             }
+        } else if(requestStatusClass.equals(REQUEST_STATUS_DATA_RETURNED)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_INTERESTED,
+                    LifeCycleRequestStatusStatus.CONFIRMED);
+        } else if(requestStatusClass.equals(REQUEST_STATUS_DATA_RETURN_CONFIRMED)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.REQUEST_END);
         } else {
             logger.error("a376499caaa7-LifeCycleStatusUtilNextStatus ERROR-NG-0000051: Error no AllowedNextStatus for lifecycle Class: {} not found.", requestStatusClass);
             return Arrays.asList();
@@ -147,7 +159,18 @@ public class LifeCycleStatusUtilNextStatus {
                 return Arrays.asList(combineTypeAndStatus(LifeCycleRequestStatusType.DATA_RETURN_OFFER, LifeCycleRequestStatusStatus.ACCEPTED),
                         combineTypeAndStatus(LifeCycleRequestStatusType.DATA_RETURN_OFFER, LifeCycleRequestStatusStatus.REJECTED),
                         combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+            } else if (status.equals(LifeCycleRequestStatusStatus.ACCEPTED)) {
+                return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_RESEARCHER,
+                        combineTypeAndStatus(LifeCycleRequestStatusType.DATA_RETURN_OFFER, LifeCycleRequestStatusStatus.REJECTED),
+                        combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
             }
+        } else if(requestStatusClass.equals(REQUEST_STATUS_DATA_RETURNED)) {
+            return Arrays.asList(combineTypeAndStatus(LifeCycleRequestStatusType.DATA_RETURNED_CONFIRMED, LifeCycleRequestStatusStatus.CONFIRMED),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_DATA_RETURN_CONFIRMED)) {
+            return Arrays.asList(combineTypeAndStatus(LifeCycleRequestStatusType.REQUEST_DONE, LifeCycleRequestStatusStatus.REQUEST_END));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_REQUEST_END)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_REQUEST_DONE);
         }  else {
             logger.error("a376499caaa7-LifeCycleStatusUtilNextStatus ERROR-NG-0000053: Error no AllowedNextStatusBiobanker for lifecycle Class: {} not found.", requestStatusClass);
             return Arrays.asList();
@@ -193,7 +216,17 @@ public class LifeCycleStatusUtilNextStatus {
             } else if(requestStatusClass.equals(REQUEST_STATUS_DATA_RETURN_OFFER)) {
                 return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER,
                         combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+            } else if (status.equals(LifeCycleRequestStatusStatus.ACCEPTED)) {
+                return Arrays.asList(combineTypeAndStatus(LifeCycleRequestStatusType.DATA_RETURNED, LifeCycleRequestStatusStatus.RETURNED),
+                        combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
             }
+        } else if(requestStatusClass.equals(REQUEST_STATUS_DATA_RETURNED)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER,
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_DATA_RETURN_CONFIRMED)) {
+            return Arrays.asList(combineTypeAndStatus(LifeCycleRequestStatusType.REQUEST_DONE, LifeCycleRequestStatusStatus.REQUEST_END));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_REQUEST_END)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_REQUEST_DONE);
         } else {
             logger.error("a376499caaa7-LifeCycleStatusUtilNextStatus ERROR-NG-0000052: Error no AllowedNextStatusResearcher for lifecycle Class: {} not found.", requestStatusClass);
             return Arrays.asList();
