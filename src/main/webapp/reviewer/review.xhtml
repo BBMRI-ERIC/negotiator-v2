@@ -39,6 +39,48 @@
     <ui:param name="bodyClass" value="container body-nomargin"/>
 
     <ui:define name="body">
+
+        <style>
+            .table-overflow {
+                overflow: hidden;
+                height: 200px;
+                line-height: 25px;
+            }
+            .table-overflow:before {
+                content: "";
+                float: left;
+                width: 5px;
+                height: 200px;
+            }
+            .table-overflow > *:first-child {
+                float: right;
+                width: 100%;
+                margin-left: -5px;
+            }
+            .table-overflow:after {
+                content: "\02026";
+                box-sizing: content-box;
+                -webkit-box-sizing: content-box;
+                -moz-box-sizing: content-box;
+                float: right;
+                position: relative;
+                top: -25px;
+                left: 100%;
+                width: 3em;
+                margin-left: -3em;
+                padding-right: 5px;
+                text-align: right;
+                background-size: 100% 100%;
+
+                background: -webkit-gradient(linear, left top, right top,
+                from(rgba(249, 249, 249, 0)), to(rgb(249, 249, 249)), color-stop(50%, rgb(249, 249, 249)));
+                background: -moz-linear-gradient(to right, rgba(249, 249, 249, 0), rgb(249, 249, 249) 50%, rgb(249, 249, 249));
+                background: -o-linear-gradient(to right, rgba(249, 249, 249, 0), rgb(249, 249, 249) 50%, rgb(249, 249, 249));
+                background: -ms-linear-gradient(to right, rgba(249, 249, 249, 0), rgb(249, 249, 249) 50%, rgb(249, 249, 249));
+                background: linear-gradient(to right, rgba(249, 249, 249, 0), rgb(249, 249, 249) 50%, rgb(249, 249, 249));
+            }
+        </style>
+
         <h:panelGroup layout="block" styleClass="row">
             <h3>#{label['reviewer.review.header']}</h3>
         </h:panelGroup>
@@ -91,15 +133,16 @@
                     </thead>
                     <tbody>
                         <ui:repeat value="#{reviewBean.queryRecordList}" var="queryRecord">
-                            <tr>
+                            <tr style="max-height: 50px;">
                                 <th scope="row">#{queryRecord.id}</th>
-                                <td>#{queryRecord.title}</td>
-                                <td>#{queryRecord.queryCreationTime}</td>
-                                <td>#{queryRecord.researcherName}<br/>#{queryRecord.researcherEmail}<br/>#{queryRecord.researcherOrganization}</td>
-                                <td>#{queryRecord.text}</td>
-                                <td>#{queryRecord.requestDescription}</td>
-                                <td>#{queryRecord.ethicsVote}</td>
+                                <td><div class="table-overflow"><div><p>#{queryRecord.title}</p></div></div></td>
+                                <td><div class="table-overflow"><div><p>#{queryRecord.queryCreationTime}</p></div></div></td>
+                                <td><div class="table-overflow"><div><p>#{queryRecord.researcherName}<br/>#{queryRecord.researcherEmail}<br/>#{queryRecord.researcherOrganization}</p></div></div></td>
+                                <td><div class="table-overflow"><div><p>#{queryRecord.text}</p></div></div></td>
+                                <td><div class="table-overflow"><div><p>#{queryRecord.requestDescription}</p></div></div></td>
+                                <td><div class="table-overflow"><div><p>#{queryRecord.ethicsVote}</p></div></div></td>
                                 <td>
+                                    <span style="font-size: 25px;" class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                                     <h:form id="approveRequest" enctype="multipart/form-data">
                                         <h:inputTextarea id="reviewcomment" value="#{reviewBean.reviewComment}"
                                                          styleClass="form-control" rows="5">
