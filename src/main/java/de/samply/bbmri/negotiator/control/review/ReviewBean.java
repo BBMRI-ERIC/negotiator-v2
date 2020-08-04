@@ -31,9 +31,10 @@ public class ReviewBean implements Serializable {
     private int approvedRequests = 0;
     private int rejectedRequests = 0;
     private List reviewRequest;
-    private HashMap<Integer, RequestLifeCycleStatus> requestStatusList = new HashMap<Integer, RequestLifeCycleStatus>();
-    private List<QueryRecord> queryRecordList = new ArrayList<QueryRecord>();
+    private final HashMap<Integer, RequestLifeCycleStatus> requestStatusList = new HashMap<Integer, RequestLifeCycleStatus>();
+    private final List<QueryRecord> queryRecordList = new ArrayList<QueryRecord>();
     private String reviewComment = "";
+    private QueryRecord selectedQueryRecord = null;
 
     @PostConstruct
     public void init() {
@@ -121,5 +122,13 @@ public class ReviewBean implements Serializable {
 
     public void setReviewComment(String reviewComment) {
         this.reviewComment = reviewComment;
+    }
+
+    public QueryRecord getSelectedQueryRecord() {
+        return selectedQueryRecord;
+    }
+
+    public void setSelectedQueryRecord(QueryRecord selectedQueryRecord) {
+        this.selectedQueryRecord = selectedQueryRecord;
     }
 }
