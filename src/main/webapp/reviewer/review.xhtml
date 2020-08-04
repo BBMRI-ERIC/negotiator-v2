@@ -30,6 +30,7 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
                 template="../components/default.xhtml">
 
     <f:metadata>
@@ -78,6 +79,25 @@
                 background: -o-linear-gradient(to right, rgba(249, 249, 249, 0), rgb(249, 249, 249) 50%, rgb(249, 249, 249));
                 background: -ms-linear-gradient(to right, rgba(249, 249, 249, 0), rgb(249, 249, 249) 50%, rgb(249, 249, 249));
                 background: linear-gradient(to right, rgba(249, 249, 249, 0), rgb(249, 249, 249) 50%, rgb(249, 249, 249));
+            }
+            @media (min-width: 768px) {
+                .modal-dialog {
+                    width: 768px;
+                    margin: 30px auto;
+                }
+                .modal-body-data-container {
+                    width: 708px;
+                }
+            }
+
+            @media (min-width: 900px) {
+                .modal-dialog {
+                    width: 900px;
+                    margin: 30px auto;
+                }
+                .modal-body-data-container {
+                    width: 840px;
+                }
             }
         </style>
 
@@ -181,12 +201,34 @@
                     </div>
                     <div class="modal-body">
                         <ui:repeat value="#{reviewBean.queryRecordList}" var="queryRecord">
-                            <div id="requestOverviewModal#{queryRecord.id}" class="container">
+                            <div id="requestOverviewModal#{queryRecord.id}" class="container modal-body-data-container">
                                 <div class="row">
-                                    <div class="col-sm-2 col-xs-1">#{queryRecord.id}</div>
-                                    <div class="col-sm-2 col-xs-1">#{queryRecord.title}</div>
+                                    <div class="col-sm-2 col-xs-12">#{queryRecord.id}</div>
+                                    <div class="col-sm-10 col-xs-12">#{queryRecord.title}</div>
+                                    <div class="col-sm-3 col-xs-12">#{queryRecord.queryCreationTime}</div>
+                                    <div class="col-sm-3 col-xs-12">#{queryRecord.researcherName}</div>
+                                    <div class="col-sm-6 col-xs-12">#{queryRecord.researcherEmail}</div>
+                                    <div class="col-sm-12 col-xs-12">#{queryRecord.researcherOrganization}</div>
+                                    <br/>
                                 </div>
-
+                                <div class="row" style="margin-top: 10px;">
+                                    <b>Project description:</b><br/>
+                                    <div class="col-sm-12 col-xs-12">#{queryRecord.text}</div>
+                                </div>
+                                <div class="row">
+                                    <b>Request description:</b><br/>
+                                    <div class="col-sm-12 col-xs-12">#{queryRecord.requestDescription}</div>
+                                </div>
+                                <div class="row">
+                                    <b>Ethics Vote:</b><br/>
+                                    <div class="col-sm-12 col-xs-12">#{queryRecord.ethicsVote}</div>
+                                </div>
+                                <div class="row">
+                                    Attachments:<br/>
+                                    <div class="col-sm-12 col-xs-12">
+                                        <bbmricc:queryDetailAttachments queryBean="#{queryRecord}" fileUploadBean="#{fileUploadBean}" />
+                                    </div>
+                                </div>
                             </div>
                         </ui:repeat>
                     </div>
