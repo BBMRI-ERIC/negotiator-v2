@@ -250,23 +250,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return null;
     }
 
-    /**
-     * Starts negotiation for a query.
-     *
-     * @return refreshes the view
-     */
-    public String startNegotiation() {
-        try (Config config = ConfigFactory.get()) {
-            DbUtil.startNegotiation(config, selectedQuery.getId());
-            requestLifeCycleStatus.nextStatus("started", "start", null, userBean.getUserId());
-            requestLifeCycleStatus.setQuery(selectedQuery);
-            requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
-    }
-
     public String resubmitRequest() {
         requestLifeCycleStatus = new RequestLifeCycleStatus(selectedQuery.getId());
         requestLifeCycleStatus.createStatus(userBean.getUserId());
@@ -335,18 +318,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
             System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Builds url for biobanker to navigate to the query with id=selectedQuery.getId()
-     * @return    The URL for the biobanker
-     */
-    public String getQueryUrlForBiobanker() {
-        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
-
-        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
-                context.getRequestServerPort(), context.getRequestContextPath(),
-                "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
     }
 
     /*
