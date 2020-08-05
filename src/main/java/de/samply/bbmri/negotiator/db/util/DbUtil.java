@@ -403,6 +403,15 @@ public class DbUtil {
         return config.map(result, QueryRecord.class);
     }
 
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getQueryFromIdAsQuery(Config config, Integer queryId) {
+        Record result = config.dsl()
+                .selectFrom(Tables.QUERY)
+                .where(Tables.QUERY.ID.eq(queryId))
+                .fetchOne();
+
+        return config.map(result, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+    }
+
     /**
      * Edits/Updates title, description and jsonText of a query.
      * @param title title of the query

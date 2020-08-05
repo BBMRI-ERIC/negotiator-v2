@@ -2,16 +2,21 @@ package de.samply.bbmri.negotiator.control.review;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -23,6 +28,8 @@ import java.util.List;
 @ViewScoped
 public class ReviewBean implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private final Logger logger = LoggerFactory.getLogger(ReviewBean.class);
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -76,10 +83,27 @@ public class ReviewBean implements Serializable {
     }
 
     public String approveRequest(Integer queryRecordId) {
-        requestStatusList.get(queryRecordId).nextStatus("approved", "review", "{\"statusApprovedText\":\"" + reviewComment + "\"}", userBean.getUserId());
-        requestStatusList.get(queryRecordId).nextStatus("waitingstart", "start", null, userBean.getUserId());
+        try (Config config = ConfigFactory.get()) {
+            requestStatusList.get(queryRecordId).nextStatus("approved", "review", "{\"statusApprovedText\":\"" + reviewComment + "\"}", userBean.getUserId());
+            requestStatusList.get(queryRecordId).nextStatus("waitingstart", "start", null, userBean.getUserId());
+            DbUtil.startNegotiation(config, queryRecordId);
+            Query selectedQuery = DbUtil.getQueryFromIdAsQuery(config, queryRecordId);
+            requestStatusList.get(queryRecordId).nextStatus("started", "start", null, userBean.getUserId());
+            requestStatusList.get(queryRecordId).setQuery(selectedQuery);
+            requestStatusList.get(queryRecordId).contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker(queryRecordId));
+        } catch (Exception e) {
+            logger.error("ff0c840998df-ReviewBean ERROR-NG-0000054: Error approving request and starting negotiation.");
+        }
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public String getQueryUrlForBiobanker(Integer queryRecordId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + queryRecordId);
     }
 
     public String rejectRequest(Integer queryRecordId) {
