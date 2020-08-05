@@ -42,44 +42,49 @@
     <h:panelGroup layout="block" styleClass="deco-none">
 
         <h:panelGroup layout="block"
+                      style="min-width: 370px;"
                       styleClass="panel panel-default clickable #{cc.attrs.item.query.id == cc.attrs.selectedQuery ? 'selected-query' : ''}">
 
-            <h:panelGroup layout="block" styleClass="panel-heading">
-
-                <h:link outcome="detail" styleClass="detailLink" value="#{cc.attrs.item.query.title}">
-                    <f:param name="queryId" value="#{cc.attrs.item.query.id}"/>
-                </h:link>
-
-                <h:panelGroup styleClass="pull-right"
-                              rendered="#{cc.attrs.item.commentCount > 0 or cc.attrs.item.privateNegotiationCount > 0}">
-
-                    <div class="badge queryNumberResponsesBadge"
-                         style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }#{cc.attrs.item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
-                         data-toggle="tooltip"
-                         data-placement="bottom"
-                         title="#{item.unreadCommentCount} unread comments from #{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
-
-                        <i class="glyphicon glyphicon-bullhorn"></i>
-                        <h:outputText value="   #{item.unreadCommentCount}/#{cc.attrs.item.commentCount}"/>
+            <h:panelGroup layout="block" styleClass="panel-heading container" style="width: 100%;">
+                <div class="row">
+                    <div class="col-sm-6 col-xs-12" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-right: 0;">
+                        <h:link outcome="detail" styleClass="detailLink" value="#{cc.attrs.item.query.title}">
+                            <f:param name="queryId" value="#{cc.attrs.item.query.id}"/>
+                        </h:link>
                     </div>
 
-                    <div class="badge queryNumberResponsesBadge"
-                         style='#{cc.attrs.item.privateNegotiationCount == 0 ? "display:none;" : "" }'
-                         data-toggle="tooltip"
-                         data-placement="bottom"
-                         title="#{cc.attrs.item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+                    <h:panelGroup styleClass="pull-right col-sm-6 col-xs-12"
+                                  style="padding-left: 0;"
+                                  rendered="#{cc.attrs.item.commentCount > 0 or cc.attrs.item.privateNegotiationCount > 0}">
 
-                        <i class="glyphicon glyphicon-tower"></i>
-                        <h:outputText value="   #{cc.attrs.item.privateNegotiationCount}" />
-                    </div>
+                        <h:outputText value="#{cc.attrs.item.lastCommentTime}"
+                                      styleClass="queryCreationDate"
+                                      title="#{label['queryview.querycc.attrs.item.datetime.last.comment']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
+                        </h:outputText>
 
-                    <h:outputText value="#{cc.attrs.item.lastCommentTime}"
-                                  styleClass="queryCreationDate"
-                                  title="#{label['queryview.querycc.attrs.item.datetime.last.comment']}">
-                        <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
-                    </h:outputText>
+                        <div class="badge queryNumberResponsesBadge pull-right"
+                             style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }#{cc.attrs.item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                             data-toggle="tooltip"
+                             data-placement="bottom"
+                             title="#{item.unreadCommentCount} unread comments from #{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
 
-                </h:panelGroup>
+                            <i class="glyphicon glyphicon-bullhorn"></i>
+                            <h:outputText value="   #{item.unreadCommentCount}/#{cc.attrs.item.commentCount}"/>
+                        </div>
+
+                        <div class="badge queryNumberResponsesBadge pull-right"
+                             style='#{cc.attrs.item.privateNegotiationCount == 0 ? "display:none;" : "" }'
+                             data-toggle="tooltip"
+                             data-placement="bottom"
+                             title="#{cc.attrs.item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+
+                            <i class="glyphicon glyphicon-tower"></i>
+                            <h:outputText value="   #{cc.attrs.item.privateNegotiationCount}" />
+                        </div>
+
+                    </h:panelGroup>
+                </div>
 
             </h:panelGroup>
 

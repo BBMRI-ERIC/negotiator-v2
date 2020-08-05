@@ -44,80 +44,86 @@
 <composite:implementation>
     <h:panelGroup layout="block" styleClass="deco-none">
         <h:panelGroup layout="block"
+                      style="min-width: 365px;"
                       styleClass="panel panel-default clickable #{cc.attrs.item.query.id == cc.attrs.selectedQuery ? 'selected-query' : ''}
 								#{cc.attrs.item.isArchived() ? 'archived-query' : ''} ">
 
-            <h:panelGroup layout="block" styleClass="panel-heading">
+            <h:panelGroup layout="block" styleClass="panel-heading container" style="width: 100%;">
 
-                <h:commandLink
-                        styleClass="#{cc.attrs.item.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
-                        title="#{cc.attrs.item.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
-                        action="#{cc.attrs.backingBean.starQuery(queryDto)}">
-                    <i class="fa fa-star"></i>
-                </h:commandLink>
-
-                <h:link outcome="detail"
-                        title="#{label['queryview.queryitem.action.clickme']}"
-                        style="margin-left: 30px;" styleClass="detailLink">
-                    <f:param name="queryId" value="#{cc.attrs.item.query.id}" />
-                    <f:param name="flag" value="#{ownerQueriesBean.flagFilter}" />
-                    <h:outputText value="#{cc.attrs.item.query.title}" />
-                </h:link>
-
-                <h:panelGroup styleClass="pull-right">
-
-                    <h:panelGroup layout="block"
-                                  styleClass="btn-group queryActionButtons pull-right"
-                                  role="group" aria-label="...">
-
+                <div class="row">
+                    <div class="col-sm-1 col-xs-1">
                         <h:commandLink
-                                styleClass="#{cc.attrs.item.isArchived() ? 'btn btn-primary' : 'btn btn-default'}"
-                                title="#{cc.attrs.item.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
-                                action="#{cc.attrs.backingBean.archiveQuery(queryDto)}">
-                            <i class="fa fa-folder-open"></i>
+                                styleClass="#{cc.attrs.item.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
+                                title="#{cc.attrs.item.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+                                action="#{cc.attrs.backingBean.starQuery(queryDto)}">
+                            <i class="fa fa-star"></i>
                         </h:commandLink>
+                    </div>
 
-                        <h:commandLink
-                                styleClass="#{cc.attrs.item.isIgnored() ? 'btn btn-primary' : 'btn btn-default'}"
-                                title="#{cc.attrs.item.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
-                                action="#{cc.attrs.backingBean.ignoreQuery(queryDto)}">
-                            <i class="fa fa-sign-out"></i>
-                        </h:commandLink>
+                    <div class="col-sm-5 col-xs-5" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">
+                        <h:link outcome="detail"
+                                title="#{label['queryview.queryitem.action.clickme']}"
+
+                                styleClass="detailLink">
+                            <f:param name="queryId" value="#{cc.attrs.item.query.id}" />
+                            <f:param name="flag" value="#{ownerQueriesBean.flagFilter}" />
+                            <h:outputText value="#{cc.attrs.item.query.title}" />
+                        </h:link>
+                    </div>
+
+                    <h:panelGroup styleClass="col-sm-6 col-xs-6">
+
+                        <h:panelGroup layout="block"
+                                      styleClass="btn-group queryActionButtons pull-right"
+                                      role="group" aria-label="...">
+
+                            <h:commandLink
+                                    styleClass="#{cc.attrs.item.isArchived() ? 'btn btn-primary' : 'btn btn-default'}"
+                                    title="#{cc.attrs.item.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
+                                    action="#{cc.attrs.backingBean.archiveQuery(queryDto)}">
+                                <i class="fa fa-folder-open"></i>
+                            </h:commandLink>
+
+                            <h:commandLink
+                                    styleClass="#{cc.attrs.item.isIgnored() ? 'btn btn-primary' : 'btn btn-default'}"
+                                    title="#{cc.attrs.item.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
+                                    action="#{cc.attrs.backingBean.ignoreQuery(queryDto)}">
+                                <i class="fa fa-sign-out"></i>
+                            </h:commandLink>
+
+                        </h:panelGroup>
+
+                        <div class="badge queryNumberResponsesBadge pull-right"
+                             style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }#{cc.attrs.item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                             data-toggle="tooltip"
+                             data-placement="bottom"
+                             title="#{cc.attrs.item.unreadCommentCount} unread comments from #{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
+
+                            <i class="glyphicon glyphicon-bullhorn"></i>
+                            <h:outputText value="   #{cc.attrs.item.unreadCommentCount}/#{cc.attrs.item.commentCount}"/>
+                        </div>
+
+                        <div class="badge queryNumberResponsesBadge pull-right"
+                             style='#{cc.attrs.item.privateNegotiationCount == 0 ? "display:none;" : "" }'
+                             data-toggle="tooltip"
+                             data-placement="bottom"
+                             title="#{cc.attrs.item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+
+                            <i class="glyphicon glyphicon-tower"></i>
+                            <h:outputText value="   #{cc.attrs.item.privateNegotiationCount}" />
+                        </div>
 
                     </h:panelGroup>
 
-                    <div class="badge queryNumberResponsesBadge"
-                         style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }#{cc.attrs.item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
-                         data-toggle="tooltip"
-                         data-placement="bottom"
-                         title="#{cc.attrs.item.unreadCommentCount} unread comments from #{cc.attrs.item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
-
-                        <i class="glyphicon glyphicon-bullhorn"></i>
-                        <h:outputText value="   #{cc.attrs.item.unreadCommentCount}/#{cc.attrs.item.commentCount}"/>
-                    </div>
-
-                    <div class="badge queryNumberResponsesBadge"
-                         style='#{cc.attrs.item.privateNegotiationCount == 0 ? "display:none;" : "" }'
-                         data-toggle="tooltip"
-                         data-placement="bottom"
-                         title="#{cc.attrs.item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
-
-                        <i class="glyphicon glyphicon-tower"></i>
-                        <h:outputText value="   #{cc.attrs.item.privateNegotiationCount}" />
-                    </div>
-
-                </h:panelGroup>
+                </div>
 
             </h:panelGroup>
 
 
             <h:panelGroup layout="block" styleClass="panel-body">
                 <h:panelGroup layout="block" styleClass="row">
-                    <h:panelGroup layout="block" styleClass="col-md-2 col-xs-2">
-                        <bbmricc:avatar person="#{cc.attrs.item.queryAuthor}" />
-                    </h:panelGroup>
 
-                    <h:panelGroup styleClass="col-md-10">
+                    <h:panelGroup styleClass="col-md-12">
                         <h:panelGroup layout="block" styleClass="row queryOwner">
                             #{cc.attrs.item.queryAuthor.authName}
                         </h:panelGroup>
