@@ -164,7 +164,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Part dtaFile;
 	private Part otherAccessFile;
 
-	private FileUtil fileUtil = new FileUtil();
+	private final FileUtil fileUtil = new FileUtil();
 	private List<FacesMessage> fileValidationMessages = new ArrayList<>();
 	Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
 
@@ -464,12 +464,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 				String fileId = UUID.randomUUID().toString();
 				String filename = storeFile(part, fileId);
 				result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "MTA"));
-				seperatorForJason = ",";
-			}
-			for (Part part : getAllFilePartsFromMultifileUpload(dtaFile)) {
-				String fileId = UUID.randomUUID().toString();
-				String filename = storeFile(part, fileId);
-				result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "DTA"));
 				seperatorForJason = ",";
 			}
 			for (Part part : getAllFilePartsFromMultifileUpload(otherAccessFile)) {
