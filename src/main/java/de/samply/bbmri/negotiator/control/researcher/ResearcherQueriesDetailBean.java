@@ -258,6 +258,35 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     /**
+     * Starts negotiation for a query.
+     *
+     * @return refreshes the view
+     */
+    public String startNegotiation() {
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.startNegotiation(config, selectedQuery.getId());
+            requestLifeCycleStatus.nextStatus("started", "start", null, userBean.getUserId());
+            requestLifeCycleStatus.setQuery(selectedQuery);
+            requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
+    }
+
+    /**
+     * Builds url for biobanker to navigate to the query with id=selectedQuery.getId()
+     * @return    The URL for the biobanker
+     */
+    public String getQueryUrlForBiobanker() {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
+    }
+
+    /**
      * Add search filter
      */
     public void addFilter() {

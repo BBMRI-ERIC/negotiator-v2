@@ -274,6 +274,16 @@
                     <h:panelGroup styleClass="col-md-12" >
                         <h:panelGroup styleClass="col-md-3" >
                         </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-6" rendered="#{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().status.equals('waitingstart')}">
+                            <h:form id="form">
+                                <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                                <h:commandButton id="startNegotiation"
+                                                 value="#{label['querydetail.action.startNegotiation.buttonText']}"
+                                                 action="#{researcherQueriesDetailBean.startNegotiation()}"
+                                                 title="#{label['querydetail.tooltip.startNegotiation']}"
+                                                 styleClass="btn btn-primary" style="margin-top: 40px;background-color: #eb690b;"/>
+                            </h:form>
+                        </h:panelGroup>
                         <h:panelGroup styleClass="col-md-6" style="border-color: #eb690b; border-width: 1px; border-style: solid;" rendered="#{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().status.equals('rejected')}">
                             <h3>The request was rejected by BBMRI-ERIC.</h3>
                             <p><span style="text-decoration: underline;">Reason:</span>

@@ -2531,7 +2531,7 @@ public class DbUtil {
         try (Config config = ConfigFactory.get()) {
             ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM \n" +
                     "(SELECT (json_array_elements((q.json_text::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable, " +
-                    "COUNT(*) FROM query q GROUP BY readable) jsonc;");
+                    "COUNT(*) FROM query q WHERE q.json_text IS NOT NULL AND q.json_text != '' GROUP BY readable) jsonc;");
             Result<Record> result = resultQuery.fetch();
             for(Record record : result) {
                 System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
@@ -2549,13 +2549,14 @@ public class DbUtil {
     public static String getHumanReadableStatisticsForNetwork(Config config, Integer networkId) {
         ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
                 "SELECT sub1.readable, COUNT(*) count_all, COUNT(sub2.readable) count_network FROM ( " +
-                "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q GROUP BY q.id) sub1 " +
+                "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q " +
+                " WHERE q.json_text IS NOT NULL AND q.json_text != '' GROUP BY q.id) sub1 " +
                 "LEFT JOIN ( " +
                 "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q " +
                 "JOIN query_collection qc ON q.id = qc.query_id " +
                 "JOIN network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
                 "WHERE network_id = " + networkId +
-                " GROUP BY q.id) sub2 " +
+                " q.json_text IS NOT NULL AND q.json_text != '' GROUP BY q.id) sub2 " +
                 "ON sub1.readable = sub2.readable " +
                 "GROUP BY sub1.readable " +
                 ") jsonc;");
