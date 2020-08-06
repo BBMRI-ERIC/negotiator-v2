@@ -129,11 +129,11 @@ public class LifeCycleStatusUtilNextStatus {
                 result.add(combineTypeAndStatus(LifeCycleRequestStatusType.ACCESS_CONDITIONS, LifeCycleRequestStatusStatus.INDICATE_ACCESS_CONDITIONS));
             }
             result.add(combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
-            result.add(combineTypeAndStatus(LifeCycleRequestStatusType.INTEREST, LifeCycleRequestStatusStatus.INTERESTED));
+            result.add(combineTypeAndStatus(LifeCycleRequestStatusType.INTEREST, LifeCycleRequestStatusStatus.INTERESTED, LifeCycleRequestStatusExtension.BACK));
             return result;
         } else if(requestStatusClass.equals(REQUEST_STATUS_ACCESS_CONDITIONS)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_RESEARCHER,
-                    combineTypeAndStatus(LifeCycleRequestStatusType.AVAILABILITY, LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.AVAILABILITY, LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE, LifeCycleRequestStatusExtension.BACK),
                     combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else if(requestStatusClass.equals(REQUEST_STATUS_ACCEPT_CONDITIONS)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED,
@@ -161,7 +161,7 @@ public class LifeCycleStatusUtilNextStatus {
                         combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
             } else if (status.equals(LifeCycleRequestStatusStatus.ACCEPTED)) {
                 return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_RESEARCHER,
-                        combineTypeAndStatus(LifeCycleRequestStatusType.DATA_RETURN_OFFER, LifeCycleRequestStatusStatus.REJECTED),
+                        combineTypeAndStatus(LifeCycleRequestStatusType.DATA_RETURN_OFFER, LifeCycleRequestStatusStatus.REJECTED, LifeCycleRequestStatusExtension.BACK),
                         combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
             }
         } else if(requestStatusClass.equals(REQUEST_STATUS_DATA_RETURNED)) {
@@ -236,6 +236,10 @@ public class LifeCycleStatusUtilNextStatus {
 
     private static String combineTypeAndStatus(String type, String status) {
         return type + "." + status;
+    }
+
+    private static String combineTypeAndStatus(String type, String status, String extension) {
+        return type + "." + status + "." + extension;
     }
 
 }
