@@ -44,18 +44,18 @@
                                    itemLabel="#{label[nextStatus]}" itemValue="#{nextStatus}" />
                 </h:selectOneMenu>
 
-                <div id="numberOfAvailableSamples#{cc.attrs.collectionId}" style="display: none;">
-                    #{label['lifecycleCollectionStatus.numberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
-                    <h:inputText id="numberOfAvailableSamples#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfSamplesAvailable}"
-                                  styleClass="form-control"
-                                  pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailableSamples']}">
-                    </h:inputText>
-                </div>
                 <div id="numberOfAvailablePatients#{cc.attrs.collectionId}" style="display: none;">
                     #{label['lifecycleCollectionStatus.numberAvaivablePatients.title']} <i class="fa fa-pencil-square-o" />
                     <h:inputText id="numberOfAvailablePatients#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfPatientsAvailable}"
                                  styleClass="form-control"
                                  pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailablePatients']}">
+                    </h:inputText>
+                </div>
+                <div id="numberOfAvailableSamples#{cc.attrs.collectionId}" style="display: none;">
+                    #{label['lifecycleCollectionStatus.numberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
+                    <h:inputText id="numberOfAvailableSamples#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfSamplesAvailable}"
+                                  styleClass="form-control"
+                                  pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailableSamples']}">
                     </h:inputText>
                 </div>
                 <div id="shippedNumber#{cc.attrs.collectionId}" style="display: none;">
