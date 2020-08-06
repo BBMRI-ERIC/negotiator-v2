@@ -124,9 +124,11 @@ public class LifeCycleStatusUtilNextStatus {
                     combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else if(requestStatusClass.equals(REQUEST_STATUS_AVAILABILITY)) {
             List<String> result = new ArrayList<String>();
-            result.add(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED);
-            if(status.equals(LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE)) {
+            if(status.equals(LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE) || status.equals(LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE_COLLECTABLE)) {
+                result.add(combineTypeAndStatus(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED, LifeCycleRequestStatusExtension.INDICATE_ACCESS_CONDITIONS));
                 result.add(combineTypeAndStatus(LifeCycleRequestStatusType.ACCESS_CONDITIONS, LifeCycleRequestStatusStatus.INDICATE_ACCESS_CONDITIONS));
+            } else {
+                result.add(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED);
             }
             result.add(combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
             result.add(combineTypeAndStatus(LifeCycleRequestStatusType.INTEREST, LifeCycleRequestStatusStatus.INTERESTED, LifeCycleRequestStatusExtension.BACK));
