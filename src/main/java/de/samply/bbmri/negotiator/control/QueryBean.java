@@ -250,6 +250,11 @@ public class QueryBean implements Serializable {
            /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
            if(id != null) {
                DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id);
+               requestLifeCycleStatus = new RequestLifeCycleStatus(id);
+               if(!requestLifeCycleStatus.statusCreated()) {
+                   requestLifeCycleStatus.createStatus(userBean.getUserId());
+                   requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+               }
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
@@ -260,6 +265,7 @@ public class QueryBean implements Serializable {
                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
                requestLifeCycleStatus.createStatus(userBean.getUserId());
                requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+               config.commit();
                return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
            }
        } catch (IOException e) {

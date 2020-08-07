@@ -425,8 +425,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return dataCache.getBiobankName(biobankId);
     }
 
-    public void abandonRequest() {
+    public String abandonRequest() {
         requestLifeCycleStatus.nextStatus("abandoned", "abandoned", null, userBean.getUserId());
+        return "/researcher/index.xhtml";
     }
 
     /*

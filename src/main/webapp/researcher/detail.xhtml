@@ -153,14 +153,17 @@
                                 <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -120px;">
-                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-from-request-history" style="margin: 10px;">
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-from-request-history"
+                                        style="margin: 10px;display: none;">
                                     #{label['queryview.lifecycle.requestHistory.title']}
                                 </button>
-                                <h:button action="#{researcherQueriesDetailBean.abandonRequest()}"
-                                          value="#{label['queryview.lifecycle.abandonRequest.title']}"
-                                          title="#{label['queryview.lifecycle.abandonRequest.tooltip']}"
-                                          styleClass="btn btn-danger" style="margin: 10px;">
-                                </h:button>
+                                <h:form>
+                                    <h:commandButton action="#{researcherQueriesDetailBean.abandonRequest()}"
+                                              value="#{label['queryview.lifecycle.abandonRequest.title']}"
+                                              title="#{label['queryview.lifecycle.abandonRequest.tooltip']}"
+                                              styleClass="btn btn-danger" style="margin: 10px;">
+                                    </h:commandButton>
+                                </h:form>
 
                             </div>
                         </div>

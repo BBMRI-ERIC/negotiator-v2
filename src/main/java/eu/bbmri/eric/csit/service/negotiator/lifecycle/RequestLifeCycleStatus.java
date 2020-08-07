@@ -68,6 +68,10 @@ public class RequestLifeCycleStatus {
         requestStatusFactory(requestStatusDTO);
     }
 
+    public boolean statusCreated() {
+        return DbUtil.requestStatusForRequestExists(query_id);
+    }
+
     public void initialiseCollectionStatus() {
         if(collectionStatusList == null) {
             collectionStatusList = new HashMap<Integer, CollectionLifeCycleStatus>();

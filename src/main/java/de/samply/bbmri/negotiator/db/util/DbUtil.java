@@ -669,7 +669,10 @@ public class DbUtil {
                     .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
                             .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.QUERY.RESEARCHER_ID))
                             .and(Tables.PERSON_COMMENT.READ.eq(false)))
-                .where(condition)
+                .leftOuterJoin(Tables.REQUEST_STATUS)
+                    .on(Tables.REQUEST_STATUS.QUERY_ID.eq(Tables.QUERY.ID)
+                            .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
+                .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
@@ -748,6 +751,9 @@ public class DbUtil {
 
         condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
 
+        Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("reque_ststatus_table_abandon");
+
     	Result<Record> fetch = config.dsl()
 				.select(getFields(Tables.QUERY, "query"))
 				.select(getFields(queryAuthor, "query_author"))
@@ -776,15 +782,20 @@ public class DbUtil {
     			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
 
-                .join(Tables.REQUEST_STATUS, JoinType.JOIN)
-                .on(Tables.QUERY.ID.eq(Tables.REQUEST_STATUS.QUERY_ID))
+                .join(requestStatusTableStart, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
+
+                .join(requestStatusTableAbandon, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).eq("abandoned")))
 
                 .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
                         .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                         .and(Tables.PERSON_COMMENT.READ.eq(false)))
 
-    			.where(condition).and(Tables.REQUEST_STATUS.STATUS.eq("started"))
+    			.where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
@@ -2268,6 +2279,24 @@ public class DbUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean requestStatusForRequestExists(Integer request_id) {
+        try (Config config = ConfigFactory.get()) {
+            int count = config.dsl().selectCount()
+                    .from(Tables.REQUEST_STATUS)
+                    .where(Tables.REQUEST_STATUS.QUERY_ID.eq(request_id))
+                    .fetchOne(0, int.class);
+            if(count == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR saving/updating Request Status.");
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static CollectionRequestStatusDTO saveUpdateCollectionRequestStatus(Integer collectionRequestStatusId, Integer query_id, Integer collection_id, String status, String status_type, String status_json, Date status_date, Integer status_user_id) {
