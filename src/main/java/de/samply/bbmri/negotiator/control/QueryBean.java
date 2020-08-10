@@ -72,7 +72,7 @@ public class QueryBean implements Serializable {
 
    private Integer jsonQueryId;
 
-   private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
+   private static final Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
@@ -131,7 +131,7 @@ public class QueryBean implements Serializable {
     /**
      * List of faces messages
      */
-    private List<FacesMessage> msgs = new ArrayList<>();
+    private final List<FacesMessage> msgs = new ArrayList<>();
 
     /**
      * List of faces messages
@@ -254,6 +254,7 @@ public class QueryBean implements Serializable {
                if(!requestLifeCycleStatus.statusCreated()) {
                    requestLifeCycleStatus.createStatus(userBean.getUserId());
                    requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+
                }
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
