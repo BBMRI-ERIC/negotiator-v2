@@ -422,7 +422,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	}
 
 	private String createStatusJson(String status) {
-		if(numberOfSamplesAvailable != null || numberOfSamplesAvailable != null ) {
+		if(status.equals(LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_ACCESSIBLE)) {
 			String result = "{\"numberAvaiableSamples\":\"";
 			if(numberOfSamplesAvailable != null ) {
 				result += numberOfSamplesAvailable;
@@ -460,17 +460,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 		String seperatorForJason = "";
 		try {
 			fileValidationMessages = new ArrayList<>();
-			for (Part part : getAllFilePartsFromMultifileUpload(mtaFile)) {
-				String fileId = UUID.randomUUID().toString();
-				String filename = storeFile(part, fileId);
-				result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "MTA"));
-				seperatorForJason = ",";
+			if(mtaFile != null) {
+				for (Part part : getAllFilePartsFromMultifileUpload(mtaFile)) {
+					String fileId = UUID.randomUUID().toString();
+					String filename = storeFile(part, fileId);
+					result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "MTA"));
+					seperatorForJason = ",";
+				}
 			}
-			for (Part part : getAllFilePartsFromMultifileUpload(otherAccessFile)) {
-				String fileId = UUID.randomUUID().toString();
-				String filename = storeFile(part, fileId);
-				result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "Other"));
-				seperatorForJason = ",";
+			if(otherAccessFile != null) {
+				for (Part part : getAllFilePartsFromMultifileUpload(otherAccessFile)) {
+					String fileId = UUID.randomUUID().toString();
+					String filename = storeFile(part, fileId);
+					result.append(seperatorForJason + createIndicateAccessConditionFilesJson(fileId, queryId, filename, "Other"));
+					seperatorForJason = ",";
+				}
 			}
 		} catch (Exception e) {
 			logger.error("729f8d59add2-OwnerQueriesDetailBean ERROR-NG-0000054: Error uploading files for access condition.");

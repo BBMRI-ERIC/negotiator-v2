@@ -31,10 +31,13 @@ public class LifeCycleRequestStatusStatus {
     public static final String REQUEST_END = "requestEnd";
 
     public static final String NOT_INTERESTED = "not_interested";
+    public static final String NOT_INTERESTED_RESEARCHER = "not_interested_researcher";
     public static final String ABANDONED = "abandoned";
 
     public static final String NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER = "notselected.watingForResponse";
     public static final String NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_RESEARCHER = "notselected.watingForResponseFromResearcher";
     public static final String NOT_SELECTED_NOT_SELECTED = "notselected.notselected";
     public static final String NOT_SELECTED_REQUEST_DONE = "notselected.requestDone";
+    public static final String BIOBANKER_STEPPED_AWAY = "abandoned.biobankerSteppedAway";
+    public static final String RESEARCHER_STEPPED_AWAY = "abandoned.researcherSteppedAway";
 }

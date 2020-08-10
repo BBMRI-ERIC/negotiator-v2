@@ -1,8 +1,12 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
+import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -10,12 +14,22 @@ import java.util.List;
 public class RequestStatusAbandoned implements RequestStatus {
 
     private final String statusType = LifeCycleRequestStatusType.ABANDONED;
+    private String status = LifeCycleRequestStatusStatus.ABANDONED;
     private final String statusText = "Negotiation abandoned";
     private Date statusDate = null;
-    private final List allowedNextStatus = Arrays.asList();
+    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private List<String> allowedNextStatusBiobanker = new ArrayList<>();
+    private List<String> allowedNextStatusResearcher = new ArrayList<>();
 
     public RequestStatusAbandoned(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
+    }
+
+    public RequestStatusAbandoned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
+        statusDate = collectionRequestStatusDTO.getStatusDate();
+        status = collectionRequestStatusDTO.getStatus();
+        allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), status);
+        allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), status);
     }
 
     @Override
@@ -50,12 +64,12 @@ public class RequestStatusAbandoned implements RequestStatus {
 
     @Override
     public List<String> getNextStatusForBiobankers() {
-        return Arrays.asList();
+        return allowedNextStatusBiobanker;
     }
 
     @Override
     public List<String> getNextStatusForResearchers() {
-        return Arrays.asList();
+        return allowedNextStatusResearcher;
     }
 
     @Override

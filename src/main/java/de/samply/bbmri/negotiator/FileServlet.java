@@ -164,7 +164,7 @@ public class FileServlet extends HttpServlet {
             } else if(fileScope.equals("lifeCycleFile")) {
                 ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT value->>'filename' FROM json_array_elements((" +
                         "SELECT status_json::json#>'{indicateAccessConditionFiles}' " +
-                        "FROM public.query_lifecycle_collection WHERE status_json ILIKE '%3a01e502-f0a3-4186-b891-bc94b70fc951%')) " +
+                        "FROM public.query_lifecycle_collection WHERE status_json ILIKE '%" + fileId + "%')) " +
                         "WHERE value::text ILIKE '%" + fileId + "%';");
                 Result<Record> result = resultQuery.fetch();
                 for(Record record : result) {

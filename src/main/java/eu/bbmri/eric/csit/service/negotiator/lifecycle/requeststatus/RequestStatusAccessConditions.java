@@ -102,6 +102,7 @@ public class RequestStatusAccessConditions implements RequestStatus {
 
     private String getStatusFilesFromJson(String statusJsonString) {
         StringBuilder result = new StringBuilder();
+        result.append(" ");
         if(statusJsonString == null) {
             return result.toString();
         }
@@ -115,7 +116,7 @@ public class RequestStatusAccessConditions implements RequestStatus {
                 result.append("<br/>" + file.get("fileType").toString() + ": ");
                 result.append("<a href=\"../attachment/" + downloadPath + "\">" + file.get("filename").toString() + "</a>");
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return result.toString();

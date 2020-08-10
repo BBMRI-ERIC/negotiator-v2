@@ -112,6 +112,9 @@ public class CollectionLifeCycleStatus {
         } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.DATA_RETURNED)) {
             RequestStatus status = new RequestStatusDataReturned(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.ABANDONED)) {
+            RequestStatus status = new RequestStatusAbandoned(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
         } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.DATA_RETURNED_CONFIRMED)) {
             RequestStatus status = new RequestStatusDataReturnConfirmed(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);

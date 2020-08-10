@@ -20,4 +20,5 @@ public class LifeCycleRequestStatusType {
     public static final String DATA_RETURNED = "dataReturned";
     public static final String DATA_RETURNED_CONFIRMED = "dataReturnedConfirmed";
     public static final String REQUEST_DONE = "requestDone";
+
 }

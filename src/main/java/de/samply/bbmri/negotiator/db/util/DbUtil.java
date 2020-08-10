@@ -1186,6 +1186,15 @@ public class DbUtil {
                 .fetchOne();
     }
 
+    private static NetworkRecord getNetwork(Config config, String directoryId, String directoryName) {
+        return config.map(config.dsl().select(getFields(Tables.NETWORK))
+                .from(Tables.NETWORK)
+                .join(Tables.LIST_OF_DIRECTORIES).on(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
+                .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
+                .and(Tables.LIST_OF_DIRECTORIES.DIRECTORY_PREFIX.eq(directoryName))
+                .fetchOne(), NetworkRecord.class);
+    }
+
     /**
      * Synchronizes the given Biobank from the directory with the Biobank in the database.
      * @param config database configuration
@@ -1632,6 +1641,39 @@ public class DbUtil {
         personRecord.setAuthName(personDTO.getDisplayName());
         personRecord.setOrganization(personDTO.getOrganization());
         personRecord.store();
+    }
+
+    public static void savePerunNetworkMapping(Config config, PerunMappingDTO mapping) {
+        try {
+            DSLContext dsl = config.dsl();
+            String networkId = mapping.getName();
+            NetworkRecord network = getNetwork(config, networkId, mapping.getDirectory());
+            if(network != null) {
+                dsl.deleteFrom(Tables.PERSON_NETWORK)
+                        .where(Tables.PERSON_NETWORK.NETWORK_ID.eq(network.getId()))
+                        .execute();
+
+                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                    PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
+                    if(personRecord != null) {
+                        PersonNetworkRecord personNetworkRecordExists = dsl.selectFrom(Tables.PERSON_NETWORK)
+                                .where(Tables.PERSON_NETWORK.NETWORK_ID.eq(network.getId()))
+                                .and(Tables.PERSON_NETWORK.PERSON_ID.eq(personRecord.getId())).fetchOne();
+                        if(personNetworkRecordExists == null) {
+                            PersonNetworkRecord personNetworkRecord = dsl.newRecord(Tables.PERSON_NETWORK);
+                            personNetworkRecord.setNetworkId(network.getId());
+                            personNetworkRecord.setPersonId(personRecord.getId());
+                            personNetworkRecord.store();
+                            config.commit();
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            logger.error("5299a9df3532-DbUtil ERROR-NG-0000057: Error updating user network mapping from perun.");
+            ex.printStackTrace();
+        }
     }
 
     /**
