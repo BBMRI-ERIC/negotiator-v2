@@ -13,8 +13,9 @@
     {switch $locale}
         {default}
             A new request has been added.
-            {\n}The title of the request is: {$queryId} {$queryName}
-            {\n}{\n}The request can be approved: {$url} {\n}{\n}
+            {\n}The title of the request is: [$queryId] {$queryName}
+            {\n}{\n}Not all collections have representatives: {\n}{\n}
+            {$notreachableCollections}
 
     {/switch}
 {/deltemplate}

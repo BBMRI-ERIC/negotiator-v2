@@ -56,6 +56,9 @@ public class NotificationService {
                 }
                 new NotificationTest(notificationRecord, emailAddress);
                 break;
+            case NotificationType.CREATE_REQUEST_NOTIFICATION:
+                new NotificationCreateRequest(notificationRecord, requestId, personId);
+                break;
             default:
                 logger.error("23afa6c4695a-NotificationService ERROR-NG-0000022: Notification type not defined.");
         }

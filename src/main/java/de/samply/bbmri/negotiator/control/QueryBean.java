@@ -47,6 +47,8 @@ import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,7 +256,7 @@ public class QueryBean implements Serializable {
                if(!requestLifeCycleStatus.statusCreated()) {
                    requestLifeCycleStatus.createStatus(userBean.getUserId());
                    requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
-
+                   NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
                }
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
@@ -267,6 +269,7 @@ public class QueryBean implements Serializable {
                requestLifeCycleStatus.createStatus(userBean.getUserId());
                requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
                config.commit();
+               NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, record.getId(), null, userBean.getUserId());
                return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
            }
        } catch (IOException e) {
