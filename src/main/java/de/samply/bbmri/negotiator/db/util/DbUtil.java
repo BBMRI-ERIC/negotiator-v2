@@ -1647,7 +1647,7 @@ public class DbUtil {
         try {
             DSLContext dsl = config.dsl();
             String networkId = mapping.getName();
-            NetworkRecord network = getNetwork(config, networkId, mapping.getDirectory());
+            NetworkRecord network = getNetwork(config, networkId, "BBMRI-ERIC Directory");
             if(network != null) {
                 dsl.deleteFrom(Tables.PERSON_NETWORK)
                         .where(Tables.PERSON_NETWORK.NETWORK_ID.eq(network.getId()))
@@ -2329,11 +2329,7 @@ public class DbUtil {
                     .from(Tables.REQUEST_STATUS)
                     .where(Tables.REQUEST_STATUS.QUERY_ID.eq(request_id))
                     .fetchOne(0, int.class);
-            if(count == 0) {
-                return false;
-            } else {
-                return true;
-            }
+            return count != 0;
         } catch (SQLException e) {
             System.err.println("ERROR saving/updating Request Status.");
             e.printStackTrace();
