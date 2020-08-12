@@ -32,7 +32,7 @@ public class NotificationCreateRequest extends Notification {
 
 
             createMailBodyBuilder("BBMRI_CREATE_REQUEST.soy");
-
+            prepareNotificationForBBMRIERIC(subject);
         } catch (Exception ex) {
             logger.error("919bbece7131-NotificationCreateRequest ERROR-NG-0000058: Error in NotificationCreateRequest.");
             logger.error("context", ex);
