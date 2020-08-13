@@ -1,5 +1,5 @@
 {delpackage Notification}
-{namespace samply.mailing}
+{namespace eu.negotiator.mailing}
 
 /**
  * Main content for query added notification mail.
@@ -7,14 +7,13 @@
  * @param? name The locale of the mail
  * @param? queryName The name of the mail
  * @param? url The url of the query
- * @param? queryId The query Id
  */
 {deltemplate maincontent}
     {switch $locale}
         {default}
-            A new request has been added for review.
-            {\n}The title of the request is: {$queryId} {$queryName}
-            {\n}{\n}The request can be approved: {$url} {\n}{\n}
+            Your request with the title: {$queryName} has been rejected{\n}
+            You can check the status and resubmit it here: {\n}{\n}
+            {$url}
 
     {/switch}
 {/deltemplate}
