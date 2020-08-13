@@ -7,13 +7,14 @@
  * @param? name The locale of the mail
  * @param? queryName The name of the mail
  * @param? url The url of the query
+ * @param? queryId The query ID
  * @param? collections Collections that are not reachable
  */
 {deltemplate maincontent}
     {switch $locale}
         {default}
             A new request has been added.
-            {\n}The title of the request is: [$queryId] {$queryName}
+            {\n}The title of the request is: {$queryId} {$queryName}
             {\n}{\n}Not all collections have representatives: {\n}{\n}
             {$notreachableCollections}
 
