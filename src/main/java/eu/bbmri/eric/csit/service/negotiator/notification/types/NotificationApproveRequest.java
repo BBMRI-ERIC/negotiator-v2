@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NotificationCreateRequest extends Notification {
-    private static final Logger logger = LoggerFactory.getLogger(NotificationCreateRequest.class);
+public class NotificationApproveRequest extends Notification {
+    private static final Logger logger = LoggerFactory.getLogger(NotificationApproveRequest.class);
 
-    public NotificationCreateRequest(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
-        logger.info("919bbece7131-NotificationCreateRequest new request created.");
+    public NotificationApproveRequest(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
+        logger.info("8fc97b6f5a1a-NotificationApproveRequest new request created.");
         this.requestId = requestId;
         this.notificationRecord = notificationRecord;
         this.personId = personId;
@@ -28,28 +28,27 @@ public class NotificationCreateRequest extends Notification {
             setQuery();
             setResearcherContact();
 
-            String subject = "[BBMRI-ERIC Negotiator] New request created for review: " + queryRecord.getTitle();
+            String subject = "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + "has been approved.";
 
-            createMailBodyBuilder("BBMRI_CREATE_REQUEST.soy");
-            prepareNotificationForBBMRIERIC(subject);
+            createMailBodyBuilder("REQUEST_APPROVED.soy");
+            prepareNotification(subject);
         } catch (Exception ex) {
-            logger.error("919bbece7131-NotificationCreateRequest ERROR-NG-0000058: Error in NotificationCreateRequest.");
+            logger.error("919bbece7131-NotificationCreateRequest ERROR-NG-0000060: Error in NotificationApproveRequest.");
             logger.error("context", ex);
         }
     }
 
-    private void prepareNotificationForBBMRIERIC(String subject) {
-        String bbmriemail = "negotiator@helpdesk.bbmri-eric.eu";
+    private void prepareNotification(String subject) {
         try {
             String body = getMailBody(getSoyParameters());
 
-            MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(bbmriemail, subject, body);
-            if(checkSendNotificationImmediatelyForUser(bbmriemail, NotificationType.CREATE_REQUEST_NOTIFICATION)) {
-                String status = sendMailNotification(bbmriemail, subject, body);
+            MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
+            if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.REJECT_REQUEST_NOTIFICATION)) {
+                String status = sendMailNotification(researcherEmailAddresse, subject, body);
                 updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
             }
         } catch (Exception ex) {
-            logger.error(String.format("919bbece7131-NotificationCreateRequest ERROR-NG-0000059: Error creating a notification for reviewer %s.", bbmriemail));
+            logger.error(String.format("97fdbf0f7bc2-NotificationRejectRequest ERROR-NG-0000063: Error creating a notification for approved request for %s.", researcherEmailAddresse));
             logger.error("context", ex);
         }
     }
@@ -58,7 +57,7 @@ public class NotificationCreateRequest extends Notification {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("queryName", queryRecord.getTitle());
         parameters.put("queryId", queryRecord.getId().toString());
-        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/reviewer/review.xhtml");
+        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId);
         return parameters;
     }
 }
