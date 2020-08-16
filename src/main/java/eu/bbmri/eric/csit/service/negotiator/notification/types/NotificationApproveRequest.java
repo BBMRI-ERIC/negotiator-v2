@@ -33,7 +33,7 @@ public class NotificationApproveRequest extends Notification {
             createMailBodyBuilder("REQUEST_APPROVED.soy");
             prepareNotification(subject);
         } catch (Exception ex) {
-            logger.error("919bbece7131-NotificationCreateRequest ERROR-NG-0000060: Error in NotificationApproveRequest.");
+            logger.error("8fc97b6f5a1a-NotificationApproveRequest ERROR-NG-0000060: Error in NotificationApproveRequest.");
             logger.error("context", ex);
         }
     }
@@ -48,7 +48,7 @@ public class NotificationApproveRequest extends Notification {
                 updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
             }
         } catch (Exception ex) {
-            logger.error(String.format("97fdbf0f7bc2-NotificationRejectRequest ERROR-NG-0000063: Error creating a notification for approved request for %s.", researcherEmailAddresse));
+            logger.error(String.format("8fc97b6f5a1a-NotificationApproveRequest ERROR-NG-0000063: Error creating a notification for approved request for %s.", researcherEmailAddresse));
             logger.error("context", ex);
         }
     }

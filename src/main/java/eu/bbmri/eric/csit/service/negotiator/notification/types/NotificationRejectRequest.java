@@ -33,7 +33,7 @@ public class NotificationRejectRequest extends Notification {
             createMailBodyBuilder("REQUEST_REJECTED.soy");
             prepareNotification(subject);
         } catch (Exception ex) {
-            logger.error("919bbece7131-NotificationCreateRequest ERROR-NG-0000061: Error in NotificationRejectRequest.");
+            logger.error("97fdbf0f7bc2-NotificationRejectRequest ERROR-NG-0000061: Error in NotificationRejectRequest.");
             logger.error("context", ex);
         }
     }
