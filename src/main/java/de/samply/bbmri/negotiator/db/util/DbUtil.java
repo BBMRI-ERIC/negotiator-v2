@@ -1187,12 +1187,26 @@ public class DbUtil {
     }
 
     private static NetworkRecord getNetwork(Config config, String directoryId, String directoryName) {
-        return config.map(config.dsl().select(getFields(Tables.NETWORK))
+        Record result = config.dsl().select(getFields(Tables.NETWORK))
                 .from(Tables.NETWORK)
                 .join(Tables.LIST_OF_DIRECTORIES).on(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
                 .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
-                .and(Tables.LIST_OF_DIRECTORIES.DIRECTORY_PREFIX.eq(directoryName))
-                .fetchOne(), NetworkRecord.class);
+                .and(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName))
+                .fetchOne();
+        if(result == null) {
+            Record listOfDirectoriesRecord = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES)
+                    .where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName))
+                    .fetchOne();
+
+            NetworkRecord networkRecord = config.dsl().newRecord(Tables.NETWORK);
+            networkRecord.setDirectoryId(directoryId);
+            networkRecord.setName(directoryId.replaceAll("bbmri-eric:networkID:", ""));
+            networkRecord.setAcronym(directoryId.replaceAll("bbmri-eric:networkID:", ""));
+            networkRecord.setListOfDirectoriesId(listOfDirectoriesRecord.getValue(Tables.LIST_OF_DIRECTORIES.ID));
+            networkRecord.store();
+            return networkRecord;
+        }
+        return config.map(result, NetworkRecord.class);
     }
 
     /**
