@@ -32,22 +32,29 @@
                 </div>
             </div>
 
-            <h:outputScript>
-                var dataSet =#{networkCollectionsBean.collectionJson}
+            <h:panelGroup rendered="#{networkCollectionsBean.collectionJson.size() == 0}" >
+                No Collections linked to this Network
+            </h:panelGroup>
 
-                $(document).ready(function() {
-                $('#example').DataTable( {
-                data: dataSet,
-                columns: [
-                    { "data": "directory", title: "Directory" },
-                    { "data": "collection_id", title: "CollectionId" },
-                    { "data": "biobank_name", title: "Biobank Name" },
-                    { "data": "collection_name", title: "Collection Name" },
-                    { "data": "collection_users", title: "Users" }
-                ]
-                } );
-                } );
-            </h:outputScript>
+
+            <h:panelGroup rendered="#{networkCollectionsBean.collectionJson.size() > 0}" >
+                <h:outputScript>
+                    var dataSet =#{networkCollectionsBean.collectionJson}
+
+                    $(document).ready(function() {
+                    $('#example').DataTable( {
+                    data: dataSet,
+                    columns: [
+                        { "data": "directory", title: "Directory" },
+                        { "data": "collection_id", title: "CollectionId" },
+                        { "data": "biobank_name", title: "Biobank Name" },
+                        { "data": "collection_name", title: "Collection Name" },
+                        { "data": "collection_users", title: "Users" }
+                    ]
+                    } );
+                    } );
+                </h:outputScript>
+            </h:panelGroup>
         </h:panelGroup>
 
         <!-- Table of Collections End -->

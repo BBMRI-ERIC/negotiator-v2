@@ -32,26 +32,32 @@
                 </div>
             </div>
 
-            <h:outputScript>
-                var dataSetRequestForNetwork =#{requestOverviewBean.requestForNetwork}
+            <h:panelGroup rendered="#{requestOverviewBean.requestForNetwork.size() == 0}" >
+                No Request linked to this Network.
+            </h:panelGroup>
 
-                $(document).ready(function() {
-                    console.log(dataSetRequestForNetwork)
-                    $('#example').DataTable( {
-                        data: dataSetRequestForNetwork,
-                        columns: [
-                            { "data": "query_id", title: "QueryId" },
-                            { "data": "query_title", title: "Title" },
-                            { "data": "biobank_name", title: "Biobank Name" },
-                            { "data": "number_of_collections", title: "# of collections" },
-                            { "data": "number_of_collections_abandoned", title: "# of collections abandoned request" },
-                            { "data": "start_time", title: "Request Start Time" },
-                            { "data": "time_to_response", title: "Response Time" },
-                            { "data": "time_from_last_response", title: "Last Response" }
-                        ]
+            <h:panelGroup rendered="#{requestOverviewBean.requestForNetwork.size() > 0}" >
+                <h:outputScript>
+                    var dataSetRequestForNetwork =#{requestOverviewBean.requestForNetwork}
+
+                    $(document).ready(function() {
+                        console.log(dataSetRequestForNetwork)
+                        $('#example').DataTable( {
+                            data: dataSetRequestForNetwork,
+                            columns: [
+                                { "data": "query_id", title: "QueryId" },
+                                { "data": "query_title", title: "Title" },
+                                { "data": "biobank_name", title: "Biobank Name" },
+                                { "data": "number_of_collections", title: "# of collections" },
+                                { "data": "number_of_collections_abandoned", title: "# of collections abandoned request" },
+                                { "data": "start_time", title: "Request Start Time" },
+                                { "data": "time_to_response", title: "Response Time" },
+                                { "data": "time_from_last_response", title: "Last Response" }
+                            ]
+                        } );
                     } );
-                } );
-            </h:outputScript>
+                </h:outputScript>
+            </h:panelGroup>
         </h:panelGroup>
 
         <!-- Table of Collections End -->
