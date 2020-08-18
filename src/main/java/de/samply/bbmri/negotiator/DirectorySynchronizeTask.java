@@ -102,7 +102,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             int numberOfNetworks = synchronizeNetworks(directoryId, config, client, updateNetworks);
             int numberOfBiobanks = synchronizeBiobanks(directoryId, config, client, updateNetworks);
             int numberOfCollections = synchronizedCollections(directoryId, config, client, updateNetworks);
-            updateBbmriEricNationalNodes(config, directoryId, bbmriEricNationalNetworks);
+            //updateBbmriEricNationalNodes(config, directoryId, bbmriEricNationalNetworks);
 
             logger.info("Synchronization with the directory finished. Biobanks: " + numberOfBiobanks + ", Collections:" + numberOfCollections + ", Networks: " + numberOfNetworks);
             config.commit();

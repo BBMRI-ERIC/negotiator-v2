@@ -32,12 +32,12 @@
                 </div>
             </div>
 
-            <h:panelGroup rendered="#{networkCollectionsBean.collectionJson.size() == 0}" >
+            <h:panelGroup rendered="#{networkCollectionsBean.collectionJson.length() == 0}" >
                 No Collections linked to this Network
             </h:panelGroup>
 
 
-            <h:panelGroup rendered="#{networkCollectionsBean.collectionJson.size() > 0}" >
+            <h:panelGroup rendered="#{networkCollectionsBean.collectionJson.length() > 0}" >
                 <h:outputScript>
                     var dataSet =#{networkCollectionsBean.collectionJson}
 

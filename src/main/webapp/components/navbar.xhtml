@@ -11,7 +11,7 @@
 				position:relative;
 			}
 			.dropdown-submenu>.dropdown-menu {
-				top:0;
+				top:5px;
 				left:100%;
 				margin-top:-6px;
 				margin-left:-1px;
@@ -109,10 +109,9 @@
 							<li class="dropdown"><a href="#" class="dropdown-toggle"
 													data-toggle="dropdown" role="button" aria-haspopup="true"
 													aria-expanded="false" title="Network manager">Network manager<span class="caret"></span></a>
-
-								<ui:repeat value="#{userBean.networks}"
+								<ul class="dropdown-menu">
+									<ui:repeat value="#{userBean.networks}"
 										   var="network" varStatus="loop">
-									<ul class="dropdown-menu">
 										<li class="menu-item dropdown dropdown-submenu">
 											<a href="#" class="dropdown-toggle"
 											   data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -140,9 +139,8 @@
 													</li>
 												</ul>
 										</li>
-									</ul>
-								</ui:repeat>
-
+									</ui:repeat>
+								</ul>
 							</li>
 
 						</c:if>

@@ -1299,6 +1299,10 @@ public class DbUtil {
     }
 
     public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId, int collectionId) {
+        if(directoryCollection.getNetworkLinks().size() > 0) {
+            System.out.println(directoryCollection.getName());
+        }
+
         config.dsl().deleteFrom(Tables.NETWORK_COLLECTION_LINK)
                 .where(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(collectionId))
                 .execute();
@@ -2576,7 +2580,7 @@ public class DbUtil {
                 "SELECT q.id, substring(MAX(q.query_creation_time)::text, 0, 11)::date date FROM public.query q " +
                 "JOIN public.query_collection qc ON q.id = qc.query_id " +
                 "JOIN public.network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
-                "WHERE ncl.network_id = 24 GROUP BY q.id) sub2 ON sub1.id = sub2.id " +
+                "WHERE ncl.network_id = " + networkId + " GROUP BY q.id) sub2 ON sub1.id = sub2.id " +
                 "GROUP BY sub1.date ORDER BY sub1.date) subjson;");
         Result<Record> result = resultQuery.fetch();
         for(Record record : result) {

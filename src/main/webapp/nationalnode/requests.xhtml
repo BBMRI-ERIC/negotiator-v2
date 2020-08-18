@@ -32,11 +32,11 @@
                 </div>
             </div>
 
-            <h:panelGroup rendered="#{requestOverviewBean.requestForNetwork.size() == 0}" >
+            <h:panelGroup rendered="#{requestOverviewBean.requestForNetwork.length() == 0}" >
                 No Request linked to this Network.
             </h:panelGroup>
 
-            <h:panelGroup rendered="#{requestOverviewBean.requestForNetwork.size() > 0}" >
+            <h:panelGroup rendered="#{requestOverviewBean.requestForNetwork.length() > 0}" >
                 <h:outputScript>
                     var dataSetRequestForNetwork =#{requestOverviewBean.requestForNetwork}
 
