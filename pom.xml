@@ -30,6 +30,7 @@
         <version.samply.directory.client>2.0.3</version.samply.directory.client>
         <version.samply.negotiator.dto>2.0.0</version.samply.negotiator.dto>
         <version.samply.share.dto>4.0.0</version.samply.share.dto>
+        <version.swagger.core>2.1.4</version.swagger.core>
 
         <!--<database.server>negotiator-db</database.server>
         <database.port>5432</database.port>
@@ -80,7 +81,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+        <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
@@ -100,6 +101,18 @@
             <version>2.23.4</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Swagger API documentation
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
+            <version>${version.swagger.core}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2-servlet-initializer-v2</artifactId>
+            <version>${version.swagger.core}</version>
+        </dependency>-->
 
         <!-- https://github.com/powermock/powermock/wiki/Mockito-2-Maven -->
         <dependency>
