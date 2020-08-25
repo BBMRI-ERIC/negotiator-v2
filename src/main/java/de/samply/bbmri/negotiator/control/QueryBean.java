@@ -204,7 +204,7 @@ public class QueryBean implements Serializable {
         if (jsonQueryId != null) {
             try (Config config = ConfigFactory.get()) {
                 String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-                jsonQuery = generateJsonQuery(searchJsonQuery);
+                jsonQuery = generateJsonQuery(sessionBean.getTransientQueryJson(), searchJsonQuery);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -358,6 +358,41 @@ public class QueryBean implements Serializable {
         }
         return  jsonQuery;
    }
+
+    /**
+     * Generate the JSON including the new search query String
+     * @param searchJsonQuery
+     * @return
+     */
+    private String generateJsonQuery(String jsonQueryStored, String searchJsonQuery) {
+        try (Config config = ConfigFactory.get()) {
+            RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+            // Get saved query object
+            QueryDTO queryDTO = mapper.readValue(jsonQueryStored, QueryDTO.class);
+            // Get the search query object from the new json string
+            QuerySearchDTO querySearchDTO = mapper.readValue(searchJsonQuery, QuerySearchDTO.class);
+            // check searchQueryTocken if update of query or new
+            if(querySearchDTO.getToken() == null) {
+                querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
+                queryDTO.addSearchQuery(querySearchDTO);
+            } else {
+                String nTocken = querySearchDTO.getToken().replaceAll(".*__search__", "");
+                if (nTocken == null || nTocken.equals("") || nTocken.equals("null")) {
+                    // new search query
+                    querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
+                    queryDTO.addSearchQuery(querySearchDTO);
+                } else {
+                    // edited search query
+                    queryDTO.updateSearchQuery(querySearchDTO, nTocken);
+                }
+            }
+            jsonQuery = queryDTO.toJsonString();
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+        return  jsonQuery;
+    }
 
    /**
     * Save title and text in session bean when uploading attachment.
