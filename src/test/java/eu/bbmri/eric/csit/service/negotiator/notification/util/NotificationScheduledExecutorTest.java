@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,8 +26,29 @@ public class NotificationScheduledExecutorTest {
     @Test
     @DisplayName("Test interval 1 day in milliseconds.")
     public void testDelayCalculationOneDayInMilliseconds() {
-        long interval = notificationScheduledExecutor.getInterval();
+        long interval = notificationScheduledExecutor.getInterval24Houers();
         assertEquals(86400000L, interval);
+    }
+
+    @Test
+    @DisplayName("Test interval 10 minutes in milliseconds.")
+    public void testDelayCalculation10MinutesInMilliseconds() {
+        long interval = notificationScheduledExecutor.getInterval10Minutes();
+        assertEquals(600000L, interval);
+    }
+
+    @Test
+    @DisplayName("Test selected interval for mail notification (10 minutes in milliseconds).")
+    public void testDelayCalculationSelectedInterval10MinutesInMilliseconds() {
+        long interval = notificationScheduledExecutor.getInterval();
+        assertEquals(600000L, interval);
+    }
+
+    @Test
+    @DisplayName("Test selected interval for mail notification (10 minutes in milliseconds).")
+    public void testDelayCalculation10MinutesDelay() {
+        long delay = notificationScheduledExecutor.getDelay10Minutes();
+        assertEquals(600000L, delay);
     }
 
     @ParameterizedTest
@@ -37,7 +57,7 @@ public class NotificationScheduledExecutorTest {
             "01-12-2005 11:15:23,2677000",
             "26-02-2010 01:01:00,39540000"})
     public void testIntervalCalculationInMillisecondsForTimeBeforeNoon(String input, Long expected) throws ParseException {
-        Long delay = notificationScheduledExecutor.getDelay(simpleDateFormat.parse(input));
+        Long delay = notificationScheduledExecutor.getDelayToNoon(simpleDateFormat.parse(input));
         assertEquals(expected, delay);
     }
 
@@ -47,7 +67,7 @@ public class NotificationScheduledExecutorTest {
             "01-12-2005 23:15:23,45877000",
             "26-02-2010 15:01:00,75540000"})
     public void testIntervalCalculationInMillisecondsForTimeAfterNoon(String input, Long expected) throws ParseException {
-        Long delay = notificationScheduledExecutor.getDelay(simpleDateFormat.parse(input));
+        Long delay = notificationScheduledExecutor.getDelayToNoon(simpleDateFormat.parse(input));
         assertEquals(expected, delay);
     }
 }

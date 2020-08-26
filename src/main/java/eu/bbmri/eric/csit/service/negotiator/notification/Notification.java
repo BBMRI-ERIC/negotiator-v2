@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,15 +58,15 @@ public abstract class Notification extends Thread {
         databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(mailNotificationRecordId, status);
     }
 
-    protected boolean checkSendNotificationImmediatelyForUser(String emailAddress, Integer noteficationType) {
+    protected boolean checkSendNotificationImmediatelyForUser(String emailAddress, Integer notificationType) {
         //TODO: Needs Implementation for future release.
         if(emailAddress == null) {
             abstractLogger.info("EmailAddress Not Set");
         }
-        if(noteficationType == null) {
-            abstractLogger.info("EmailAddress Not Set");
+        if(notificationType == null) {
+            abstractLogger.info("NotificationType Not Set");
         }
-        return true;
+        return !notificationType.equals(NotificationType.STATUS_CHANGED_NOTIFICATION);
     }
 
     protected void createMailBodyBuilder(String mailTemplateFile) {

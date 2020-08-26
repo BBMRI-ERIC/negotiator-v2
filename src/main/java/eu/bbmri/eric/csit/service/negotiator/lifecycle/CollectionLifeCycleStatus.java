@@ -9,18 +9,18 @@ import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 public class CollectionLifeCycleStatus {
     private static final Logger logger = LoggerFactory.getLogger(CollectionLifeCycleStatus.class);
 
     private final TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
-    private final RequestStatus colectionAbandonedRequest = null;
+    private final RequestStatus collectionAbandonedRequest = null;
     private Integer query_id = null;
     private Integer collection_id = null;
     private String collectionReadableID = null;
@@ -61,8 +61,8 @@ public class CollectionLifeCycleStatus {
         if(statusTree.size() == 0) {
             return null;
         }
-        if(colectionAbandonedRequest != null) {
-            return colectionAbandonedRequest;
+        if(collectionAbandonedRequest != null) {
+            return collectionAbandonedRequest;
         }
         return statusTree.lastEntry().getValue();
     }
@@ -71,6 +71,11 @@ public class CollectionLifeCycleStatus {
         if(getStatus() == null && statusType.equalsIgnoreCase("contact") || getStatus().checkAllowedNextStatus(status)) {
             CollectionRequestStatusDTO collectionRequestStatusDTO = createCollectionRequestStatusInDB(status, statusType, status_json, status_user_id);
             collectionRequestStatusFactory(collectionRequestStatusDTO);
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("collectionId", collection_id.toString());
+            parameters.put("collectionName", collectionBiobankDTO.getCollection().getName());
+            parameters.put("newRequestStatus", getStatus().getStatus());
+            NotificationService.sendNotification(NotificationType.STATUS_CHANGED_NOTIFICATION, query_id, null, status_user_id, parameters);
         } else {
             System.err.println("ERROR-NG-0000004: Collection Request Status, wrong next status Provided.");
             System.err.println("Status is: " + getStatus().getStatusType() + " - " + getStatus().getStatus());

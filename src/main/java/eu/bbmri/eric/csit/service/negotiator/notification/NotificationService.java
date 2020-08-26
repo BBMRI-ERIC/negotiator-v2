@@ -49,6 +49,21 @@ public class NotificationService {
                 }
                 new NotificationCollectionUnreachable(notificationRecord, requestId, personId, notreachableCollections);
                 break;
+            case NotificationType.STATUS_CHANGED_NOTIFICATION:
+                Integer collectionId = 0;
+                if(parameters.containsKey("collectionId")) {
+                    collectionId = Integer.getInteger(parameters.get("collectionId"));
+                }
+                String collectionName = "";
+                if(parameters.containsKey("collectionName")) {
+                    collectionName = parameters.get("collectionName");
+                }
+                String newRequestStatus = "";
+                if(parameters.containsKey("newRequestStatus")) {
+                    newRequestStatus = parameters.get("newRequestStatus");
+                }
+                new NotificationStatusChanged(notificationRecord, requestId, personId, collectionId, collectionName, newRequestStatus);
+                break;
             case NotificationType.TEST_NOTIFICATION:
                 String emailAddress = "robert.reihs@bbmri-eric.eu";
                 if(parameters.containsKey("emailAddress")) {

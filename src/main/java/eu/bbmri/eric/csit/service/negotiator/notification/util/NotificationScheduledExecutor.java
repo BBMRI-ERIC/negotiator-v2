@@ -1,12 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.util;
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
-import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtilNotification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +19,29 @@ public class NotificationScheduledExecutor extends TimerTask {
     public void run() {
         logger.info("4a95d7c2ff04-NotificationScheduledExecutor started.");
         try {
-            List<MailNotificationRecord> mailNotificationRecords =  getNotSendNotifications();
-            for(MailNotificationRecord mailNotificationRecord : mailNotificationRecords) {
-                String status = sendMailNotification(mailNotificationRecord.getEmailAddress(), mailNotificationRecord.getSubject(), mailNotificationRecord.getBody());
-                updateNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
-            }
+            List<MailNotificationRecord> mailNotificationRecords =  getNotificationsWithErrorSendStatus();
+            sendNotifications(mailNotificationRecords);
+            mailNotificationRecords =  getNotificationsCreatedNotSend();
+            sendNotifications(mailNotificationRecords);
         } catch (Exception ex) {
             logger.error("4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000030: Error in NotificationScheduledExecutor sending mails.");
             logger.error("context", ex);
         }
     }
 
-    private List<MailNotificationRecord> getNotSendNotifications() {
-        return databaseUtil.getDatabaseUtilNotification().getPendingNotifications();
+    private List<MailNotificationRecord> getNotificationsWithErrorSendStatus() {
+        return databaseUtil.getDatabaseUtilNotification().getNotificationsWithStatus("error", 0);
+    }
+
+    private List<MailNotificationRecord> getNotificationsCreatedNotSend() {
+        return databaseUtil.getDatabaseUtilNotification().getNotificationsWithStatus("created", -10);
+    }
+
+    private void sendNotifications(List<MailNotificationRecord> mailNotificationRecords) {
+        for(MailNotificationRecord mailNotificationRecord : mailNotificationRecords) {
+            String status = sendMailNotification(mailNotificationRecord.getEmailAddress(), mailNotificationRecord.getSubject(), mailNotificationRecord.getBody());
+            updateNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+        }
     }
 
     private void updateNotificationInDatabase(Integer mailNotificationRecordId, String status) {
@@ -54,10 +59,14 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     public long getDelay() {
-        return getDelay(new Date());
+        return getDelayToNoon(new Date());
     }
 
-    public long getDelay(Date date) {
+    public long getDelay10Minutes() {
+        return 1000L * 60L * 10L;
+    }
+
+    public long getDelayToNoon(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("HHmmss");
         Integer time = Integer.parseInt(formatter.format(date));
         long noon = 12*3600000L;
@@ -75,11 +84,15 @@ public class NotificationScheduledExecutor extends TimerTask {
         return millisecounds;
     }
 
+    public long getInterval() { return getInterval10Minutes(); }
+
+    public long getInterval10Minutes() { return 1000L * 60L * 10L; }
+
     /*
      * Interval calculation for scheduling:
      * 24h = 1000ms * 60s * 60min * 24h
      */
-    public long getInterval() {
+    public long getInterval24Houers() {
         return 1000L * 60L * 60L * 24L;
     }
 

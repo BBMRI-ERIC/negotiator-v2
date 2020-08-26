@@ -4,10 +4,8 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.jooq.DSLContext;
-import org.jooq.Record2;
-import org.jooq.Result;
-import org.jooq.SQLDialect;
+import org.jetbrains.annotations.NotNull;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +19,13 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
 
+import static org.jooq.impl.DSL.timestampAdd;
+
 public class DatabaseUtilNotification {
 
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    private static Logger logger = LoggerFactory.getLogger(DatabaseUtilNotification.class);
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseUtilNotification.class);
 
     public DatabaseUtilNotification(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -127,6 +127,25 @@ public class DatabaseUtilNotification {
         return null;
     }
 
+    public List<MailNotificationRecord> getNotificationsWithStatus(String status, Integer interval) {
+        try (Connection conn = dataSource.getConnection()) {
+            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+            Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
+                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq(status))
+                    .and(Tables.MAIL_NOTIFICATION.CREATE_DATE.lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), interval, DatePart.MINUTE)))
+                    .fetch();
+            List<MailNotificationRecord> returnRecords = new ArrayList<>();
+            for(MailNotificationRecord record : records) {
+                returnRecords.add(record);
+            }
+            return returnRecords;
+        } catch (Exception ex) {
+            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000034: Error listing pending Mail Notification Entries.");
+            logger.error("context", ex);
+        }
+        return null;
+    }
+
     public void updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status) {
         try (Connection conn = dataSource.getConnection()) {
             DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
@@ -152,13 +171,7 @@ public class DatabaseUtilNotification {
                     .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
                     .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                     .fetch();
-            Map<String, String> addressList = new HashMap<>();
-            for(Record2<String, String> record1 : record) {
-                if(!addressList.containsKey(record1.value1())) {
-                    addressList.put(record1.value1(), record1.value2());
-                }
-            }
-            return addressList;
+            return mapEmailAddressesAndNames(record);
         } catch (Exception ex) {
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for queryId: {}.", queryId);
             logger.error("context", ex);
@@ -175,13 +188,7 @@ public class DatabaseUtilNotification {
                     .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                     .where(Tables.COLLECTION.BIOBANK_ID.eq(biobankId))
                     .fetch();
-            Map<String, String> addressList = new HashMap<>();
-            for(Record2<String, String> record1 : record) {
-                if(!addressList.containsKey(record1.value1())) {
-                    addressList.put(record1.value1(), record1.value2());
-                }
-            }
-            return addressList;
+            return mapEmailAddressesAndNames(record);
         } catch (Exception ex) {
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000037: Error listing email-addresses for biobankId: {}.", biobankId);
             logger.error("context", ex);
@@ -189,4 +196,30 @@ public class DatabaseUtilNotification {
         return null;
     }
 
+    public Map<String, String> getCollectionEmailAddresses(Integer collectionId) {
+        try (Connection conn = dataSource.getConnection()) {
+            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+            Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
+                    .from(Tables.PERSON)
+                    .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                    .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
+                    .fetch();
+            return mapEmailAddressesAndNames(record);
+        } catch (Exception ex) {
+            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000066: Error listing email-addresses for collectionId: {}.", collectionId);
+            logger.error("context", ex);
+        }
+        return null;
+    }
+
+    @NotNull
+    private Map<String, String> mapEmailAddressesAndNames(Result<Record2<String, String>> record) {
+        Map<String, String> addressList = new HashMap<>();
+        for (Record2<String, String> record1 : record) {
+            if (!addressList.containsKey(record1.value1())) {
+                addressList.put(record1.value1(), record1.value2());
+            }
+        }
+        return addressList;
+    }
 }
