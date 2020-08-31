@@ -23,7 +23,7 @@ public class NotificationScheduledExecutor extends TimerTask {
             sendNotifications(mailNotificationRecords);
             mailNotificationRecords = getNotificationsCreatedNotSend();
             sendNotifications(mailNotificationRecords);
-            mailNotificationRecords = getAggreagatedNotifications();
+            mailNotificationRecords = getAggregatedNotifications();
         } catch (Exception ex) {
             logger.error("4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000030: Error in NotificationScheduledExecutor sending mails.");
             logger.error("context", ex);
@@ -38,7 +38,8 @@ public class NotificationScheduledExecutor extends TimerTask {
         return databaseUtil.getDatabaseUtilNotification().getNotificationsWithStatus("created", -10);
     }
 
-    private List<MailNotificationRecord> getAggreagatedNotifications() {
+    private List<MailNotificationRecord> getAggregatedNotifications() {
+        databaseUtil.getDatabaseUtilNotification().getNotificationForAggregated();
         // TODO:
         // get Pending Notifications ready to send
         // aggregate Notification and create a new Notification+
