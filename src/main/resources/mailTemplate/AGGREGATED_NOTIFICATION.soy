@@ -1,0 +1,16 @@
+{delpackage Notification}
+{namespace eu.negotiator.mailing}
+
+/**
+ * Main content for comment added notification mail.
+ * @param? locale The locale of the mail
+ * @param? name The locale of the mail
+ * @param? body Aggregated Body
+ */
+{deltemplate maincontent}
+    {switch $locale}
+        {default}
+            {$body}
+
+    {/switch}
+{/deltemplate}

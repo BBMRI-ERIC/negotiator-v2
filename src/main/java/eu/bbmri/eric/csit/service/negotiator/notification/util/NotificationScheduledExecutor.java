@@ -2,13 +2,12 @@ package eu.bbmri.eric.csit.service.negotiator.notification.util;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimerTask;
+import java.util.*;
 
 public class NotificationScheduledExecutor extends TimerTask {
 
@@ -23,7 +22,7 @@ public class NotificationScheduledExecutor extends TimerTask {
             sendNotifications(mailNotificationRecords);
             mailNotificationRecords = getNotificationsCreatedNotSend();
             sendNotifications(mailNotificationRecords);
-            mailNotificationRecords = getAggregatedNotifications();
+            sendAggregatedNotifications();
         } catch (Exception ex) {
             logger.error("4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000030: Error in NotificationScheduledExecutor sending mails.");
             logger.error("context", ex);
@@ -38,13 +37,30 @@ public class NotificationScheduledExecutor extends TimerTask {
         return databaseUtil.getDatabaseUtilNotification().getNotificationsWithStatus("created", -10);
     }
 
-    private List<MailNotificationRecord> getAggregatedNotifications() {
-        databaseUtil.getDatabaseUtilNotification().getNotificationForAggregated();
-        // TODO:
-        // get Pending Notifications ready to send
-        // aggregate Notification and create a new Notification+
-        // return list
-        return null;
+    private void sendAggregatedNotifications() {
+        List<String> mailAddresses = databaseUtil.getDatabaseUtilNotification().getNotificationMailForAggregation();
+        for(String mailAddress : mailAddresses) {
+            List<MailNotificationRecord> pendingNotifications = databaseUtil.getDatabaseUtilNotification().getPendingNotificationsForMailAddress(mailAddress);
+            Integer personId = databaseUtil.getDatabaseUtilPerson().getPersonIdByEmailAddress(mailAddress);
+            aggregatedNotification(pendingNotifications, personId);
+        }
+    }
+
+    private void aggregatedNotification(List<MailNotificationRecord> pendingNotifications, Integer personId) {
+        String aggregated_body = "";
+        String aggregation_splitter = "";
+        for(MailNotificationRecord pendingNotification : pendingNotifications) {
+            aggregated_body += aggregation_splitter;
+            String body = pendingNotification.getBody().replaceAll("\nYours sincerely\nThe BBMRI-ERIC Team", "");
+            aggregated_body += body.replaceAll("Dear .*\n\n", "");
+            aggregation_splitter = "\n===============================\n";
+        }
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("body", aggregated_body);
+        NotificationService.sendNotification(NotificationType.AGGREGATED_NOTIFICATION, 0, 0, personId, parameters);
+        for(MailNotificationRecord pendingNotification : pendingNotifications) {
+            updateNotificationInDatabase(pendingNotification.getMailNotificationId(), "aggregated");
+        }
     }
 
     private void sendNotifications(List<MailNotificationRecord> mailNotificationRecords) {

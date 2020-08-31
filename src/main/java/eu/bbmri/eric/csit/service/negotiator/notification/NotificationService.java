@@ -74,6 +74,12 @@ public class NotificationService {
             case NotificationType.CREATE_REQUEST_NOTIFICATION:
                 new NotificationCreateRequest(notificationRecord, requestId, personId);
                 break;
+            case NotificationType.AGGREGATED_NOTIFICATION:
+                String body = "";
+                if(parameters.containsKey("body")) {
+                    body = parameters.get("body");
+                }
+                new NotificationAggregatedNotification(notificationRecord, personId, body);
             default:
                 logger.error("23afa6c4695a-NotificationService ERROR-NG-0000022: Notification type not defined.");
         }

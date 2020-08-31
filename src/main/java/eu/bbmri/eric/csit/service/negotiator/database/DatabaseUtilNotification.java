@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
 
+import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.timestampAdd;
 
 public class DatabaseUtilNotification {
@@ -141,6 +142,42 @@ public class DatabaseUtilNotification {
             return returnRecords;
         } catch (Exception ex) {
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000034: Error listing pending Mail Notification Entries.");
+            logger.error("context", ex);
+        }
+        return null;
+    }
+
+    public List<String> getNotificationMailForAggregation() {
+        try (Connection conn = dataSource.getConnection()) {
+            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+            List<String> result = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
+                    .from(Tables.MAIL_NOTIFICATION)
+                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
+                    .and(max(Tables.MAIL_NOTIFICATION.CREATE_DATE).lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), -10, DatePart.MINUTE)))
+                    .groupBy(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
+                    .fetch(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS);
+            return result;
+        } catch (Exception ex) {
+            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000069: Error getting listing pending Mail Notification Entries for aggregation.");
+            logger.error("context", ex);
+        }
+        return null;
+    }
+
+    public List<MailNotificationRecord> getPendingNotificationsForMailAddress(String mailAddress) {
+        try (Connection conn = dataSource.getConnection()) {
+            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+            Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
+                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
+                    .and(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS.eq(mailAddress))
+                    .fetch();
+            List<MailNotificationRecord> returnRecords = new ArrayList<>();
+            for(MailNotificationRecord record : records) {
+                returnRecords.add(record);
+            }
+            return returnRecords;
+        } catch (Exception ex) {
+            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000070: Error getting listing of pending Mail Notification for email {}.", mailAddress);
             logger.error("context", ex);
         }
         return null;

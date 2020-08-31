@@ -12,6 +12,7 @@ public abstract class NotificationType {
     public static final int PRIVATE_COMMAND_NOTIFICATION = 6;
     public static final int STATUS_CHANGED_NOTIFICATION = 7;
     public static final int NOT_REACHABLE_COLLECTION_NOTIFICATION = 8;
+    public static final int AGGREGATED_NOTIFICATION = 9;
 
     public static final int TEST_NOTIFICATION = 100;
 
@@ -35,6 +36,8 @@ public abstract class NotificationType {
                 return "NOT_REACHABLE_COLLECTION_NOTIFICATION";
             case NotificationType.TEST_NOTIFICATION:
                 return "TEST_NOTIFICATION";
+            case NotificationType.AGGREGATED_NOTIFICATION:
+                return "AGGREGATED_NOTIFICATION";
             default:
                 return "ERROR-NG-0000010: ERROR: Type Not defined";
         }
