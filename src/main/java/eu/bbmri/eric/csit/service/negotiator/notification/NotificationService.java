@@ -22,66 +22,71 @@ public class NotificationService {
 
     public static void sendNotification(Integer notificationType, Integer requestId, Integer commentId, Integer personId, Map<String, String> parameters) {
         logger.info("23afa6c4695a-NotificationService: {} requestID: {} commentID: {}", notificationType, requestId, commentId);
+        try {
 
-        NotificationRecord notificationRecord = createNotificationEntry(notificationType, requestId, commentId, personId);
-        if(notificationRecord == null) {
-            logger.error("23afa6c4695a-NotificationService ERROR-NG-0000011: Notification Record Null.");
-        }
+            NotificationRecord notificationRecord = createNotificationEntry(notificationType, requestId, commentId, personId);
+            if (notificationRecord == null) {
+                logger.error("23afa6c4695a-NotificationService ERROR-NG-0000011: Notification Record Null.");
+            }
 
-        switch (notificationType) {
-            case NotificationType.START_NEGOTIATION_NOTIFICATION:
-                new NotificationStartNegotiation(notificationRecord, requestId, personId);
-                break;
-            case NotificationType.PUBLIC_COMMAND_NOTIFICATION:
-                new NotificationNewPublicComment(notificationRecord, requestId, personId, commentId);
-                break;
-            case NotificationType.PRIVATE_COMMAND_NOTIFICATION:
-                String biobankName = "";
-                if(parameters.containsKey("biobankName")) {
-                    biobankName = parameters.get("biobankName");
-                }
-                new NotificationNewPrivateComment(notificationRecord, requestId, personId, commentId, biobankName);
-                break;
-            case NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION:
-                String notreachableCollections = "";
-                if(parameters.containsKey("notreachableCollections")) {
-                    notreachableCollections = parameters.get("notreachableCollections");
-                }
-                new NotificationCollectionUnreachable(notificationRecord, requestId, personId, notreachableCollections);
-                break;
-            case NotificationType.STATUS_CHANGED_NOTIFICATION:
-                Integer collectionId = 0;
-                if(parameters.containsKey("collectionId")) {
-                    collectionId = Integer.getInteger(parameters.get("collectionId"));
-                }
-                String collectionName = "";
-                if(parameters.containsKey("collectionName")) {
-                    collectionName = parameters.get("collectionName");
-                }
-                String newRequestStatus = "";
-                if(parameters.containsKey("newRequestStatus")) {
-                    newRequestStatus = parameters.get("newRequestStatus");
-                }
-                new NotificationStatusChanged(notificationRecord, requestId, personId, collectionId, collectionName, newRequestStatus);
-                break;
-            case NotificationType.TEST_NOTIFICATION:
-                String emailAddress = "robert.reihs@bbmri-eric.eu";
-                if(parameters.containsKey("emailAddress")) {
-                    emailAddress = parameters.get("emailAddress");
-                }
-                new NotificationTest(notificationRecord, emailAddress);
-                break;
-            case NotificationType.CREATE_REQUEST_NOTIFICATION:
-                new NotificationCreateRequest(notificationRecord, requestId, personId);
-                break;
-            case NotificationType.AGGREGATED_NOTIFICATION:
-                String body = "";
-                if(parameters.containsKey("body")) {
-                    body = parameters.get("body");
-                }
-                new NotificationAggregatedNotification(notificationRecord, personId, body);
-            default:
-                logger.error("23afa6c4695a-NotificationService ERROR-NG-0000022: Notification type not defined.");
+            switch (notificationType) {
+                case NotificationType.START_NEGOTIATION_NOTIFICATION:
+                    new NotificationStartNegotiation(notificationRecord, requestId, personId);
+                    break;
+                case NotificationType.PUBLIC_COMMAND_NOTIFICATION:
+                    new NotificationNewPublicComment(notificationRecord, requestId, personId, commentId);
+                    break;
+                case NotificationType.PRIVATE_COMMAND_NOTIFICATION:
+                    String biobankName = "";
+                    if (parameters.containsKey("biobankName")) {
+                        biobankName = parameters.get("biobankName");
+                    }
+                    new NotificationNewPrivateComment(notificationRecord, requestId, personId, commentId, biobankName);
+                    break;
+                case NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION:
+                    String notreachableCollections = "";
+                    if (parameters.containsKey("notreachableCollections")) {
+                        notreachableCollections = parameters.get("notreachableCollections");
+                    }
+                    new NotificationCollectionUnreachable(notificationRecord, requestId, personId, notreachableCollections);
+                    break;
+                case NotificationType.STATUS_CHANGED_NOTIFICATION:
+                    Integer collectionId = 0;
+                    if (parameters.containsKey("collectionId")) {
+                        collectionId = Integer.parseInt(parameters.get("collectionId"));
+                    }
+                    String collectionName = "";
+                    if (parameters.containsKey("collectionName")) {
+                        collectionName = parameters.get("collectionName");
+                    }
+                    String newRequestStatus = "";
+                    if (parameters.containsKey("newRequestStatus")) {
+                        newRequestStatus = parameters.get("newRequestStatus");
+                    }
+                    new NotificationStatusChanged(notificationRecord, requestId, personId, collectionId, collectionName, newRequestStatus);
+                    break;
+                case NotificationType.TEST_NOTIFICATION:
+                    String emailAddress = "robert.reihs@bbmri-eric.eu";
+                    if (parameters.containsKey("emailAddress")) {
+                        emailAddress = parameters.get("emailAddress");
+                    }
+                    new NotificationTest(notificationRecord, emailAddress);
+                    break;
+                case NotificationType.CREATE_REQUEST_NOTIFICATION:
+                    new NotificationCreateRequest(notificationRecord, requestId, personId);
+                    break;
+                case NotificationType.AGGREGATED_NOTIFICATION:
+                    String body = "";
+                    if (parameters.containsKey("body")) {
+                        body = parameters.get("body");
+                    }
+                    new NotificationAggregatedNotification(notificationRecord, personId, body);
+                default:
+                    logger.error("23afa6c4695a-NotificationService ERROR-NG-0000022: Notification type not defined.");
+            }
+        } catch (Exception ex) {
+            logger.error("23afa6c4695a-NotificationService ERROR-NG-0000074: Error in the Notification Factory for creating Notification for type: {}.", notificationType);
+            logger.error("context", ex);
         }
     }
 
