@@ -85,7 +85,7 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     public long getDelay() {
-        return getDelayToNoon(new Date());
+        return getDelay10Minutes();
     }
 
     public long getDelay10Minutes() {

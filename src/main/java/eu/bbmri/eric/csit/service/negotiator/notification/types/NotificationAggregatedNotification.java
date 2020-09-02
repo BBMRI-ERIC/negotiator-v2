@@ -29,6 +29,7 @@ public class NotificationAggregatedNotification extends Notification {
     public void run() {
         try {
             String subject = "[BBMRI-ERIC Negotiator] Multiple notification list";
+            setContact();
             createMailBodyBuilder("AGGREGATED_NOTIFICATION.soy");
             prepareNotification(subject);
         } catch (Exception ex) {

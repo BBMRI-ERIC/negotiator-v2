@@ -19,8 +19,7 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
 
-import static org.jooq.impl.DSL.max;
-import static org.jooq.impl.DSL.timestampAdd;
+import static org.jooq.impl.DSL.*;
 
 public class DatabaseUtilNotification {
 
@@ -150,12 +149,23 @@ public class DatabaseUtilNotification {
     public List<String> getNotificationMailForAggregation() {
         try (Connection conn = dataSource.getConnection()) {
             DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            List<String> result = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
+            Table<?> subquery = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS, max(Tables.MAIL_NOTIFICATION.CREATE_DATE).as("create_date"))
+                    .from(Tables.MAIL_NOTIFICATION)
+                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
+                    .groupBy(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS).asTable("GROUPED_MAIL_NOTIFICATION");
+
+            List<String> result = database.select(subquery.field("email_address"))
+                    .from(subquery)
+                    .where(cast(subquery.field("create_date"),Timestamp.class).lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), -10, DatePart.MINUTE)))
+                    .fetch(subquery.field("email_address"), String.class);
+
+
+            /*List<String> result = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
                     .from(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
                     .and(max(Tables.MAIL_NOTIFICATION.CREATE_DATE).lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), -10, DatePart.MINUTE)))
                     .groupBy(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
-                    .fetch(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS);
+                    .fetch(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS);*/
             return result;
         } catch (Exception ex) {
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000069: Error getting listing pending Mail Notification Entries for aggregation.");
