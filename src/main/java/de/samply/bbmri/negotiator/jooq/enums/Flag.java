@@ -31,7 +31,9 @@ public enum Flag implements EnumType {
 
 	IGNORED("IGNORED"),
 
-	STARRED("STARRED");
+	STARRED("STARRED"),
+
+	TEST("TEST");
 
 	private final String literal;
 
