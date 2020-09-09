@@ -60,7 +60,6 @@ public class OfferBean implements Serializable {
     private String offerComment;
     private Integer offerFrom;
     private Integer privateCommentToRemove = null;
-    private Boolean testRequest;
 
     @PostConstruct
     public void init() {
@@ -161,11 +160,4 @@ public class OfferBean implements Serializable {
         this.offerFrom = offerFrom;
     }
 
-    public Boolean getTestRequest() {
-        return testRequest;
-    }
-
-    public void setTestRequest(Boolean testRequest) {
-        this.testRequest = testRequest;
-    }
 }

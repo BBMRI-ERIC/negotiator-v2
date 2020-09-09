@@ -140,6 +140,8 @@ public class QueryBean implements Serializable {
      */
     private List<QuerySearchDTO> searchQueries = new ArrayList<>();
 
+    private boolean testRequest;
+
    /**
     * Initializes this bean by registering email notification observer
     */
@@ -583,4 +585,11 @@ public class QueryBean implements Serializable {
 
     public String getQtoken() { return qtoken; }
 
+    public boolean isTestRequest() {
+        return testRequest;
+    }
+
+    public void setTestRequest(boolean testRequest) {
+        this.testRequest = testRequest;
+    }
 }

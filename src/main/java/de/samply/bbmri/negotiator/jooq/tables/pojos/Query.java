@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query implements Serializable {
 
-	private static final long serialVersionUID = -1395365062;
+	private static final long serialVersionUID = 1331677481;
 
 	private Integer   id;
 	private String    title;
@@ -41,6 +41,7 @@ public class Query implements Serializable {
 	private String    researcherName;
 	private String    researcherEmail;
 	private String    researcherOrganization;
+	private Boolean   testRequest;
 
 	public Query() {}
 
@@ -61,6 +62,7 @@ public class Query implements Serializable {
 		this.researcherName = value.researcherName;
 		this.researcherEmail = value.researcherEmail;
 		this.researcherOrganization = value.researcherOrganization;
+		this.testRequest = value.testRequest;
 	}
 
 	public Query(
@@ -79,7 +81,8 @@ public class Query implements Serializable {
 		Timestamp negotiationStartedTime,
 		String    researcherName,
 		String    researcherEmail,
-		String    researcherOrganization
+		String    researcherOrganization,
+		Boolean   testRequest
 	) {
 		this.id = id;
 		this.title = title;
@@ -97,6 +100,7 @@ public class Query implements Serializable {
 		this.researcherName = researcherName;
 		this.researcherEmail = researcherEmail;
 		this.researcherOrganization = researcherOrganization;
+		this.testRequest = testRequest;
 	}
 
 	public Integer getId() {
@@ -225,5 +229,13 @@ public class Query implements Serializable {
 
 	public void setResearcherOrganization(String researcherOrganization) {
 		this.researcherOrganization = researcherOrganization;
+	}
+
+	public Boolean getTestRequest() {
+		return this.testRequest;
+	}
+
+	public void setTestRequest(Boolean testRequest) {
+		this.testRequest = testRequest;
 	}
 }
