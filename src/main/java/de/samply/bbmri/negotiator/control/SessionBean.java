@@ -73,6 +73,7 @@ public class SessionBean implements Serializable {
      * text and is thus cleared from the session bean once the page is refreshed after attachment upload.
      */
     private String transientQueryRequestDescription;
+    private Boolean transientQueryTestRequest;
 
     /**
      * The ethics code of the query when the page is refreshed  - for file upload or changing query from directory.
@@ -234,5 +235,13 @@ public class SessionBean implements Serializable {
 
     public void setTransientCommentAttachmentMap(HashMap<String, String> transientCommentAttachmentMap) {
         this.transientCommentAttachmentMap = transientCommentAttachmentMap;
+    }
+
+    public Boolean getTransientQueryTestRequest() {
+        return transientQueryTestRequest;
+    }
+
+    public void setTransientQueryTestRequest(Boolean transientQueryTestRequest) {
+        this.transientQueryTestRequest = transientQueryTestRequest;
     }
 }

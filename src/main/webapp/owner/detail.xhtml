@@ -40,6 +40,7 @@
     <f:metadata>
         <f:viewParam name="queryId" value="#{ownerQueriesDetailBean.queryId}" />
         <f:viewParam name="flag" value="#{ownerQueriesDetailBean.flagFilter}" />
+        <f:viewParam name="testRequest" value="#{ownerQueriesDetailBean.isTestRequest}" />
         <f:viewAction action="#{ownerQueriesDetailBean.initialize}" />
         <f:viewAction action="#{commentBean.initialize}" />
         <f:viewAction action="#{lifeCycleStatusBean.initialize}" />

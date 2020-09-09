@@ -77,25 +77,34 @@
 							    aria-expanded="false" title="#{label['queryview.action.menu']}">#{label['queryview.myBiobank']}<span class="caret"></span></a>
 							    <ul class="dropdown-menu">
 								    <li>
-								        <h:link outcome="/owner/index" value="#{label['queryview.inbox']}" title="#{label['queryview.action.viewInbox']}">  																		 
-					  				    </h:link>
+								        <h:link outcome="/owner/index" value="#{label['queryview.inbox']}" title="#{label['queryview.action.viewInbox']}">
+											<f:param name="testRequest" value="false"/>
+										</h:link>
 								
 								    </li>
 								    <li>
 								        <h:link outcome="/owner/index" value="#{label['queryview.starred']}" title="#{label['queryview.action.viewStarred']}" >
-								            <f:param name="flag" value="STARRED"/>  																		 
+								            <f:param name="flag" value="STARRED"/>
+											<f:param name="testRequest" value="false"/>
 					  				    </h:link>								
 								    </li>								
 								    <li>								
 								        <h:link outcome="/owner/index" value="#{label['queryview.archived']}" title="#{label['queryview.action.viewArchived']}" >
-								            <f:param name="flag" value="ARCHIVED"/>  																		 
+								            <f:param name="flag" value="ARCHIVED"/>
+											<f:param name="testRequest" value="false"/>
 					  				    </h:link>								
 								    </li>
 								    <li>								
 								        <h:link outcome="/owner/index" value="#{label['queryview.ignored']}" title="#{label['queryview.action.viewIgnored']}" >
-								            <f:param name="flag" value="IGNORED"/>  																		 
+								            <f:param name="flag" value="IGNORED"/>
+											<f:param name="testRequest" value="false"/>
 					  			        </h:link>
 								    </li>
+									<li>
+										<h:link outcome="/owner/index" value="#{label['queryview.testRequest']}" title="#{label['queryview.action.testRequest']}" >
+											<f:param name="testRequest" value="true"/>
+										</h:link>
+									</li>
 							    </ul>
 						    </li>
 						</c:if>

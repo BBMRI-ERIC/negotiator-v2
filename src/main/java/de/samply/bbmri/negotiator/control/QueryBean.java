@@ -186,6 +186,7 @@ public class QueryBean implements Serializable {
         queryTitle = queryRecord.getTitle();
         queryText = queryRecord.getText();
         queryRequestDescription = queryRecord.getRequestDescription();
+        testRequest = queryRecord.getTestRequest();
         if(jsonQueryId == null) {
             jsonQuery = queryRecord.getJsonText();
         } else {
@@ -202,7 +203,7 @@ public class QueryBean implements Serializable {
         queryText = sessionBean.getTransientQueryText();
         queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
         ethicsVote = sessionBean.getTransientEthicsCode();
-
+        testRequest = sessionBean.getTransientQueryTestRequest();
         if (jsonQueryId != null) {
             try (Config config = ConfigFactory.get()) {
                 String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
@@ -253,7 +254,7 @@ public class QueryBean implements Serializable {
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
            if(id != null) {
-               DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id);
+               DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest);
                requestLifeCycleStatus = new RequestLifeCycleStatus(id);
                if(!requestLifeCycleStatus.statusCreated()) {
                    requestLifeCycleStatus.createStatus(userBean.getUserId());
@@ -265,7 +266,8 @@ public class QueryBean implements Serializable {
            } else {
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                        jsonQuery, ethicsVote, userBean.getUserId(),
-                       true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization());
+                       true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                       testRequest);
                config.commit();
                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
                requestLifeCycleStatus.createStatus(userBean.getUserId());
@@ -405,6 +407,7 @@ public class QueryBean implements Serializable {
        sessionBean.setTransientQueryJson(jsonQuery);
        sessionBean.setTransientQueryRequestDescription(queryRequestDescription);
        sessionBean.setTransientEthicsCode(ethicsVote);
+       sessionBean.setTransientQueryTestRequest(testRequest);
        sessionBean.setSaveTransientState(true);
    }
 
@@ -418,6 +421,7 @@ public class QueryBean implements Serializable {
        sessionBean.setTransientQueryRequestDescription(null);
        sessionBean.setTransientQueryJson(null);
        sessionBean.setTransientEthicsCode(null);
+       sessionBean.setTransientQueryTestRequest(null);
        sessionBean.setSaveTransientState(false);
 
    }
@@ -461,7 +465,8 @@ public class QueryBean implements Serializable {
             if (id == null) {
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(),
-                        false, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization());
+                        false, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                        testRequest);
                 config.commit();
                 setId(record.getId());
             }

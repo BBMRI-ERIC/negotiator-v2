@@ -423,13 +423,14 @@ public class DbUtil {
      * @throws JsonParseException
      */
     public static void editQuery(Config config, String title, String text, String requestDescription,
-            String jsonText, String ethicsVote, Integer queryId) {
+            String jsonText, String ethicsVote, Integer queryId, boolean testRequest) {
         try {config.dsl().update(Tables.QUERY)
                 .set(Tables.QUERY.TITLE, title)
                 .set(Tables.QUERY.TEXT, text)
                 .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription)
                 .set(Tables.QUERY.JSON_TEXT, jsonText)
                 .set(Tables.QUERY.ETHICS_VOTE, ethicsVote)
+                .set(Tables.QUERY.TEST_REQUEST, testRequest)
                 .set(Tables.QUERY.VALID_QUERY, true).where(Tables.QUERY.ID.eq(queryId)).execute();
 
             /**
@@ -698,6 +699,7 @@ public class DbUtil {
             query.setRequestDescription((String) record.getValue("query_request_description"));
             query.setEthicsVote((String) record.getValue("query_ethics_vote"));
             query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
+            query.setTestRequest((Boolean) record.getValue("query_test_request"));
             queryStatsDTO.setQuery(query);
             queryAuthor.setId((Integer) record.getValue("query_author_id"));
             queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
@@ -722,7 +724,7 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest) {
     	Person queryAuthor = Tables.PERSON.as("query_author");
 
     	Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
@@ -796,6 +798,7 @@ public class DbUtil {
                         .and(Tables.PERSON_COMMENT.READ.eq(false)))
 
     			.where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
+                .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
@@ -1431,7 +1434,8 @@ public class DbUtil {
      */
     public static QueryRecord saveQuery(Config config, String title,
                                         String text, String requestDescription, String jsonText, String ethicsVote, int researcherId,
-                                        Boolean validQuery, String researcher_name, String researcher_email, String researcher_organization) throws SQLException, IOException {
+                                        Boolean validQuery, String researcher_name, String researcher_email, String researcher_organization,
+                                        Boolean testRequest) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
         queryRecord.setJsonText(jsonText);
@@ -1447,6 +1451,7 @@ public class DbUtil {
         queryRecord.setResearcherName(researcher_name);
         queryRecord.setResearcherEmail(researcher_email);
         queryRecord.setResearcherOrganization(researcher_organization);
+        queryRecord.setTestRequest(testRequest);
         queryRecord.store();
 
         /**

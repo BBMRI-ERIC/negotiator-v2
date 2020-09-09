@@ -148,12 +148,13 @@
                             <th scope="col">Project Description</th>
                             <th scope="col">Request Description</th>
                             <th scope="col">Ethics Vote</th>
+                            <th scope="col">Test Request</th>
                             <th scope="col">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <ui:repeat value="#{reviewBean.queryRecordList}" var="queryRecord">
-                            <tr style="max-height: 50px;">
+                            <tr style="max-height: 50px;" class="#{queryRecord.testRequest ? 'test-request-table-row' : ''}">
                                 <th scope="row">#{queryRecord.id}</th>
                                 <td><div class="table-overflow"><div><p>#{queryRecord.title}</p></div></div></td>
                                 <td><div class="table-overflow"><div><p>#{queryRecord.queryCreationTime}</p></div></div></td>
@@ -161,6 +162,7 @@
                                 <td><div class="table-overflow"><div><p>#{queryRecord.text}</p></div></div></td>
                                 <td><div class="table-overflow"><div><p>#{queryRecord.requestDescription}</p></div></div></td>
                                 <td><div class="table-overflow"><div><p>#{queryRecord.ethicsVote}</p></div></div></td>
+                                <td><div class="table-overflow"><div><p>#{queryRecord.testRequest}</p></div></div></td>
                                 <td>
                                     <button id="toggleModalIndicateAccessConditions"
                                             aria-hidden="true"

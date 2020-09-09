@@ -104,6 +104,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 * The currently active flag filter. Set this to whatever flag you want and you will see the flagged queries only.
 	 */
 	private Flag flagFilter = Flag.UNFLAGGED;
+	private Boolean isTestRequest = false;
 
 	/**
      * The id of the query selected from owner.index.xhtml page, if there is one
@@ -361,7 +362,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter);
+				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, isTestRequest);
 
 				for (int i = 0; i < queries.size(); ++i) {
 					getPrivateNegotiationCountAndTime(i);
@@ -768,5 +769,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setOtherAccessFile(Part otherAccessFile) {
 		this.otherAccessFile = otherAccessFile;
+	}
+
+	public Boolean getIsTestRequest() {
+		return isTestRequest;
+	}
+
+	public void setIsTestRequest(Boolean testRequest) {
+		isTestRequest = testRequest;
 	}
 }

@@ -37,6 +37,7 @@
     
     <f:metadata>
 		<f:viewParam name="flag" value="#{ownerQueriesBean.flagFilter}" />
+        <f:viewParam name="testRequest" value="#{ownerQueriesBean.isTestRequest}" />
 		<f:viewAction action="#{sessionBean.clearAllFilters()}" />
 	</f:metadata>
 		
@@ -69,7 +70,7 @@
 
                 <h:panelGroup layout="block" styleClass="deco-none">
                     <h:panelGroup layout="block" styleClass="panel panel-default clickable #{queryDto.isArchived() ? 'archived-query' : ''} ">
-                        <h:panelGroup layout="block" styleClass="panel-heading">
+                        <h:panelGroup layout="block" styleClass="#{queryDto.query.testRequest ? 'test-query-heading' : ''} panel-heading">
                             <h:form id="queryItemActions">
                                 <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
                                                title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
