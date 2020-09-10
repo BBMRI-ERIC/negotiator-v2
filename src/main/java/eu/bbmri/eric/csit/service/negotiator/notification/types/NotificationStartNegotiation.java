@@ -58,7 +58,12 @@ public class NotificationStartNegotiation extends Notification {
 
                 MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
                 if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.START_NEGOTIATION_NOTIFICATION)) {
-                    String status = sendMailNotification(emailAddress, subject, body);
+                    String status;
+                    if(queryRecord.getTestRequest()) {
+                        status = "test";
+                    } else {
+                        status = sendMailNotification(emailAddress, subject, body);
+                    }
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
                 }
             } catch (Exception ex) {

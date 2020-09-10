@@ -30,6 +30,10 @@ public class NotificationRejectRequest extends Notification {
 
             String subject = "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + " has been rejected.";
 
+            if(queryRecord.getTestRequest()) {
+                subject = "[BBMRI-ERIC Negotiator] TEST Request: " + queryRecord.getTitle() + "has been rejected.";
+            }
+
             createMailBodyBuilder("REQUEST_REJECTED.soy");
             prepareNotification(subject);
         } catch (Exception ex) {

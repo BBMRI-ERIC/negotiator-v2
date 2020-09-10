@@ -103,6 +103,14 @@
                 #{query.getNegotiationStartedTime().toString()}
             </h:column>
             <h:column>
+                <f:facet name="header">Test Request</f:facet>
+                <span id="TestRequest#{query.getId()}">#{query.getTestRequest()}</span>
+                <h:form id="form-test-request">
+                    <h:commandButton action="#{adminDebugBean.switchTestRequest(query.getId())}" value="#{query.testRequest ? 'Switch to normal Reqest' : 'Switch to Test Reqest'}"
+                                     styleClass="btn btn-default"/>
+                </h:form>
+            </h:column>
+            <h:column>
                 <f:facet name="header">Reset Negotiation</f:facet>
                 <h:form id="form">
                     <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->

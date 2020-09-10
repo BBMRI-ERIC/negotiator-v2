@@ -30,6 +30,10 @@ public class NotificationCreateRequest extends Notification {
 
             String subject = "[BBMRI-ERIC Negotiator] New request created for review: " + queryRecord.getTitle();
 
+            if(queryRecord.getTestRequest()) {
+                subject = "[BBMRI-ERIC Negotiator] TESTREQUEST: New request created for review: " + queryRecord.getTitle();
+            }
+
             createMailBodyBuilder("BBMRI_CREATE_REQUEST.soy");
             prepareNotificationForBBMRIERIC(subject);
         } catch (Exception ex) {

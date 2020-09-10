@@ -82,7 +82,12 @@ public class NotificationNewPrivateComment extends Notification {
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.PUBLIC_COMMAND_NOTIFICATION)) {
-                String status = sendMailNotification(researcherEmailAddresse, subject, body);
+                String status;
+                if(queryRecord.getTestRequest()) {
+                    status = "test";
+                } else {
+                    status = sendMailNotification(researcherEmailAddresse, subject, body);
+                }
                 updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
             }
         } catch (Exception ex) {
@@ -101,7 +106,12 @@ public class NotificationNewPrivateComment extends Notification {
 
                 MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
                 if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.PUBLIC_COMMAND_NOTIFICATION)) {
-                    String status = sendMailNotification(emailAddress, subject, body);
+                    String status;
+                    if(queryRecord.getTestRequest()) {
+                        status = "test";
+                    } else {
+                        status = sendMailNotification(emailAddress, subject, body);
+                    }
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
                 }
             } catch (Exception ex) {

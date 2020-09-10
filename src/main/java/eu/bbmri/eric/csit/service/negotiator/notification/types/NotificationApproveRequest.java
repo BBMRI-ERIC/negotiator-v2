@@ -30,6 +30,10 @@ public class NotificationApproveRequest extends Notification {
 
             String subject = "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + "has been approved.";
 
+            if(queryRecord.getTestRequest()) {
+                subject = "[BBMRI-ERIC Negotiator] TEST Request: " + queryRecord.getTitle() + "has been approved.";
+            }
+
             createMailBodyBuilder("REQUEST_APPROVED.soy");
             prepareNotification(subject);
         } catch (Exception ex) {

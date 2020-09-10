@@ -1974,25 +1974,12 @@ public class DbUtil {
             queryRecord.setResearcherName((String)record.getValue("researcher_name"));
             queryRecord.setResearcherEmail((String)record.getValue("researcher_email"));
             queryRecord.setResearcherOrganization((String)record.getValue("researcher_organization"));
+            queryRecord.setTestRequest((Boolean)record.getValue("test_request"));
             queries.add(queryRecord);
         }
         return queries;
     }
 
-    /*
-    SELECT CAST(array_to_json(array_agg(row_to_json(jsond))) AS varchar) AS directories FROM (
-        SELECT json_build_object('name', d2.name, 'url', d2.url, 'description', d2.description, 'Biobanks',
-            (SELECT array_to_json(array_agg(row_to_json(jsonb))) FROM (
-                SELECT directory_id, name, (
-                    SELECT array_to_json(array_agg(row_to_json(jsonc))) FROM (
-                        SELECT directory_id, name FROM public.collection c WHERE c.biobank_id = b.id
-                    ) AS jsonc
-                ) AS collections
-                FROM public.biobank b WHERE b.list_of_directories_id = d.id
-            ) AS jsonb)) AS directory
-        FROM public.list_of_directories d LEFT JOIN public.list_of_directories d2 ON d2.name = d.directory_prefix
-    ) AS jsond;
-     */
     public static String getFullListForAPI(Config config) {
         ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsond))) AS varchar) AS directories FROM ( " +
                 "SELECT json_build_object('name', d2.name, 'url', d2.url, 'description', d2.description, 'Biobanks', " +
@@ -2539,7 +2526,7 @@ public class DbUtil {
                 "ON c.id = qlc_last.collection_id AND q.id = qlc_last.query_id " +
                 "LEFT JOIN public.query_lifecycle_collection qlc_abandoned " +
                 "ON c.id = qlc_abandoned.collection_id AND q.id = qlc_abandoned.query_id AND qlc_abandoned.status_type = 'abandoned' " +
-                "WHERE (ncl.network_id = " + networkId + " OR nbl.network_id = " + networkId + ") " +
+                "WHERE (ncl.network_id = " + networkId + " OR nbl.network_id = " + networkId + ")  AND q.test_request = false " +
                 "GROUP BY q.id, q.title, b.id, b.name, b.directory_id " +
                 ") jsonc;");
         Result<Record> result = resultQuery.fetch();
@@ -2579,13 +2566,13 @@ public class DbUtil {
         ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(subjson))) AS varchar) FROM " +
                 "(SELECT sub1.date, COUNT(sub1.id) number_of_queries, COUNT(sub2.id) number_of_network_queries FROM " +
                 "(SELECT q.id, substring(MAX(q.query_creation_time)::text, 0, 11)::date date FROM public.query q " +
-                "JOIN public.query_collection qc ON q.id = qc.query_id " +
+                "JOIN public.query_collection qc ON q.id = qc.query_id  WHERE q.test_request = false " +
                 "GROUP BY q.id) sub1 " +
                 "LEFT JOIN ( " +
                 "SELECT q.id, substring(MAX(q.query_creation_time)::text, 0, 11)::date date FROM public.query q " +
                 "JOIN public.query_collection qc ON q.id = qc.query_id " +
                 "JOIN public.network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
-                "WHERE ncl.network_id = " + networkId + " GROUP BY q.id) sub2 ON sub1.id = sub2.id " +
+                "WHERE ncl.network_id = " + networkId + " AND q.test_request = false GROUP BY q.id) sub2 ON sub1.id = sub2.id " +
                 "GROUP BY sub1.date ORDER BY sub1.date) subjson;");
         Result<Record> result = resultQuery.fetch();
         for(Record record : result) {
@@ -2620,7 +2607,7 @@ public class DbUtil {
         try (Config config = ConfigFactory.get()) {
             ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM \n" +
                     "(SELECT (json_array_elements((q.json_text::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable, " +
-                    "COUNT(*) FROM query q WHERE q.json_text IS NOT NULL AND q.json_text != '' GROUP BY readable) jsonc;");
+                    "COUNT(*) FROM query q WHERE q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY readable) jsonc;");
             Result<Record> result = resultQuery.fetch();
             for(Record record : result) {
                 System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
@@ -2639,13 +2626,13 @@ public class DbUtil {
         ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
                 "SELECT sub1.readable, COUNT(*) count_all, COUNT(sub2.readable) count_network FROM ( " +
                 "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q " +
-                " WHERE q.json_text IS NOT NULL AND q.json_text != '' GROUP BY q.id) sub1 " +
+                " WHERE q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY q.id) sub1 " +
                 "LEFT JOIN ( " +
                 "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q " +
                 "JOIN query_collection qc ON q.id = qc.query_id " +
                 "JOIN network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
                 "WHERE network_id = " + networkId +
-                " AND q.json_text IS NOT NULL AND q.json_text != '' GROUP BY q.id) sub2 " +
+                " AND q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY q.id) sub2 " +
                 "ON sub1.readable = sub2.readable " +
                 "GROUP BY sub1.readable " +
                 ") jsonc;");
@@ -2654,5 +2641,9 @@ public class DbUtil {
             return (String)record.getValue(0);
         }
         return "";
+    }
+
+    public static void toggleRequestTestState(Config config, Integer queryId) {
+        config.dsl().execute("UPDATE public.query SET test_request= NOT test_request WHERE id=" + queryId);
     }
 }

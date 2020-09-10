@@ -99,11 +99,16 @@ public class NotificationStatusChanged extends Notification {
             try {
                 String body = getMailBody(getSoyParameters(url, contactName));
                 MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
-                if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.STATUS_CHANGED_NOTIFICATION)) {
-                    String status = sendMailNotification(emailAddress, subject, body);
-                    updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+
+                if(queryRecord.getTestRequest()) {
+                    updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "test");
                 } else {
-                    updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "pending");
+                    if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.STATUS_CHANGED_NOTIFICATION)) {
+                        String status = sendMailNotification(emailAddress, subject, body);
+                        updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                    } else {
+                        updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "pending");
+                    }
                 }
             } catch (Exception ex) {
                 logger.error(String.format("97fdbf0f7bc2-NotificationStatusChanged ERROR-NG-0000068: Error creating a notification for %s.", emailAddress));
