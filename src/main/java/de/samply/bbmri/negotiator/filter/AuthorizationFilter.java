@@ -46,7 +46,7 @@ import java.io.IOException;
 @WebFilter(filterName = "AuthorizationFilter")
 public class AuthorizationFilter implements Filter {
 
-    private Logger logger = LoggerFactory.getLogger(AuthorizationFilter.class);
+    private final Logger logger = LoggerFactory.getLogger(AuthorizationFilter.class);
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()

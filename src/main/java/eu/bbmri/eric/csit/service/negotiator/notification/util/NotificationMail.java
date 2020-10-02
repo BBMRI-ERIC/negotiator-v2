@@ -15,7 +15,7 @@ import java.util.Properties;
 
 public class NotificationMail {
 
-    private static Logger logger = LoggerFactory.getLogger(NotificationMail.class);
+    private static final Logger logger = LoggerFactory.getLogger(NotificationMail.class);
 
     private String host = "";
     private int port = 0;

@@ -40,12 +40,12 @@ public class NegotiatorStatus {
     /**
      * The map for the last successful statuses
      */
-    private Map<NegotiatorTaskType, NegotiatorTaskStatus> successMap = new HashMap<>();
+    private final Map<NegotiatorTaskType, NegotiatorTaskStatus> successMap = new HashMap<>();
 
     /**
      * The map for the last failed statuses
      */
-    private Map<NegotiatorTaskType, NegotiatorTaskStatus> failMap = new HashMap<>();
+    private final Map<NegotiatorTaskType, NegotiatorTaskStatus> failMap = new HashMap<>();
 
     public enum NegotiatorTaskType {
         /**

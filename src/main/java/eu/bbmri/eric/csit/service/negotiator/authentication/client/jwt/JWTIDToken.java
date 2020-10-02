@@ -54,7 +54,7 @@ public class JWTIDToken extends AbstractJWT {
     /**
      * The list of roles that the user is a member of
      */
-    private List<RoleDTO> roles = new ArrayList<>();
+    private final List<RoleDTO> roles = new ArrayList<>();
 
     /**
      * {@link de.samply.bbmri.auth.client.jwt.AbstractJWT#AbstractJWT(OAuth2Client, String)}

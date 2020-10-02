@@ -36,7 +36,7 @@ public class DataCacheTest {
     @Mock
     private Config config;
 
-    private List<BiobankRecord> biobankRecords = null;
+    private final List<BiobankRecord> biobankRecords = null;
 
     @BeforeEach
     void setUp() {

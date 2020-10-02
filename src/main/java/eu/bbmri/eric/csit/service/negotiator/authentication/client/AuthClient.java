@@ -35,10 +35,10 @@ public class AuthClient {
     private JWTAccessToken accessToken;
     private JWTIDToken idToken;
     private UserDTO user;
-    private String redirectUri;
+    private final String redirectUri;
 
     public AuthClient(OAuth2Client config, Client client) {
-        this(config.getHost(), KeyLoader.loadKey(config.getHostPublicKey()), config.getClientId(), config.getClientSecret(), (String)null, (String)null, client);
+        this(config.getHost(), KeyLoader.loadKey(config.getHostPublicKey()), config.getClientId(), config.getClientSecret(), null, null, client);
     }
 
     public AuthClient(OAuth2Client config, String code, String redirectUri, Client client) {
@@ -101,9 +101,9 @@ public class AuthClient {
             form.param("grant_type", "authorization_code");
             form.param("code", this.code);
             form.param("redirect_uri", this.redirectUri);
-            Response response = (Response)builder.header("Authorization", BasicAuth.getAuthorizationHeader(this.clientId, this.clientSecret)).post(Entity.form(form), Response.class);
+            Response response = builder.header("Authorization", BasicAuth.getAuthorizationHeader(this.clientId, this.clientSecret)).post(Entity.form(form), Response.class);
             if (response.getStatus() == 200) {
-                AccessTokenDTO tokenDTO = (AccessTokenDTO)response.readEntity(AccessTokenDTO.class);
+                AccessTokenDTO tokenDTO = response.readEntity(AccessTokenDTO.class);
                 logger.debug("Got a response from Perun");
                 logger.debug("Access token: {}", tokenDTO.getAccessToken());
                 logger.debug("Scope: {}", tokenDTO.getScope());
@@ -139,16 +139,16 @@ public class AuthClient {
     }
 
     private void getNewUserInfo() {
-        logger.debug((String)this.client.target(this.baseUrl).path("oidc").path("userinfo").request(new String[]{"application/json"}).header("Authorization", this.getAuthorizationHeader()).get(String.class));
-        this.user = (UserDTO)this.client.target(this.baseUrl).path("oidc").path("userinfo").request(new String[]{"application/json"}).header("Authorization", this.getAuthorizationHeader()).get(UserDTO.class);
+        logger.debug(this.client.target(this.baseUrl).path("oidc").path("userinfo").request("application/json").header("Authorization", this.getAuthorizationHeader()).get(String.class));
+        this.user = this.client.target(this.baseUrl).path("oidc").path("userinfo").request("application/json").header("Authorization", this.getAuthorizationHeader()).get(UserDTO.class);
     }
 
     public UserListDTO getUsersForCollection(String collectionId) {
-        return (UserListDTO)this.client.target("http://localhost:8080/").path("api/perun/fake/collections").path(collectionId).path("users").request(new String[]{"application/json"}).get(UserListDTO.class);
+        return this.client.target("http://localhost:8080/").path("api/perun/fake/collections").path(collectionId).path("users").request(new String[]{"application/json"}).get(UserListDTO.class);
     }
 
     private Builder getAccessTokenBuilder() {
-        return this.client.target(this.baseUrl).path("oidc").path("token").request(new String[]{"application/json"});
+        return this.client.target(this.baseUrl).path("oidc").path("token").request("application/json");
     }
 
     public UserDTO getUser() {

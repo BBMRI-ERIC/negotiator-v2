@@ -48,6 +48,9 @@
 				-moz-border-radius:6px 0 6px 6px;
 				border-radius:6px 0 6px 6px;
 			}
+			.activeLink {
+				background-color: #E8E8E8;
+			}
 		</h:outputStylesheet>
 
 		<h:panelGroup styleClass="container" layout="block" id="navbar">
@@ -72,7 +75,7 @@
 				<h:panelGroup layout="block" styleClass="navbar-collapse collapse">
 					<ul class="nav navbar-nav">
 						<c:if test="#{userBean.biobankOwner}">
-						    <li class="dropdown"><a href="#" class="dropdown-toggle"
+						    <li class="dropdown"><a href="#" class="dropdown-toggle #{request.requestURI.startsWith('/owner') ? 'activeLink' : ''}"
 							    data-toggle="dropdown" role="button" aria-haspopup="true"
 							    aria-expanded="false" title="#{label['queryview.action.menu']}">#{label['queryview.myBiobank']}<span class="caret"></span></a>
 							    <ul class="dropdown-menu">
@@ -80,7 +83,6 @@
 								        <h:link outcome="/owner/index" value="#{label['queryview.inbox']}" title="#{label['queryview.action.viewInbox']}">
 											<f:param name="testRequest" value="false"/>
 										</h:link>
-								
 								    </li>
 								    <li>
 								        <h:link outcome="/owner/index" value="#{label['queryview.starred']}" title="#{label['queryview.action.viewStarred']}" >
@@ -109,13 +111,13 @@
 						    </li>
 						</c:if>
 						<c:if test="#{userBean.researcher}">
-								    <li>
+								    <li class="#{request.requestURI.startsWith('/researcher') ? 'activeLink' : ''}">
 								        <h:link value="#{label['queryview.myCreatedQueries']}" outcome="/researcher/index.xhtml">
 								        </h:link>
 								    </li>
 						</c:if>
 						<c:if test="#{userBean.nationalNodeRepresentative}">
-							<li class="dropdown"><a href="#" class="dropdown-toggle"
+							<li class="dropdown #{request.requestURI.startsWith('/nationalnode') ? 'activeLink' : ''}"><a href="#" class="dropdown-toggle"
 													data-toggle="dropdown" role="button" aria-haspopup="true"
 													aria-expanded="false" title="Network manager">Network manager<span class="caret"></span></a>
 								<ul class="dropdown-menu">
@@ -154,7 +156,7 @@
 
 						</c:if>
 						<c:if test="#{userBean.isAdmin()}">
-							<li class="dropdown"><a href="#" class="dropdown-toggle"
+							<li class="dropdown #{request.requestURI.startsWith('/reviewer') ? 'activeLink' : ''}"><a href="#" class="dropdown-toggle"
 													data-toggle="dropdown" role="button" aria-haspopup="true"
 													aria-expanded="false" title="#{label['queryview.action.menu']}">#{label['reviewer.navbar.reviewer']}<span class="caret"></span></a>
 								<ul class="dropdown-menu">
@@ -170,7 +172,7 @@
 							</li>
 						</c:if>
 						<ui:fragment rendered="#{userBean.isAdmin()}">
-							<li>
+							<li class=" #{request.requestURI.startsWith('/admin') ? 'activeLink' : ''}">
 								<h:link outcome="/admin/index">
 									<h:outputText value="#{label['admin.interface']}"/>
 								</h:link>

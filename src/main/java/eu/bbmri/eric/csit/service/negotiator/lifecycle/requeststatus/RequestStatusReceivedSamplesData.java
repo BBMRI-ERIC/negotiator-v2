@@ -11,12 +11,12 @@ import java.util.List;
 public class RequestStatusReceivedSamplesData implements RequestStatus {
 
     private String status = null;
-    private String statusType = LifeCycleRequestStatusType.RECEIVED_SAMPLES;
-    private String statusText = "Samples/Data received.";
+    private final String statusType = LifeCycleRequestStatusType.RECEIVED_SAMPLES;
+    private final String statusText = "Samples/Data received.";
     private Date statusDate = null;
-    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
-    private List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
-    private List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
+    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
+    private final List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     public RequestStatusReceivedSamplesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();

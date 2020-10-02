@@ -20,10 +20,10 @@ import java.util.List;
 
 public class DatabaseUtilPerson {
 
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    private static Logger logger = LoggerFactory.getLogger(DatabaseUtilPerson.class);
-    private DatabaseModelMapper databaseModelMapper = new DatabaseModelMapper();
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseUtilPerson.class);
+    private final DatabaseModelMapper databaseModelMapper = new DatabaseModelMapper();
 
     public DatabaseUtilPerson(DataSource dataSource) {
         this.dataSource = dataSource;

@@ -37,7 +37,7 @@ public class Perun {
      * The logger for all perun rest endpoints
      */
     private static final Logger logger = LoggerFactory.getLogger(Perun.class);
-    private HashMap<String, Integer> mapping_updates_collections = new HashMap<String, Integer>();
+    private final HashMap<String, Integer> mapping_updates_collections = new HashMap<String, Integer>();
 
     /**
      * Accepts a list of perun users and puts them into the database

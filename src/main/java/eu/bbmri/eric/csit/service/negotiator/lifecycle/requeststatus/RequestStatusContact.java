@@ -10,14 +10,14 @@ import java.util.List;
 public class RequestStatusContact implements RequestStatus {
 
     private String status = null;
-    private String statusType = LifeCycleRequestStatusType.CONTACT;
-    private String statusText = "Collection representatives not contacted yet.";
+    private final String statusType = LifeCycleRequestStatusType.CONTACT;
+    private final String statusText = "Collection representatives not contacted yet.";
     private Date statusDate = null;
-    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
 
-    private List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
+    private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
 
-    private List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
+    private final List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     public RequestStatusContact(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();

@@ -39,7 +39,7 @@
         <database.password>saher</database.password>-->
 
         <database.server>localhost</database.server>
-        <database.port>5432</database.port>
+        <database.port>5434</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
         <database.password>negotiator</database.password>

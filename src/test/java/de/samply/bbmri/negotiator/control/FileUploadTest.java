@@ -40,7 +40,7 @@ public class FileUploadTest {
     @DisplayName("Test File validation no file supplyed by servlet")
     void testNoFileSupplyed() {
         mock(FileUtil.class);
-        lenient().when(fileUtil.validateFile((Part)isNull(), anyInt())).thenReturn(null);
+        lenient().when(fileUtil.validateFile(isNull(), anyInt())).thenReturn(null);
         mock(Negotiator.class);
         when(negotiator.getMaxUploadFileSize()).thenReturn(512*1024*1024);
         try {
@@ -55,7 +55,7 @@ public class FileUploadTest {
     @Disabled
     void testValidFileSupplyed() {
         mock(FileUtil.class);
-        lenient().when(fileUtil.validateFile((Part)any(), anyInt())).thenReturn(new ArrayList<FacesMessage>());
+        lenient().when(fileUtil.validateFile(any(), anyInt())).thenReturn(new ArrayList<FacesMessage>());
         mock(Negotiator.class);
         when(negotiator.getMaxUploadFileSize()).thenReturn(512*1024*1024);
         mock(Part.class);

@@ -74,7 +74,7 @@ public abstract class AbstractJWT implements Serializable {
     /**
      * The public key used to verify the JWTs signature.
      */
-    private PublicKey publicKey;
+    private final PublicKey publicKey;
 
     /**
      * Initializes this JWT with an OAuth2Client configuration and

@@ -15,12 +15,12 @@ import java.util.List;
 public class RequestStatusShippedSamplesData implements RequestStatus {
 
     private String status = null;
-    private String statusType = LifeCycleRequestStatusType.SHIPPED_SAMPLES;
+    private final String statusType = LifeCycleRequestStatusType.SHIPPED_SAMPLES;
     private String statusText = "Shipped Samples/Data.";
     private Date statusDate = null;
-    private List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
-    private List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
-    private List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
+    private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
+    private final List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
     public RequestStatusShippedSamplesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();

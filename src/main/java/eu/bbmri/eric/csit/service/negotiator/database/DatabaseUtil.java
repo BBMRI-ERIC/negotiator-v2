@@ -12,13 +12,13 @@ import javax.sql.DataSource;
 public class DatabaseUtil {
 
     @Resource(name="jdbc/postgres")
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    private static Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
 
-    private DatabaseUtilNotification databaseUtilNotification;
-    private DatabaseUtilRequest databaseUtilRequest;
-    private DatabaseUtilPerson databaseUtilPerson;
+    private final DatabaseUtilNotification databaseUtilNotification;
+    private final DatabaseUtilRequest databaseUtilRequest;
+    private final DatabaseUtilPerson databaseUtilPerson;
 
     public DatabaseUtil() {
         try {

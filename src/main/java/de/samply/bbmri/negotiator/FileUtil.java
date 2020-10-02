@@ -48,7 +48,7 @@ import fi.solita.clamav.ClamAVClient;
 public class FileUtil {
 
 
-    private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
     /**
      * ClamAV timeout in milliseconds. Set to 20 seconds.

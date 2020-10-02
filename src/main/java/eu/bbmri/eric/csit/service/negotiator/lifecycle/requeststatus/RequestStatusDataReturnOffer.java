@@ -14,8 +14,8 @@ import java.util.List;
 public class RequestStatusDataReturnOffer implements RequestStatus {
 
     private String status = null;
-    private String statusType = LifeCycleRequestStatusType.DATA_RETURN_OFFER;
-    private String statusText = "Offer for data return.";
+    private final String statusType = LifeCycleRequestStatusType.DATA_RETURN_OFFER;
+    private final String statusText = "Offer for data return.";
     private Date statusDate = null;
     private List<String> allowedNextStatus = new ArrayList<>();
     private List<String> allowedNextStatusBiobanker = new ArrayList<>();

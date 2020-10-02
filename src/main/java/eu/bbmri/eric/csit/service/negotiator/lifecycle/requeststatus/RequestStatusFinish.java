@@ -8,10 +8,10 @@ import java.util.List;
 
 public class RequestStatusFinish implements RequestStatus {
 
-    private String statusType = "finish";
-    private String statusText = "Request finished";
+    private final String statusType = "finish";
+    private final String statusText = "Request finished";
     private Date statusDate = null;
-    private List allowedNextStatus = Arrays.asList("review");
+    private final List allowedNextStatus = Arrays.asList("review");
 
     public RequestStatusFinish(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();

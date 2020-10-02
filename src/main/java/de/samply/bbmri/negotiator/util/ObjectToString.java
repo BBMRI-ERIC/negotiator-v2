@@ -61,7 +61,7 @@ public class ObjectToString {
          * print all 1st level values without traversing into them. Setting to 1 will traverse up to 2nd level and so
          * on.
          */
-        private int                 maxDepth;
+        private final int                 maxDepth;
 
         private int                 depth;
 

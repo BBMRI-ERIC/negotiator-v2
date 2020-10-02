@@ -15,7 +15,7 @@ public class RequestStatusAbandoned implements RequestStatus {
 
     private final String statusType = LifeCycleRequestStatusType.ABANDONED;
     private String status = LifeCycleRequestStatusStatus.ABANDONED;
-    private final String statusText = "Negotiation abandoned";
+    private String statusText = "Negotiation abandoned";
     private Date statusDate = null;
     private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private List<String> allowedNextStatusBiobanker = new ArrayList<>();
@@ -28,6 +28,12 @@ public class RequestStatusAbandoned implements RequestStatus {
     public RequestStatusAbandoned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
+        if(status.equalsIgnoreCase(LifeCycleRequestStatusStatus.NOT_INTERESTED)) {
+            statusText = "Biobank stepped away";
+        }
+        if(status.equalsIgnoreCase(LifeCycleRequestStatusStatus.NOT_INTERESTED_RESEARCHER)) {
+            statusText = "Researcher stepped away";
+        }
         allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), status);
         allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), status);
     }
@@ -39,7 +45,7 @@ public class RequestStatusAbandoned implements RequestStatus {
 
     @Override
     public String getStatus() {
-        return "abandoned";
+        return status;
     }
 
     @Override

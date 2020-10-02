@@ -20,10 +20,10 @@ import java.sql.Connection;
 
 public class DatabaseUtilRequest {
 
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
-    private static Logger logger = LoggerFactory.getLogger(DatabaseUtilRequest.class);
-    private DatabaseModelMapper databaseModelMapper = new DatabaseModelMapper();
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseUtilRequest.class);
+    private final DatabaseModelMapper databaseModelMapper = new DatabaseModelMapper();
 
     public DatabaseUtilRequest(DataSource dataSource) {
         this.dataSource = dataSource;

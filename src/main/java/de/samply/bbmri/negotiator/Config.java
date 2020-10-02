@@ -51,7 +51,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
 
     private static final long serialVersionUID = -915149314520303632L;
 
-    private static Logger logger = LoggerFactory.getLogger(Config.class);
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
 
     /**
      * The jOOQ DSLContext, initialized in the constructor.

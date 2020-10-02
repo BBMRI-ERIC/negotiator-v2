@@ -21,7 +21,7 @@ public class AntiVirusExceptionEnum {
         ConnectException("Connection refused");
 
 
-        private String text;
+        private final String text;
 
         antiVirusMessageType(String text) {
             this.text = text;

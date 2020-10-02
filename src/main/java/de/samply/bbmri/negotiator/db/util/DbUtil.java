@@ -46,6 +46,7 @@ import de.samply.share.model.bbmri.BbmriResult;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
