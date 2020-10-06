@@ -71,11 +71,13 @@ public class CollectionLifeCycleStatus {
         if(getStatus() == null && statusType.equalsIgnoreCase("contact") || getStatus().checkAllowedNextStatus(status)) {
             CollectionRequestStatusDTO collectionRequestStatusDTO = createCollectionRequestStatusInDB(status, statusType, status_json, status_user_id);
             collectionRequestStatusFactory(collectionRequestStatusDTO);
-            Map<String, String> parameters = new HashMap<>();
-            parameters.put("collectionId", collection_id.toString());
-            parameters.put("collectionName", collectionBiobankDTO.getCollection().getName());
-            parameters.put("newRequestStatus", getStatus().getStatus());
-            NotificationService.sendNotification(NotificationType.STATUS_CHANGED_NOTIFICATION, query_id, null, status_user_id, parameters);
+            if(!collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.CONTACT)) {
+                Map<String, String> parameters = new HashMap<>();
+                parameters.put("collectionId", collection_id.toString());
+                parameters.put("collectionName", collectionBiobankDTO.getCollection().getName());
+                parameters.put("newRequestStatus", getStatus().getStatus());
+                NotificationService.sendNotification(NotificationType.STATUS_CHANGED_NOTIFICATION, query_id, null, status_user_id, parameters);
+            }
         } else {
             System.err.println("ERROR-NG-0000004: Collection Request Status, wrong next status Provided.");
             System.err.println("Status is: " + getStatus().getStatusType() + " - " + getStatus().getStatus());
