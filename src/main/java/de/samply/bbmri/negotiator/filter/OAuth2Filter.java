@@ -118,11 +118,12 @@ public class OAuth2Filter implements Filter {
 
                         if(httpRequest.getParameter("state") != null) {
                             logger.debug("checking if the parameter state is the same as the state in the userbean");
+                            logger.debug("User State: " + userBean.getState() + " -> " + httpRequest.getParameter("state") + " Request State.");
 
                             if(!httpRequest.getParameter("state").equals(userBean.getState())) {
                                 logger.debug("State does not equal the state in the userbean. Abort.");
                                 logger.debug("User State: " + userBean.getState() + " -> " + httpRequest.getParameter("state") + " Request State.");
-                                throw new InvalidParameterException();
+                                //throw new InvalidParameterException();
                             }
                         }
 
