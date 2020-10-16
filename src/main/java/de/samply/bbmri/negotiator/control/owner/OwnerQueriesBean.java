@@ -30,11 +30,7 @@ package de.samply.bbmri.negotiator.control.owner;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -63,12 +59,13 @@ public class OwnerQueriesBean implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private List<OwnerQueryStatsDTO> queries;
+	private List<OwnerQueryStatsDTO> queries = new ArrayList<>();
 
 	/**
 	 * The currently active flag filter. Set this to whatever flag you want and you will see the flagged queries only.
 	 */
 	private Flag flagFilter = Flag.UNFLAGGED;
+	private Boolean isTestRequest = false;
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -94,7 +91,7 @@ public class OwnerQueriesBean implements Serializable {
 	public void ignoreQuery(OwnerQueryStatsDTO queryDto) {
 		try (Config config = ConfigFactory.get()) {
 			config.get().commit();
-			queries = null;
+			queries = new ArrayList<>();
 			flagQuery(queryDto, Flag.IGNORED);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -137,7 +134,7 @@ public class OwnerQueriesBean implements Serializable {
 		try (Config config = ConfigFactory.get()) {
 			DbUtil.flagQuery(config, queryDto, flag, userBean.getUserId());
 			config.get().commit();
-			queries = null;
+			queries = new ArrayList<>();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -177,14 +174,14 @@ public class OwnerQueriesBean implements Serializable {
 	 * @return
 	 */
 	public List<OwnerQueryStatsDTO> getQueries() {
-		if (queries == null) {
+		if (queries == null || queries.isEmpty()) {
 			try (Config config = ConfigFactory.get()) {
 
 			    queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
-					        flagFilter);
+					        flagFilter, isTestRequest);
 
 				for (int i = 0; i < queries.size(); ++i) {
-					getPrivateNegotiationCountAndTime(i);
+					getPrivateNegotiationCountAndTime(config, i);
 				}
 
 				sortQueries();
@@ -196,22 +193,17 @@ public class OwnerQueriesBean implements Serializable {
 		return queries;
 	}
 
-	public void getPrivateNegotiationCountAndTime(int index){
-		try(Config config = ConfigFactory.get()) {
-			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
-			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
-			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
-		} catch (SQLException e) {
-			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
-			e.printStackTrace();
-		}
+	public void getPrivateNegotiationCountAndTime(Config config, int index){
+		Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+		queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
+		queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
 	}
 
 	/**
 	 * Add search filter
 	 */
 	public void addFilter() {
-		queries = null;
+		queries = new ArrayList<>();
 		sessionBean.addFilter();
 	}
 
@@ -222,7 +214,7 @@ public class OwnerQueriesBean implements Serializable {
 	 *
 	 */
 	public void removeFilter(String arg) {
-		queries = null;
+		queries = new ArrayList<>();
 		sessionBean.removeFilter(arg);
 	}
 
@@ -271,5 +263,13 @@ public class OwnerQueriesBean implements Serializable {
 
 	public String getPagetitle() {
 		return "pagetitle_"+flagFilter;
+	}
+
+	public Boolean getIsTestRequest() {
+		return isTestRequest;
+	}
+
+	public void setIsTestRequest(Boolean testRequest) {
+		isTestRequest = testRequest;
 	}
 }

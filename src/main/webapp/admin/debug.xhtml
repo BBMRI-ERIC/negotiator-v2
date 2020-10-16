@@ -102,40 +102,17 @@
                 <f:facet name="header">Negotiation Started Time</f:facet>
                 #{query.getNegotiationStartedTime().toString()}
             </h:column>
-            <!--
             <h:column>
-                <f:facet name="header">Biobanks and Collections</f:facet>
-                <h:panelGroup id="queryCollectionsDisplay" layout="block">
-
-                    <h:panelGroup styleClass="text" layout="block">
-                        <h:outputLabel value="#{label['queryview.title.amountMatchingCollections']}"/>
-                        <h:outputText
-                                value="#{adminDebugBean.getMatchingBiobanks(query.getId())} #{adminDebugBean.getReachableCollections(query.getId())}"
-                                style="margin-left: 22px;">
-                        </h:outputText>
-
-                        <a href="#" data-toggle="collapse" data-target="#collection-list" class="label label-default">
-                            #{label['queryview.action.showcollections']}
-                        </a>
-                    </h:panelGroup>
-
-                    <div id="collection-list-{query.getId()}" class="collapse">
-                        #{adminDebugBean.getJsTreeJson(query.getId())}
-                    </div>
-                    <h:outputScript>
-                        $(function() {
-                            var data1= JSON.parse(document.getElementById("collection-list-{query.getId()}").innerHTML);
-                            $('#collection-list-{query.getId()}').jstree({
-                                'core': {
-                                    'data': data1
-                                }
-                            });
-                        });
-                    </h:outputScript>
-                </h:panelGroup>
+                <f:facet name="header">Test Request</f:facet>
+                <span id="TestRequest#{query.getId()}">#{query.getTestRequest()}</span>
+                <h:form id="form-test-request">
+                    <h:commandButton action="#{adminDebugBean.switchTestRequest(query.getId())}" value="#{query.testRequest ? 'Switch to normal Reqest' : 'Switch to Test Reqest'}"
+                                     styleClass="btn btn-default"/>
+                </h:form>
             </h:column>
-            -->
-
+            <h:column>
+                <f:facet name="header">Transfer request</f:facet>
+            </h:column>
             <h:column>
                 <f:facet name="header">Reset Negotiation</f:facet>
                 <h:form id="form">

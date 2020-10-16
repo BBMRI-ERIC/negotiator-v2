@@ -45,224 +45,233 @@
 	<ui:param name="bodyClass" value="container body-nomargin" />
 
 	<ui:define name="body">
+		<h:form id="uploadform" enctype="multipart/form-data">
 
-		<h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
+			<h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
 
-            <h:panelGroup layout="block">
-                <h2>Request details</h2>
-                On this page you can provide the details for your request.<br />
-                First define the search parameters for the samples you are looking for. Click the "Edit Search
-                Parameters" button to change them. If you like to add additonal search queries, for the same catalouge or an other catalouge use the "Add new Search Query" button to be redirected to one og the catalogues<br />
-                Then fill out the form below, giving your query a title and describing both the project you are working
-                on and adding more detailed information for this request in particular.<br />
-                If you have additional information, you can attach files to this request.<br />
-            <p />
-                <br/>
-            </h:panelGroup>
-			<h:panelGroup layout="block">
+				<h:panelGroup layout="block">
+					<h2>Request details</h2>
+					On this page you can provide the details for your request.<br />
+					First define the search parameters for the samples you are looking for. Click the "Edit Search
+					Parameters" button to change them. If you like to add additonal search queries, for the same catalouge or an other catalouge use the "Add new Search Query" button to be redirected to one og the catalogues<br />
+					Then fill out the form below, giving your query a title and describing both the project you are working
+					on and adding more detailed information for this request in particular.<br />
+					If you have additional information, you can attach files to this request.<br />
+				<p />
+					<br/>
+				</h:panelGroup>
+				<h:panelGroup layout="block">
 
-				<table class="table table-hover">
-					<thead>
-						<tr>
-							<th>#{label['queryview.structuredQuery.table.directory']}</th>
-							<th>#{label['queryview.structuredQuery.table.searchParameters']}</th>
-							<th>#{label['queryview.structuredQuery.table.collectionNumbers']}</th>
-							<th>#{label['queryview.structuredQuery.table.actions']}</th>
-						</tr>
-					</thead>
-					<tbody>
-					<ui:repeat value="#{queryBean.searchQueries}" var="searchQuery">
-						<tr>
-							<td>#{queryBean.getDirectoryNameByUrl(searchQuery.url)}</td>
-							<td>#{searchQuery.humanReadable}</td>
-							<td>#{searchQuery.numberOfCollections}<div style="display:none;">| #{searchQuery.token}</div></td>
-							<td>
-                                <h:form>
-                                    <h:commandLink action="#{queryBean.editSearchParameters(searchQuery.url, searchQuery.token)}"	styleClass="btn btn-primary"
-                                                   title="#{label['queryview.structuredQuery.table.tooltip.editSearchParameters']}">
-                                        #{label['queryview.structuredQuery.table.editSearchParameters']}
-                                    </h:commandLink>
-                                </h:form>
-                            </td>
-						</tr>
-					</ui:repeat>
-					</tbody>
-				</table>
-
-
-
-			</h:panelGroup>
-
-			<br/>
-
-			<h:panelGroup layout="block" style="float: right;">
-				<style>
-					.searchparametertooltip {
-						background-color: #004275;
-						border-radius: 10px;
-						display: inline-block;
-						position: relative;
-						font-weight: bold;
-						color: #fff;
-						padding: 6px 12px;
-						margin-bottom: 0;
-						font-size: 14px;
-						line-height: 1.42857143;
-						text-align: center;
-						white-space: nowrap;
-						vertical-align: middle;
-						cursor: pointer;
-					}
-
-					.searchparametertooltip .searchparametertooltiparea {
-						visibility: hidden;
-						background-color: #F5F5F5;
-						color: #eee;
-						text-align: center;
-						border-radius: 6px;
-						padding: 10px;
-						margin: 10px;
-						right: -33px;
-						top: 20px;
-						border: 1px;
-						border-color: #004275;
-						border-style: solid;
-
-						/* Position the tooltip */
-						position: absolute;
-						z-index: 1;
-					}
-
-					.searchparametertooltip:hover .searchparametertooltiparea {
-						visibility: visible;
-					}
-
-					.searchparametertooltip .searchparametertooltiparea .searchparametertooltipareabtn {
-						margin: 5px;
-					}
-				</style>
-
-				<span class="searchparametertooltip">Add new Search Query
-					<span class="searchparametertooltiparea">
-						<ui:repeat value="#{directoryBean.directories}" var="directory">
-							<h:form>
-								<h:commandLink action="#{queryBean.addSearchParameters(directory.restUrl)}"	styleClass="btn btn-primary searchparametertooltipareabtn"
-											   title="#{directory.name}">
-									#{directory.name}
-								</h:commandLink>
-							</h:form>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>#{label['queryview.structuredQuery.table.directory']}</th>
+								<th>#{label['queryview.structuredQuery.table.searchParameters']}</th>
+								<th>#{label['queryview.structuredQuery.table.collectionNumbers']}</th>
+								<th>#{label['queryview.structuredQuery.table.actions']}</th>
+							</tr>
+						</thead>
+						<tbody>
+						<ui:repeat value="#{queryBean.searchQueries}" var="searchQuery">
+							<tr>
+								<td>#{queryBean.getDirectoryNameByUrl(searchQuery.url)}</td>
+								<td>#{searchQuery.humanReadable}</td>
+								<td>#{searchQuery.numberOfCollections}<div style="display:none;">| #{searchQuery.token}</div></td>
+								<td>
+									<h:commandLink action="#{queryBean.editSearchParameters(searchQuery.url, searchQuery.token)}"	styleClass="btn btn-primary"
+													   title="#{label['queryview.structuredQuery.table.tooltip.editSearchParameters']}">
+											#{label['queryview.structuredQuery.table.editSearchParameters']}
+									</h:commandLink>
+								</td>
+							</tr>
 						</ui:repeat>
+						</tbody>
+					</table>
+
+
+
+				</h:panelGroup>
+
+				<br/>
+
+				<h:panelGroup layout="block" style="float: right;">
+					<style>
+						.searchparametertooltip {
+							background-color: #004275;
+							border-radius: 10px;
+							display: inline-block;
+							position: relative;
+							font-weight: bold;
+							color: #fff;
+							padding: 6px 12px;
+							margin-bottom: 0;
+							font-size: 14px;
+							line-height: 1.42857143;
+							text-align: center;
+							white-space: nowrap;
+							vertical-align: middle;
+							cursor: pointer;
+						}
+
+						.searchparametertooltip .searchparametertooltiparea {
+							visibility: hidden;
+							background-color: #F5F5F5;
+							color: #eee;
+							text-align: center;
+							border-radius: 6px;
+							padding: 10px;
+							margin: 10px;
+							right: -33px;
+							top: 20px;
+							border: 1px;
+							border-color: #004275;
+							border-style: solid;
+
+							/* Position the tooltip */
+							position: absolute;
+							z-index: 1;
+						}
+
+						.searchparametertooltip:hover .searchparametertooltiparea {
+							visibility: visible;
+						}
+
+						.searchparametertooltip .searchparametertooltiparea .searchparametertooltipareabtn {
+							margin: 5px;
+						}
+
+						.test-request-selection-box {
+							background-color: #fafafa;
+							border: 1px solid #cacece;
+							box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+							padding: 9px;
+							border-radius: 3px;
+						}
+					</style>
+
+					<span class="searchparametertooltip">Add new Search Query
+						<span class="searchparametertooltiparea">
+							<ui:repeat value="#{directoryBean.directories}" var="directory">
+								<h:commandLink action="#{queryBean.addSearchParameters(directory.restUrl)}"	styleClass="btn btn-primary searchparametertooltipareabtn"
+												   title="#{directory.name}">
+										#{directory.name}
+								</h:commandLink><br />
+							</ui:repeat>
+						</span>
 					</span>
-				</span>
 
-			</h:panelGroup>
+				</h:panelGroup>
 
-			<br/>
+				<br/>
 
+					<div class="form-group">
+						<span class="required">
+							#{label['queryview.title.title']} <i class="fa fa-pencil-square-o" />
+						</span>
+						<h:inputText id="title" value="#{queryBean.queryTitle}"
+							styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
+							validatorMessage="#{label['error.invalidTitleLength']}">
+							<f:validateLength for="title" maximum="250" />
+						</h:inputText>
+						<h:message for="title" style="color:red" styleClass="pre-wrap" />
 
-			<h:form id="uploadform" enctype="multipart/form-data">
+						<br/>
+						<span class="required">
+							#{label['queryview.title.text']} <i class="fa fa-pencil-square-o" />
+						</span>
+						<h:inputTextarea id="description" value="#{queryBean.queryText}"
+							styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.text']}"
+							validatorMessage="#{label['error.invalidDescriptionLength']}">
+							<f:validateLength for="description" maximum="6000" />
+						</h:inputTextarea>
+						<h:message for="description" style="color:red"
+							styleClass="pre-wrap" />
 
-				<div class="form-group">
-                    <span class="required">
-                        #{label['queryview.title.title']} <i class="fa fa-pencil-square-o" />
-                    </span>
-					<h:inputText id="title" value="#{queryBean.queryTitle}"
-						styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
-						validatorMessage="#{label['error.invalidTitleLength']}">
-						<f:validateLength for="title" minimum="5" maximum="250" />
-					</h:inputText>
-					<h:message for="title" style="color:red" styleClass="pre-wrap" />
+						<br/>
+						<span class="required">
+							#{label['queryview.title.requestdescription']} <i class="fa fa-pencil-square-o" />
+						</span>
+						<h:inputTextarea id="requestdescription" value="#{queryBean.queryRequestDescription}"
+										 styleClass="form-control" rows="5"
+										 pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
+										 validatorMessage="#{label['error.invalidDescriptionLength']}">
+							<f:validateLength for="requestdescription" maximum="6000" />							<!-- LENGTH Increased -->
+						</h:inputTextarea>
+						<h:message for="requestdescription" style="color:red"
+								   styleClass="pre-wrap" />
 
-					<br></br>
-                    <span class="required">
-                        #{label['queryview.title.text']} <i class="fa fa-pencil-square-o" />
-                    </span>
-					<h:inputTextarea id="description" value="#{queryBean.queryText}"
-						styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.text']}"
-						validatorMessage="#{label['error.invalidDescriptionLength']}">
-						<f:validateLength for="description" minimum="5" maximum="6000" />
-					</h:inputTextarea>
-					<h:message for="description" style="color:red"
-						styleClass="pre-wrap" />
+						<br/>
+						#{label['queryview.title.ethicsVote']}
+						<h:inputTextarea id="ethicsVote" value="#{queryBean.ethicsVote}"
+										 styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.ethicsVote']}"
+										 validatorMessage="#{label['error.invalidDescriptionLength']}">
+							<f:validateLength for="description" maximum="2000" />
+						</h:inputTextarea>
+						<h:message for="ethicsVote" style="color:red"
+								   styleClass="pre-wrap" />
 
-					<br></br>
-                    <span class="required">
-                        #{label['queryview.title.requestdescription']} <i class="fa fa-pencil-square-o" />
-                    </span>
-					<h:inputTextarea id="requestdescription" value="#{queryBean.queryRequestDescription}"
-									 styleClass="form-control" rows="5"
-                                     pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
-									 validatorMessage="#{label['error.invalidDescriptionLength']}">
-						<f:validateLength for="requestdescription" minimum="5" maximum="6000" />							<!-- LENGTH Increased -->
-					</h:inputTextarea>
-					<h:message for="requestdescription" style="color:red"
-							   styleClass="pre-wrap" />
+						<br/> #{label['queryview.title.attachments']}
 
-                    <br></br>
-					#{label['queryview.title.ethicsVote']}
-                    <h:inputTextarea id="ethicsVote" value="#{queryBean.ethicsVote}"
-                                     styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.ethicsVote']}"
-                                     validatorMessage="#{label['error.invalidDescriptionLength']}">
-                        <f:validateLength for="description" maximum="2000" />
-                    </h:inputTextarea>
-                    <h:message for="ethicsVote" style="color:red"
-                               styleClass="pre-wrap" />
+						<!-- Attachments for a query -->
+						<h:panelGroup layout="block">
 
-                    <br></br> #{label['queryview.title.attachments']}
+							<!-- Uploaded attachments for a query -->
+							<bbmricc:fileUploaderDisplay componentQueryBean="#{queryBean}"
+														 fileUploadBean="#{fileUploadBean}"
+														 scope="queryAttachment"/>
+							<!-- Upload the attachments for a query -->
+							<bbmricc:fileUpload componentQueryBean="#{queryBean}"
+												fileUploadBean="#{fileUploadBean}"
+												scope="queryAttachment"/>
 
-					<!-- Attachments for a query -->
-					<h:panelGroup layout="block">
+						</h:panelGroup>
+					</div>
+					<br/><br/>
 
-						<!-- Uploaded attachments for a query -->
-						<bbmricc:fileUploaderDisplay componentQueryBean="#{queryBean}"
-													 fileUploadBean="#{fileUploadBean}"
-													 scope="queryAttachment"/>
-						<!-- Upload the attachments for a query -->
-						<bbmricc:fileUpload componentQueryBean="#{queryBean}"
-											fileUploadBean="#{fileUploadBean}"
-											scope="queryAttachment"/>
-
+					<h:panelGroup layout="block" style="float: left;color: #c6c6c6;">
+							<h:selectBooleanCheckbox id="testRequest" value="#{queryBean.testRequest}"
+													 styleClass="form-control test-request-selection-box"
+													 style="height: 15px;float: left;width: 15px;" />
+						<span style="float: left;margin-left: 10px;">#{label['queryview.title.markTestRequest']}</span>
 					</h:panelGroup>
-                </div>
-				<br></br>
-                <br></br>
-                
-				<h:panelGroup layout="block" styleClass="pull-right">
-                    <h:button outcome="detail" styleClass="btn btn-primary" value="#{label['global.button.cancel']}"
-                              style="margin-right: 5px;"  rendered="#{queryBean.mode == 'edit'}">                              
-                              
-                        <f:param name="queryId" value="#{queryBean.id}" />
-                    </h:button>
-                    
-					<h:commandButton action="#{queryBean.saveQuery()}"
-						value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
-						title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"						
-						styleClass="btn btn-primary" />
-                </h:panelGroup>
 
-				<div class="modal fade" id="modal-from-delete-file-confirm-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								Confirm file deletion
-							</div>
-							<div class="modal-body">
-								Are you sure you want to delete this file?
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-								<h:commandButton action="#{queryBean.removeAttachment()}"
-												 value="Yes" styleClass="btn btn-danger btn-ok"
-												 title="#{label['attachmentview.tooltip.attachmentDelete']}">
-								</h:commandButton>
+					<h:panelGroup layout="block" styleClass="pull-right">
+						<h:button outcome="detail" styleClass="btn btn-primary" value="#{label['global.button.cancel']}"
+								  style="margin-right: 5px;"  rendered="#{queryBean.mode == 'edit'}">
+
+							<f:param name="queryId" value="#{queryBean.id}" />
+						</h:button>
+
+						<h:commandButton action="#{queryBean.saveQuery()}"
+							value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
+							title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"
+							styleClass="btn btn-primary" />
+					</h:panelGroup>
+
+					<div class="modal fade" id="modal-from-delete-file-confirm-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+						<div class="modal-dialog">
+							<div class="modal-content">
+								<div class="modal-header">
+									Confirm file deletion
+								</div>
+								<div class="modal-body">
+									Are you sure you want to delete this file?
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+									<h:commandButton action="#{queryBean.removeAttachment()}"
+													 value="Yes" styleClass="btn btn-danger btn-ok"
+													 title="#{label['attachmentview.tooltip.attachmentDelete']}">
+									</h:commandButton>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
 
-			</h:form>
-			
-		</h:panelGroup>
+			</h:panelGroup>
+
+		</h:form>
+		<br/><br/><br/><br/><br/>
 
 	</ui:define>
 </ui:composition>

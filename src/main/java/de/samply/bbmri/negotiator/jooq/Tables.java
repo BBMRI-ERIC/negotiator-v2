@@ -11,12 +11,18 @@ import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
+import de.samply.bbmri.negotiator.jooq.tables.MailNotification;
 import de.samply.bbmri.negotiator.jooq.tables.Network;
 import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
 import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
+import de.samply.bbmri.negotiator.jooq.tables.Notification;
+import de.samply.bbmri.negotiator.jooq.tables.NotificationSetting;
 import de.samply.bbmri.negotiator.jooq.tables.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
+import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
+import de.samply.bbmri.negotiator.jooq.tables.PersonNetwork;
+import de.samply.bbmri.negotiator.jooq.tables.PersonOffer;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
@@ -79,6 +85,11 @@ public class Tables {
 	public static final ListOfDirectories LIST_OF_DIRECTORIES = de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories.LIST_OF_DIRECTORIES;
 
 	/**
+	 * The table public.mail_notification
+	 */
+	public static final MailNotification MAIL_NOTIFICATION = de.samply.bbmri.negotiator.jooq.tables.MailNotification.MAIL_NOTIFICATION;
+
+	/**
 	 * The table public.network
 	 */
 	public static final Network NETWORK = de.samply.bbmri.negotiator.jooq.tables.Network.NETWORK;
@@ -94,6 +105,16 @@ public class Tables {
 	public static final NetworkCollectionLink NETWORK_COLLECTION_LINK = de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink.NETWORK_COLLECTION_LINK;
 
 	/**
+	 * The table public.notification
+	 */
+	public static final Notification NOTIFICATION = de.samply.bbmri.negotiator.jooq.tables.Notification.NOTIFICATION;
+
+	/**
+	 * The table public.notification_setting
+	 */
+	public static final NotificationSetting NOTIFICATION_SETTING = de.samply.bbmri.negotiator.jooq.tables.NotificationSetting.NOTIFICATION_SETTING;
+
+	/**
 	 * table to store private conversation made on a query between two people(owner and researcher)
 	 */
 	public static final Offer OFFER = de.samply.bbmri.negotiator.jooq.tables.Offer.OFFER;
@@ -107,6 +128,21 @@ public class Tables {
 	 * Table for connecting people with collections
 	 */
 	public static final PersonCollection PERSON_COLLECTION = de.samply.bbmri.negotiator.jooq.tables.PersonCollection.PERSON_COLLECTION;
+
+	/**
+	 * The table public.person_comment
+	 */
+	public static final PersonComment PERSON_COMMENT = de.samply.bbmri.negotiator.jooq.tables.PersonComment.PERSON_COMMENT;
+
+	/**
+	 * The table public.person_network
+	 */
+	public static final PersonNetwork PERSON_NETWORK = de.samply.bbmri.negotiator.jooq.tables.PersonNetwork.PERSON_NETWORK;
+
+	/**
+	 * The table public.person_offer
+	 */
+	public static final PersonOffer PERSON_OFFER = de.samply.bbmri.negotiator.jooq.tables.PersonOffer.PERSON_OFFER;
 
 	/**
 	 * query table to contain all  queries

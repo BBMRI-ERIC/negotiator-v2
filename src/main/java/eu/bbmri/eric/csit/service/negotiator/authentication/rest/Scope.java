@@ -34,7 +34,7 @@ public enum  Scope {
 
     private final String identifier;
 
-    private Scope(String identifier) {
+    Scope(String identifier) {
         this.identifier = identifier;
     }
 

@@ -176,4 +176,11 @@ public class QueryDao extends DAOImpl<QueryRecord, de.samply.bbmri.negotiator.jo
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByResearcherOrganization(String... values) {
 		return fetch(Query.QUERY.RESEARCHER_ORGANIZATION, values);
 	}
+
+	/**
+	 * Fetch records that have <code>test_request IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Query> fetchByTestRequest(Boolean... values) {
+		return fetch(Query.QUERY.TEST_REQUEST, values);
+	}
 }

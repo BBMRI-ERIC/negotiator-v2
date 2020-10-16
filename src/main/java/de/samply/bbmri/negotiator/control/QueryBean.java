@@ -46,6 +46,9 @@ import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,10 +74,12 @@ public class QueryBean implements Serializable {
 
    private Integer jsonQueryId;
 
-   private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
+   private static final Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
+
+   private RequestLifeCycleStatus requestLifeCycleStatus;
 
    /**
     * Session bean use to store transient edit query values
@@ -128,12 +133,14 @@ public class QueryBean implements Serializable {
     /**
      * List of faces messages
      */
-    private List<FacesMessage> msgs = new ArrayList<>();
+    private final List<FacesMessage> msgs = new ArrayList<>();
 
     /**
      * List of faces messages
      */
     private List<QuerySearchDTO> searchQueries = new ArrayList<>();
+
+    private boolean testRequest;
 
    /**
     * Initializes this bean by registering email notification observer
@@ -143,6 +150,7 @@ public class QueryBean implements Serializable {
            /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
            if(id != null)
            {
+               requestLifeCycleStatus = new RequestLifeCycleStatus(id);
                setMode("edit");
                QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
 
@@ -178,6 +186,7 @@ public class QueryBean implements Serializable {
         queryTitle = queryRecord.getTitle();
         queryText = queryRecord.getText();
         queryRequestDescription = queryRecord.getRequestDescription();
+        testRequest = queryRecord.getTestRequest();
         if(jsonQueryId == null) {
             jsonQuery = queryRecord.getJsonText();
         } else {
@@ -194,11 +203,11 @@ public class QueryBean implements Serializable {
         queryText = sessionBean.getTransientQueryText();
         queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
         ethicsVote = sessionBean.getTransientEthicsCode();
-
+        testRequest = sessionBean.getTransientQueryTestRequest();
         if (jsonQueryId != null) {
             try (Config config = ConfigFactory.get()) {
                 String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-                jsonQuery = generateJsonQuery(searchJsonQuery);
+                jsonQuery = generateJsonQuery(sessionBean.getTransientQueryJson(), searchJsonQuery);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -242,18 +251,29 @@ public class QueryBean implements Serializable {
     * Saves the newly created or edited query in the database.
     */
    public String saveQuery() throws SQLException {
-       // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
            if(id != null) {
-               DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id);
+               DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest);
+               requestLifeCycleStatus = new RequestLifeCycleStatus(id);
+               if(!requestLifeCycleStatus.statusCreated()) {
+                   requestLifeCycleStatus.createStatus(userBean.getUserId());
+                   requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+                   NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
+               }
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                        jsonQuery, ethicsVote, userBean.getUserId(),
-                       true);
+                       true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                       testRequest);
                config.commit();
+               requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
+               requestLifeCycleStatus.createStatus(userBean.getUserId());
+               requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+               config.commit();
+               NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, record.getId(), null, userBean.getUserId());
                return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
            }
        } catch (IOException e) {
@@ -343,6 +363,41 @@ public class QueryBean implements Serializable {
         return  jsonQuery;
    }
 
+    /**
+     * Generate the JSON including the new search query String
+     * @param searchJsonQuery
+     * @return
+     */
+    private String generateJsonQuery(String jsonQueryStored, String searchJsonQuery) {
+        try (Config config = ConfigFactory.get()) {
+            RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+            // Get saved query object
+            QueryDTO queryDTO = mapper.readValue(jsonQueryStored, QueryDTO.class);
+            // Get the search query object from the new json string
+            QuerySearchDTO querySearchDTO = mapper.readValue(searchJsonQuery, QuerySearchDTO.class);
+            // check searchQueryTocken if update of query or new
+            if(querySearchDTO.getToken() == null) {
+                querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
+                queryDTO.addSearchQuery(querySearchDTO);
+            } else {
+                String nTocken = querySearchDTO.getToken().replaceAll(".*__search__", "");
+                if (nTocken == null || nTocken.equals("") || nTocken.equals("null")) {
+                    // new search query
+                    querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
+                    queryDTO.addSearchQuery(querySearchDTO);
+                } else {
+                    // edited search query
+                    queryDTO.updateSearchQuery(querySearchDTO, nTocken);
+                }
+            }
+            jsonQuery = queryDTO.toJsonString();
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+        return  jsonQuery;
+    }
+
    /**
     * Save title and text in session bean when uploading attachment.
     */
@@ -352,6 +407,7 @@ public class QueryBean implements Serializable {
        sessionBean.setTransientQueryJson(jsonQuery);
        sessionBean.setTransientQueryRequestDescription(queryRequestDescription);
        sessionBean.setTransientEthicsCode(ethicsVote);
+       sessionBean.setTransientQueryTestRequest(testRequest);
        sessionBean.setSaveTransientState(true);
    }
 
@@ -365,6 +421,7 @@ public class QueryBean implements Serializable {
        sessionBean.setTransientQueryRequestDescription(null);
        sessionBean.setTransientQueryJson(null);
        sessionBean.setTransientEthicsCode(null);
+       sessionBean.setTransientQueryTestRequest(null);
        sessionBean.setSaveTransientState(false);
 
    }
@@ -408,7 +465,8 @@ public class QueryBean implements Serializable {
             if (id == null) {
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(),
-                        false);
+                        false, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                        testRequest);
                 config.commit();
                 setId(record.getId());
             }
@@ -456,6 +514,14 @@ public class QueryBean implements Serializable {
 
     public void setSessionBean(SessionBean sessionBean) {
         this.sessionBean = sessionBean;
+    }
+
+    public RequestLifeCycleStatus getRequestLifeCycleStatus() {
+        return requestLifeCycleStatus;
+    }
+
+    public void setRequestLifeCycleStatus(RequestLifeCycleStatus requestLifeCycleStatus) {
+        this.requestLifeCycleStatus = requestLifeCycleStatus;
     }
 
     public FileUploadBean getFileUploadBean() {
@@ -524,4 +590,11 @@ public class QueryBean implements Serializable {
 
     public String getQtoken() { return qtoken; }
 
+    public boolean isTestRequest() {
+        return testRequest;
+    }
+
+    public void setTestRequest(boolean testRequest) {
+        this.testRequest = testRequest;
+    }
 }

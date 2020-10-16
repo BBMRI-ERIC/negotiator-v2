@@ -4,14 +4,19 @@
 package de.samply.bbmri.negotiator.jooq.tables;
 
 
+import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.tables.records.NetworkCollectionLinkRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 
 
@@ -28,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class NetworkCollectionLink extends TableImpl<NetworkCollectionLinkRecord> {
 
-	private static final long serialVersionUID = -1127251512;
+	private static final long serialVersionUID = 1475018876;
 
 	/**
 	 * The reference instance of <code>public.network_collection_link</code>
@@ -73,6 +78,22 @@ public class NetworkCollectionLink extends TableImpl<NetworkCollectionLinkRecord
 
 	private NetworkCollectionLink(String alias, Table<NetworkCollectionLinkRecord> aliased, Field<?>[] parameters) {
 		super(alias, Public.PUBLIC, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public UniqueKey<NetworkCollectionLinkRecord> getPrimaryKey() {
+		return Keys.NETWORK_COLLECTION_LINK_PK;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<UniqueKey<NetworkCollectionLinkRecord>> getKeys() {
+		return Arrays.<UniqueKey<NetworkCollectionLinkRecord>>asList(Keys.NETWORK_COLLECTION_LINK_PK);
 	}
 
 	/**

@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ListOfDirectories implements Serializable {
 
-	private static final long serialVersionUID = 1978970356;
+	private static final long serialVersionUID = 782410780;
 
 	private Integer id;
 	private String  name;
@@ -37,6 +37,8 @@ public class ListOfDirectories implements Serializable {
 	private String  description;
 	private Boolean syncActive;
 	private String  directoryPrefix;
+	private String  resourceNetworks;
+	private Boolean bbmriEricNationalNodes;
 
 	public ListOfDirectories() {}
 
@@ -54,6 +56,8 @@ public class ListOfDirectories implements Serializable {
 		this.description = value.description;
 		this.syncActive = value.syncActive;
 		this.directoryPrefix = value.directoryPrefix;
+		this.resourceNetworks = value.resourceNetworks;
+		this.bbmriEricNationalNodes = value.bbmriEricNationalNodes;
 	}
 
 	public ListOfDirectories(
@@ -69,7 +73,9 @@ public class ListOfDirectories implements Serializable {
 		String  resourceCollections,
 		String  description,
 		Boolean syncActive,
-		String  directoryPrefix
+		String  directoryPrefix,
+		String  resourceNetworks,
+		Boolean bbmriEricNationalNodes
 	) {
 		this.id = id;
 		this.name = name;
@@ -84,6 +90,8 @@ public class ListOfDirectories implements Serializable {
 		this.description = description;
 		this.syncActive = syncActive;
 		this.directoryPrefix = directoryPrefix;
+		this.resourceNetworks = resourceNetworks;
+		this.bbmriEricNationalNodes = bbmriEricNationalNodes;
 	}
 
 	public Integer getId() {
@@ -188,5 +196,21 @@ public class ListOfDirectories implements Serializable {
 
 	public void setDirectoryPrefix(String directoryPrefix) {
 		this.directoryPrefix = directoryPrefix;
+	}
+
+	public String getResourceNetworks() {
+		return this.resourceNetworks;
+	}
+
+	public void setResourceNetworks(String resourceNetworks) {
+		this.resourceNetworks = resourceNetworks;
+	}
+
+	public Boolean getBbmriEricNationalNodes() {
+		return this.bbmriEricNationalNodes;
+	}
+
+	public void setBbmriEricNationalNodes(Boolean bbmriEricNationalNodes) {
+		this.bbmriEricNationalNodes = bbmriEricNationalNodes;
 	}
 }

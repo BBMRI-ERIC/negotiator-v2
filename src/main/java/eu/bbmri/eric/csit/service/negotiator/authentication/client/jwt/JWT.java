@@ -79,7 +79,7 @@ public class JWT {
     protected String sign(PrivateKey privateKey) throws JOSEException {
         if(privateKey instanceof RSAPrivateKey) {
             SignedJWT signedJWT = new SignedJWT(new JWSHeader(JWSAlgorithm.RS512), builder.build());
-            JWSSigner signer = new RSASSASigner((RSAPrivateKey) privateKey);
+            JWSSigner signer = new RSASSASigner(privateKey);
             signedJWT.sign(signer);
             return signedJWT.serialize();
         } else if(privateKey instanceof ECPrivateKey) {

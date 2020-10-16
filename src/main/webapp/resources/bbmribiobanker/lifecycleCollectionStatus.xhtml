@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+      xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri">
+
+<composite:interface>
+    <composite:attribute name="collectionLifeCycleStatus" required="true"/>
+    <composite:attribute name="collectionId" required="true"/>
+    <composite:attribute name="biobankId" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+
+    <img src="https://lh3.googleusercontent.com/proxy/_Cyv3JxXInYbpHbMjLimzxEi6aKi0JsO5qvrYMlcjEfDrTXRGARlbSyL30PFpLQgnfgFdSEQoJJdWTex_Jx5bqkBEJDiOe0KYJJiIf_Di4CH9riUsA"
+         id="spinner"
+         style="display: none; width: 30px;"
+         alt=""/>
+
+        <h:form id="status-form">
+
+            <div class="col-sm-3 col-lg-3">#{cc.attrs.collectionLifeCycleStatus.collectionName}</div>
+            <div class="col-sm-3 col-lg-3">
+                #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
+                <span style="font-size: 12px; font-style: italic;">
+                    <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" />
+                </span>
+            </div>
+            <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
+                #{label['lifecycleCollectionStatus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
+                <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
+                                 class="form-control"
+                                 style="width: 100%;height: 2rem;"
+                                 value="#{lifeCycleStatusBean.nextCollectionLifecycleStatusStatus}"
+                                 onchange="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(this);"
+                                 onload="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(this);">
+                    <f:selectItems value="#{cc.attrs.collectionLifeCycleStatus.status.nextStatusForBiobankers}" var="nextStatus"
+                                   itemLabel="#{label[nextStatus]}" itemValue="#{nextStatus}" />
+                </h:selectOneMenu>
+
+                <div id="numberOfAvailablePatients#{cc.attrs.collectionId}" style="display: none;">
+                    #{label['lifecycleCollectionStatus.numberAvaivablePatients.title']} <i class="fa fa-pencil-square-o" />
+                    <h:inputText id="numberOfAvailablePatients#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfPatientsAvailable}"
+                                 styleClass="form-control"
+                                 pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailablePatients']}">
+                    </h:inputText>
+                </div>
+                <div id="numberOfAvailableSamples#{cc.attrs.collectionId}" style="display: none;">
+                    #{label['lifecycleCollectionStatus.numberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
+                    <h:inputText id="numberOfAvailableSamples#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfSamplesAvailable}"
+                                  styleClass="form-control"
+                                  pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailableSamples']}">
+                    </h:inputText>
+                </div>
+                <div id="shippedNumber#{cc.attrs.collectionId}" style="display: none;">
+                    #{label['lifecycleCollectionStatus.shippedNumber.title']} <i class="fa fa-pencil-square-o" />
+                    <h:inputTextarea id="shippedNumber" value="#{lifeCycleStatusBean.shippedNumber}"
+                                     styleClass="form-control"
+                                     pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.shippedNumber']}">
+                    </h:inputTextarea>
+                </div>
+                <h:outputScript>
+                    function showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(data) {
+                        if(data.value == 'availability.sample_data_available_accessible') {
+                            $("#numberOfAvailableSamples#{cc.attrs.collectionId}").show();
+                        } else {
+                            $("#numberOfAvailableSamples#{cc.attrs.collectionId}").hide();
+                        }
+                        if(data.value == 'availability.sample_data_available_accessible') {
+                            $("#numberOfAvailablePatients#{cc.attrs.collectionId}").show();
+                        } else {
+                            $("#numberOfAvailablePatients#{cc.attrs.collectionId}").hide();
+                        }
+                        if(data.value == 'accessConditions.indicateAccessConditions') {
+                            $("#toggleModalIndicateAccessConditions").click();
+                            updateIdsForIndicateAccessConditions('#{cc.attrs.collectionId}', '#{cc.attrs.biobankId}');
+                        } else {
+                            $("#indicateAccessConditions#{cc.attrs.collectionId}").hide();
+                        }
+                        if(data.value == 'shippedSamples.shipped') {
+                            $("#shippedNumber#{cc.attrs.collectionId}").show();
+                        } else {
+                            $("#shippedNumber#{cc.attrs.collectionId}").hide();
+                        }
+                    }
+
+                    function onStatusChange(data) {
+                        var spinner = document.getElementById("spinner");
+                        var status = data.status;
+                        if (status === "begin") {
+                            spinner.style.display = "inline";
+                        } else {
+                            spinner.style.display = "none";
+                        }
+                    }
+                </h:outputScript>
+            </div>
+            <div class="col-sm-2 col-lg-2">
+                <button type="button" style="width: 100%;white-space: normal;" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0)">
+                    #{label['lifecycleCollectionStatus.form.button.updateCollection']}
+                </button>
+                <button type="button" style="width: 100%;white-space: normal;" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">
+                    #{label['lifecycleCollectionStatus.form.button.updateCollectionsBiobank']}
+                </button>
+            </div>
+
+
+        </h:form>
+
+</composite:implementation>
+
+</html>

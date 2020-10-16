@@ -41,10 +41,12 @@
 <composite:implementation>
 
     <h:panelGroup layout="block" id="queryDetailData">
+        <h:panelGroup rendered="#{cc.attrs.bean.selectedQuery.testRequest}">
+            <h2 style="color: #ec6707;background-color: #004275;padding: 5px;border-radius: 10px;">Test Request</h2>
+        </h:panelGroup>
 
         <h3 style="margin-top: 0px; margin-bottom: 0px; text-align: left">
             #{cc.attrs.bean.selectedQuery.title}
-
         </h3>
         <h:panelGroup layout="block" style="font-size: smaller ">
             <h:outputText

@@ -60,6 +60,13 @@ public class Negotiator implements Serializable {
     private String uploadFileSalt;
 
     /**
+     * Negotiator base url
+     */
+    @XmlElement
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    private String negotiatorUrl;
+
+    /**
      * Maximum file size for uploaded attachments in Byte
      */
     @XmlElement
@@ -170,6 +177,9 @@ public class Negotiator implements Serializable {
      */
     @XmlElement
     private int clamavPort;
+
+    @XmlElement
+    private boolean developmentServer;
 
     /**
      * The list of collections, that will be faked.
@@ -362,6 +372,14 @@ public class Negotiator implements Serializable {
 
     public void setMaxUploadFileSize(int maxUploadFileSize) {
         this.maxUploadFileSize = maxUploadFileSize;
+    }
+
+    public String getNegotiatorUrl() {
+        return negotiatorUrl;
+    }
+
+    public void setNegotiatorUrl(String negotiatorUrl) {
+        this.negotiatorUrl = negotiatorUrl;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

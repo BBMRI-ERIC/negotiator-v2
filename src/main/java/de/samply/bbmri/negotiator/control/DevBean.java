@@ -51,6 +51,11 @@ public class DevBean implements Serializable {
         return "/researcher/index.xhtml?faces-redirect=true";
     }
 
+    public String choseNationalNodeRepresentative() {
+        userBean.fakeUser(UserBean.DUMMY_DATA_SUBJECT_NATIONAL_NODE_REPRESENTATIVE);
+        return "/nationalnode/index.xhtml?faces-redirect=true";
+    }
+
     public String choseAdmin() {
         userBean.fakeUser("admin001");
         return "/admin/index.xhtml?faces-redirect=true";

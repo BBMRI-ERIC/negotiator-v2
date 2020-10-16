@@ -4,14 +4,19 @@
 package de.samply.bbmri.negotiator.jooq.tables;
 
 
+import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Public;
 import de.samply.bbmri.negotiator.jooq.tables.records.NetworkBiobankLinkRecord;
+
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Generated;
 
 import org.jooq.Field;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.impl.TableImpl;
 
 
@@ -28,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class NetworkBiobankLink extends TableImpl<NetworkBiobankLinkRecord> {
 
-	private static final long serialVersionUID = 1834034536;
+	private static final long serialVersionUID = 69140062;
 
 	/**
 	 * The reference instance of <code>public.network_biobank_link</code>
@@ -73,6 +78,22 @@ public class NetworkBiobankLink extends TableImpl<NetworkBiobankLinkRecord> {
 
 	private NetworkBiobankLink(String alias, Table<NetworkBiobankLinkRecord> aliased, Field<?>[] parameters) {
 		super(alias, Public.PUBLIC, aliased, parameters, "");
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public UniqueKey<NetworkBiobankLinkRecord> getPrimaryKey() {
+		return Keys.NETWORK_BIOBANK_LINK_PK;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<UniqueKey<NetworkBiobankLinkRecord>> getKeys() {
+		return Arrays.<UniqueKey<NetworkBiobankLinkRecord>>asList(Keys.NETWORK_BIOBANK_LINK_PK);
 	}
 
 	/**

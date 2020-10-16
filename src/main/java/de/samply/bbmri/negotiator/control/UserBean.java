@@ -43,7 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.docuverse.identicon.IdenticonUtil;
 
-import com.nimbusds.jwt.JWTClaimsSet;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
 import eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient;
 import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidKeyException;
 import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidTokenException;
@@ -76,13 +76,14 @@ public class UserBean implements Serializable {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
-	private Logger logger = LoggerFactory.getLogger(UserBean.class);
+	private final Logger logger = LoggerFactory.getLogger(UserBean.class);
 
 	/**
 	 * The subjects from the dummy data.
 	 */
 	public static final String DUMMY_DATA_SUBJECT_RESEARCHER = "https://auth-dev.mitro.dkfz.de/users/8";
 	public static final String DUMMY_DATA_SUBJECT_BIOBANK_OWNER = "https://auth-dev.mitro.dkfz.de/users/7";
+	public static final String DUMMY_DATA_SUBJECT_NATIONAL_NODE_REPRESENTATIVE = "https://auth-dev.mitro.dkfz.de/users/9";
 
 	/**
 	 * The current userEmail (email). Null if the login is not valid
@@ -114,10 +115,17 @@ public class UserBean implements Serializable {
 	 */
 	private Boolean researcher = false;
 
+	private Boolean nationalNodeRepresentative = false;
+
+	/**
+	 * If the user is a BBMRI-ERIC reviewer or not.
+	 */
+	private Boolean reviewer = false;
+
 	/**
 	 * ID of the Location (only biobank owners)
 	 */
-	private Biobank biobank = null;
+	private final Biobank biobank = null;
 
 	/**
 	 * The *mapped* user ID in the database.
@@ -152,6 +160,8 @@ public class UserBean implements Serializable {
 	 * The collections of this user
 	 */
 	private List<Collection> collections;
+
+	private List<Network> networks;
 
     /**
      * The identity string of the user who sudo'd another
@@ -350,6 +360,7 @@ public class UserBean implements Serializable {
 			refreshToken = null;
 			biobankOwner = false;
 			researcher = false;
+			reviewer = false;
 			return;
 		}
 
@@ -441,36 +452,46 @@ public class UserBean implements Serializable {
 			 * If the user hasn't been to this negotiator before, store him in the database
 			 */
 			if (person == null) {
-				person = config.dsl().newRecord(Tables.PERSON);
-				person.setAuthName(userRealName);
-				person.setAuthEmail(userEmail);
-				person.setAuthSubject(userIdentity);
+				try {
+					person = config.dsl().newRecord(Tables.PERSON);
+					person.setAuthName(userRealName);
+					person.setAuthEmail(userEmail);
+					person.setAuthSubject(userIdentity);
 
-				/**
-				 * Set the image as identicon. As long as the identity provider does not support avatars, generate an
-				 * identicon by default.
-				 */
-				person.setPersonImage(IdenticonUtil.generateIdenticon(256));
-				person.store();
-
-				isAdmin = false;
-			} else {
-				/**
-				 * Otherwise just update some fields.
-				 */
-				person.setAuthName(userRealName);
-				person.setAuthEmail(userEmail);
-
-				/**
-				 * Set the identicon, if the identity provider does not support avatars. And only if it is still null
-				 */
-				if (person.getPersonImage() == null) {
+					/**
+					 * Set the image as identicon. As long as the identity provider does not support avatars, generate an
+					 * identicon by default.
+					 */
 					person.setPersonImage(IdenticonUtil.generateIdenticon(256));
-				}
-				person.update();
+					person.store();
 
-				if(person.getIsAdmin())
-					isAdmin = true;
+					isAdmin = false;
+				} catch (Exception e) {
+					System.err.println("ERROR: Creating user.");
+					config.rollback();
+				}
+			} else {
+				try {
+					/**
+					 * Otherwise just update some fields.
+					 */
+					person.setAuthName(userRealName);
+					person.setAuthEmail(userEmail);
+
+					/**
+					 * Set the identicon, if the identity provider does not support avatars. And only if it is still null
+					 */
+					if (person.getPersonImage() == null) {
+						person.setPersonImage(IdenticonUtil.generateIdenticon(256));
+					}
+					person.update();
+
+					if (person.getIsAdmin())
+						isAdmin = true;
+				} catch (Exception e) {
+					System.err.println("ERROR: Update user.");
+					config.rollback();
+				}
 			}
 
 			loginValid = true;
@@ -480,8 +501,11 @@ public class UserBean implements Serializable {
 			 * Check if the user is a biobanker
 			 */
             collections = DbUtil.getCollections(config, person.getId());
-
             biobankOwner = collections.size() > 0;
+
+            // Check if user is NationalNodeRepresentative
+			networks = DbUtil.getNetworks(config, person.getId());
+			nationalNodeRepresentative = networks.size() > 0;
 
             this.person = config.map(person, Person.class);
 
@@ -489,7 +513,7 @@ public class UserBean implements Serializable {
 
 			config.get().commit();
 
-		} catch (SQLException | IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -749,6 +773,16 @@ public class UserBean implements Serializable {
 		this.researcher = researcher;
 	}
 
+	public Boolean getReviewer() {
+		//TODO: Chenge
+		return true;
+		//return reviewer;
+	}
+
+	public void setReviewer(Boolean reviewer) {
+		this.reviewer = reviewer;
+	}
+
 	public Boolean hasNewQueryRedirectURL() {
 		return newQueryRedirectURL != null;
 	}
@@ -768,4 +802,16 @@ public class UserBean implements Serializable {
     public void setCollections(List<Collection> collections) {
         this.collections = collections;
     }
+
+	public Boolean getNationalNodeRepresentative() {
+		return nationalNodeRepresentative;
+	}
+
+	public void setNationalNodeRepresentative(Boolean nationalNodeRepresentative) {
+		this.nationalNodeRepresentative = nationalNodeRepresentative;
+	}
+
+	public List<Network> getNetworks() {
+		return networks;
+	}
 }

@@ -91,4 +91,11 @@ public class NetworkDao extends DAOImpl<NetworkRecord, de.samply.bbmri.negotiato
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Network> fetchByDirectoryId(String... values) {
 		return fetch(Network.NETWORK.DIRECTORY_ID, values);
 	}
+
+	/**
+	 * Fetch records that have <code>list_of_directories_id IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Network> fetchByListOfDirectoriesId(Integer... values) {
+		return fetch(Network.NETWORK.LIST_OF_DIRECTORIES_ID, values);
+	}
 }

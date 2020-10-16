@@ -11,12 +11,18 @@ import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
 import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
+import de.samply.bbmri.negotiator.jooq.tables.MailNotification;
 import de.samply.bbmri.negotiator.jooq.tables.Network;
 import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
 import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
+import de.samply.bbmri.negotiator.jooq.tables.Notification;
+import de.samply.bbmri.negotiator.jooq.tables.NotificationSetting;
 import de.samply.bbmri.negotiator.jooq.tables.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
+import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
+import de.samply.bbmri.negotiator.jooq.tables.PersonNetwork;
+import de.samply.bbmri.negotiator.jooq.tables.PersonOffer;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
@@ -51,7 +57,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -1204839950;
+	private static final long serialVersionUID = -780559495;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -80,7 +86,10 @@ public class Public extends SchemaImpl {
 			Sequences.CONNECTOR_LOG_ID_SEQ,
 			Sequences.JSON_QUERY_ID_SEQ,
 			Sequences.LIST_OF_DIRECTORIES_ID_SEQ,
+			Sequences.MAIL_NOTIFICATION_MAIL_NOTIFICATION_ID_SEQ,
 			Sequences.NETWORK_ID_SEQ,
+			Sequences.NOTIFICATION_NOTIFICATION_ID_SEQ,
+			Sequences.NOTIFICATION_SETTING_NOTIFICATION_SETTING_ID_SEQ,
 			Sequences.OFFER_ID_SEQ,
 			Sequences.PERSON_ID_SEQ,
 			Sequences.QUERY_ATTACHMENT_COMMENT_ID_SEQ,
@@ -107,12 +116,18 @@ public class Public extends SchemaImpl {
 			FlaggedQuery.FLAGGED_QUERY,
 			JsonQuery.JSON_QUERY,
 			ListOfDirectories.LIST_OF_DIRECTORIES,
+			MailNotification.MAIL_NOTIFICATION,
 			Network.NETWORK,
 			NetworkBiobankLink.NETWORK_BIOBANK_LINK,
 			NetworkCollectionLink.NETWORK_COLLECTION_LINK,
+			Notification.NOTIFICATION,
+			NotificationSetting.NOTIFICATION_SETTING,
 			Offer.OFFER,
 			Person.PERSON,
 			PersonCollection.PERSON_COLLECTION,
+			PersonComment.PERSON_COMMENT,
+			PersonNetwork.PERSON_NETWORK,
+			PersonOffer.PERSON_OFFER,
 			Query.QUERY,
 			QueryAttachment.QUERY_ATTACHMENT,
 			QueryAttachmentComment.QUERY_ATTACHMENT_COMMENT,

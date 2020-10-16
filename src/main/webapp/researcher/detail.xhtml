@@ -31,6 +31,7 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+                xmlns:bbmriresearchercc="http://xmlns.jcp.org/jsf/composite/bbmriresearcher"
                 template="../components/default.xhtml"
 >
 
@@ -140,30 +141,172 @@
 
                             <f:param name="queryId" value="#{researcherQueriesDetailBean.selectedQuery.id}"/>
                         </h:button>
+
+                        <!-- LifeCycle Menu -->
+                        <div class="dropdown" style="float: right">
+                            <button class="btn btn-secondary dropdown-toggle"
+                                    type="button"
+                                    id="dropdownMenuButton"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">
+                                <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -120px;">
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-from-request-history"
+                                        style="margin: 10px;display: none;">
+                                    #{label['queryview.lifecycle.requestHistory.title']}
+                                </button>
+                                <h:form>
+                                    <h:commandButton action="#{researcherQueriesDetailBean.abandonRequest()}"
+                                              value="#{label['queryview.lifecycle.abandonRequest.title']}"
+                                              title="#{label['queryview.lifecycle.abandonRequest.tooltip']}"
+                                              styleClass="btn btn-danger" style="margin: 10px;">
+                                    </h:commandButton>
+                                </h:form>
+
+                            </div>
+                        </div>
                     </h:panelGroup>
 
                 </h:panelGroup>
-                <h:panelGroup style="display: none;">
-                    Date: -=#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime}=-
+
+
+                <h:panelGroup layout="block"
+                              style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
+                              rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}">
+
+                    <h:panelGroup style="display:none;">
+                        <h:form id="lifeCycleStatusBeanUpdateStatusForm" enctype="multipart/form-data">
+
+                            <h:inputText id="collectionId" value="#{researcherQueriesDetailBean.collectionId}"/>
+                            <h:inputText id="biobankId" value="#{researcherQueriesDetailBean.biobankId}"/>
+                            <h:inputText id="nextCollectionLifecycleStatusStatus" value="#{researcherQueriesDetailBean.nextCollectionLifecycleStatusStatus}"/>
+                            <h:inputText id="offer" value="#{researcherQueriesDetailBean.offer}"/>
+
+                            <h:commandButton style="" id="lifeCycleStatusBeanUpdateStatusFormLink"
+                                             action="#{researcherQueriesDetailBean.updateCollectionLifecycleStatus()}">
+                                <f:ajax execute="@form" render="@form" />
+                            </h:commandButton>
+                        </h:form>
+
+                        <script type="text/javascript" >
+                            function invokeCommandLink(collectionId, biobankId) {
+                                var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
+                                var offer = $("#offer" + collectionId).find("textarea").val();
+
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:offer").value = offer;
+
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
+                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
+
+                                var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
+                                jsfcommandButton.click();
+                            }
+
+                            function publicCommentReadUpdate(commentId) {
+                                var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
+                                document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
+                                document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
+                                updateCommentReadStatus[0].click();
+                            }
+                        </script>
+                    </h:panelGroup>
+
+                    <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
+                    <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.biobankIds}"
+                               var="biobankId" varStatus="loop">
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header" id="headingTwo">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobankId}" aria-expanded="false" aria-controls="collapseTwo">
+                                            #{researcherQueriesDetailBean.getBiobankNameFromCache(biobankId)}
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseLifecycleBiobank#{biobankId}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                    <div class="card-body">
+
+                                        <div class="container" style="width: 100%;">
+                                            <div class="row">
+                                                <!-- TODO: Collection table with select -->
+                                                <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId)}"
+                                                           var="collectionStatus" varStatus="loop">
+                                                    <h:form>
+                                                        <bbmriresearchercc:lifecycleCollectionStatus
+                                                                collectionLifeCycleStatus="#{collectionStatus}"
+                                                                collectionId="#{collectionStatus.collectionId}"
+                                                                biobankId="#{biobankId}" />
+                                                    </h:form>
+                                                </ui:repeat>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </ui:repeat>
                 </h:panelGroup>
+
+                <h:outputScript>
+                    function showConfirmDialog() {
+                        $('#modal-from-request-history').modal('show');
+                    }
+                </h:outputScript>
+
+                <div class="modal fade" id="modal-from-request-history" tabindex="-1" role="dialog" aria-labelledby="requestHistoryModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                Request History
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete this file?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 <h:panelGroup styleClass="row" layout="block">
                     <h:panelGroup styleClass="col-md-12" >
-                        <h:panelGroup styleClass="col-md-4" >
+                        <h:panelGroup styleClass="col-md-3" >
                         </h:panelGroup>
-                        <h:panelGroup styleClass="col-md-4" >
+                        <h:panelGroup styleClass="col-md-6" rendered="#{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().status.equals('waitingstart')}">
                             <h:form id="form">
                                 <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
                                 <h:commandButton id="startNegotiation"
-                                                 rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime == null}"
                                                  value="#{label['querydetail.action.startNegotiation.buttonText']}"
                                                  action="#{researcherQueriesDetailBean.startNegotiation()}"
                                                  title="#{label['querydetail.tooltip.startNegotiation']}"
-                                                 styleClass="btn btn-primary" style="margin-top: 40px"/>
+                                                 styleClass="btn btn-primary" style="margin-top: 40px;background-color: #eb690b;"/>
                             </h:form>
-
                         </h:panelGroup>
-                        <h:panelGroup styleClass="col-md-4" >
+                        <h:panelGroup styleClass="col-md-6" style="border-color: #eb690b; border-width: 1px; border-style: solid;" rendered="#{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().status.equals('rejected')}">
+                            <h3>The request was rejected by BBMRI-ERIC.</h3>
+                            <p><span style="text-decoration: underline;">Reason:</span>
+                                <br/> #{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().statusText}
+                                <br/>
+                            </p>
+                            <p style="font-style: italic;">You can update your request information and resubmit it for review.</p>
+                            <p><h:form id="resubmitForm">
+                                <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                                <h:commandButton id="Resubmit"
+                                                 value="Resubmit"
+                                                 action="#{researcherQueriesDetailBean.resubmitRequest()}"
+                                                 title="You can resubmit your request for review."
+                                                 styleClass="btn btn-primary" style="background-color: #eb690b;"/>
+                            </h:form></p>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-6" rendered="#{researcherQueriesDetailBean.getRequestLifeCycleStatus().getStatus().status.equals('under_review')}">
+                            <h3>Request is under review by BBMRI-ERIC.</h3>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="col-md-3" >
                         </h:panelGroup>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -191,7 +334,8 @@
                                                  person="#{comment.person}"
                                                  collections="#{comment.collections}"
                                                  scope="commentAttachment"
-                                                 commentComponent="#{commentBean}"/>
+                                                 commentComponent="#{commentBean}"
+                                                 commentRead="#{comment.commentRead}"/>
 
                             </ui:repeat>
 
@@ -246,6 +390,7 @@
 
                                 <div class="panel panel-default deco-none" >
                                           <div id="heading#{i}" class="panel-heading " data-toggle="collapse" data-target="#hh#{i}">
+
                                             <h4 class="panel-title">
 
                                                 <c:if test="#{(i-1 le researcherQueriesDetailBean.biobankWithOffer.size()) and  (i-1 ge 0)}">

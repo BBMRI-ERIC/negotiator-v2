@@ -47,12 +47,12 @@ public class FileUploadBean implements Serializable {
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
-    private static Logger logger = LoggerFactory.getLogger(FileUploadBean.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileUploadBean.class);
 
     List<FacesMessage> msgs = null;
     Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
     private Integer queryId = null;
-    private FileUtil fileUtil = new FileUtil();
+    private final FileUtil fileUtil = new FileUtil();
 
     private Part file;
     private String attachmentType;

@@ -145,7 +145,7 @@ public class ResearcherQueriesBean implements Serializable {
         selectedQuery = query;
 
         try(Config config = ConfigFactory.get()) {
-            comments = DbUtil.getComments(config, selectedQuery.getId());
+            comments = DbUtil.getComments(config, selectedQuery.getId(), userBean.getUserId());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -160,23 +160,12 @@ public class ResearcherQueriesBean implements Serializable {
             System.err.println("#################>  DEBUGG: " + queries.size());
 
             for (int i = 0; i < queries.size(); ++i) {
-                getCommentCountAndTime(i);
                 getPrivateNegotiationCountAndTime(i);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return queries;
-    }
-
-    public void getCommentCountAndTime(int index){
-        try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getCommentCountAndTime(config, queries.get(index).getQuery().getId());
-            queries.get(index).setCommentCount((int) result.get(0).getValue("comment_count"));
-            queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public void getPrivateNegotiationCountAndTime(int index){

@@ -41,6 +41,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.convention.NameTokenizers;
 import org.modelmapper.jooq.RecordValueReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The JOOQ Configuration wrapper with AutoClosable
@@ -48,6 +50,8 @@ import org.modelmapper.jooq.RecordValueReader;
 public class Config extends DefaultConfiguration implements AutoCloseable {
 
     private static final long serialVersionUID = -915149314520303632L;
+
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
 
     /**
      * The jOOQ DSLContext, initialized in the constructor.
@@ -60,7 +64,12 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
 
      // Disable JOOQ logging
         Settings settings = new Settings();
-        settings.withExecuteLogging(true);
+
+        boolean debuggmode = false;
+        if(logger.isDebugEnabled()) {
+            debuggmode = true;
+        }
+            settings.withExecuteLogging(debuggmode);
         setSettings(settings);
 
         dsl = DSL.using(this);
@@ -91,6 +100,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
 
     @Override
     public void close() throws SQLException {
+        connectionProvider().acquire().commit();
         connectionProvider().acquire().close();
     }
 

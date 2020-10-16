@@ -39,13 +39,13 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import de.samply.bbmri.negotiator.*;
-import de.samply.bbmri.negotiator.control.QueryEmailNotifier;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -57,6 +57,8 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Manages the query detail view for owners
@@ -67,6 +69,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
+
+    private final Logger logger = LoggerFactory.getLogger(ResearcherQueriesDetailBean.class);
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -150,14 +154,23 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * The list of offerPersonDTO's, hence it's a list of lists.
      */
     private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
-    private DataCache dataCache = DataCache.getInstance();
+    private final DataCache dataCache = DataCache.getInstance();
+
+    /**
+     * Lifecycle Collection Data (Form, Structure)
+     */
+    private RequestLifeCycleStatus requestLifeCycleStatus = null;
+    private Integer collectionId;
+    private Integer biobankId;
+    private String nextCollectionLifecycleStatusStatus;
+    private String offer;
 
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
     public String initialize() {
         try(Config config = ConfigFactory.get()) {
-            setComments(DbUtil.getComments(config, queryId));
+            setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
             setBiobankWithOffer(DbUtil.getOfferMakers(config, queryId));
 
             for (int i = 0; i < biobankWithOffer.size(); ++i) {
@@ -217,6 +230,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
                 setHumanReadableQuery(queryDTO.getHumanReadable());
             }
+            /*
+             * Initialize Lifecycle Status
+             */
+            requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+            requestLifeCycleStatus.initialise();
+            requestLifeCycleStatus.initialiseCollectionStatus();
+
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -230,6 +250,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return null;
     }
 
+    public String resubmitRequest() {
+        requestLifeCycleStatus = new RequestLifeCycleStatus(selectedQuery.getId());
+        requestLifeCycleStatus.createStatus(userBean.getUserId());
+        requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+        return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
+    }
+
     /**
      * Starts negotiation for a query.
      *
@@ -238,12 +265,25 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public String startNegotiation() {
         try (Config config = ConfigFactory.get()) {
             DbUtil.startNegotiation(config, selectedQuery.getId());
-            //Send out email notifications once the researcher starts negotiation.
-            sendEmailsToPotentialBiobankers();
+            requestLifeCycleStatus.nextStatus("started", "start", null, userBean.getUserId());
+            requestLifeCycleStatus.setQuery(selectedQuery);
+            requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
+    }
+
+    /**
+     * Builds url for biobanker to navigate to the query with id=selectedQuery.getId()
+     * @return    The URL for the biobanker
+     */
+    public String getQueryUrlForBiobanker() {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
     }
 
     /**
@@ -289,7 +329,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
             try (Config config = ConfigFactory.get()) {
                 queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
                 for (int i = 0; i < queries.size(); ++i) {
-                    getCommentCountAndTime(i);
                     getPrivateNegotiationCountAndTime(i);
                 }
             } catch (SQLException e) {
@@ -297,17 +336,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
             }
         }
         return queries;
-    }
-
-    public void getCommentCountAndTime(int index){
-        try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getCommentCountAndTime(config, queries.get(index).getQuery().getId());
-            result.get(0).getValue("comment_count");
-            queries.get(index).setCommentCount((int) result.get(0).getValue("comment_count"));
-            queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public void getPrivateNegotiationCountAndTime(int index){
@@ -321,29 +349,46 @@ public class ResearcherQueriesDetailBean implements Serializable {
         }
     }
 
-    /**
-     * Gets the potential biobankers and sends out the emails
+    /*
+     * Lifecycle Collection update
      */
-    public void sendEmailsToPotentialBiobankers() {
-        try (Config config = ConfigFactory.get()) {
-            List<NegotiatorDTO> negotiators = DbUtil.getPotentialNegotiators(config, selectedQuery.getId(), Flag.IGNORED, 0);
-            QueryEmailNotifier notifier = new QueryEmailNotifier(negotiators, getQueryUrlForBiobanker(), selectedQuery, userBean.getPerson());
-            notifier.sendEmailNotification();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public String updateCollectionLifecycleStatus() {
+        if(biobankId != 0) {
+            return updateCollectionLifecycleStatusByBiobank(biobankId);
+        } else {
+            return updateCollectionLifecycleStatus(collectionId);
         }
     }
 
-    /**
-     * Builds url for biobanker to navigate to the query with id=selectedQuery.getId()
-     * @return    The URL for the biobanker
-     */
-    public String getQueryUrlForBiobanker() {
-        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+    public String updateCollectionLifecycleStatus(Integer collectionId) {
+        if(nextCollectionLifecycleStatusStatus == null || nextCollectionLifecycleStatusStatus.length() == 0) {
+            return "";
+        }
+        String status = nextCollectionLifecycleStatusStatus.split("\\.")[1];
+        String statusType = nextCollectionLifecycleStatusStatus.split("\\.")[0];
+        if(statusType.equalsIgnoreCase("notselected")) {
+            return "";
+        }
 
-        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
-                context.getRequestServerPort(), context.getRequestContextPath(),
-                "/owner/detail.xhtml?queryId=" + selectedQuery.getId());
+        requestLifeCycleStatus.nextStatus(status, statusType, createStatusJson(), userBean.getUserId(), collectionId);
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public String updateCollectionLifecycleStatusByBiobank(Integer biobankId) {
+        List<CollectionLifeCycleStatus> collectionList = requestLifeCycleStatus.getCollectionsForBiobank(biobankId);
+        for(CollectionLifeCycleStatus collectionLifeCycleStatus : collectionList) {
+            updateCollectionLifecycleStatus(collectionLifeCycleStatus.getCollectionId());
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    private String createStatusJson() {
+        if(offer != null && offer.length() > 0) {
+            return "{\"offer\":\"" + offer + "\"}";
+        }
+        return null;
     }
 
     /*
@@ -378,6 +423,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public String getBiobankNameFromCache(Integer biobankId) {
         return dataCache.getBiobankName(biobankId);
+    }
+
+    public String abandonRequest() {
+        requestLifeCycleStatus.nextStatus("abandoned", "abandoned", null, userBean.getUserId());
+        return "/researcher/index.xhtml";
     }
 
     /*
@@ -522,5 +572,39 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public Person getUserDataForResearcher(Integer researcherId) {
         Person requester = this.userBean.getPerson();
         return requester;
+    }
+
+    public String getOffer() { return this.offer; }
+
+    public void setOffer(String offer) {
+        this.offer = offer;
+    }
+
+    public RequestLifeCycleStatus getRequestLifeCycleStatus() {
+        return requestLifeCycleStatus;
+    }
+
+    public String getNextCollectionLifecycleStatusStatus() {
+        return nextCollectionLifecycleStatusStatus;
+    }
+
+    public void setNextCollectionLifecycleStatusStatus(String nextCollectionLifecycleStatusStatus) {
+        this.nextCollectionLifecycleStatusStatus = nextCollectionLifecycleStatusStatus;
+    }
+
+    public Integer getCollectionId() {
+        return collectionId;
+    }
+
+    public void setCollectionId(Integer collectionId) {
+        this.collectionId = collectionId;
+    }
+
+    public Integer getBiobankId() {
+        return biobankId;
+    }
+
+    public void setBiobankId(Integer biobankId) {
+        this.biobankId = biobankId;
     }
 }

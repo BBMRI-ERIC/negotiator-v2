@@ -54,9 +54,24 @@ public class Sequences {
 	public static final Sequence<Long> LIST_OF_DIRECTORIES_ID_SEQ = new SequenceImpl<Long>("list_of_directories_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
+	 * The sequence <code>public.mail_notification_mail_notification_id_seq</code>
+	 */
+	public static final Sequence<Long> MAIL_NOTIFICATION_MAIL_NOTIFICATION_ID_SEQ = new SequenceImpl<Long>("mail_notification_mail_notification_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
 	 * The sequence <code>public.network_id_seq</code>
 	 */
 	public static final Sequence<Long> NETWORK_ID_SEQ = new SequenceImpl<Long>("network_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>public.notification_notification_id_seq</code>
+	 */
+	public static final Sequence<Long> NOTIFICATION_NOTIFICATION_ID_SEQ = new SequenceImpl<Long>("notification_notification_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+	/**
+	 * The sequence <code>public.notification_setting_notification_setting_id_seq</code>
+	 */
+	public static final Sequence<Long> NOTIFICATION_SETTING_NOTIFICATION_SETTING_ID_SEQ = new SequenceImpl<Long>("notification_setting_notification_setting_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
 	/**
 	 * The sequence <code>public.offer_id_seq</code>

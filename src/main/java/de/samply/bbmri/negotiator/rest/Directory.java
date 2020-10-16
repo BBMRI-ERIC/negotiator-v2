@@ -111,10 +111,7 @@ public class Directory {
                 throw new BadRequestException();
             }
 
-            System.out.println(negotiator.getDevelopment().getMolgenisAcceptInvalidUrl());
-            System.out.println(querySearchDTO.getUrl().toLowerCase());
-            System.out.println(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase());
-
+            // No URL Checking
             /*if(!negotiator.getDevelopment().getMolgenisAcceptInvalidUrl()) {
                     //&&
                     //DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl().toLowerCase().replaceAll("/.*", "")) != null)  {

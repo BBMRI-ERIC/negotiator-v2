@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+>
+
+<composite:interface>
+    <composite:attribute name="queryBean" required="true"/>
+</composite:interface>
+
+<composite:implementation>
+    <div class="lifecycle-status-details" style="border: solid;border-color: #DDDDDD;border-width: 1px;margin: 0px 0px 0px 0px;padding: 5px; display: none;">
+
+        <div class="lifecycle-status-details-heading" id="heading-lifecycle-status-details">
+            Request Status:
+            <span class="pull-right" style="padding: 20px">
+                <i class="glyphicon glyphicon-chevron-up" data-toggle="collapse" data-target="#collapse-lifecycle-status-details" aria-expanded="true" aria-controls="collapse-lifecycle-status-details" />
+            </span>
+        </div>
+        <div id="collapse-lifecycle-status-details" class="collapse show" aria-labelledby="heading-lifecycle-status-details" role="tabpanel">
+
+            <h:outputStylesheet>
+                .row{
+                    margin-top:40px;
+                    padding: 0 10px;
+                }
+
+                .clickable-icon{
+                    cursor: pointer;
+                }
+
+                .panel-heading span {
+                    margin-top: -20px;
+                    font-size: 15px;
+                }
+
+                .lifecycle-panel-heading-node {
+                    padding: 3px 1px;
+                }
+
+                .lifecycle-panel-title-node {
+                    font-size: 15px;
+                    font-family: Source Sans Pro, sans-serif;
+                }
+
+                .lifecycle-panel-title-node:after, .lifecycle-panel-title-node:before {
+                    content: '';
+                }
+
+                .lifecycle-panel-body-node {
+                    padding: 3px;
+                }
+
+                .lifecycle-btn-start-negotiation {
+                    padding: 3px 6px;
+                    margin: 5px 5px 5px 5px;
+                    font-size: 12px;
+                    font-weight: normal;
+                    line-height: 1.42857143;
+                }
+            </h:outputStylesheet>
+
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="panel panel-success">
+                        <div class="panel-heading lifecycle-panel-heading-node">
+                            <h3 class="panel-title lifecycle-panel-title-node">Created</h3>
+                            <span class="pull-right clickable-icon"><i class="glyphicon glyphicon-chevron-down"></i></span>
+                        </div>
+                        <div class="panel-body panel-collapsed lifecycle-panel-body-node">
+                            <h:outputText
+                                title="#{label['queryview.queryitem.datetime.creation']}"
+                                value="#{cc.attrs.queryBean.selectedQuery.queryCreationTime}">
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
+                            </h:outputText>
+                        </div>
+                    </div>
+                    <i class="glyphicon glyphicon-arrow-down"></i>
+
+                    <div class="panel #{cc.attrs.queryBean.selectedQuery.negotiationStartedTime == null ? 'panel-info' : 'panel-success'}">
+                        <div class="panel-heading lifecycle-panel-heading-node">
+                            <h3 class="panel-title lifecycle-panel-title-node">Contacted</h3>
+                            <span class="pull-right clickable-icon"><i class="glyphicon glyphicon-chevron-up"></i></span>
+                        </div>
+                        <div class="panel-body lifecycle-panel-body-node">
+
+                            <h:form id="form" rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime == null}">
+                                <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                                <h:commandButton id="startNegotiation"
+                                                 rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime == null}"
+                                                 value="#{label['querydetail.action.startNegotiation.buttonText']}"
+                                                 action="#{researcherQueriesDetailBean.startNegotiation()}"
+                                                 title="#{label['querydetail.tooltip.startNegotiation']}"
+                                                 styleClass="btn btn-primary lifecycle-btn-start-negotiation" />
+                            </h:form>
+                            <h:outputText rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}"
+                                    title="#{label['queryview.queryitem.datetime.creation']}"
+                                    value="#{cc.attrs.queryBean.selectedQuery.negotiationStartedTime}">
+                                <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
+                            </h:outputText>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Panel 1</h3>
+                            <span class="pull-right clickable-icon-"><i class="glyphicon glyphicon-chevron-up"></i></span>
+                        </div>
+                        <div class="panel-body">Panel content</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Panel 1</h3>
+                            <span class="pull-right clickable-icon"><i class="glyphicon glyphicon-chevron-up"></i></span>
+                        </div>
+                        <div class="panel-body">Panel content</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Panel 1</h3>
+                            <span class="pull-right clickable-icon"><i class="glyphicon glyphicon-chevron-up"></i></span>
+                        </div>
+                        <div class="panel-body">Panel content</div>
+                    </div>
+                </div>
+            </div>
+
+            <h:outputScript>
+                $(document).on('click', '.panel-heading span.clickable-icon', function(e){
+                    var $this = $(this);
+                    if(!$this.hasClass('panel-collapsed')) {
+                        $this.parents('.panel').find('.panel-body').slideUp();
+                        $this.addClass('panel-collapsed');
+                        $this.find('i').removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-down');
+                    } else {
+                        $this.parents('.panel').find('.panel-body').slideDown();
+                        $this.removeClass('panel-collapsed');
+                        $this.find('i').removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-up');
+                    }
+                })
+            </h:outputScript>
+
+<!--
+            Collection I:
+            <h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 60%;height: 2rem;">
+                <f:selectItem itemValue="Undecided" itemLabel="Undecided" />
+                <f:selectItem itemValue="Not Interrested" itemLabel="Not Interrested" />
+                <f:selectItem itemValue="Collectiong Information" itemLabel="Collectiong Information" />
+                <f:selectItem itemValue="We have requested data/samples and we can share those for the given purpose" itemLabel="We have requested data/samples and we can share those for the given purpose" />
+                <f:selectItem itemValue="We have requested data/samples and we are unable to share those for the given purpose" itemLabel="We have requested data/samples and we are unable to share those for the given purpose" />
+                <f:selectItem itemValue="We do not have requested data/samples, but we can collect those prospectively" itemLabel="We do not have requested data/samples, but we can collect those prospectively" />
+                <f:selectItem itemValue="We do not have requested data/samples and we are unable to collect those prospectively" itemLabel="We do not have requested data/samples and we are unable to collect those prospectively" />
+                <f:selectItem itemValue="Data/samples transferd" itemLabel="Data/samples transferd" />
+            </h:selectOneMenu>
+
+            Collection II:
+            <h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 60%;height: 2rem;">
+                <f:selectItem itemValue="Undecided" itemLabel="Undecided" />
+                <f:selectItem itemValue="Not Interrested" itemLabel="Not Interrested" />
+                <f:selectItem itemValue="Collectiong Information" itemLabel="Collectiong Information" />
+                <f:selectItem itemValue="We have requested data/samples and we can share those for the given purpose" itemLabel="We have requested data/samples and we can share those for the given purpose" />
+                <f:selectItem itemValue="We have requested data/samples and we are unable to share those for the given purpose" itemLabel="We have requested data/samples and we are unable to share those for the given purpose" />
+                <f:selectItem itemValue="We do not have requested data/samples, but we can collect those prospectively" itemLabel="We do not have requested data/samples, but we can collect those prospectively" />
+                <f:selectItem itemValue="We do not have requested data/samples and we are unable to collect those prospectively" itemLabel="We do not have requested data/samples and we are unable to collect those prospectively" />
+                <f:selectItem itemValue="Data/samples transferd" itemLabel="Data/samples transferd" />
+            </h:selectOneMenu>
+            -->
+        </div>
+
+
+    </div>
+</composite:implementation>
+
+</html>

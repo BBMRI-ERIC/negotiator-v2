@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+                template="../components/default.xhtml">
+
+    <ui:param name="bodyClass" value="container"/>
+
+    <ui:define name="body" >
+
+        <!--<script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+        <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+        <script src="cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+        <style>
+            .blink_me {
+                animation: blinker 2s linear infinite;
+            }
+
+            @keyframes blinker {
+                50% { opacity: 0; }
+            }
+
+            .negotiator-dashboard-card-header {
+                padding: 3px 0 3px 5px;
+                margin-bottom: 2px;
+                font-weight: bold;
+                border-bottom-width: 1px;
+                border-bottom-color: #0088cc;
+                background-color: #ADADAD;
+            }
+        </style>
+
+        <h:panelGroup layout="block" styleClass="row">
+            <h3>Dashboard</h3>
+        </h:panelGroup>
+
+        <!-- Request review  -->
+
+        <h:panelGroup layout="block" styleClass="row">
+            <div class="card bg-light border-light">
+                <div class="card-header negotiator-dashboard-card-header">
+                    #{label['reviewer.review.header']}
+                </div>
+
+                <div class="card-body container" style="padding: 5px;">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="panel panel-warning" style="margin-bottom: 3px;">
+                                <div class="panel-heading">Open Requests</div>
+                                <div class="panel-body">#{reviewBean.openRequests}</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="panel panel-success" style="margin-bottom: 3px;">
+                                <div class="panel-heading">Approved Requests</div>
+                                <div class="panel-body">#{reviewBean.approvedRequests}</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="panel panel-danger" style="margin-bottom: 3px;">
+                                <div class="panel-heading">Rejected Requests</div>
+                                <div class="panel-body">#{reviewBean.rejectedRequests}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:panelGroup>
+
+        <!-- Requests initialized and created -->
+
+        <h:panelGroup layout="block" styleClass="row" style="margin-top: 10px;">
+            <div class="card bg-light border-light">
+                <div class="card-header negotiator-dashboard-card-header">
+                    #{label['dashboard.header.requests']}
+                </div>
+
+                <div class="card-body container" style="padding: 5px;">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="panel panel-info" style="margin-bottom: 3px;">
+                                <div class="panel-heading">Negotiation initialized</div>
+                                <div class="panel-body">#{dashboardBean.queriesInitialized}</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="panel panel-info" style="margin-bottom: 3px;">
+                                <div class="panel-heading">Requests created</div>
+                                <div class="panel-body">#{dashboardBean.numberOfRequests}</div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="panel panel-info" style="margin-bottom: 3px;">
+                                <div class="panel-heading">Requests last 7 days (created/initialized)</div>
+                                <div class="panel-body">#{dashboardBean.numberOfRequestsLast7Days}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <canvas id="dashboardRequestLineChart" style="padding: 25px;"></canvas>
+
+            </div>
+
+
+
+            <h:outputScript>
+                /* chart.js chart examples */
+
+                // chart colors
+                var colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
+
+                var jsonfile = {
+                    "jsonarray": #{dashboardBean.dataRequestLineGraph}
+                };
+
+                var labels = jsonfile.jsonarray.map(function(e) {
+                    return e.creation_date;
+                });
+                var data_created = jsonfile.jsonarray.map(function(e) {
+                    return e.created_count;
+                });
+                var data_initialized = jsonfile.jsonarray.map(function(e) {
+                return e.initialized_count;
+                });
+
+                /* large line chart */
+                var chLine = document.getElementById("dashboardRequestLineChart");
+                var chartData = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Requests created',
+                        data: data_created,
+                        backgroundColor: 'transparent',
+                        borderColor: colors[0],
+                        borderWidth: 4,
+                        pointBackgroundColor: colors[0]
+                    },
+                        {
+                            label: 'Negotiation initialized',
+                            data: data_initialized,
+                            backgroundColor: colors[3],
+                            borderColor: colors[1],
+                            borderWidth: 4,
+                            pointBackgroundColor: colors[1]
+                        }]
+                };
+
+                if (chLine) {
+                    new Chart(chLine, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: false
+                                    }
+                                }]
+                            },
+                            legend: {
+                                display: true
+                            }
+                        }
+                    });
+                }
+            </h:outputScript>
+
+        </h:panelGroup>
+
+        <!-- Table of Searches -->
+
+        <h:panelGroup layout="block" styleClass="row" style="margin-top: 10px;">
+            <div class="card bg-light border-light">
+                <div class="card-header negotiator-dashboard-card-header">
+                    #{label['dashboard.header.search']}
+                </div>
+
+                <div class="card-body container" style="padding: 5px;">
+                    <table id="example" class="display" width="100%"></table>
+                </div>
+            </div>
+
+            <h:outputScript>
+                var dataSet =#{dashboardBean.humanReadableStatisticsData}
+
+                $(document).ready(function() {
+                    $('#example').DataTable( {
+                        data: dataSet,
+                        columns: [
+                            { "data": "readable", title: "Search" },
+                            { "data": "count", title: "Count" }
+                        ]
+                    } );
+                } );
+            </h:outputScript>
+        </h:panelGroup>
+
+
+
+    </ui:define>
+
+</ui:composition>

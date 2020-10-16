@@ -54,7 +54,7 @@ public class AdminBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
-    private Logger logger = LoggerFactory.getLogger(AdminBean.class);
+    private final Logger logger = LoggerFactory.getLogger(AdminBean.class);
 
     private String sudo;
 

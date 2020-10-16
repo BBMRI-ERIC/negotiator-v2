@@ -33,6 +33,8 @@ import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -97,19 +99,16 @@ public class CommentBean implements Serializable {
             }
             config.commit();
 
+            DbUtil.addCommentReadForComment(config, commentId, userBean.getUserId());
+
+            markCommentNotReadForUsers(config);
+
             uploadAttachmentComment(commentId);
 
             clearEditChanges();
             clearFileChanges();
 
-            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()), userBean.getPerson());
-            notifier.sendEmailNotificationToBiobankers(userBean.getUserId());
-            if (userBean.getBiobankOwner()){
-                /* Send notification to the query owner if a biobanker made a comment
-                 */
-                notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment, userBean.getUserRealName(), new SimpleDateFormat("dd.MM.yyyy HH.mm").format(new Date().getTime()), userBean.getPerson());
-                notifier.sendEmailNotificationToQueryOwner();
-            }
+            NotificationService.sendNotification(NotificationType.PUBLIC_COMMAND_NOTIFICATION, query.getId(), commentId, userBean.getUserId(), null);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -117,6 +116,10 @@ public class CommentBean implements Serializable {
 
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    private void markCommentNotReadForUsers(Config config) {
+        userBean.getUserId();
     }
 
     /**
@@ -216,6 +219,17 @@ public class CommentBean implements Serializable {
         }
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public void markCommentReadForUser(Integer userId, Integer commentId, boolean commentRead) {
+        if(commentRead) {
+            return;
+        }
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.updateCommentReadForUser(config, userId, commentId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public UserBean getUserBean() {

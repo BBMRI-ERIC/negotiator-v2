@@ -1,12 +1,5 @@
 # Negotiator
-
 This is the BBMRI negotiator v2
-
-## Links (MITRO related)
-
-- [Jira](https://jira.mitro.dkfz.de/secure/RapidBoard.jspa?rapidView=9&projectKey=BIO)
-- [Bitbucket](https://code.mitro.dkfz.de/projects/BIO)
-- [Confluence](https://wiki.mitro.dkfz.de/display/BIO/Biobank+Home)
 
 ## Getting Started
 

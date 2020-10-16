@@ -38,8 +38,8 @@ import javax.servlet.annotation.WebListener;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import de.samply.bbmri.negotiator.control.ApplicationBean;
 import de.samply.bbmri.negotiator.db.util.Migration;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationScheduledExecutor;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.flywaydb.core.api.FlywayException;
 import org.slf4j.Logger;
@@ -65,6 +65,8 @@ public class ServletListener implements ServletContextListener {
     private static final Logger logger = LoggerFactory.getLogger(ServletListener.class);
 
     private static Timer timer;
+
+    private Timer notificationScheduledExecutorTimer;
 
     /**
      * Context initialized.
@@ -110,6 +112,10 @@ public class ServletListener implements ServletContextListener {
 
             timer = new Timer();
             timer.schedule(new DirectorySynchronizeTask(), 10000, 1000 * 60 * 60);
+
+            notificationScheduledExecutorTimer = new Timer();
+            NotificationScheduledExecutor notificationScheduledExecutor = new NotificationScheduledExecutor();
+            notificationScheduledExecutorTimer.schedule(notificationScheduledExecutor, notificationScheduledExecutor.getDelay(), notificationScheduledExecutor.getInterval());
 
             logger.info("Context initialized");
         } catch (FileNotFoundException | JAXBException | SAXException | ParserConfigurationException
