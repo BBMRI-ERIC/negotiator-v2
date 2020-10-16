@@ -58,6 +58,9 @@ public class QueryStatsDTO implements Serializable {
      * The number of comments for this query.
      */
     private int commentCount;
+    private int unreadCommentCount = 0;
+
+    private int privateNegotiationCount;
 
     public Query getQuery() {
         return query;
@@ -72,7 +75,13 @@ public class QueryStatsDTO implements Serializable {
     }
 
     public void setLastCommentTime(Timestamp lastCommentTime) {
-        this.lastCommentTime = lastCommentTime;
+        if(this.lastCommentTime == null) {
+            this.lastCommentTime = lastCommentTime;
+        } else {
+            if(lastCommentTime != null && this.lastCommentTime.before(lastCommentTime)) {
+                this.lastCommentTime = lastCommentTime;
+            }
+        }
     }
 
     public int getCommentCount() {
@@ -83,11 +92,27 @@ public class QueryStatsDTO implements Serializable {
         this.commentCount = commentCount;
     }
 
+    public int getPrivateNegotiationCount() {
+        return privateNegotiationCount;
+    }
+
+    public void setPrivateNegotiationCount(int privateNegotiationCount) {
+        this.privateNegotiationCount = privateNegotiationCount;
+    }
+
     public Person getQueryAuthor() {
         return queryAuthor;
     }
 
     public void setQueryAuthor(Person queryAuthor) {
         this.queryAuthor = queryAuthor;
+    }
+
+    public int getUnreadCommentCount() {
+        return unreadCommentCount;
+    }
+
+    public void setUnreadCommentCount(int unreadCommentCount) {
+        this.unreadCommentCount = unreadCommentCount;
     }
 }

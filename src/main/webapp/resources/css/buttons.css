@@ -32,32 +32,5 @@
     background-color: #3271a0;
 }
 
-.btn-success {
-    background-color: #ec6707;
-}
-
-.btn-success:hover, .btn-success:focus {
-    background-color: #ff9345;
-    color: white;
-}
-
 .btn-info {
-}
-
-.btn-warning {
-    background-color: #e5e388;
-    color: #333333;
-}
-
-.btn-danger {
-    background-color: #ff9999;
-}
-
-
-.btn-warning:hover, .btn-warning:focus {
-
-}
-
-.btn-danger:hover, .btn-danger:focus {
-
 }

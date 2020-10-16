@@ -29,34 +29,110 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
-      xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri">
+      xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri" xmlns:p="http://java.sun.com/jsf/html">
 
 
 <composite:interface>
     <composite:attribute name="comment" required="true"/>
     <composite:attribute name="person" required="true"/>
     <composite:attribute name="collections" />
+    <composite:attribute name="ownerQueriesDetailBean" />
+    <composite:attribute name="scope" />
+    <composite:attribute name="commentComponent" />
+    <composite:attribute name="commentRead" />
 </composite:interface>
 
 <composite:implementation>
+
+    <h:outputScript name="js/affiliation-collapsible.js" />
+    <h:outputStylesheet name="css/collapsible.css" />
+
+    <!-- onmouseover="publicCommentReadUpdate('#{cc.attrs.comment.id}');"  -->
+
     <h:panelGroup layout="block" styleClass="panel panel-default" style="border-color: #ddd">
 
-        <h:panelGroup layout="block" styleClass="panel-heading">
+        <h:form id="updateCommentRead" enctype="multipart/form-data" style="display:none;">
+            <h:commandButton value="Ajax Submit"
+                             styleClass="updateCommentReadForComment#{cc.attrs.comment.id}"
+                             id="updateCommentReadForComment#{cc.attrs.comment.id}"
+                             action="#{commentBean.markCommentReadForUser(userBean.person.id, cc.attrs.comment.id, cc.attrs.commentRead)}">
+                <f:ajax execute="@this" render="@form" />
+            </h:commandButton>
+        </h:form>
 
-            #{cc.attrs.person.authName}
-            <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
-                <h:outputText value=", Collection: "/>
-                <ui:repeat value="#{cc.attrs.collections}" var="collection" varStatus="loop">
-                    <h:outputText value="#{collection.name}"/> #{!loop.last ? ', ' : ''}
-                </ui:repeat>
-            </ui:fragment>
-            <h:panelGroup styleClass="pull-right">
-                <h:outputText value="#{cc.attrs.comment.commentTime}">
-                    <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>
-                </h:outputText>
+        <h:panelGroup layout="block" styleClass="panel-heading">
+            <h:panelGroup>
+                <!-- Discussion Name of User -->
+                #{cc.attrs.person.authName}
+                <h:panelGroup>
+                    <!-- Collapseable Icon to open affliliation -->
+                    <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
+                        <i class="fa fa-plus-square-o affiliation-collapsible-plus"></i>
+                        <i class="fa fa-minus-square-o affiliation-collapsible-minus"></i>
+                    </ui:fragment>
+                </h:panelGroup>
             </h:panelGroup>
+
+            <!-- Date of comment -->
+            <h:panelGroup styleClass="pull-right">
+                <h:form id="deleteComment" enctype="multipart/form-data">
+
+                    <span class="btn btn-default updateCommentReadForCommentShowMarkAsReadButton#{cc.attrs.comment.id}" style="margin-top: -6px;#{cc.attrs.commentRead ? 'display:none;': ''}" onclick="publicCommentReadUpdate('#{cc.attrs.comment.id}');">Mark as read</span>
+                    <span style="margin-right: 5px;#{cc.attrs.commentRead ? 'display:none;': ''}" class="glyphicon glyphicon-envelope updateCommentReadForCommentShowElement#{cc.attrs.comment.id}" aria-hidden="true"></span>
+
+                    <h:outputText value="#{cc.attrs.comment.commentTime}">
+                        <f:convertDateTime dateStyle="long" timeStyle="short" type="both"/>
+                    </h:outputText>
+
+                    <ui:fragment rendered="#{cc.attrs.scope == 'commentAttachment'}">
+                        <h:commandLink
+                                styleClass="confirm-delete"
+                                action="#{commentBean.setCommentToBeRemove(cc.attrs.comment.id)}"
+                                title="#{label['comment.tootltip.delete']}"
+                                rendered="#{cc.attrs.comment.personId == userBean.person.id}">
+                            <i class="glyphicon glyphicon-trash"></i>
+                            <f:ajax onevent="showConfirmDialogPublicComment"/>
+                        </h:commandLink>
+                        <h:outputScript>
+                            function showConfirmDialogPublicComment(data) {
+                                if(data.status == "success") {
+                                    $('#modal-from-public-comment-dom').modal('show');
+                                }
+                            }
+                        </h:outputScript>
+                    </ui:fragment>
+                    <ui:fragment rendered="#{cc.attrs.scope == 'privateAttachment'}">
+                        <h:commandLink
+                                styleClass="confirm-delete"
+                                action="#{offerBean.setCommentToBeRemove(cc.attrs.comment.id)}"
+                                title="#{label['comment.tootltip.delete']}"
+                                rendered="#{cc.attrs.comment.personId == userBean.person.id}">
+                            <i class="glyphicon glyphicon-trash"></i>
+                            <f:ajax onevent="showConfirmDialogPrivateComment"/>
+                        </h:commandLink>
+                        <h:outputScript>
+                            function showConfirmDialogPrivateComment(data) {
+                                if(data.status == "success") {
+                                    $('#modal-from-private-comment-dom').modal('show');
+                                }
+                            }
+                        </h:outputScript>
+                    </ui:fragment>
+
+                </h:form>
+            </h:panelGroup>
+
+            <!-- Collapsable Affliation-->
+            <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
+                <h:panelGroup layout="block" styleClass="collapse affiliation-collapsible-content">
+                    <ui:repeat value="#{cc.attrs.collections}" var="collection" varStatus="loop">
+                        <h:outputText escape="false" value="#{ownerQueriesDetailBean.getBiobankName(collection.biobankId)} - #{collection.name} (#{collection.directoryId}) "/><br />
+                    </ui:repeat>
+                </h:panelGroup>
+            </ui:fragment>
 
         </h:panelGroup>
 
@@ -84,8 +160,19 @@
             </h:panelGroup>
 
         </h:panelGroup>
+        <h:panelGroup layout="block"  rendered="#{cc.attrs.scope == 'commentAttachment'}">
+            <h:panelGroup layout="block"  rendered="#{cc.attrs.comment.attachment == true}">
+                <bbmricc:queryDetailAttachments
+                                            queryBean="#{researcherQueriesDetailBean}"
+                                            fileUploadBean="#{fileUploadBean}"
+                                            scope="commentAttachment"
+                                            offer="#{cc.attrs.comment.id}"
+                                            delete="#{cc.attrs.comment.personId == userBean.person.id}"/>
+            </h:panelGroup>
+        </h:panelGroup>
 
     </h:panelGroup>
+
 </composite:implementation>
 
 </html>

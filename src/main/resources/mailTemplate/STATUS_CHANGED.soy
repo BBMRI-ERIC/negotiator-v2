@@ -1,0 +1,22 @@
+{delpackage Notification}
+{namespace eu.negotiator.mailing}
+
+/**
+ * Main content for comment added notification mail.
+ * @param? locale The locale of the mail
+ * @param? name The locale of the mail
+ * @param? queryName The name of the query
+ * @param? url The url of the query the comment is added to
+ * @param? status New status of the request
+ * @param? collectionName Name of the collection
+ */
+{deltemplate maincontent}
+    {switch $locale}
+        {default}
+            The status of the request {$queryName}
+            {\n}has been changed for collection {$collectionName} to status: {$status}
+            {\n}To view, please use the following link:
+            {\n}{$url}
+
+    {/switch}
+{/deltemplate}

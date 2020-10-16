@@ -32,13 +32,7 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.ServerErrorException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -69,6 +63,20 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 public class Directory {
 
     private static final Logger logger = LoggerFactory.getLogger(Directory.class);
+
+    @OPTIONS
+    @Path("/create_query")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createQueryOptions(String queryString, @Context HttpServletRequest request) {
+        return Response
+                .status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .build();
+    }
 
     /**
      * Takes a JSON query object like, stores it in the database and returns a redirect URL, that allows
@@ -103,10 +111,7 @@ public class Directory {
                 throw new BadRequestException();
             }
 
-            System.out.println(negotiator.getDevelopment().getMolgenisAcceptInvalidUrl());
-            System.out.println(querySearchDTO.getUrl().toLowerCase());
-            System.out.println(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase());
-
+            // No URL Checking
             /*if(!negotiator.getDevelopment().getMolgenisAcceptInvalidUrl()) {
                     //&&
                     //DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl().toLowerCase().replaceAll("/.*", "")) != null)  {
@@ -142,14 +147,39 @@ public class Directory {
 
                 result.setRedirectUri(builder);
 
-                return Response.created(new URI(builder)).entity(result).build();
+                return Response.created(new URI(builder)).entity(result)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                        .header("Access-Control-Allow-Credentials", "true")
+                        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                        .build();
             } else {
                 // get the id of the query from the structure, the compleat token is still in the request
                 String qTocken = querySearchDTO.getToken().replaceAll("__search__.*", "");
                 QueryRecord queryRecord = DbUtil.getQuery(config, qTocken);
 
                 if(queryRecord == null) {
-                    throw new NotFoundException();
+                    /**
+                     * Create the json_query object itself and store it in the database.
+                     */
+                    JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
+                    jsonQueryRecord.setJsonText(queryString);
+                    System.out.println("queryString: " + queryString);
+                    jsonQueryRecord.store();
+                    config.commit();
+
+                    CreateQueryResultDTO result = new CreateQueryResultDTO();
+
+                    String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
+
+                    result.setRedirectUri(builder);
+
+                    return Response.created(new URI(builder)).entity(result)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                            .header("Access-Control-Allow-Credentials", "true")
+                            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                            .build();
                 }
 
                 /**
@@ -167,7 +197,12 @@ public class Directory {
 
                 result.setRedirectUri(builder);
 
-                return Response.accepted(result).location(new URI(builder)).build();
+                return Response.accepted(result)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                        .header("Access-Control-Allow-Credentials", "true")
+                        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                        .location(new URI(builder)).build();
             }
         } catch (IOException | URISyntaxException e) {
             System.err.println("-------Error API");

@@ -45,6 +45,9 @@ public class PerunPersonDTO implements Serializable {
     @XmlElement
     private String mail;
 
+    @XmlElement
+    private String organization;
+
     public String getDisplayName() {
         return displayName;
     }
@@ -67,5 +70,13 @@ public class PerunPersonDTO implements Serializable {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public String getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
     }
 }

@@ -27,6 +27,8 @@
 <negotiator>
     <uploadFileSalt>test1234</uploadFileSalt>
 
+    <maxUploadFileSize>225443840</maxUploadFileSize>
+
     <perunUsername>perunusername</perunUsername>
 
     <perunPassword>perunpassword</perunPassword>

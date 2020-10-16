@@ -30,21 +30,35 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
 >
 
 <composite:interface>
-    <composite:attribute name="bean" required="true"/>
+    <composite:attribute name="queryBean" required="true"/>
+    <composite:attribute name="fileUploadBean" required="true"/>
+    <composite:attribute name="scope" required="false" default="queryAttachment" />
+    <composite:attribute name="offer" required="false" default="-1" />
+    <composite:attribute name="delete" required="false" default="false" />
 </composite:interface>
 
 <composite:implementation>
 
     <h:panelGroup layout="block" id="queryDetailAttachments">
 
-        <h:dataTable value="#{cc.attrs.bean.attachmentMap.entrySet().toArray()}"
-                     var="attachment" style="table-layout: fixed;"
+        <h:dataTable value="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer).entrySet().toArray()}"
+                     var="attachment"
+                     headerClass="query-detail-attachments-table-attachment-type-header,query-detail-attachments-table-attachment-name-header"
+                     columnClasses="query-detail-attachments-table-attachment-type,query-detail-attachments-table-attachment-name,query-detail-attachments-table-attachment-type"
                      class="table-striped table-bordered table-responsive table-fullwidth"
-                     rendered="#{cc.attrs.bean.attachments.size() > 0}">
+                     rendered="#{cc.attrs.fileUploadBean.getAttachmentMap(cc.attrs.scope, cc.attrs.offer).entrySet().size() > 0}">
+
+            <h:column>
+                <f:facet name="header">Attachment Type</f:facet>
+                <h:panelGroup>
+                    #{cc.attrs.fileUploadBean.getAttachmentType(attachment.key)}
+                </h:panelGroup>
+            </h:column>
 
             <h:column styleClass="attachment-links">
                 <f:facet name="header">Attachments</f:facet>
@@ -58,6 +72,54 @@
                         <i class="fa fa-paperclip" style="margin-right: 2px;"/>#{attachment.value}
                     </h:panelGroup>
                 </h:outputLink>
+            </h:column>
+
+
+
+            <h:column rendered="#{cc.attrs.delete}">
+                <f:facet name="header">Delete File</f:facet>
+
+                <h:panelGroup rendered="#{cc.attrs.delete}">
+                    <h:form id="deleteCommentAttachment" enctype="multipart/form-data">
+                        <h:commandLink
+                                styleClass="confirm-delete"
+                                action="#{fileUploadBean.setCommentAttachmentToBeRemoved(attachment.key)}"
+                                title="#{label['comment.tootltip.delete']}"
+                                rendered="#{cc.attrs.delete}">
+                        <i class="glyphicon glyphicon-trash"></i>
+                            <f:ajax onevent="showConfirmDialogDeleteCommentAttachment"/>
+                        </h:commandLink>
+
+                        <div class="modal fade" id="modal-from-dom-deleteCommentAttachment-#{attachment.key}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        #{label['comment.dialog.deleteHeader']}
+                                    </div>
+                                    <div class="modal-body">
+                                        #{label['comment.dialog.deleteMsg']}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                        <h:commandButton action="#{fileUploadBean.deleteMarkedCommentAttachment()}"
+                                                         value="Yes" styleClass="btn btn-danger btn-ok"
+                                                         title="#{label['comment.tootltip.delete']}">
+                                        </h:commandButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h:outputScript>
+                            function showConfirmDialogDeleteCommentAttachment(data) {
+                                if(data.status == "success") {
+                                    $('#modal-from-dom-deleteCommentAttachment-#{attachment.key}').modal('show');
+                                }
+                            }
+                        </h:outputScript>
+
+                    </h:form>
+                </h:panelGroup>
             </h:column>
 
         </h:dataTable>

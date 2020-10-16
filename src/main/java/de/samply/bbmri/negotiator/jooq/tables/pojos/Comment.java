@@ -23,13 +23,15 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment implements Serializable {
 
-	private static final long serialVersionUID = -2105032786;
+	private static final long serialVersionUID = 1329638102;
 
 	private Integer   id;
 	private Integer   queryId;
 	private Integer   personId;
 	private Timestamp commentTime;
 	private String    text;
+	private Boolean   attachment;
+	private String    status;
 
 	public Comment() {}
 
@@ -39,6 +41,8 @@ public class Comment implements Serializable {
 		this.personId = value.personId;
 		this.commentTime = value.commentTime;
 		this.text = value.text;
+		this.attachment = value.attachment;
+		this.status = value.status;
 	}
 
 	public Comment(
@@ -46,13 +50,17 @@ public class Comment implements Serializable {
 		Integer   queryId,
 		Integer   personId,
 		Timestamp commentTime,
-		String    text
+		String    text,
+		Boolean   attachment,
+		String    status
 	) {
 		this.id = id;
 		this.queryId = queryId;
 		this.personId = personId;
 		this.commentTime = commentTime;
 		this.text = text;
+		this.attachment = attachment;
+		this.status = status;
 	}
 
 	public Integer getId() {
@@ -93,5 +101,21 @@ public class Comment implements Serializable {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public Boolean getAttachment() {
+		return this.attachment;
+	}
+
+	public void setAttachment(Boolean attachment) {
+		this.attachment = attachment;
+	}
+
+	public String getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }

@@ -51,10 +51,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import de.samply.bbmri.auth.client.AuthClient;
-import de.samply.bbmri.auth.client.InvalidKeyException;
-import de.samply.bbmri.auth.client.InvalidTokenException;
-import de.samply.bbmri.auth.client.jwt.KeyLoader;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidKeyException;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidTokenException;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.jwt.KeyLoader;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.common.config.OAuth2Client;
@@ -118,10 +118,12 @@ public class OAuth2Filter implements Filter {
 
                         if(httpRequest.getParameter("state") != null) {
                             logger.debug("checking if the parameter state is the same as the state in the userbean");
+                            logger.debug("User State: " + userBean.getState() + " -> " + httpRequest.getParameter("state") + " Request State.");
 
                             if(!httpRequest.getParameter("state").equals(userBean.getState())) {
                                 logger.debug("State does not equal the state in the userbean. Abort.");
-                                throw new InvalidParameterException();
+                                logger.debug("User State: " + userBean.getState() + " -> " + httpRequest.getParameter("state") + " Request State.");
+                                //throw new InvalidParameterException();
                             }
                         }
 

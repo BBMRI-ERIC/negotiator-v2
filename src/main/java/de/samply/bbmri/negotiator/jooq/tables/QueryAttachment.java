@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class QueryAttachment extends TableImpl<QueryAttachmentRecord> {
 
-	private static final long serialVersionUID = 1170210394;
+	private static final long serialVersionUID = -249535213;
 
 	/**
 	 * The reference instance of <code>public.query_attachment</code>
@@ -64,6 +64,11 @@ public class QueryAttachment extends TableImpl<QueryAttachmentRecord> {
 	 * The column <code>public.query_attachment.attachment</code>. The name of the attached file stored in file system, not including the directory
 	 */
 	public final TableField<QueryAttachmentRecord, String> ATTACHMENT = createField("attachment", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "The name of the attached file stored in file system, not including the directory");
+
+	/**
+	 * The column <code>public.query_attachment.attachment_type</code>.
+	 */
+	public final TableField<QueryAttachmentRecord, String> ATTACHMENT_TYPE = createField("attachment_type", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "");
 
 	/**
 	 * Create a <code>public.query_attachment</code> table reference

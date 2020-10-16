@@ -27,6 +27,7 @@ package de.samply.bbmri.negotiator.control;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
@@ -72,6 +73,7 @@ public class SessionBean implements Serializable {
      * text and is thus cleared from the session bean once the page is refreshed after attachment upload.
      */
     private String transientQueryRequestDescription;
+    private Boolean transientQueryTestRequest;
 
     /**
      * The ethics code of the query when the page is refreshed  - for file upload or changing query from directory.
@@ -82,6 +84,10 @@ public class SessionBean implements Serializable {
      * The variable that decides if session vales have to be loaded or not.
      */
     private boolean saveTransientState;
+
+    private Integer transientCommentCommentId;
+    private String transientCommentComment;
+    private HashMap<String, String> transientCommentAttachmentMap;
 
     /**
      * Removes all the filters at once.
@@ -207,5 +213,35 @@ public class SessionBean implements Serializable {
 
     public void setTransientEthicsCode(String transientEthicsCode) {
         this.transientEthicsCode = transientEthicsCode;
+    }
+
+    public Integer getTransientCommentCommentId() {
+        return transientCommentCommentId;
+    }
+
+    public void setTransientCommentCommentId(Integer transientCommentCommentId) {
+        this.transientCommentCommentId = transientCommentCommentId;
+    }
+
+    public String getTransientCommentComment() {
+        return transientCommentComment;
+    }
+
+    public void setTransientCommentComment(String transientCommentComment) {
+        this.transientCommentComment = transientCommentComment;
+    }
+
+    public HashMap<String, String> getTransientCommentAttachmentMap() { return transientCommentAttachmentMap; }
+
+    public void setTransientCommentAttachmentMap(HashMap<String, String> transientCommentAttachmentMap) {
+        this.transientCommentAttachmentMap = transientCommentAttachmentMap;
+    }
+
+    public Boolean getTransientQueryTestRequest() {
+        return transientQueryTestRequest;
+    }
+
+    public void setTransientQueryTestRequest(Boolean transientQueryTestRequest) {
+        this.transientQueryTestRequest = transientQueryTestRequest;
     }
 }

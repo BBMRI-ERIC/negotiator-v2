@@ -35,6 +35,8 @@
 
 <composite:interface>
 	<composite:attribute name="query" required="true" />
+	<composite:attribute name="componentQueryBean" required="true" />
+    <composite:attribute name="fileUploadBean" required="true" />
 	<composite:attribute name="offer" required="false" />
 	<composite:attribute name="makeOffer" required="false" default="false"  />
 	<composite:attribute name="rendered" required="false" />
@@ -44,7 +46,7 @@
 
 	<h:panelGroup layout="block" styleClass="col-md-12" rendered="#{cc.attrs.rendered}">
 
-		<h:form id="myform">
+		<h:form id="uploadform" enctype="multipart/form-data">
 
 			<h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
 
@@ -56,12 +58,27 @@
 				<h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<h:inputTextarea id="commentText" value="#{commentBean.comment}"
 						styleClass="form-control" rows="5"
-						validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 500 characters ">
-						<f:validateLength for="commentText" minimum="1" maximum="500" />
+						validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 1000000 characters ">
+						<f:validateLength for="commentText" minimum="0" maximum="1000000" />
 						<h:messages id="commentValidationMessage" for="commentText"
 							style="color:red" showSummary="true" showDetails="false" />
-					</h:inputTextarea>					
-				</h:panelGroup>	
+					</h:inputTextarea>
+                    <h:inputHidden id="commentId" value="#{commentBean.commentId}" />
+                </h:panelGroup>
+
+				<!-- Attachments for a query comment -->
+				<h:panelGroup layout="block" rendered="#{cc.attrs.makeOffer == 'false'}">
+					<!-- Uploaded attachments for a query -->
+					<bbmricc:fileUploaderDisplay componentQueryBean="#{cc.attrs.componentQueryBean}"
+												 fileUploadBean="#{cc.attrs.fileUploadBean}"
+												 scope="commentAttachment" />
+					<!-- Upload the attachments for a query -->
+					<bbmricc:fileUpload componentQueryBean="#{commentBean}"
+										fileUploadBean="#{cc.attrs.fileUploadBean}"
+										scope="commentAttachment"
+                                        queryId="#{cc.attrs.query.id}" />
+
+				</h:panelGroup>
 
 				<h:panelGroup layout="block" styleClass="pull-right"  style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<h:commandButton
@@ -69,16 +86,33 @@
 						value="#{label['querydetail.action.addComment.buttontext']}"
 						title="#{label['querydetail.action.addComment']}"
 						styleClass="btn btn-primary" />
-				</h:panelGroup>				
+				</h:panelGroup>
 
                 <h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'true'}">
                     <h:inputTextarea id="offerCommentText" value="#{offerBean.offerComment}"
                         styleClass="form-control" rows="5"
-                        validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 500 characters ">
-                        <f:validateLength for="offerCommentText" minimum="1" maximum="500" />
+                        validatorMessage="Minimum length of a comment allowed is 1. Maximum length of a comment allowed is 1000000 characters ">
+                        <f:validateLength for="offerCommentText" minimum="0" maximum="1000000" />
                         <h:messages id="offerCommentValidationMessage" for="offerCommentText"
                             style="color:red" showSummary="true" showDetails="false" />
                     </h:inputTextarea>
+				</h:panelGroup>
+
+				<!-- Attachments for a private negotiation -->
+				<h:panelGroup layout="block" rendered="#{cc.attrs.makeOffer == 'true'}">
+					<!-- Uploaded attachments for a query-->
+					<bbmricc:fileUploaderDisplay componentQueryBean="#{cc.attrs.componentQueryBean}"
+												 fileUploadBean="#{cc.attrs.fileUploadBean}"
+												 scope="privateAttachment"
+												 offer="#{cc.attrs.offer}"
+												 userSelectedId="#{userBean.person.id}" />
+					<!-- Upload the attachments for a query -->
+					<bbmricc:fileUpload componentQueryBean="#{cc.attrs.componentQueryBean}"
+										fileUploadBean="#{cc.attrs.fileUploadBean}"
+										isOffer="#{cc.attrs.makeOffer}"
+										offer="#{cc.attrs.offer}"
+										scope="privateAttachment"/>
+
 				</h:panelGroup>
 
 				<h:panelGroup layout="block" style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'true'}">

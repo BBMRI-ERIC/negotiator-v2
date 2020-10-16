@@ -66,4 +66,5 @@ public class QuerySearchDTO {
     public void setHumanReadable(String humanReadable) {
         this.humanReadable = humanReadable;
     }
+
 }

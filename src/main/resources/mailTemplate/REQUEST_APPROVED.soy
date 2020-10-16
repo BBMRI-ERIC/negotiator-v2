@@ -1,0 +1,20 @@
+{delpackage Notification}
+{namespace eu.negotiator.mailing}
+
+/**
+ * Main content for query added notification mail.
+ * @param? locale The locale of the mail
+ * @param? name The locale of the mail
+ * @param? queryName The name of the mail
+ * @param? url The url of the query
+ */
+{deltemplate maincontent}
+    {switch $locale}
+        {default}
+            Your request with the title: {$queryName} has been approved{\n}
+            and was send to the Biobank and Collection representatives.
+            {\n}{\n}You can check the status of the request and communicate with the representatives: {\n}{\n}
+            {$url}
+
+    {/switch}
+{/deltemplate}

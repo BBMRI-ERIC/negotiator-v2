@@ -30,9 +30,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
+import javax.faces.application.FacesMessage;
 import javax.servlet.http.Part;
 
+import de.samply.bbmri.negotiator.helper.MessageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +48,7 @@ import fi.solita.clamav.ClamAVClient;
 public class FileUtil {
 
 
-    private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
     /**
      * ClamAV timeout in milliseconds. Set to 20 seconds.
@@ -56,18 +61,15 @@ public class FileUtil {
      * @param file file
      * @return name of persisted file
      */
-    public static String saveQueryAttachment(Part file, String fileName) {
+    public String saveQueryAttachment(Part file, String fileName) {
         String uploadPath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
         File uploadDir = new File(uploadPath);
         uploadDir.mkdirs();
         
         try (InputStream input = file.getInputStream()) {
-            
             Files.copy(input, new File(uploadDir, fileName).toPath());
             return fileName;
-            
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error("Couldn't save attachment ", e);
             return null;
         }
@@ -78,7 +80,7 @@ public class FileUtil {
      * @param filePart
      * @return
      */
-    public static String getFileName(Part filePart) {
+    public String getOriginalFileNameFromPart(Part filePart) {
         String header = filePart.getHeader("content-disposition");
         for(String headerPart : header.split(";")) {
             if(headerPart.trim().startsWith("filename")){
@@ -88,13 +90,29 @@ public class FileUtil {
         return null;
     }
 
+    public String getStorageFileName(Integer queryId, Integer fileId, String fileName) {
+        String[] splitFilename = fileName.split("\\.");
+        String fileExtension = splitFilename[splitFilename.length - 1];
+        return "query_" + queryId + "_file_" + fileId + "." + fileExtension;
+    }
+
+    public String getStorageFileName(Integer queryId, String fileId, String fileName) {
+        String[] splitFilename = fileName.split("\\.");
+        String fileExtension = splitFilename[splitFilename.length - 1];
+        return "query_" + queryId + "_file_" + fileId + "." + fileExtension;
+    }
+
+    public Pattern getStorageNamePattern() {
+        return Pattern.compile("^query_(\\d*)_file_(\\d*)\\.(\\w*)_scope_(\\w*)_salt_(.*)");
+    }
+
     /**
      * Checks the given file for a virus using clamav. Returns
      * @param config the negotiator configuration
      * @param inputStream the fileinputstream that will be checked for viruses
      * @return true, if a virus has been found. False otherwise
      */
-    public static boolean checkVirusClamAV(Negotiator config, InputStream inputStream) throws IOException {
+    public boolean checkVirusClamAV(Negotiator config, InputStream inputStream) throws IOException {
         /**
          * If there is no clamav configured, return false and do not check for viruses
          */
@@ -110,10 +128,28 @@ public class FileUtil {
          * something is very wrong and do not continue.
          */
         try {
-            return !ClamAVClient.isCleanReply(cl.scan(inputStream));
+            byte[] reply = cl.scan(inputStream);
+            return !ClamAVClient.isCleanReply(reply);
         } catch (Exception e) {
             logger.error("Error while scanning file: ", e);
             throw e;
         }
+    }
+
+    public List<FacesMessage> validateFile(Part file, int maxUploadSize) {
+        List<FacesMessage> msgs = new ArrayList<>();
+        if(file != null) {
+            if (file.getSize() > maxUploadSize) {
+                msgs.addAll(MessageHelper.generateValidateFileMessages(maxUploadSize));
+            }
+            try {
+                if (checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
+                    msgs.addAll(MessageHelper.generateValidateFileMessages("checkVirusClamAVTriggeredVirusWarning"));
+                }
+            } catch (Exception e) {
+                msgs.addAll(MessageHelper.generateValidateFileMessages(e.getMessage()));
+            }
+        }
+        return msgs;
     }
 }

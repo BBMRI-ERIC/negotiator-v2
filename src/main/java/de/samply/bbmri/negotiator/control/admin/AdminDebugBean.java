@@ -67,31 +67,31 @@ public class AdminDebugBean implements Serializable {
     /**
      * Collections that are reachable (mail available)
      */
-    private HashMap<Integer, String> reachableCollections = new HashMap<Integer, String>();
+    private final HashMap<Integer, String> reachableCollections = new HashMap<Integer, String>();
     /**
      * List of collection with biobanks details of a specific query.
      */
-    private HashMap<Integer, List<CollectionBiobankDTO>> matchingBiobankCollection = new HashMap<Integer, List<CollectionBiobankDTO>>();//new ArrayList<>();
+    private final HashMap<Integer, List<CollectionBiobankDTO>> matchingBiobankCollection = new HashMap<Integer, List<CollectionBiobankDTO>>();//new ArrayList<>();
     /**
      * String contains Json data for JsTree view
      */
-    private HashMap<Integer, String> jsTreeJson = new HashMap<Integer, String>();
+    private final HashMap<Integer, String> jsTreeJson = new HashMap<Integer, String>();
     /**
      * List to store the person id who has not contacted already
      */
-    private HashMap<Integer, List<CollectionBiobankDTO>> biobankWithoutOffer = new HashMap<Integer, List<CollectionBiobankDTO>>();//new ArrayList<>();
+    private final HashMap<Integer, List<CollectionBiobankDTO>> biobankWithoutOffer = new HashMap<Integer, List<CollectionBiobankDTO>>();//new ArrayList<>();
     /**
      * Biobanks that match to a query
      */
-    private HashMap<Integer, Integer> matchingBiobanks = new HashMap<Integer, Integer>();
+    private final HashMap<Integer, Integer> matchingBiobanks = new HashMap<Integer, Integer>();
     /**
      * The list of BIOBANK ID who are related with a given query
      */
-    private HashMap<Integer, List<Integer>> biobankWithOffer = new HashMap<Integer, List<Integer>>();
+    private final HashMap<Integer, List<Integer>> biobankWithOffer = new HashMap<Integer, List<Integer>>();
     /**
      * The list of offerPersonDTO's, hence it's a list of lists.
      */
-    private HashMap<Integer, List<List<OfferPersonDTO>>> listOfSampleOffers = new HashMap<Integer, List<List<OfferPersonDTO>>>();//new ArrayList<>();
+    private final HashMap<Integer, List<List<OfferPersonDTO>>> listOfSampleOffers = new HashMap<Integer, List<List<OfferPersonDTO>>>();//new ArrayList<>();
 
     // END Collection Assostiations
     //---------------------------------
@@ -127,15 +127,26 @@ public class AdminDebugBean implements Serializable {
     public void loadQueries() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueries(config);
-            for(QueryRecord queryRecord : queries) {
-                setupCollections(config, queryRecord.getId());
-            }
             users = new HashMap<Integer, PersonRecord>();
             for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
             }
-
         } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void switchTestRequest(Integer queryId) {
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.toggleRequestTestState(config, queryId);
+            for(QueryRecord query : queries) {
+                if(query.getId() == queryId) {
+                    query.setTestRequest(!query.getTestRequest());
+                    return;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("3f0113dc7f4c-AdminDebugBean ERROR-NG-0000075: Error switching test request state for request " + queryId + ".");
             e.printStackTrace();
         }
     }

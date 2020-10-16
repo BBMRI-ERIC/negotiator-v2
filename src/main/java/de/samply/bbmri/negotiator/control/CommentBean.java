@@ -29,8 +29,12 @@ package de.samply.bbmri.negotiator.control;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
+import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -39,6 +43,8 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @ManagedBean
 @ViewScoped
@@ -49,7 +55,27 @@ public class CommentBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
+    @ManagedProperty(value = "#{fileUploadBean}")
+    private FileUploadBean fileUploadBean;
+
+    @ManagedProperty(value = "#{sessionBean}")
+    private SessionBean sessionBean;
+
     private String comment;
+    private Integer commentId;
+    private Integer commentToRemove;
+
+    public void initialize() {
+        if(sessionBean.isSaveTransientState() == true) {
+            getSavedValuesFromSessionBean();
+        }
+    }
+
+    private void getSavedValuesFromSessionBean() {
+        commentId = sessionBean.getTransientCommentCommentId();
+        comment = sessionBean.getTransientCommentComment();
+        clearEditChanges();
+    }
 
     /**
      * Persist comment and trigger an email notification
@@ -59,17 +85,30 @@ public class CommentBean implements Serializable {
      */
     public String saveComment(Query query) {
         try(Config config = ConfigFactory.get()) {
-            DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment);
+            if(commentId != null && commentId != -1 && commentId != 0) {
+                System.out.println("commentId: " + commentId);
+                System.out.println("comment: " + comment);
+                DbUtil.updateComment(config, commentId, comment, "published", true);
+            } else {
+                if(comment.isEmpty()) {
+                    return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                            + "?includeViewParams=true&faces-redirect=true";
+                }
+                CommentRecord record = DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment, "published", false);
+                commentId = record.getId();
+            }
             config.commit();
 
-            CommentEmailNotifier notifier = new CommentEmailNotifier(query, getQueryUrlForBiobanker(query.getId()), comment);
-            notifier.sendEmailNotificationToBiobankers(userBean.getUserId());
-            if (userBean.getBiobankOwner()){
-                /* Send notification to the query owner if a biobanker made a comment
-                 */
-                notifier = new CommentEmailNotifier(query, getQueryUrlForResearcher(query.getId()), comment);
-                notifier.sendEmailNotificationToQueryOwner();
-            }
+            DbUtil.addCommentReadForComment(config, commentId, userBean.getUserId());
+
+            markCommentNotReadForUsers(config);
+
+            uploadAttachmentComment(commentId);
+
+            clearEditChanges();
+            clearFileChanges();
+
+            NotificationService.sendNotification(NotificationType.PUBLIC_COMMAND_NOTIFICATION, query.getId(), commentId, userBean.getUserId(), null);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -77,6 +116,10 @@ public class CommentBean implements Serializable {
 
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    private void markCommentNotReadForUsers(Config config) {
+        userBean.getUserId();
     }
 
     /**
@@ -121,6 +164,73 @@ public class CommentBean implements Serializable {
                 "/researcher/detail.xhtml?queryId=" + queryId);
     }
 
+    public void saveEditChangesTemporarily() {
+        sessionBean.setTransientCommentCommentId(commentId);
+        sessionBean.setTransientCommentComment(comment);
+        sessionBean.setSaveTransientState(true);
+    }
+
+    public void clearEditChanges() {
+        sessionBean.setTransientCommentCommentId(null);
+        sessionBean.setTransientCommentComment(null);
+        //TODO: Clear commentId of Bean???
+        sessionBean.setSaveTransientState(false);
+    }
+
+    public void clearFileChanges() {
+        sessionBean.setTransientCommentAttachmentMap(null);
+        fileUploadBean.setCommentAttachments(null);
+    }
+
+    public String uploadAttachmentComment(Integer queryId) {
+        if (!fileUploadBean.isFileToUpload())
+            return "";
+        try (Config config = ConfigFactory.get()) {
+            if(commentId == null || commentId == -1 || commentId == 0) {
+                CommentRecord record = DbUtil.addComment(config, queryId, userBean.getUserId(), comment, "saved", true);
+                config.commit();
+                setCommentId(record.getId());
+            } else {
+                DbUtil.updateComment(config, commentId, comment, "published", true);
+            }
+            boolean fileCreationSuccessful = fileUploadBean.createQueryAttachmentComment(getCommentId());
+            if(fileCreationSuccessful) {
+                saveEditChangesTemporarily();
+            } else {
+                config.rollback();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public String deleteMarkedComment() {
+        if(commentToRemove == null)
+            return "";
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.markeCommentDeleted(config, commentToRemove);
+            config.commit();
+            commentToRemove = null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public void markCommentReadForUser(Integer userId, Integer commentId, boolean commentRead) {
+        if(commentRead) {
+            return;
+        }
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.updateCommentReadForUser(config, userId, commentId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public UserBean getUserBean() {
         return userBean;
@@ -128,6 +238,26 @@ public class CommentBean implements Serializable {
 
     public void setUserBean(UserBean userBean) {
         this.userBean = userBean;
+    }
+
+    public SessionBean getSessionBean() {
+        return sessionBean;
+    }
+
+    public void setSessionBean(SessionBean sessionBean) {
+        this.sessionBean = sessionBean;
+    }
+
+    public FileUploadBean getFileUploadBean() {
+        return fileUploadBean;
+    }
+
+    public void setFileUploadBean(FileUploadBean fileUploadBean) {
+        this.fileUploadBean = fileUploadBean;
+    }
+
+    public void setCommentToBeRemove(Integer collectionId) {
+        this.commentToRemove = collectionId;
     }
 
     public String getComment() {
@@ -138,4 +268,11 @@ public class CommentBean implements Serializable {
         this.comment = comment;
     }
 
+    public Integer getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(Integer commentId) {
+        this.commentId = commentId;
+    }
 }

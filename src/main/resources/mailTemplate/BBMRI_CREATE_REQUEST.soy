@@ -1,0 +1,20 @@
+{delpackage Notification}
+{namespace samply.mailing}
+
+/**
+ * Main content for query added notification mail.
+ * @param? locale The locale of the mail
+ * @param? name The locale of the mail
+ * @param? queryName The name of the mail
+ * @param? url The url of the query
+ * @param? queryId The query Id
+ */
+{deltemplate maincontent}
+    {switch $locale}
+        {default}
+            A new request has been added for review.
+            {\n}The title of the request is: {$queryId} {$queryName}
+            {\n}{\n}The request can be approved: {$url} {\n}{\n}
+
+    {/switch}
+{/deltemplate}

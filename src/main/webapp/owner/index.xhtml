@@ -37,6 +37,7 @@
     
     <f:metadata>
 		<f:viewParam name="flag" value="#{ownerQueriesBean.flagFilter}" />
+        <f:viewParam name="testRequest" value="#{ownerQueriesBean.isTestRequest}" />
 		<f:viewAction action="#{sessionBean.clearAllFilters()}" />
 	</f:metadata>
 		
@@ -69,7 +70,7 @@
 
                 <h:panelGroup layout="block" styleClass="deco-none">
                     <h:panelGroup layout="block" styleClass="panel panel-default clickable #{queryDto.isArchived() ? 'archived-query' : ''} ">
-                        <h:panelGroup layout="block" styleClass="panel-heading">
+                        <h:panelGroup layout="block" styleClass="#{queryDto.query.testRequest ? 'test-query-heading' : ''} panel-heading">
                             <h:form id="queryItemActions">
                                 <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
                                                title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
@@ -102,10 +103,25 @@
 
                                     </h:panelGroup>
 
-                                    <h:panelGroup styleClass="badge queryNumberResponsesBadge" rendered="#{queryDto.commentCount > 0}">
-                                        <h:outputText title="#{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}"
-                                                      value="#{queryDto.commentCount}"/>
-                                    </h:panelGroup>
+                                    <div class="badge queryNumberResponsesBadge"
+                                         style='#{queryDto.commentCount == 0 ? "display:none;" : "" }#{queryDto.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                                         data-toggle="tooltip"
+                                         data-placement="bottom"
+                                         title="#{queryDto.unreadCommentCount} unread comments from #{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
+
+                                        <i class="glyphicon glyphicon-bullhorn"></i>
+                                        <h:outputText value="   #{queryDto.unreadCommentCount}/#{queryDto.commentCount}"/>
+                                    </div>
+
+                                    <div class="badge queryNumberResponsesBadge"
+                                         style='#{queryDto.privateNegotiationCount == 0 ? "display:none;" : "" }'
+                                         data-toggle="tooltip"
+                                         data-placement="bottom"
+                                         title="#{queryDto.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+
+                                        <i class="glyphicon glyphicon-tower"></i>
+                                        <h:outputText value="   #{queryDto.privateNegotiationCount}" />
+                                    </div>
 
                                 </h:panelGroup>
                             </h:form>

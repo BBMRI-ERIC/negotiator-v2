@@ -28,6 +28,9 @@ package de.samply.bbmri.negotiator.control;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -40,7 +43,11 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
 @ManagedBean
 @ViewScoped
@@ -50,11 +57,9 @@ public class OfferBean implements Serializable {
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
-
     private String offerComment;
-
     private Integer offerFrom;
-
+    private Integer privateCommentToRemove = null;
 
     @PostConstruct
     public void init() {
@@ -69,16 +74,20 @@ public class OfferBean implements Serializable {
      */
     public String saveOffer(Query query, Integer offerFrom ) {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
+            OfferRecord offerRecord = DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
 
-            /**
-             * Send notifications only, if a biobanker makes an offer
-             */
-            if (userBean.getBiobankOwner()) {
-                OfferEmailNotifier notifier = new OfferEmailNotifier(query, getQueryUrl(query.getId()));
-                notifier.sendEmailNotification();
+            String biobankName = "";
+            try {
+                biobankName = DbUtil.getBiobankName(config, offerFrom);
+            } catch (Exception e) {
+                System.err.println("Error getting Biobank Name from offer ID: " + offerFrom);
+                e.printStackTrace();
             }
+
+            Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put("biobankName", biobankName);
+            NotificationService.sendNotification(NotificationType.PRIVATE_COMMAND_NOTIFICATION, query.getId(), offerRecord.getId(), userBean.getUserId(), parameters);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -99,6 +108,32 @@ public class OfferBean implements Serializable {
         return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
                 context.getRequestServerPort(), context.getRequestContextPath(),
                 "/researcher/detail.xhtml?queryId=" + queryId);
+    }
+
+    public String getQueryUrlBiobanker(Integer queryId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + queryId);
+    }
+
+    public void setCommentToBeRemove(Integer commentId) {
+        this.privateCommentToRemove = commentId;
+    }
+
+    public String deleteMarkedComment() {
+        if(privateCommentToRemove == null)
+            return "";
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.markePrivateCommentDeleted(config, privateCommentToRemove);
+            config.commit();
+            privateCommentToRemove = null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return FacesContext.getCurrentInstance().getViewRoot().getViewId()
+                + "?includeViewParams=true&faces-redirect=true";
     }
 
     public UserBean getUserBean() {

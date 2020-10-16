@@ -27,9 +27,14 @@
 package de.samply.bbmri.negotiator;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentCommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentPrivateRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentRecord;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jooq.ResultQuery;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -68,13 +73,13 @@ public class FileServlet extends HttpServlet {
     }
 
     @Override
+    // TODO: Refector
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException
-    {
+        throws ServletException, IOException {
         /* Get requested file by path info.  */
         String requestedFile = request.getPathInfo();
 
-        if(requestedFile == null) {
+        if (requestedFile == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST); // 400
             return;
         }
@@ -91,12 +96,12 @@ public class FileServlet extends HttpServlet {
 
         //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
         // patterngrops 1: queryID, 2: fileID, 3: fileName
-        Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_salt_(.*)\\.pdf$");
+        Pattern pattern = Pattern.compile("^query_(\\d*)_file_(.*)\\.(\\w*)_scope_(\\w*)_salt_(.*)\\.download$");
         Matcher matcher = pattern.matcher(requestedFile);
         String filenameSalt = null;
 
-        if(matcher.find()) {
-            filenameSalt = matcher.group(3);
+        if (matcher.find()) {
+            filenameSalt = matcher.group(5);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404.
             return;
@@ -110,10 +115,18 @@ public class FileServlet extends HttpServlet {
 
         String queryId = matcher.group(1);
         String fileId = matcher.group(2);
+        String fileExtension = matcher.group(3);
+        String fileScope = matcher.group(4);
         Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
 
         // check if the salt fits
-        String trueFileName = "query_" + queryId + "_file_" + fileId;
+        FileUtil fileUtil = new FileUtil();
+        String trueFileName = "";
+        if (fileId.contains("-")) {
+            trueFileName = fileUtil.getStorageFileName(Integer.parseInt(queryId), fileId, fileExtension);
+        } else {
+            trueFileName = fileUtil.getStorageFileName(Integer.parseInt(queryId), Integer.parseInt(fileId), fileExtension);
+        }
         String saltCheck = DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
                 trueFileName);
 
@@ -123,7 +136,7 @@ public class FileServlet extends HttpServlet {
         }
 
         /* Decode the file name (might contain spaces and on) and prepare file object.  */
-        File file = new File(filePath, URLDecoder.decode(trueFileName + ".pdf", "UTF-8"));
+        File file = new File(filePath, URLDecoder.decode(trueFileName, "UTF-8"));
 
         /* Check if file actually exists in filesystem.  */
         if (!file.exists()) {
@@ -133,10 +146,31 @@ public class FileServlet extends HttpServlet {
 
         String downloadFileName = null;
         try(Config config = ConfigFactory.get()) {
-            QueryAttachmentRecord attachmentRecord = config.dsl().selectFrom(Tables.QUERY_ATTACHMENT).where(Tables.QUERY_ATTACHMENT
-                    .ID.eq(Integer.parseInt(fileId)))
-                    .fetchOneInto(Tables.QUERY_ATTACHMENT);
-            downloadFileName = attachmentRecord.getAttachment();
+            if(fileScope.equals("queryAttachment")) {
+                QueryAttachmentRecord attachmentRecord = config.dsl().selectFrom(Tables.QUERY_ATTACHMENT).where(Tables.QUERY_ATTACHMENT
+                        .ID.eq(Integer.parseInt(fileId)))
+                        .fetchOneInto(Tables.QUERY_ATTACHMENT);
+                downloadFileName = attachmentRecord.getAttachment();
+            } else if(fileScope.equals("commentAttachment")) {
+                QueryAttachmentCommentRecord attachmentRecord = config.dsl().selectFrom(Tables.QUERY_ATTACHMENT_COMMENT).where(Tables.QUERY_ATTACHMENT_COMMENT
+                        .ID.eq(Integer.parseInt(fileId)))
+                        .fetchOneInto(Tables.QUERY_ATTACHMENT_COMMENT);
+                downloadFileName = attachmentRecord.getAttachment();
+            } else if(fileScope.equals("privateAttachment")) {
+                QueryAttachmentPrivateRecord attachmentRecord = config.dsl().selectFrom(Tables.QUERY_ATTACHMENT_PRIVATE).where(Tables.QUERY_ATTACHMENT_PRIVATE
+                        .ID.eq(Integer.parseInt(fileId)))
+                        .fetchOneInto(Tables.QUERY_ATTACHMENT_PRIVATE);
+                downloadFileName = attachmentRecord.getAttachment();
+            } else if(fileScope.equals("lifeCycleFile")) {
+                ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT value->>'filename' FROM json_array_elements((" +
+                        "SELECT status_json::json#>'{indicateAccessConditionFiles}' " +
+                        "FROM public.query_lifecycle_collection WHERE status_json ILIKE '%" + fileId + "%')) " +
+                        "WHERE value::text ILIKE '%" + fileId + "%';");
+                Result<Record> result = resultQuery.fetch();
+                for(Record record : result) {
+                    downloadFileName = (String)record.getValue(0);
+                }
+            }
         } catch(SQLException | NumberFormatException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // 500

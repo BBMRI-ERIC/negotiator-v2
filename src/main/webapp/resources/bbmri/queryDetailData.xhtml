@@ -30,6 +30,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
 >
 
@@ -40,17 +41,20 @@
 <composite:implementation>
 
     <h:panelGroup layout="block" id="queryDetailData">
+        <h:panelGroup rendered="#{cc.attrs.bean.selectedQuery.testRequest}">
+            <h2 style="color: #ec6707;background-color: #004275;padding: 5px;border-radius: 10px;">Test Request</h2>
+        </h:panelGroup>
 
         <h3 style="margin-top: 0px; margin-bottom: 0px; text-align: left">
             #{cc.attrs.bean.selectedQuery.title}
-
         </h3>
         <h:panelGroup layout="block" style="font-size: smaller ">
             <h:outputText
                     title="#{label['queryview.queryitem.datetime.creation']}"
                     value="#{cc.attrs.bean.selectedQuery.queryCreationTime}">
                 <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
-            </h:outputText>
+            </h:outputText><br/>
+            RequestID: #{cc.attrs.bean.selectedQuery.id}
         </h:panelGroup>
         <!--        Function for the show more button        -->
         <h4>#{label['queryview.title.text']}</h4>
@@ -120,6 +124,15 @@
 
         <h4>#{label['queryview.title.requestdescription']}</h4>
         <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.requestDescription}</p>
+
+        <h4>#{label['queryview.title.requesterDetails']}</h4>
+        <c:set var="requesterDetails" value="#{cc.attrs.bean.getUserDataForResearcher(cc.attrs.bean.selectedQuery.researcherId)}" />
+        <c:if test="#{requesterDetails != Null}">
+            <p class="pre-wrap">#{requesterDetails.authName}</p>
+            <p class="pre-wrap">#{requesterDetails.authEmail}</p>
+            <p class="pre-wrap">#{requesterDetails.organization}</p>
+        </c:if>
+
 
 
         <h4>#{label['queryview.title.ethicsVote']}</h4>

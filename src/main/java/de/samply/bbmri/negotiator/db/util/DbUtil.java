@@ -32,20 +32,21 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
 import de.samply.share.model.bbmri.BbmriResult;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -56,13 +57,14 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.jooq.Keys;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.rest.Directory;
-import de.samply.directory.client.dto.DirectoryBiobank;
-import de.samply.directory.client.dto.DirectoryCollection;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
+
+import static org.jooq.impl.DSL.field;
 
 /**
  * The database util for basic queries.
@@ -77,10 +79,8 @@ public class DbUtil {
      * @return
      */
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
-        Result<ListOfDirectoriesRecord> record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
-
-        List<ListOfDirectoriesRecord> test = config.map(record, ListOfDirectoriesRecord.class);
-        return config.map(record, ListOfDirectoriesRecord.class);
+        Result<ListOfDirectoriesRecord> records = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
+        return config.map(records, ListOfDirectoriesRecord.class);
     }
 
     /**
@@ -90,8 +90,25 @@ public class DbUtil {
      * @return
      */
     public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) {
-        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
-        return config.map(record, ListOfDirectoriesRecord.class);
+        try {
+            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
+            return config.map(record, ListOfDirectoriesRecord.class);
+        } catch (IllegalArgumentException e) {
+            logger.error("No Directory Entry found for ID: " + listOfDirectoryId);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) {
+        try {
+            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
+            return config.map(record, ListOfDirectoriesRecord.class);
+        } catch (IllegalArgumentException e) {
+            logger.error("No Directory Entry found for DirectoryName: " + directoryName);
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**
@@ -374,17 +391,26 @@ public class DbUtil {
     /**
      * Get title and text of a query.
      * @param config JOOQ configuration
-     * @param id the query id for which the edit description started
+     * @param queryId the query id for which the edit description started
      * @return QueryRecord object
      * @throws SQLException
      */
-    public static QueryRecord getQueryFromId(Config config, Integer id) {
+    public static QueryRecord getQueryFromId(Config config, Integer queryId) {
         Record result = config.dsl()
                 .selectFrom(Tables.QUERY)
-                .where(Tables.QUERY.ID.eq(id))
+                .where(Tables.QUERY.ID.eq(queryId))
                 .fetchOne();
 
         return config.map(result, QueryRecord.class);
+    }
+
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getQueryFromIdAsQuery(Config config, Integer queryId) {
+        Record result = config.dsl()
+                .selectFrom(Tables.QUERY)
+                .where(Tables.QUERY.ID.eq(queryId))
+                .fetchOne();
+
+        return config.map(result, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
     }
 
     /**
@@ -398,13 +424,14 @@ public class DbUtil {
      * @throws JsonParseException
      */
     public static void editQuery(Config config, String title, String text, String requestDescription,
-            String jsonText, String ethicsVote, Integer queryId) {
+            String jsonText, String ethicsVote, Integer queryId, boolean testRequest) {
         try {config.dsl().update(Tables.QUERY)
                 .set(Tables.QUERY.TITLE, title)
                 .set(Tables.QUERY.TEXT, text)
                 .set(Tables.QUERY.REQUEST_DESCRIPTION, requestDescription)
                 .set(Tables.QUERY.JSON_TEXT, jsonText)
                 .set(Tables.QUERY.ETHICS_VOTE, ethicsVote)
+                .set(Tables.QUERY.TEST_REQUEST, testRequest)
                 .set(Tables.QUERY.VALID_QUERY, true).where(Tables.QUERY.ID.eq(queryId)).execute();
 
             /**
@@ -461,10 +488,11 @@ public class DbUtil {
      * @return the ID of the inserted attachment
      * @throws SQLException
      */
-    public static Integer insertQueryAttachmentRecord(Config config, Integer queryId, String attachment) {
+    public static Integer insertQueryAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType) {
         Result<QueryAttachmentRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT)
                 .set(Tables.QUERY_ATTACHMENT.ATTACHMENT, attachment)
                 .set(Tables.QUERY_ATTACHMENT.QUERY_ID, queryId)
+                .set(Tables.QUERY_ATTACHMENT.ATTACHMENT_TYPE, attachmentType)
                 .returning(Tables.QUERY_ATTACHMENT.ID)
                 .fetch();
 
@@ -475,16 +503,82 @@ public class DbUtil {
         return result.getValues(Tables.QUERY_ATTACHMENT.ID).get(0);
     }
 
+    public static Integer insertPrivateAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType, Integer personId, Integer biobank_in_private_chat, Timestamp attachment_time) {
+        Result<QueryAttachmentPrivateRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT_PRIVATE)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT, attachment)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.QUERY_ID, queryId)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT_TYPE, attachmentType)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.PERSON_ID, personId)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.BIOBANK_IN_PRIVATE_CHAT, biobank_in_private_chat)
+                .set(Tables.QUERY_ATTACHMENT_PRIVATE.ATTACHMENT_TIME, attachment_time)
+                .returning(Tables.QUERY_ATTACHMENT_PRIVATE.ID)
+                .fetch();
+
+        if(result == null || result.getValues(Tables.QUERY_ATTACHMENT_PRIVATE.ID) == null || result.getValues(Tables
+                .QUERY_ATTACHMENT_PRIVATE.ID).size() < 1)
+            return null;
+
+        return result.getValues(Tables.QUERY_ATTACHMENT.ID).get(0);
+    }
+
+    public static Integer insertCommentAttachmentRecord(Config config, Integer queryId, String attachment, String attachmentType, Integer commentId) {
+        Result<QueryAttachmentCommentRecord> result = config.dsl().insertInto(Tables.QUERY_ATTACHMENT_COMMENT)
+                .set(Tables.QUERY_ATTACHMENT_COMMENT.ATTACHMENT, attachment)
+                .set(Tables.QUERY_ATTACHMENT_COMMENT.QUERY_ID, queryId)
+                .set(Tables.QUERY_ATTACHMENT_COMMENT.ATTACHMENT_TYPE, attachmentType)
+                .set(Tables.QUERY_ATTACHMENT_COMMENT.COMMENT_ID, commentId)
+                .returning(Tables.QUERY_ATTACHMENT_COMMENT.ID)
+                .fetch();
+
+        if(result == null || result.getValues(Tables.QUERY_ATTACHMENT_COMMENT.ID) == null || result.getValues(Tables
+                .QUERY_ATTACHMENT_COMMENT.ID).size() < 1)
+            return null;
+
+        return result.getValues(Tables.QUERY_ATTACHMENT_COMMENT.ID).get(0);
+    }
+
+    public static Integer insertQueryAttachmentRecord(Config config, AttachmentDTO fileDTO) {
+        if(fileDTO.getClass().equals(QueryAttachmentDTO.class)) {
+            QueryAttachmentDTO queryFileDTO = (QueryAttachmentDTO)fileDTO;
+            return insertQueryAttachmentRecord(config, queryFileDTO.getQueryId(), queryFileDTO.getAttachment(), queryFileDTO.getAttachmentType());
+        } else if (fileDTO.getClass().equals(PrivateAttachmentDTO.class)) {
+            PrivateAttachmentDTO privateFileDTO = (PrivateAttachmentDTO)fileDTO;
+            return insertPrivateAttachmentRecord(config, privateFileDTO.getQueryId(), privateFileDTO.getAttachment(), privateFileDTO.getAttachmentType(),
+                    privateFileDTO.getPersonId(), privateFileDTO.getBiobank_in_private_chat(), privateFileDTO.getAttachment_time());
+        } else if (fileDTO.getClass().equals(CommentAttachmentDTO.class)) {
+            CommentAttachmentDTO commentFileDTO = (CommentAttachmentDTO)fileDTO;
+            return insertCommentAttachmentRecord(config, commentFileDTO.getQueryId(), commentFileDTO.getAttachment(),
+                    commentFileDTO.getAttachmentType(), commentFileDTO.getCommentId());
+        } else {
+            logger.error("Error insertQueryAttachmentRecord: No matching Attachment Class.");
+            return null;
+        }
+    }
+
 
     public static void deleteQueryAttachmentRecord(Config config, Integer queryId, Integer attachment) {
         config.dsl().delete(Tables.QUERY_ATTACHMENT)
             .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
-            .and(Tables.QUERY_ATTACHMENT.ID.eq(attachment)).execute();
+            .and(Tables.QUERY_ATTACHMENT.ID.eq(attachment))
+            .execute();
 
         config.dsl().update(Tables.QUERY)
-        .set(Tables.QUERY.NUM_ATTACHMENTS, Tables.QUERY.NUM_ATTACHMENTS.sub(1))
-        .where(Tables.QUERY.ID.eq(queryId)).execute();
+            .set(Tables.QUERY.NUM_ATTACHMENTS, Tables.QUERY.NUM_ATTACHMENTS.sub(1))
+            .where(Tables.QUERY.ID.eq(queryId))
+            .execute();
 
+    }
+
+    public static void deleteCommentAttachment(Config config, Integer commentAttachmentId) {
+        config.dsl().delete(Tables.QUERY_ATTACHMENT_COMMENT)
+                .where(Tables.QUERY_ATTACHMENT_COMMENT.ID.eq(commentAttachmentId))
+                .execute();
+    }
+
+    public static void deletePrivateCommentAttachment(Config config, Integer privateCommentAttachmentId) {
+        config.dsl().delete(Tables.QUERY_ATTACHMENT_PRIVATE)
+                .where(Tables.QUERY_ATTACHMENT_PRIVATE.ID.eq(privateCommentAttachmentId))
+                .execute();
     }
 
     /**
@@ -563,18 +657,65 @@ public class DbUtil {
             condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
         }
 
-        Result<Record> fetch = config.dsl()
+        Result<Record> records = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
                 .select(getFields(Tables.PERSON, "query_author"))
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
                 .from(Tables.QUERY)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
-                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).onKey(Keys.COMMENT__COMMENT_QUERY_ID_FKEY)
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID).and(Tables.COMMENT.STATUS.eq("published")))
                 .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
-                .where(condition)
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                    .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                            .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.QUERY.RESEARCHER_ID))
+                            .and(Tables.PERSON_COMMENT.READ.eq(false)))
+                .leftOuterJoin(Tables.REQUEST_STATUS)
+                    .on(Tables.REQUEST_STATUS.QUERY_ID.eq(Tables.QUERY.ID)
+                            .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
+                .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return config.map(fetch, QueryStatsDTO.class);
+        return mapRecordResultQueryStatsDTOList(records);
+    }
+
+    private static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> records) {
+        List<QueryStatsDTO> result = new ArrayList<QueryStatsDTO>();
+        for(Record record : records) {
+            QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
+            query.setId((Integer) record.getValue("query_id"));
+            query.setTitle((String) record.getValue("query_title"));
+            query.setText((String) record.getValue("query_text"));
+            query.setQueryXml((String) record.getValue("query_query_xml"));
+            query.setQueryCreationTime((Timestamp) record.getValue("query_query_creation_time"));
+            query.setResearcherId((Integer) record.getValue("query_researcher_id"));
+            query.setJsonText((String) record.getValue("query_json_text"));
+            query.setNumAttachments((Integer) record.getValue("query_num_attachments"));
+            query.setNegotiatorToken((String) record.getValue("query_negotiator_token"));
+            query.setValidQuery((Boolean) record.getValue("query_valid_query"));
+            query.setRequestDescription((String) record.getValue("query_request_description"));
+            query.setEthicsVote((String) record.getValue("query_ethics_vote"));
+            query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
+            query.setTestRequest((Boolean) record.getValue("query_test_request"));
+            queryStatsDTO.setQuery(query);
+            queryAuthor.setId((Integer) record.getValue("query_author_id"));
+            queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
+            queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
+            queryAuthor.setAuthEmail((String) record.getValue("query_author_auth_email"));
+            queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
+            queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
+            queryAuthor.setOrganization((String) record.getValue("query_author_organization"));
+            queryStatsDTO.setQueryAuthor(queryAuthor);
+            queryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
+            queryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
+            queryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
+            result.add(queryStatsDTO);
+        }
+        return result;
     }
 
     /**
@@ -584,7 +725,7 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag) {
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest) {
     	Person queryAuthor = Tables.PERSON.as("query_author");
 
     	Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
@@ -611,11 +752,17 @@ public class DbUtil {
     		condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
     	}
 
+        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+
+        Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("reque_ststatus_table_abandon");
+
     	Result<Record> fetch = config.dsl()
 				.select(getFields(Tables.QUERY, "query"))
 				.select(getFields(queryAuthor, "query_author"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
                 .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
                         .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
     			.from(Tables.QUERY)
@@ -633,12 +780,26 @@ public class DbUtil {
     			.on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
 
     			.join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
-    			.on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID))
+    			.on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID).and(Tables.COMMENT.STATUS.eq("published")))
 
     			.join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
     			.on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
 
-    			.where(condition)
+                .join(requestStatusTableStart, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
+
+                .join(requestStatusTableAbandon, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).eq("abandoned")))
+
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                        .and(Tables.PERSON_COMMENT.READ.eq(false)))
+
+    			.where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
+                .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
@@ -663,46 +824,159 @@ public class DbUtil {
         return config.map(result, QueryAttachmentDTO.class);
     }
 
+    public static List<PrivateAttachmentDTO> getPrivateAttachmentRecords(Config config, int queryId) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_ATTACHMENT_PRIVATE, "privateAttachment"))
+                .from(Tables.QUERY_ATTACHMENT_PRIVATE)
+                .where(Tables.QUERY_ATTACHMENT_PRIVATE.QUERY_ID.eq(queryId))
+                .orderBy(Tables.QUERY_ATTACHMENT_PRIVATE.ID.asc()).fetch();
+
+        List<PrivateAttachmentDTO> privateAttachmentDTOList = new ArrayList<PrivateAttachmentDTO>();
+        for (Record record : result) {
+            try {
+                PrivateAttachmentDTO privateAttachmentDTO = new PrivateAttachmentDTO();
+                privateAttachmentDTO.setId((Integer) record.getValue("privateAttachment_id"));
+                privateAttachmentDTO.setPersonId((Integer) record.getValue("privateAttachment_person_id"));
+                privateAttachmentDTO.setQueryId((Integer) record.getValue("privateAttachment_query_id"));
+                privateAttachmentDTO.setBiobank_in_private_chat((Integer) record.getValue("privateAttachment_biobank_in_private_chat"));
+                privateAttachmentDTO.setAttachment_time((Timestamp) record.getValue("privateAttachment_attachment_time"));
+                privateAttachmentDTO.setAttachment((String) record.getValue("privateAttachment_attachment"));
+                privateAttachmentDTO.setAttachmentType((String) record.getValue("privateAttachment_attachment_type"));
+                privateAttachmentDTOList.add(privateAttachmentDTO);
+            } catch (Exception ex) {
+                System.err.println("Exception converting record to PrivateAttachmentDTO");
+                ex.printStackTrace();
+            }
+        }
+
+        return privateAttachmentDTOList;
+    }
+
+    public static List<CommentAttachmentDTO> getCommentAttachmentRecords(Config config, int queryId) {
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "commentAttachment"))
+                .from(Tables.QUERY_ATTACHMENT_COMMENT)
+                .where(Tables.QUERY_ATTACHMENT_COMMENT.QUERY_ID.eq(queryId))
+                .orderBy(Tables.QUERY_ATTACHMENT_COMMENT.ID.asc()).fetch();
+
+        List<CommentAttachmentDTO> commentAttachmentDTOList = new ArrayList<CommentAttachmentDTO>();
+        for (Record record : result) {
+            try {
+                CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
+                commentAttachmentDTO.setId((Integer) record.getValue("commentAttachment_id"));
+                commentAttachmentDTO.setQueryId((Integer) record.getValue("commentAttachment_query_id"));
+                commentAttachmentDTO.setCommentId((Integer) record.getValue("commentAttachment_comment_id"));
+                commentAttachmentDTO.setAttachment((String) record.getValue("commentAttachment_attachment"));
+                commentAttachmentDTO.setAttachmentType((String) record.getValue("commentAttachment_attachment_type"));
+                commentAttachmentDTOList.add(commentAttachmentDTO);
+            } catch (Exception ex) {
+                System.err.println("Exception converting record to CommentAttachmentDTO");
+                ex.printStackTrace();
+            }
+        }
+
+        return commentAttachmentDTOList;
+    }
+
+    public static List<CommentAttachmentDTO> getCommentAttachments(Config config, Integer commentId) {
+        List<QueryAttachmentCommentRecord> list = config.dsl().selectFrom(Tables.QUERY_ATTACHMENT_COMMENT)
+                .where(Tables.QUERY_ATTACHMENT_COMMENT.COMMENT_ID.eq(commentId))
+                .fetch();
+
+        List<CommentAttachmentDTO> commentAttachmentList = new ArrayList<CommentAttachmentDTO>();
+        for(QueryAttachmentCommentRecord queryAttachmentCommentRecord : list) {
+            try {
+                CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
+                commentAttachmentDTO.setId(queryAttachmentCommentRecord.getId());
+                commentAttachmentDTO.setCommentId(queryAttachmentCommentRecord.getCommentId());
+                commentAttachmentDTO.setQueryId(queryAttachmentCommentRecord.getQueryId());
+                commentAttachmentDTO.setAttachment(queryAttachmentCommentRecord.getAttachment());
+                commentAttachmentDTO.setAttachmentType(queryAttachmentCommentRecord.getAttachmentType());
+                commentAttachmentList.add(commentAttachmentDTO);
+            } catch (Exception ex) {
+                System.err.println("Exception converting record to CommentAttachmentDTO");
+                ex.printStackTrace();
+            }
+        }
+        return commentAttachmentList;
+    }
+
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config
      * @param queryId
      * @return
      */
-    public static List<CommentPersonDTO> getComments(Config config, int queryId) {
-        Result<Record> result = config.dsl()
+    public static List<CommentPersonDTO> getComments(Config config, int queryId, int personId) {
+
+        List<CommentPersonDTO> result = new ArrayList<>();
+
+        Result<Record> commentsAndCommenter = config.dsl()
                 .select(getFields(Tables.COMMENT, "comment"))
                 .select(getFields(Tables.PERSON, "person"))
-                .select(getFields(Tables.COLLECTION, "collection"))
-        		.from(Tables.COMMENT)
+                .select(getFields(Tables.PERSON_COMMENT, "personcomment"))
+                .from(Tables.COMMENT)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(personId)))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+                .and(Tables.COMMENT.STATUS.eq("published"))
                 .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
 
-        List<CommentPersonDTO> map = config.map(result, CommentPersonDTO.class);
+        HashMap<Integer, List<Collection>> personCollections = new HashMap<>();
 
-        List<CommentPersonDTO> target = new ArrayList<>();
-        /**
-         * Now we have to do weird things, grouping them together manually
-         */
-        HashMap<Integer, CommentPersonDTO> mapped = new HashMap<>();
-
-        for(CommentPersonDTO dto : map) {
-            if(!mapped.containsKey(dto.getComment().getId())) {
-                mapped.put(dto.getComment().getId(), dto);
-
-                if(dto.getCollection() != null) {
-                    dto.getCollections().add(dto.getCollection());
-                }
-                target.add(dto);
-            } else if(dto.getCollection() != null) {
-                    mapped.get(dto.getComment().getId()).getCollections().add(dto.getCollection());
+        for(Record record : commentsAndCommenter) {
+            CommentPersonDTO commentPersonDTO = new CommentPersonDTO();
+            commentPersonDTO.setComment(config.map(record, Comment.class));
+            commentPersonDTO.getComment().setId(Integer.parseInt(record.getValue("comment_id").toString()));
+            commentPersonDTO.setPerson(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            commentPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
+            commentPersonDTO.setCommentRead(record.getValue("personcomment_read") == null || (boolean) record.getValue("personcomment_read"));
+            Integer commenterId = commentPersonDTO.getPerson().getId();
+            if(!personCollections.containsKey(commenterId)) {
+                Result<Record> collections = config.dsl()
+                        .select(getFields(Tables.COLLECTION, "collection"))
+                        .from(Tables.PERSON_COLLECTION)
+                        .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                        .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
+                        .fetch();
+                personCollections.put(commenterId, config.map(collections, Collection.class));
             }
+            commentPersonDTO.setCollections(personCollections.get(commenterId));
+            result.add(commentPersonDTO);
         }
+        return result;
+    }
 
-        return target;
+    public static void updateCommentReadForUser(Config config, Integer userId, Integer commentId) {
+        PersonCommentRecord record = config.dsl().selectFrom(Tables.PERSON_COMMENT)
+                .where(Tables.PERSON_COMMENT.COMMENT_ID.eq(commentId))
+                .and(Tables.PERSON_COMMENT.PERSON_ID.eq(userId))
+                .fetchOne();
+
+        if(record != null && !record.getRead()) {
+            record.setRead(true);
+            record.setDateRead(new Timestamp(new Date().getTime()));
+            record.update();
+        }
+    }
+
+    public static void addCommentReadForComment(Config config, Integer commentId, Integer commenterId) {
+        config.dsl().resultQuery("INSERT INTO public.person_comment (person_id, comment_id, read) " +
+                "(SELECT person_id, " + commentId + ", false FROM " +
+                "((SELECT pc.person_id person_id " +
+                "FROM public.comment com " +
+                "JOIN query_collection qc ON com.query_id = qc.query_id " +
+                "JOIN person_collection pc ON qc.collection_id = pc.collection_id " +
+                "WHERE com.id = " + commentId + ") " +
+                "UNION " +
+                "(SELECT q.researcher_id person_id " +
+                "FROM public.comment com " +
+                "JOIN query q ON com.query_id = q.id " +
+                "WHERE com.id = " + commentId + ")) sub " +
+                "GROUP BY person_id)").execute();
+
+        updateCommentReadForUser(config, commenterId, commentId);
     }
 
     /**
@@ -713,14 +987,16 @@ public class DbUtil {
      * @param comment
      * @param biobankInPrivateChat biobank id
      */
-    public static void addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
+    public static OfferRecord addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
         OfferRecord record = config.dsl().newRecord(Tables.OFFER);
         record.setQueryId(queryId);
         record.setPersonId(personId);
         record.setBiobankInPrivateChat(biobankInPrivateChat);
         record.setText(comment);
+        record.setStatus("published");
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
+        return record;
     }
 
 
@@ -730,13 +1006,47 @@ public class DbUtil {
      * @param personId
      * @param comment
      */
-    public static void addComment(Config config, int queryId, int personId, String comment) throws SQLException {
+    public static CommentRecord addComment(Config config, int queryId, int personId, String comment, String status, boolean attachment) throws SQLException {
         CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
         record.setQueryId(queryId);
         record.setPersonId(personId);
         record.setText(comment);
+        record.setStatus(status);
+        record.setAttachment(attachment);
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
+        return record;
+    }
+
+    public static CommentRecord updateComment(Config config, int commentId, String comment, String status, boolean attachment) {
+        CommentRecord record = config.dsl().selectFrom(Tables.COMMENT)
+                .where(Tables.COMMENT.ID.eq(commentId))
+                .fetchOne();
+
+        record.setText(comment);
+        record.setCommentTime(new Timestamp(new Date().getTime()));
+        record.setStatus(status);
+        record.setAttachment(attachment);
+
+        record.update();
+
+        return record;
+    }
+
+    public static void markeCommentDeleted(Config config, int commentId) {
+        CommentRecord record = config.dsl().selectFrom(Tables.COMMENT)
+                .where(Tables.COMMENT.ID.eq(commentId))
+                .fetchOne();
+        record.setStatus("deleted");
+        record.update();
+    }
+
+    public static void markePrivateCommentDeleted(Config config, int commentId) {
+        OfferRecord record = config.dsl().selectFrom(Tables.OFFER)
+                .where(Tables.OFFER.ID.eq(commentId))
+                .fetchOne();
+        record.setStatus("deleted");
+        record.update();
     }
 
 	/**
@@ -784,6 +1094,49 @@ public class DbUtil {
                 .fetchOne();
     }
 
+    public static String getBiobankName(Config config, int biobankId, int listOfDirectoriesId) {
+        String biobankname = "";
+        try {
+            BiobankRecord biobankRecord = config.dsl().selectFrom(Tables.BIOBANK)
+                    .where(Tables.BIOBANK.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoriesId))
+                    .and(Tables.BIOBANK.ID.eq(biobankId))
+                    .fetchOne();
+            if(biobankRecord != null) {
+                biobankname = biobankRecord.getName();
+            }
+        } catch (Exception ex) {
+
+        }
+
+        return biobankname;
+    }
+
+    public static String getBiobankName(Config config, int biobankId) {
+        String biobankname = "";
+        try {
+            BiobankRecord biobankRecord = config.dsl().selectFrom(Tables.BIOBANK)
+                    .where(Tables.BIOBANK.ID.eq(biobankId))
+                    .fetchOne();
+            if(biobankRecord != null) {
+                biobankname = biobankRecord.getName();
+            }
+        } catch (Exception ex) {
+
+        }
+
+        return biobankname;
+    }
+
+    // Create Script to collect all biobanknames for a query
+    public static List<BiobankRecord> getBiobanks(Config config) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.BIOBANK))
+                    .from(Tables.BIOBANK)
+                    .orderBy(Tables.BIOBANK.ID)
+                    .fetch();
+
+        return config.map(record, BiobankRecord.class);
+    }
+
     /**
      * Returns a list of all biobanks relevant to this query and this biobank owner
      */
@@ -820,73 +1173,192 @@ public class DbUtil {
     /**
      * Returns the collection for the given directory ID.
      * @param config database configuration
-     * @param id directory collection ID
+     * @param directoryId directory collection ID
      * @return
      */
-    private static CollectionRecord getCollection(Config config, String id, int listOfDirectoryId) {
+    private static CollectionRecord getCollection(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.COLLECTION)
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(id))
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryId))
                 .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
                 .fetchOne();
+    }
+
+    private static NetworkRecord getNetwork(Config config, String directoryId, int listOfDirectoryId) {
+        return config.dsl().selectFrom(Tables.NETWORK)
+                .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
+                .and(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq((listOfDirectoryId)))
+                .fetchOne();
+    }
+
+    private static NetworkRecord getNetwork(Config config, String directoryId, String directoryName) {
+        Record result = config.dsl().select(getFields(Tables.NETWORK))
+                .from(Tables.NETWORK)
+                .join(Tables.LIST_OF_DIRECTORIES).on(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
+                .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
+                .and(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName))
+                .fetchOne();
+        if(result == null) {
+            Record listOfDirectoriesRecord = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES)
+                    .where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName))
+                    .fetchOne();
+
+            NetworkRecord networkRecord = config.dsl().newRecord(Tables.NETWORK);
+            networkRecord.setDirectoryId(directoryId);
+            networkRecord.setName(directoryId.replaceAll("bbmri-eric:networkID:", ""));
+            networkRecord.setAcronym(directoryId.replaceAll("bbmri-eric:networkID:", ""));
+            networkRecord.setListOfDirectoriesId(listOfDirectoriesRecord.getValue(Tables.LIST_OF_DIRECTORIES.ID));
+            networkRecord.store();
+            return networkRecord;
+        }
+        return config.map(result, NetworkRecord.class);
     }
 
     /**
      * Synchronizes the given Biobank from the directory with the Biobank in the database.
      * @param config database configuration
-     * @param dto biobank from the directory
-     * @param directoryId ID of the directory the biobank belongs to
+     * @param directoryBiobank biobank from the directory
+     * @param listOfDirectoryId ID of the directory the biobank belongs to
+     * @return
      */
-    public static void synchronizeBiobank(Config config, DirectoryBiobank dto, int directoryId) {
-        BiobankRecord record = DbUtil.getBiobank(config, dto.getId(), directoryId);
+    public static BiobankRecord synchronizeBiobank(Config config, DirectoryBiobank directoryBiobank, int listOfDirectoryId) {
+        BiobankRecord record = DbUtil.getBiobank(config, directoryBiobank.getId(), listOfDirectoryId);
 
         if(record == null) {
             /**
              * Create the location, because it doesnt exist yet
              */
-            logger.debug("Found new biobank, with id {}, adding it to the database" , dto.getId());
+            logger.debug("Found new biobank, with id {}, adding it to the database" , directoryBiobank.getId());
             record = config.dsl().newRecord(Tables.BIOBANK);
-            record.setDirectoryId(dto.getId());
+            record.setDirectoryId(directoryBiobank.getId());
         } else {
-            logger.debug("Biobank {} already exists, updating fields", dto.getId());
+            logger.debug("Biobank {} already exists, updating fields", directoryBiobank.getId());
         }
 
-        record.setDescription(dto.getDescription());
-        record.setName(dto.getName());
-        record.setListOfDirectoriesId(directoryId);
+        record.setDescription(directoryBiobank.getDescription());
+        record.setName(directoryBiobank.getName());
+        record.setListOfDirectoriesId(listOfDirectoryId);
         record.store();
+
+        return record;
+    }
+
+    public static void updateBiobankNetworkLinks(Config config, DirectoryBiobank directoryBiobank, int listOfDirectoryId, int biobankId) {
+        config.dsl().deleteFrom(Tables.NETWORK_BIOBANK_LINK)
+                .where(Tables.NETWORK_BIOBANK_LINK.BIOBANK_ID.eq(biobankId))
+                .execute();
+
+        for(DirectoryNetworkLink directoryNetworkLink : directoryBiobank.getNetworkLinks()) {
+            NetworkBiobankLinkRecord record = config.dsl().newRecord(Tables.NETWORK_BIOBANK_LINK);
+            record.setBiobankId(biobankId);
+            NetworkRecord networkRecord = DbUtil.getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
+            record.setNetworkId(networkRecord.getId());
+            record.store();
+        }
+    }
+    
+    public static List<NetworkBiobankLinkRecord> getBiobankNetworkLinks(Config config, String directoryBiobankId, int listOfDirectoryId) {
+        Result<Record> record = config.dsl().select(getFields(Tables.NETWORK_BIOBANK_LINK))
+                .from(Tables.NETWORK_BIOBANK_LINK)
+                .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.NETWORK_BIOBANK_LINK.BIOBANK_ID))
+                .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryBiobankId))
+                .and(Tables.BIOBANK.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
+                .fetch();
+        return config.map(record, NetworkBiobankLinkRecord.class);
     }
 
     /**
      * Synchronizes the given Collection from the directory with the Collection in the database.
      * @param config database configuration
-     * @param dto collection from the directory
-     * @param directoryId ID of the directory the collection belongs to
+     * @param directoryCollection collection from the directory
+     * @param listOfDirectoryId ID of the directory the collection belongs to
+     * @return
      */
-    public static void synchronizeCollection(Config config, DirectoryCollection dto, int directoryId) {
-        CollectionRecord record = DbUtil.getCollection(config, dto.getId(), directoryId);
+    public static CollectionRecord synchronizeCollection(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId) {
+        CollectionRecord record = DbUtil.getCollection(config, directoryCollection.getId(), listOfDirectoryId);
 
         if(record == null) {
             /**
              * Create the collection, because it doesnt exist yet
              */
-            logger.debug("Found new collection, with id {}, adding it to the database" , dto.getId());
+            logger.debug("Found new collection, with id {}, adding it to the database" , directoryCollection.getId());
             record = config.dsl().newRecord(Tables.COLLECTION);
-            record.setDirectoryId(dto.getId());
-            record.setListOfDirectoriesId(directoryId);
+            record.setDirectoryId(directoryCollection.getId());
+            record.setListOfDirectoriesId(listOfDirectoryId);
         } else {
-            logger.debug("Biobank {} already exists, updating fields", dto.getId());
+            logger.debug("Biobank {} already exists, updating fields", directoryCollection.getId());
         }
 
-        if(dto.getBiobank() == null) {
+        if(directoryCollection.getBiobank() == null) {
             logger.debug("Biobank is null. A collection without a biobank?!");
         } else {
-            BiobankRecord biobankRecord = getBiobank(config, dto.getBiobank().getId(), directoryId);
+            BiobankRecord biobankRecord = getBiobank(config, directoryCollection.getBiobank().getId(), listOfDirectoryId);
 
             record.setBiobankId(biobankRecord.getId());
         }
 
-        record.setName(dto.getName());
+        record.setName(directoryCollection.getName());
         record.store();
+
+        return record;
+    }
+
+    public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId, int collectionId) {
+        if(directoryCollection.getNetworkLinks().size() > 0) {
+            System.out.println(directoryCollection.getName());
+        }
+
+        config.dsl().deleteFrom(Tables.NETWORK_COLLECTION_LINK)
+                .where(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(collectionId))
+                .execute();
+
+        for(DirectoryNetworkLink directoryNetworkLink : directoryCollection.getNetworkLinks()) {
+            NetworkCollectionLinkRecord record = config.dsl().newRecord(Tables.NETWORK_COLLECTION_LINK);
+            record.setCollectionId(collectionId);
+            NetworkRecord networkRecord = DbUtil.getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
+            record.setNetworkId(networkRecord.getId());
+            record.store();
+        }
+    }
+
+    public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int listOfDirectoriesId) {
+        NetworkRecord record = DbUtil.getNetwork(config, directoryNetwork.getId(), listOfDirectoriesId);
+        if(record == null) {
+            logger.debug("Found new network, with id {}, adding it to the database" , directoryNetwork.getId());
+            record = config.dsl().newRecord(Tables.NETWORK);
+            record.setDirectoryId(directoryNetwork.getId());
+            record.setName(directoryNetwork.getName());
+            record.setAcronym(directoryNetwork.getAcronym());
+            record.setDescription(directoryNetwork.getDescription());
+            record.setListOfDirectoriesId(listOfDirectoriesId);
+        } else {
+            record.setName(directoryNetwork.getName());
+            record.setAcronym(directoryNetwork.getAcronym());
+            record.setDescription(directoryNetwork.getDescription());
+            record.setListOfDirectoriesId(listOfDirectoriesId);
+        }
+        record.store();
+    }
+
+    public static void updateNetworkBiobankLinks(Config config, String nnacronym, String directoryIdStart) {
+        config.dsl().execute("INSERT INTO public.network_biobank_link(biobank_id, network_id) " +
+                "SELECT bio.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "FROM public.biobank bio WHERE bio.directory_id ILIKE '" + directoryIdStart + "' " +
+                "AND id NOT IN ( " +
+                "SELECT b.id FROM public.biobank b " +
+                "JOIN public.network_biobank_link nb ON nb.biobank_id = b.id " +
+                "JOIN public.network n ON nb.network_id = n.id " +
+                "WHERE n.acronym = '" + nnacronym + "')");
+    }
+
+    public static void updateNetworkCollectionLinks(Config config, String nnacronym, String directoryIdStart) {
+        config.dsl().execute("INSERT INTO public.network_collection_link(collection_id, network_id) " +
+                "SELECT col.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "FROM public.collection col WHERE col.directory_id ILIKE '" + directoryIdStart + "' " +
+                "AND id NOT IN ( " +
+                "SELECT c.id FROM public.collection c " +
+                "JOIN public.network_collection_link nc ON nc.collection_id = c.id " +
+                "JOIN public.network n ON nc.network_id = n.id " +
+                "WHERE n.acronym = '" + nnacronym + "')");
     }
 
     /*
@@ -907,6 +1379,37 @@ public class DbUtil {
                 .where (Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and (Tables.FLAGGED_QUERY.FLAG.eq(flag))))
                 .fetch();
           return config.map(record, NegotiatorDTO.class);
+    }
+
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollection(Config config, Integer collectionId) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.PERSON_COLLECTION)
+                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
+                .fetch();
+        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
+    }
+
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForBiobank(Config config, Integer biobankId) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.BIOBANK)
+                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .where(Tables.BIOBANK.ID.eq(biobankId))
+                .fetch();
+        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
+    }
+
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollectionsInQuery(Config config, Integer queryId) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.COLLECTION)
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
+                .join(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .fetch();
+        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
     }
 
     /*
@@ -932,7 +1435,8 @@ public class DbUtil {
      */
     public static QueryRecord saveQuery(Config config, String title,
                                         String text, String requestDescription, String jsonText, String ethicsVote, int researcherId,
-                                        Boolean validQuery) throws SQLException, IOException {
+                                        Boolean validQuery, String researcher_name, String researcher_email, String researcher_organization,
+                                        Boolean testRequest) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
         queryRecord.setJsonText(jsonText);
@@ -945,6 +1449,10 @@ public class DbUtil {
         queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
         queryRecord.setNumAttachments(0);
         queryRecord.setValidQuery(validQuery);
+        queryRecord.setResearcherName(researcher_name);
+        queryRecord.setResearcherEmail(researcher_email);
+        queryRecord.setResearcherOrganization(researcher_organization);
+        queryRecord.setTestRequest(testRequest);
         queryRecord.store();
 
         /**
@@ -1041,22 +1549,25 @@ public class DbUtil {
          *
          * Those are not processing heavy SQL statements, IMHO it's fine.
          */
+        try {
+            if (queryDto.getFlag() == null || queryDto.getFlag() == Flag.UNFLAGGED) {
+                FlaggedQueryRecord newFlag = config.dsl().newRecord(Tables.FLAGGED_QUERY);
+                newFlag.setFlag(flag);
+                newFlag.setPersonId(userId);
+                newFlag.setQueryId(queryDto.getQuery().getId());
 
-        if(queryDto.getFlag() == null || queryDto.getFlag() == Flag.UNFLAGGED) {
-            FlaggedQueryRecord newFlag = config.dsl().newRecord(Tables.FLAGGED_QUERY);
-            newFlag.setFlag(flag);
-            newFlag.setPersonId(userId);
-            newFlag.setQueryId(queryDto.getQuery().getId());
-
-            newFlag.store();
-        } else if(queryDto.getFlag() == flag) {
-            config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-                    .and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userId)).execute();
-        } else {
-            config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
-                    .where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userId))
-                    .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
-                    .execute();
+                newFlag.store();
+            } else if (queryDto.getFlag() == flag) {
+                config.dsl().delete(Tables.FLAGGED_QUERY).where(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
+                        .and(Tables.FLAGGED_QUERY.PERSON_ID.equal(userId)).execute();
+            } else {
+                config.dsl().update(Tables.FLAGGED_QUERY).set(Tables.FLAGGED_QUERY.FLAG, flag)
+                        .where(Tables.FLAGGED_QUERY.PERSON_ID.eq(userId))
+                        .and(Tables.FLAGGED_QUERY.QUERY_ID.eq(queryDto.getQuery().getId()))
+                        .execute();
+            }
+        } catch (Exception e) {
+            System.err.println("ERROR: flagQuery(Config, OwnerQueryStatsDTO, Flag, int)");
         }
     }
 
@@ -1077,6 +1588,27 @@ public class DbUtil {
                 )).fetch(), Collection.class);
     }
 
+    public static List<Network> getNetworks(Config config, int userId) {
+        return config.map(config.dsl().selectFrom(Tables.NETWORK)
+                .where(Tables.NETWORK.ID.in(
+                        config.dsl().select(Tables.NETWORK.ID)
+                                .from(Tables.NETWORK)
+                                .join(Tables.PERSON_NETWORK)
+                                .on(Tables.PERSON_NETWORK.NETWORK_ID.eq(Tables.NETWORK.ID))
+                                .where(Tables.PERSON_NETWORK.PERSON_ID.eq(userId))
+                )).fetch(), Network.class);
+    }
+
+    public static List<Collection> getCollections(Config config) {
+        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
+                .where(Tables.COLLECTION.ID.in(
+                        config.dsl().select(Tables.COLLECTION.ID)
+                                .from(Tables.COLLECTION)
+                                .join(Tables.PERSON_COLLECTION)
+                                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                )).fetch(), Collection.class);
+    }
+
     /**
      * Returns the list of users for a given collection.
      * @param config the current configuration
@@ -1094,14 +1626,24 @@ public class DbUtil {
     }
 
     /**
-     * Returns the list of collections which the given user is responsible for.
+     * Returns the list of collections which the specified collectionId.
      * @param config the current configuration
      * @param collectionId the person ID
      * @return
      */
-    public static List<CollectionRecord> getCollections(Config config, String collectionId) {
+    public static List<CollectionRecord> getCollections(Config config, String collectionId, int listOfDirectoriesId) {
         return config.map(config.dsl().selectFrom(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
+                .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoriesId))
+                .fetch(), CollectionRecord.class);
+    }
+
+    public static List<CollectionRecord> getCollections(Config config, String collectionId, String directoryName) {
+        return config.map(config.dsl().select(getFields(Tables.COLLECTION))
+                .from(Tables.COLLECTION)
+                .join(Tables.LIST_OF_DIRECTORIES).on(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
+                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
+                .and(Tables.LIST_OF_DIRECTORIES.DIRECTORY_PREFIX.eq(directoryName))
                 .fetch(), CollectionRecord.class);
     }
 
@@ -1121,7 +1663,41 @@ public class DbUtil {
 
         personRecord.setAuthEmail(personDTO.getMail());
         personRecord.setAuthName(personDTO.getDisplayName());
+        personRecord.setOrganization(personDTO.getOrganization());
         personRecord.store();
+    }
+
+    public static void savePerunNetworkMapping(Config config, PerunMappingDTO mapping) {
+        try {
+            DSLContext dsl = config.dsl();
+            String networkId = mapping.getName();
+            NetworkRecord network = getNetwork(config, networkId, "BBMRI-ERIC Directory");
+            if(network != null) {
+                dsl.deleteFrom(Tables.PERSON_NETWORK)
+                        .where(Tables.PERSON_NETWORK.NETWORK_ID.eq(network.getId()))
+                        .execute();
+
+                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                    PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
+                    if(personRecord != null) {
+                        PersonNetworkRecord personNetworkRecordExists = dsl.selectFrom(Tables.PERSON_NETWORK)
+                                .where(Tables.PERSON_NETWORK.NETWORK_ID.eq(network.getId()))
+                                .and(Tables.PERSON_NETWORK.PERSON_ID.eq(personRecord.getId())).fetchOne();
+                        if(personNetworkRecordExists == null) {
+                            PersonNetworkRecord personNetworkRecord = dsl.newRecord(Tables.PERSON_NETWORK);
+                            personNetworkRecord.setNetworkId(network.getId());
+                            personNetworkRecord.setPersonId(personRecord.getId());
+                            personNetworkRecord.store();
+                            config.commit();
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception ex) {
+            logger.error("5299a9df3532-DbUtil ERROR-NG-0000057: Error updating user network mapping from perun.");
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -1130,29 +1706,56 @@ public class DbUtil {
      * @param mapping
      */
     public static void savePerunMapping(Config config, PerunMappingDTO mapping) {
-        DSLContext dsl = config.dsl();
+        try {
+            DSLContext dsl = config.dsl();
 
-        String collectionId = mapping.getName().replaceAll(":Representatives$", "");
+            String collectionId = mapping.getName();
 
-        List<CollectionRecord> collections = getCollections(config, collectionId);
+            List<CollectionRecord> collections = getCollections(config, collectionId, mapping.getDirectory());
 
-        for(CollectionRecord collection : collections) {
-            if(collection != null) {
-                logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
-                dsl.deleteFrom(Tables.PERSON_COLLECTION).where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).execute();
+            for (CollectionRecord collection : collections) {
+                if (collection != null) {
+                    logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
+                    dsl.deleteFrom(Tables.PERSON_COLLECTION)
+                            .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId()))
+                            .execute();
 
-                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                    PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
+                    for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
+                        logger.info("-->BUG0000068--> Perun mapping Members: {}", member.getUserId());
+                        PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
 
-                    if (personRecord != null) {
-                        logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
-                        PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
-                        personCollectionRecord.setCollectionId(collection.getId());
-                        personCollectionRecord.setPersonId(personRecord.getId());
-                        personCollectionRecord.store();
+                        try {
+                            config.commit();
+                            if (personRecord != null) {
+                                PersonCollectionRecord personCollectionRecordExists = dsl.selectFrom(Tables.PERSON_COLLECTION)
+                                        .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).
+                                                and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personRecord.getId())).fetchOne();
+                                if (personCollectionRecordExists == null) {
+                                    logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
+                                    PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
+                                    personCollectionRecord.setCollectionId(collection.getId());
+                                    personCollectionRecord.setPersonId(personRecord.getId());
+                                    personCollectionRecord.store();
+                                    config.commit();
+                                } else {
+                                    logger.info("-->BUG0000068--> Perun mapping Members alredy exists: COLLECTION_ID - {} PERSON_ID - {}", collection.getId(), personRecord.getId());
+                                }
+                            }
+                        } catch (Exception ex) {
+                            System.err.println("-->BUG0000068--> savePerunMapping inner");
+                            ex.printStackTrace();
+                            /*try {
+                                config.rollback();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }*/
+                        }
                     }
                 }
             }
+        } catch (Exception ex) {
+            System.err.println("-->BUG0000105--> savePerunMapping outer");
+            ex.printStackTrace();
         }
     }
 
@@ -1216,6 +1819,7 @@ public class DbUtil {
                 .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT.eq(biobankInPrivateChat))
+                .and(Tables.OFFER.STATUS.eq("published"))
                 .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
 
         List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
@@ -1248,8 +1852,34 @@ public class DbUtil {
                 .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .from(Tables.COMMENT)
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
+                .and(Tables.COMMENT.STATUS.eq("published"))
                 .fetch();
 
+        return result;
+    }
+
+    public static Result<Record> getPrivateNegotiationCountAndTimeForResearcher(Config config, Integer queryId){
+        Result<Record> result = config.dsl()
+                .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .from(Tables.OFFER)
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .and(Tables.OFFER.STATUS.eq("published"))
+                .fetch();
+        return result;
+    }
+
+    public static Result<Record> getPrivateNegotiationCountAndTimeForBiobanker(Config config, Integer queryId, Integer personId){
+        Result<Record> result = config.dsl()
+                .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .from(Tables.OFFER)
+                .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT))
+                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
+                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .where(Tables.OFFER.QUERY_ID.eq(queryId))
+                .and(Tables.OFFER.STATUS.eq("published"))
+                .and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId)).fetch();
         return result;
     }
 
@@ -1329,35 +1959,41 @@ public class DbUtil {
         List<QueryRecord> queries = new ArrayList<QueryRecord>();
         for(Record record : result) {
             QueryRecord queryRecord = new QueryRecord();
-            queryRecord.setId((Integer)record.getValue(0));
-            queryRecord.setTitle((String)record.getValue(1));
-            queryRecord.setText((String)record.getValue(2));
-            queryRecord.setQueryXml((String)record.getValue(3));
-            queryRecord.setQueryCreationTime((Timestamp)record.getValue(4));
-            queryRecord.setResearcherId((Integer)record.getValue(5));
-            queryRecord.setJsonText((String)record.getValue(6));
-            queryRecord.setNumAttachments((Integer)record.getValue(7));
-            queryRecord.setNegotiatorToken((String)record.getValue(8));
-            queryRecord.setValidQuery((Boolean)record.getValue(9));
-            queryRecord.setRequestDescription((String)record.getValue(10));
-            queryRecord.setEthicsVote((String)record.getValue(11));
-            queryRecord.setNegotiationStartedTime((Timestamp)record.getValue(12));
+            queryRecord.setId((Integer)record.getValue("id"));
+            queryRecord.setTitle((String)record.getValue("title"));
+            queryRecord.setText((String)record.getValue("text"));
+            queryRecord.setQueryXml((String)record.getValue("query_xml"));
+            queryRecord.setQueryCreationTime((Timestamp)record.getValue("query_creation_time"));
+            queryRecord.setResearcherId((Integer)record.getValue("researcher_id"));
+            queryRecord.setJsonText((String)record.getValue("json_text"));
+            queryRecord.setNumAttachments((Integer)record.getValue("num_attachments"));
+            queryRecord.setNegotiatorToken((String)record.getValue("negotiator_token"));
+            queryRecord.setValidQuery((Boolean)record.getValue("valid_query"));
+            queryRecord.setRequestDescription((String)record.getValue("request_description"));
+            queryRecord.setEthicsVote((String)record.getValue("ethics_vote"));
+            queryRecord.setNegotiationStartedTime((Timestamp)record.getValue("negotiation_started_time"));
+            queryRecord.setResearcherName((String)record.getValue("researcher_name"));
+            queryRecord.setResearcherEmail((String)record.getValue("researcher_email"));
+            queryRecord.setResearcherOrganization((String)record.getValue("researcher_organization"));
+            queryRecord.setTestRequest((Boolean)record.getValue("test_request"));
             queries.add(queryRecord);
         }
         return queries;
     }
 
     public static String getFullListForAPI(Config config) {
-        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jd))) AS varchar) AS directories FROM (\n" +
-                "SELECT json_build_object('name', name, 'url', url, 'description', description, 'Biobanks',\t\t\t\t\t\t \n" +
-                "(SELECT array_to_json(array_agg(row_to_json(jb))) FROM \n" +
-                "\t(SELECT directory_id, name,\n" +
-                "\t (SELECT array_to_json(array_agg(row_to_json(jc))) FROM\n" +
-                "\t (SELECT directory_id, name\n" +
-                "\t FROM public.collection c WHERE c.list_of_directories_id = b.list_of_directories_id AND c.biobank_id = b.id) jc) AS collections \n" +
-                "\t FROM public.biobank b WHERE b.list_of_directories_id = d.id) jb)) AS directory\t\t\t\t\t\t \n" +
-                "\tFROM public.list_of_directories d\n" +
-                ") jd;");
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsond))) AS varchar) AS directories FROM ( " +
+                "SELECT json_build_object('name', d2.name, 'url', d2.url, 'description', d2.description, 'Biobanks', " +
+                "(SELECT array_to_json(array_agg(row_to_json(jsonb))) FROM ( " +
+                "SELECT directory_id, name, ( " +
+                "SELECT array_to_json(array_agg(row_to_json(jsonc))) FROM ( " +
+                "SELECT directory_id, name FROM public.collection c WHERE c.biobank_id = b.id " +
+                ") AS jsonc " +
+                ") AS collections " +
+                "FROM public.biobank b WHERE b.list_of_directories_id = d.id " +
+                ") AS jsonb)) AS directory " +
+                "FROM public.list_of_directories d LEFT JOIN public.list_of_directories d2 ON d2.name = d.directory_prefix " +
+                ") AS jsond;");
         Result<Record> result = resultQuery.fetch();
         for(Record record : result) {
             System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
@@ -1609,5 +2245,406 @@ public class DbUtil {
         }
         br.close();
         executeSQL(connection, sb.toString());
+    }
+
+    /*
+     * Get request staus for lifecycle
+     */
+    public static List<RequestStatusDTO> getRequestStatus(Config config, Integer requestId) {
+        Result<RequestStatusRecord> fetch = config.dsl().selectFrom(Tables.REQUEST_STATUS)
+                .where(Tables.REQUEST_STATUS.QUERY_ID.eq(requestId))
+                .fetch();
+        List<RequestStatusDTO> returnList = new ArrayList<RequestStatusDTO>();
+        for(RequestStatusRecord requestStatusRecord : fetch) {
+            returnList.add(mapRequestStatusDTO(requestStatusRecord));
+        }
+        return returnList;
+    }
+
+    private static RequestStatusDTO mapRequestStatusDTO(RequestStatusRecord requestStatusRecord) {
+        RequestStatusDTO requestStatusDTO = new RequestStatusDTO();
+        requestStatusDTO.setId(requestStatusRecord.getId());
+        requestStatusDTO.setQueryId(requestStatusRecord.getQueryId());
+        requestStatusDTO.setStatus(requestStatusRecord.getStatus());
+        requestStatusDTO.setStatusDate(requestStatusRecord.getStatusDate());
+        requestStatusDTO.setStatusType(requestStatusRecord.getStatusType());
+        requestStatusDTO.setStatusJson(requestStatusRecord.getStatusJson());
+        requestStatusDTO.setStatusUserId(requestStatusRecord.getStatusUserId());
+        return requestStatusDTO;
+    }
+
+    public static List<CollectionRequestStatusDTO> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
+        Result<QueryLifecycleCollectionRecord> fetch = config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
+                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
+                .and(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID.eq(collectionId))
+                .fetch();
+        List<CollectionRequestStatusDTO> returnList = new ArrayList<CollectionRequestStatusDTO>();
+        for(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord : fetch) {
+            returnList.add(mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
+        }
+        return returnList;
+    }
+
+    private static CollectionRequestStatusDTO mapCollectionRequestStatusDTO(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord) {
+        CollectionRequestStatusDTO collectionRequestStatusDTO = new CollectionRequestStatusDTO();
+        collectionRequestStatusDTO.setId(queryLifecycleCollectionRecord.getId());
+        collectionRequestStatusDTO.setQueryId(queryLifecycleCollectionRecord.getQueryId());
+        collectionRequestStatusDTO.setCollectionId(queryLifecycleCollectionRecord.getCollectionId());
+        collectionRequestStatusDTO.setStatus(queryLifecycleCollectionRecord.getStatus());
+        collectionRequestStatusDTO.setStatusDate(queryLifecycleCollectionRecord.getStatusDate());
+        collectionRequestStatusDTO.setStatusType(queryLifecycleCollectionRecord.getStatusType());
+        collectionRequestStatusDTO.setStatusJson(queryLifecycleCollectionRecord.getStatusJson());
+        collectionRequestStatusDTO.setStatusUserId(queryLifecycleCollectionRecord.getStatusUserId());
+        return collectionRequestStatusDTO;
+    }
+
+    /*
+     * Save request status for lifecycle
+     */
+    public static RequestStatusDTO saveUpdateRequestStatus(Integer requestStatusId, Integer query_id, String status, String status_type, String status_json, Date status_date, Integer status_user_id) {
+        RequestStatusRecord requestStatus = null;
+        try (Config config = ConfigFactory.get()) {
+            if(requestStatusId == null) {
+                requestStatus = config.dsl().newRecord(Tables.REQUEST_STATUS);
+                requestStatus.setQueryId(query_id);
+                requestStatus.setStatus(status);
+                requestStatus.setStatusType(status_type);
+                requestStatus.setStatusJson(status_json);
+                requestStatus.setStatusDate(new Timestamp(status_date.getTime()));
+                requestStatus.setStatusUserId(status_user_id);
+                requestStatus.store();
+                config.commit();
+            } else {
+                config.dsl().update(Tables.REQUEST_STATUS)
+                        .set(Tables.REQUEST_STATUS.QUERY_ID, query_id)
+                        .set(Tables.REQUEST_STATUS.STATUS, status)
+                        .set(Tables.REQUEST_STATUS.STATUS_TYPE, status_type)
+                        .set(Tables.REQUEST_STATUS.STATUS_JSON, status_json)
+                        .set(Tables.REQUEST_STATUS.STATUS_DATE, new Timestamp(status_date.getTime()))
+                        .set(Tables.REQUEST_STATUS.STATUS_USER_ID, status_user_id).where(Tables.REQUEST_STATUS.ID.eq(requestStatusId)).execute();
+                config.commit();
+                requestStatus = config.dsl().selectFrom(Tables.REQUEST_STATUS)
+                        .where(Tables.REQUEST_STATUS.ID.eq(requestStatusId)).fetchOne();
+            }
+            return mapRequestStatusDTO(requestStatus);
+        } catch (SQLException e) {
+            System.err.println("ERROR saving/updating Request Status.");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static boolean requestStatusForRequestExists(Integer request_id) {
+        try (Config config = ConfigFactory.get()) {
+            int count = config.dsl().selectCount()
+                    .from(Tables.REQUEST_STATUS)
+                    .where(Tables.REQUEST_STATUS.QUERY_ID.eq(request_id))
+                    .fetchOne(0, int.class);
+            return count != 0;
+        } catch (SQLException e) {
+            System.err.println("ERROR saving/updating Request Status.");
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static CollectionRequestStatusDTO saveUpdateCollectionRequestStatus(Integer collectionRequestStatusId, Integer query_id, Integer collection_id, String status, String status_type, String status_json, Date status_date, Integer status_user_id) {
+        QueryLifecycleCollectionRecord collectionRequestStatus = null;
+        try (Config config = ConfigFactory.get()) {
+            if(collectionRequestStatusId == null) {
+                collectionRequestStatus = config.dsl().newRecord(Tables.QUERY_LIFECYCLE_COLLECTION);
+                collectionRequestStatus.setQueryId(query_id);
+                collectionRequestStatus.setCollectionId(collection_id);
+                collectionRequestStatus.setStatus(status);
+                collectionRequestStatus.setStatusType(status_type);
+                collectionRequestStatus.setStatusJson(status_json);
+                collectionRequestStatus.setStatusDate(new Timestamp(status_date.getTime()));
+                collectionRequestStatus.setStatusUserId(status_user_id);
+                collectionRequestStatus.store();
+                config.commit();
+            } else {
+                config.dsl().update(Tables.QUERY_LIFECYCLE_COLLECTION)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID, query_id)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID, collection_id)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS, status)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_TYPE, status_type)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_JSON, status_json)
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_DATE, new Timestamp(status_date.getTime()))
+                        .set(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_USER_ID, status_user_id).where(Tables.QUERY_LIFECYCLE_COLLECTION.ID.eq(collectionRequestStatusId)).execute();
+                config.commit();
+                collectionRequestStatus = config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
+                        .where(Tables.QUERY_LIFECYCLE_COLLECTION.ID.eq(collectionRequestStatusId)).fetchOne();
+            }
+            return mapCollectionRequestStatusDTO(collectionRequestStatus);
+        } catch (SQLException e) {
+            System.err.println("ERROR saving/updating Request Status.");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static HashMap<String, String> getOpenRequests() {
+        HashMap<String, String> returnlist = new HashMap<String, String>();
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CASE WHEN status ILIKE 'rejected' THEN 'rejected'\n" +
+                    "WHEN status ILIKE 'under_review' THEN 'review'\n" +
+                    "ELSE 'approved' END statuscase, COUNT(*)\n" +
+                    "\tFROM public.request_status\n" +
+                    "\tWHERE (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
+                    "\tFROM public.request_status GROUP BY query_id) GROUP BY statuscase;");
+            Result<Record> result = resultQuery.fetch();
+            for(Record record : result) {
+                returnlist.put( record.getValue(0).toString(), record.getValue(1).toString() );
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return returnlist;
+    }
+
+    public static List<RequestStatusDTO> getRequestStatusDTOToReview() {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> fetch = config.dsl().resultQuery("SELECT * FROM public.request_status WHERE query_id IN \n" +
+                    "(SELECT query_id\n" +
+                    "FROM public.request_status\n" +
+                    "WHERE status ILIKE 'under_review' AND (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
+                    "FROM public.request_status GROUP BY query_id) ORDER BY status_date) ORDER BY query_id, status_date;").fetch();
+            return config.map(fetch, RequestStatusDTO.class);
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static int getNumberOfInitializedQueries() {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> fetch = config.dsl().resultQuery("SELECT COUNT(*) FROM public.json_query;").fetch();
+            for(Record record : fetch) {
+                return Integer.parseInt(record.getValue(0).toString());
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public static String getNumberOfQueriesLast7Days() {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> fetch = config.dsl().resultQuery("SELECT COUNT(*) FROM public.query WHERE query_creation_time > current_date - interval '7 days';").fetch();
+            int querys_created = 0;
+            for(Record record : fetch) {
+                querys_created = Integer.parseInt(record.getValue(0).toString());
+            }
+            Result<Record> fetch_json_query = config.dsl().resultQuery("SELECT COUNT(*) FROM public.json_query WHERE query_create_time > current_date - interval '7 days';").fetch();
+            int querys_initialized = 0;
+            for(Record record : fetch_json_query) {
+                querys_initialized = Integer.parseInt(record.getValue(0).toString());
+            }
+            return querys_created + "/" + querys_initialized;
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return 0 + "/" + 0;
+    }
+
+    public static List<QueryRecord> getNumberOfQueries() {
+        List<QueryRecord> returnList = new ArrayList();
+        try (Config config = ConfigFactory.get()) {
+            return config.dsl().selectFrom(Tables.QUERY).orderBy(Tables.QUERY.QUERY_CREATION_TIME).fetch();
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return returnList;
+    }
+
+    public static List<QueryRecord> getNumberOfQueriesAssociatedWithNetwork(Config config, Integer networkId) {
+        Result<Record> record = config.dsl().select(getFields(Tables.QUERY))
+                .from(Tables.QUERY)
+                .join(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.QUERY_ID.eq(Tables.QUERY.ID))
+                .join(Tables.NETWORK_COLLECTION_LINK).on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                .where(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID.eq(networkId))
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME)
+                .fetch();
+        return config.map(record, QueryRecord.class);
+    }
+
+    public static List<CollectionRecord> getCollectionsForNetwork(Config config, Integer networkId) {
+        Result<Record> record = config.dsl().select(getFields(Tables.COLLECTION))
+                .from(Tables.COLLECTION)
+                .join(Tables.NETWORK_COLLECTION_LINK).on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID.eq(networkId))
+                .fetch();
+        return config.map(record, CollectionRecord.class);
+    }
+
+    public static String getCollectionForNetworkAsJson(Config config, Integer networkId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
+                "SELECT directory, collection_id, biobank_name, collection_name, STRING_AGG(user_name, '<br>') collection_users FROM ( " +
+                "SELECT lod.name directory, c.directory_id collection_id, b.name biobank_name, c.name collection_name, p.auth_name || ' (' || p.auth_email || ')' user_name " +
+                "FROM public.collection c " +
+                "JOIN public.network_collection_link ncl ON c.id = ncl.collection_id " +
+                "LEFT JOIN public.person_collection pc ON c.id = pc.collection_id " +
+                "LEFT JOIN public.person p ON pc.person_id = p.id " +
+                "JOIN biobank b ON c.biobank_id = b.id " +
+                "JOIN list_of_directories lod ON c.list_of_directories_id = lod.id " +
+                "WHERE ncl.network_id = " + networkId + " ) sub " +
+                "GROUP BY directory, collection_id, biobank_name, collection_name " +
+                ") jsonc;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            return (String)record.getValue(0);
+        }
+        return "";
+    }
+
+    public static String getRequestsForNetworkAsJson(Config config, Integer networkId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
+                "SELECT q.id query_id, q.title query_title, b.id biobank_id, b.name biobank_name, b.directory_id biobank_directory_id, " +
+                "MAX(q.negotiation_started_time) start_time, " +
+                "LEAST(MIN(com.comment_time), MIN(o.comment_time), MIN(qlc.status_date)) response_time," +
+                "GREATEST(MAX(com.comment_time), MAX(o.comment_time), MAX(qlc_last.status_date)) last_response," +
+                "age(LEAST(MIN(com.comment_time), MIN(o.comment_time), MIN(qlc.status_date)), MAX(q.negotiation_started_time)) time_to_response," +
+                "age(GREATEST(MAX(com.comment_time), MAX(o.comment_time), MAX(qlc_last.status_date))) time_from_last_response, " +
+                "COUNT(DISTINCT c.id) number_of_collections, COUNT(DISTINCT qlc_abandoned.id) number_of_collections_abandoned," +
+                "COUNT(DISTINCT pc.person_id) number_of_persons " +
+                "FROM public.query q " +
+                "JOIN public.query_collection qc ON q.id = qc.query_id " +
+                "JOIN public.collection c ON qc.collection_id = c.id " +
+                "JOIN public.biobank b ON c.biobank_id = b.id " +
+                "LEFT JOIN public.network_biobank_link nbl ON nbl.biobank_id = b.id " +
+                "LEFT JOIN public.network_collection_link ncl ON ncl.collection_id = c.id " +
+                "LEFT JOIN public.person_collection pc ON pc.collection_id = c.id " +
+                "LEFT JOIN public.comment com ON com.person_id = pc.person_id AND q.id = com.query_id " +
+                "LEFT JOIN public.offer o ON o.biobank_in_private_chat = b.id AND q.id = o.query_id " +
+                "LEFT JOIN public.query_lifecycle_collection qlc " +
+                "ON c.id = qlc.collection_id AND q.id = qlc.query_id AND (qlc.status_type = 'abandoned' OR qlc.status_type = 'availability') " +
+                "LEFT JOIN public.query_lifecycle_collection qlc_last " +
+                "ON c.id = qlc_last.collection_id AND q.id = qlc_last.query_id " +
+                "LEFT JOIN public.query_lifecycle_collection qlc_abandoned " +
+                "ON c.id = qlc_abandoned.collection_id AND q.id = qlc_abandoned.query_id AND qlc_abandoned.status_type = 'abandoned' " +
+                "WHERE (ncl.network_id = " + networkId + " OR nbl.network_id = " + networkId + ")  AND q.test_request = false " +
+                "GROUP BY q.id, q.title, b.id, b.name, b.directory_id " +
+                ") jsonc;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            return (String)record.getValue(0);
+        }
+        return "";
+    }
+
+    public static Long getNumberOfBiobanksInNetwork(Config config, Integer networkId) {
+        Result<Record> result = config.dsl().resultQuery("SELECT COUNT(*) FROM network_biobank_link WHERE network_id = " + networkId + ";").fetch();
+        for(Record record : result) {
+            return (Long)record.getValue(0);
+        }
+        return 0L;
+    }
+
+    public static Long getNumberOfCollectionsInNetwork(Config config, Integer networkId) {
+        Result<Record> result = config.dsl().resultQuery("SELECT COUNT(*) FROM network_collection_link WHERE network_id = " + networkId + ";").fetch();
+        for(Record record : result) {
+            return (Long)record.getValue(0);
+        }
+        return 0L;
+    }
+
+    public static Long getNumberOfAssociatedUsersInNetwork(Config config, Integer networkId) {
+        Result<Record> result = config.dsl().resultQuery("SELECT COUNT(*) FROM (SELECT person_id FROM network_collection_link ncl " +
+                "JOIN person_collection pc ON ncl.collection_id = pc.collection_id " +
+                "WHERE network_id = " + networkId + " GROUP BY person_id) sub;").fetch();
+        for(Record record : result) {
+            return (Long)record.getValue(0);
+        }
+        return 0L;
+    }
+
+    public static String getNetworkDashboardStatiticForNetwork(Config config, Integer networkId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(subjson))) AS varchar) FROM " +
+                "(SELECT sub1.date, COUNT(sub1.id) number_of_queries, COUNT(sub2.id) number_of_network_queries FROM " +
+                "(SELECT q.id, substring(MAX(q.query_creation_time)::text, 0, 11)::date date FROM public.query q " +
+                "JOIN public.query_collection qc ON q.id = qc.query_id  WHERE q.test_request = false " +
+                "GROUP BY q.id) sub1 " +
+                "LEFT JOIN ( " +
+                "SELECT q.id, substring(MAX(q.query_creation_time)::text, 0, 11)::date date FROM public.query q " +
+                "JOIN public.query_collection qc ON q.id = qc.query_id " +
+                "JOIN public.network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
+                "WHERE ncl.network_id = " + networkId + " AND q.test_request = false GROUP BY q.id) sub2 ON sub1.id = sub2.id " +
+                "GROUP BY sub1.date ORDER BY sub1.date) subjson;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            return (String)record.getValue(0);
+        }
+        return "";
+    }
+
+    public static String getDataForDashboardRequestLineGraph() {
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM\n" +
+                    "(SELECT CASE WHEN created_query.creation_date IS NOT null THEN created_query.creation_date WHEN initialized_query.creation_date IS NOT null \n" +
+                    "THEN initialized_query.creation_date ELSE '2020-01-01'::date END creation_date, created_query.created_count, initialized_query. initialized_count FROM\n" +
+                    "(SELECT DATE(query_creation_time) creation_date, COUNT(*) created_count FROM public.query GROUP BY DATE(query_creation_time)) created_query FULL OUTER JOIN \n" +
+                    "(SELECT DATE(query_create_time) creation_date, COUNT(*) initialized_count FROM public.json_query GROUP BY DATE(query_create_time)) initialized_query \n" +
+                    "ON created_query.creation_date = initialized_query.creation_date ORDER BY creation_date) jsonc;");
+            Result<Record> result = resultQuery.fetch();
+            for(Record record : result) {
+                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+
+                //PGobject jsonObject = record.getValue(0);
+                return (String)record.getValue(0);
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return "ERROR";
+    }
+
+    public static String getHumanReadableStatistics() {
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM \n" +
+                    "(SELECT (json_array_elements((q.json_text::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable, " +
+                    "COUNT(*) FROM query q WHERE q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY readable) jsonc;");
+            Result<Record> result = resultQuery.fetch();
+            for(Record record : result) {
+                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+
+                //PGobject jsonObject = record.getValue(0);
+                return (String)record.getValue(0);
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting open Request Status.");
+            e.printStackTrace();
+        }
+        return "ERROR";
+    }
+
+    public static String getHumanReadableStatisticsForNetwork(Config config, Integer networkId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
+                "SELECT sub1.readable, COUNT(*) count_all, COUNT(sub2.readable) count_network FROM ( " +
+                "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q " +
+                " WHERE q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY q.id) sub1 " +
+                "LEFT JOIN ( " +
+                "SELECT (json_array_elements((MAX(q.json_text)::jsonb -> 'searchQueries')::json)::json ->> 'humanReadable') readable FROM query q " +
+                "JOIN query_collection qc ON q.id = qc.query_id " +
+                "JOIN network_collection_link ncl ON qc.collection_id = ncl.collection_id " +
+                "WHERE network_id = " + networkId +
+                " AND q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY q.id) sub2 " +
+                "ON sub1.readable = sub2.readable " +
+                "GROUP BY sub1.readable " +
+                ") jsonc;");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            return (String)record.getValue(0);
+        }
+        return "";
+    }
+
+    public static void toggleRequestTestState(Config config, Integer queryId) {
+        config.dsl().execute("UPDATE public.query SET test_request= NOT test_request WHERE id=" + queryId);
     }
 }

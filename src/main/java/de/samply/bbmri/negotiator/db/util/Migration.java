@@ -37,7 +37,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Migration {
-    private static Logger logger = LoggerFactory.getLogger(Migration.class);
+    private static final Logger logger = LoggerFactory.getLogger(Migration.class);
     private static Flyway flyway;
 
     private Migration() {

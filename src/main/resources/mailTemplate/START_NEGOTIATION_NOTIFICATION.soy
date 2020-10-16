@@ -1,0 +1,27 @@
+{delpackage Notification}
+{namespace eu.negotiator.mailing}
+
+/**
+ * Main content for query added notification mail.
+ * @param? locale The locale of the mail
+ * @param? name The locale of the mail
+ * @param? queryName The name of the mail
+ * @param? url The url of the query
+ */
+{deltemplate maincontent}
+    {switch $locale}
+        {case 'de', 'de_DE'}
+           A new request has been added.
+           {\n}The title of the request is: {$queryName}
+            {\n}To start negotiating, please use the following link: {\n}{\n}
+            {$url}
+
+
+        {default}
+            A new request has been added.
+            {\n}The title of the request is: {$queryName}
+            {\n}{\n}To start negotiating, please use the following link: {\n}{\n}
+            {$url}
+
+    {/switch}
+{/deltemplate}

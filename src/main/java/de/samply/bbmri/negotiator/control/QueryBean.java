@@ -26,38 +26,29 @@
 
 package de.samply.bbmri.negotiator.control;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.validator.ValidatorException;
-import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.helper.QuerySearchHelper;
+import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
-import de.samply.bbmri.negotiator.util.AntiVirusExceptionEnum;
-import org.apache.commons.codec.digest.DigestUtils;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,15 +57,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.FileUtil;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import de.samply.bbmri.negotiator.model.NegotiatorDTO;
-import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.rest.Directory;
 
 
@@ -87,24 +72,23 @@ public class QueryBean implements Serializable {
 
    private static final long serialVersionUID = -611428463046308071L;
 
-   /**
-    * Query attachment upload
-    */
-   private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
    private Integer jsonQueryId;
 
-
-
-    private static Logger logger = LoggerFactory.getLogger(QueryBean.class);
+   private static final Logger logger = LoggerFactory.getLogger(QueryBean.class);
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
+
+   private RequestLifeCycleStatus requestLifeCycleStatus;
 
    /**
     * Session bean use to store transient edit query values
     */
    @ManagedProperty(value = "#{sessionBean}")
    private SessionBean sessionBean;
+
+    @ManagedProperty(value = "#{fileUploadBean}")
+    private FileUploadBean fileUploadBean;
 
    /**
     * The query id if user is in the edit mode.
@@ -141,26 +125,6 @@ public class QueryBean implements Serializable {
     */
    private String qtoken;
 
-   /**
-    * List of all the attachments for a given query
-    */
-   private List<QueryAttachmentDTO> attachments;
-
-    /**
-     * Map of saved filename and realname of attachments
-     */
-    private HashMap<String, String> attachmentMap = null;
-
-    /**
-     * temporal var to store attachment name to be deleted for confirmation dialog
-     */
-    private String toRemoveAttachment = null;
-
-    /**
-    * Query attachment upload.
-    */
-   private Part file;
-
     /**
      * String containing ethics code, if available.
      */
@@ -169,22 +133,24 @@ public class QueryBean implements Serializable {
     /**
      * List of faces messages
      */
-    private List<FacesMessage> msgs = new ArrayList<>();
+    private final List<FacesMessage> msgs = new ArrayList<>();
 
     /**
      * List of faces messages
      */
     private List<QuerySearchDTO> searchQueries = new ArrayList<>();
 
+    private boolean testRequest;
+
    /**
     * Initializes this bean by registering email notification observer
     */
    public void initialize() {
-       System.out.println("initialize: " + id + " - " + jsonQueryId);
        try(Config config = ConfigFactory.get()) {
            /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
            if(id != null)
            {
+               requestLifeCycleStatus = new RequestLifeCycleStatus(id);
                setMode("edit");
                QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
 
@@ -192,23 +158,13 @@ public class QueryBean implements Serializable {
                 * Save query title and text temporarily when a file is being uploaded.
                 */
                if(sessionBean.isSaveTransientState() == false){
-                   queryTitle = queryRecord.getTitle();
-                   queryText = queryRecord.getText();
-                   queryRequestDescription = queryRecord.getRequestDescription();
-                   if(jsonQueryId == null) {
-                       jsonQuery = queryRecord.getJsonText();
-                   } else {
-                       jsonQuery = generateJsonQuery(DbUtil.getJsonQuery(config, jsonQueryId));
-                   }
-                   ethicsVote = queryRecord.getEthicsVote();
+                   getSavedValuesFromDatabaseObject(config, queryRecord);
                }else {
-                   /**
-                    * Get the values of the fields before page was refreshed - for file upload or changing query from directory
-                    */
-                   getSavedValues();
+                    // Get the values of the fields before page was refreshed - for file upload or changing query from directory
+                   getSavedValuesFromSessionBean();
                }
                qtoken = queryRecord.getNegotiatorToken();
-               setAttachments(DbUtil.getQueryAttachmentRecords(config, id));
+
            }
            else{
                setMode("newQuery");
@@ -216,17 +172,51 @@ public class QueryBean implements Serializable {
                // Add Token to query String
                searchJsonQuery = searchJsonQuery.replace("\"URL\"", "\"token\":\"" + UUID.randomUUID().toString().replace("-", "") + "\",\"URL\"");
                jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
-               System.out.println("jsonQuery: " + jsonQuery);
            }
            logger.debug("jsonQuery: " + jsonQuery);
            QueryDTO queryDTO = Directory.getQueryDTO(jsonQuery);
-           System.out.println("Size of SearchQueries: " + queryDTO.getSearchQueries().size());
            searchQueries = new ArrayList<QuerySearchDTO>(queryDTO.getSearchQueries());
        }
        catch (Exception e) {
            logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
        }
    }
+
+    private void getSavedValuesFromDatabaseObject(Config config, QueryRecord queryRecord) {
+        queryTitle = queryRecord.getTitle();
+        queryText = queryRecord.getText();
+        queryRequestDescription = queryRecord.getRequestDescription();
+        testRequest = queryRecord.getTestRequest();
+        if(jsonQueryId == null) {
+            jsonQuery = queryRecord.getJsonText();
+        } else {
+            jsonQuery = generateJsonQuery(DbUtil.getJsonQuery(config, jsonQueryId));
+        }
+        ethicsVote = queryRecord.getEthicsVote();
+    }
+
+    /**
+     * Gets values from session bean that are saved before page is refreshed - for file upload or changing query from directory.
+     */
+    public void getSavedValuesFromSessionBean() {
+        queryTitle = sessionBean.getTransientQueryTitle();
+        queryText = sessionBean.getTransientQueryText();
+        queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
+        ethicsVote = sessionBean.getTransientEthicsCode();
+        testRequest = sessionBean.getTransientQueryTestRequest();
+        if (jsonQueryId != null) {
+            try (Config config = ConfigFactory.get()) {
+                String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+                jsonQuery = generateJsonQuery(sessionBean.getTransientQueryJson(), searchJsonQuery);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            jsonQuery = sessionBean.getTransientQueryJson();
+        }
+        clearEditChanges();
+
+    }
 
     public List<ListOfDirectoriesRecord> getDirectories() {
         try(Config config = ConfigFactory.get()) {
@@ -261,18 +251,29 @@ public class QueryBean implements Serializable {
     * Saves the newly created or edited query in the database.
     */
    public String saveQuery() throws SQLException {
-       // TODO: verify user is indeed a researcher
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
            if(id != null) {
-               DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id);
+               DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest);
+               requestLifeCycleStatus = new RequestLifeCycleStatus(id);
+               if(!requestLifeCycleStatus.statusCreated()) {
+                   requestLifeCycleStatus.createStatus(userBean.getUserId());
+                   requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+                   NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
+               }
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                        jsonQuery, ethicsVote, userBean.getUserId(),
-                       true);
+                       true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                       testRequest);
                config.commit();
+               requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
+               requestLifeCycleStatus.createStatus(userBean.getUserId());
+               requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+               config.commit();
+               NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, record.getId(), null, userBean.getUserId());
                return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
            }
        } catch (IOException e) {
@@ -315,37 +316,15 @@ public class QueryBean implements Serializable {
          * Add token if an existing query is being edited. Else the user is still in the process of creating a
          * query and it has not been saved in the Query table hence no token is used.
          */
-        if(mode.equals("edit")) {
+        if(mode == null) {
+            externalContext.redirect(url);
+        } else if(mode.equals("edit")) {
             saveEditChangesTemporarily();
             externalContext.redirect(url + "?nToken=" + qtoken + "__search__");
         }else{
             externalContext.redirect(url);
         }
     }
-
-   /**
-    * Gets values from session bean that are saved before page is refreshed - for file upload or changing query from directory.
-    */
-   public void getSavedValues() {
-       queryTitle = sessionBean.getTransientQueryTitle();
-       queryText = sessionBean.getTransientQueryText();
-       queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
-       ethicsVote = sessionBean.getTransientEthicsCode();
-
-       if (jsonQueryId != null) {
-           try (Config config = ConfigFactory.get()) {
-               //TODO: Kleines Query
-               String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-               jsonQuery = generateJsonQuery(searchJsonQuery);
-           } catch (SQLException e) {
-               e.printStackTrace();
-           }
-       } else {
-           jsonQuery = sessionBean.getTransientQueryJson();
-       }
-       clearEditChanges();
-
-   }
 
     /**
      * Generate the JSON including the new search query String
@@ -384,6 +363,41 @@ public class QueryBean implements Serializable {
         return  jsonQuery;
    }
 
+    /**
+     * Generate the JSON including the new search query String
+     * @param searchJsonQuery
+     * @return
+     */
+    private String generateJsonQuery(String jsonQueryStored, String searchJsonQuery) {
+        try (Config config = ConfigFactory.get()) {
+            RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+            // Get saved query object
+            QueryDTO queryDTO = mapper.readValue(jsonQueryStored, QueryDTO.class);
+            // Get the search query object from the new json string
+            QuerySearchDTO querySearchDTO = mapper.readValue(searchJsonQuery, QuerySearchDTO.class);
+            // check searchQueryTocken if update of query or new
+            if(querySearchDTO.getToken() == null) {
+                querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
+                queryDTO.addSearchQuery(querySearchDTO);
+            } else {
+                String nTocken = querySearchDTO.getToken().replaceAll(".*__search__", "");
+                if (nTocken == null || nTocken.equals("") || nTocken.equals("null")) {
+                    // new search query
+                    querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
+                    queryDTO.addSearchQuery(querySearchDTO);
+                } else {
+                    // edited search query
+                    queryDTO.updateSearchQuery(querySearchDTO, nTocken);
+                }
+            }
+            jsonQuery = queryDTO.toJsonString();
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+        return  jsonQuery;
+    }
+
    /**
     * Save title and text in session bean when uploading attachment.
     */
@@ -393,6 +407,7 @@ public class QueryBean implements Serializable {
        sessionBean.setTransientQueryJson(jsonQuery);
        sessionBean.setTransientQueryRequestDescription(queryRequestDescription);
        sessionBean.setTransientEthicsCode(ethicsVote);
+       sessionBean.setTransientQueryTestRequest(testRequest);
        sessionBean.setSaveTransientState(true);
    }
 
@@ -406,169 +421,10 @@ public class QueryBean implements Serializable {
        sessionBean.setTransientQueryRequestDescription(null);
        sessionBean.setTransientQueryJson(null);
        sessionBean.setTransientEthicsCode(null);
+       sessionBean.setTransientQueryTestRequest(null);
        sessionBean.setSaveTransientState(false);
 
    }
-
-   /**
-    * Uploads and stores content of file from provided input stream
- * @throws IOException
-    */
-    public String uploadAttachment() throws IOException {
-        if (file == null)
-            return "";
-
-        String originalFileName = FileUtil.getFileName(file);
-        Integer fileId;
-        String uploadName;
-
-        try (Config config = ConfigFactory.get()) {
-            if (id == null) {
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, ethicsVote, userBean.getUserId()
-                        , false);
-                config.commit();
-                setId(record.getId());
-            }
-
-            fileId = DbUtil.insertQueryAttachmentRecord(config, getId(), originalFileName);
-            if (fileId == null) {
-                // something went wrong in db
-                config.rollback();
-                return "";
-            }
-            // XXX: this needs to match the pattern in FileServlet.doGet and
-            // ResearcherQueriesDetailBean.getAttachmentMap
-            uploadName = "query_" + getId() + "_file_" + fileId + ".pdf";
-            if (FileUtil.saveQueryAttachment(file, uploadName) != null) {
-                if (mode.equals("edit")) {
-                    saveEditChangesTemporarily();
-                }
-                config.commit();
-            } else {
-                // something went wrong saving the file to disk
-                config.rollback();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return "";
-        }
-
-        return "/researcher/newQuery?queryId=" + getId() + "&faces-redirect=true";
-    }
-
-   /**
-    * Validates uploaded file to be of correct size, content type and format
-    * @param ctx
-    * @param comp
-    * @param value
-    * @throws IOException
-    */
-   public void validateFile(FacesContext ctx, UIComponent comp, Object value) throws IOException {
-       //clear message list every time a new file is selected for validation
-       msgs.clear();
-       Part file = (Part)value;
-       if(file != null) {
-           if (file.getSize() > MAX_UPLOAD_SIZE) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed", "The given file was too big." +
-                       " Maximum size allowed is: "+MAX_UPLOAD_SIZE/1024/1024+" MB"));
-           }
-
-           if (!"application/pdf".equals(file.getContentType())) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed", "The uploaded file was not " +
-                       "a PDF file."));
-           }
-
-
-           try {
-               if (FileUtil.checkVirusClamAV(NegotiatorConfig.get().getNegotiator(), file.getInputStream())) {
-                   msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed",
-                           "The uploaded file triggered a virus warning and therefore has not been accepted."));
-               }
-           } catch (Exception e) {
-               msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed",
-                       "The uploaded file triggered a virus warning and therefore has not been accepted."));
-
-               generateAntiVirusExceptionMessages(e.getMessage());
-           }
-
-
-           if (!msgs.isEmpty()) {
-               throw new ValidatorException(msgs);
-           }
-       }
-   }
-
-    public void setToRemoveAttachment(String filename) {
-        this.toRemoveAttachment = filename;
-    }
-
-    /**
-    * Removes an attachment from the given query
-    */
-   public String removeAttachment() {
-
-        String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
-       // reset it
-       toRemoveAttachment = null;
-
-       if(attachment == null)
-           return "";
-
-       //XXX: this pattern needs to match QueryBean.uploadAttachment() and ResearcherQueriesDetailBean.getAttachmentMap
-       // patterngrops 1: queryID, 2: fileID, 3: fileName
-       Pattern pattern = Pattern.compile("^query_(\\d*)_file_(\\d*)_salt_(.*)");
-       Matcher matcher = pattern.matcher(attachment);
-
-       String fileID = null;
-       String queryID = null;
-       logger.debug("Wanting to remove file "+attachment);
-       if(matcher.find()) {
-           queryID = matcher.group(1);
-           fileID = matcher.group(2);
-           logger.debug("Pattern matched and found file ID = "+fileID+" for query "+queryID);
-       }
-
-       Integer fileIdInteger = null;
-       Integer queryIdInteger = null;
-       try {
-           fileIdInteger = Integer.parseInt(fileID);
-           queryIdInteger = Integer.parseInt(queryID);
-           logger.debug("Integer version of fileID = "+fileIdInteger+" and queryID = "+queryIdInteger);
-       } catch(NumberFormatException e) {
-           FacesContext context = FacesContext.getCurrentInstance();
-           context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "File could not be deleted",
-                   "The uploaded file could not be deleted due to some unforseen error.") );
-           return "";
-       }
-
-       if(queryIdInteger != id) {
-           logger.error("QueryID of file "+queryIdInteger+" does not match QueryID "+id+" of this bean.");
-           return "";
-       }
-
-       logger.debug("Removing file "+attachment+" with ID "+fileIdInteger);
-       try (Config config = ConfigFactory.get()) {
-           DbUtil.deleteQueryAttachmentRecord(config, getId(), fileIdInteger);
-           config.commit();
-
-           String filePath = NegotiatorConfig.get().getNegotiator().getAttachmentPath();
-           File file = new File(filePath, URLDecoder.decode(attachment, "UTF-8"));
-           logger.debug("Deleting physical file "+file.getAbsolutePath());
-
-           file.delete();
-           if (mode.equals("edit")) {
-               saveEditChangesTemporarily();
-           }
-       } catch (SQLException e) {
-           e.printStackTrace();
-       } catch(UnsupportedEncodingException e) {
-           e.printStackTrace();
-       }
-       return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
-   }
-
 
    /**
     * Build url to be able to navigate to the query with id=queryId
@@ -598,23 +454,82 @@ public class QueryBean implements Serializable {
                 "/owner/detail.xhtml?queryId=" + getId());
     }
 
-    /**
-     * Generates a 'readable' anti-virus(clamAV) message for the user.
-     * @param antiVirusException   exception generated by anti-virus (clamAV)
+    /*
+     * File Upload code block
      */
-    private void generateAntiVirusExceptionMessages(String antiVirusException){
+    public String uploadAttachment() throws IOException {
+        if (!fileUploadBean.isFileToUpload())
+            return "";
 
-        if (antiVirusException.contains(AntiVirusExceptionEnum.antiVirusMessageType.SocketTimeoutException.text()) ){
-
-            msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Upload Failed",
-                    "Read timed out at the network. Please try again in a few moments"));
+        try (Config config = ConfigFactory.get()) {
+            if (id == null) {
+                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                        jsonQuery, ethicsVote, userBean.getUserId(),
+                        false, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                        testRequest);
+                config.commit();
+                setId(record.getId());
+            }
+            boolean fileCreationSuccessful = fileUploadBean.createQueryAttachment();
+            if(fileCreationSuccessful) {
+                if (mode.equals("edit")) {
+                    saveEditChangesTemporarily();
+                }
+            } else {
+                config.rollback();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "";
         }
+        return "/researcher/newQuery?queryId=" + getId() + "&faces-redirect=true";
+    }
 
-        if (antiVirusException.contains(AntiVirusExceptionEnum.antiVirusMessageType.ConnectException.text())){
-
-            msgs.add(new FacesMessage(FacesMessage.SEVERITY_ERROR,"Upload Failed",
-                    "Connection refused. Please report the problem." ));
+    public String removeAttachment() {
+        boolean fileDeleted = fileUploadBean.removeAttachment();
+        if(!fileDeleted) {
+            return "";
         }
+        if (mode.equals("edit")) {
+            saveEditChangesTemporarily();
+        }
+        return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
+    }
+
+    /*
+     * Getter / Setter for bean
+     */
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
+
+    public SessionBean getSessionBean() {
+        return sessionBean;
+    }
+
+    public void setSessionBean(SessionBean sessionBean) {
+        this.sessionBean = sessionBean;
+    }
+
+    public RequestLifeCycleStatus getRequestLifeCycleStatus() {
+        return requestLifeCycleStatus;
+    }
+
+    public void setRequestLifeCycleStatus(RequestLifeCycleStatus requestLifeCycleStatus) {
+        this.requestLifeCycleStatus = requestLifeCycleStatus;
+    }
+
+    public FileUploadBean getFileUploadBean() {
+        return fileUploadBean;
+    }
+
+    public void setFileUploadBean(FileUploadBean fileUploadBean) {
+        this.fileUploadBean = fileUploadBean;
     }
 
 	public String getQueryTitle() {
@@ -631,14 +546,7 @@ public class QueryBean implements Serializable {
 
     public void setId(Integer id) {
         this.id =id;
-    }
-
-    public UserBean getUserBean() {
-        return userBean;
-    }
-
-    public void setUserBean(UserBean userBean) {
-        this.userBean = userBean;
+        fileUploadBean.setupQuery(id);
     }
 
     public String getQueryText() {
@@ -655,55 +563,6 @@ public class QueryBean implements Serializable {
 
     public void setMode(String mode) {
         this.mode = mode;
-    }
-
-    public List<QueryAttachmentDTO> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<QueryAttachmentDTO> attachments) {
-        this.attachments = attachments;
-    }
-
-    /**
-     * Lazyloaded map of saved filenames and original filenames
-     * @return
-     */
-    public HashMap<String, String> getAttachmentMap() {
-        if(attachmentMap == null) {
-            attachmentMap = new HashMap<>();
-            for(QueryAttachmentDTO att : attachments) {
-                //XXX: this pattern needs to match
-                String uploadName = "query_" + getId() + "_file_" + att.getId();
-
-                Negotiator negotiatorConfig = NegotiatorConfig.get().getNegotiator();
-
-                uploadName = uploadName + "_salt_"+ DigestUtils.sha256Hex(negotiatorConfig.getUploadFileSalt() +
-                        uploadName) + ".pdf";
-
-
-                uploadName = org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(uploadName.getBytes());
-
-                attachmentMap.put(uploadName, att.getAttachment());
-            }
-        }
-        return attachmentMap;
-    }
-
-    public Part getFile() {
-        return file;
-    }
-
-    public void setFile(Part file) {
-        this.file = file;
-    }
-
-    public SessionBean getSessionBean() {
-        return sessionBean;
-    }
-
-    public void setSessionBean(SessionBean sessionBean) {
-        this.sessionBean = sessionBean;
     }
 
     public Integer getJsonQueryId() {
@@ -729,14 +588,13 @@ public class QueryBean implements Serializable {
         this.ethicsVote = ethicsVote;
     }
 
-    public List<FacesMessage> getMsgs() {
-        return msgs;
-    }
-
-    public void setMsgs(List<FacesMessage> msgs) {
-        this.msgs = msgs;
-    }
-
     public String getQtoken() { return qtoken; }
 
+    public boolean isTestRequest() {
+        return testRequest;
+    }
+
+    public void setTestRequest(boolean testRequest) {
+        this.testRequest = testRequest;
+    }
 }

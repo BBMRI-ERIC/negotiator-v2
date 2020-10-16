@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends TableImpl<QueryRecord> {
 
-	private static final long serialVersionUID = 1143350447;
+	private static final long serialVersionUID = 1598220325;
 
 	/**
 	 * The reference instance of <code>public.query</code>
@@ -115,6 +115,26 @@ public class Query extends TableImpl<QueryRecord> {
 	 * The column <code>public.query.negotiation_started_time</code>. Time when the researcher started the negotiation for the query.
 	 */
 	public final TableField<QueryRecord, Timestamp> NEGOTIATION_STARTED_TIME = createField("negotiation_started_time", org.jooq.impl.SQLDataType.TIMESTAMP, this, "Time when the researcher started the negotiation for the query.");
+
+	/**
+	 * The column <code>public.query.researcher_name</code>.
+	 */
+	public final TableField<QueryRecord, String> RESEARCHER_NAME = createField("researcher_name", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+	/**
+	 * The column <code>public.query.researcher_email</code>.
+	 */
+	public final TableField<QueryRecord, String> RESEARCHER_EMAIL = createField("researcher_email", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+	/**
+	 * The column <code>public.query.researcher_organization</code>.
+	 */
+	public final TableField<QueryRecord, String> RESEARCHER_ORGANIZATION = createField("researcher_organization", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+	/**
+	 * The column <code>public.query.test_request</code>.
+	 */
+	public final TableField<QueryRecord, Boolean> TEST_REQUEST = createField("test_request", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "");
 
 	/**
 	 * Create a <code>public.query</code> table reference

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:composite="http://xmlns.jcp.org/jsf/composite">
+
+<composite:interface>
+    <composite:attribute name="componentQueryBean" required="true"/>
+    <composite:attribute name="fileUploadBean" required="true"/>
+    <composite:attribute name="isOffer" required="false" default="false"  />
+    <composite:attribute name="offer" required="false" />
+    <composite:attribute name="scope" required="true" default="queryAttachment" />
+    <composite:attribute name="queryId" required="false" default="-1" />
+</composite:interface>
+
+<composite:implementation>
+
+    <h:panelGroup layout="block" style="margin-top: 0px;" >
+
+        <h:panelGroup class="input-group" layout="block">
+            <input placeholder="#{label['attachmentview.placeholder']}" type="text"
+                   class="form-control" style="width: 80%;" readonly="readonly"
+                   onclick="$('#uploadform\\:file').click();" />
+
+            <h:selectOneMenu value="#{cc.attrs.fileUploadBean.attachmentType}" class="form-control" style="width: 20%;height: 2rem;">
+                <f:selectItem itemValue="other" itemLabel="other" />
+                <f:selectItem itemValue="Project Description" itemLabel="Project Description" rendered="#{cc.attrs.scope == 'queryAttachment' or cc.attrs.scope == 'commentAttachment'}" />
+                <f:selectItem itemValue="Request Description" itemLabel="Request Description" rendered="#{cc.attrs.scope == 'queryAttachment' or cc.attrs.scope == 'commentAttachment'}" />
+                <f:selectItem itemValue="Ethics Vote" itemLabel="Ethics Vote" />
+                <f:selectItem itemValue="Material Transfer Agreement" itemLabel="Material Transfer Agreement" />
+                <f:selectItem itemValue="Data Transfer Agreement" itemLabel="Data Transfer Agreement" />
+            </h:selectOneMenu>
+
+            <label class="input-group-btn"> +
+                <h:panelGroup class="btn btn-default">
+                    <h:outputText value="#{label['querydetail.action.browse']}" />
+                    <h:inputFile id="file" value="#{cc.attrs.fileUploadBean.file}"
+                                 validator="#{cc.attrs.fileUploadBean.validateFile}"
+                                 onchange="$('.activateUploadbtn').removeClass('disabled');"
+                                 style="display: none;" />
+                </h:panelGroup>
+                <h:commandButton id="uploadBtnPublic" value="Upload" rendered="#{cc.attrs.scope == 'queryAttachment'}"
+                                             action="#{cc.attrs.componentQueryBean.uploadAttachment}"
+                                             styleClass="btn btn-primary disabled activateUploadbtn" />
+                <h:commandButton id="uploadBtnPrivate" value="Upload secret" rendered="#{cc.attrs.scope == 'privateAttachment'}"
+                                 action="#{cc.attrs.componentQueryBean.uploadAttachmentPrivate(cc.attrs.offer)}"
+                                 styleClass="btn btn-primary disabled activateUploadbtn" />
+                <h:commandButton id="uploadBtnComment" value="Upload secret" rendered="#{cc.attrs.scope == 'commentAttachment'}"
+                                 action="#{cc.attrs.componentQueryBean.uploadAttachmentComment(cc.attrs.queryId)}"
+                                 styleClass="btn btn-primary disabled activateUploadbtn" />
+            </label>
+        </h:panelGroup>
+        <h:panelGroup layout="block">
+            <ul>
+                <ui:repeat value="#{cc.attrs.fileUploadBean.msgs}" var="msgs">
+                    <li>
+                        <h:outputText id="uploadMessages" value="#{msgs.detail}" style="#{msgs.summary == 'Upload Failed' ? 'color: red' : 'color: green'}" />
+                    </li>
+                </ui:repeat>
+            </ul>
+        </h:panelGroup>
+        <h:outputScript>
+            $(function() {
+                initializeFileUpload();
+            });
+        </h:outputScript>
+    </h:panelGroup>
+
+</composite:implementation>
+
+</html>
+

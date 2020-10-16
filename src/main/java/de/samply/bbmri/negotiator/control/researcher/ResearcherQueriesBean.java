@@ -38,6 +38,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.validation.constraints.Null;
 
 import org.jooq.Record;
 import org.jooq.Result;
@@ -144,7 +145,7 @@ public class ResearcherQueriesBean implements Serializable {
         selectedQuery = query;
 
         try(Config config = ConfigFactory.get()) {
-            comments = DbUtil.getComments(config, selectedQuery.getId());
+            comments = DbUtil.getComments(config, selectedQuery.getId(), userBean.getUserId());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -153,9 +154,13 @@ public class ResearcherQueriesBean implements Serializable {
     public List<QueryStatsDTO> getQueries() {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+            if(queries == null) {
+                System.err.println("#################>  DEBUGG: queries == null");
+            }
+            System.err.println("#################>  DEBUGG: " + queries.size());
 
             for (int i = 0; i < queries.size(); ++i) {
-                getCommentCountAndTime(i);
+                getPrivateNegotiationCountAndTime(i);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -163,13 +168,13 @@ public class ResearcherQueriesBean implements Serializable {
         return queries;
     }
 
-    public void getCommentCountAndTime(int index){
+    public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getCommentCountAndTime(config, queries.get(index).getQuery().getId());
-            result.get(0).getValue("comment_count");
-            queries.get(index).setCommentCount((int) result.get(0).getValue("comment_count"));
+            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId());
+            queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
         } catch (SQLException e) {
+            System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
             e.printStackTrace();
         }
     }

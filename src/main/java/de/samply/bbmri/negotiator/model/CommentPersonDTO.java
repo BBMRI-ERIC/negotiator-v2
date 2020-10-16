@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
@@ -54,6 +55,8 @@ public class CommentPersonDTO implements Serializable {
 	 * The collection of the person who made the comment.
 	 */
 	private Collection collection;
+
+	private boolean commentRead;
 
 	/**
 	 * The list of the collection the person is responsible for
@@ -90,5 +93,13 @@ public class CommentPersonDTO implements Serializable {
 
 	public void setCollections(List<Collection> collections) {
 		this.collections = collections;
+	}
+
+	public boolean getCommentRead() {
+		return commentRead;
+	}
+
+	public void setCommentRead(boolean commentRead) {
+		this.commentRead = commentRead;
 	}
 }

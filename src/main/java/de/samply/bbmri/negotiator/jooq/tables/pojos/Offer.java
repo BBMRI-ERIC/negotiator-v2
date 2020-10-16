@@ -24,7 +24,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer implements Serializable {
 
-	private static final long serialVersionUID = 1713424993;
+	private static final long serialVersionUID = 2076515868;
 
 	private Integer   id;
 	private Integer   queryId;
@@ -32,6 +32,7 @@ public class Offer implements Serializable {
 	private Integer   biobankInPrivateChat;
 	private Timestamp commentTime;
 	private String    text;
+	private String    status;
 
 	public Offer() {}
 
@@ -42,6 +43,7 @@ public class Offer implements Serializable {
 		this.biobankInPrivateChat = value.biobankInPrivateChat;
 		this.commentTime = value.commentTime;
 		this.text = value.text;
+		this.status = value.status;
 	}
 
 	public Offer(
@@ -50,7 +52,8 @@ public class Offer implements Serializable {
 		Integer   personId,
 		Integer   biobankInPrivateChat,
 		Timestamp commentTime,
-		String    text
+		String    text,
+		String    status
 	) {
 		this.id = id;
 		this.queryId = queryId;
@@ -58,6 +61,7 @@ public class Offer implements Serializable {
 		this.biobankInPrivateChat = biobankInPrivateChat;
 		this.commentTime = commentTime;
 		this.text = text;
+		this.status = status;
 	}
 
 	public Integer getId() {
@@ -106,5 +110,13 @@ public class Offer implements Serializable {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public String getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }
