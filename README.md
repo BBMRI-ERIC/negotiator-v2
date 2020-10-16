@@ -2,12 +2,6 @@
 
 This is the BBMRI-ERIC negotiator.
 
-## Links (MITRO related)
-
-- [Jira](https://jira.mitro.dkfz.de/secure/RapidBoard.jspa?rapidView=9&projectKey=BIO)
-- [Bitbucket](https://code.mitro.dkfz.de/projects/BIO)
-- [Confluence](https://wiki.mitro.dkfz.de/display/BIO/Biobank+Home)
-
 ## Getting Started
 
 This application uses a number of samply libraries which can be found at: https://maven.samply.de/nexus
