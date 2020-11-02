@@ -29,7 +29,6 @@ package de.samply.bbmri.negotiator.control.admin;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
@@ -93,6 +92,10 @@ public class AdminDebugBean implements Serializable {
      */
     private final HashMap<Integer, List<List<OfferPersonDTO>>> listOfSampleOffers = new HashMap<Integer, List<List<OfferPersonDTO>>>();//new ArrayList<>();
 
+    // Data Transfer
+    private Integer transferQueryId;
+    private Integer transferQueryToUserId;
+
     // END Collection Assostiations
     //---------------------------------
 
@@ -108,6 +111,10 @@ public class AdminDebugBean implements Serializable {
 
     public String getUserName(Integer id) {
         return users.get(id).getAuthName();
+    }
+
+    public HashMap<Integer, PersonRecord> getUser() {
+        return users;
     }
 
     public String restNegotiation(Integer id) {
@@ -132,6 +139,15 @@ public class AdminDebugBean implements Serializable {
                 users.put(personRecord.getId(), personRecord);
             }
         } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void transferRequest() {
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.transferQuery(config, transferQueryId, transferQueryToUserId);
+        } catch (SQLException e) {
+            System.err.println("3f0113dc7f4c-AdminDebugBean ERROR-NG-0000076: Error Transferring Request " + transferQueryId + " to user " + transferQueryToUserId + ".");
             e.printStackTrace();
         }
     }
@@ -245,4 +261,19 @@ public class AdminDebugBean implements Serializable {
         this.biobankWithOffer.put(queryId, biobankWithOffer);
     }
 
+    public Integer getTransferQueryId() {
+        return transferQueryId;
+    }
+
+    public void setTransferQueryId(Integer transferQueryId) {
+        this.transferQueryId = transferQueryId;
+    }
+
+    public Integer getTransferQueryToUserId() {
+        return transferQueryToUserId;
+    }
+
+    public void setTransferQueryToUserId(Integer transferQueryToUserId) {
+        this.transferQueryToUserId = transferQueryToUserId;
+    }
 }

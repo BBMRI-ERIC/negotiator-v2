@@ -481,6 +481,17 @@ public class DbUtil {
         }
     }
 
+    public static void transferQuery(Config config, Integer queryId, Integer researcherId) {
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Person researcher = getPersonDetails(config, researcherId);
+        config.dsl().update(Tables.QUERY)
+                .set(Tables.QUERY.RESEARCHER_ID, researcherId)
+                .set(Tables.QUERY.RESEARCHER_EMAIL, researcher.getAuthEmail())
+                .set(Tables.QUERY.RESEARCHER_NAME, researcher.getAuthName())
+                .set(Tables.QUERY.RESEARCHER_ORGANIZATION, researcher.getOrganization())
+                .where(Tables.QUERY.ID.eq(queryId))
+                .execute();
+    }
+
     /**
      * Insert query attachment name
      * @param queryId
