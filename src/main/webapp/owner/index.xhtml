@@ -81,6 +81,7 @@
                                 <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}" style="margin-left: 30px;" styleClass="detailLink">
                                     <f:param name="queryId" value="#{queryDto.query.id}"/>
                                     <f:param name="flag" value="#{ownerQueriesBean.flagFilter}"/>
+                                    <f:param name="testRequest" value="#{ownerQueriesBean.isTestRequest}"/>
                                     <h:outputText value="#{queryDto.query.title}"/>
                                 </h:link>
 
