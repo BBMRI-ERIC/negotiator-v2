@@ -1,6 +1,5 @@
 # Negotiator
-
-This is the BBMRI-ERIC negotiator.
+This is the BBMRI negotiator v2
 
 ## Getting Started
 
