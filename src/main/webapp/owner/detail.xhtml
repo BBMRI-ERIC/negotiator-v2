@@ -29,6 +29,7 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
@@ -97,6 +98,10 @@
                               style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
                               rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
+                    <style>
+                        #{ownerQueriesDetailBean.getCSSGrid()}
+                    </style>
+
                     <b>#{label['querydetail.owner.associatedbiobanks']}</b>
                     <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
                                var="biobank" varStatus="loop">
@@ -112,17 +117,18 @@
                                 <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                     <div class="card-body">
 
-                                        <div class="container" style="width: 100%;">
-                                            <div class="row">
+                                        <div class="container lifecycleContentArea" style="width: 100%;">
                                                 <!-- TODO: Collection table with select -->
                                                 <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
                                                            var="collectionStatus" varStatus="loop">
+                                                    <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id).indexOf(collectionStatus)}">
+
                                                     <bbmribiobankercc:lifecycleCollectionStatus
                                                                 collectionLifeCycleStatus="#{collectionStatus}"
                                                                 collectionId="#{collectionStatus.collectionId}"
                                                                 biobankId="#{biobank.id}" />
+                                                    </div>
                                                 </ui:repeat>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
