@@ -220,6 +220,19 @@
                     </style>
 
                     <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
+
+                    <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollections().keys}"
+                               var="collectionsKey" varStatus="loop">
+                        <div>
+                            #{collectionsKey}:
+                            <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollections()[collectionsKey]}"
+                                       var="collection" varStatus="loop">
+                                #{collection.collectionName}<br/>
+                            </ui:repeat>
+                            <hr/>
+                        </div>
+                    </ui:repeat>
+
                     <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.biobankIds}"
                                var="biobankId" varStatus="loop">
                         <div id="accordion">
@@ -241,7 +254,7 @@
                                                            var="collectionStatus" varStatus="loop">
                                                     <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId).indexOf(collectionStatus)}">
                                                     <h:form>
-                                                        <bbmriresearchercc:lifecycleCollectionStatus
+                                                        <bbmriresearchercc:
                                                                 collectionLifeCycleStatus="#{collectionStatus}"
                                                                 collectionId="#{collectionStatus.collectionId}"
                                                                 biobankId="#{biobankId}" />

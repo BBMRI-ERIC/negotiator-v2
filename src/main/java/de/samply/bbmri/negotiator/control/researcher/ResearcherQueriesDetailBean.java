@@ -166,6 +166,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private Integer biobankId;
     private String nextCollectionLifecycleStatusStatus;
     private String offer;
+    HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
 
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
@@ -238,6 +239,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
             requestLifeCycleStatus.initialise();
             requestLifeCycleStatus.initialiseCollectionStatus();
+            createCollectionListSortedByStatus();
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -250,6 +252,17 @@ public class ResearcherQueriesDetailBean implements Serializable {
         setJsTreeJson(ObjectToJson.getJsonTree(matchingBiobankCollection));
 
         return null;
+    }
+
+    private void createCollectionListSortedByStatus() {
+        for(Integer biobankIds : requestLifeCycleStatus.getBiobankIds()) {
+            for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
+                if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus() .getStatus())) {
+                    sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
+                }
+                sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
+            }
+        }
     }
 
     public String resubmitRequest() {
@@ -608,6 +621,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setBiobankId(Integer biobankId) {
         this.biobankId = biobankId;
+    }
+
+    public HashMap<String, List<CollectionLifeCycleStatus>> getSortedCollections() {
+        return sortedCollections;
     }
 
     public String getCSSGrid() {
