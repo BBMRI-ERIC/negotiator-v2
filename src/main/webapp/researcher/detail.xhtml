@@ -221,15 +221,34 @@
 
                     <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
 
-                    <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollections().keys}"
+                    <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsKeys()}"
                                var="collectionsKey" varStatus="loop">
-                        <div>
-                            #{collectionsKey}:
-                            <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollections()[collectionsKey]}"
-                                       var="collection" varStatus="loop">
-                                #{collection.collectionName}<br/>
-                            </ui:repeat>
-                            <hr/>
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header" id="headingTwo">
+                                    <h5 class="mb-0">
+                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{collectionsKey}" aria-expanded="false" aria-controls="collapseTwo">
+                                            #{collectionsKey}:
+                                        </button>
+                                    </h5>
+                                </div>
+                                <div id="collapseLifecycleBiobank#{collectionsKey}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <div class="container lifecycleContentArea">
+                                            <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
+                                                       var="collection" varStatus="loop">
+                                                <h:form>
+                                                    <bbmriresearchercc:lifecycleCollectionStatus
+                                                                collectionLifeCycleStatus="#{collection}"
+                                                                collectionId="#{collection.collectionId}"
+                                                                biobankId="#{-1}" />
+                                                </h:form>
+                                            </ui:repeat>
+                                            <hr/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </ui:repeat>
 
@@ -254,7 +273,7 @@
                                                            var="collectionStatus" varStatus="loop">
                                                     <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId).indexOf(collectionStatus)}">
                                                     <h:form>
-                                                        <bbmriresearchercc:
+                                                        <bbmriresearchercc:lifecycleCollectionStatus
                                                                 collectionLifeCycleStatus="#{collectionStatus}"
                                                                 collectionId="#{collectionStatus.collectionId}"
                                                                 biobankId="#{biobankId}" />

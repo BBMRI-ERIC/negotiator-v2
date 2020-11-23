@@ -257,10 +257,17 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private void createCollectionListSortedByStatus() {
         for(Integer biobankIds : requestLifeCycleStatus.getBiobankIds()) {
             for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
-                if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus() .getStatus())) {
-                    sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
+                if(collectionLifeCycleStatus.getStatus() == null) {
+                    if(!sortedCollections.containsKey("ERROR State")) {
+                        sortedCollections.put("ERROR State", new ArrayList<>());
+                    }
+                    sortedCollections.get("ERROR State").add(collectionLifeCycleStatus);
+                } else {
+                    if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus().getStatus())) {
+                        sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
+                    }
+                    sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
                 }
-                sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
             }
         }
     }
@@ -625,6 +632,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public HashMap<String, List<CollectionLifeCycleStatus>> getSortedCollections() {
         return sortedCollections;
+    }
+
+    public List<String> getSortedCollectionsKeys() {
+        return new ArrayList<String>(sortedCollections.keySet());
+    }
+
+    public List<CollectionLifeCycleStatus> getSortedCollectionsByKathegory(String key) {
+        return sortedCollections.get(key);
     }
 
     public String getCSSGrid() {
