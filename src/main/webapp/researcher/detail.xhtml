@@ -173,121 +173,7 @@
                 </h:panelGroup>
 
 
-                <h:panelGroup layout="block"
-                              style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
-                              rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}">
 
-                    <h:panelGroup style="display:none;">
-                        <h:form id="lifeCycleStatusBeanUpdateStatusForm" enctype="multipart/form-data">
-
-                            <h:inputText id="collectionId" value="#{researcherQueriesDetailBean.collectionId}"/>
-                            <h:inputText id="biobankId" value="#{researcherQueriesDetailBean.biobankId}"/>
-                            <h:inputText id="nextCollectionLifecycleStatusStatus" value="#{researcherQueriesDetailBean.nextCollectionLifecycleStatusStatus}"/>
-                            <h:inputText id="offer" value="#{researcherQueriesDetailBean.offer}"/>
-
-                            <h:commandButton style="" id="lifeCycleStatusBeanUpdateStatusFormLink"
-                                             action="#{researcherQueriesDetailBean.updateCollectionLifecycleStatus()}">
-                                <f:ajax execute="@form" render="@form" />
-                            </h:commandButton>
-                        </h:form>
-
-                        <script type="text/javascript" >
-                            function invokeCommandLink(collectionId, biobankId) {
-                                var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
-                                var offer = $("#offer" + collectionId).find("textarea").val();
-
-                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
-                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:offer").value = offer;
-
-                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
-                                document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
-
-                                var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
-                                jsfcommandButton.click();
-                            }
-
-                            function publicCommentReadUpdate(commentId) {
-                                var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
-                                document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
-                                document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
-                                updateCommentReadStatus[0].click();
-                            }
-                        </script>
-                    </h:panelGroup>
-
-                    <style>
-                        #{researcherQueriesDetailBean.getCSSGrid()}
-                    </style>
-
-                    <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
-
-                    <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsKeys()}"
-                               var="collectionsKey" varStatus="loop">
-                        <div id="accordion">
-                            <div class="card">
-                                <div class="card-header" id="headingTwo">
-                                    <h5 class="mb-0">
-                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{collectionsKey}" aria-expanded="false" aria-controls="collapseTwo">
-                                            #{collectionsKey}:
-                                        </button>
-                                    </h5>
-                                </div>
-                                <div id="collapseLifecycleBiobank#{collectionsKey}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                                    <div class="card-body">
-                                        <div class="container lifecycleContentArea">
-                                            <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
-                                                       var="collection" varStatus="loop">
-                                                <h:form>
-                                                    <bbmriresearchercc:lifecycleCollectionStatus
-                                                                collectionLifeCycleStatus="#{collection}"
-                                                                collectionId="#{collection.collectionId}"
-                                                                biobankId="#{-1}" />
-                                                </h:form>
-                                            </ui:repeat>
-                                            <hr/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ui:repeat>
-
-                    <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.biobankIds}"
-                               var="biobankId" varStatus="loop">
-                        <div id="accordion">
-                            <div class="card">
-                                <div class="card-header" id="headingTwo">
-                                    <h5 class="mb-0">
-                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobankId}" aria-expanded="false" aria-controls="collapseTwo">
-                                            #{researcherQueriesDetailBean.getBiobankNameFromCache(biobankId)}
-                                        </button>
-                                    </h5>
-                                </div>
-                                <div id="collapseLifecycleBiobank#{biobankId}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                                    <div class="card-body">
-
-                                        <div class="container lifecycleContentArea">
-                                            <!--<div class="row">-->
-                                                <!-- TODO: Collection table with select -->
-                                                <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId)}"
-                                                           var="collectionStatus" varStatus="loop">
-                                                    <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId).indexOf(collectionStatus)}">
-                                                    <h:form>
-                                                        <bbmriresearchercc:lifecycleCollectionStatus
-                                                                collectionLifeCycleStatus="#{collectionStatus}"
-                                                                collectionId="#{collectionStatus.collectionId}"
-                                                                biobankId="#{biobankId}" />
-                                                    </h:form>
-                                                    </div>
-                                                </ui:repeat>
-                                            </div>
-                                        <!--</div>-->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ui:repeat>
-                </h:panelGroup>
 
                 <h:outputScript>
                     function showConfirmDialog() {
@@ -355,16 +241,137 @@
 
                     <ul class="nav nav-tabs" id="myTab">
                         <li class="active" id="first"><a data-toggle="tab"
-                                                         href="#comments">#{label['querydetail.title.comments']}</a>
+                                                         href="#status">#{label['querydetail.title.status']}</a>
                         </li>
                         <li id="second"><a data-toggle="tab"
+                                                         href="#comments">#{label['querydetail.title.comments']}</a>
+                        </li>
+                        <li id="third"><a data-toggle="tab"
                                            href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
                         </li>
                     </ul>
 
                     <div class="tab-content">
+                        <div id="status" class="tab-pane fade in active">
+                            <h:panelGroup layout="block"
+                                          style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
+                                          rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}">
+
+                                <h:panelGroup style="display:none;">
+                                    <h:form id="lifeCycleStatusBeanUpdateStatusForm" enctype="multipart/form-data">
+
+                                        <h:inputText id="collectionId" value="#{researcherQueriesDetailBean.collectionId}"/>
+                                        <h:inputText id="biobankId" value="#{researcherQueriesDetailBean.biobankId}"/>
+                                        <h:inputText id="nextCollectionLifecycleStatusStatus" value="#{researcherQueriesDetailBean.nextCollectionLifecycleStatusStatus}"/>
+                                        <h:inputText id="offer" value="#{researcherQueriesDetailBean.offer}"/>
+
+                                        <h:commandButton style="" id="lifeCycleStatusBeanUpdateStatusFormLink"
+                                                         action="#{researcherQueriesDetailBean.updateCollectionLifecycleStatus()}">
+                                            <f:ajax execute="@form" render="@form" />
+                                        </h:commandButton>
+                                    </h:form>
+
+                                    <script type="text/javascript" >
+                                        function invokeCommandLink(collectionId, biobankId) {
+                                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
+                                            var offer = $("#offer" + collectionId).find("textarea").val();
+
+                                            document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
+                                            document.getElementById("lifeCycleStatusBeanUpdateStatusForm:offer").value = offer;
+
+                                            document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
+                                            document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
+
+                                            var jsfcommandButton = document.getElementById("lifeCycleStatusBeanUpdateStatusForm:lifeCycleStatusBeanUpdateStatusFormLink");
+                                            jsfcommandButton.click();
+                                        }
+
+                                        function publicCommentReadUpdate(commentId) {
+                                            var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
+                                            document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
+                                            document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
+                                            updateCommentReadStatus[0].click();
+                                        }
+                                    </script>
+                                </h:panelGroup>
+
+                                <style>
+                                    #{researcherQueriesDetailBean.getCSSGrid()}
+                                </style>
+
+                                <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
+
+                                <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsKeys()}"
+                                           var="collectionsKey" varStatus="loop">
+                                    <div id="accordion">
+                                        <div class="card">
+                                            <div class="card-header" id="headingTwo">
+                                                <h5 class="mb-0">
+                                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{collectionsKey}" aria-expanded="false" aria-controls="collapseTwo">
+                                                        #{collectionsKey}:
+                                                    </button>
+                                                </h5>
+                                            </div>
+                                            <div id="collapseLifecycleBiobank#{collectionsKey}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                                <div class="card-body">
+                                                    <div class="container lifecycleContentArea">
+                                                        <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
+                                                                   var="collection" varStatus="loop">
+                                                            <h:form>
+                                                                <bbmriresearchercc:lifecycleCollectionStatus
+                                                                        collectionLifeCycleStatus="#{collection}"
+                                                                        collectionId="#{collection.collectionId}"
+                                                                        biobankId="#{-1}" />
+                                                            </h:form>
+                                                        </ui:repeat>
+                                                        <hr/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ui:repeat>
+
+                                <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.biobankIds}"
+                                           var="biobankId" varStatus="loop">
+                                    <div id="accordion">
+                                        <div class="card">
+                                            <div class="card-header" id="headingTwo">
+                                                <h5 class="mb-0">
+                                                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobankId}" aria-expanded="false" aria-controls="collapseTwo">
+                                                        #{researcherQueriesDetailBean.getBiobankNameFromCache(biobankId)}
+                                                    </button>
+                                                </h5>
+                                            </div>
+                                            <div id="collapseLifecycleBiobank#{biobankId}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                                <div class="card-body">
+
+                                                    <div class="container lifecycleContentArea">
+                                                        <!--<div class="row">-->
+                                                        <!-- TODO: Collection table with select -->
+                                                        <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId)}"
+                                                                   var="collectionStatus" varStatus="loop">
+                                                            <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId).indexOf(collectionStatus)}">
+                                                                <h:form>
+                                                                    <bbmriresearchercc:lifecycleCollectionStatus
+                                                                            collectionLifeCycleStatus="#{collectionStatus}"
+                                                                            collectionId="#{collectionStatus.collectionId}"
+                                                                            biobankId="#{biobankId}" />
+                                                                </h:form>
+                                                            </div>
+                                                        </ui:repeat>
+                                                    </div>
+                                                    <!--</div>-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ui:repeat>
+                            </h:panelGroup>
+                        </div>
+
                         <!-- Comment Tab -->
-                        <div id="comments" class="tab-pane fade in active">
+                        <div id="comments" class="tab-pane fade">
 
                             <ui:repeat value="#{researcherQueriesDetailBean.comments}"
                                        var="comment">

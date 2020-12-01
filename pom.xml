@@ -34,17 +34,17 @@
         <version.samply.share.dto>4.0.0</version.samply.share.dto>
         <version.swagger.core>2.1.4</version.swagger.core>
 
-        <!--<database.server>negotiator-db</database.server>
+        <database.server>negotiator-db</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>saher</database.username>
-        <database.password>saher</database.password>-->
+        <database.password>saher</database.password>
 
-        <database.server>localhost</database.server>
+        <!--<database.server>localhost</database.server>
         <database.port>5434</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
-        <database.password>negotiator</database.password>
+        <database.password>negotiator</database.password>-->
 
         <!--<database.server>localhost</database.server>
         <database.port>5432</database.port>
