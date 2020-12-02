@@ -158,6 +158,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     private Integer maxNumberOfCollections = 0;
 
+    private int commentCount;
+    private int unreadCommentCount = 0;
+    private List<Person> personList;
+
     /**
      * Lifecycle Collection Data (Form, Structure)
      */
@@ -166,7 +170,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private Integer biobankId;
     private String nextCollectionLifecycleStatusStatus;
     private String offer;
-    HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
+    private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
 
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
@@ -215,6 +219,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             for (QueryStatsDTO query : getQueries()) {
                 if (query.getQuery().getId() == queryId) {
                     selectedQuery = query.getQuery();
+                    setCommentCountAndUreadCommentCount(query);
                 }
             }
 
@@ -233,6 +238,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
                 setHumanReadableQuery(queryDTO.getHumanReadable());
             }
+
+            setPersonListForRequest(config, selectedQuery.getId());
+
             /*
              * Initialize Lifecycle Status
              */
@@ -252,6 +260,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
         setJsTreeJson(ObjectToJson.getJsonTree(matchingBiobankCollection));
 
         return null;
+    }
+
+    private void setPersonListForRequest(Config config, Integer queryId) {
+        personList = DbUtil.getPersonsContactsForRequest(config, queryId);
     }
 
     private void createCollectionListSortedByStatus() {
@@ -369,6 +381,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
             System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
             e.printStackTrace();
         }
+    }
+
+    private void setCommentCountAndUreadCommentCount(QueryStatsDTO query) {
+        commentCount = query.getCommentCount();
+        unreadCommentCount = query.getUnreadCommentCount();
     }
 
     /*
@@ -806,5 +823,29 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return_value.append(classes_css);
 
         return return_value.toString();
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    public int getUnreadCommentCount() {
+        return unreadCommentCount;
+    }
+
+    public void setUnreadCommentCount(int unreadCommentCount) {
+        this.unreadCommentCount = unreadCommentCount;
+    }
+
+    public List<Person> getPersonList() {
+        return personList;
+    }
+
+    public void setPersonList(List<Person> personList) {
+        this.personList = personList;
     }
 }
