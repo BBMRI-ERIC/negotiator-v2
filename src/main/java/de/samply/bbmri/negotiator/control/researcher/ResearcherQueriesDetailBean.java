@@ -160,6 +160,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     private int commentCount;
     private int unreadCommentCount = 0;
+    private int privateNegotiationCount;
+    private int unreadPrivateNegotiationCount = 0;
     private List<Person> personList;
 
     /**
@@ -374,9 +376,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId());
+            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
             queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+            queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
         } catch (SQLException e) {
             System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
             e.printStackTrace();
@@ -386,6 +389,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private void setCommentCountAndUreadCommentCount(QueryStatsDTO query) {
         commentCount = query.getCommentCount();
         unreadCommentCount = query.getUnreadCommentCount();
+        privateNegotiationCount = query.getPrivateNegotiationCount();
+        unreadPrivateNegotiationCount = query.getUnreadPrivateNegotiationCount();
     }
 
     /*
@@ -847,5 +852,21 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setPersonList(List<Person> personList) {
         this.personList = personList;
+    }
+
+    public int getPrivateNegotiationCount() {
+        return privateNegotiationCount;
+    }
+
+    public void setPrivateNegotiationCount(int privateNegotiationCount) {
+        this.privateNegotiationCount = privateNegotiationCount;
+    }
+
+    public int getUnreadPrivateNegotiationCount() {
+        return unreadPrivateNegotiationCount;
+    }
+
+    public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
+        this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
     }
 }

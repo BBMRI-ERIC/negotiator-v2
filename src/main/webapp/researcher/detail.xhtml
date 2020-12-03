@@ -61,6 +61,10 @@
                 border: 1px solid #ec6707;
                 border-bottom-color: transparent;
             }
+
+            .nav-tabs > li > a {
+                border: 1px solid #ec6707;
+            }
         </style>
 
         <h:panelGroup layout="block" styleClass="col-md-3 left-panel">
@@ -267,7 +271,7 @@
                             <a data-toggle="tab" href="#comments">
                                 #{label['querydetail.title.comments']}
                                 <div class="badge queryNumberResponsesBadge pull-right"
-                                     style='margin-left: 4px;#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }#{researcherQueriesDetailBean.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                                     style='margin-left: 4px;#{researcherQueriesDetailBean.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
                                      data-toggle="tooltip"
                                      data-placement="bottom"
                                      title="#{researcherQueriesDetailBean.unreadCommentCount} unread comments from #{researcherQueriesDetailBean.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
@@ -277,8 +281,19 @@
                                 </div>
                             </a>
                         </li>
-                        <li id="third"><a data-toggle="tab"
-                                           href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
+                        <li id="third">
+                            <a data-toggle="tab" href="#sampleAvailability">
+                                #{label['querydetail.title.privateNegotiation']}
+                                <div class="badge queryNumberResponsesBadge pull-right"
+                                     style='margin-left: 4px;#{researcherQueriesDetailBean.unreadPrivateNegotiationCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                                     data-toggle="tooltip"
+                                     data-placement="bottom"
+                                     title="#{researcherQueriesDetailBean.unreadPrivateNegotiationCount} unread comments from #{researcherQueriesDetailBean.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+
+                                    <i class="glyphicon glyphicon-tower"></i>
+                                    <h:outputText value="   #{researcherQueriesDetailBean.unreadPrivateNegotiationCount}/#{researcherQueriesDetailBean.privateNegotiationCount}" />
+                                </div>
+                            </a>
                         </li>
                     </ul>
 

@@ -1869,11 +1869,16 @@ public class DbUtil {
         return result;
     }
 
-    public static Result<Record> getPrivateNegotiationCountAndTimeForResearcher(Config config, Integer queryId){
+    public static Result<Record> getPrivateNegotiationCountAndTimeForResearcher(Config config, Integer queryId, Integer personId){
         Result<Record> result = config.dsl()
                 .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .select(Tables.PERSON_OFFER.READ.count().as("unread_private_negotiation_count"))
                 .from(Tables.OFFER)
+                .leftOuterJoin(Tables.PERSON_OFFER)
+                    .on(Tables.PERSON_OFFER.OFFER_ID.eq(Tables.OFFER.ID)
+                            .and(Tables.PERSON_OFFER.PERSON_ID.eq(personId))
+                            .and(Tables.PERSON_OFFER.READ.eq(false)))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.STATUS.eq("published"))
                 .fetch();
