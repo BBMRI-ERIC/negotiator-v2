@@ -272,10 +272,10 @@ public class ResearcherQueriesDetailBean implements Serializable {
         for(Integer biobankIds : requestLifeCycleStatus.getBiobankIds()) {
             for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
                 if(collectionLifeCycleStatus.getStatus() == null) {
-                    if(!sortedCollections.containsKey("ERROR State")) {
-                        sortedCollections.put("ERROR State", new ArrayList<>());
+                    if(!sortedCollections.containsKey("ERRORState")) {
+                        sortedCollections.put("ERRORState", new ArrayList<>());
                     }
-                    sortedCollections.get("ERROR State").add(collectionLifeCycleStatus);
+                    sortedCollections.get("ERRORState").add(collectionLifeCycleStatus);
                 } else {
                     if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus().getStatus())) {
                         sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
