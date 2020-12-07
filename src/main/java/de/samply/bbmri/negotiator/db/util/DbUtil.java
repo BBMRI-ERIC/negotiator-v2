@@ -38,6 +38,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
@@ -990,6 +991,36 @@ public class DbUtil {
         updateCommentReadForUser(config, commenterId, commentId);
     }
 
+    public static void addOfferCommentReadForComment(Config config, Integer offertId, Integer commenterId, Integer biobankId) {
+        config.dsl().resultQuery("INSERT INTO public.person_offer (person_id, offer_id, read) " +
+                "(SELECT person_id, " + offertId + ", false FROM " +
+                "((SELECT pc.person_id person_id " +
+                "FROM public.collection c " +
+                "JOIN person_collection pc ON pc.collection_id = c.id " +
+                "WHERE c.biobank_id = " + biobankId + ") " +
+                "UNION " +
+                "(SELECT q.researcher_id person_id " +
+                "FROM public.offer com " +
+                "JOIN query q ON com.query_id = q.id " +
+                "WHERE com.id = " + offertId + ")) sub " +
+                "GROUP BY person_id)").execute();
+
+        updateOfferCommentReadForUser(config, commenterId, offertId);
+    }
+
+    public static void updateOfferCommentReadForUser(Config config, Integer userId, Integer offertId) {
+        PersonOfferRecord record = config.dsl().selectFrom(Tables.PERSON_OFFER)
+                .where(Tables.PERSON_OFFER.OFFER_ID.eq(offertId))
+                .and(Tables.PERSON_OFFER.PERSON_ID.eq(userId))
+                .fetchOne();
+
+        if(record != null && !record.getRead()) {
+            record.setRead(true);
+            record.setDateRead(new Timestamp(new Date().getTime()));
+            record.update();
+        }
+    }
+
     /**
      * Adds an offer comment for the given queryId, personId, offerFrom with the given text.
      * @param config
@@ -1819,26 +1850,43 @@ public class DbUtil {
      * @param queryId
      * @return target
      */
-    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer biobankInPrivateChat) {
-        Result<Record> result = config.dsl()
+    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer biobankInPrivateChat, int personId) {
+        Result<Record> offerPersons = config.dsl()
                 .select(getFields(Tables.OFFER, "offer"))
                 .select(getFields(Tables.PERSON, "person"))
                 .select(getFields(Tables.COLLECTION, "collection"))
+                .select(getFields(Tables.PERSON_OFFER, "personoffer"))
                 .from(Tables.OFFER)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.OFFER.PERSON_ID.eq(Tables.PERSON.ID))
                 .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
                 .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .leftOuterJoin(Tables.PERSON_OFFER).on(Tables.PERSON_OFFER.OFFER_ID.eq(Tables.OFFER.ID)).and(Tables.PERSON_OFFER.PERSON_ID.eq(personId))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT.eq(biobankInPrivateChat))
                 .and(Tables.OFFER.STATUS.eq("published"))
                 .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
 
+        List<OfferPersonDTO> result = new ArrayList<>();
+
+        for(Record record : offerPersons) {
+            OfferPersonDTO offerPersonDTO = new OfferPersonDTO();
+            offerPersonDTO.setOffer(config.map(record, Offer.class));
+            offerPersonDTO.getOffer().setId(Integer.parseInt(record.getValue("offer_id").toString()));
+            offerPersonDTO.setPerson(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            offerPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
+            offerPersonDTO.setCommentRead(record.getValue("personoffer_read") == null || (boolean) record.getValue("personoffer_read"));
+            result.add(offerPersonDTO);
+        }
+
+        return result;
+
+        /**
         List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
 
         List<OfferPersonDTO> target = new ArrayList<>();
-        /**
+
          * Now we have to do weird things, grouping them together manually
-         */
+
         HashMap<Integer, OfferPersonDTO> mapped = new HashMap<>();
 
         for(OfferPersonDTO dto : map) {
@@ -1853,7 +1901,7 @@ public class DbUtil {
                     mapped.get(dto.getOffer().getId()).getCollections().add(dto.getCollection());
             }
         }
-        return target;
+        return target;*/
     }
 
     public static Result<Record> getCommentCountAndTime(Config config, Integer queryId){

@@ -184,7 +184,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
             for (int i = 0; i < biobankWithOffer.size(); ++i) {
                 List<OfferPersonDTO> offerPersonDTO;
-                offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i));
+                offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i), userBean.getUserId());
                 listOfSampleOffers.add(offerPersonDTO);
             }
 

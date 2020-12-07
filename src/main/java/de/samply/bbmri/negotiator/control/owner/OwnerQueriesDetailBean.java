@@ -182,7 +182,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId()));
+				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId(), userBean.getUserId()));
 			}
 
             /**
