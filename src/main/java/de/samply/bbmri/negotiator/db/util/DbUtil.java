@@ -1880,7 +1880,7 @@ public class DbUtil {
 
         return result;
 
-        /**
+        /*
         List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
 
         List<OfferPersonDTO> target = new ArrayList<>();

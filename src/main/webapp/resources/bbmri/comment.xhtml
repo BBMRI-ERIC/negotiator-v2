@@ -58,7 +58,7 @@
             <h:commandButton value="Ajax Submit"
                              styleClass="updateCommentReadForComment#{cc.attrs.comment.id}"
                              id="updateCommentReadForComment#{cc.attrs.comment.id}"
-                             action="#{commentBean.markCommentReadForUser(userBean.person.id, cc.attrs.comment.id, cc.attrs.commentRead)}">
+                             action="#{cc.attrs.commentComponent.markCommentReadForUser(userBean.person.id, cc.attrs.comment.id, cc.attrs.commentRead)}">
                 <f:ajax execute="@this" render="@form" />
             </h:commandButton>
         </h:form>

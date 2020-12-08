@@ -138,6 +138,17 @@ public class OfferBean implements Serializable {
                 + "?includeViewParams=true&faces-redirect=true";
     }
 
+    public void markCommentReadForUser(Integer userId, Integer offerId, boolean commentRead) {
+        if(commentRead) {
+            return;
+        }
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.updateOfferCommentReadForUser(config, userId, offerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public UserBean getUserBean() {
         return userBean;
     }
