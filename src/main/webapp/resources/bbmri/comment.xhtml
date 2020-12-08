@@ -79,7 +79,6 @@
             <!-- Date of comment -->
             <h:panelGroup styleClass="pull-right">
                 <h:form id="deleteComment" enctype="multipart/form-data">
-                    -#{cc.attrs.commentRead}-
 
                     <span class="btn btn-default updateCommentReadForCommentShowMarkAsReadButton#{cc.attrs.comment.id}" style="margin-top: -6px;#{cc.attrs.commentRead ? 'display:none;': ''}" onclick="publicCommentReadUpdate('#{cc.attrs.comment.id}');">
                         Mark as read
