@@ -950,6 +950,9 @@ public class DbUtil {
                         .select(getFields(Tables.COLLECTION, "collection"))
                         .from(Tables.PERSON_COLLECTION)
                         .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                        .join(Tables.QUERY_COLLECTION)
+                            .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                                .and(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                         .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
                         .fetch();
                 personCollections.put(commenterId, config.map(collections, Collection.class));
@@ -1854,12 +1857,9 @@ public class DbUtil {
         Result<Record> offerPersons = config.dsl()
                 .select(getFields(Tables.OFFER, "offer"))
                 .select(getFields(Tables.PERSON, "person"))
-                .select(getFields(Tables.COLLECTION, "collection"))
                 .select(getFields(Tables.PERSON_OFFER, "personoffer"))
                 .from(Tables.OFFER)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.OFFER.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .leftOuterJoin(Tables.PERSON_OFFER).on(Tables.PERSON_OFFER.OFFER_ID.eq(Tables.OFFER.ID)).and(Tables.PERSON_OFFER.PERSON_ID.eq(personId))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT.eq(biobankInPrivateChat))
@@ -1867,6 +1867,7 @@ public class DbUtil {
                 .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
 
         List<OfferPersonDTO> result = new ArrayList<>();
+        HashMap<Integer, List<Collection>> personCollections = new HashMap<>();
 
         for(Record record : offerPersons) {
             OfferPersonDTO offerPersonDTO = new OfferPersonDTO();
@@ -1875,6 +1876,20 @@ public class DbUtil {
             offerPersonDTO.setPerson(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
             offerPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
             offerPersonDTO.setCommentRead(record.getValue("personoffer_read") == null || (boolean) record.getValue("personoffer_read"));
+            Integer commenterId = offerPersonDTO.getPerson().getId();
+            if(!personCollections.containsKey(commenterId)) {
+                Result<Record> collections = config.dsl()
+                        .select(getFields(Tables.COLLECTION, "collection"))
+                        .from(Tables.PERSON_COLLECTION)
+                        .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                        .join(Tables.QUERY_COLLECTION)
+                            .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                                .and(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                        .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
+                        .fetch();
+                personCollections.put(commenterId, config.map(collections, Collection.class));
+            }
+            offerPersonDTO.setCollections(personCollections.get(commenterId));
             result.add(offerPersonDTO);
         }
 
