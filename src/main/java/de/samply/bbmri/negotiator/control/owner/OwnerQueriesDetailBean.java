@@ -59,6 +59,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
@@ -150,6 +151,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private final DataCache dataCache = DataCache.getInstance();
 
+	private int commentCount;
+	private int unreadCommentCount = 0;
+	private int privateNegotiationCount;
+	private int unreadPrivateNegotiationCount = 0;
+
 	/**
 	 * Lifecycle Collection Data (Form, Structure)
 	 */
@@ -185,14 +191,15 @@ public class OwnerQueriesDetailBean implements Serializable {
 				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId(), userBean.getUserId()));
 			}
 
-            /**
-             * Get the selected(clicked on) query from the list of queries for the owner
-             */
-            for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
-            	if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
-            		selectedQuery = ownerQueryStatsDTO.getQuery();
-            	}
-            }
+			/**
+			 * Get the selected(clicked on) query from the list of queries for the owner
+			 */
+			for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
+				if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
+					selectedQuery = ownerQueryStatsDTO.getQuery();
+					setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
+				}
+			}
 
             if(selectedQuery != null) {
 				RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
@@ -300,7 +307,12 @@ public class OwnerQueriesDetailBean implements Serializable {
         }
     }
 
-
+	private void setCommentCountAndUreadCommentCount(QueryStatsDTO query) {
+		commentCount = query.getCommentCount();
+		unreadCommentCount = query.getUnreadCommentCount();
+		privateNegotiationCount = query.getPrivateNegotiationCount();
+		unreadPrivateNegotiationCount = query.getUnreadPrivateNegotiationCount();
+	}
 
 	/**
      * Sorts the queries such that the archived ones appear at the end.
@@ -951,5 +963,37 @@ public class OwnerQueriesDetailBean implements Serializable {
 		return_value.append(classes_css);
 
 		return return_value.toString();
+	}
+
+	public int getCommentCount() {
+		return commentCount;
+	}
+
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
+	}
+
+	public int getUnreadCommentCount() {
+		return unreadCommentCount;
+	}
+
+	public void setUnreadCommentCount(int unreadCommentCount) {
+		this.unreadCommentCount = unreadCommentCount;
+	}
+
+	public int getPrivateNegotiationCount() {
+		return privateNegotiationCount;
+	}
+
+	public void setPrivateNegotiationCount(int privateNegotiationCount) {
+		this.privateNegotiationCount = privateNegotiationCount;
+	}
+
+	public int getUnreadPrivateNegotiationCount() {
+		return unreadPrivateNegotiationCount;
+	}
+
+	public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
+		this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
 	}
 }
