@@ -59,6 +59,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
@@ -150,6 +151,15 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private final DataCache dataCache = DataCache.getInstance();
 
+	private int commentCount;
+	private int unreadCommentCount = 0;
+	private int privateNegotiationCount;
+	private int unreadPrivateNegotiationCount = 0;
+
+	private List<Person> personList;
+
+	private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
+
 	/**
 	 * Lifecycle Collection Data (Form, Structure)
 	 */
@@ -182,17 +192,18 @@ public class OwnerQueriesDetailBean implements Serializable {
 			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId()));
+				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId(), userBean.getUserId()));
 			}
 
-            /**
-             * Get the selected(clicked on) query from the list of queries for the owner
-             */
-            for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
-            	if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
-            		selectedQuery = ownerQueryStatsDTO.getQuery();
-            	}
-            }
+			/**
+			 * Get the selected(clicked on) query from the list of queries for the owner
+			 */
+			for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
+				if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
+					selectedQuery = ownerQueryStatsDTO.getQuery();
+					setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
+				}
+			}
 
             if(selectedQuery != null) {
 				RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
@@ -232,12 +243,16 @@ public class OwnerQueriesDetailBean implements Serializable {
 					return null;
 				}
             }
+
+			setPersonListForRequest(config, selectedQuery.getId());
+
             /*
              * Initialize Lifecycle Status
              */
 			requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
 			requestLifeCycleStatus.initialise();
 			requestLifeCycleStatus.initialiseCollectionStatus();
+			createCollectionListSortedByStatus();
 
 			for(BiobankRecord biobankRecord : associatedBiobanks) {
 				int bbcolsize = requestLifeCycleStatus.getCollectionsForBiobank(biobankRecord.getId()).size();
@@ -251,6 +266,28 @@ public class OwnerQueriesDetailBean implements Serializable {
         }
 
         return null;
+	}
+
+	private void setPersonListForRequest(Config config, Integer queryId) {
+		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+	}
+
+	private void createCollectionListSortedByStatus() {
+		for(Integer biobankIds : requestLifeCycleStatus.getBiobankIds()) {
+			for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
+				if(collectionLifeCycleStatus.getStatus() == null) {
+					if(!sortedCollections.containsKey("ERRORState")) {
+						sortedCollections.put("ERRORState", new ArrayList<>());
+					}
+					sortedCollections.get("ERRORState").add(collectionLifeCycleStatus);
+				} else {
+					if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus().getStatus())) {
+						sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
+					}
+					sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
+				}
+			}
+		}
 	}
 
     /**
@@ -300,7 +337,12 @@ public class OwnerQueriesDetailBean implements Serializable {
         }
     }
 
-
+	private void setCommentCountAndUreadCommentCount(QueryStatsDTO query) {
+		commentCount = query.getCommentCount();
+		unreadCommentCount = query.getUnreadCommentCount();
+		privateNegotiationCount = query.getPrivateNegotiationCount();
+		unreadPrivateNegotiationCount = query.getUnreadPrivateNegotiationCount();
+	}
 
 	/**
      * Sorts the queries such that the archived ones appear at the end.
@@ -389,6 +431,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
 			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+			queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
 		} catch (SQLException e) {
 			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
 			e.printStackTrace();
@@ -951,5 +994,57 @@ public class OwnerQueriesDetailBean implements Serializable {
 		return_value.append(classes_css);
 
 		return return_value.toString();
+	}
+
+	public int getCommentCount() {
+		return commentCount;
+	}
+
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
+	}
+
+	public int getUnreadCommentCount() {
+		return unreadCommentCount;
+	}
+
+	public void setUnreadCommentCount(int unreadCommentCount) {
+		this.unreadCommentCount = unreadCommentCount;
+	}
+
+	public int getPrivateNegotiationCount() {
+		return privateNegotiationCount;
+	}
+
+	public void setPrivateNegotiationCount(int privateNegotiationCount) {
+		this.privateNegotiationCount = privateNegotiationCount;
+	}
+
+	public int getUnreadPrivateNegotiationCount() {
+		return unreadPrivateNegotiationCount;
+	}
+
+	public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
+		this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
+	}
+
+	public List<Person> getPersonList() {
+		return personList;
+	}
+
+	public void setPersonList(List<Person> personList) {
+		this.personList = personList;
+	}
+
+	public HashMap<String, List<CollectionLifeCycleStatus>> getSortedCollections() {
+		return sortedCollections;
+	}
+
+	public List<String> getSortedCollectionsKeys() {
+		return new ArrayList<String>(sortedCollections.keySet());
+	}
+
+	public List<CollectionLifeCycleStatus> getSortedCollectionsByKathegory(String key) {
+		return sortedCollections.get(key);
 	}
 }

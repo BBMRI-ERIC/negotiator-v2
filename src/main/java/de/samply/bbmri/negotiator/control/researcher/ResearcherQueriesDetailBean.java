@@ -158,6 +158,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     private Integer maxNumberOfCollections = 0;
 
+    private int commentCount;
+    private int unreadCommentCount = 0;
+    private int privateNegotiationCount;
+    private int unreadPrivateNegotiationCount = 0;
+    private List<Person> personList;
+
     /**
      * Lifecycle Collection Data (Form, Structure)
      */
@@ -166,6 +172,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private Integer biobankId;
     private String nextCollectionLifecycleStatusStatus;
     private String offer;
+    private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
 
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
@@ -177,7 +184,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
             for (int i = 0; i < biobankWithOffer.size(); ++i) {
                 List<OfferPersonDTO> offerPersonDTO;
-                offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i));
+                offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i), userBean.getUserId());
                 listOfSampleOffers.add(offerPersonDTO);
             }
 
@@ -214,6 +221,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             for (QueryStatsDTO query : getQueries()) {
                 if (query.getQuery().getId() == queryId) {
                     selectedQuery = query.getQuery();
+                    setCommentCountAndUreadCommentCount(query);
                 }
             }
 
@@ -232,12 +240,16 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
                 setHumanReadableQuery(queryDTO.getHumanReadable());
             }
+
+            setPersonListForRequest(config, selectedQuery.getId());
+
             /*
              * Initialize Lifecycle Status
              */
             requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
             requestLifeCycleStatus.initialise();
             requestLifeCycleStatus.initialiseCollectionStatus();
+            createCollectionListSortedByStatus();
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -250,6 +262,28 @@ public class ResearcherQueriesDetailBean implements Serializable {
         setJsTreeJson(ObjectToJson.getJsonTree(matchingBiobankCollection));
 
         return null;
+    }
+
+    private void setPersonListForRequest(Config config, Integer queryId) {
+        personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+    }
+
+    private void createCollectionListSortedByStatus() {
+        for(Integer biobankIds : requestLifeCycleStatus.getBiobankIds()) {
+            for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
+                if(collectionLifeCycleStatus.getStatus() == null) {
+                    if(!sortedCollections.containsKey("ERRORState")) {
+                        sortedCollections.put("ERRORState", new ArrayList<>());
+                    }
+                    sortedCollections.get("ERRORState").add(collectionLifeCycleStatus);
+                } else {
+                    if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus().getStatus())) {
+                        sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
+                    }
+                    sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
+                }
+            }
+        }
     }
 
     public String resubmitRequest() {
@@ -342,13 +376,21 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId());
+            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
             queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+            queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
         } catch (SQLException e) {
             System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
             e.printStackTrace();
         }
+    }
+
+    private void setCommentCountAndUreadCommentCount(QueryStatsDTO query) {
+        commentCount = query.getCommentCount();
+        unreadCommentCount = query.getUnreadCommentCount();
+        privateNegotiationCount = query.getPrivateNegotiationCount();
+        unreadPrivateNegotiationCount = query.getUnreadPrivateNegotiationCount();
     }
 
     /*
@@ -610,6 +652,18 @@ public class ResearcherQueriesDetailBean implements Serializable {
         this.biobankId = biobankId;
     }
 
+    public HashMap<String, List<CollectionLifeCycleStatus>> getSortedCollections() {
+        return sortedCollections;
+    }
+
+    public List<String> getSortedCollectionsKeys() {
+        return new ArrayList<String>(sortedCollections.keySet());
+    }
+
+    public List<CollectionLifeCycleStatus> getSortedCollectionsByKathegory(String key) {
+        return sortedCollections.get(key);
+    }
+
     public String getCSSGrid() {
         StringBuilder contacted = new StringBuilder();
         StringBuilder interested = new StringBuilder();
@@ -774,5 +828,45 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return_value.append(classes_css);
 
         return return_value.toString();
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    public int getUnreadCommentCount() {
+        return unreadCommentCount;
+    }
+
+    public void setUnreadCommentCount(int unreadCommentCount) {
+        this.unreadCommentCount = unreadCommentCount;
+    }
+
+    public List<Person> getPersonList() {
+        return personList;
+    }
+
+    public void setPersonList(List<Person> personList) {
+        this.personList = personList;
+    }
+
+    public int getPrivateNegotiationCount() {
+        return privateNegotiationCount;
+    }
+
+    public void setPrivateNegotiationCount(int privateNegotiationCount) {
+        this.privateNegotiationCount = privateNegotiationCount;
+    }
+
+    public int getUnreadPrivateNegotiationCount() {
+        return unreadPrivateNegotiationCount;
+    }
+
+    public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
+        this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
     }
 }
