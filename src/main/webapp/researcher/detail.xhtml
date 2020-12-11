@@ -494,6 +494,12 @@
 
                         </div>
 
+                        <style>
+                            .showUnreadMarkerOnBiobank {
+                                display: none;
+                            }
+                        </style>
+
                         <!-- Private Negotiation -->
                         <div id="sampleAvailability" class="tab-pane fade">
                             <div>
@@ -534,6 +540,14 @@
                             </c:if>
                             </c:forEach>
 
+                            <script type="text/javascript">
+                                function onLoadShowNotificationsOnBiobank(biobankName, commentRead) {
+                                    if(commentRead == "false") {
+                                        document.getElementById("biobankNotificationClass"+biobankName).classList.remove("showUnreadMarkerOnBiobank");
+                                    }
+                                }
+                            </script>
+
                             <c:forEach begin="1" end="#{researcherQueriesDetailBean.biobankWithOffer.size()}" var="i">
 
                                 <div class="panel panel-default deco-none" >
@@ -545,6 +559,7 @@
                                                     <c:set var="biobankName" value="#{researcherQueriesDetailBean.getBiobankNameFromCache(researcherQueriesDetailBean.biobankWithOffer.get(i-1))}"/>
                                                 </c:if>
                                                 <a>#{biobankName}</a>
+                                                <span id='biobankNotificationClass#{biobankName.replaceAll(" ", "")}' class='glyphicon glyphicon-envelope showUnreadMarkerOnBiobank' style="margin:0 0 0 15px;"></span>
                                             </h4>
                                           </div>
 
@@ -565,6 +580,10 @@
                                             <ui:repeat
                                                     value="#{researcherQueriesDetailBean.listOfSampleOffers[i-1]}"
                                                     var="offers">
+
+                                                <h:outputScript>
+                                                    window.onload = onLoadShowNotificationsOnBiobank("#{biobankName.replaceAll(" ", "")}", "#{offers.commentRead}");
+                                                </h:outputScript>
 
                                                 <bbmricc:comment comment="#{offers.offer}"
                                                                  person="#{offers.person}"

@@ -1894,29 +1894,6 @@ public class DbUtil {
         }
 
         return result;
-
-        /*
-        List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
-
-        List<OfferPersonDTO> target = new ArrayList<>();
-
-         * Now we have to do weird things, grouping them together manually
-
-        HashMap<Integer, OfferPersonDTO> mapped = new HashMap<>();
-
-        for(OfferPersonDTO dto : map) {
-            if(!mapped.containsKey(dto.getOffer().getId())) {
-                mapped.put(dto.getOffer().getId(), dto);
-
-                if(dto.getCollection() != null) {
-                    dto.getCollections().add(dto.getCollection());
-                }
-                target.add(dto);
-            } else if(dto.getCollection() != null) {
-                    mapped.get(dto.getOffer().getId()).getCollections().add(dto.getCollection());
-            }
-        }
-        return target;*/
     }
 
     public static Result<Record> getCommentCountAndTime(Config config, Integer queryId){
