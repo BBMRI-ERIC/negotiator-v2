@@ -156,6 +156,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private int privateNegotiationCount;
 	private int unreadPrivateNegotiationCount = 0;
 
+	private List<Person> personList;
+
+	private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
+
 	/**
 	 * Lifecycle Collection Data (Form, Structure)
 	 */
@@ -239,12 +243,16 @@ public class OwnerQueriesDetailBean implements Serializable {
 					return null;
 				}
             }
+
+			setPersonListForRequest(config, selectedQuery.getId());
+
             /*
              * Initialize Lifecycle Status
              */
 			requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
 			requestLifeCycleStatus.initialise();
 			requestLifeCycleStatus.initialiseCollectionStatus();
+			createCollectionListSortedByStatus();
 
 			for(BiobankRecord biobankRecord : associatedBiobanks) {
 				int bbcolsize = requestLifeCycleStatus.getCollectionsForBiobank(biobankRecord.getId()).size();
@@ -258,6 +266,28 @@ public class OwnerQueriesDetailBean implements Serializable {
         }
 
         return null;
+	}
+
+	private void setPersonListForRequest(Config config, Integer queryId) {
+		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+	}
+
+	private void createCollectionListSortedByStatus() {
+		for(Integer biobankIds : requestLifeCycleStatus.getBiobankIds()) {
+			for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
+				if(collectionLifeCycleStatus.getStatus() == null) {
+					if(!sortedCollections.containsKey("ERRORState")) {
+						sortedCollections.put("ERRORState", new ArrayList<>());
+					}
+					sortedCollections.get("ERRORState").add(collectionLifeCycleStatus);
+				} else {
+					if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus().getStatus())) {
+						sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
+					}
+					sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
+				}
+			}
+		}
 	}
 
     /**
@@ -401,6 +431,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
 			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+			queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
 		} catch (SQLException e) {
 			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
 			e.printStackTrace();
@@ -995,5 +1026,25 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
 		this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
+	}
+
+	public List<Person> getPersonList() {
+		return personList;
+	}
+
+	public void setPersonList(List<Person> personList) {
+		this.personList = personList;
+	}
+
+	public HashMap<String, List<CollectionLifeCycleStatus>> getSortedCollections() {
+		return sortedCollections;
+	}
+
+	public List<String> getSortedCollectionsKeys() {
+		return new ArrayList<String>(sortedCollections.keySet());
+	}
+
+	public List<CollectionLifeCycleStatus> getSortedCollectionsByKathegory(String key) {
+		return sortedCollections.get(key);
 	}
 }

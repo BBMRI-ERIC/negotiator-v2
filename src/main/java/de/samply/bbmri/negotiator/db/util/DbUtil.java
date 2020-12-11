@@ -815,8 +815,26 @@ public class DbUtil {
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
+        //List<OwnerQueryStatsDTO> t1 = config.map(fetch, OwnerQueryStatsDTO.class);
+        //List<OwnerQueryStatsDTO> t2 = mapRecordResultOwnerQueryStatsDTOList(config, fetch);
 
-		return config.map(fetch, OwnerQueryStatsDTO.class);
+		//return config.map(fetch, OwnerQueryStatsDTO.class);
+        return mapRecordResultOwnerQueryStatsDTOList(config, fetch);
+    }
+
+    private static List<OwnerQueryStatsDTO> mapRecordResultOwnerQueryStatsDTOList(Config config, Result<Record> records) {
+        List<OwnerQueryStatsDTO> result = new ArrayList<OwnerQueryStatsDTO>();
+        for(Record record : records) {
+            OwnerQueryStatsDTO ownerQueryStatsDTO = new OwnerQueryStatsDTO();
+            ownerQueryStatsDTO.setQuery(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class));
+            ownerQueryStatsDTO.setQueryAuthor(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            ownerQueryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
+            ownerQueryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
+            ownerQueryStatsDTO.setFlag((Flag) record.getValue("flag"));
+            ownerQueryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
+            result.add(ownerQueryStatsDTO);
+        }
+        return result;
     }
 
 
@@ -1929,10 +1947,15 @@ public class DbUtil {
         Result<Record> result = config.dsl()
                 .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .select(Tables.PERSON_OFFER.READ.count().as("unread_private_negotiation_count"))
                 .from(Tables.OFFER)
                 .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT))
                 .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
                 .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .leftOuterJoin(Tables.PERSON_OFFER)
+                    .on(Tables.PERSON_OFFER.OFFER_ID.eq(Tables.OFFER.ID)
+                        .and(Tables.PERSON_OFFER.PERSON_ID.eq(personId))
+                        .and(Tables.PERSON_OFFER.READ.eq(false)))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.STATUS.eq("published"))
                 .and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId)).fetch();
