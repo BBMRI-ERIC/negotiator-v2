@@ -59,6 +59,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
@@ -150,9 +151,19 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private final DataCache dataCache = DataCache.getInstance();
 
+	private int commentCount;
+	private int unreadCommentCount = 0;
+	private int privateNegotiationCount;
+	private int unreadPrivateNegotiationCount = 0;
+
+	private List<Person> personList;
+
+	private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
+
 	/**
 	 * Lifecycle Collection Data (Form, Structure)
 	 */
+	private Integer maxNumberOfCollections = 0;
 	private RequestLifeCycleStatus requestLifeCycleStatus = null;
 	private Integer collectionId;
 	private Integer biobankId;
@@ -181,17 +192,18 @@ public class OwnerQueriesDetailBean implements Serializable {
 			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId()));
+				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId(), userBean.getUserId()));
 			}
 
-            /**
-             * Get the selected(clicked on) query from the list of queries for the owner
-             */
-            for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
-            	if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
-            		selectedQuery = ownerQueryStatsDTO.getQuery();
-            	}
-            }
+			/**
+			 * Get the selected(clicked on) query from the list of queries for the owner
+			 */
+			for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
+				if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
+					selectedQuery = ownerQueryStatsDTO.getQuery();
+					setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
+				}
+			}
 
             if(selectedQuery != null) {
 				RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
@@ -231,18 +243,51 @@ public class OwnerQueriesDetailBean implements Serializable {
 					return null;
 				}
             }
+
+			setPersonListForRequest(config, selectedQuery.getId());
+
             /*
              * Initialize Lifecycle Status
              */
 			requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
 			requestLifeCycleStatus.initialise();
 			requestLifeCycleStatus.initialiseCollectionStatus();
+			createCollectionListSortedByStatus();
+
+			for(BiobankRecord biobankRecord : associatedBiobanks) {
+				int bbcolsize = requestLifeCycleStatus.getCollectionsForBiobank(biobankRecord.getId()).size();
+				if(bbcolsize > maxNumberOfCollections) {
+					maxNumberOfCollections = bbcolsize;
+				}
+			}
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
         return null;
+	}
+
+	private void setPersonListForRequest(Config config, Integer queryId) {
+		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+	}
+
+	private void createCollectionListSortedByStatus() {
+		for(Integer biobankIds : requestLifeCycleStatus.getBiobankIds()) {
+			for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
+				if(collectionLifeCycleStatus.getStatus() == null) {
+					if(!sortedCollections.containsKey("ERRORState")) {
+						sortedCollections.put("ERRORState", new ArrayList<>());
+					}
+					sortedCollections.get("ERRORState").add(collectionLifeCycleStatus);
+				} else {
+					if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus().getStatus())) {
+						sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
+					}
+					sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
+				}
+			}
+		}
 	}
 
     /**
@@ -292,7 +337,12 @@ public class OwnerQueriesDetailBean implements Serializable {
         }
     }
 
-
+	private void setCommentCountAndUreadCommentCount(QueryStatsDTO query) {
+		commentCount = query.getCommentCount();
+		unreadCommentCount = query.getUnreadCommentCount();
+		privateNegotiationCount = query.getPrivateNegotiationCount();
+		unreadPrivateNegotiationCount = query.getUnreadPrivateNegotiationCount();
+	}
 
 	/**
      * Sorts the queries such that the archived ones appear at the end.
@@ -381,6 +431,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
 			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+			queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
 		} catch (SQLException e) {
 			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
 			e.printStackTrace();
@@ -777,5 +828,223 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void setIsTestRequest(Boolean testRequest) {
 		isTestRequest = testRequest;
+	}
+
+	public String getCSSGrid() {
+		StringBuilder contacted = new StringBuilder();
+		StringBuilder interested = new StringBuilder();
+		StringBuilder not_interrested = new StringBuilder();
+		StringBuilder sample_data_not_available = new StringBuilder();
+		StringBuilder sample_data_not_available_collecatable = new StringBuilder();
+
+		StringBuilder notreachable = new StringBuilder();
+		StringBuilder sample_data_available_accessible = new StringBuilder();
+		StringBuilder sample_data_available_not_accessible = new StringBuilder();
+		StringBuilder indicateAccessConditions = new StringBuilder();
+		StringBuilder selectAndAccept = new StringBuilder();
+		StringBuilder signed = new StringBuilder();
+		StringBuilder shipped = new StringBuilder();
+		StringBuilder received = new StringBuilder();
+		StringBuilder end = new StringBuilder();
+		StringBuilder offer = new StringBuilder();
+		StringBuilder accepted = new StringBuilder();
+		StringBuilder rejected = new StringBuilder();
+		StringBuilder not_interested_researcher = new StringBuilder();
+		StringBuilder not_interested = new StringBuilder();
+		StringBuilder biobankerSteppedAway = new StringBuilder();
+		StringBuilder researcherSteppedAway = new StringBuilder();
+		StringBuilder abandoned = new StringBuilder();
+		StringBuilder watingForResponse = new StringBuilder();
+		StringBuilder watingForResponseFromResearcher = new StringBuilder();
+
+		StringBuilder classes_css = new StringBuilder();
+		String classes = ".contactedXX {\n" +
+				"            grid-area: contact_contactedXX;\n" +
+				"        }\n" +
+				"                        .interestedXX {\n" +
+				"            grid-area: interest_interestedXX;\n" +
+				"        }\n" +
+				"                        .not_interrestedXX {\n" +
+				"            grid-area: abandoned_not_interrestedXX;\n" +
+				"        }\n" +
+				"                        .sample_data_not_availableXX {\n" +
+				"            grid-area: availability_sample_data_not_availableXX;\n" +
+				"        }\n" +
+				"                        .sample_data_not_available_collecatableXX {\n" +
+				"            grid-area: availability_sample_data_not_available_collecatableXX;\n" +
+				"        }" +
+				"                        .notreachableXX {\n" +
+				"            grid-area: contact_notreachableXX;\n" +
+				"        }" +
+				"                        .sample_data_available_accessibleXX {\n" +
+				"            grid-area: availability_sample_data_available_accessibleXX;\n" +
+				"        }" +
+				"                        .sample_data_available_not_accessibleXX {\n" +
+				"            grid-area: availability_sample_data_available_not_accessibleXX;\n" +
+				"        }" +
+				"                        .indicateAccessConditionsXX {\n" +
+				"            grid-area: accessConditions_indicateAccessConditionsXX;\n" +
+				"        }" +
+				"                        .selectAndAcceptXX {\n" +
+				"            grid-area: acceptConditions_selectAndAcceptXX;\n" +
+				"        }" +
+				"                        .signedXX {\n" +
+				"            grid-area: mtaSigned_signedXX;\n" +
+				"        }" +
+				"                        .shippedXX {\n" +
+				"            grid-area: shippedSamples_shippedXX;\n" +
+				"        }" +
+				"                        .receivedXX {\n" +
+				"            grid-area: receivedSamples_receivedXX;\n" +
+				"        }" +
+				"                        .endXX {\n" +
+				"            grid-area: endOfProject_endXX;\n" +
+				"        }" +
+				"                        .offerXX {\n" +
+				"            grid-area: dataReturnOffer_offerXX;\n" +
+				"        }" +
+				"                        .acceptedXX {\n" +
+				"            grid-area: dataReturnOffer_acceptedXX;\n" +
+				"        }" +
+				"                        .rejectedXX {\n" +
+				"            grid-area: dataReturnOffer_rejectedXX;\n" +
+				"        }" +
+				"                        .not_interested_researcherXX {\n" +
+				"            grid-area: abandoned_not_interested_researcherXX;\n" +
+				"        }" +
+				"                        .not_interestedXX {\n" +
+				"            grid-area: abandoned_not_interestedXX;\n" +
+				"        }" +
+				"                        .biobankerSteppedAwayXX {\n" +
+				"            grid-area: abandoned_biobankerSteppedAwayXX;\n" +
+				"        }" +
+				"                        .researcherSteppedAwayXX {\n" +
+				"            grid-area: abandoned_researcherSteppedAwayXX;\n" +
+				"        }" +
+				"                        .abandonedXX {\n" +
+				"            grid-area: abandoned_abandonedXX;\n" +
+				"        }" +
+				"                        .watingForResponseXX {\n" +
+				"            grid-area: notselected_watingForResponseXX;\n" +
+				"        }" +
+				"                        .watingForResponseFromResearcherXX {\n" +
+				"            grid-area: notselected_watingForResponseFromResearcherXX;\n" +
+				"        }";
+		for(Integer colCssCounter= 0; colCssCounter < maxNumberOfCollections; colCssCounter++) {
+			contacted.append("\"contact_contacted" + colCssCounter + "\" ");
+			interested.append("\"interest_interested" + colCssCounter + "\" ");
+			not_interrested.append("\"abandoned_not_interrested" + colCssCounter + "\" ");
+			sample_data_not_available.append("\"availability_sample_data_not_available" + colCssCounter + "\" ");
+			sample_data_not_available_collecatable.append("\"availability_sample_data_not_available_collecatable" + colCssCounter + "\" ");
+
+			notreachable.append("\"contact_notreachable" + colCssCounter + "\" ");
+			sample_data_available_accessible.append("\"availability_sample_data_available_accessible" + colCssCounter + "\" ");
+			sample_data_available_not_accessible.append("\"availability_sample_data_available_not_accessible" + colCssCounter + "\" ");
+			indicateAccessConditions.append("\"accessConditions_indicateAccessConditions" + colCssCounter + "\" ");
+			selectAndAccept.append("\"acceptConditions_selectAndAccept" + colCssCounter + "\" ");
+			signed.append("\"mtaSigned_signed" + colCssCounter + "\" ");
+			shipped.append("\"shippedSamples_shipped" + colCssCounter + "\" ");
+			received.append("\"receivedSamples_received" + colCssCounter + "\" ");
+			end.append("\"endOfProject_end" + colCssCounter + "\" ");
+			offer.append("\"dataReturnOffer_offer" + colCssCounter + "\" ");
+			accepted.append("\"dataReturnOffer_accepted" + colCssCounter + "\" ");
+			rejected.append("\"dataReturnOffer_rejected" + colCssCounter + "\" ");
+			not_interested_researcher.append("\"abandoned_not_interested_researcher" + colCssCounter + "\" ");
+			not_interested.append("\"abandoned_not_interested" + colCssCounter + "\" ");
+			biobankerSteppedAway.append("\"abandoned_biobankerSteppedAway" + colCssCounter + "\" ");
+			researcherSteppedAway.append("\"abandoned_researcherSteppedAway" + colCssCounter + "\" ");
+			abandoned.append("\"abandoned_abandoned" + colCssCounter + "\" ");
+			watingForResponse.append("\"notselected_watingForResponse" + colCssCounter + "\" ");
+			watingForResponseFromResearcher.append("\"notselected_watingForResponseFromResearcher" + colCssCounter + "\" ");
+
+			classes_css.append(classes.replaceAll("XX", colCssCounter.toString()));
+		}
+		StringBuilder return_value = new StringBuilder();
+		return_value.append(".lifecycleContentArea {\n" +
+				"            width: 100%;\n" +
+				"            display: grid;\n" +
+				"            grid-template-rows: auto;\n" +
+				"            grid-template-columns: 100%;\n" +
+				"            grid-template-areas:");
+		return_value.append(contacted);
+		return_value.append(interested);
+		return_value.append(watingForResponse);
+		return_value.append(watingForResponseFromResearcher);
+		return_value.append(sample_data_not_available_collecatable);
+		return_value.append(notreachable);
+		return_value.append(sample_data_available_accessible);
+		return_value.append(indicateAccessConditions);
+		return_value.append(selectAndAccept);
+		return_value.append(signed);
+		return_value.append(shipped);
+		return_value.append(received);
+		return_value.append(offer);
+		return_value.append(accepted);
+		return_value.append(rejected);
+		return_value.append(sample_data_available_not_accessible);
+		return_value.append(sample_data_not_available);
+		return_value.append(end);
+		return_value.append(not_interested_researcher);
+		return_value.append(not_interested);
+		return_value.append(biobankerSteppedAway);
+		return_value.append(researcherSteppedAway);
+		return_value.append(abandoned);
+		return_value.append(not_interrested);
+		return_value.append(";}");
+		return_value.append(classes_css);
+
+		return return_value.toString();
+	}
+
+	public int getCommentCount() {
+		return commentCount;
+	}
+
+	public void setCommentCount(int commentCount) {
+		this.commentCount = commentCount;
+	}
+
+	public int getUnreadCommentCount() {
+		return unreadCommentCount;
+	}
+
+	public void setUnreadCommentCount(int unreadCommentCount) {
+		this.unreadCommentCount = unreadCommentCount;
+	}
+
+	public int getPrivateNegotiationCount() {
+		return privateNegotiationCount;
+	}
+
+	public void setPrivateNegotiationCount(int privateNegotiationCount) {
+		this.privateNegotiationCount = privateNegotiationCount;
+	}
+
+	public int getUnreadPrivateNegotiationCount() {
+		return unreadPrivateNegotiationCount;
+	}
+
+	public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
+		this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
+	}
+
+	public List<Person> getPersonList() {
+		return personList;
+	}
+
+	public void setPersonList(List<Person> personList) {
+		this.personList = personList;
+	}
+
+	public HashMap<String, List<CollectionLifeCycleStatus>> getSortedCollections() {
+		return sortedCollections;
+	}
+
+	public List<String> getSortedCollectionsKeys() {
+		return new ArrayList<String>(sortedCollections.keySet());
+	}
+
+	public List<CollectionLifeCycleStatus> getSortedCollectionsByKathegory(String key) {
+		return sortedCollections.get(key);
 	}
 }

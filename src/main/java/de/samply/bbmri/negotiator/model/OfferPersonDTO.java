@@ -55,6 +55,8 @@ public class OfferPersonDTO {
      */
     private Collection collection;
 
+    private boolean commentRead;
+
     /**
      * The list of the collections in the domain of the person who made the offer.
      */
@@ -90,5 +92,13 @@ public class OfferPersonDTO {
 
     public void setOffer(Offer offer) {
         this.offer = offer;
+    }
+
+    public boolean isCommentRead() {
+        return commentRead;
+    }
+
+    public void setCommentRead(boolean commentRead) {
+        this.commentRead = commentRead;
     }
 }

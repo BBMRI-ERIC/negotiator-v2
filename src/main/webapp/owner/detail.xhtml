@@ -29,6 +29,7 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
@@ -49,6 +50,24 @@
     <ui:param name="bodyClass" value="container-fluid body-nomargin" />
 
     <ui:define name="body">
+
+        <style>
+            .nav-tabs {
+                border-bottom: 1px solid #ec6707;
+            }
+
+            .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+                color: #555;
+                cursor: default;
+                background-color: #337ab73b;
+                border: 1px solid #ec6707;
+                border-bottom-color: transparent;
+            }
+
+            .nav-tabs > li > a {
+                border: 1px solid #ec6707;
+            }
+        </style>
 
         <h:panelGroup layout="block" styleClass="col-md-3 left-panel">
 
@@ -93,43 +112,7 @@
 
                 <bbmricc:queryDetailAttachments queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
 
-                <h:panelGroup layout="block"
-                              style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
-                              rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
-                    <b>#{label['querydetail.owner.associatedbiobanks']}</b>
-                    <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
-                               var="biobank" varStatus="loop">
-                        <div id="accordion">
-                            <div class="card">
-                                <div class="card-header" id="headingTwo">
-                                    <h5 class="mb-0">
-                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
-                                            #{biobank.name}
-                                        </button>
-                                    </h5>
-                                </div>
-                                <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                                    <div class="card-body">
-
-                                        <div class="container" style="width: 100%;">
-                                            <div class="row">
-                                                <!-- TODO: Collection table with select -->
-                                                <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
-                                                           var="collectionStatus" varStatus="loop">
-                                                    <bbmribiobankercc:lifecycleCollectionStatus
-                                                                collectionLifeCycleStatus="#{collectionStatus}"
-                                                                collectionId="#{collectionStatus.collectionId}"
-                                                                biobankId="#{biobank.id}" />
-                                                </ui:repeat>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ui:repeat>
-                </h:panelGroup>
 
                 <h:form styleClass="form-horizontal" style="width: 100%; margin-top: 10px;">
                     <h:commandButton action="#{ownerQueriesDetailBean.participateInQuery()}"
@@ -142,41 +125,204 @@
 
                 <h:panelGroup layout="block" style="margin-top:10px;">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a data-toggle="tab" href="#comments">#{label['querydetail.title.comments']}</a>
+                            <li class="active" id="first">
+                                <a data-toggle="tab" href="#status">
+                                    #{label['querydetail.title.status']}
+                                </a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#comments">
+                                    #{label['querydetail.title.comments']}
+                                    <div class="badge queryNumberResponsesBadge pull-right"
+                                         style='margin-left: 4px;#{ownerQueriesDetailBean.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                                         data-toggle="tooltip"
+                                         data-placement="bottom"
+                                         title="#{ownerQueriesDetailBean.unreadCommentCount} unread comments from #{ownerQueriesDetailBean.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
+
+                                        <i class="glyphicon glyphicon-bullhorn"></i>
+                                        <h:outputText value="   #{ownerQueriesDetailBean.unreadCommentCount}/#{ownerQueriesDetailBean.commentCount}"/>
+                                    </div>
+                                </a>
                             </li>
                             <ui:fragment rendered="#{ownerQueriesDetailBean.nonConfidential == false}">
-                            <li><a data-toggle="tab" href="#sampleAvailability">#{label['querydetail.title.privateNegotiation']}</a>
-                            </li>
+                                <li>
+                                    <a data-toggle="tab" href="#sampleAvailability">
+                                        #{label['querydetail.title.privateNegotiation']}
+                                        <div class="badge queryNumberResponsesBadge pull-right"
+                                             style='margin-left: 4px;#{ownerQueriesDetailBean.unreadPrivateNegotiationCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                                             data-toggle="tooltip"
+                                             data-placement="bottom"
+                                             title="#{ownerQueriesDetailBean.unreadPrivateNegotiationCount} unread comments from #{ownerQueriesDetailBean.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+
+                                            <i class="glyphicon glyphicon-tower"></i>
+                                            <h:outputText value="   #{ownerQueriesDetailBean.unreadPrivateNegotiationCount}/#{ownerQueriesDetailBean.privateNegotiationCount}" />
+                                        </div>
+                                    </a>
+                                </li>
                             </ui:fragment>
                         </ul>
 
-
+                    <style>
+                        .showUnreadMarkerOnBiobank {
+                            display: none;
+                        }
+                    </style>
 
                     <div class="tab-content">
-                        <div id="comments" class="tab-pane fade in active">
+                        <!-- Lifecycle Status -->
+                        <div id="status" class="tab-pane fade in active">
+                            <h:panelGroup layout="block"
+                                          style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
+                                          rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
-                            <ui:repeat value="#{ownerQueriesDetailBean.comments}"
-                                var="comment">
+                                <style>
+                                    #{ownerQueriesDetailBean.getCSSGrid()}
+                                </style>
 
-                                <bbmricc:comment comment="#{comment.comment}"
-                                                 person="#{comment.person}"
-                                                 collections="#{comment.collections}"
-                                                 ownerQueriesDetailBean="#{ownerQueriesDetailBean}"
-                                                 scope="commentAttachment"
-                                                 commentComponent="#{commentBean}"
-                                                 commentRead="#{comment.commentRead}"/>
+                                <b>#{label['querydetail.owner.associatedbiobanks']}</b>
 
-                            </ui:repeat>
+                                <div style="width: 100%;">
+                                    <div style="float: right;background-color: #9a9a9a;border-radius: 5px;padding: 3px;margin-bottom: 3px;">
+                                        <span style="padding-left: 2px;cursor: pointer;" onclick="sortByStatus()">Sort by Status</span>
+                                        |
+                                        <span style="padding-left: 2px;cursor: pointer;" onclick="sortByBiobank()">Sort by Biobank</span>
+                                    </div>
+                                </div>
+                                <style>
+                                    .hideSortingView {
+                                        display: none;
+                                    }
+                                </style>
 
-                            <div class="col-xs-12">
+                                <h:outputScript>
+                                    function sortByBiobank() {
+                                        var statusSort = document.getElementById("sortingViewStatus");
+                                        statusSort.classList.add("hideSortingView");
+                                        var biobankSort = document.getElementById("sortingViewBiobank");
+                                        biobankSort.classList.remove("hideSortingView");
+                                    }
+                                    function sortByStatus() {
+                                        var statusSort = document.getElementById("sortingViewStatus");
+                                        statusSort.classList.remove("hideSortingView");
+                                        var biobankSort = document.getElementById("sortingViewBiobank");
+                                        biobankSort.classList.add("hideSortingView");
+                                    }
+                                </h:outputScript>
+
+                                <div id="sortingViewStatus" style="clear: both;">
+                                    <ui:repeat value="#{ownerQueriesDetailBean.getSortedCollectionsKeys()}"
+                                               var="collectionsKey" varStatus="loop">
+                                        <div id="accordion">
+                                            <div class="card">
+                                                <div class="card-header" id="headingTwo">
+                                                    <h5 class="mb-0">
+                                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{collectionsKey}" aria-expanded="false" aria-controls="collapseTwo">
+                                                            #{label[collectionsKey]}:
+                                                        </button>
+                                                    </h5>
+                                                </div>
+                                                <div id="collapseLifecycleBiobank#{collectionsKey}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                                    <div class="card-body">
+                                                        <div class="container lifecycleContentArea">
+                                                            <ui:repeat value="#{ownerQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
+                                                                       var="collectionStatus" varStatus="loop">
+                                                                <h:form>
+                                                                    <bbmribiobankercc:lifecycleCollectionStatus
+                                                                            collectionLifeCycleStatus="#{collectionStatus}"
+                                                                            collectionId="#{collectionStatus.collectionId}"
+                                                                            biobankId="#{-1}" />
+                                                                </h:form>
+                                                            </ui:repeat>
+                                                            <hr/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui:repeat>
+                                </div>
+
+                                <div id="sortingViewBiobank" class="hideSortingView" style="clear: both;">
+                                    <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
+                                               var="biobank" varStatus="loop">
+                                        <div id="accordion">
+                                            <div class="card">
+                                                <div class="card-header" id="headingTwo">
+                                                    <h5 class="mb-0">
+                                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
+                                                            #{biobank.name}
+                                                        </button>
+                                                    </h5>
+                                                </div>
+                                                <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                                    <div class="card-body">
+
+                                                        <div class="container lifecycleContentArea" style="width: 100%;">
+                                                            <!-- TODO: Collection table with select -->
+                                                            <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
+                                                                       var="collectionStatus" varStatus="loop">
+                                                                <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id).indexOf(collectionStatus)}">
+
+                                                                    <bbmribiobankercc:lifecycleCollectionStatus
+                                                                            collectionLifeCycleStatus="#{collectionStatus}"
+                                                                            collectionId="#{collectionStatus.collectionId}"
+                                                                            biobankId="#{biobank.id}" />
+                                                                </div>
+                                                            </ui:repeat>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ui:repeat>
+                                </div>
+                            </h:panelGroup>
+                        </div>
+
+                        <!-- Comment Tab -->
+                        <div id="comments" class="tab-pane fade">
+
+                            <div class="row" style="margin:5px;padding-left: 10px;">
+                                In the group discussion all representatives of the involved Biobanks, the researcher and BBMRI-ERIC moderators can read and reply to the messages.
+                                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">Show User List</button>
+                                <div id="demo" class="collapse">
+                                    <div class="container">
+                                        <div class="row">
+                                            <ui:repeat value="#{ownerQueriesDetailBean.personList}"
+                                                       var="person">
+                                                <div class="col-xs-3"><i class="glyphicon glyphicon-user"/>#{person.authName}</div>
+                                            </ui:repeat>
+                                        </div></div>
+                                </div>
+                            </div>
+
+                            <div class="row" >
+                                <bbmricc:commentReply rendered="#{ownerQueriesDetailBean.nonConfidential == false}"
+                                                  query="#{ownerQueriesDetailBean.selectedQuery}" componentQueryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}"/>
+                            </div>
+
+                            <div class="col-xs-12 row">
                                 <hr></hr>
                             </div>
 
-                            <bbmricc:commentReply rendered="#{ownerQueriesDetailBean.nonConfidential == false}"
-                                query="#{ownerQueriesDetailBean.selectedQuery}" componentQueryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}"/>
+                            <div class="row" style="margin: 10px;">
+                                <ui:repeat value="#{ownerQueriesDetailBean.comments}"
+                                    var="comment">
+
+                                    <bbmricc:comment comment="#{comment.comment}"
+                                                     person="#{comment.person}"
+                                                     collections="#{comment.collections}"
+                                                     ownerQueriesDetailBean="#{ownerQueriesDetailBean}"
+                                                     scope="commentAttachment"
+                                                     commentComponent="#{commentBean}"
+                                                     commentRead="#{comment.commentRead}"/>
+
+                                </ui:repeat>
+                            </div>
 
                         </div>
 
+                        <!-- Private Comment Tab -->
                         <div id="sampleAvailability" class="tab-pane fade">
                             <ui:fragment rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() == 0}">
                                 <br />
@@ -187,6 +333,13 @@
                             <br />
                             <c:set var="oneMarkerOnly" value="#{ownerQueriesDetailBean.associatedBiobanks.size() == 1}" />
 
+                            <script type="text/javascript">
+                                function onLoadShowNotificationsOnBiobank(biobankName, commentRead) {
+                                    if(commentRead == "false") {
+                                        document.getElementById("biobankNotificationClass"+biobankName).classList.remove("showUnreadMarkerOnBiobank");
+                                    }
+                                }
+                            </script>
 
                             <c:forEach begin="1" end="#{ownerQueriesDetailBean.associatedBiobanks.size()}" var="i">
                                 <div class="panel panel-default deco-none">
@@ -195,6 +348,7 @@
                                     <div id="heading#{i}" class="panel-heading" data-toggle="collapse" data-target="#hh#{i}" >
                                         <h4 class="panel-title">
                                             <a> #{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name} </a>
+                                            <span id='biobankNotificationClass#{biobankName.replaceAll(" ", "")}' class='glyphicon glyphicon-envelope showUnreadMarkerOnBiobank' style="margin:0 0 0 15px;"></span>
                                         </h4>
                                     </div>
                                     <div id="hh#{i}"
@@ -215,11 +369,16 @@
                                                     value="#{ownerQueriesDetailBean.listOfSampleOffers[i-1]}"
                                                     var="offers">
 
+                                                <h:outputScript>
+                                                    window.onload = onLoadShowNotificationsOnBiobank("#{biobankName.replaceAll(" ", "")}", "#{offers.commentRead}");
+                                                </h:outputScript>
+
                                                 <bbmricc:comment comment="#{offers.offer}"
                                                                  person="#{offers.person}"
                                                                  collections="#{offers.collections}"
                                                                  scope="privateAttachment"
-                                                                 commentComponent="#{commentBean}"/>
+                                                                 commentComponent="#{offerBean}"
+                                                                 commentRead="#{offers.commentRead}"/>
 
                                             </ui:repeat>
 

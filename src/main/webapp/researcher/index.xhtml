@@ -148,13 +148,13 @@
 										</div>
 
 										<div class="badge queryNumberResponsesBadge"
-											 style='#{item.privateNegotiationCount == 0 ? "display:none;" : "" }'
+											 style='#{item.privateNegotiationCount == 0 ? "display:none;" : "" }#{item.unreadPrivateNegotiationCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
 											 data-toggle="tooltip"
 											 data-placement="bottom"
-											 title="#{item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+											 title="#{item.unreadPrivateNegotiationCount} unread comments from #{item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
 
 											<i class="glyphicon glyphicon-tower"></i>
-											<h:outputText value="   #{item.privateNegotiationCount}" />
+											<h:outputText value="   #{item.unreadPrivateNegotiationCount}/#{item.privateNegotiationCount}" />
 										</div>
 
 										<h:outputText value="#{item.lastCommentTime}"

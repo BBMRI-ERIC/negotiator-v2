@@ -85,6 +85,8 @@ public class OfferBean implements Serializable {
                 e.printStackTrace();
             }
 
+            DbUtil.addOfferCommentReadForComment(config, offerRecord.getId(), userBean.getUserId(), offerFrom);
+
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("biobankName", biobankName);
             NotificationService.sendNotification(NotificationType.PRIVATE_COMMAND_NOTIFICATION, query.getId(), offerRecord.getId(), userBean.getUserId(), parameters);
@@ -134,6 +136,17 @@ public class OfferBean implements Serializable {
         }
         return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                 + "?includeViewParams=true&faces-redirect=true";
+    }
+
+    public void markCommentReadForUser(Integer userId, Integer offerId, boolean commentRead) {
+        if(commentRead) {
+            return;
+        }
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.updateOfferCommentReadForUser(config, userId, offerId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public UserBean getUserBean() {

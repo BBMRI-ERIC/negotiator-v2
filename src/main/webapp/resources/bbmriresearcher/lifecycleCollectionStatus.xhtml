@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
@@ -56,7 +57,10 @@
     <div class="col-sm-2 col-lg-2">
         <div class="col-sm-2 col-lg-2">
             <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0)">Update Collection</button>
-            <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">Update for all Collections</button>
+            <c:if test="#{cc.attrs.biobankId!=-1}">
+                <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">Update for all Collections</button>
+            </c:if>
+
         </div>
     </div>
 
