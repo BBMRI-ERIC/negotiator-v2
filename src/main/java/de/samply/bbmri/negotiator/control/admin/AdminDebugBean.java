@@ -28,19 +28,24 @@ package de.samply.bbmri.negotiator.control.admin;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.apache.logging.log4j.util.StringBuilders;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -131,6 +136,29 @@ public class AdminDebugBean implements Serializable {
             e.printStackTrace();
         }
         return "/admin/debug.xhtml";
+    }
+
+    public String resendNotifications(Integer requestId) {
+        try (Config config = ConfigFactory.get()) {
+            Query query = DbUtil.getQueryFromIdAsQuery(config, requestId);
+            if(query.getNegotiationStartedTime() == null) {
+                DbUtil.startNegotiation(config, requestId);
+            }
+            RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(requestId);
+            requestLifeCycleStatus.setQuery(query);
+            requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker(requestId));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "/admin/debug.xhtml";
+    }
+
+    public String getQueryUrlForBiobanker(Integer queryRecordId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + queryRecordId);
     }
 
     /**

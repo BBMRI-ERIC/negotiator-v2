@@ -117,6 +117,7 @@
             </h:column>
             <h:column>
                 <f:facet name="header">Reset Negotiation</f:facet>
+                <!-- Reset Request -->
                 <h:form id="form">
                     <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
                     <h:commandButton id="resetNegotiation"
@@ -124,7 +125,16 @@
                                      value="#{label['querydetail.action.resetNegotiation.buttonText']}"
                                      action="#{adminDebugBean.restNegotiation(query.getId())}"
                                      title="#{label['querydetail.tooltip.restNegotiation']}"
-                                     styleClass="btn btn-primary" style="margin-top: 40px"/>
+                                     styleClass="btn btn-primary" style="margin-top: 5px"/>
+                </h:form>
+                <!-- Resend Notification to all Biobanks -->
+                <h:form id="formResendNotification">
+                    <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                    <h:commandButton id="resendNotifications"
+                                     value="#{label['querydetail.action.resendNotifications.buttonText']}"
+                                     action="#{adminDebugBean.resendNotifications(query.getId())}"
+                                     title="#{label['querydetail.tooltip.resendNotifications']}"
+                                     styleClass="btn btn-primary" style="margin-top: 5px"/>
                 </h:form>
             </h:column>
         </h:dataTable>
