@@ -374,6 +374,20 @@
                                         var biobankSort = document.getElementById("sortingViewBiobank");
                                         biobankSort.classList.add("hideSortingView");
                                     }
+
+                                    $(document).ready(function(){
+                                        // Add minus icon for collapse element which is open by default
+                                        $(".collapse.show").each(function(){
+                                            $(this).prev(".card-header").find(".fa").addClass("fa-minus").removeClass("fa-plus");
+                                        });
+
+                                        // Toggle plus minus icon on show hide of collapse element
+                                        $(".collapse").on('show.bs.collapse', function(){
+                                            $(this).prev(".card-header").find(".fa").removeClass("fa-plus").addClass("fa-minus");
+                                        }).on('hide.bs.collapse', function(){
+                                            $(this).prev(".card-header").find(".fa").removeClass("fa-minus").addClass("fa-plus");
+                                        });
+                                    });
                                 </h:outputScript>
 
                                 <div id="sortingViewStatus" style="clear: both;">
@@ -384,7 +398,7 @@
                                                 <div class="card-header" id="headingTwo">
                                                     <h5 class="mb-0">
                                                         <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{collectionsKey}" aria-expanded="false" aria-controls="collapseTwo">
-                                                            #{label[collectionsKey]}:
+                                                            <i class="fa fa-plus"></i> #{label[collectionsKey]}:
                                                         </button>
                                                     </h5>
                                                 </div>
@@ -417,7 +431,7 @@
                                                 <div class="card-header" id="headingTwo">
                                                     <h5 class="mb-0">
                                                         <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobankId}" aria-expanded="false" aria-controls="collapseTwo">
-                                                            #{researcherQueriesDetailBean.getBiobankNameFromCache(biobankId)}
+                                                            <i class="fa fa-plus"></i> #{researcherQueriesDetailBean.getBiobankNameFromCache(biobankId)}
                                                         </button>
                                                     </h5>
                                                 </div>

@@ -207,9 +207,23 @@
                                         var biobankSort = document.getElementById("sortingViewBiobank");
                                         biobankSort.classList.add("hideSortingView");
                                     }
+
+                                    $(document).ready(function(){
+                                        // Add minus icon for collapse element which is open by default
+                                        $(".collapse.show").each(function(){
+                                            $(this).prev(".card-header").find(".fa").addClass("fa-minus").removeClass("fa-plus");
+                                        });
+
+                                        // Toggle plus minus icon on show hide of collapse element
+                                        $(".collapse").on('show.bs.collapse', function(){
+                                            $(this).prev(".card-header").find(".fa").removeClass("fa-plus").addClass("fa-minus");
+                                        }).on('hide.bs.collapse', function(){
+                                            $(this).prev(".card-header").find(".fa").removeClass("fa-minus").addClass("fa-plus");
+                                        });
+                                    });
                                 </h:outputScript>
 
-                                <div id="sortingViewStatus" style="clear: both;">
+                                <div id="sortingViewStatus" class="hideSortingView" style="clear: both;">
                                     <ui:repeat value="#{ownerQueriesDetailBean.getSortedCollectionsKeys()}"
                                                var="collectionsKey" varStatus="loop">
                                         <div id="accordion">
@@ -217,7 +231,7 @@
                                                 <div class="card-header" id="headingTwo">
                                                     <h5 class="mb-0">
                                                         <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{collectionsKey}" aria-expanded="false" aria-controls="collapseTwo">
-                                                            #{label[collectionsKey]}:
+                                                            <i class="fa fa-plus"></i> #{label[collectionsKey]}:
                                                         </button>
                                                     </h5>
                                                 </div>
@@ -242,7 +256,7 @@
                                     </ui:repeat>
                                 </div>
 
-                                <div id="sortingViewBiobank" class="hideSortingView" style="clear: both;">
+                                <div id="sortingViewBiobank" style="clear: both;">
                                     <ui:repeat value="#{ownerQueriesDetailBean.associatedBiobanks}"
                                                var="biobank" varStatus="loop">
                                         <div id="accordion">
@@ -250,7 +264,7 @@
                                                 <div class="card-header" id="headingTwo">
                                                     <h5 class="mb-0">
                                                         <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
-                                                            #{biobank.name}
+                                                            <i class="fa fa-plus"></i> #{biobank.name}
                                                         </button>
                                                     </h5>
                                                 </div>
