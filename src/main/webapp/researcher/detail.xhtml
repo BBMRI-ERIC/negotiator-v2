@@ -30,6 +30,7 @@
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
                 xmlns:bbmriresearchercc="http://xmlns.jcp.org/jsf/composite/bbmriresearcher"
                 template="../components/default.xhtml"
@@ -214,6 +215,10 @@
                         </script>
                     </h:panelGroup>
 
+                    <style>
+                        #{researcherQueriesDetailBean.getCSSGrid()}
+                    </style>
+
                     <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
                     <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.biobankIds}"
                                var="biobankId" varStatus="loop">
@@ -229,20 +234,22 @@
                                 <div id="collapseLifecycleBiobank#{biobankId}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                     <div class="card-body">
 
-                                        <div class="container" style="width: 100%;">
-                                            <div class="row">
+                                        <div class="container lifecycleContentArea">
+                                            <!--<div class="row">-->
                                                 <!-- TODO: Collection table with select -->
                                                 <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId)}"
                                                            var="collectionStatus" varStatus="loop">
+                                                    <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId).indexOf(collectionStatus)}">
                                                     <h:form>
                                                         <bbmriresearchercc:lifecycleCollectionStatus
                                                                 collectionLifeCycleStatus="#{collectionStatus}"
                                                                 collectionId="#{collectionStatus.collectionId}"
                                                                 biobankId="#{biobankId}" />
                                                     </h:form>
+                                                    </div>
                                                 </ui:repeat>
                                             </div>
-                                        </div>
+                                        <!--</div>-->
                                     </div>
                                 </div>
                             </div>

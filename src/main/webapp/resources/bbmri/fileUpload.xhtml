@@ -50,7 +50,7 @@
                 <h:commandButton id="uploadBtnPrivate" value="Upload secret" rendered="#{cc.attrs.scope == 'privateAttachment'}"
                                  action="#{cc.attrs.componentQueryBean.uploadAttachmentPrivate(cc.attrs.offer)}"
                                  styleClass="btn btn-primary disabled activateUploadbtn" />
-                <h:commandButton id="uploadBtnComment" value="Upload secret" rendered="#{cc.attrs.scope == 'commentAttachment'}"
+                <h:commandButton id="uploadBtnComment" value="Upload" rendered="#{cc.attrs.scope == 'commentAttachment'}"
                                  action="#{cc.attrs.componentQueryBean.uploadAttachmentComment(cc.attrs.queryId)}"
                                  styleClass="btn btn-primary disabled activateUploadbtn" />
             </label>

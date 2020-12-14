@@ -28,16 +28,24 @@ package de.samply.bbmri.negotiator.control.admin;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.ServletUtil;
+import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.Query;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import org.apache.logging.log4j.util.StringBuilders;
 
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -56,6 +64,9 @@ import java.util.List;
 @ManagedBean
 public class AdminDebugBean implements Serializable {
 
+
+    @ManagedProperty(value = "#{userBean}")
+    private UserBean userBean;
     /**
      * The list of queries
      */
@@ -93,6 +104,10 @@ public class AdminDebugBean implements Serializable {
      */
     private final HashMap<Integer, List<List<OfferPersonDTO>>> listOfSampleOffers = new HashMap<Integer, List<List<OfferPersonDTO>>>();//new ArrayList<>();
 
+    // Data Transfer
+    private Integer transferQueryId;
+    private Integer transferQueryToUserId;
+
     // END Collection Assostiations
     //---------------------------------
 
@@ -110,6 +125,10 @@ public class AdminDebugBean implements Serializable {
         return users.get(id).getAuthName();
     }
 
+    public HashMap<Integer, PersonRecord> getUser() {
+        return users;
+    }
+
     public String restNegotiation(Integer id) {
         try (Config config = ConfigFactory.get()) {
             DbUtil.restNegotiation(config, id);
@@ -117,6 +136,29 @@ public class AdminDebugBean implements Serializable {
             e.printStackTrace();
         }
         return "/admin/debug.xhtml";
+    }
+
+    public String resendNotifications(Integer requestId) {
+        try (Config config = ConfigFactory.get()) {
+            Query query = DbUtil.getQueryFromIdAsQuery(config, requestId);
+            if(query.getNegotiationStartedTime() == null) {
+                DbUtil.startNegotiation(config, requestId);
+            }
+            RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(requestId);
+            requestLifeCycleStatus.setQuery(query);
+            requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker(requestId));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "/admin/debug.xhtml";
+    }
+
+    public String getQueryUrlForBiobanker(Integer queryRecordId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + queryRecordId);
     }
 
     /**
@@ -132,6 +174,26 @@ public class AdminDebugBean implements Serializable {
                 users.put(personRecord.getId(), personRecord);
             }
         } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void transferRequest() {
+        try (Config config = ConfigFactory.get()) {
+            QueryRecord queryRecord = DbUtil.getQueryFromId(config, transferQueryId);
+            Person researcher_old = DbUtil.getPersonDetails(config, queryRecord.getResearcherId());
+            Person researcher_new = DbUtil.getPersonDetails(config, transferQueryToUserId);
+            StringBuilder commentMessage = new StringBuilder();
+            commentMessage.append("---- System message ----\n\n");
+            commentMessage.append("The ownership of this request has been transferred from ");
+            commentMessage.append(researcher_old.getAuthName());
+            commentMessage.append(" to ");
+            commentMessage.append(researcher_new.getAuthName());
+            commentMessage.append(".");
+            DbUtil.transferQuery(config, transferQueryId, transferQueryToUserId);
+            DbUtil.addComment(config, transferQueryId, userBean.getUserId(), commentMessage.toString(), "published", false);
+        } catch (SQLException e) {
+            System.err.println("3f0113dc7f4c-AdminDebugBean ERROR-NG-0000076: Error Transferring Request " + transferQueryId + " to user " + transferQueryToUserId + ".");
             e.printStackTrace();
         }
     }
@@ -245,4 +307,27 @@ public class AdminDebugBean implements Serializable {
         this.biobankWithOffer.put(queryId, biobankWithOffer);
     }
 
+    public Integer getTransferQueryId() {
+        return transferQueryId;
+    }
+
+    public void setTransferQueryId(Integer transferQueryId) {
+        this.transferQueryId = transferQueryId;
+    }
+
+    public Integer getTransferQueryToUserId() {
+        return transferQueryToUserId;
+    }
+
+    public void setTransferQueryToUserId(Integer transferQueryToUserId) {
+        this.transferQueryToUserId = transferQueryToUserId;
+    }
+
+    public UserBean getUserBean() {
+        return userBean;
+    }
+
+    public void setUserBean(UserBean userBean) {
+        this.userBean = userBean;
+    }
 }

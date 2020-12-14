@@ -71,6 +71,15 @@
                 #{adminDebugBean.getUserName(query.getResearcherId())}
             </h:column>
             <h:column>
+                <f:facet name="header">Transfer request</f:facet>
+                <button
+                        onclick="$('#toggleModalIndicateAccessConditions').click();updateFieldsRequestTransfer('#{query.getId()}', '#{query.getTitle()}', '#{adminDebugBean.getUserName(query.getResearcherId())}');"
+                        type="button"
+                        class="btn btn-primary">
+                    Transfer
+                </button>
+            </h:column>
+            <h:column>
                 <f:facet name="header">JsonText</f:facet>
                 <h:panelGroup style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap">
                     #{query.getJsonText()}
@@ -85,10 +94,6 @@
                 <h:panelGroup style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap">
                     #{query.getNegotiatorToken()}
                 </h:panelGroup>
-            </h:column>
-            <h:column>
-                <f:facet name="header">ValidQuery</f:facet>
-                #{query.getValidQuery()}
             </h:column>
             <h:column>
                 <f:facet name="header">RequestDescription</f:facet>
@@ -111,10 +116,8 @@
                 </h:form>
             </h:column>
             <h:column>
-                <f:facet name="header">Transfer request</f:facet>
-            </h:column>
-            <h:column>
                 <f:facet name="header">Reset Negotiation</f:facet>
+                <!-- Reset Request -->
                 <h:form id="form">
                     <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
                     <h:commandButton id="resetNegotiation"
@@ -122,10 +125,81 @@
                                      value="#{label['querydetail.action.resetNegotiation.buttonText']}"
                                      action="#{adminDebugBean.restNegotiation(query.getId())}"
                                      title="#{label['querydetail.tooltip.restNegotiation']}"
-                                     styleClass="btn btn-primary" style="margin-top: 40px"/>
+                                     styleClass="btn btn-primary" style="margin-top: 5px"/>
+                </h:form>
+                <!-- Resend Notification to all Biobanks -->
+                <h:form id="formResendNotification">
+                    <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                    <h:commandButton id="resendNotifications"
+                                     value="#{label['querydetail.action.resendNotifications.buttonText']}"
+                                     action="#{adminDebugBean.resendNotifications(query.getId())}"
+                                     title="#{label['querydetail.tooltip.resendNotifications']}"
+                                     styleClass="btn btn-primary" style="margin-top: 5px"/>
                 </h:form>
             </h:column>
         </h:dataTable>
+
+        <button id="toggleModalIndicateAccessConditions" type="button" style="display: none;" class="btn btn-primary" data-toggle="modal" data-target="#transferResearcherModal">
+            Transfer request
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="transferResearcherModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="exampleModalLabel">Transfer Request</h3>
+                    </div>
+                    <div class="modal-body">
+                        <h:form id="transferRequestForm" enctype="multipart/form-data">
+
+                            <h4>Query: <span id="transferQueryName"></span></h4><br/>
+
+                            <h:inputText style="display: none;" id="transferQueryId" value="#{adminDebugBean.transferQueryId}"/>
+
+                            <span style="font-weight: bold;" id="transferResearcherName"></span> ==>
+
+                            <h:selectOneMenu id="transferToResearcher"
+                                    class="form-control"
+                                    value="#{adminDebugBean.transferQueryToUserId}">
+                                <f:selectItems value="#{adminDebugBean.user.entrySet()}" var="user"
+                                           itemLabel="#{user.value.getAuthName()}" itemValue="#{user.key}" />
+                            </h:selectOneMenu>
+
+                            <h:commandButton id="transferRequestFormLink"
+                                             action="#{adminDebugBean.transferRequest()}"
+                                             style="display: none;">
+                                <f:ajax execute="@form" render="@form" />
+                            </h:commandButton>
+                        </h:form>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                            #{label['admin.form.button.close']}
+                        </button>
+                        <button type="button" class="btn btn-primary"
+                                onclick='transferRequest()'>
+                            #{label['admin.form.button.transferRequest']}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" >
+            function updateFieldsRequestTransfer(queryId, queryTitle, reseacherName) {
+                document.getElementById("transferRequestForm:transferQueryId").value = queryId;
+                document.getElementById("transferQueryName").innerText = queryTitle;
+                document.getElementById("transferResearcherName").innerText = reseacherName;
+            }
+
+            function transferRequest() {
+                var jsfcommandButton = document.getElementById("transferRequestForm:transferRequestFormLink");
+                jsfcommandButton.click();
+                $('#transferResearcherModal').modal('hide');
+            }
+        </script>
 
     </ui:define>
 </ui:composition>
