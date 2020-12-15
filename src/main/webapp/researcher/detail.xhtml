@@ -179,7 +179,7 @@
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -120px;">
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-from-request-history"
-                                        style="margin: 10px;display: none;">
+                                        style="margin: 10px;">
                                     #{label['queryview.lifecycle.requestHistory.title']}
                                 </button>
                                 <h:form>
@@ -203,16 +203,40 @@
                     function showConfirmDialog() {
                         $('#modal-from-request-history').modal('show');
                     }
+
+                    var data = #{researcherQueriesDetailBean.getRequestLifeCycleStatus().getRequestLifecycleHistory()}
+
+                    $(document).ready( function () {
+                        $('#request-lifecycle-history').DataTable({
+                            paging: false,
+                            fixedHeader: true,
+                            scrollY: 300,
+                            "order": [[ 0, "desc" ]],
+                            data: data,
+                            columns: [
+                                { title: "Date", data: 'Date' },
+                                { title: "Biobank Name", data: 'Biobank Name' },
+                                { title: "Collection Name", data: 'Collection Name' },
+                                { title: "Status", data: 'Status' },
+                                { title: "Description", data: 'Description' },
+                                { title: "User", data: 'User' }
+                            ]
+                        });
+                    } );
                 </h:outputScript>
 
                 <div class="modal fade" id="modal-from-request-history" tabindex="-1" role="dialog" aria-labelledby="requestHistoryModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog" style="width: 900px;">
                         <div class="modal-content">
                             <div class="modal-header">
-                                Request History
+                                #{label['lifecycle.histroy.modal.title']}
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to delete this file?
+
+                                <table id="request-lifecycle-history" class="display">
+
+                                </table>
+
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

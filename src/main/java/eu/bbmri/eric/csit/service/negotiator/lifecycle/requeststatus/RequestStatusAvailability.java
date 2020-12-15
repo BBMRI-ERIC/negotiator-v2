@@ -21,10 +21,12 @@ public class RequestStatusAvailability implements RequestStatus {
     private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private final List<String> allowedNextStatusBiobanker = new ArrayList<>();
     private final List<String> allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
+    private final Integer userId;
 
     public RequestStatusAvailability(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
+        userId = collectionRequestStatusDTO.getStatusUserId();
         allowedNextStatusBiobanker.addAll(LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), this.status));
         if(status.equalsIgnoreCase("sample_data_available_accessible")) {
             String numberAvaiableSamples = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "numberAvaiableSamples");
@@ -86,8 +88,13 @@ public class RequestStatusAvailability implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>contacted</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 
     private String getStatusTextFromJson(String statusJsonString, String jsonKey) {

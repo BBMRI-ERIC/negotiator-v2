@@ -5,9 +5,9 @@ import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import org.jooq.tools.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class RequestStatusAbandoned implements RequestStatus {
     private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private List<String> allowedNextStatusBiobanker = new ArrayList<>();
     private List<String> allowedNextStatusResearcher = new ArrayList<>();
-
+    private Integer userId;
     public RequestStatusAbandoned(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
     }
@@ -28,6 +28,7 @@ public class RequestStatusAbandoned implements RequestStatus {
     public RequestStatusAbandoned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
+        userId = collectionRequestStatusDTO.getStatusUserId();
         if(status.equalsIgnoreCase(LifeCycleRequestStatusStatus.NOT_INTERESTED)) {
             statusText = "Biobank stepped away";
         }
@@ -79,7 +80,12 @@ public class RequestStatusAbandoned implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>abandoned</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 }

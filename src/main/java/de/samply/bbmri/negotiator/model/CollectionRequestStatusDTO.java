@@ -75,4 +75,5 @@ public class CollectionRequestStatusDTO {
     public void setStatusUserId(Integer status_user_id) {
         this.status_user_id = status_user_id;
     }
+
 }

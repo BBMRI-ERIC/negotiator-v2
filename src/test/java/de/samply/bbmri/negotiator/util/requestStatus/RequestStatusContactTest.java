@@ -78,13 +78,4 @@ public class RequestStatusContactTest {
                 "not_interested");
         assertEquals(allowedNextStatus, requestStatusContact.getAllowedNextStatus());
     }
-
-    @Test
-    @DisplayName("Test html table row creation.")
-    void testGetStatusAsHtmlRow() {
-        Mockito.lenient().when(collectionRequestStatusDTO.getStatusType()).thenReturn("contact");
-        Mockito.lenient().when(collectionRequestStatusDTO.getStatusDate()).thenReturn(testDate);
-        requestStatusContact = new RequestStatusContact(collectionRequestStatusDTO);
-        assertEquals("<tr><td>null</td><td>contacted</td><td></td><td></tr>", requestStatusContact.getTableRow());
-    }
 }

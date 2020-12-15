@@ -17,6 +17,7 @@ public class RequestStatusDataReturnOffer implements RequestStatus {
     private final String statusType = LifeCycleRequestStatusType.DATA_RETURN_OFFER;
     private final String statusText = "Offer for data return.";
     private Date statusDate = null;
+    private final Integer userId;
     private List<String> allowedNextStatus = new ArrayList<>();
     private List<String> allowedNextStatusBiobanker = new ArrayList<>();
     private List<String> allowedNextStatusResearcher = new ArrayList<>();
@@ -27,6 +28,7 @@ public class RequestStatusDataReturnOffer implements RequestStatus {
         allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName(), status);
         allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName(), status);
         allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName(), status);
+        userId = collectionRequestStatusDTO.getStatusUserId();
     }
 
     @Override
@@ -70,8 +72,13 @@ public class RequestStatusDataReturnOffer implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>contacted</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 
     private String getStatusTextFromJson(String statusJsonString, String jsonKey) {
