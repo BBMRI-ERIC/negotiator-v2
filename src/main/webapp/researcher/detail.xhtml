@@ -103,53 +103,53 @@
 
                 <div style="background-color: #e3e3e3;padding: 10px;margin-bottom: 5px;border-radius: 10px;">
 
-                <h:panelGroup layout="block" id="queryDetails">
+                    <h:panelGroup layout="block" id="queryDetails">
 
-                    <h:messages showSummary="true" showDetail="false"
-                                styleClass="list-group"
-                                errorClass="list-group-item list-group-item-danger"
-                                infoClass="list-group-item list-group-item-info"/>
+                        <h:messages showSummary="true" showDetail="false"
+                                    styleClass="list-group"
+                                    errorClass="list-group-item list-group-item-danger"
+                                    infoClass="list-group-item list-group-item-info"/>
 
-                    <bbmricc:queryDetailData bean="#{researcherQueriesDetailBean}" />
+                        <bbmricc:queryDetailData bean="#{researcherQueriesDetailBean}" />
 
-                </h:panelGroup>
-               <h:panelGroup id="queryCollectionsDisplay" layout="block">
+                    </h:panelGroup>
+                   <h:panelGroup id="queryCollectionsDisplay" layout="block">
 
-                    <h:panelGroup styleClass="text" layout="block">
-                        <h:outputLabel value="#{label['queryview.title.amountMatchingCollections']}"/>
-                        <h:outputText
-                                value="#{researcherQueriesDetailBean.matchingBiobanks} #{researcherQueriesDetailBean.reachableCollections}"
-                                style="margin-left: 22px;">
-                        </h:outputText>
+                        <h:panelGroup styleClass="text" layout="block">
+                            <h:outputLabel value="#{label['queryview.title.amountMatchingCollections']}"/>
+                            <h:outputText
+                                    value="#{researcherQueriesDetailBean.matchingBiobanks} #{researcherQueriesDetailBean.reachableCollections}"
+                                    style="margin-left: 22px;">
+                            </h:outputText>
 
-                        <a href="#" data-toggle="collapse" data-target="#collection-list" class="label label-default">
-                            #{label['queryview.action.showcollections']}
-                        </a>
+                            <a href="#" data-toggle="collapse" data-target="#collection-list" class="label label-default">
+                                #{label['queryview.action.showcollections']}
+                            </a>
+                        </h:panelGroup>
+
+                       <div id="collection-list" class="collapse">
+                           #{researcherQueriesDetailBean.jsTreeJson}
+                       </div>
+                       <h:outputScript>
+                           $(function() {
+                               var data1= JSON.parse(document.getElementById("collection-list").innerHTML);
+                               $('#collection-list').jstree({
+                                   'core': {
+                                       'data': data1
+                                   }
+                               });
+                           });
+                       </h:outputScript>
                     </h:panelGroup>
 
-                   <div id="collection-list" class="collapse">
-                       #{researcherQueriesDetailBean.jsTreeJson}
-                   </div>
-                   <h:outputScript>
-                       $(function() {
-                           var data1= JSON.parse(document.getElementById("collection-list").innerHTML);
-                           $('#collection-list').jstree({
-                               'core': {
-                                   'data': data1
-                               }
-                           });
-                       });
-                   </h:outputScript>
-                </h:panelGroup>
+                    <h:panelGroup id="noCollectionsText"
+                            rendered="#{researcherQueriesDetailBean.matchingBiobankCollection.size() == 0}"
+                            layout="block">
+                        <h:outputLabel value="#{label['queryview.title.nocollections']}"
+                                       styleClass="form-control-static"/>
+                    </h:panelGroup>
 
-                <h:panelGroup id="noCollectionsText"
-                        rendered="#{researcherQueriesDetailBean.matchingBiobankCollection.size() == 0}"
-                        layout="block">
-                    <h:outputLabel value="#{label['queryview.title.nocollections']}"
-                                   styleClass="form-control-static"/>
-                </h:panelGroup>
-
-                <bbmricc:queryDetailAttachments queryBean="#{researcherQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" delete="false"/>
+                    <bbmricc:queryDetailAttachments queryBean="#{researcherQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" delete="false"/>
 
                 </div>
 

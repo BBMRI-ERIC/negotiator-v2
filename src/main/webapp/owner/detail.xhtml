@@ -108,20 +108,24 @@
 
             <h:panelGroup layout="block">
 
-                <bbmricc:queryDetailData bean="#{ownerQueriesDetailBean}" />
+                <div style="background-color: #e3e3e3;padding: 10px;margin-bottom: 5px;border-radius: 10px;">
+                    <bbmricc:queryDetailData bean="#{ownerQueriesDetailBean}" />
 
-                <bbmricc:queryDetailAttachments queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
+                    <bbmricc:queryDetailAttachments queryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}" />
 
 
 
-                <h:form styleClass="form-horizontal" style="width: 100%; margin-top: 10px;">
-                    <h:commandButton action="#{ownerQueriesDetailBean.participateInQuery()}"
-                                     value="#{label['querydetail.action.participate']}"
-                                     rendered="#{ownerQueriesDetailBean.nonConfidential == true}"
-                                     styleClass="btn btn-primary">
-                            <f:ajax render="left-panel right-panel" />
-                    </h:commandButton>
-                </h:form>
+                    <h:form styleClass="form-horizontal" style="width: 100%; margin-top: 10px;">
+                        <h:commandButton action="#{ownerQueriesDetailBean.participateInQuery()}"
+                                         value="#{label['querydetail.action.participate']}"
+                                         rendered="#{ownerQueriesDetailBean.nonConfidential == true}"
+                                         styleClass="btn btn-primary">
+                                <f:ajax render="left-panel right-panel" />
+                        </h:commandButton>
+                    </h:form>
+                </div>
+
+                <!-- Tab Section -->
 
                 <h:panelGroup layout="block" style="margin-top:10px;">
                         <ul class="nav nav-tabs">
