@@ -12,7 +12,7 @@ public interface RequestStatus {
 
     Locale locale = new Locale("en", "US");
     ResourceBundle labelFormat = ResourceBundle.getBundle("global", locale);
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy hh:mm");
 
     Date getStatusDate();
     String getStatus();
