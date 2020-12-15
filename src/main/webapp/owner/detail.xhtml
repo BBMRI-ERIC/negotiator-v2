@@ -183,14 +183,21 @@
 
                                 <div style="width: 100%;">
                                     <div style="float: right;background-color: #9a9a9a;border-radius: 5px;padding: 3px;margin-bottom: 3px;">
-                                        <span style="padding-left: 2px;cursor: pointer;" onclick="sortByStatus()">Sort by Status</span>
+                                        <span id="sortingViewStatusButton" style="padding-left: 2px;cursor: pointer;" onclick="sortByStatus()">Sort by Status</span>
                                         |
-                                        <span style="padding-left: 2px;cursor: pointer;" onclick="sortByBiobank()">Sort by Biobank</span>
+                                        <span id="sortingViewBiobankButton" class="highlightSortOption" style="padding-left: 2px;cursor: pointer;" onclick="sortByBiobank()">Sort by Biobank</span>
                                     </div>
                                 </div>
                                 <style>
                                     .hideSortingView {
                                         display: none;
+                                    }
+                                    .highlightSortOption {
+                                        background-color: #004275;
+                                        color: #FFFFFF;
+                                        border-radius: 5px;
+                                        padding: 3px;
+                                        margin-bottom: 3px;
                                     }
                                 </style>
 
@@ -200,12 +207,20 @@
                                         statusSort.classList.add("hideSortingView");
                                         var biobankSort = document.getElementById("sortingViewBiobank");
                                         biobankSort.classList.remove("hideSortingView");
+                                        var statusSort = document.getElementById("sortingViewStatusButton");
+                                        statusSort.classList.remove("highlightSortOption");
+                                        var biobankSort = document.getElementById("sortingViewBiobankButton");
+                                        biobankSort.classList.add("highlightSortOption");
                                     }
                                     function sortByStatus() {
                                         var statusSort = document.getElementById("sortingViewStatus");
                                         statusSort.classList.remove("hideSortingView");
                                         var biobankSort = document.getElementById("sortingViewBiobank");
                                         biobankSort.classList.add("hideSortingView");
+                                        var statusSort = document.getElementById("sortingViewStatusButton");
+                                        statusSort.classList.add("highlightSortOption");
+                                        var biobankSort = document.getElementById("sortingViewBiobankButton");
+                                        biobankSort.classList.remove("highlightSortOption");
                                     }
 
                                     $(document).ready(function(){
