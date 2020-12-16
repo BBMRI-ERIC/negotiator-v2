@@ -252,9 +252,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 			requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
 			requestLifeCycleStatus.initialise();
 			requestLifeCycleStatus.initialiseCollectionStatus();
-			createCollectionListSortedByStatus();
 
 			for(BiobankRecord biobankRecord : associatedBiobanks) {
+				createCollectionListSortedByStatus(biobankRecord.getId());
 				int bbcolsize = requestLifeCycleStatus.getCollectionsForBiobank(biobankRecord.getId()).size();
 				if(bbcolsize > maxNumberOfCollections) {
 					maxNumberOfCollections = bbcolsize;
@@ -272,20 +272,18 @@ public class OwnerQueriesDetailBean implements Serializable {
 		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
 	}
 
-	private void createCollectionListSortedByStatus() {
-		for(Integer biobankIds : requestLifeCycleStatus.getBiobankIds()) {
-			for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
-				if(collectionLifeCycleStatus.getStatus() == null) {
-					if(!sortedCollections.containsKey("ERRORState")) {
-						sortedCollections.put("ERRORState", new ArrayList<>());
-					}
-					sortedCollections.get("ERRORState").add(collectionLifeCycleStatus);
-				} else {
-					if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus().getStatus())) {
-						sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
-					}
-					sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
+	private void createCollectionListSortedByStatus(Integer biobankIds) {
+		for(CollectionLifeCycleStatus collectionLifeCycleStatus : requestLifeCycleStatus.getCollectionsForBiobank(biobankIds)) {
+			if(collectionLifeCycleStatus.getStatus() == null) {
+				if(!sortedCollections.containsKey("ERRORState")) {
+					sortedCollections.put("ERRORState", new ArrayList<>());
 				}
+				sortedCollections.get("ERRORState").add(collectionLifeCycleStatus);
+			} else {
+				if(!sortedCollections.containsKey(collectionLifeCycleStatus.getStatus().getStatus())) {
+					sortedCollections.put(collectionLifeCycleStatus.getStatus().getStatus(), new ArrayList<>());
+				}
+				sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
 			}
 		}
 	}
