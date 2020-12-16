@@ -259,7 +259,8 @@
                                                                     <bbmribiobankercc:lifecycleCollectionStatus
                                                                             collectionLifeCycleStatus="#{collectionStatus}"
                                                                             collectionId="#{collectionStatus.collectionId}"
-                                                                            biobankId="#{-1}" />
+                                                                            biobankId="#{-1}"
+                                                                            formIdPrefix="_sortStatus_" />
                                                                 </h:form>
                                                             </ui:repeat>
                                                             <hr/>
@@ -295,7 +296,8 @@
                                                                     <bbmribiobankercc:lifecycleCollectionStatus
                                                                             collectionLifeCycleStatus="#{collectionStatus}"
                                                                             collectionId="#{collectionStatus.collectionId}"
-                                                                            biobankId="#{biobank.id}" />
+                                                                            biobankId="#{biobank.id}"
+                                                                            formIdPrefix="_sortBiobank_" />
                                                                 </div>
                                                             </ui:repeat>
                                                         </div>
@@ -585,20 +587,22 @@
                             $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val('notselected.notselected');
                         }
 
-                        function updateIdsForIndicateAccessConditions(collectionId, biobankId) {
-                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
+                        function updateIdsForIndicateAccessConditions(collectionId, biobankId, formIdPrefix) {
+                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
                         }
 
-                        function invokeCommandLink(collectionId, biobankId) {
-                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
-                            var numberOfAvailableSamples = $("#numberOfAvailableSamples" + collectionId).find("input").val();
-                            var numberOfAvailablePatients = $("#numberOfAvailablePatients" + collectionId).find("input").val();
-                            var indicateAccessConditions = $("#indicateAccessConditions" + collectionId).find("textarea").val();
-                            var indicateAccessConditionsMTAFile = $("#indicateAccessConditionsMTAFile" + collectionId).find("input").val();
-                            var shippedNumber = $("#shippedNumber" + collectionId).find("textarea").val();
+                        function invokeCommandLink(collectionId, biobankId, formIdPrefix) {
+                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
+                            var numberOfAvailableSamples = $("#numberOfAvailableSamples" + formIdPrefix + collectionId).find("input").val();
+                            var numberOfAvailablePatients = $("#numberOfAvailablePatients" + formIdPrefix + collectionId).find("input").val();
+                            var indicateAccessConditions = $("#indicateAccessConditions" + formIdPrefix + collectionId).find("textarea").val();
+                            var indicateAccessConditionsMTAFile = $("#indicateAccessConditionsMTAFile" + formIdPrefix + collectionId).find("input").val();
+                            var shippedNumber = $("#shippedNumber" + formIdPrefix + collectionId).find("textarea").val();
+
+                            alert(nextCollectionLifecycleStatusStatus);
 
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfSamplesAvailable").value = numberOfAvailableSamples;
