@@ -38,7 +38,10 @@
         <h3>#{label['admin.debug.query']}</h3>
 
         <h:form styleClass="form-horizontal">
-            <h:commandButton action="#{adminDebugBean.loadQueries()}" value="#{label['admin.debug.click']}"
+            <h:commandButton action="#{adminDebugBean.loadQueries(true)}" value="#{label['admin.debug.click.filter']}"
+                             styleClass="btn btn-success"/>
+
+            <h:commandButton style="margin-left: 25px;" action="#{adminDebugBean.loadQueries(false)}" value="#{label['admin.debug.click.nofilter']}"
                              styleClass="btn btn-default"/>
         </h:form>
 

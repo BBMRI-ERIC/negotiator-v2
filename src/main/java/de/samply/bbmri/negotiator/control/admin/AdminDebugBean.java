@@ -166,9 +166,9 @@ public class AdminDebugBean implements Serializable {
      *
      * @return
      */
-    public void loadQueries() {
+    public void loadQueries(Boolean filterRemoveTestRequests) {
         try(Config config = ConfigFactory.get()) {
-            queries = DbUtil.getQueries(config);
+            queries = DbUtil.getQueries(config, filterRemoveTestRequests);
             users = new HashMap<Integer, PersonRecord>();
             for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);

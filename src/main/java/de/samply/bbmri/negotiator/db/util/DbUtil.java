@@ -2026,11 +2026,20 @@ public class DbUtil {
      * @param config    DB access handle
      * @return List<QueryRecord> list of query record objects
      */
-    public static List<QueryRecord> getQueries(Config config){
-        Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY))
-                .from(Tables.QUERY)
-                .orderBy(Tables.QUERY.ID.asc()).fetch();
+    public static List<QueryRecord> getQueries(Config config, boolean filterTestRequests){
+        Result<Record> result = null;
+        if(filterTestRequests) {
+            result = config.dsl()
+                    .select(getFields(Tables.QUERY))
+                    .from(Tables.QUERY)
+                    .where(Tables.QUERY.TEST_REQUEST.eq(false))
+                    .orderBy(Tables.QUERY.ID.asc()).fetch();
+        } else {
+            result = config.dsl()
+                    .select(getFields(Tables.QUERY))
+                    .from(Tables.QUERY)
+                    .orderBy(Tables.QUERY.ID.asc()).fetch();
+        }
 
         // TODO: QueryRecord Mapping is not working for requestDescription, ethicsVote and negotiationStartedTime
         // for this malual Mapping
