@@ -1837,6 +1837,7 @@ public class DbUtil {
                 .join(Tables.BIOBANK)
                 .on(Tables.COLLECTION.BIOBANK_ID.eq(Tables.BIOBANK.ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .orderBy(Tables.COLLECTION.BIOBANK_ID, Tables.COLLECTION.NAME)
                 .fetch();
         /** config.dsl().select(Tables.COLLECTION.fields())
                 .from(Tables.COLLECTION)
