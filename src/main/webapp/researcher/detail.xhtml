@@ -342,10 +342,6 @@
                                     </script>
                                 </h:panelGroup>
 
-                                <style>
-                                    #{researcherQueriesDetailBean.getCSSGrid()}
-                                </style>
-
                                 <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
 
                                 <div style="width: 100%;">
@@ -453,13 +449,10 @@
                                                 </div>
                                                 <div id="collapseLifecycleBiobank#{biobankId}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                                     <div class="card-body">
-
-                                                        <div class="container lifecycleContentArea">
-                                                            <!--<div class="row">-->
                                                             <!-- TODO: Collection table with select -->
                                                             <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId)}"
                                                                        var="collectionStatus" varStatus="loop">
-                                                                <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId).indexOf(collectionStatus)}">
+                                                                <div>
                                                                     <h:form>
                                                                         <bbmriresearchercc:lifecycleCollectionStatus
                                                                                 collectionLifeCycleStatus="#{collectionStatus}"
@@ -469,8 +462,6 @@
                                                                     </h:form>
                                                                 </div>
                                                             </ui:repeat>
-                                                        </div>
-                                                        <!--</div>-->
                                                     </div>
                                                 </div>
                                             </div>
