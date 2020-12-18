@@ -29,6 +29,7 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
                 template="default.xhtml">
 
     <ui:param name="bodyClass" value="container"/>
@@ -45,9 +46,20 @@
                              styleClass="btn btn-default"/>
         </h:form>
 
-        <h:dataTable rendered="#{adminDebugBean.queries.size() > 0}" value="#{adminDebugBean.queries}" var="query"
+        <h:form>
+
+        <h:dataTable id="queryTable" rendered="#{adminDebugBean.queries.size() > 0}" value="#{adminDebugBean.queries}" var="query"
                      columnClasses="columns,columns,columns,columns,columns,columns,columns,columns,columns,columns,columns"
                      rowClasses="rows" class="table-striped table-bordered table-responsive table-fullwidth">
+
+            <f:facet name="{Exporters}">
+                <div style="float:right;padding-top: 5px;">
+                    <h:commandLink>
+                        Export Excel
+                        <p:dataExporter type="xls" target="queryTable" fileName="queryTable" />
+                    </h:commandLink>
+                </div>
+            </f:facet>
 
             <h:column>
                 <f:facet name="header">Id</f:facet>
@@ -141,6 +153,13 @@
                 </h:form>
             </h:column>
         </h:dataTable>
+
+        <h3>Export Page Data Only</h3>
+        <h:commandLink>
+            Export Excel
+            <p:dataExporter type="xls" target="queryTable" fileName="queryTable" pageOnly="true"/>
+        </h:commandLink>
+        </h:form>
 
         <button id="toggleModalIndicateAccessConditions" type="button" style="display: none;" class="btn btn-primary" data-toggle="modal" data-target="#transferResearcherModal">
             Transfer request
