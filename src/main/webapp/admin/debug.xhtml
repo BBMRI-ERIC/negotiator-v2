@@ -29,48 +29,76 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
                 template="default.xhtml">
 
     <ui:param name="bodyClass" value="container"/>
 
     <ui:define name="body">
 
+        <style>
+            .ui-datatable-tablewrapper {
+                width: 2200px;
+                overflow-x: visible;
+                overflow-y: auto;
+            }
+
+        </style>
+
         <h3>#{label['admin.debug.query']}</h3>
 
         <h:form styleClass="form-horizontal">
-            <h:commandButton action="#{adminDebugBean.loadQueries()}" value="#{label['admin.debug.click']}"
+            <h:commandButton action="#{adminDebugBean.loadQueries(true)}" value="#{label['admin.debug.click.filter']}"
+                             styleClass="btn btn-success"/>
+
+            <h:commandButton style="margin-left: 25px;" action="#{adminDebugBean.loadQueries(false)}" value="#{label['admin.debug.click.nofilter']}"
                              styleClass="btn btn-default"/>
         </h:form>
 
-        <h:dataTable rendered="#{adminDebugBean.queries.size() > 0}" value="#{adminDebugBean.queries}" var="query"
-                     columnClasses="columns,columns,columns,columns,columns,columns,columns,columns,columns,columns,columns"
-                     rowClasses="rows" class="table-striped table-bordered table-responsive table-fullwidth">
+        <h:form>
 
-            <h:column>
+            <h3>Export Page Data Only</h3>
+            <h:commandLink>
+                Export Excel
+                <p:dataExporter type="xls" target="queryTable" fileName="queryTable" pageOnly="true"/>
+            </h:commandLink>
+
+        <p:dataTable id="queryTable" rendered="#{adminDebugBean.queries.size() > 0}" value="#{adminDebugBean.queries}" var="query"
+                     columnClasses="columns,columns,columns,columns,columns,columns,columns,columns,columns,columns,columns"
+                     rowClasses="rows" class="table-striped table-bordered table-responsive table-fullwidth"
+                        style="width: 2200px;">
+
+            <f:facet name="{Exporters}">
+                <div style="float:right;padding-top: 5px;">
+                    <h:commandLink>
+                        Export Excel
+                        <p:dataExporter type="xls" target="queryTable" fileName="negotiatorQueryTable" />
+                    </h:commandLink>
+                </div>
+            </f:facet>
+
+            <p:column style="width: 30px;max-height: 75px;">
                 <f:facet name="header">Id</f:facet>
-                #{query.getId()}
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getId()}" />
+            </p:column>
+            <p:column style="width: 100px;max-height: 75px;">
                 <f:facet name="header">Title</f:facet>
-                <h:panelGroup style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap">
-                    #{query.getTitle()}
-                </h:panelGroup>
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getTitle()}" />
+
+            </p:column>
+            <p:column style="width: 150px;max-height: 75px;">
                 <f:facet name="header">Text</f:facet>
-                <h:panelGroup style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap">
-                    #{query.getText()}
-                </h:panelGroup>
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getText()}" />
+            </p:column>
+            <p:column style="width: 150px;max-height: 75px;">
                 <f:facet name="header">QueryCreationTime</f:facet>
-                #{query.getQueryCreationTime()}
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getQueryCreationTime()}" />
+            </p:column>
+            <p:column style="width: 150px;max-height: 75px;">
                 <f:facet name="header">ResearcherId</f:facet>
-                #{adminDebugBean.getUserName(query.getResearcherId())}
-            </h:column>
-            <h:column>
+                <h:outputText value="#{adminDebugBean.getUserName(query.getResearcherId())}" />
+            </p:column>
+            <p:column exportable="false"  style="width: 100px;max-height: 75px;">
                 <f:facet name="header">Transfer request</f:facet>
                 <button
                         onclick="$('#toggleModalIndicateAccessConditions').click();updateFieldsRequestTransfer('#{query.getId()}', '#{query.getTitle()}', '#{adminDebugBean.getUserName(query.getResearcherId())}');"
@@ -78,45 +106,47 @@
                         class="btn btn-primary">
                     Transfer
                 </button>
-            </h:column>
-            <h:column>
+            </p:column>
+            <p:column style="display: none;width: 200px;overflow: hidden;">
                 <f:facet name="header">JsonText</f:facet>
-                <h:panelGroup style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap">
-                    #{query.getJsonText()}
-                </h:panelGroup>
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getJsonText()}" />
+            </p:column>
+            <p:column  style="width: 75px;max-height: 75px;">
                 <f:facet name="header">Attachments</f:facet>
-                #{query.getNumAttachments()}
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getNumAttachments()}" />
+            </p:column>
+            <p:column exportable="false"  style="width: 75px;max-height: 75px;">
                 <f:facet name="header">NegotiatorToken</f:facet>
                 <h:panelGroup style=" overflow: hidden; text-overflow: ellipsis; display:block; white-space: nowrap">
-                    #{query.getNegotiatorToken()}
+                    <h:outputText value="#{query.getNegotiatorToken()}" />
                 </h:panelGroup>
-            </h:column>
-            <h:column>
+            </p:column>
+            <p:column  style="width: 250px;max-height: 75px;">
                 <f:facet name="header">RequestDescription</f:facet>
-                #{query.getRequestDescription()}
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getRequestDescription()}" />
+            </p:column>
+            <p:column  style="width: 150px;max-height: 75px;">
                 <f:facet name="header">EthicsVote</f:facet>
-                #{query.getEthicsVote()}
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getEthicsVote()}" />
+            </p:column>
+            <p:column  style="width: 120px;max-height: 75px;">
                 <f:facet name="header">Negotiation Started Time</f:facet>
-                #{query.getNegotiationStartedTime().toString()}
-            </h:column>
-            <h:column>
+                <h:outputText value="#{query.getNegotiationStartedTime().toString()}" />
+            </p:column>
+            <p:column  style="width: 80px;max-height: 75px;">
                 <f:facet name="header">Test Request</f:facet>
-                <span id="TestRequest#{query.getId()}">#{query.getTestRequest()}</span>
+                <h:outputText value="#{query.getTestRequest()}" />
+            </p:column>
+            <p:column exportable="false"  style="width: 150px;max-height: 75px;">
+                <f:facet name="header">Toggle Test Request</f:facet>
                 <h:form id="form-test-request">
                     <h:commandButton action="#{adminDebugBean.switchTestRequest(query.getId())}" value="#{query.testRequest ? 'Switch to normal Reqest' : 'Switch to Test Reqest'}"
                                      styleClass="btn btn-default"/>
                 </h:form>
-            </h:column>
-            <h:column>
+            </p:column>
+            <p:column exportable="false"  style="width: 200px;max-height: 75px;">
                 <f:facet name="header">Reset Negotiation</f:facet>
+                <!-- Reset Request -->
                 <h:form id="form">
                     <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
                     <h:commandButton id="resetNegotiation"
@@ -124,10 +154,26 @@
                                      value="#{label['querydetail.action.resetNegotiation.buttonText']}"
                                      action="#{adminDebugBean.restNegotiation(query.getId())}"
                                      title="#{label['querydetail.tooltip.restNegotiation']}"
-                                     styleClass="btn btn-primary" style="margin-top: 40px"/>
+                                     styleClass="btn btn-primary" style="margin-top: 5px"/>
                 </h:form>
-            </h:column>
-        </h:dataTable>
+                <!-- Resend Notification to all Biobanks -->
+                <h:form id="formResendNotification">
+                    <!-- Show the start negotiation button only if the negotiation hasn't started yet for a given query. -->
+                    <h:commandButton id="resendNotifications"
+                                     value="#{label['querydetail.action.resendNotifications.buttonText']}"
+                                     action="#{adminDebugBean.resendNotifications(query.getId())}"
+                                     title="#{label['querydetail.tooltip.resendNotifications']}"
+                                     styleClass="btn btn-primary" style="margin-top: 5px"/>
+                </h:form>
+            </p:column>
+        </p:dataTable>
+
+        <h3>Export Page Data Only</h3>
+        <h:commandLink>
+            Export Excel
+            <p:dataExporter type="xls" target="queryTable" fileName="queryTable" pageOnly="true"/>
+        </h:commandLink>
+        </h:form>
 
         <button id="toggleModalIndicateAccessConditions" type="button" style="display: none;" class="btn btn-primary" data-toggle="modal" data-target="#transferResearcherModal">
             Transfer request

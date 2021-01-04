@@ -175,10 +175,6 @@
                                           style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
                                           rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
 
-                                <style>
-                                    #{ownerQueriesDetailBean.getCSSGrid()}
-                                </style>
-
                                 <b>#{label['querydetail.owner.associatedbiobanks']}</b>
 
                                 <div style="width: 100%;">
@@ -222,6 +218,20 @@
                                         var biobankSort = document.getElementById("sortingViewBiobankButton");
                                         biobankSort.classList.remove("highlightSortOption");
                                     }
+
+                                    $(document).ready(function(){
+                                        // Add minus icon for collapse element which is open by default
+                                        $(".collapse.show").each(function(){
+                                            $(this).prev(".card-header").find(".fa").addClass("fa-minus").removeClass("fa-plus");
+                                        });
+
+                                        // Toggle plus minus icon on show hide of collapse element
+                                        $(".collapse").on('show.bs.collapse', function(){
+                                            $(this).prev(".card-header").find(".fa").removeClass("fa-plus").addClass("fa-minus");
+                                        }).on('hide.bs.collapse', function(){
+                                            $(this).prev(".card-header").find(".fa").removeClass("fa-minus").addClass("fa-plus");
+                                        });
+                                    });
                                 </h:outputScript>
 
                                 <div id="sortingViewStatus" class="hideSortingView" style="clear: both;">
@@ -232,7 +242,7 @@
                                                 <div class="card-header" id="headingTwo">
                                                     <h5 class="mb-0">
                                                         <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{collectionsKey}" aria-expanded="false" aria-controls="collapseTwo">
-                                                            #{label[collectionsKey]}:
+                                                            <i class="fa fa-plus"></i> #{label[collectionsKey]}:
                                                         </button>
                                                     </h5>
                                                 </div>
@@ -245,7 +255,8 @@
                                                                     <bbmribiobankercc:lifecycleCollectionStatus
                                                                             collectionLifeCycleStatus="#{collectionStatus}"
                                                                             collectionId="#{collectionStatus.collectionId}"
-                                                                            biobankId="#{-1}" />
+                                                                            biobankId="#{-1}"
+                                                                            formIdPrefix="_sortStatus_" />
                                                                 </h:form>
                                                             </ui:repeat>
                                                             <hr/>
@@ -265,27 +276,25 @@
                                                 <div class="card-header" id="headingTwo">
                                                     <h5 class="mb-0">
                                                         <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
-                                                            #{biobank.name}
+                                                            <i class="fa fa-plus"></i> #{biobank.name}
                                                         </button>
                                                     </h5>
                                                 </div>
                                                 <div id="collapseLifecycleBiobank#{biobank.id}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                                     <div class="card-body">
 
-                                                        <div class="container lifecycleContentArea" style="width: 100%;">
                                                             <!-- TODO: Collection table with select -->
                                                             <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
                                                                        var="collectionStatus" varStatus="loop">
-                                                                <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id).indexOf(collectionStatus)}">
 
-                                                                    <bbmribiobankercc:lifecycleCollectionStatus
+                                                                <bbmribiobankercc:lifecycleCollectionStatus
                                                                             collectionLifeCycleStatus="#{collectionStatus}"
                                                                             collectionId="#{collectionStatus.collectionId}"
-                                                                            biobankId="#{biobank.id}" />
-                                                                </div>
+                                                                            biobankId="#{biobank.id}"
+                                                                            formIdPrefix="_sortBiobank_" />
+
                                                             </ui:repeat>
                                                         </div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -339,6 +348,10 @@
 
                         <!-- Private Comment Tab -->
                         <div id="sampleAvailability" class="tab-pane fade">
+                            <div>
+                                In the discussion only members of the Biobanks and the researcher can read and reply to the messages.
+                            </div>
+
                             <ui:fragment rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() == 0}">
                                 <br />
                                 <p>
@@ -567,20 +580,20 @@
                             $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val('notselected.notselected');
                         }
 
-                        function updateIdsForIndicateAccessConditions(collectionId, biobankId) {
-                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
+                        function updateIdsForIndicateAccessConditions(collectionId, biobankId, formIdPrefix) {
+                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
                         }
 
-                        function invokeCommandLink(collectionId, biobankId) {
-                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
-                            var numberOfAvailableSamples = $("#numberOfAvailableSamples" + collectionId).find("input").val();
-                            var numberOfAvailablePatients = $("#numberOfAvailablePatients" + collectionId).find("input").val();
-                            var indicateAccessConditions = $("#indicateAccessConditions" + collectionId).find("textarea").val();
-                            var indicateAccessConditionsMTAFile = $("#indicateAccessConditionsMTAFile" + collectionId).find("input").val();
-                            var shippedNumber = $("#shippedNumber" + collectionId).find("textarea").val();
+                        function invokeCommandLink(collectionId, biobankId, formIdPrefix) {
+                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
+                            var numberOfAvailableSamples = $("#numberOfAvailableSamples" + formIdPrefix + collectionId).find("input").val();
+                            var numberOfAvailablePatients = $("#numberOfAvailablePatients" + formIdPrefix + collectionId).find("input").val();
+                            var indicateAccessConditions = $("#indicateAccessConditions" + formIdPrefix + collectionId).find("textarea").val();
+                            var indicateAccessConditionsMTAFile = $("#indicateAccessConditionsMTAFile" + formIdPrefix + collectionId).find("input").val();
+                            var shippedNumber = $("#shippedNumber" + formIdPrefix + collectionId).find("textarea").val();
 
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfSamplesAvailable").value = numberOfAvailableSamples;
