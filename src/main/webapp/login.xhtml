@@ -35,19 +35,70 @@
             </div>
         </ui:fragment>
 
-        <p>The BBMRI-ERIC Negotiator is a brand-new service that
+        <p>The BBMRI-ERIC Negotiator is a ervice that
             provides an efficient communication platform for biobankers and
             researchers requesting samples and/or data.<br />
             It substantially simplifies the communication steps that are necessary to obtain
             information on the availability of relevant samples/data,
             particularly if the researchers need to communicate with multiple
             candidate biobanks.<br />
-            The Negotiator 1.0 is connected to the already established
+            The Negotiator 2.0 is connected to the already established
             <a href="https://directory.bbmri-eric.eu" target="_blank"><b>BBMRI-ERIC Directory</b></a>,
             the biggest biobanking catalogue on the globe.
             <br />
             In case of any issues, contact us at <b>negotiator@helpdesk.bbmri-eric.eu</b>
         </p>
+
+        <style>
+            .tabs-right {
+                border-bottom: none;
+                padding-top: 2px;
+            }
+            .tabs-right {
+                border-left: 1px solid #ddd;
+            }
+            .tabs-right>li {
+                float: none;
+                margin-bottom: 2px;
+            }
+            .tabs-right>li {
+                margin-left: -1px;
+            }
+
+            .tabs-right>li.active>a,
+            .tabs-right>li.active>a:hover,
+            .tabs-right>li.active>a:focus {
+                border-bottom: 1px solid #ddd;
+                border-left-color: transparent;
+            }
+            .tabs-right>li>a {
+                border-radius: 0 4px 4px 0;
+                margin-right: 0;
+            }
+        </style>
+
+        <div  class="col-sm-12">
+            <h3>News</h3>
+            <hr/>
+            <div class="col-xs-9">
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="news1"><p>BBMRI-ERIC introduced status tracking of requests in the Negotiator 2.0. This means requests can be categorised based on their status, such as "Under review" or "shipped". It allows communication to be streamlined and requests to be tracked more easily.</p>
+                        <p>We are now releasing a minor usability update in Negotiator 2.1, which should help you with using these features. The whole negotiation now has 3 tabs available:</p>
+                        <img src="#{resource['images/news/news12020.png']}"/>
+                        <p>You can interact with the request status in the first tab (e.g., indicating availability of material/data, providing MTA/DTA as a biobanker, or selecting which biobanks you want to continue with as a requester). The second tab is the request-wide discussion and the third tab is the confidential 1:1 communication between the requester and the biobank. Please note that the latter two tabs now indicate how many new messages you have.</p>
+                        <p>The second important feature is the ability to sort collections/biobanks based on their indicated status (= e.g., availability of material/data). This is particularly important if you have negotiations with many collections/biobanks.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-3"> <!-- required for floating -->
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs tabs-right sideways">
+                    <li class="active"><a href="#news1" data-toggle="tab">16.12.2020</a></li>
+                </ul>
+            </div>
+        </div>
 
 
         <div id="choice-biobanker-researcher">
