@@ -78,13 +78,13 @@
                         </div>
 
                         <div class="badge queryNumberResponsesBadge pull-right"
-                             style='#{cc.attrs.item.privateNegotiationCount == 0 ? "display:none;" : "" }'
+                             style='#{cc.attrs.item.privateNegotiationCount == 0 ? "display:none;" : "" }#{cc.attrs.item.unreadPrivateNegotiationCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
                              data-toggle="tooltip"
                              data-placement="bottom"
-                             title="#{cc.attrs.item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+                             title="#{cc.attrs.item.unreadPrivateNegotiationCount} unread comments from #{cc.attrs.item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
 
                             <i class="glyphicon glyphicon-tower"></i>
-                            <h:outputText value="   #{cc.attrs.item.privateNegotiationCount}" />
+                            <h:outputText value="   #{cc.attrs.item.unreadPrivateNegotiationCount}/#{cc.attrs.item.privateNegotiationCount}" />
                         </div>
 
                     </h:panelGroup>

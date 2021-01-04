@@ -4,6 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
@@ -13,6 +14,7 @@
     <composite:attribute name="collectionLifeCycleStatus" required="true"/>
     <composite:attribute name="collectionId" required="true"/>
     <composite:attribute name="biobankId" required="true"/>
+    <composite:attribute name="formIdPrefix" required="true"/>
 </composite:interface>
 
 <composite:implementation>
@@ -24,7 +26,7 @@
             <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" />
         </span>
     </div>
-    <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
+    <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
         #{label['lifecycleCollectionStatus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
         <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
                          class="form-control"
@@ -35,7 +37,7 @@
             <f:selectItems value="#{cc.attrs.collectionLifeCycleStatus.status.nextStatusForResearchers}" var="nextStatus"
                            itemLabel="#{label[nextStatus]}" itemValue="#{nextStatus}" />
         </h:selectOneMenu>
-        <div id="offer" style="display: none;">
+        <div id="offer#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" style="display: none;">
             #{label['lifecycleCollectionStatus.offer.title']} <i class="fa fa-pencil-square-o" />
             <h:inputTextarea id="offer" value="#{researcherQueriesDetailBean.offer}"
                              styleClass="form-control"
@@ -45,9 +47,9 @@
         <h:outputScript>
             function showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(data) {
                 if(data.value == 'dataReturnOffer.offer') {
-                    $("#offer").show();
+                    $("#offer#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").show();
                 } else {
-                    $("#offer").hide();
+                    $("#offer#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                 }
             }
         </h:outputScript>
@@ -55,8 +57,11 @@
     </div>
     <div class="col-sm-2 col-lg-2">
         <div class="col-sm-2 col-lg-2">
-            <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0)">Update Collection</button>
-            <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">Update for all Collections</button>
+            <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0, '#{cc.attrs.collectionId}')">Update Collection</button>
+            <c:if test="#{cc.attrs.biobankId!=-1}">
+                <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId}, '#{cc.attrs.collectionId}')">Update for all Collections</button>
+            </c:if>
+
         </div>
     </div>
 

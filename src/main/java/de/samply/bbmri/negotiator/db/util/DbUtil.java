@@ -38,6 +38,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
@@ -814,8 +815,26 @@ public class DbUtil {
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
+        //List<OwnerQueryStatsDTO> t1 = config.map(fetch, OwnerQueryStatsDTO.class);
+        //List<OwnerQueryStatsDTO> t2 = mapRecordResultOwnerQueryStatsDTOList(config, fetch);
 
-		return config.map(fetch, OwnerQueryStatsDTO.class);
+		//return config.map(fetch, OwnerQueryStatsDTO.class);
+        return mapRecordResultOwnerQueryStatsDTOList(config, fetch);
+    }
+
+    private static List<OwnerQueryStatsDTO> mapRecordResultOwnerQueryStatsDTOList(Config config, Result<Record> records) {
+        List<OwnerQueryStatsDTO> result = new ArrayList<OwnerQueryStatsDTO>();
+        for(Record record : records) {
+            OwnerQueryStatsDTO ownerQueryStatsDTO = new OwnerQueryStatsDTO();
+            ownerQueryStatsDTO.setQuery(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class));
+            ownerQueryStatsDTO.setQueryAuthor(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            ownerQueryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
+            ownerQueryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
+            ownerQueryStatsDTO.setFlag((Flag) record.getValue("flag"));
+            ownerQueryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
+            result.add(ownerQueryStatsDTO);
+        }
+        return result;
     }
 
 
@@ -932,7 +951,7 @@ public class DbUtil {
                         .and(Tables.PERSON_COMMENT.PERSON_ID.eq(personId)))
                 .where(Tables.COMMENT.QUERY_ID.eq(queryId))
                 .and(Tables.COMMENT.STATUS.eq("published"))
-                .orderBy(Tables.COMMENT.COMMENT_TIME.asc()).fetch();
+                .orderBy(Tables.COMMENT.COMMENT_TIME.desc()).fetch();
 
         HashMap<Integer, List<Collection>> personCollections = new HashMap<>();
 
@@ -949,6 +968,9 @@ public class DbUtil {
                         .select(getFields(Tables.COLLECTION, "collection"))
                         .from(Tables.PERSON_COLLECTION)
                         .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                        .join(Tables.QUERY_COLLECTION)
+                            .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                                .and(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                         .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
                         .fetch();
                 personCollections.put(commenterId, config.map(collections, Collection.class));
@@ -988,6 +1010,36 @@ public class DbUtil {
                 "GROUP BY person_id)").execute();
 
         updateCommentReadForUser(config, commenterId, commentId);
+    }
+
+    public static void addOfferCommentReadForComment(Config config, Integer offertId, Integer commenterId, Integer biobankId) {
+        config.dsl().resultQuery("INSERT INTO public.person_offer (person_id, offer_id, read) " +
+                "(SELECT person_id, " + offertId + ", false FROM " +
+                "((SELECT pc.person_id person_id " +
+                "FROM public.collection c " +
+                "JOIN person_collection pc ON pc.collection_id = c.id " +
+                "WHERE c.biobank_id = " + biobankId + ") " +
+                "UNION " +
+                "(SELECT q.researcher_id person_id " +
+                "FROM public.offer com " +
+                "JOIN query q ON com.query_id = q.id " +
+                "WHERE com.id = " + offertId + ")) sub " +
+                "GROUP BY person_id)").execute();
+
+        updateOfferCommentReadForUser(config, commenterId, offertId);
+    }
+
+    public static void updateOfferCommentReadForUser(Config config, Integer userId, Integer offertId) {
+        PersonOfferRecord record = config.dsl().selectFrom(Tables.PERSON_OFFER)
+                .where(Tables.PERSON_OFFER.OFFER_ID.eq(offertId))
+                .and(Tables.PERSON_OFFER.PERSON_ID.eq(userId))
+                .fetchOne();
+
+        if(record != null && !record.getRead()) {
+            record.setRead(true);
+            record.setDateRead(new Timestamp(new Date().getTime()));
+            record.update();
+        }
     }
 
     /**
@@ -1785,6 +1837,7 @@ public class DbUtil {
                 .join(Tables.BIOBANK)
                 .on(Tables.COLLECTION.BIOBANK_ID.eq(Tables.BIOBANK.ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .orderBy(Tables.COLLECTION.BIOBANK_ID, Tables.COLLECTION.NAME)
                 .fetch();
         /** config.dsl().select(Tables.COLLECTION.fields())
                 .from(Tables.COLLECTION)
@@ -1819,41 +1872,47 @@ public class DbUtil {
      * @param queryId
      * @return target
      */
-    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer biobankInPrivateChat) {
-        Result<Record> result = config.dsl()
+    public static List<OfferPersonDTO> getOffers(Config config, int queryId, Integer biobankInPrivateChat, int personId) {
+        Result<Record> offerPersons = config.dsl()
                 .select(getFields(Tables.OFFER, "offer"))
                 .select(getFields(Tables.PERSON, "person"))
-                .select(getFields(Tables.COLLECTION, "collection"))
+                .select(getFields(Tables.PERSON_OFFER, "personoffer"))
                 .from(Tables.OFFER)
                 .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.OFFER.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .leftOuterJoin(Tables.PERSON_OFFER).on(Tables.PERSON_OFFER.OFFER_ID.eq(Tables.OFFER.ID)).and(Tables.PERSON_OFFER.PERSON_ID.eq(personId))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT.eq(biobankInPrivateChat))
                 .and(Tables.OFFER.STATUS.eq("published"))
                 .orderBy(Tables.OFFER.COMMENT_TIME.asc()).fetch();
 
-        List<OfferPersonDTO> map = config.map(result, OfferPersonDTO.class);
+        List<OfferPersonDTO> result = new ArrayList<>();
+        HashMap<Integer, List<Collection>> personCollections = new HashMap<>();
 
-        List<OfferPersonDTO> target = new ArrayList<>();
-        /**
-         * Now we have to do weird things, grouping them together manually
-         */
-        HashMap<Integer, OfferPersonDTO> mapped = new HashMap<>();
-
-        for(OfferPersonDTO dto : map) {
-            if(!mapped.containsKey(dto.getOffer().getId())) {
-                mapped.put(dto.getOffer().getId(), dto);
-
-                if(dto.getCollection() != null) {
-                    dto.getCollections().add(dto.getCollection());
-                }
-                target.add(dto);
-            } else if(dto.getCollection() != null) {
-                    mapped.get(dto.getOffer().getId()).getCollections().add(dto.getCollection());
+        for(Record record : offerPersons) {
+            OfferPersonDTO offerPersonDTO = new OfferPersonDTO();
+            offerPersonDTO.setOffer(config.map(record, Offer.class));
+            offerPersonDTO.getOffer().setId(Integer.parseInt(record.getValue("offer_id").toString()));
+            offerPersonDTO.setPerson(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            offerPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
+            offerPersonDTO.setCommentRead(record.getValue("personoffer_read") == null || (boolean) record.getValue("personoffer_read"));
+            Integer commenterId = offerPersonDTO.getPerson().getId();
+            if(!personCollections.containsKey(commenterId)) {
+                Result<Record> collections = config.dsl()
+                        .select(getFields(Tables.COLLECTION, "collection"))
+                        .from(Tables.PERSON_COLLECTION)
+                        .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                        .join(Tables.QUERY_COLLECTION)
+                            .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                                .and(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                        .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
+                        .fetch();
+                personCollections.put(commenterId, config.map(collections, Collection.class));
             }
+            offerPersonDTO.setCollections(personCollections.get(commenterId));
+            result.add(offerPersonDTO);
         }
-        return target;
+
+        return result;
     }
 
     public static Result<Record> getCommentCountAndTime(Config config, Integer queryId){
@@ -1869,11 +1928,16 @@ public class DbUtil {
         return result;
     }
 
-    public static Result<Record> getPrivateNegotiationCountAndTimeForResearcher(Config config, Integer queryId){
+    public static Result<Record> getPrivateNegotiationCountAndTimeForResearcher(Config config, Integer queryId, Integer personId){
         Result<Record> result = config.dsl()
                 .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .select(Tables.PERSON_OFFER.READ.count().as("unread_private_negotiation_count"))
                 .from(Tables.OFFER)
+                .leftOuterJoin(Tables.PERSON_OFFER)
+                    .on(Tables.PERSON_OFFER.OFFER_ID.eq(Tables.OFFER.ID)
+                            .and(Tables.PERSON_OFFER.PERSON_ID.eq(personId))
+                            .and(Tables.PERSON_OFFER.READ.eq(false)))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.STATUS.eq("published"))
                 .fetch();
@@ -1884,10 +1948,15 @@ public class DbUtil {
         Result<Record> result = config.dsl()
                 .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
+                .select(Tables.PERSON_OFFER.READ.count().as("unread_private_negotiation_count"))
                 .from(Tables.OFFER)
                 .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT))
                 .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
                 .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .leftOuterJoin(Tables.PERSON_OFFER)
+                    .on(Tables.PERSON_OFFER.OFFER_ID.eq(Tables.OFFER.ID)
+                        .and(Tables.PERSON_OFFER.PERSON_ID.eq(personId))
+                        .and(Tables.PERSON_OFFER.READ.eq(false)))
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.STATUS.eq("published"))
                 .and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId)).fetch();
@@ -1957,11 +2026,20 @@ public class DbUtil {
      * @param config    DB access handle
      * @return List<QueryRecord> list of query record objects
      */
-    public static List<QueryRecord> getQueries(Config config){
-        Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY))
-                .from(Tables.QUERY)
-                .orderBy(Tables.QUERY.ID.asc()).fetch();
+    public static List<QueryRecord> getQueries(Config config, boolean filterTestRequests){
+        Result<Record> result = null;
+        if(filterTestRequests) {
+            result = config.dsl()
+                    .select(getFields(Tables.QUERY))
+                    .from(Tables.QUERY)
+                    .where(Tables.QUERY.TEST_REQUEST.eq(false))
+                    .orderBy(Tables.QUERY.ID.asc()).fetch();
+        } else {
+            result = config.dsl()
+                    .select(getFields(Tables.QUERY))
+                    .from(Tables.QUERY)
+                    .orderBy(Tables.QUERY.ID.asc()).fetch();
+        }
 
         // TODO: QueryRecord Mapping is not working for requestDescription, ethicsVote and negotiationStartedTime
         // for this malual Mapping
@@ -2657,5 +2735,17 @@ public class DbUtil {
 
     public static void toggleRequestTestState(Config config, Integer queryId) {
         config.dsl().execute("UPDATE public.query SET test_request= NOT test_request WHERE id=" + queryId);
+    }
+
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForRequest(Config config, Integer queryId) {
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+                .from(Tables.PERSON)
+                .fullOuterJoin(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                .fullOuterJoin(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                .fullOuterJoin(Tables.QUERY).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
+                .or(Tables.PERSON.IS_ADMIN.isTrue()))
+                .fetch();
+        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
     }
 }

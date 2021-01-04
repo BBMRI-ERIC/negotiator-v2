@@ -48,13 +48,13 @@
 
 		<h:form id="uploadform" enctype="multipart/form-data">
 
-			<h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
+			<!--<h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
 
 				<bbmricc:avatar person="#{userBean.person}" />
 
-			</h:panelGroup>
+			</h:panelGroup>-->
 
-			<h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
+			<h:panelGroup layout="block" styleClass="col-xs-12 col-md-12">
 				<h:panelGroup class="form-group" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<h:inputTextarea id="commentText" value="#{commentBean.comment}"
 						styleClass="form-control" rows="5"
@@ -80,7 +80,7 @@
 
 				</h:panelGroup>
 
-				<h:panelGroup layout="block" styleClass="pull-right"  style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'false'}">
+				<h:panelGroup layout="block" styleClass="pull-right"  style="margin-top:5px;" rendered="#{cc.attrs.makeOffer == 'false'}">
 					<h:commandButton
 						action="#{commentBean.saveComment(cc.attrs.query)}"
 						value="#{label['querydetail.action.addComment.buttontext']}"
@@ -115,7 +115,7 @@
 
 				</h:panelGroup>
 
-				<h:panelGroup layout="block" style="margin-top:20px;" rendered="#{cc.attrs.makeOffer == 'true'}">
+				<h:panelGroup layout="block" style="margin-top:5px;" rendered="#{cc.attrs.makeOffer == 'true'}">
 					<h:panelGroup styleClass="pull-left" >
 <!-- 						<h:commandButton disabled="#{true}" -->
 <!-- 							value="#{label['querydetail.action.privateDiscussion']}" -->

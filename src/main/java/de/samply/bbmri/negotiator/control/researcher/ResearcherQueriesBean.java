@@ -170,9 +170,10 @@ public class ResearcherQueriesBean implements Serializable {
 
     public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId());
+            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
             queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+            queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
         } catch (SQLException e) {
             System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
             e.printStackTrace();

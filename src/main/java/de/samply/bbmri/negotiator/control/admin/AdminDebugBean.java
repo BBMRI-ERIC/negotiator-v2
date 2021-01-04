@@ -166,9 +166,9 @@ public class AdminDebugBean implements Serializable {
      *
      * @return
      */
-    public void loadQueries() {
+    public void loadQueries(Boolean filterRemoveTestRequests) {
         try(Config config = ConfigFactory.get()) {
-            queries = DbUtil.getQueries(config);
+            queries = DbUtil.getQueries(config, filterRemoveTestRequests);
             users = new HashMap<Integer, PersonRecord>();
             for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
@@ -222,7 +222,7 @@ public class AdminDebugBean implements Serializable {
 
         for (int i = 0; i < biobankWithOffer.get(queryId).size(); ++i) {
             List<OfferPersonDTO> offerPersonDTO;
-            offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(queryId).get(i));
+            offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(queryId).get(i), userBean.getUserId());
             listOfSampleOffers.get(queryId).add(offerPersonDTO);
         }
 
