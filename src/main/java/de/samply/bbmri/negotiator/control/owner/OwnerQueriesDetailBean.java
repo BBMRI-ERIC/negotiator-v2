@@ -265,9 +265,6 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private void setPersonListForRequest(Config config, Integer queryId) {
 		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
-		for(Person person : personList) {
-			System.out.println("PersonTestList AGH34567: " + person.getId() + " - " + person.getAuthName());
-		}
 	}
 
 	private void createCollectionListSortedByStatus(Integer biobankIds) {
