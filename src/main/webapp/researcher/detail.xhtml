@@ -415,9 +415,10 @@
                                                 </div>
                                                 <div id="collapseLifecycleBiobank#{collectionsKey}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                                     <div class="card-body">
-                                                        <div class="container lifecycleContentArea">
-                                                            <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
-                                                                       var="collection" varStatus="loop">
+
+                                                        <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
+                                                                   var="collection" varStatus="loop">
+                                                            <div class="row">
                                                                 <h:form>
                                                                     <bbmriresearchercc:lifecycleCollectionStatus
                                                                             collectionLifeCycleStatus="#{collection}"
@@ -425,9 +426,10 @@
                                                                             biobankId="#{-1}"
                                                                             formIdPrefix="_sortStatus_" />
                                                                 </h:form>
-                                                            </ui:repeat>
-                                                            <hr/>
-                                                        </div>
+                                                            </div>
+                                                        </ui:repeat>
+                                                        <hr/>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -452,7 +454,7 @@
                                                             <!-- TODO: Collection table with select -->
                                                             <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId)}"
                                                                        var="collectionStatus" varStatus="loop">
-                                                                <div>
+                                                                <div class="row">
                                                                     <h:form>
                                                                         <bbmriresearchercc:lifecycleCollectionStatus
                                                                                 collectionLifeCycleStatus="#{collectionStatus}"
