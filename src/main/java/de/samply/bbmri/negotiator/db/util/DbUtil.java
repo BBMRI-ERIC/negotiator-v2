@@ -2746,6 +2746,22 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
                 .or(Tables.PERSON.IS_ADMIN.isTrue()))
                 .fetch();
-        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
+        return mapResultPerson(record);
+    }
+
+    private static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> mapResultPerson(Result<Record> records) {
+        List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> result = new ArrayList<>();
+        for(Record record : records) {
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
+            if(record.getValue("id") == null) {
+                continue;
+            }
+            person.setId(record.getValue("id", Integer.class));
+            person.setAuthEmail(record.getValue("auth_email", String.class));
+            person.setAuthName(record.getValue("auth_name", String.class));
+            person.setOrganization(record.getValue("organization", String.class));
+            result.add(person);
+        }
+        return result;
     }
 }
