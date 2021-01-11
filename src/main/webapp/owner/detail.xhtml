@@ -108,6 +108,7 @@
 
             <h:panelGroup layout="block">
 
+                <!-- Request Description Area -->
                 <div style="background-color: #e3e3e3;padding: 10px;margin-bottom: 5px;border-radius: 10px;">
                     <bbmricc:queryDetailData bean="#{ownerQueriesDetailBean}" />
 
@@ -124,9 +125,82 @@
                         </h:commandButton>
                     </h:form>
                 </div>
+                <!-- Request Description Area end -->
+
+                <!-- LifeCycleHistory -->
+                <h:panelGroup styleClass="row" layout="block">
+
+                    <h:panelGroup styleClass="col-md-12 btn-toolbar" layout="block">
+
+                        <!-- LifeCycle Menu -->
+                        <div class="dropdown" style="float: right">
+                            <button class="btn btn-secondary dropdown-toggle"
+                                    type="button"
+                                    id="dropdownMenuButton"
+                                    data-toggle="dropdown"
+                                    aria-haspopup="true"
+                                    aria-expanded="false">
+                                <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="left: -120px;">
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-from-request-history"
+                                        style="margin: 10px;">
+                                    #{label['queryview.lifecycle.requestHistory.title']}
+                                </button>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+
+                </h:panelGroup>
+
+                <h:outputScript>
+                    var data = #{ownerQueriesDetailBean.getRequestLifeCycleStatus().getRequestLifecycleHistory()}
+
+                    $(document).ready( function () {
+                        $('#request-lifecycle-history').DataTable({
+                            paging: false,
+                            fixedHeader: true,
+                            scrollY: 300,
+                            "order": [[ 0, "desc" ]],
+                            data: data,
+                            columns: [
+                                { title: "Date", data: 'Date' },
+                                { title: "Biobank Name", data: 'Biobank Name' },
+                                { title: "Collection Name", data: 'Collection Name' },
+                                { title: "Status", data: 'Status' },
+                                { title: "Description", data: 'Description' },
+                                { title: "User", data: 'User' }
+                            ]
+                        });
+                    } );
+
+                    $(document).on("shown.bs.modal", function (e) {
+                        $('#request-lifecycle-history').DataTable().columns.adjust();
+                    });
+                </h:outputScript>
+
+                <div class="modal fade" id="modal-from-request-history" tabindex="-1" role="dialog" aria-labelledby="requestHistoryModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" style="width: 90%;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>#{label['lifecycle.histroy.modal.title']}</h3>
+                            </div>
+                            <div class="modal-body">
+
+                                <table id="request-lifecycle-history" class="table table-striped table-bordered" style="width:100%">
+
+                                </table>
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- LifeCycleHistory end -->
 
                 <!-- Tab Section -->
-
                 <h:panelGroup layout="block" style="margin-top:10px;">
                         <ul class="nav nav-tabs">
                             <li class="active" id="first">
