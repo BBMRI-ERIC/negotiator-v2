@@ -2753,7 +2753,7 @@ public class DbUtil {
         List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> result = new ArrayList<>();
         for(Record record : records) {
             de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
-            if(record.getValue("id") == null) {
+            if(record.getValue("person_id") == null) {
                 continue;
             }
             person.setId(record.getValue("person_id", Integer.class));
