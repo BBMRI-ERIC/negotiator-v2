@@ -19,7 +19,12 @@
 
 <composite:implementation>
 
-    <div class="col-sm-3 col-lg-3">#{cc.attrs.collectionLifeCycleStatus.collectionName}</div>
+    <div class="col-sm-3 col-lg-3">
+        <c:if test='${cc.attrs.formIdPrefix.equals("_sortStatus_")}'>
+            #{cc.attrs.collectionLifeCycleStatus.biobankName} -
+        </c:if>
+        #{cc.attrs.collectionLifeCycleStatus.collectionName}
+    </div>
     <div class="col-sm-3 col-lg-3">
         #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
         <span style="font-size: 12px; font-style: italic;">
