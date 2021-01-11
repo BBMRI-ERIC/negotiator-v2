@@ -248,9 +248,9 @@
                                                 </div>
                                                 <div id="collapseLifecycleBiobank#{collectionsKey}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                                     <div class="card-body">
-                                                        <div class="container lifecycleContentArea">
-                                                            <ui:repeat value="#{ownerQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
-                                                                       var="collectionStatus" varStatus="loop">
+                                                        <ui:repeat value="#{ownerQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
+                                                                   var="collectionStatus" varStatus="loop">
+                                                            <div class="row">
                                                                 <h:form>
                                                                     <bbmribiobankercc:lifecycleCollectionStatus
                                                                             collectionLifeCycleStatus="#{collectionStatus}"
@@ -258,9 +258,9 @@
                                                                             biobankId="#{-1}"
                                                                             formIdPrefix="_sortStatus_" />
                                                                 </h:form>
-                                                            </ui:repeat>
-                                                            <hr/>
-                                                        </div>
+                                                            </div>
+                                                        </ui:repeat>
+                                                        <hr/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -286,13 +286,13 @@
                                                             <!-- TODO: Collection table with select -->
                                                             <ui:repeat value="#{ownerQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobank.id)}"
                                                                        var="collectionStatus" varStatus="loop">
-
-                                                                <bbmribiobankercc:lifecycleCollectionStatus
-                                                                            collectionLifeCycleStatus="#{collectionStatus}"
-                                                                            collectionId="#{collectionStatus.collectionId}"
-                                                                            biobankId="#{biobank.id}"
-                                                                            formIdPrefix="_sortBiobank_" />
-
+                                                                <div class="row">
+                                                                    <bbmribiobankercc:lifecycleCollectionStatus
+                                                                                collectionLifeCycleStatus="#{collectionStatus}"
+                                                                                collectionId="#{collectionStatus.collectionId}"
+                                                                                biobankId="#{biobank.id}"
+                                                                                formIdPrefix="_sortBiobank_" />
+                                                                </div>
                                                             </ui:repeat>
                                                         </div>
                                                 </div>
