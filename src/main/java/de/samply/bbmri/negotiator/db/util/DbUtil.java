@@ -2756,10 +2756,10 @@ public class DbUtil {
             if(record.getValue("id") == null) {
                 continue;
             }
-            person.setId(record.getValue("id", Integer.class));
-            person.setAuthEmail(record.getValue("auth_email", String.class));
-            person.setAuthName(record.getValue("auth_name", String.class));
-            person.setOrganization(record.getValue("organization", String.class));
+            person.setId(record.getValue("person_id", Integer.class));
+            person.setAuthEmail(record.getValue("person_auth_email", String.class));
+            person.setAuthName(record.getValue("person_auth_name", String.class));
+            person.setOrganization(record.getValue("person_organization", String.class));
             result.add(person);
         }
         return result;
