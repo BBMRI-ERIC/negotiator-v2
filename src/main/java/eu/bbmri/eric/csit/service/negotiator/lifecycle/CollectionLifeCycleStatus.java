@@ -172,5 +172,9 @@ public class CollectionLifeCycleStatus {
         return collectionBiobankDTO.getCollection().getName();
     }
 
+    public String getBiobankName() {
+        return collectionBiobankDTO.getBiobank().getName();
+    }
+
     public Integer getCollectionId() { return this.collection_id; }
 }
