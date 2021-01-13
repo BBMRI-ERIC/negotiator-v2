@@ -2363,7 +2363,8 @@ public class DbUtil {
     }
 
     public static List<CollectionRequestStatusDTO> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
-        Result<QueryLifecycleCollectionRecord> fetch = config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
+        Result<QueryLifecycleCollectionRecord> fetch = config.dsl()
+                .selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
                 .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
                 .and(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID.eq(collectionId))
                 .fetch();

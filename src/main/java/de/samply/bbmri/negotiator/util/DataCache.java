@@ -6,6 +6,7 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 
 import java.sql.SQLException;
@@ -18,6 +19,7 @@ public class DataCache {
     List<BiobankRecord> biobankRecords_ = null;
     HashMap<Integer, String> biobankNames_ = null;
     HashMap<Integer, CollectionContactsDTO> collectionPersons_ = null;
+    HashMap<Integer, String> userNames_ = null;
 
     private DataCache() {
 
@@ -30,22 +32,6 @@ public class DataCache {
             }
         }
         return dataCache;
-    }
-
-    public void createUpdateBiobankList() {
-        List<BiobankRecord> biobankRecords = null;
-        HashMap<Integer, String> biobankNames = new HashMap<Integer, String>();
-        try(Config config = ConfigFactory.get()) {
-            biobankRecords = DbUtil.getBiobanks(config);
-            for(BiobankRecord biobankRecord : biobankRecords) {
-                biobankNames.put(biobankRecord.getId(), biobankRecord.getName());
-            }
-            biobankRecords_ = biobankRecords;
-            biobankNames_ = biobankNames;
-        } catch (SQLException e) {
-            System.err.println("ERROR-NG-0000006: DataCache::createUpdateBiobankList()");
-            e.printStackTrace();
-        }
     }
 
     public String getBiobankName(Integer biobankId) {
@@ -66,6 +52,47 @@ public class DataCache {
             return collectionPersons_.get(collectionId);
         }
         return null;
+    }
+
+    public String getUserName(Integer userId) {
+        if(userNames_ == null) {
+            createUserList();
+        }
+        if(userNames_.containsKey(userId)) {
+            return userNames_.get(userId);
+        }
+        return "";
+    }
+
+    private void createUserList() {
+        if(userNames_ == null) {
+            userNames_ = new HashMap<Integer, String>();
+        }
+        try(Config config = ConfigFactory.get()) {
+            List<PersonRecord> persons = DbUtil.getAllUsers(config);
+            for(PersonRecord person : persons) {
+                userNames_.put(person.getId(), person.getAuthName());
+            }
+        }catch (SQLException e) {
+            System.err.println("ERROR-NG-0000077: DataCache::createUserList()");
+            e.printStackTrace();
+        }
+    }
+
+    public void createUpdateBiobankList() {
+        List<BiobankRecord> biobankRecords = null;
+        HashMap<Integer, String> biobankNames = new HashMap<Integer, String>();
+        try(Config config = ConfigFactory.get()) {
+            biobankRecords = DbUtil.getBiobanks(config);
+            for(BiobankRecord biobankRecord : biobankRecords) {
+                biobankNames.put(biobankRecord.getId(), biobankRecord.getName());
+            }
+            biobankRecords_ = biobankRecords;
+            biobankNames_ = biobankNames;
+        } catch (SQLException e) {
+            System.err.println("ERROR-NG-0000006: DataCache::createUpdateBiobankList()");
+            e.printStackTrace();
+        }
     }
 
     public void createUpdateCollectionPersons() {

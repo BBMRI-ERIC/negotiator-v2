@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import org.jooq.tools.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +15,7 @@ public class RequestStatusDataReturned implements RequestStatus {
     private final String statusType = LifeCycleRequestStatusType.DATA_RETURNED;
     private final String statusText = "Project data returned.";
     private Date statusDate = null;
+    private final Integer userId;
     private final List<String> allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private final List<String> allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
     private final List<String> allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
@@ -21,6 +23,7 @@ public class RequestStatusDataReturned implements RequestStatus {
     public RequestStatusDataReturned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
+        userId = collectionRequestStatusDTO.getStatusUserId();
     }
 
     @Override
@@ -64,7 +67,12 @@ public class RequestStatusDataReturned implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return null;
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 }

@@ -6,11 +6,14 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
+import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import net.minidev.json.JSONArray;
+import org.jooq.tools.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +28,9 @@ public class CollectionLifeCycleStatus {
     private Integer collection_id = null;
     private String collectionReadableID = null;
     private List<Person> contacts = null;
+    private List<Integer> contactIds = null;
     private CollectionBiobankDTO collectionBiobankDTO = null;
+    private final DataCache dataCache = DataCache.getInstance();
 
     public CollectionLifeCycleStatus(Integer query_id, Integer collection_id, String collectionReadableID) {
         this.query_id = query_id;
@@ -45,6 +50,14 @@ public class CollectionLifeCycleStatus {
 
     public void initialiseContacts(List<Person> personsContactsForCollection) {
         contacts = personsContactsForCollection;
+        setContactsIdList();
+    }
+
+    private void setContactsIdList() {
+        contactIds = new ArrayList<>();
+        for(Person person : contacts) {
+            contactIds.add(person.getId());
+        }
     }
 
     public void initialise(List<CollectionRequestStatusDTO> collectionRequestStatusDTOList) {
@@ -177,4 +190,20 @@ public class CollectionLifeCycleStatus {
     }
 
     public Integer getCollectionId() { return this.collection_id; }
+
+    public JSONArray getRequestLifecycleHistoryForCollection() {
+        JSONArray returnValue = new JSONArray();
+        for(Long statusid : statusTree.keySet()) {
+            JSONObject statusObject = statusTree.get(statusid).getJsonEntry();
+            statusObject.put("Biobank Name", getBiobankName());
+            statusObject.put("Collection Name", getCollectionName());
+            statusObject.put("User", dataCache.getUserName((Integer)statusObject.get("UserId")));
+            returnValue.add(statusObject);
+        }
+        return returnValue;
+    }
+
+    public boolean checkUserInCollection(Person person) {
+        return contactIds.contains(person.getId());
+    }
 }

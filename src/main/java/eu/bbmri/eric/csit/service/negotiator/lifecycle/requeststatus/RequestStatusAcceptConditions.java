@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import org.jooq.tools.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -20,9 +21,12 @@ public class RequestStatusAcceptConditions implements RequestStatus {
 
     private final List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
 
+    private final Integer userId;
+
     public RequestStatusAcceptConditions(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
+        userId = collectionRequestStatusDTO.getStatusUserId();
     }
 
     @Override
@@ -66,7 +70,12 @@ public class RequestStatusAcceptConditions implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>contacted</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 }

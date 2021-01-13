@@ -735,6 +735,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 		return requestLifeCycleStatus;
 	}
 
+	public String getRequestLifeCycleStatusHistory() {
+		return requestLifeCycleStatus.getRequestLifecycleHistory(userBean.getPerson());
+	}
+
 	public String getNextCollectionLifecycleStatusStatus() {
 		return nextCollectionLifecycleStatusStatus;
 	}
