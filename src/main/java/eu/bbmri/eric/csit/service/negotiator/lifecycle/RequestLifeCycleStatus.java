@@ -200,15 +200,24 @@ public class RequestLifeCycleStatus {
     }
 
     public String getRequestLifecycleHistory() {
+        return getRequestLifecycleHistory(null);
+    }
+
+    public String getRequestLifecycleHistory(Person person) {
         JSONArray returnValue = new JSONArray();
         for(Long statusid : statusTree.keySet()) {
             JSONObject statusObject = statusTree.get(statusid).getJsonEntry();
-            statusObject.put("Biobank Name", "Biobank Name");
-            statusObject.put("Collection Name", "Collection Name");
+            statusObject.put("Biobank Name", "-");
+            statusObject.put("Collection Name", "-");
             statusObject.put("User", dataCache.getUserName((Integer)statusObject.get("UserId")));
             returnValue.add(statusObject);
         }
         for(Integer collectionKey : collectionStatusList.keySet()) {
+            if(person != null) {
+                if(!collectionStatusList.get(collectionKey).checkUserInCollection(person)) {
+                    continue;
+                }
+            }
             returnValue.addAll(collectionStatusList.get(collectionKey).getRequestLifecycleHistoryForCollection());
         }
         return returnValue.toString();

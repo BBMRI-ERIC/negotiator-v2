@@ -28,6 +28,7 @@ public class CollectionLifeCycleStatus {
     private Integer collection_id = null;
     private String collectionReadableID = null;
     private List<Person> contacts = null;
+    private List<Integer> contactIds = null;
     private CollectionBiobankDTO collectionBiobankDTO = null;
     private final DataCache dataCache = DataCache.getInstance();
 
@@ -49,6 +50,14 @@ public class CollectionLifeCycleStatus {
 
     public void initialiseContacts(List<Person> personsContactsForCollection) {
         contacts = personsContactsForCollection;
+        setContactsIdList();
+    }
+
+    private void setContactsIdList() {
+        contactIds = new ArrayList<>();
+        for(Person person : contacts) {
+            contactIds.add(person.getId());
+        }
     }
 
     public void initialise(List<CollectionRequestStatusDTO> collectionRequestStatusDTOList) {
@@ -192,5 +201,9 @@ public class CollectionLifeCycleStatus {
             returnValue.add(statusObject);
         }
         return returnValue;
+    }
+
+    public boolean checkUserInCollection(Person person) {
+        return contactIds.contains(person.getId());
     }
 }

@@ -154,7 +154,7 @@
                 </h:panelGroup>
 
                 <h:outputScript>
-                    var data = #{ownerQueriesDetailBean.getRequestLifeCycleStatus().getRequestLifecycleHistory()}
+                    var data = #{ownerQueriesDetailBean.getRequestLifeCycleStatusHistory()}
 
                     $(document).ready( function () {
                         $('#request-lifecycle-history').DataTable({
