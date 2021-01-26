@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.database;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.rest.dto.PerunMappingDTO;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
@@ -56,5 +57,33 @@ public class DatabaseUtilPerson {
             logger.error("context", ex);
         }
         return null;
+    }
+
+    public Integer getPersonIdByAuthSubjectId(String authSubjectId) {
+        try (Connection conn = dataSource.getConnection()) {
+            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+            Integer personId = database.select(Tables.PERSON.ID)
+                    .from(Tables.PERSON)
+                    .where(Tables.PERSON.AUTH_SUBJECT.eq(authSubjectId))
+                    .fetchOne(Tables.PERSON.ID);
+            return personId;
+        } catch (Exception ex) {
+            logger.error("8ed18878-DatabaseUtilPerson ERROR-NG-0000084: Error get person with authSubjectId: {}.", authSubjectId);
+            logger.error("context", ex);
+        }
+        return null;
+    }
+
+    public void updatePersonCollectionMapping(PerunMappingDTO mapping) {
+        try (Connection conn = dataSource.getConnection()) {
+            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+            String collectionId = mapping.getName();
+
+
+
+        } catch (Exception ex) {
+            logger.error("8ed18878-DatabaseUtilPerson ERROR-NG-0000081: Error updating person collection mapping.");
+            logger.error("context", ex);
+        }
     }
 }

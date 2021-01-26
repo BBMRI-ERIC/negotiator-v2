@@ -85,7 +85,7 @@ public class ServletListener implements ServletContextListener {
 
             String fallback = event.getServletContext().getRealPath("/WEB-INF");
 
-            Configurator.initialize(null, FileFinderUtil.findFile("log4j2.xml", projectName, fallback).getAbsolutePath());
+            Configurator.initialize(null, FileFinderUtil.findFile("delete.xml", projectName, fallback).getAbsolutePath());
 
             logger.info("Registering PostgreSQL driver");
             Class.forName("org.postgresql.Driver").newInstance();
