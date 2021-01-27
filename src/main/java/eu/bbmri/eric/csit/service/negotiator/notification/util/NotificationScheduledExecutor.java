@@ -55,12 +55,14 @@ public class NotificationScheduledExecutor extends TimerTask {
             aggregated_body += body.replaceAll("Dear .*\n\n", "");
             aggregation_splitter = "\n===============================\n";
         }
+        for(MailNotificationRecord pendingNotification : pendingNotifications) {
+            if(!updateNotificationInDatabase(pendingNotification.getMailNotificationId(), "aggregated")) {
+                return;
+            }
+        }
         Map<String, String> parameters = new HashMap<>();
         parameters.put("body", aggregated_body);
         NotificationService.sendNotification(NotificationType.AGGREGATED_NOTIFICATION, 0, 0, personId, parameters);
-        for(MailNotificationRecord pendingNotification : pendingNotifications) {
-            updateNotificationInDatabase(pendingNotification.getMailNotificationId(), "aggregated");
-        }
     }
 
     private void sendNotifications(List<MailNotificationRecord> mailNotificationRecords) {
@@ -70,8 +72,8 @@ public class NotificationScheduledExecutor extends TimerTask {
         }
     }
 
-    private void updateNotificationInDatabase(Integer mailNotificationRecordId, String status) {
-        databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(mailNotificationRecordId, status);
+    private boolean updateNotificationInDatabase(Integer mailNotificationRecordId, String status) {
+        return databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(mailNotificationRecordId, status);
     }
 
     private String sendMailNotification(String recipient, String subject, String body) {

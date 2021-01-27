@@ -193,19 +193,21 @@ public class DatabaseUtilNotification {
         return null;
     }
 
-    public void updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status) {
+    public boolean updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status) {
         try (Connection conn = dataSource.getConnection()) {
             DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
             database.update(Tables.MAIL_NOTIFICATION)
                     .set(Tables.MAIL_NOTIFICATION.STATUS, status)
                     .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(new Date().getTime()))
                     .where(Tables.MAIL_NOTIFICATION.MAIL_NOTIFICATION_ID.eq(mailNotificationRecordId)).execute();
+            return true;
         } catch (Exception ex) {
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000035: Error update Mail Notification Entries for " +
                     "mailNotificationRecordId: {}, status: {}.",
                     mailNotificationRecordId, status);
             logger.error("context", ex);
         }
+        return false;
     }
 
     public Map<String, String> getEmailAddressesForQuery(Integer queryId) {
