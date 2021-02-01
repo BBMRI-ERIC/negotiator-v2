@@ -16,6 +16,8 @@ public abstract class NotificationType {
 
     public static final int TEST_NOTIFICATION = 100;
 
+    public static final int SYSTEM_ERROR_NOTIFICATION = 200;
+
     public static String getNotificationType(Integer notificationType) {
         switch (notificationType) {
             case NotificationType.CREATE_REQUEST_NOTIFICATION:
@@ -38,6 +40,8 @@ public abstract class NotificationType {
                 return "TEST_NOTIFICATION";
             case NotificationType.AGGREGATED_NOTIFICATION:
                 return "AGGREGATED_NOTIFICATION";
+            case NotificationType.SYSTEM_ERROR_NOTIFICATION:
+                return "SYSTEM_ERROR_NOTIFICATION";
             default:
                 return "ERROR-NG-0000010: ERROR: Type Not defined";
         }

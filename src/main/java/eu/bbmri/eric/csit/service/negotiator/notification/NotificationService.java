@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.notification;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.notification.types.*;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationSlack;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,19 @@ public class NotificationService {
 
     private NotificationService() {}
     private static final DatabaseUtil databaseUtil = new DatabaseUtil();
+
+    public static void sendSystemNotification(Integer notificationType, String notificationText) {
+        logger.info("23afa6c4695a-NotificationService: Send system notification: {}", notificationType);
+        switch (notificationType) {
+            case NotificationType.SYSTEM_ERROR_NOTIFICATION:
+                NotificationSlackMassage notificationSlackMassage = new NotificationSlackMassage(NotificationType.getNotificationType(NotificationType.SYSTEM_ERROR_NOTIFICATION) + ": " + notificationText);
+                NotificationSlack notificationSlack = new NotificationSlack();
+                notificationSlack.createJsonEmployee(notificationSlackMassage);
+                break;
+            default:
+                logger.error("23afa6c4695a-NotificationService ERROR-NG-0000085: Notification type not defined.");
+        }
+    }
 
     public static void sendNotification(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
         sendNotification(notificationType, requestId, commentId, personId, new HashMap<String, String>());

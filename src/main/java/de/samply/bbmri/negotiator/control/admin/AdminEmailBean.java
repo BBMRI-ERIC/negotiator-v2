@@ -84,9 +84,7 @@ public class AdminEmailBean implements Serializable {
                 }
             }
 
-            NotificationSlackMassage notificationSlackMassage = new NotificationSlackMassage("Test Massage!");
-            NotificationSlack notificationSlack = new NotificationSlack();
-            notificationSlack.createJsonEmployee(notificationSlackMassage);
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION, "Test Massage!");
 
         } catch(Exception e) {
             e.printStackTrace();
