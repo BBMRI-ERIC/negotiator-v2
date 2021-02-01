@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.database;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
@@ -203,6 +204,9 @@ public class DatabaseUtilNotification {
                     .where(Tables.MAIL_NOTIFICATION.MAIL_NOTIFICATION_ID.eq(mailNotificationRecordId)).execute();
             return true;
         } catch (Exception ex) {
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,
+                    "882e8cb6-DbUtilNotification ERROR-NG-0000035: Error update Mail Notification Entries for " +
+                                "mailNotificationRecordId: " + mailNotificationRecordId + ", status: " + status + ".");
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000035: Error update Mail Notification Entries for " +
                     "mailNotificationRecordId: {}, status: {}.",
                     mailNotificationRecordId, status);
