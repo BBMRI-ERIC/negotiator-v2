@@ -268,19 +268,19 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.6.4</version>
+            <version>3.8.9</version>
         </dependency>
 
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-meta</artifactId>
-            <version>3.6.4</version>
+            <version>3.8.9</version>
         </dependency>
 
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-codegen</artifactId>
-            <version>3.6.4</version>
+            <version>3.8.9</version>
         </dependency>
 
         <dependency>
@@ -332,6 +332,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+
+        <!-- Slack Bot-->
+        <dependency>
+            <groupId>com.slack.api</groupId>
+            <artifactId>slack-api-client</artifactId>
+            <version>1.5.3</version>
         </dependency>
 
         <!-- Webjars -->

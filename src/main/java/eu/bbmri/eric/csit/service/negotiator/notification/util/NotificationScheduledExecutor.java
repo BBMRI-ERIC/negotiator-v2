@@ -57,6 +57,7 @@ public class NotificationScheduledExecutor extends TimerTask {
         }
         for(MailNotificationRecord pendingNotification : pendingNotifications) {
             if(!updateNotificationInDatabase(pendingNotification.getMailNotificationId(), "aggregated")) {
+
                 return;
             }
         }
