@@ -30,8 +30,7 @@ public class DatabaseUtilPerson {
     }
 
     public PersonRecord getPerson(Integer personId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Record record = database.selectFrom(Tables.PERSON)
                     .where(Tables.PERSON.ID.eq(personId))
                     .fetchOne();
@@ -44,8 +43,7 @@ public class DatabaseUtilPerson {
     }
 
     public Integer getPersonIdByEmailAddress(String emailAddress) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Integer personId = database.select(Tables.PERSON.ID)
                     .from(Tables.PERSON)
                     .where(Tables.PERSON.AUTH_EMAIL.eq(emailAddress))

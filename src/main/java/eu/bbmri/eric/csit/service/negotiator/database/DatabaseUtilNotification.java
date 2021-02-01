@@ -33,8 +33,7 @@ public class DatabaseUtilNotification {
     }
 
     public NotificationRecord addNotificationEntry(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             NotificationRecord record = database.newRecord(Tables.NOTIFICATION);
             record.setQueryId(requestId);
             record.setCommentId(commentId);
@@ -54,8 +53,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<NotificationRecord> getNotificationRecords() {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<NotificationRecord> records = database.selectFrom(Tables.NOTIFICATION)
                     .fetch();
             List<NotificationRecord> returnRecords = new ArrayList<>();
@@ -73,8 +71,7 @@ public class DatabaseUtilNotification {
     }
 
     public MailNotificationRecord addMailNotificationEntry(String emailAddress, Integer notificationId, Integer personId, String status, String subject, String body) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             MailNotificationRecord record = database.newRecord(Tables.MAIL_NOTIFICATION);
             record.setNotificationId(notificationId);
             record.setPersonId(personId);
@@ -95,8 +92,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<MailNotificationRecord> getMailNotificationRecords() {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
                     .fetch();
             List<MailNotificationRecord> returnRecords = new ArrayList<>();
@@ -112,8 +108,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<MailNotificationRecord> getPendingNotifications() {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.notEqual("success"))
                     .fetch();
@@ -130,8 +125,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<MailNotificationRecord> getNotificationsWithStatus(String status, Integer interval) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.eq(status))
                     .and(Tables.MAIL_NOTIFICATION.CREATE_DATE.lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), interval, DatePart.MINUTE)))
@@ -149,8 +143,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<String> getNotificationMailForAggregation() {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Table<?> subquery = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS, max(Tables.MAIL_NOTIFICATION.CREATE_DATE).as("create_date"))
                     .from(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
@@ -160,14 +153,6 @@ public class DatabaseUtilNotification {
                     .from(subquery)
                     .where(cast(subquery.field("create_date"),Timestamp.class).lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), -10, DatePart.MINUTE)))
                     .fetch(subquery.field("email_address"), String.class);
-
-
-            /*List<String> result = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
-                    .from(Tables.MAIL_NOTIFICATION)
-                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
-                    .and(max(Tables.MAIL_NOTIFICATION.CREATE_DATE).lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), -10, DatePart.MINUTE)))
-                    .groupBy(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
-                    .fetch(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS);*/
             return result;
         } catch (Exception ex) {
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000069: Error getting listing pending Mail Notification Entries for aggregation.");
@@ -177,8 +162,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<MailNotificationRecord> getPendingNotificationsForMailAddress(String mailAddress) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
                     .and(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS.eq(mailAddress))
@@ -196,8 +180,7 @@ public class DatabaseUtilNotification {
     }
 
     public boolean updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             database.update(Tables.MAIL_NOTIFICATION)
                     .set(Tables.MAIL_NOTIFICATION.STATUS, status)
                     .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(new Date().getTime()))
@@ -216,8 +199,7 @@ public class DatabaseUtilNotification {
     }
 
     public Map<String, String> getEmailAddressesForQuery(Integer queryId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
@@ -234,8 +216,7 @@ public class DatabaseUtilNotification {
     }
 
     public Map<String, String> getBiobankEmailAddresses(Integer biobankId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
@@ -251,8 +232,7 @@ public class DatabaseUtilNotification {
     }
 
     public Map<String, String> getCollectionEmailAddresses(Integer collectionId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
