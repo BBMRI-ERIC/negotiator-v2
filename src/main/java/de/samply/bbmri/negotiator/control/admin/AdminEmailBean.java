@@ -1,12 +1,9 @@
 package de.samply.bbmri.negotiator.control.admin;
 
-import com.slack.api.Slack;
-import com.slack.api.methods.response.api.ApiTestResponse;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
-import eu.bbmri.eric.csit.service.negotiator.database.TestDB;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.types.NotificationSlackMassage;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationSlack;
@@ -90,25 +87,6 @@ public class AdminEmailBean implements Serializable {
             NotificationSlackMassage notificationSlackMassage = new NotificationSlackMassage("Test Massage!");
             NotificationSlack notificationSlack = new NotificationSlack();
             notificationSlack.createJsonEmployee(notificationSlackMassage);
-
-/*
-            int i = 1;
-            //for(int i = 0; i < 30; i++) {
-                TestDB tdb = new TestDB("Run1_" + i);
-                tdb.start();
-                TestDB tdb1 = new TestDB("Run2_" + i);
-                tdb1.start();
-                TestDB tdb2 = new TestDB("Run3_" + i);
-                tdb2.start();
-                TestDB tdb3 = new TestDB("Run4_" + i);
-                tdb3.start();
-                TestDB tdb4 = new TestDB("Run5_" + i);
-                tdb4.start();
-                TestDB tdb5 = new TestDB("Run6_" + i);
-                tdb5.start();
-                TestDB tdb6 = new TestDB("Run7_" + i);
-                tdb6.start();
-            //}*/
 
         } catch(Exception e) {
             e.printStackTrace();
