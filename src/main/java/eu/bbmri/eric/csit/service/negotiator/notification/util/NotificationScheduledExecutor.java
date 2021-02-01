@@ -78,13 +78,15 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     private String sendMailNotification(String recipient, String subject, String body) {
-        NotificationMail notificationMail = new NotificationMail();
+        /*NotificationMail notificationMail = new NotificationMail();
         boolean success = notificationMail.sendMail(recipient, subject, body);
         if(success) {
             return "success";
         } else {
             return "error";
-        }
+        }*/
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_TEST, recipient + " - " + subject);
+        return "success";
     }
 
     public long getDelay() {
