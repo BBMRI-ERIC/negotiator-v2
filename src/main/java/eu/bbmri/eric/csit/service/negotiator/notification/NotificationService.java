@@ -21,9 +21,14 @@ public class NotificationService {
         logger.info("23afa6c4695a-NotificationService: Send system notification: {}", notificationType);
         switch (notificationType) {
             case NotificationType.SYSTEM_ERROR_NOTIFICATION:
-                NotificationSlackMassage notificationSlackMassage = new NotificationSlackMassage(NotificationType.getNotificationType(NotificationType.SYSTEM_ERROR_NOTIFICATION) + ": " + notificationText);
+                NotificationSlackMassage notificationSlackMassage = new NotificationSlackMassage(NotificationType.getNotificationType(notificationType) + ": " + notificationText);
                 NotificationSlack notificationSlack = new NotificationSlack();
                 notificationSlack.createJsonEmployee(notificationSlackMassage);
+                break;
+            case NotificationType.SYSTEM_TEST_NOTIFICATION:
+                NotificationSlackMassage notificationTestSlackMassage = new NotificationSlackMassage(NotificationType.getNotificationType(notificationType) + ": " + notificationText);
+                NotificationSlack notificationTestSlack = new NotificationSlack();
+                notificationTestSlack.createJsonEmployee(notificationTestSlackMassage);
                 break;
             default:
                 logger.error("23afa6c4695a-NotificationService ERROR-NG-0000085: Notification type not defined.");

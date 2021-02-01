@@ -62,6 +62,11 @@ public class AdminEmailBean implements Serializable {
         return null;
     }
 
+    public String sendSlackMsg() {
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_TEST_NOTIFICATION, "Test Massage!");
+        return null;
+    }
+
     public UserBean getUserBean() {
         return userBean;
     }
@@ -83,8 +88,6 @@ public class AdminEmailBean implements Serializable {
                             mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 }
             }
-
-            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION, "Test Massage!");
 
         } catch(Exception e) {
             e.printStackTrace();
