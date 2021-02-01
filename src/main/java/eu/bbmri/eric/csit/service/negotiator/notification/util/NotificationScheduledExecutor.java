@@ -85,7 +85,7 @@ public class NotificationScheduledExecutor extends TimerTask {
         } else {
             return "error";
         }*/
-        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_TEST, recipient + " - " + subject);
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG, recipient + " - " + subject);
         return "success";
     }
 

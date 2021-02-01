@@ -25,7 +25,7 @@ public class NotificationService {
                 NotificationSlack notificationSlack = new NotificationSlack();
                 notificationSlack.createJsonEmployee(notificationSlackMassage);
                 break;
-            case NotificationType.SYSTEM_NOTIFICATION_TEST:
+            case NotificationType.SYSTEM_NOTIFICATION_DEBUG:
                 NotificationSlackMassage notificationSlackMassage1 = new NotificationSlackMassage(NotificationType.getNotificationType(notificationType) + ": " + notificationText);
                 NotificationSlack notificationSlack1 = new NotificationSlack();
                 notificationSlack1.createJsonEmployee(notificationSlackMassage1);

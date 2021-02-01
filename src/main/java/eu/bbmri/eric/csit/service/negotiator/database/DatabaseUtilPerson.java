@@ -47,6 +47,7 @@ public class DatabaseUtilPerson {
             Integer personId = database.select(Tables.PERSON.ID)
                     .from(Tables.PERSON)
                     .where(Tables.PERSON.AUTH_EMAIL.eq(emailAddress))
+                    .limit(1)
                     .fetchOne(Tables.PERSON.ID);
             return personId;
         } catch (Exception ex) {
