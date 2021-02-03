@@ -1,15 +1,10 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.types;
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

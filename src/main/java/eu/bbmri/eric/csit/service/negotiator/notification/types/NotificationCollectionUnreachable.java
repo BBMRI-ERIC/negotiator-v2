@@ -1,9 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.types;
 
-import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

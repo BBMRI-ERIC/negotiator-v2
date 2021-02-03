@@ -1,4 +1,4 @@
-package eu.bbmri.eric.csit.service.negotiator.notification;
+package eu.bbmri.eric.csit.service.negotiator.notification.types;
 
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
