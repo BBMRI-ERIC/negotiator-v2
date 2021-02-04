@@ -5,6 +5,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationContacts;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,9 @@ public class NotificationNewPublicComment extends Notification {
 
     public NotificationNewPublicComment(NotificationRecord notificationRecord, Integer requestId, Integer personId, Integer commentId) {
         logger.info("7fb9050532fa-NotificationNewPublicComment created for commentId: {}", commentId);
+        this.notificationContacts.setNotificationType(NotificationType.PUBLIC_COMMAND_NOTIFICATION);
+        this.notificationContacts.setRequestId(requestId);
+
         this.requestId = requestId;
         this.notificationRecord = notificationRecord;
         this.personId = personId;
@@ -34,11 +38,12 @@ public class NotificationNewPublicComment extends Notification {
     @Override
     public void run() {
         try {
+            this.notificationContacts.setTriggerPerson(this.personId);
             setQuery();
             setResearcherContact();
             setCommenterContact();
             setComment();
-            Map<String, String> emailAddressesAndNames = getBiobanksEmailAddressesAndNames();
+            Map<String, String> emailAddressesAndNames = this.notificationContacts.getBiobanksEmailAddressesAndNames();
             emailAddressesAndNames.remove(researcherEmailAddresse);
             emailAddressesAndNames.remove(commenterEmailAddresse);
 

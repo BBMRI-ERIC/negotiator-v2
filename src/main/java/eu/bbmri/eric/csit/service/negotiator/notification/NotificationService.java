@@ -12,10 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationService {
+
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+    private static final DatabaseUtil databaseUtil = new DatabaseUtil();
 
     private NotificationService() {}
-    private static final DatabaseUtil databaseUtil = new DatabaseUtil();
 
     public static void sendSystemNotification(Integer notificationType, String notificationText) {
         logger.info("23afa6c4695a-NotificationService: Send system notification: {}", notificationType);

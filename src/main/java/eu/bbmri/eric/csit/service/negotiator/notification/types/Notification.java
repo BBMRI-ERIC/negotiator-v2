@@ -7,6 +7,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationContacts;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
@@ -26,6 +27,7 @@ public abstract class Notification extends Thread {
     private SoyTofu.Renderer mailBodyRenderer;
 
     protected DatabaseUtil databaseUtil = new DatabaseUtil();
+    protected NotificationContacts notificationContacts = new NotificationContacts();
     protected Integer requestId;
     protected NotificationRecord notificationRecord;
     protected Integer personId;
@@ -102,6 +104,7 @@ public abstract class Notification extends Thread {
 
     protected void setResearcherContact() {
         PersonRecord personRecord = databaseUtil.getDatabaseUtilPerson().getPerson(queryRecord.getResearcherId());
+        notificationContacts.setResearcherPerson(personRecord);
         researcherName = personRecord.getAuthName();
         researcherEmailAddresse = personRecord.getAuthEmail();
     }

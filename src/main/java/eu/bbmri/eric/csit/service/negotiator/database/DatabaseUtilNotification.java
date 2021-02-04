@@ -215,6 +215,24 @@ public class DatabaseUtilNotification {
         return null;
     }
 
+    public Map<String, String> getFilterdBiobanksEmailAddressesAndNamesForRequest(Integer requestId, Integer personId) {
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
+            Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
+                    .from(Tables.PERSON)
+                    .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)
+                            .and(Tables.PERSON_COLLECTION.COLLECTION_ID.notIn(xxxxxxx)))
+                    .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                    .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(requestId))
+                    .fetch();
+            return mapEmailAddressesAndNames(record);
+        } catch (Exception ex) {
+            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for requestId: {}, removing all from same collection as personId: {}.", requestId, personId);
+            logger.error("context", ex);
+        }
+        return new HashMap<>();
+    }
+
     public Map<String, String> getBiobankEmailAddresses(Integer biobankId) {
         try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
