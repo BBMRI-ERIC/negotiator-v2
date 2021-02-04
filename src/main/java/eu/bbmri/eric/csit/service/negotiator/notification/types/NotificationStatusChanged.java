@@ -64,11 +64,6 @@ public class NotificationStatusChanged extends Notification {
         return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddresses(collectionId);
     }
 
-    /*
-     * TODO: refactor
-     *  move prepareNotificationForResearcher, prepareNotificationForCollectionRepresentative, getSoyParameters
-     *  to abstract class
-     */
     private void prepareNotificationForResearcher(String subject) {
         try {
             if (statusChangerContactEmailAddresse.equals(researcherEmailAddresse)) {

@@ -26,7 +26,7 @@ public abstract class NotificationStatus {
             case NotificationStatus.SUCCESS:
                 return "success";
             default:
-                return "ERROR-NG-0000010: ERROR: Type Not defined";
+                return "ERROR-NG-0000086: ERROR: Type Not defined";
         }
     }
 
@@ -49,7 +49,7 @@ public abstract class NotificationStatus {
         if(notificationStatus.equals("success")) {
             return NotificationStatus.SUCCESS;
         }
-        System.err.println("ERROR-NG-0000010: ERROR: Type Not defined");
+        System.err.println("ERROR-NG-0000087: ERROR: Type Not defined");
         return 0;
     }
 }
