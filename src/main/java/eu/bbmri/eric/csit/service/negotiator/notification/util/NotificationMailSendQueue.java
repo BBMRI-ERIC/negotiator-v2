@@ -33,7 +33,7 @@ public class NotificationMailSendQueue {
         notificationQueue.add(mailNotificationId);
     }
 
-    public Integer getNextNotificationId() {
+    public Integer getNextMailNotificationId() {
         return notificationQueue.poll();
     }
 

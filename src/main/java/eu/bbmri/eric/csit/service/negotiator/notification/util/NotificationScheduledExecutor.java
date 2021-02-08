@@ -3,6 +3,8 @@ package eu.bbmri.eric.csit.service.negotiator.notification.util;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationEmailMassage;
+import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationMailStatusUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,15 @@ public class NotificationScheduledExecutor extends TimerTask {
     public void run() {
         logger.info("4a95d7c2ff04-NotificationScheduledExecutor started.");
         try {
+            // check for aggregation of notifications
+            aggregateNotifications();
+            // send notifications in notification list
+            HashSet<NotificationMailStatusUpdate> sendUpdates = sendNotifications();
+            // Update DB
+            updateSendNotifications(sendUpdates);
+            // Debug Send Data to Slack
+
+            // TODO: Refector
             List<MailNotificationRecord> mailNotificationRecords = getNotificationsWithErrorSendStatus();
             sendNotifications(mailNotificationRecords);
             mailNotificationRecords = getNotificationsCreatedNotSend();
@@ -29,6 +40,28 @@ public class NotificationScheduledExecutor extends TimerTask {
             logger.error("context", ex);
         }
     }
+
+    private void aggregateNotifications() {
+        // TODO: Create Aggregation
+    }
+
+    private HashSet<NotificationMailStatusUpdate> sendNotifications() {
+        HashSet<NotificationMailStatusUpdate> returnResult = new HashSet<>();
+        NotificationMail notificationMail = new NotificationMail();
+        Integer mailNotificationId = null;
+        while((mailNotificationId = notificationMailSendQueue.getNextMailNotificationId()) != null) {
+            NotificationEmailMassage mail = notificationMailSendQueue.getNotificationEmailMassage(mailNotificationId);
+            boolean success = notificationMail.sendMail(mail.getRecipient(), mail.getSubject(), mail.getBody());
+            returnResult.add(new NotificationMailStatusUpdate(mailNotificationId, success, new Date()));
+        }
+        return returnResult;
+    }
+
+    private void updateSendNotifications(HashSet<NotificationMailStatusUpdate> sendUpdates) {
+        // TODO: Update DB
+    }
+
+    // TODO: Refector
 
     private List<MailNotificationRecord> getNotificationsWithErrorSendStatus() {
         return databaseUtil.getDatabaseUtilNotification().getNotificationsWithStatus("error", 0);
@@ -57,7 +90,7 @@ public class NotificationScheduledExecutor extends TimerTask {
             aggregation_splitter = "\n===============================\n";
         }
         for(MailNotificationRecord pendingNotification : pendingNotifications) {
-            if(!updateNotificationInDatabase(pendingNotification.getMailNotificationId(), "aggregated")) {
+            if(!updateNotificationInDatabase(pendingNotification.getMailNotificationId(), NotificationStatus.getNotificationType(NotificationStatus.AGGREGATED))) {
 
                 return;
             }
