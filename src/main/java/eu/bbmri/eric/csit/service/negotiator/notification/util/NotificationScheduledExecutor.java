@@ -29,7 +29,7 @@ public class NotificationScheduledExecutor extends TimerTask {
             updateSendNotifications(sendUpdates);
             // Debug Send Data to Slack
 
-            // TODO: Refector
+            // TODO: Refector remove data
             List<MailNotificationRecord> mailNotificationRecords = getNotificationsWithErrorSendStatus();
             sendNotifications(mailNotificationRecords);
             mailNotificationRecords = getNotificationsCreatedNotSend();
