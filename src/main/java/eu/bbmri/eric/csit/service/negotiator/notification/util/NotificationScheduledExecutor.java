@@ -13,6 +13,7 @@ public class NotificationScheduledExecutor extends TimerTask {
 
     private static final Logger logger = LoggerFactory.getLogger(NotificationScheduledExecutor.class);
     private final DatabaseUtil databaseUtil = new DatabaseUtil();
+    private final NotificationMailSendQueue notificationMailSendQueue = NotificationMailSendQueue.getNotificationSendQueue();
 
     @Override
     public void run() {
