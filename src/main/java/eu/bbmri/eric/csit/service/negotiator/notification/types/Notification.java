@@ -9,8 +9,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationEmailMassage;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationContacts;
-import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
-import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationSendQueue;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMailSendQueue;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ public abstract class Notification extends Thread {
 
     protected DatabaseUtil databaseUtil = new DatabaseUtil();
     protected NotificationContacts notificationContacts = new NotificationContacts();
-    protected NotificationSendQueue notificationSendQueue = NotificationSendQueue.getNotificationSendQueue();
+    protected NotificationMailSendQueue notificationMailSendQueue = NotificationMailSendQueue.getNotificationSendQueue();
     protected Integer requestId;
     protected NotificationRecord notificationRecord;
     protected Integer personId;
@@ -50,8 +49,8 @@ public abstract class Notification extends Thread {
     }
 
     protected void sendMailNotification(Integer mailNotificationId, String recipient, String subject, String body) {
-        notificationSendQueue.addNotificationToQueue(mailNotificationId);
-        notificationSendQueue.addNotificationEmailMassages(mailNotificationId, new NotificationEmailMassage(mailNotificationId, recipient, subject, body));
+        notificationMailSendQueue.addNotificationToQueue(mailNotificationId);
+        notificationMailSendQueue.addNotificationEmailMassages(mailNotificationId, new NotificationEmailMassage(mailNotificationId, recipient, subject, body));
     }
 
     protected void updateMailNotificationInDatabase(Integer mailNotificationRecordId, String status) throws SQLException {

@@ -6,27 +6,27 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class NotificationSendQueue {
+public class NotificationMailSendQueue {
 
-    private static volatile NotificationSendQueue notificationSendQueue;
+    private static volatile NotificationMailSendQueue notificationMailSendQueue;
     private final Queue<Integer> notificationQueue = new LinkedList<>();
     private final HashMap<Integer, NotificationEmailMassage> notificationEmailMassages = new HashMap<Integer, NotificationEmailMassage>();
 
-    private NotificationSendQueue() {
+    private NotificationMailSendQueue() {
 
     }
 
-    public static NotificationSendQueue getNotificationSendQueue() {
-        NotificationSendQueue localNotificationSendQueue = notificationSendQueue;
-        if(localNotificationSendQueue == null) {
-            synchronized (NotificationSendQueue.class) {
-                localNotificationSendQueue = notificationSendQueue;
-                if(localNotificationSendQueue == null) {
-                    notificationSendQueue = localNotificationSendQueue = new NotificationSendQueue();
+    public static NotificationMailSendQueue getNotificationSendQueue() {
+        NotificationMailSendQueue localNotificationMailSendQueue = notificationMailSendQueue;
+        if(localNotificationMailSendQueue == null) {
+            synchronized (NotificationMailSendQueue.class) {
+                localNotificationMailSendQueue = notificationMailSendQueue;
+                if(localNotificationMailSendQueue == null) {
+                    notificationMailSendQueue = localNotificationMailSendQueue = new NotificationMailSendQueue();
                 }
             }
         }
-        return localNotificationSendQueue;
+        return localNotificationMailSendQueue;
     }
 
     public void addNotificationToQueue(Integer mailNotificationId) {
