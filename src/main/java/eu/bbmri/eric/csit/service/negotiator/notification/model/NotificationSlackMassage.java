@@ -1,4 +1,4 @@
-package eu.bbmri.eric.csit.service.negotiator.notification.types;
+package eu.bbmri.eric.csit.service.negotiator.notification.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

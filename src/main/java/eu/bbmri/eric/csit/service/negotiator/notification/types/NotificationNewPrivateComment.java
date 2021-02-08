@@ -5,6 +5,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,9 +80,10 @@ public class NotificationNewPrivateComment extends Notification {
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.PUBLIC_COMMAND_NOTIFICATION)) {
                 String status;
                 if(queryRecord.getTestRequest()) {
-                    status = "test";
+                    status = NotificationStatus.getNotificationType(NotificationStatus.TEST);
                 } else {
-                    status = sendMailNotification(researcherEmailAddresse, subject, body);
+                    status = NotificationStatus.getNotificationType(NotificationStatus.CREATED);
+                    sendMailNotification(mailNotificationRecord.getMailNotificationId(), researcherEmailAddresse, subject, body);
                 }
                 updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
             }
@@ -103,9 +105,10 @@ public class NotificationNewPrivateComment extends Notification {
                 if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.PUBLIC_COMMAND_NOTIFICATION)) {
                     String status;
                     if(queryRecord.getTestRequest()) {
-                        status = "test";
+                        status = NotificationStatus.getNotificationType(NotificationStatus.TEST);
                     } else {
-                        status = sendMailNotification(emailAddress, subject, body);
+                        status = NotificationStatus.getNotificationType(NotificationStatus.CREATED);
+                        sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
                     }
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
                 }

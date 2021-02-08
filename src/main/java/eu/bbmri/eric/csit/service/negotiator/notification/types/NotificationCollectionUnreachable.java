@@ -46,8 +46,7 @@ public class NotificationCollectionUnreachable extends Notification {
             String bbmriemail = "negotiator@helpdesk.bbmri-eric.eu";
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(bbmriemail, subject, body);
             if(checkSendNotificationImmediatelyForUser(bbmriemail, NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION)) {
-                String status = sendMailNotification(bbmriemail, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), bbmriemail, subject, body);
             }
         } catch (Exception ex) {
             logger.error(String.format("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000026: Error creating a notification for researcher %s.", researcherEmailAddresse));

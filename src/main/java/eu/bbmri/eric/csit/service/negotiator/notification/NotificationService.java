@@ -2,6 +2,7 @@ package eu.bbmri.eric.csit.service.negotiator.notification;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
+import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationSlackMassage;
 import eu.bbmri.eric.csit.service.negotiator.notification.types.*;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationSlack;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;

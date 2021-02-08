@@ -1,8 +1,47 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.util;
 
+import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationEmailMassage;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class NotificationSendQueue {
 
-    //https://medium.com/@cancerian0684/singleton-design-pattern-and-how-to-make-it-thread-safe-b207c0e7e368
-    //https://www.geeksforgeeks.org/java-singleton-design-pattern-practices-examples/#:~:text=To%20make%20a%20singleton%20class,can't%20access%20it%20simultaneously.&text=filter_none-,Pros%3A,It%20is%20also%20thread%20safe.
+    private static volatile NotificationSendQueue notificationSendQueue;
+    private final Queue<Integer> notificationQueue = new LinkedList<>();
+    private final HashMap<Integer, NotificationEmailMassage> notificationEmailMassages = new HashMap<Integer, NotificationEmailMassage>();
 
+    private NotificationSendQueue() {
+
+    }
+
+    public static NotificationSendQueue getNotificationSendQueue() {
+        NotificationSendQueue localNotificationSendQueue = notificationSendQueue;
+        if(localNotificationSendQueue == null) {
+            synchronized (NotificationSendQueue.class) {
+                localNotificationSendQueue = notificationSendQueue;
+                if(localNotificationSendQueue == null) {
+                    notificationSendQueue = localNotificationSendQueue = new NotificationSendQueue();
+                }
+            }
+        }
+        return localNotificationSendQueue;
+    }
+
+    public void addNotificationToQueue(Integer mailNotificationId) {
+        notificationQueue.add(mailNotificationId);
+    }
+
+    public Integer getNextNotificationId() {
+        return notificationQueue.poll();
+    }
+
+    public void addNotificationEmailMassages(Integer mailNotificationId, NotificationEmailMassage notificationEmailMassage) {
+        notificationEmailMassages.put(mailNotificationId, notificationEmailMassage);
+    }
+
+    public NotificationEmailMassage getNotificationEmailMassage(Integer mailNotificationId) {
+        return notificationEmailMassages.get(mailNotificationId);
+    }
 }

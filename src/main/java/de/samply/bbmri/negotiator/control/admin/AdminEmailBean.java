@@ -5,8 +5,6 @@ import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
-import eu.bbmri.eric.csit.service.negotiator.notification.types.NotificationSlackMassage;
-import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationSlack;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
 import javax.faces.bean.ManagedBean;

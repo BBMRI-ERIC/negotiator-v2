@@ -2,7 +2,7 @@ package eu.bbmri.eric.csit.service.negotiator.notification.util;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
-import eu.bbmri.eric.csit.service.negotiator.notification.types.NotificationSlackMassage;
+import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationSlackMassage;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;

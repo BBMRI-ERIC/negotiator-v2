@@ -47,8 +47,7 @@ public class NotificationRejectRequest extends Notification {
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.REJECT_REQUEST_NOTIFICATION)) {
-                String status = sendMailNotification(researcherEmailAddresse, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), researcherEmailAddresse, subject, body);
             }
         } catch (Exception ex) {
             logger.error(String.format("97fdbf0f7bc2-NotificationRejectRequest ERROR-NG-0000062: Error creating a notification for reject request for %s.", researcherEmailAddresse));

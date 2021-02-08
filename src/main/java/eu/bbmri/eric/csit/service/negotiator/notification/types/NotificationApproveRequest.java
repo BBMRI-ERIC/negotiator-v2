@@ -47,8 +47,7 @@ public class NotificationApproveRequest extends Notification {
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.REJECT_REQUEST_NOTIFICATION)) {
-                String status = sendMailNotification(researcherEmailAddresse, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), researcherEmailAddresse, subject, body);
             }
         } catch (Exception ex) {
             logger.error(String.format("8fc97b6f5a1a-NotificationApproveRequest ERROR-NG-0000063: Error creating a notification for approved request for %s.", researcherEmailAddresse));

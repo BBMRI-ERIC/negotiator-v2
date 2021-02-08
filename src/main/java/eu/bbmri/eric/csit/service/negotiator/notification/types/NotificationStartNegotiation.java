@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.notification.types;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,9 +57,10 @@ public class NotificationStartNegotiation extends Notification {
                 if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.START_NEGOTIATION_NOTIFICATION)) {
                     String status;
                     if(queryRecord.getTestRequest()) {
-                        status = "test";
+                        status = NotificationStatus.getNotificationType(NotificationStatus.TEST);
                     } else {
-                        status = sendMailNotification(emailAddress, subject, body);
+                        status = NotificationStatus.getNotificationType(NotificationStatus.CREATED);
+                        sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
                     }
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
                 }

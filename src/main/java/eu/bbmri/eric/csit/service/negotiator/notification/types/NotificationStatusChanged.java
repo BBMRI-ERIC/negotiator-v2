@@ -73,8 +73,7 @@ public class NotificationStatusChanged extends Notification {
             String body = getMailBody(getSoyParameters(url, researcherName));
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.STATUS_CHANGED_NOTIFICATION)) {
-                String status = sendMailNotification(researcherEmailAddresse, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), researcherEmailAddresse, subject, body);
             } else {
                 updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "pending");
             }
@@ -98,8 +97,7 @@ public class NotificationStatusChanged extends Notification {
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "test");
                 } else {
                     if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.STATUS_CHANGED_NOTIFICATION)) {
-                        String status = sendMailNotification(emailAddress, subject, body);
-                        updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                        sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
                     } else {
                         updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "pending");
                     }
