@@ -21,20 +21,11 @@ public class NotificationScheduledExecutor extends TimerTask {
     public void run() {
         logger.info("4a95d7c2ff04-NotificationScheduledExecutor started.");
         try {
-            // check for aggregation of notifications
             aggregateNotifications();
-            // send notifications in notification list
             HashSet<NotificationMailStatusUpdate> sendUpdates = sendNotifications();
-            // Update DB
-            updateSendNotifications(sendUpdates);
-            // Debug Send Data to Slack
-
-            // TODO: Refector remove data
-            List<MailNotificationRecord> mailNotificationRecords = getNotificationsWithErrorSendStatus();
-            sendNotifications(mailNotificationRecords);
-            mailNotificationRecords = getNotificationsCreatedNotSend();
-            sendNotifications(mailNotificationRecords);
-            sendAggregatedNotifications();
+            while(sendUpdates.size() > 0) {
+                sendUpdates = updateSendNotifications(sendUpdates);
+            }
         } catch (Exception ex) {
             logger.error("4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000030: Error in NotificationScheduledExecutor sending mails.");
             logger.error("context", ex);
@@ -42,7 +33,40 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     private void aggregateNotifications() {
-        // TODO: Create Aggregation
+        if(!inTimeWindow()) {
+            return;
+        }
+        List<String> emailAddresses = databaseUtil.getDatabaseUtilNotification().getNotificationMailAddressesForAggregation();
+        for(String emailAddress : emailAddresses) {
+            String aggregated_body = generateAggregateEmail(emailAddress);
+            Integer personId = databaseUtil.getDatabaseUtilPerson().getPersonIdByEmailAddress(emailAddress);
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("body", aggregated_body);
+            NotificationService.sendNotification(NotificationType.AGGREGATED_NOTIFICATION, 0, 0, personId, parameters);
+        }
+
+    }
+
+    private boolean inTimeWindow() {
+        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("HHmm");
+        return Integer.parseInt(formatter.format(now)) >= 600 && Integer.parseInt(formatter.format(now)) <= 610;
+    }
+
+    private String generateAggregateEmail(String emailAddress) {
+        List<MailNotificationRecord> notificationsToAggregate = databaseUtil.getDatabaseUtilNotification().getPendingNotificationsForMailAddress(emailAddress);
+        String aggregated_body = "";
+        String aggregation_splitter = "";
+        for(MailNotificationRecord pendingNotification : notificationsToAggregate) {
+            aggregated_body += aggregation_splitter;
+            String body = pendingNotification.getBody().replaceAll("\nYours sincerely\nThe BBMRI-ERIC Team", "");
+            aggregated_body += body.replaceAll("Dear .*\n\n", "");
+            aggregation_splitter = "\n===============================\n";
+            // Update Database Status
+            databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(pendingNotification.getMailNotificationId(),
+                    NotificationStatus.getNotificationType(NotificationStatus.AGGREGATED));
+        }
+        return aggregated_body;
     }
 
     private HashSet<NotificationMailStatusUpdate> sendNotifications() {
@@ -57,70 +81,15 @@ public class NotificationScheduledExecutor extends TimerTask {
         return returnResult;
     }
 
-    private void updateSendNotifications(HashSet<NotificationMailStatusUpdate> sendUpdates) {
-        // TODO: Update DB
-    }
-
-    // TODO: Refector
-
-    private List<MailNotificationRecord> getNotificationsWithErrorSendStatus() {
-        return databaseUtil.getDatabaseUtilNotification().getNotificationsWithStatus("error", 0);
-    }
-
-    private List<MailNotificationRecord> getNotificationsCreatedNotSend() {
-        return databaseUtil.getDatabaseUtilNotification().getNotificationsWithStatus("created", -10);
-    }
-
-    private void sendAggregatedNotifications() {
-        List<String> mailAddresses = databaseUtil.getDatabaseUtilNotification().getNotificationMailForAggregation();
-        for(String mailAddress : mailAddresses) {
-            List<MailNotificationRecord> pendingNotifications = databaseUtil.getDatabaseUtilNotification().getPendingNotificationsForMailAddress(mailAddress);
-            Integer personId = databaseUtil.getDatabaseUtilPerson().getPersonIdByEmailAddress(mailAddress);
-            aggregatedNotification(pendingNotifications, personId);
-        }
-    }
-
-    private void aggregatedNotification(List<MailNotificationRecord> pendingNotifications, Integer personId) {
-        String aggregated_body = "";
-        String aggregation_splitter = "";
-        for(MailNotificationRecord pendingNotification : pendingNotifications) {
-            aggregated_body += aggregation_splitter;
-            String body = pendingNotification.getBody().replaceAll("\nYours sincerely\nThe BBMRI-ERIC Team", "");
-            aggregated_body += body.replaceAll("Dear .*\n\n", "");
-            aggregation_splitter = "\n===============================\n";
-        }
-        for(MailNotificationRecord pendingNotification : pendingNotifications) {
-            if(!updateNotificationInDatabase(pendingNotification.getMailNotificationId(), NotificationStatus.getNotificationType(NotificationStatus.AGGREGATED))) {
-
-                return;
+    private HashSet<NotificationMailStatusUpdate> updateSendNotifications(HashSet<NotificationMailStatusUpdate> sendUpdates) {
+        for(NotificationMailStatusUpdate notificationMailStatusUpdate : sendUpdates) {
+            boolean dbUpdateSuccess = databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(notificationMailStatusUpdate.getMailNotificationId(),
+                    NotificationStatus.getNotificationType(notificationMailStatusUpdate.getStatus()), notificationMailStatusUpdate.getStatusDate());
+            if(dbUpdateSuccess) {
+                sendUpdates.remove(notificationMailStatusUpdate);
             }
         }
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("body", aggregated_body);
-        NotificationService.sendNotification(NotificationType.AGGREGATED_NOTIFICATION, 0, 0, personId, parameters);
-    }
-
-    private void sendNotifications(List<MailNotificationRecord> mailNotificationRecords) {
-        for(MailNotificationRecord mailNotificationRecord : mailNotificationRecords) {
-            String status = sendMailNotification(mailNotificationRecord.getEmailAddress(), mailNotificationRecord.getSubject(), mailNotificationRecord.getBody());
-            updateNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
-        }
-    }
-
-    private boolean updateNotificationInDatabase(Integer mailNotificationRecordId, String status) {
-        return databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(mailNotificationRecordId, status);
-    }
-
-    private String sendMailNotification(String recipient, String subject, String body) {
-        /*NotificationMail notificationMail = new NotificationMail();
-        boolean success = notificationMail.sendMail(recipient, subject, body);
-        if(success) {
-            return "success";
-        } else {
-            return "error";
-        }*/
-        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG, recipient + " - " + subject);
-        return "success";
+        return sendUpdates;
     }
 
     public long getDelay() {

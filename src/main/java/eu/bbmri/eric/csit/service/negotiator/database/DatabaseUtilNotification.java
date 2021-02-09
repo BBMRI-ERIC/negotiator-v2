@@ -4,6 +4,7 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
@@ -142,30 +143,34 @@ public class DatabaseUtilNotification {
         return null;
     }
 
-    public List<String> getNotificationMailForAggregation() {
+    public List<String> getNotificationMailAddressesForAggregation() {
         try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
-            Table<?> subquery = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS, max(Tables.MAIL_NOTIFICATION.CREATE_DATE).as("create_date"))
+            Table<?> subquery = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
                     .from(Tables.MAIL_NOTIFICATION)
-                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
+                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.PENDING))
+                            .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.ERROR)))
+                            .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.CREATED))))
                     .groupBy(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS).asTable("GROUPED_MAIL_NOTIFICATION");
 
             List<String> result = database.select(subquery.field("email_address"))
                     .from(subquery)
-                    .where(cast(subquery.field("create_date"),Timestamp.class).lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), -10, DatePart.MINUTE)))
                     .fetch(subquery.field("email_address"), String.class);
             return result;
         } catch (Exception ex) {
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000069: Error getting listing pending Mail Notification Entries for aggregation.");
             logger.error("context", ex);
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public List<MailNotificationRecord> getPendingNotificationsForMailAddress(String mailAddress) {
         try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
-                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
+                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.PENDING))
+                            .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.CREATED)))
+                            .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.ERROR))))
                     .and(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS.eq(mailAddress))
+                    .orderBy(Tables.MAIL_NOTIFICATION.CREATE_DATE)
                     .fetch();
             List<MailNotificationRecord> returnRecords = new ArrayList<>();
             for(MailNotificationRecord record : records) {
@@ -198,6 +203,25 @@ public class DatabaseUtilNotification {
         return false;
     }
 
+    public boolean updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status, Date statusDate) {
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
+            database.update(Tables.MAIL_NOTIFICATION)
+                    .set(Tables.MAIL_NOTIFICATION.STATUS, status)
+                    .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(statusDate.getTime()))
+                    .where(Tables.MAIL_NOTIFICATION.MAIL_NOTIFICATION_ID.eq(mailNotificationRecordId)).execute();
+            return true;
+        } catch (Exception ex) {
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,
+                    "882e8cb6-DbUtilNotification ERROR-NG-0000088: Error update Mail Notification Entries for " +
+                            "mailNotificationRecordId: " + mailNotificationRecordId + ", status: " + status + ", date: " + statusDate + ".");
+            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000088: Error update Mail Notification Entries for " +
+                            "mailNotificationRecordId: {}, status: {}, date: {}.",
+                    mailNotificationRecordId, status, statusDate);
+            logger.error("context", ex);
+        }
+        return false;
+    }
+
     public Map<String, String> getEmailAddressesForQuery(Integer queryId) {
         try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
@@ -219,8 +243,7 @@ public class DatabaseUtilNotification {
         try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
-                    .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)
-                            .and(Tables.PERSON_COLLECTION.COLLECTION_ID.notIn(xxxxxxx)))
+                    .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                     .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                     .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
                     .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(requestId))

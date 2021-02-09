@@ -73,7 +73,7 @@ public class NotificationNewPrivateComment extends Notification {
 
     private void prepareNotificationForResearcher(String subject) {
         try {
-            String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId;
+            String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId;
             String body = getMailBody(getSoyParameters(url, researcherName));
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
@@ -94,7 +94,7 @@ public class NotificationNewPrivateComment extends Notification {
     }
 
     private void prepareNotificationPerUser(Map<String, String> emailAddressesAndNames, String subject) {
-        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/owner/detail.xhtml?queryId=" + requestId;
+        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "owner/detail.xhtml?queryId=" + requestId;
         for(Map.Entry<String, String> contact : emailAddressesAndNames.entrySet()) {
             String emailAddress = contact.getKey();
             String contactName = contact.getValue();

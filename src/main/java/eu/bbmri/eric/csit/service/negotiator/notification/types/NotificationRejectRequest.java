@@ -59,7 +59,7 @@ public class NotificationRejectRequest extends Notification {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("queryName", queryRecord.getTitle());
         parameters.put("queryId", queryRecord.getId().toString());
-        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId);
+        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId);
         return parameters;
     }
 }

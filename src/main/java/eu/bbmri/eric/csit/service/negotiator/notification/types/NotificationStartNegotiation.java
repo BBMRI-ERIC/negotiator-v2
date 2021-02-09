@@ -42,7 +42,7 @@ public class NotificationStartNegotiation extends Notification {
     }
 
     private void prepareNotificationPerUser(Map<String, String> emailAddressesAndNames, String subject) {
-        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/owner/detail.xhtml?queryId=" + requestId;
+        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "owner/detail.xhtml?queryId=" + requestId;
         for(Map.Entry<String, String> contact : emailAddressesAndNames.entrySet()) {
             String emailAddress = contact.getKey();
             String contactName = contact.getValue();

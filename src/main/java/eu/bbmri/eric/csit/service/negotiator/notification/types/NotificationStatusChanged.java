@@ -69,7 +69,7 @@ public class NotificationStatusChanged extends Notification {
             if (statusChangerContactEmailAddresse.equals(researcherEmailAddresse)) {
                 return;
             }
-            String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId;
+            String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId;
             String body = getMailBody(getSoyParameters(url, researcherName));
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.STATUS_CHANGED_NOTIFICATION)) {
@@ -85,7 +85,7 @@ public class NotificationStatusChanged extends Notification {
     }
 
     private void prepareNotificationForCollectionRepresentative(Map<String, String> emailAddressesAndNames, String subject) {
-        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/owner/detail.xhtml?queryId=" + requestId;
+        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "owner/detail.xhtml?queryId=" + requestId;
         for(Map.Entry<String, String> contact : emailAddressesAndNames.entrySet()) {
             String emailAddress = contact.getKey();
             String contactName = contact.getValue();
