@@ -65,7 +65,31 @@ public abstract class Notification extends Thread {
         if(notificationType == null) {
             abstractLogger.info("NotificationType Not Set");
         }
-        return !notificationType.equals(NotificationType.STATUS_CHANGED_NOTIFICATION);
+        switch(notificationType) {
+            case NotificationType.APPROVE_REQUEST_NOTIFICATION:
+                return true;
+            case NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION:
+                return true;
+            case NotificationType.CREATE_REQUEST_NOTIFICATION:
+                return true;
+            case NotificationType.REJECT_REQUEST_NOTIFICATION:
+                return true;
+            case NotificationType.START_NEGOTIATION_NOTIFICATION:
+                return true;
+            case NotificationType.STATUS_CHANGED_NOTIFICATION:
+                return false;
+            case NotificationType.PRIVATE_COMMAND_NOTIFICATION:
+                return false;
+            case NotificationType.PUBLIC_COMMAND_NOTIFICATION:
+                return false;
+            case NotificationType.TEST_NOTIFICATION:
+                return true;
+            case NotificationType.AGGREGATED_NOTIFICATION:
+                return true;
+            default:
+                System.err.println("ERROR-NG-0000089: Notification Type Not defined");
+                return true;
+        }
     }
 
     protected void createMailBodyBuilder(String mailTemplateFile) {
