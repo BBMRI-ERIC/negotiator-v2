@@ -61,6 +61,8 @@ public class AdminEmailBean implements Serializable {
     }
 
     public String sendSlackMsg() {
+        DatabaseUtil databaseUtil = new DatabaseUtil();
+        databaseUtil.getDatabaseUtilNotification().getFilterdBiobanksEmailAddressesAndNamesForRequest(37, 1);
         NotificationService.sendSystemNotification(NotificationType.SYSTEM_TEST_NOTIFICATION, "Test Massage!");
         return null;
     }

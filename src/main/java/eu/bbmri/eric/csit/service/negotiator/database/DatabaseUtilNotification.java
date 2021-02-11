@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.database;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
@@ -241,12 +242,22 @@ public class DatabaseUtilNotification {
 
     public Map<String, String> getFilterdBiobanksEmailAddressesAndNamesForRequest(Integer requestId, Integer personId) {
         try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
+            Table<?> subqueryCollectionStatus = database.select(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID, Tables.QUERY_LIFECYCLE_COLLECTION.STATUS)
+                    .from(Tables.QUERY_LIFECYCLE_COLLECTION)
+                    .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
+                    .orderBy(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_DATE.desc()).limit(1).asTable("COLLECTION_STATUS");
+
+            Table<?> subqueryCollectionStatusSteppedAway = database.select(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID)
+                    .from(subqueryCollectionStatus).where(subqueryCollectionStatus.field("status", String.class).eq(LifeCycleRequestStatusStatus.NOT_INTERESTED))
+                    .asTable("COLLECTION_STATUS_STEPPEDAWAY");
+
             Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                     .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                     .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
-                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(requestId))
+                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(requestId)
+                            .and(Tables.COLLECTION.ID.notIn(subqueryCollectionStatusSteppedAway.field("collection_id"))))
                     .fetch();
             return mapEmailAddressesAndNames(record);
         } catch (Exception ex) {
