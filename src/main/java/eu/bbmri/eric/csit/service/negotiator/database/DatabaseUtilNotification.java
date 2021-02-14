@@ -242,29 +242,34 @@ public class DatabaseUtilNotification {
 
     public Map<String, String> getFilterdBiobanksEmailAddressesAndNamesForRequest(Integer requestId, Integer personId) {
         try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
-            Table<?> subqueryCollectionStatus = database.select(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID, Tables.QUERY_LIFECYCLE_COLLECTION.STATUS)
-                    .from(Tables.QUERY_LIFECYCLE_COLLECTION)
-                    .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
-                    .orderBy(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_DATE.desc()).limit(1).asTable("COLLECTION_STATUS");
-
-            Table<?> subqueryCollectionStatusSteppedAway = database.select(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID)
-                    .from(subqueryCollectionStatus).where(subqueryCollectionStatus.field("status", String.class).eq(LifeCycleRequestStatusStatus.NOT_INTERESTED))
-                    .asTable("COLLECTION_STATUS_STEPPEDAWAY");
-
-            Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
-                    .from(Tables.PERSON)
-                    .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
-                    .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                    .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
-                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(requestId)
-                            .and(Tables.COLLECTION.ID.notIn(subqueryCollectionStatusSteppedAway.field("collection_id"))))
+            Result<Record> record = database.resultQuery("SELECT auth_email, auth_name FROM person p\n" +
+                    "JOIN person_collection pc ON p.id = pc.person_id\n" +
+                    "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
+                    "WHERE qc.query_id = " + requestId + " AND pc.collection_id NOT IN \n" +
+                    "(SELECT collection_id FROM \n" +
+                    "(SELECT collection_id, status FROM query_lifecycle_collection WHERE query_id = " + requestId + " ORDER BY status_date DESC LIMIT 1) AS subcollectionsstatus\n" +
+                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "');")
                     .fetch();
-            return mapEmailAddressesAndNames(record);
+
+            return map2EmailAddressesAndNames(record);
         } catch (Exception ex) {
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,
+                    "8882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for requestId: " + requestId + ", removing all from same collection as personId: " + personId + ".");
             logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for requestId: {}, removing all from same collection as personId: {}.", requestId, personId);
             logger.error("context", ex);
         }
         return new HashMap<>();
+    }
+
+    @NotNull
+    private Map<String, String> map2EmailAddressesAndNames(Result<Record> record) {
+        Map<String, String> addressList = new HashMap<>();
+        for (Record record1 : record) {
+            if (!addressList.containsKey(record1.getValue(0))) {
+                addressList.put(record1.getValue(0).toString(), record1.getValue(1).toString());
+            }
+        }
+        return addressList;
     }
 
     public Map<String, String> getBiobankEmailAddresses(Integer biobankId) {
