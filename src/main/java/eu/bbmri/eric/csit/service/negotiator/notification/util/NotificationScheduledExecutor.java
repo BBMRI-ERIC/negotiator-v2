@@ -52,7 +52,7 @@ public class NotificationScheduledExecutor extends TimerTask {
     private boolean inTimeWindow() {
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("HHmm");
-        return Integer.parseInt(formatter.format(now)) >= 600 && Integer.parseInt(formatter.format(now)) <= 610;
+        return Integer.parseInt(formatter.format(now)) >= 2000 && Integer.parseInt(formatter.format(now)) <= 2010;
     }
 
     private String generateAggregateEmail(String emailAddress) {
