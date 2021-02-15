@@ -80,7 +80,14 @@ public class SyncPerunData extends Thread {
             }
 
             deletePersonCollectionMappings(collectionRecord.getId());
+            insertPersonCollectionMappingsIfNotExists(collectionRecord.getId(), collectionMemberPersonIds);
             //TODO: Save connections / check if alredy exists
+        }
+    }
+
+    private void insertPersonCollectionMappingsIfNotExists(Integer collectionId, List<Integer> collectionMemberPersonIds) {
+        for(Integer personId : collectionMemberPersonIds) {
+            databaseUtil.getDatabaseUtilCollection().insertPersonCollectionMappingIfNotExists(collectionId, personId);
         }
     }
 

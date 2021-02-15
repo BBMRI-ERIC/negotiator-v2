@@ -15,5 +15,4 @@ public abstract class DatabaseUtilBase {
         }
         return target;
     }
-
 }

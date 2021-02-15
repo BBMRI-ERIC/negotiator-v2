@@ -2,6 +2,7 @@ package eu.bbmri.eric.csit.service.negotiator.database;
 
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -30,8 +31,7 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
 
     public List<CollectionRecord> getLinkedCollections(String collectionId, String directoryPrefix) {
         List<CollectionRecord> returnRecords = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Result<Record> records = database.select(getFields(Tables.COLLECTION))
                     .from(Tables.COLLECTION)
                     .join(Tables.LIST_OF_DIRECTORIES).on(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
@@ -50,8 +50,7 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
 
     public Integer deletePersonCollectionMappings(Integer collectionId) {
         Integer deletedResult = 0;
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             deletedResult = database.deleteFrom(Tables.PERSON_COLLECTION)
                     .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
                     .execute();
@@ -60,5 +59,19 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
             logger.error("context", ex);
         }
         return deletedResult;
+    }
+
+    public boolean insertPersonCollectionMappingIfNotExists(Integer collectionId, Integer personId) {
+        Boolean addedResult = false;
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
+            Result<PersonCollectionRecord> records = database.selectFrom(Tables.PERSON_COLLECTION)
+                    .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId).and(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId)))
+                    .fetch();
+            // TODO: if(records = = null )
+        } catch (Exception ex) {
+            logger.error("60c5ab668428-DatabaseUtilCollection ERROR-NG-0000091: Error deleting users from collection mapping {}.", collectionId);
+            logger.error("context", ex);
+        }
+        return addedResult;
     }
 }

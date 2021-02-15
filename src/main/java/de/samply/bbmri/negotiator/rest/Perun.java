@@ -11,6 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.rest.util.SyncPerunData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -100,6 +101,8 @@ public class Perun {
         }
         logger.info("Synchronizing user collection mapping from Perun");
 
+        SyncPerunData syncPerunData = new SyncPerunData(mappings, null);
+        syncPerunData.start();
 
         logger.info("Finished Perun user collection mapping.");
 
