@@ -5,17 +5,15 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.util.DataCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import eu.bbmri.eric.csit.service.negotiator.rest.util.SyncPerunData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
@@ -36,7 +34,7 @@ public class Perun {
     /**
      * The logger for all perun rest endpoints
      */
-    private static final Logger logger = LoggerFactory.getLogger(Perun.class);
+    private static final Logger logger = LogManager.getLogger(Perun.class);
     private final HashMap<String, Integer> mapping_updates_collections = new HashMap<String, Integer>();
 
     /**
@@ -86,27 +84,34 @@ public class Perun {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postMapping(Collection<PerunMappingDTO> mappings, @Context HttpServletRequest request) {
-        logger.debug("Checking perun authentication");
+        logger.info("Starting Perun user collection mapping.");
         Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
-        AuthenticationService.authenticate(request, negotiator.getPerunUsername(), negotiator.getPerunPassword());
-
+        try {
+            AuthenticationService.authenticate(request, negotiator.getPerunUsername(), negotiator.getPerunPassword());
+        } catch (ForbiddenException ex) {
+            logger.error("9bca4ebabf89-Perun ERROR-NG-0000078: Error authentication failed for user " + negotiator.getPerunUsername() + ".");
+            logger.error(ex.getMessage());
+            ex.printStackTrace();
+            return Response.status(javax.ws.rs.core.Response.Status.FORBIDDEN).build();
+        } catch (Exception ex) {
+            logger.error("9bca4ebabf89-Perun ERROR-NG-0000079: Error checking authentication for user " + negotiator.getPerunUsername() + ".");
+            logger.error(ex.getMessage());
+            ex.printStackTrace();
+            return Response.serverError().build();
+        }
         logger.info("Synchronizing user collection mapping from Perun");
+
+        SyncPerunData syncPerunData = new SyncPerunData(mappings, null);
+        syncPerunData.start();
+
+        logger.info("Finished Perun user collection mapping.");
+
+
+        //Refector
 
         try(Config config = ConfigFactory.get()) {
             for(PerunMappingDTO mapping : mappings) {
-                if(StringUtil.isEmpty(mapping.getId()) || StringUtil.isEmpty(mapping.getName())) {
-                    logger.error("Perun mapping has no ID or no name: {}", mapping.getId());
-                    logger.error("Aborting synchronization");
-                    NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, "No ID or name: " + mapping.getId());
-                    //return Response.status(Response.Status.BAD_REQUEST).build();
-                }
 
-                logger.debug("-->INFO00001--> Directory: {} CollectionID: {}", mapping.getDirectory(), mapping.getName());
-                    String text = "";
-                    for(PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                        text += member.getUserId() + " ";
-                    }
-                    logger.debug("-->INFO00002--> Directory: {} CollectionID: {} -> {}", mapping.getDirectory(), mapping.getName(), text);
                 updateCollectionMappingCount(mapping.getDirectory());
                 DbUtil.savePerunMapping(config, mapping);
             }
