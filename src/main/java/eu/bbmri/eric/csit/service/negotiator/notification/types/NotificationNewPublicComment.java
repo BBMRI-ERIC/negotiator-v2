@@ -1,15 +1,12 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.types;
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationContacts;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +26,9 @@ public class NotificationNewPublicComment extends Notification {
 
     public NotificationNewPublicComment(NotificationRecord notificationRecord, Integer requestId, Integer personId, Integer commentId) {
         logger.info("7fb9050532fa-NotificationNewPublicComment created for commentId: {}", commentId);
+        this.notificationContacts.setNotificationType(NotificationType.PUBLIC_COMMAND_NOTIFICATION);
+        this.notificationContacts.setRequestId(requestId);
+
         this.requestId = requestId;
         this.notificationRecord = notificationRecord;
         this.personId = personId;
@@ -39,11 +39,12 @@ public class NotificationNewPublicComment extends Notification {
     @Override
     public void run() {
         try {
+            this.notificationContacts.setTriggerPerson(this.personId);
             setQuery();
             setResearcherContact();
             setCommenterContact();
             setComment();
-            Map<String, String> emailAddressesAndNames = getBiobanksEmailAddressesAndNames();
+            Map<String, String> emailAddressesAndNames = this.notificationContacts.getBiobanksEmailAddressesAndNames();
             emailAddressesAndNames.remove(researcherEmailAddresse);
             emailAddressesAndNames.remove(commenterEmailAddresse);
 
@@ -75,16 +76,17 @@ public class NotificationNewPublicComment extends Notification {
 
     private void prepareNotificationForResearcher(String subject) {
         try {
-            String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId;
+            String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId;
             String body = getMailBody(getSoyParameters(url, researcherName));
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.PUBLIC_COMMAND_NOTIFICATION)) {
                 String status;
                 if(queryRecord.getTestRequest()) {
-                    status = "test";
+                    status = NotificationStatus.getNotificationType(NotificationStatus.TEST);
                 } else {
-                    status = sendMailNotification(researcherEmailAddresse, subject, body);
+                    status = NotificationStatus.getNotificationType(NotificationStatus.CREATED);
+                    sendMailNotification(mailNotificationRecord.getMailNotificationId(), researcherEmailAddresse, subject, body);
                 }
                 updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
             }
@@ -95,7 +97,7 @@ public class NotificationNewPublicComment extends Notification {
     }
 
     private void prepareNotificationPerUser(Map<String, String> emailAddressesAndNames, String subject) {
-        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/owner/detail.xhtml?queryId=" + requestId;
+        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "owner/detail.xhtml?queryId=" + requestId;
         for(Map.Entry<String, String> contact : emailAddressesAndNames.entrySet()) {
             String emailAddress = contact.getKey();
             String contactName = contact.getValue();
@@ -106,9 +108,10 @@ public class NotificationNewPublicComment extends Notification {
                 if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.PUBLIC_COMMAND_NOTIFICATION)) {
                     String status;
                     if(queryRecord.getTestRequest()) {
-                        status = "test";
+                        status = NotificationStatus.getNotificationType(NotificationStatus.TEST);
                     } else {
-                        status = sendMailNotification(emailAddress, subject, body);
+                        status = NotificationStatus.getNotificationType(NotificationStatus.CREATED);
+                        sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
                     }
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
                 }
