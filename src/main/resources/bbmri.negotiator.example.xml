@@ -53,6 +53,8 @@
 
     <mailEnabled>true</mailEnabled>
 
+    <slackSystemNotificationURL>https://slack_system_notification_url</slackSystemNotificationURL>
+
     <!-- Leave empty when no clamAV is installed -->
     <clamavHost></clamavHost>
 

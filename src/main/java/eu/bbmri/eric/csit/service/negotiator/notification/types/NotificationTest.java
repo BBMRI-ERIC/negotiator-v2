@@ -1,10 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.types;
 
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +29,7 @@ public class NotificationTest extends Notification {
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
             if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.TEST_NOTIFICATION)) {
-                String status = sendMailNotification(emailAddress, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
             }
         } catch (Exception ex) {
             logger.error("b9e5a6aa1e9b-NotificationTest ERROR-NG-0000024: Error in NotificationTest.");

@@ -1,4 +1,4 @@
-package eu.bbmri.eric.csit.service.negotiator.notification;
+package eu.bbmri.eric.csit.service.negotiator.notification.types;
 
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
@@ -7,7 +7,9 @@ import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
-import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
+import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationEmailMassage;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationContacts;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMailSendQueue;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,8 @@ public abstract class Notification extends Thread {
     private SoyTofu.Renderer mailBodyRenderer;
 
     protected DatabaseUtil databaseUtil = new DatabaseUtil();
+    protected NotificationContacts notificationContacts = new NotificationContacts();
+    protected NotificationMailSendQueue notificationMailSendQueue = NotificationMailSendQueue.getNotificationSendQueue();
     protected Integer requestId;
     protected NotificationRecord notificationRecord;
     protected Integer personId;
@@ -44,14 +48,9 @@ public abstract class Notification extends Thread {
         return mailNotificationRecord;
     }
 
-    protected String sendMailNotification(String recipient, String subject, String body) {
-        NotificationMail notificationMail = new NotificationMail();
-        boolean success = notificationMail.sendMail(recipient, subject, body);
-        if(success) {
-            return "success";
-        } else {
-            return "error";
-        }
+    protected void sendMailNotification(Integer mailNotificationId, String recipient, String subject, String body) {
+        notificationMailSendQueue.addNotificationToQueue(mailNotificationId);
+        notificationMailSendQueue.addNotificationEmailMassages(mailNotificationId, new NotificationEmailMassage(mailNotificationId, recipient, subject, body));
     }
 
     protected void updateMailNotificationInDatabase(Integer mailNotificationRecordId, String status) throws SQLException {
@@ -66,7 +65,31 @@ public abstract class Notification extends Thread {
         if(notificationType == null) {
             abstractLogger.info("NotificationType Not Set");
         }
-        return !notificationType.equals(NotificationType.STATUS_CHANGED_NOTIFICATION);
+        switch(notificationType) {
+            case NotificationType.APPROVE_REQUEST_NOTIFICATION:
+                return true;
+            case NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION:
+                return true;
+            case NotificationType.CREATE_REQUEST_NOTIFICATION:
+                return true;
+            case NotificationType.REJECT_REQUEST_NOTIFICATION:
+                return true;
+            case NotificationType.START_NEGOTIATION_NOTIFICATION:
+                return true;
+            case NotificationType.STATUS_CHANGED_NOTIFICATION:
+                return false;
+            case NotificationType.PRIVATE_COMMAND_NOTIFICATION:
+                return false;
+            case NotificationType.PUBLIC_COMMAND_NOTIFICATION:
+                return false;
+            case NotificationType.TEST_NOTIFICATION:
+                return true;
+            case NotificationType.AGGREGATED_NOTIFICATION:
+                return true;
+            default:
+                System.err.println("ERROR-NG-0000089: Notification Type Not defined");
+                return true;
+        }
     }
 
     protected void createMailBodyBuilder(String mailTemplateFile) {
@@ -102,6 +125,7 @@ public abstract class Notification extends Thread {
 
     protected void setResearcherContact() {
         PersonRecord personRecord = databaseUtil.getDatabaseUtilPerson().getPerson(queryRecord.getResearcherId());
+        notificationContacts.setResearcherPerson(personRecord);
         researcherName = personRecord.getAuthName();
         researcherEmailAddresse = personRecord.getAuthEmail();
     }

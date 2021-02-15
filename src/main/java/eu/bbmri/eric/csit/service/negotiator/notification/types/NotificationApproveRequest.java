@@ -3,7 +3,6 @@ package eu.bbmri.eric.csit.service.negotiator.notification.types;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +47,7 @@ public class NotificationApproveRequest extends Notification {
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.REJECT_REQUEST_NOTIFICATION)) {
-                String status = sendMailNotification(researcherEmailAddresse, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), researcherEmailAddresse, subject, body);
             }
         } catch (Exception ex) {
             logger.error(String.format("8fc97b6f5a1a-NotificationApproveRequest ERROR-NG-0000063: Error creating a notification for approved request for %s.", researcherEmailAddresse));
@@ -61,7 +59,7 @@ public class NotificationApproveRequest extends Notification {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("queryName", queryRecord.getTitle());
         parameters.put("queryId", queryRecord.getId().toString());
-        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId);
+        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId);
         return parameters;
     }
 }
