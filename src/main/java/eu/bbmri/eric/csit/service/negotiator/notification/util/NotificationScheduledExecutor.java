@@ -31,8 +31,8 @@ public class NotificationScheduledExecutor extends TimerTask {
             }
         } catch (Exception ex) {
             NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,
-                    "4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000030: Error in NotificationScheduledExecutor sending mails.");
-            logger.error("4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000030: Error in NotificationScheduledExecutor sending mails.");
+                    "4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000090: Error in NotificationScheduledExecutor sending mails.");
+            logger.error("4a95d7c2ff04-NotificationScheduledExecutor ERROR-NG-0000090: Error in NotificationScheduledExecutor sending mails.");
             logger.error("context", ex);
         }
     }
