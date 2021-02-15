@@ -2,6 +2,7 @@ package eu.bbmri.eric.csit.service.negotiator.database;
 
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -67,7 +68,13 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
             Result<PersonCollectionRecord> records = database.selectFrom(Tables.PERSON_COLLECTION)
                     .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId).and(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId)))
                     .fetch();
-            // TODO: if(records = = null )
+            if(records == null || records.isNotEmpty()) {
+                PersonCollectionRecord record = database.newRecord(Tables.PERSON_COLLECTION);
+                record.setPersonId(personId);
+                record.setCollectionId(collectionId);
+            } else {
+                return addedResult;
+            }
         } catch (Exception ex) {
             logger.error("60c5ab668428-DatabaseUtilCollection ERROR-NG-0000091: Error deleting users from collection mapping {}.", collectionId);
             logger.error("context", ex);
