@@ -23,6 +23,9 @@ public class NotificationScheduledExecutor extends TimerTask {
         try {
             aggregateNotifications();
             HashSet<NotificationMailStatusUpdate> sendUpdates = sendNotifications();
+            if(sendUpdates == null) {
+                return;
+            }
             while(sendUpdates.size() > 0) {
                 sendUpdates = updateSendNotifications(sendUpdates);
             }
@@ -84,6 +87,9 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     private HashSet<NotificationMailStatusUpdate> updateSendNotifications(HashSet<NotificationMailStatusUpdate> sendUpdates) {
+        if(sendUpdates == null) {
+            return new HashSet<>();
+        }
         for(NotificationMailStatusUpdate notificationMailStatusUpdate : sendUpdates) {
             boolean dbUpdateSuccess = databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(notificationMailStatusUpdate.getMailNotificationId(),
                     NotificationStatus.getNotificationType(notificationMailStatusUpdate.getStatus()), notificationMailStatusUpdate.getStatusDate());
