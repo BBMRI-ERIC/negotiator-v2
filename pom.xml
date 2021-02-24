@@ -40,17 +40,17 @@
         <database.username>saher</database.username>
         <database.password>saher</database.password>-->
 
-        <!--<database.server>localhost</database.server>
+        <database.server>localhost</database.server>
         <database.port>5434</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
-        <database.password>negotiator</database.password>-->
+        <database.password>negotiator</database.password>
 
-        <database.server>localhost</database.server>
+        <!--<database.server>localhost</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
-        <database.password>negotiator</database.password>
+        <database.password>negotiator</database.password>-->
         <!--<database.name>neg-20190910</database.name>-->
         <!--<database.password>0bpCP58yTJnNQmKqO9mX</database.password>-->
 
@@ -83,6 +83,20 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/javax.el/javax.el-api -->
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -109,11 +123,19 @@
             <artifactId>primefaces</artifactId>
             <version>8.0</version>
         </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>4.1.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans -->
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>4.0.0</version>
         </dependency>
 
         <!-- Swagger API documentation
