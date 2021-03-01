@@ -51,8 +51,8 @@ public class NotificationAggregatedNotification extends Notification {
         try {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("name", contactName);
-            parameters.put("body", body);
-            parameters.put("linklist", extractLinkCollectionFromBody(body));
+            parameters.put("body", this.body);
+            parameters.put("linklist", extractLinkCollectionFromBody(this.body));
             String bodyFinal = getMailBody(parameters);
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(contactEmailAddresse, subject, bodyFinal);
             if(checkSendNotificationImmediatelyForUser(contactEmailAddresse, NotificationType.AGGREGATED_NOTIFICATION)) {
@@ -72,10 +72,11 @@ public class NotificationAggregatedNotification extends Notification {
         while(matches.find()) {
             urls.add(matches.group());
         }
-        String result = "";
+        StringBuilder returnResult = new StringBuilder();
         for(String url : urls) {
-            result += url + "\n";
+            returnResult.append(url);
+            returnResult.append("\n");
         }
-        return result;
+        return returnResult.toString();
     }
 }
