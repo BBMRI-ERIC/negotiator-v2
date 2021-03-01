@@ -29,7 +29,7 @@ public class NotificationTest extends Notification {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("testString", "<a href=\"https://negotiator.bbmri-eric.eu/\">Test Link</a>");
             String body = getMailBody(parameters);
-            body = body.replace("ReplaceTextWithLinkesReplcae", "<a href=\"https://negotiator.bbmri-eric.eu/\"");
+            body = body.replace("ReplaceTextWithLinkesReplcae", "<a href=\"https://negotiator.bbmri-eric.eu/>Test Link</a>\"");
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
             if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.TEST_NOTIFICATION)) {
