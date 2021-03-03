@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class NotificationTest extends Notification {
 
@@ -25,7 +26,12 @@ public class NotificationTest extends Notification {
         try {
             String subject = "Negotiator Test Email";
             createMailBodyBuilder("TEST_NOTIFICATION.soy");
-            String body = getMailBody(new HashMap<String, String>());
+            Map<String, String> parameters = new HashMap<>();
+            parameters.put("testString", "<a href=\"https://negotiator.bbmri-eric.eu/\">Test Link</a>");
+            String body = getMailBody(parameters);
+            body = body.replace("ReplaceTextWithLinkesReplcae", "<a href=\"https://negotiator.bbmri-eric.eu/>Test Link</a>\"");
+
+
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
             if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.TEST_NOTIFICATION)) {
