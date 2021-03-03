@@ -2,7 +2,9 @@ package eu.bbmri.eric.csit.service.negotiator.notification;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
+import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationSlackMassage;
 import eu.bbmri.eric.csit.service.negotiator.notification.types.*;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationSlack;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +13,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationService {
+
     private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+    private static final DatabaseUtil databaseUtil = new DatabaseUtil();
 
     private NotificationService() {}
-    private static final DatabaseUtil databaseUtil = new DatabaseUtil();
+
+    public static void sendSystemNotification(Integer notificationType, String notificationText) {
+        logger.info("23afa6c4695a-NotificationService: Send system notification: {}", notificationType);
+        switch (notificationType) {
+            case NotificationType.SYSTEM_ERROR_NOTIFICATION:
+                NotificationSlackMassage notificationSlackMassage = new NotificationSlackMassage(NotificationType.getNotificationType(notificationType) + ": " + notificationText);
+                NotificationSlack notificationSlack = new NotificationSlack();
+                notificationSlack.createJsonEmployee(notificationSlackMassage);
+                break;
+            case NotificationType.SYSTEM_NOTIFICATION_DEBUG:
+                NotificationSlackMassage notificationSlackMassage1 = new NotificationSlackMassage(NotificationType.getNotificationType(notificationType) + ": " + notificationText);
+                NotificationSlack notificationSlack1 = new NotificationSlack();
+                notificationSlack1.createJsonEmployee(notificationSlackMassage1);
+                break;
+            case NotificationType.SYSTEM_TEST_NOTIFICATION:
+                NotificationSlackMassage notificationTestSlackMassage = new NotificationSlackMassage(NotificationType.getNotificationType(notificationType) + ": " + notificationText);
+                NotificationSlack notificationTestSlack = new NotificationSlack();
+                notificationTestSlack.createJsonEmployee(notificationTestSlackMassage);
+                break;
+            default:
+                logger.error("23afa6c4695a-NotificationService ERROR-NG-0000085: Notification type not defined.");
+        }
+    }
 
     public static void sendNotification(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
         sendNotification(notificationType, requestId, commentId, personId, new HashMap<String, String>());

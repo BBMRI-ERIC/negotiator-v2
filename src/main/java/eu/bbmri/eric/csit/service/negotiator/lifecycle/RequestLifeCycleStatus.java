@@ -117,7 +117,12 @@ public class RequestLifeCycleStatus {
             if(contacts == null || contacts.size() == 0) {
                 notreachableCollections = true;
                 collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
-                collectionsString.append(collectionLifeCycleStatus.getCollectionReadableID()).append("\n");
+                collectionsString.append(collectionLifeCycleStatus.getCollectionReadableID());
+                collectionsString.append(": ");
+                collectionsString.append(collectionLifeCycleStatus.getBiobankName());
+                collectionsString.append(" - ");
+                collectionsString.append(collectionLifeCycleStatus.getCollectionName());
+                collectionsString.append("\n");
             } else {
                 JsonArray contactJsonArray = new JsonArray();
                 for(Person contact : contacts) {

@@ -4,7 +4,6 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,22 +64,16 @@ public class NotificationStatusChanged extends Notification {
         return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddresses(collectionId);
     }
 
-    /*
-     * TODO: refactor
-     *  move prepareNotificationForResearcher, prepareNotificationForCollectionRepresentative, getSoyParameters
-     *  to abstract class
-     */
     private void prepareNotificationForResearcher(String subject) {
         try {
             if (statusChangerContactEmailAddresse.equals(researcherEmailAddresse)) {
                 return;
             }
-            String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId;
+            String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId;
             String body = getMailBody(getSoyParameters(url, researcherName));
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.STATUS_CHANGED_NOTIFICATION)) {
-                String status = sendMailNotification(researcherEmailAddresse, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), researcherEmailAddresse, subject, body);
             } else {
                 updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "pending");
             }
@@ -92,7 +85,7 @@ public class NotificationStatusChanged extends Notification {
     }
 
     private void prepareNotificationForCollectionRepresentative(Map<String, String> emailAddressesAndNames, String subject) {
-        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/owner/detail.xhtml?queryId=" + requestId;
+        String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "owner/detail.xhtml?queryId=" + requestId;
         for(Map.Entry<String, String> contact : emailAddressesAndNames.entrySet()) {
             String emailAddress = contact.getKey();
             String contactName = contact.getValue();
@@ -104,8 +97,7 @@ public class NotificationStatusChanged extends Notification {
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "test");
                 } else {
                     if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.STATUS_CHANGED_NOTIFICATION)) {
-                        String status = sendMailNotification(emailAddress, subject, body);
-                        updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                        sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
                     } else {
                         updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "pending");
                     }

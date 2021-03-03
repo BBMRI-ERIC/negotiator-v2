@@ -19,6 +19,7 @@ public class DatabaseUtil {
     private final DatabaseUtilNotification databaseUtilNotification;
     private final DatabaseUtilRequest databaseUtilRequest;
     private final DatabaseUtilPerson databaseUtilPerson;
+    private final DatabaseUtilCollection databaseUtilCollection;
 
     public DatabaseUtil() {
         try {
@@ -29,6 +30,7 @@ public class DatabaseUtil {
             databaseUtilNotification = new DatabaseUtilNotification(dataSource);
             databaseUtilRequest = new DatabaseUtilRequest(dataSource);
             databaseUtilPerson = new DatabaseUtilPerson(dataSource);
+            databaseUtilCollection = new DatabaseUtilCollection(dataSource);
 
         } catch (NamingException ex) {
             throw new ExceptionInInitializerError("58fb0e87-DatabaseUtil: dataSource not initialized");
@@ -45,5 +47,9 @@ public class DatabaseUtil {
 
     public DatabaseUtilPerson getDatabaseUtilPerson() {
         return databaseUtilPerson;
+    }
+
+    public DatabaseUtilCollection getDatabaseUtilCollection() {
+        return databaseUtilCollection;
     }
 }

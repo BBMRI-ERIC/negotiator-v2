@@ -181,6 +181,9 @@ public class Negotiator implements Serializable {
     @XmlElement
     private boolean developmentServer;
 
+    @XmlElement
+    private String slackSystemNotificationURL;
+
     /**
      * The list of collections, that will be faked.
      */
@@ -380,6 +383,14 @@ public class Negotiator implements Serializable {
 
     public void setNegotiatorUrl(String negotiatorUrl) {
         this.negotiatorUrl = negotiatorUrl;
+    }
+
+    public String getSlackSystemNotificationURL() {
+        return slackSystemNotificationURL;
+    }
+
+    public void setSlackSystemNotificationURL(String slackSystemNotificationURL) {
+        this.slackSystemNotificationURL = slackSystemNotificationURL;
     }
 
     @XmlAccessorType(XmlAccessType.FIELD)

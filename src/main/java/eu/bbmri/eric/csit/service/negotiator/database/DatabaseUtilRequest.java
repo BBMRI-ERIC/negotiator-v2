@@ -30,8 +30,7 @@ public class DatabaseUtilRequest {
     }
 
     public QueryRecord getQuery(Integer queryId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Record record = database.selectFrom(Tables.QUERY)
                     .where(Tables.QUERY.ID.eq(queryId))
                     .fetchOne();
@@ -44,8 +43,7 @@ public class DatabaseUtilRequest {
     }
 
     public CommentRecord getPublicComment(Integer commentId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Record record = database.selectFrom(Tables.COMMENT)
                     .where(Tables.COMMENT.ID.eq(commentId))
                     .fetchOne();
@@ -58,8 +56,7 @@ public class DatabaseUtilRequest {
     }
 
     public OfferRecord getPrivateComment(Integer commentId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
+        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
             Record record = database.selectFrom(Tables.OFFER)
                     .where(Tables.OFFER.ID.eq(commentId))
                     .fetchOne();

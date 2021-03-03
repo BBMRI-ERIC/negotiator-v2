@@ -37,10 +37,14 @@ import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
+import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.apache.logging.log4j.util.StringBuilders;
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.component.export.Exporter;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
@@ -108,6 +112,8 @@ public class AdminDebugBean implements Serializable {
     private Integer transferQueryId;
     private Integer transferQueryToUserId;
 
+    private Exporter<DataTable> jsonExporter;
+
     // END Collection Assostiations
     //---------------------------------
 
@@ -127,6 +133,11 @@ public class AdminDebugBean implements Serializable {
 
     public HashMap<Integer, PersonRecord> getUser() {
         return users;
+    }
+
+    @PostConstruct
+    public void init() {
+        jsonExporter = new JsonDataTableExporterExport();
     }
 
     public String restNegotiation(Integer id) {
@@ -329,5 +340,13 @@ public class AdminDebugBean implements Serializable {
 
     public void setUserBean(UserBean userBean) {
         this.userBean = userBean;
+    }
+
+    public Exporter<DataTable> getJsonExporter() {
+        return jsonExporter;
+    }
+
+    public void setJsonExporter(Exporter<DataTable> jsonExporter) {
+        this.jsonExporter = jsonExporter;
     }
 }

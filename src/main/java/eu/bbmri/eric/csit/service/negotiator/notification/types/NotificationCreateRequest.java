@@ -3,7 +3,6 @@ package eu.bbmri.eric.csit.service.negotiator.notification.types;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +48,7 @@ public class NotificationCreateRequest extends Notification {
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(bbmriemail, subject, body);
             if(checkSendNotificationImmediatelyForUser(bbmriemail, NotificationType.CREATE_REQUEST_NOTIFICATION)) {
-                String status = sendMailNotification(bbmriemail, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), bbmriemail, subject, body);
             }
         } catch (Exception ex) {
             logger.error(String.format("919bbece7131-NotificationCreateRequest ERROR-NG-0000059: Error creating a notification for reviewer %s.", bbmriemail));
@@ -62,7 +60,7 @@ public class NotificationCreateRequest extends Notification {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("queryName", queryRecord.getTitle());
         parameters.put("queryId", queryRecord.getId().toString());
-        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/reviewer/review.xhtml");
+        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "reviewer/review.xhtml");
         return parameters;
     }
 }

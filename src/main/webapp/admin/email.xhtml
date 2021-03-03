@@ -59,6 +59,16 @@
 			</div>
 		</h:form>
 
+		<h:form styleClass="form-horizontal">
+			<div class="col-md-12">
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<h:commandButton action="#{adminEmailBean.sendSlackMsg}" value="#{label['admin.slack.send']}" styleClass="btn btn-default"/>
+					</div>
+				</div>
+			</div>
+		</h:form>
+
 		<h3>List of Notifications:</h3>
 		<h:form styleClass="form-horizontal">
 			<h:commandButton action="#{adminEmailBean.loadNotifications()}" value="Load Notifications"
