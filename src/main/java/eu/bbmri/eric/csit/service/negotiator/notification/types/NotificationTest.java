@@ -31,6 +31,8 @@ public class NotificationTest extends Notification {
             String body = getMailBody(parameters);
             body = body.replace("ReplaceTextWithLinkesReplcae", "<a href=\"https://negotiator.bbmri-eric.eu/>Test Link</a>\"");
 
+
+
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
             if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.TEST_NOTIFICATION)) {
                 sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
