@@ -149,6 +149,9 @@ public class RequestLifeCycleStatus {
         }
     }
 
+    public void contactCollectionRepresentativesIfNotContacted() {
+    }
+
     private void requestStatusFactory(RequestStatusDTO requestStatus) {
         if(requestStatus.getStatusType().equals("created")) {
             RequestStatus status = new RequestStatusCreate(requestStatus);

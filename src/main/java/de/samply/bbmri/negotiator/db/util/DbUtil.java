@@ -1453,6 +1453,7 @@ public class DbUtil {
                     }
                 }
             } else {
+
                 for (CollectionDTO collection : querySearchDTO.getCollections()) {
                     CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
 
