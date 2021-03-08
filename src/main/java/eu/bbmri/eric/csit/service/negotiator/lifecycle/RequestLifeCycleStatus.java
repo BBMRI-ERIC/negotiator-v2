@@ -114,42 +114,70 @@ public class RequestLifeCycleStatus {
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
             List<Person> contacts = collectionLifeCycleStatus.getContacts();
-            if(contacts == null || contacts.size() == 0) {
-                notreachableCollections = true;
-                collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
-                collectionsString.append(collectionLifeCycleStatus.getCollectionReadableID());
-                collectionsString.append(": ");
-                collectionsString.append(collectionLifeCycleStatus.getBiobankName());
-                collectionsString.append(" - ");
-                collectionsString.append(collectionLifeCycleStatus.getCollectionName());
-                collectionsString.append("\n");
-            } else {
-                JsonArray contactJsonArray = new JsonArray();
-                for(Person contact : contacts) {
-                    NegotiatorDTO negotiatorDTO = new NegotiatorDTO();
-                    negotiatorDTO.setPerson(contact);
-                    mailrecipients.put(contact.getId(), negotiatorDTO);
-                    JsonObject person = new JsonObject();
-                    person.addProperty("AuthName", contact.getAuthName());
-                    person.addProperty("AuthEmail", contact.getAuthEmail());
-                    person.addProperty("ID", contact.getId());
-                    person.addProperty("Organization", contact.getOrganization());
-                    contactJsonArray.add(person);
-                }
-                JsonObject statusJson = new JsonObject();
-                statusJson.add("contacted", contactJsonArray);
-                collectionLifeCycleStatus.nextStatus("contacted", "contact", statusJson.toString(), userId);
-            }
+            notreachableCollections = contactCollectionRepresentativesInCollection(userId, mailrecipients, collectionsString, notreachableCollections, collectionLifeCycleStatus, contacts);
         }
         NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, query.getId(), null, userId);
-        if(notreachableCollections) {
+        sendNotReachableNotification(userId, collectionsString, notreachableCollections);
+    }
+
+    public void contactCollectionRepresentativesIfNotContacted(Integer userId, String accessUrl) {
+        if(collectionStatusList == null) {
+            initialiseCollectionStatus();
+        }
+        Map<Integer, NegotiatorDTO> mailrecipients = new HashMap<Integer, NegotiatorDTO>();
+        StringBuilder collectionsString = new StringBuilder();
+        boolean notreachableCollections = false;
+        HashMap<String, String> emailAddressesAndNames = new HashMap<>();
+        for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
+            CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
+            List<Person> contacts = collectionLifeCycleStatus.getContacts();
+            if(collectionLifeCycleStatus == null) {
+                notreachableCollections = contactCollectionRepresentativesInCollection(userId, mailrecipients, collectionsString, notreachableCollections, collectionLifeCycleStatus, contacts);
+                for(Person person : contacts) {
+                    emailAddressesAndNames.put(person.getAuthEmail(), person.getAuthName());
+                }
+            }
+        }
+        NotificationService.sendNotification(NotificationType.ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION, query.getId(), null, userId, emailAddressesAndNames);
+        sendNotReachableNotification(userId, collectionsString, notreachableCollections);
+    }
+
+    private void sendNotReachableNotification(Integer userId, StringBuilder collectionsString, boolean notreachableCollections) {
+        if (notreachableCollections) {
             Map<String, String> mailParameters = new HashMap<String, String>();
             mailParameters.put("notreachableCollections", collectionsString.toString());
             NotificationService.sendNotification(NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION, query.getId(), null, userId, mailParameters);
         }
     }
 
-    public void contactCollectionRepresentativesIfNotContacted() {
+    private boolean contactCollectionRepresentativesInCollection(Integer userId, Map<Integer, NegotiatorDTO> mailrecipients, StringBuilder collectionsString, boolean notreachableCollections, CollectionLifeCycleStatus collectionLifeCycleStatus, List<Person> contacts) {
+        if(contacts == null || contacts.size() == 0) {
+            notreachableCollections = true;
+            collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
+            collectionsString.append(collectionLifeCycleStatus.getCollectionReadableID());
+            collectionsString.append(": ");
+            collectionsString.append(collectionLifeCycleStatus.getBiobankName());
+            collectionsString.append(" - ");
+            collectionsString.append(collectionLifeCycleStatus.getCollectionName());
+            collectionsString.append("\n");
+        } else {
+            JsonArray contactJsonArray = new JsonArray();
+            for(Person contact : contacts) {
+                NegotiatorDTO negotiatorDTO = new NegotiatorDTO();
+                negotiatorDTO.setPerson(contact);
+                mailrecipients.put(contact.getId(), negotiatorDTO);
+                JsonObject person = new JsonObject();
+                person.addProperty("AuthName", contact.getAuthName());
+                person.addProperty("AuthEmail", contact.getAuthEmail());
+                person.addProperty("ID", contact.getId());
+                person.addProperty("Organization", contact.getOrganization());
+                contactJsonArray.add(person);
+            }
+            JsonObject statusJson = new JsonObject();
+            statusJson.add("contacted", contactJsonArray);
+            collectionLifeCycleStatus.nextStatus("contacted", "contact", statusJson.toString(), userId);
+        }
+        return notreachableCollections;
     }
 
     private void requestStatusFactory(RequestStatusDTO requestStatus) {

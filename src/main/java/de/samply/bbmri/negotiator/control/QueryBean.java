@@ -285,9 +285,9 @@ public class QueryBean implements Serializable {
        return "/researcher/index";
    }
 
-   private void checkLifeCycleStatus(Config config, Integer id, boolean testRequest) {
+   private void checkLifeCycleStatus(Config config, Integer queryId, boolean testRequest) {
        if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
-           requestLifeCycleStatus.contactCollectionRepresentativesIfNotContacted();
+           requestLifeCycleStatus.contactCollectionRepresentativesIfNotContacted(userBean.getUserId(), getQueryUrlForBiobanker(queryId));
        }
    }
 

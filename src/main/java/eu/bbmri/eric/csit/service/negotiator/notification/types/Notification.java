@@ -86,6 +86,8 @@ public abstract class Notification extends Thread {
                 return true;
             case NotificationType.AGGREGATED_NOTIFICATION:
                 return true;
+            case NotificationType.ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION:
+                return true;
             default:
                 System.err.println("ERROR-NG-0000089: Notification Type Not defined");
                 return true;

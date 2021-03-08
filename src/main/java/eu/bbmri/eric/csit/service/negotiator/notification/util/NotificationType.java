@@ -13,6 +13,7 @@ public abstract class NotificationType {
     public static final int STATUS_CHANGED_NOTIFICATION = 7;
     public static final int NOT_REACHABLE_COLLECTION_NOTIFICATION = 8;
     public static final int AGGREGATED_NOTIFICATION = 9;
+    public static final int ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION = 10;
 
     public static final int TEST_NOTIFICATION = 100;
 
@@ -23,7 +24,7 @@ public abstract class NotificationType {
     public static String getNotificationType(Integer notificationType) {
         switch (notificationType) {
             case NotificationType.CREATE_REQUEST_NOTIFICATION:
-                return "APPROVE_REQUEST_NOTIFICATION";
+                return "CREATE_REQUEST_NOTIFICATION";
             case NotificationType.APPROVE_REQUEST_NOTIFICATION:
                 return "APPROVE_REQUEST_NOTIFICATION";
             case NotificationType.REJECT_REQUEST_NOTIFICATION:
@@ -48,6 +49,8 @@ public abstract class NotificationType {
                 return "SYSTEM_TEST_NOTIFICATION";
             case NotificationType.SYSTEM_NOTIFICATION_DEBUG:
                 return "SYSTEM_NOTIFICATION_DEBUG";
+            case NotificationType.ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION:
+                return "ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION";
             default:
                 return "ERROR-NG-0000010: ERROR: Type Not defined";
         }

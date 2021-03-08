@@ -107,6 +107,10 @@ public class NotificationService {
                         body = parameters.get("body");
                     }
                     new NotificationAggregatedNotification(notificationRecord, personId, body);
+                    break;
+                case NotificationType.ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION:
+                    new NotificationCollectionAddedToStartedNegotiation(notificationRecord, requestId, personId, parameters);
+                    break;
                 default:
                     logger.error("23afa6c4695a-NotificationService ERROR-NG-0000022: Notification type not defined.");
             }
