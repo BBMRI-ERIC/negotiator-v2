@@ -1453,6 +1453,7 @@ public class DbUtil {
                     }
                 }
             } else {
+
                 for (CollectionDTO collection : querySearchDTO.getCollections()) {
                     CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
 
@@ -2680,5 +2681,25 @@ public class DbUtil {
             result.add(person);
         }
         return result;
+    }
+
+    public static void getCollectionsWithLifeCycleStatusProblem(Config config, Integer userId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT qc_f.query_id, qc_f.collection_id\n" +
+                "FROM public.query_collection qc_f\n" +
+                "JOIN public.request_status rs_f ON rs_f.query_id = qc_f.query_id\n" +
+                "WHERE rs_f.status = 'started' AND (qc_f.query_id, qc_f.collection_id) NOT IN\n" +
+                "(SELECT q.id, qlc.collection_id\n" +
+                "FROM public.query q\n" +
+                "JOIN public.request_status rs ON q.id = rs.query_id\n" +
+                "JOIN public.query_collection qc ON q.id = qc.query_id\n" +
+                "JOIN public.query_lifecycle_collection qlc ON q.id = qlc.query_id AND qc.collection_id = qlc.collection_id\n" +
+                "WHERE rs.status = 'started'\n" +
+                "GROUP BY q.id, qlc.collection_id);");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            System.out.println("Updating status for collection" + (Integer)record.getValue(1) + " in request " + (Integer)record.getValue(0));
+            saveUpdateCollectionRequestStatus(null, (Integer)record.getValue(0), (Integer)record.getValue(1),
+                    "notreachable", "contact", "", new Date(), userId);
+        }
     }
 }
