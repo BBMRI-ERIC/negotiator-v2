@@ -111,6 +111,16 @@ public class ApplicationBean implements Serializable {
         }
     }
 
+    public String updateLifecycleStatusProblem() {
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.getCollectionsWithLifeCycleStatusProblem(config, -1);
+        } catch (Exception e) {
+            System.err.println("Error Fixing LifeCycle Status Problems!");
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     /**
      * Gets the version.
      *

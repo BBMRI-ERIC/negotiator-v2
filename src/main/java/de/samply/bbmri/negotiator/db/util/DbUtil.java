@@ -241,46 +241,6 @@ public class DbUtil {
     }
 
     /**
-     * Saves the results received from the connector
-     * @param config JOOQ configuration
-     * @param result BBMRIResult object containing result
-     */
-    public static Boolean saveConnectorQueryResult(Config config, BbmriResult result){
-        Integer collectionId = getCollectionId(config, result.getDirectoryCollectionId());
-
-        if(collectionId == null) {
-            logger.error("Could not find the collection with ID {}", result.getDirectoryCollectionId());
-            return false;
-        }
-
-        try {
-            config.dsl().delete(Tables.QUERY_COLLECTION)
-                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getNegotiatorQueryId())
-                    .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
-                    .execute();
-
-            // only save an entry, if the result is actually not 0
-            if(result.getNumberOfSamples() != 0 || result.getNumberOfDonors() != 0) {
-                config.dsl().insertInto(Tables.QUERY_COLLECTION)
-                        .set(Tables.QUERY_COLLECTION.QUERY_ID, result.getNegotiatorQueryId())
-                        .set(Tables.QUERY_COLLECTION.COLLECTION_ID, collectionId)
-                        .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, false)
-                        .set(Tables.QUERY_COLLECTION.DONORS, result.getNumberOfDonors())
-                        .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
-                        .set(Tables.QUERY_COLLECTION.RESULT_RECEIVED_TIME, new Timestamp(new Date().getTime()))
-                        .execute();
-            }
-
-            config.commit();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    /**
      * Gets the time when first valid query was created in the negotiator.
      * @param config JOOQ configuration
      * @return Timestamp timestamp of query
@@ -1424,26 +1384,6 @@ public class DbUtil {
                 "WHERE n.acronym = '" + nnacronym + "')");
     }
 
-    /*
-     * Return all biobankers associated to this query, except the one who made the comment
-     */
-    public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId, Flag flag, int userId) {
-
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.QUERY_COLLECTION)
-                .join(Tables.COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .and (Tables.PERSON.ID.notEqual(userId))
-                .and (Tables.PERSON.ID.notIn (
-                        config.dsl().select(Tables.FLAGGED_QUERY.PERSON_ID)
-                        .from(Tables.FLAGGED_QUERY)
-                .where (Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and (Tables.FLAGGED_QUERY.FLAG.eq(flag))))
-                .fetch();
-          return config.map(record, NegotiatorDTO.class);
-    }
-
     public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollection(Config config, Integer collectionId) {
         Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
                 .from(Tables.PERSON_COLLECTION)
@@ -1462,29 +1402,6 @@ public class DbUtil {
                 .where(Tables.BIOBANK.ID.eq(biobankId))
                 .fetch();
         return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
-    }
-
-    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollectionsInQuery(Config config, Integer queryId) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.COLLECTION)
-                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .fetch();
-        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
-    }
-
-    /*
-     * Return query owner
-     */
-    public static NegotiatorDTO getQueryOwner(Config config, Integer queryId) {
-        Result<Record> record = config.dsl().select(getFields(Tables.PERSON,"person"))
-                .from(Tables.PERSON)
-                .join(Tables.QUERY).on(Tables.QUERY.RESEARCHER_ID.eq(Tables.PERSON.ID))
-                .where(Tables.QUERY.ID.eq(queryId)).fetch();
-
-        return config.map(record.get(0), NegotiatorDTO.class);
     }
 
     /**
@@ -1536,6 +1453,7 @@ public class DbUtil {
                     }
                 }
             } else {
+
                 for (CollectionDTO collection : querySearchDTO.getCollections()) {
                     CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
 
@@ -1837,6 +1755,7 @@ public class DbUtil {
                 .join(Tables.BIOBANK)
                 .on(Tables.COLLECTION.BIOBANK_ID.eq(Tables.BIOBANK.ID))
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
+                .orderBy(Tables.COLLECTION.BIOBANK_ID, Tables.COLLECTION.NAME)
                 .fetch();
         /** config.dsl().select(Tables.COLLECTION.fields())
                 .from(Tables.COLLECTION)
@@ -2025,11 +1944,20 @@ public class DbUtil {
      * @param config    DB access handle
      * @return List<QueryRecord> list of query record objects
      */
-    public static List<QueryRecord> getQueries(Config config){
-        Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY))
-                .from(Tables.QUERY)
-                .orderBy(Tables.QUERY.ID.asc()).fetch();
+    public static List<QueryRecord> getQueries(Config config, boolean filterTestRequests){
+        Result<Record> result = null;
+        if(filterTestRequests) {
+            result = config.dsl()
+                    .select(getFields(Tables.QUERY))
+                    .from(Tables.QUERY)
+                    .where(Tables.QUERY.TEST_REQUEST.eq(false))
+                    .orderBy(Tables.QUERY.ID.asc()).fetch();
+        } else {
+            result = config.dsl()
+                    .select(getFields(Tables.QUERY))
+                    .from(Tables.QUERY)
+                    .orderBy(Tables.QUERY.ID.asc()).fetch();
+        }
 
         // TODO: QueryRecord Mapping is not working for requestDescription, ethicsVote and negotiationStartedTime
         // for this malual Mapping
@@ -2737,6 +2665,42 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
                 .or(Tables.PERSON.IS_ADMIN.isTrue()))
                 .fetch();
-        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
+        return mapResultPerson(record);
+    }
+
+    private static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> mapResultPerson(Result<Record> records) {
+        List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> result = new ArrayList<>();
+        for(Record record : records) {
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
+            if(record.getValue("person_id") == null) {
+                continue;
+            }
+            person.setId(record.getValue("person_id", Integer.class));
+            person.setAuthEmail(record.getValue("person_auth_email", String.class));
+            person.setAuthName(record.getValue("person_auth_name", String.class));
+            person.setOrganization(record.getValue("person_organization", String.class));
+            result.add(person);
+        }
+        return result;
+    }
+
+    public static void getCollectionsWithLifeCycleStatusProblem(Config config, Integer userId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT qc_f.query_id, qc_f.collection_id\n" +
+                "FROM public.query_collection qc_f\n" +
+                "JOIN public.request_status rs_f ON rs_f.query_id = qc_f.query_id\n" +
+                "WHERE rs_f.status = 'started' AND (qc_f.query_id, qc_f.collection_id) NOT IN\n" +
+                "(SELECT q.id, qlc.collection_id\n" +
+                "FROM public.query q\n" +
+                "JOIN public.request_status rs ON q.id = rs.query_id\n" +
+                "JOIN public.query_collection qc ON q.id = qc.query_id\n" +
+                "JOIN public.query_lifecycle_collection qlc ON q.id = qlc.query_id AND qc.collection_id = qlc.collection_id\n" +
+                "WHERE rs.status = 'started'\n" +
+                "GROUP BY q.id, qlc.collection_id);");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            System.out.println("Updating status for collection" + (Integer)record.getValue(1) + " in request " + (Integer)record.getValue(0));
+            saveUpdateCollectionRequestStatus(null, (Integer)record.getValue(0), (Integer)record.getValue(1),
+                    "notreachable", "contact", "", new Date(), userId);
+        }
     }
 }

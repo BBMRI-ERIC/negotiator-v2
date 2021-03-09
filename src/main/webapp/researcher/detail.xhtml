@@ -343,9 +343,9 @@
                                     </h:form>
 
                                     <script type="text/javascript" >
-                                        function invokeCommandLink(collectionId, biobankId) {
-                                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + collectionId).find("select").val();
-                                            var offer = $("#offer" + collectionId).find("textarea").val();
+                                        function invokeCommandLink(collectionId, biobankId, formIdPrefix) {
+                                            var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
+                                            var offer = $("#offer" + formIdPrefix + collectionId).find("textarea").val();
 
                                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:offer").value = offer;
@@ -366,22 +366,25 @@
                                     </script>
                                 </h:panelGroup>
 
-                                <style>
-                                    #{researcherQueriesDetailBean.getCSSGrid()}
-                                </style>
-
                                 <b>#{label['querydetail.researcher.negotiationWithBiobanks']}</b>
 
                                 <div style="width: 100%;">
                                     <div style="float: right;background-color: #9a9a9a;border-radius: 5px;padding: 3px;margin-bottom: 3px;">
-                                        <span style="padding-left: 2px;cursor: pointer;" onclick="sortByStatus()">Sort by Status</span>
+                                        <span id="sortingViewStatusButton" class="highlightSortOption" style="padding-left: 2px;cursor: pointer;" onclick="sortByStatus()">Sort by Status</span>
                                         |
-                                        <span style="padding-left: 2px;cursor: pointer;" onclick="sortByBiobank()">Sort by Biobank</span>
+                                        <span id="sortingViewBiobankButton" style="padding-left: 2px;cursor: pointer;" onclick="sortByBiobank()">Sort by Biobank</span>
                                     </div>
                                 </div>
                                 <style>
                                     .hideSortingView {
                                         display: none;
+                                    }
+                                    .highlightSortOption {
+                                        background-color: #004275;
+                                        color: #FFFFFF;
+                                        border-radius: 5px;
+                                        padding: 3px;
+                                        margin-bottom: 3px;
                                     }
                                 </style>
 
@@ -391,12 +394,20 @@
                                         statusSort.classList.add("hideSortingView");
                                         var biobankSort = document.getElementById("sortingViewBiobank");
                                         biobankSort.classList.remove("hideSortingView");
+                                        var statusSort = document.getElementById("sortingViewStatusButton");
+                                        statusSort.classList.remove("highlightSortOption");
+                                        var biobankSort = document.getElementById("sortingViewBiobankButton");
+                                        biobankSort.classList.add("highlightSortOption");
                                     }
                                     function sortByStatus() {
                                         var statusSort = document.getElementById("sortingViewStatus");
                                         statusSort.classList.remove("hideSortingView");
                                         var biobankSort = document.getElementById("sortingViewBiobank");
                                         biobankSort.classList.add("hideSortingView");
+                                        var statusSort = document.getElementById("sortingViewStatusButton");
+                                        statusSort.classList.add("highlightSortOption");
+                                        var biobankSort = document.getElementById("sortingViewBiobankButton");
+                                        biobankSort.classList.remove("highlightSortOption");
                                     }
 
                                     $(document).ready(function(){
@@ -428,18 +439,21 @@
                                                 </div>
                                                 <div id="collapseLifecycleBiobank#{collectionsKey}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                                     <div class="card-body">
-                                                        <div class="container lifecycleContentArea">
-                                                            <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
-                                                                       var="collection" varStatus="loop">
+
+                                                        <ui:repeat value="#{researcherQueriesDetailBean.getSortedCollectionsByKathegory(collectionsKey)}"
+                                                                   var="collection" varStatus="loop">
+                                                            <div class="row">
                                                                 <h:form>
                                                                     <bbmriresearchercc:lifecycleCollectionStatus
                                                                             collectionLifeCycleStatus="#{collection}"
                                                                             collectionId="#{collection.collectionId}"
-                                                                            biobankId="#{-1}" />
+                                                                            biobankId="#{-1}"
+                                                                            formIdPrefix="_sortStatus_" />
                                                                 </h:form>
-                                                            </ui:repeat>
-                                                            <hr/>
-                                                        </div>
+                                                            </div>
+                                                        </ui:repeat>
+                                                        <hr/>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -461,23 +475,19 @@
                                                 </div>
                                                 <div id="collapseLifecycleBiobank#{biobankId}" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                                                     <div class="card-body">
-
-                                                        <div class="container lifecycleContentArea">
-                                                            <!--<div class="row">-->
                                                             <!-- TODO: Collection table with select -->
                                                             <ui:repeat value="#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId)}"
                                                                        var="collectionStatus" varStatus="loop">
-                                                                <div class="#{fn:replace(collectionStatus.status.status, '\\.', '_')}#{researcherQueriesDetailBean.requestLifeCycleStatus.getCollectionsForBiobank(biobankId).indexOf(collectionStatus)}">
+                                                                <div class="row">
                                                                     <h:form>
                                                                         <bbmriresearchercc:lifecycleCollectionStatus
                                                                                 collectionLifeCycleStatus="#{collectionStatus}"
                                                                                 collectionId="#{collectionStatus.collectionId}"
-                                                                                biobankId="#{biobankId}" />
+                                                                                biobankId="#{biobankId}"
+                                                                                formIdPrefix="_sortBiobank_" />
                                                                     </h:form>
                                                                 </div>
                                                             </ui:repeat>
-                                                        </div>
-                                                        <!--</div>-->
                                                     </div>
                                                 </div>
                                             </div>

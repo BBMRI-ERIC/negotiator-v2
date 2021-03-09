@@ -47,6 +47,7 @@ import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
@@ -261,6 +262,7 @@ public class QueryBean implements Serializable {
                    requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
                    NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
                }
+               checkLifeCycleStatus(config, id, testRequest);
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
@@ -272,6 +274,7 @@ public class QueryBean implements Serializable {
                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
                requestLifeCycleStatus.createStatus(userBean.getUserId());
                requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+               checkLifeCycleStatus(config, record.getId(), testRequest);
                config.commit();
                NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, record.getId(), null, userBean.getUserId());
                return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
@@ -280,6 +283,12 @@ public class QueryBean implements Serializable {
            e.printStackTrace();
        }
        return "/researcher/index";
+   }
+
+   private void checkLifeCycleStatus(Config config, Integer queryId, boolean testRequest) {
+       if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
+           requestLifeCycleStatus.contactCollectionRepresentativesIfNotContacted(userBean.getUserId(), getQueryUrlForBiobanker(queryId));
+       }
    }
 
    /**

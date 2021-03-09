@@ -34,17 +34,17 @@
         <version.samply.share.dto>4.0.0</version.samply.share.dto>
         <version.swagger.core>2.1.4</version.swagger.core>
 
-        <database.server>negotiator-db</database.server>
+        <!--<database.server>negotiator-db</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>saher</database.username>
-        <database.password>saher</database.password>
+        <database.password>saher</database.password>-->
 
-        <!--<database.server>localhost</database.server>
-        <database.port>5434</database.port>
+        <database.server>localhost</database.server>
+        <database.port>5433</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
-        <database.password>negotiator</database.password>-->
+        <database.password>negotiator</database.password>
 
         <!--<database.server>localhost</database.server>
         <database.port>5432</database.port>
@@ -83,6 +83,20 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/javax.el/javax.el-api -->
+        <dependency>
+            <groupId>javax.el</groupId>
+            <artifactId>javax.el-api</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -102,6 +116,26 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>2.23.4</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces</artifactId>
+            <version>8.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>4.1.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.xmlbeans/xmlbeans -->
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>4.0.0</version>
         </dependency>
 
         <!-- Swagger API documentation
@@ -229,6 +263,19 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+        </dependency>
+
+        <!--<dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
+        </dependency>-->
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.4</version>
         </dependency>
 
         <dependency>
@@ -239,12 +286,8 @@
 
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
+            <version>2.13.2</version>
         </dependency>
 
         <dependency>
@@ -256,19 +299,19 @@
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
-            <version>3.6.4</version>
+            <version>3.8.9</version>
         </dependency>
 
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-meta</artifactId>
-            <version>3.6.4</version>
+            <version>3.8.9</version>
         </dependency>
 
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq-codegen</artifactId>
-            <version>3.6.4</version>
+            <version>3.8.9</version>
         </dependency>
 
         <dependency>

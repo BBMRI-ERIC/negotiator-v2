@@ -11,34 +11,31 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NotificationStartNegotiation extends Notification {
+public class NotificationCollectionAddedToStartedNegotiation extends Notification {
+    private static final Logger logger = LoggerFactory.getLogger(NotificationCollectionAddedToStartedNegotiation.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationStartNegotiation.class);
+    private Map<String, String> emailAddressesAndNames;
 
-    public NotificationStartNegotiation(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
-        logger.info("74d87f9648e5-NotificationStartNegotiation created for requestID: {}", requestId);
+    public NotificationCollectionAddedToStartedNegotiation(NotificationRecord notificationRecord, Integer requestId, Integer personId, Map<String, String> emailAddressesAndNames) {
+        logger.info("4ef8802a4fcf-NotificationCollectionAddedToStartedNegotiation created for requestID: {}", requestId);
         this.requestId = requestId;
         this.notificationRecord = notificationRecord;
         this.personId = personId;
+        this.emailAddressesAndNames = emailAddressesAndNames;
         start();
     }
 
     @Override
     public void run() {
         try {
-            Map<String, String> emailAddressesAndNames = getCandidateEmailAddressesAndNames();
             setQuery();
             String subject = "[BBMRI-ERIC Negotiator] Request has been added: " + queryRecord.getTitle();
             createMailBodyBuilder("START_NEGOTIATION_NOTIFICATION.soy");
             prepareNotificationPerUser(emailAddressesAndNames, subject);
         } catch (Exception ex) {
-            logger.error("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000012: Error in NotificationStartNegotiation.");
+            logger.error("4ef8802a4fcf-NotificationCollectionAddedToStartedNegotiation ERROR-NG-0000092: Error in NotificationCollectionAddedToStartedNegotiation.");
             logger.error("context", ex);
         }
-    }
-
-    private Map<String, String> getCandidateEmailAddressesAndNames() {
-        return databaseUtil.getDatabaseUtilNotification().getEmailAddressesForQuery(requestId);
     }
 
     private void prepareNotificationPerUser(Map<String, String> emailAddressesAndNames, String subject) {
@@ -65,7 +62,7 @@ public class NotificationStartNegotiation extends Notification {
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
                 }
             } catch (Exception ex) {
-                logger.error(String.format("74d87f9648e5-NotificationStartNegotiation ERROR-NG-0000015: Error creating a notification for %s.", emailAddress));
+                logger.error(String.format("4ef8802a4fcf-NotificationCollectionAddedToStartedNegotiation ERROR-NG-0000093: Error creating a notification for %s.", emailAddress));
                 logger.error("context", ex);
             }
         }

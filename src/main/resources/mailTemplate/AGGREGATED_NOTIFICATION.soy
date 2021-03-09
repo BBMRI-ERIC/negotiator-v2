@@ -6,10 +6,14 @@
  * @param? locale The locale of the mail
  * @param? name The locale of the mail
  * @param? body Aggregated Body
+ * @param? linklist Aggregated list of all requests involved
  */
 {deltemplate maincontent}
     {switch $locale}
         {default}
+            You had some Notifications for request listed below:{\n}
+            {$linklist}
+            {\n}{\n}Full list of updates: {\n}
             {$body}
 
     {/switch}

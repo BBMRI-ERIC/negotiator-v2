@@ -14,6 +14,7 @@
     <composite:attribute name="collectionLifeCycleStatus" required="true"/>
     <composite:attribute name="collectionId" required="true"/>
     <composite:attribute name="biobankId" required="true"/>
+    <composite:attribute name="formIdPrefix" required="true"/>
 </composite:interface>
 
 <composite:implementation>
@@ -25,14 +26,19 @@
 
         <h:form id="status-form">
 
-            <div class="col-sm-3 col-lg-3">#{cc.attrs.collectionLifeCycleStatus.collectionName}</div>
+            <div class="col-sm-3 col-lg-3">
+                <c:if test='${cc.attrs.formIdPrefix.equals("_sortStatus_")}'>
+                    #{cc.attrs.collectionLifeCycleStatus.biobankName} -
+                </c:if>
+                #{cc.attrs.collectionLifeCycleStatus.collectionName}
+            </div>
             <div class="col-sm-3 col-lg-3">
                 #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
                 <span style="font-size: 12px; font-style: italic;">
                     <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" />
                 </span>
             </div>
-            <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
+            <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
                 #{label['lifecycleCollectionStatus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
                 <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
                                  class="form-control"
@@ -44,21 +50,21 @@
                                    itemLabel="#{label[nextStatus]}" itemValue="#{nextStatus}" />
                 </h:selectOneMenu>
 
-                <div id="numberOfAvailablePatients#{cc.attrs.collectionId}" style="display: none;">
+                <div id="numberOfAvailablePatients#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" style="display: none;">
                     #{label['lifecycleCollectionStatus.numberAvaivablePatients.title']} <i class="fa fa-pencil-square-o" />
                     <h:inputText id="numberOfAvailablePatients#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfPatientsAvailable}"
                                  styleClass="form-control"
                                  pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailablePatients']}">
                     </h:inputText>
                 </div>
-                <div id="numberOfAvailableSamples#{cc.attrs.collectionId}" style="display: none;">
+                <div id="numberOfAvailableSamples#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" style="display: none;">
                     #{label['lifecycleCollectionStatus.numberAvaivableSamples.title']} <i class="fa fa-pencil-square-o" />
                     <h:inputText id="numberOfAvailableSamples#{cc.attrs.collectionId}" value="#{lifeCycleStatusBean.numberOfSamplesAvailable}"
                                   styleClass="form-control"
                                   pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.numberOfAvailableSamples']}">
                     </h:inputText>
                 </div>
-                <div id="shippedNumber#{cc.attrs.collectionId}" style="display: none;">
+                <div id="shippedNumber#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" style="display: none;">
                     #{label['lifecycleCollectionStatus.shippedNumber.title']} <i class="fa fa-pencil-square-o" />
                     <h:inputTextarea id="shippedNumber" value="#{lifeCycleStatusBean.shippedNumber}"
                                      styleClass="form-control"
@@ -68,25 +74,25 @@
                 <h:outputScript>
                     function showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(data) {
                         if(data.value == 'availability.sample_data_available_accessible') {
-                            $("#numberOfAvailableSamples#{cc.attrs.collectionId}").show();
+                            $("#numberOfAvailableSamples#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").show();
                         } else {
-                            $("#numberOfAvailableSamples#{cc.attrs.collectionId}").hide();
+                            $("#numberOfAvailableSamples#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                         }
                         if(data.value == 'availability.sample_data_available_accessible') {
-                            $("#numberOfAvailablePatients#{cc.attrs.collectionId}").show();
+                            $("#numberOfAvailablePatients#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").show();
                         } else {
-                            $("#numberOfAvailablePatients#{cc.attrs.collectionId}").hide();
+                            $("#numberOfAvailablePatients#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                         }
                         if(data.value == 'accessConditions.indicateAccessConditions') {
                             $("#toggleModalIndicateAccessConditions").click();
-                            updateIdsForIndicateAccessConditions('#{cc.attrs.collectionId}', '#{cc.attrs.biobankId}');
+                            updateIdsForIndicateAccessConditions('#{cc.attrs.collectionId}', '#{cc.attrs.biobankId}', #{cc.attrs.formIdPrefix});
                         } else {
-                            $("#indicateAccessConditions#{cc.attrs.collectionId}").hide();
+                            $("#indicateAccessConditions#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                         }
                         if(data.value == 'shippedSamples.shipped') {
-                            $("#shippedNumber#{cc.attrs.collectionId}").show();
+                            $("#shippedNumber#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").show();
                         } else {
-                            $("#shippedNumber#{cc.attrs.collectionId}").hide();
+                            $("#shippedNumber#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                         }
                     }
 
@@ -102,10 +108,10 @@
                 </h:outputScript>
             </div>
             <div class="col-sm-2 col-lg-2">
-                <button type="button" style="width: 100%;white-space: normal;" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0)">
+                <button type="button" style="width: 100%;white-space: normal;" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0, '#{cc.attrs.formIdPrefix}')">
                     #{label['lifecycleCollectionStatus.form.button.updateCollection']}
                 </button>
-                <button type="button" style="width: 100%;white-space: normal;" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId})">
+                <button type="button" style="width: 100%;white-space: normal;" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId}, '#{cc.attrs.formIdPrefix}')">
                     #{label['lifecycleCollectionStatus.form.button.updateCollectionsBiobank']}
                 </button>
             </div>
