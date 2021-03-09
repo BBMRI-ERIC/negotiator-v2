@@ -26,6 +26,7 @@
   -->
 
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
+				xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 template="default.xhtml">
 
@@ -61,6 +62,22 @@
 
 		<div>
 			Git-Branch: #{applicationBean.gitBranch}, Git-Commit-ID: #{applicationBean.gitCommitId}, Version: #{applicationBean.version}
+		</div>
+
+		<div class="card" style="margin-top: 45px;">
+			<div class="card-header bg-warning" style="padding: 5px;">Update LifeCycle Problems</div>
+			<div class="card-body" style="padding: 5px;	height: 80px;">
+				<h:form styleClass="form-horizontal">
+					<div class="col-md-12">
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								Fix LifeCyle Issue where collections ar not inizialized correctly: <br/>
+								<h:commandButton action="#{applicationBean.updateLifecycleStatusProblem}" value="#{label['admin.lifecycle.fixIssues']}" styleClass="btn btn-default"/>
+							</div>
+						</div>
+					</div>
+				</h:form>
+			</div>
 		</div>
 
 	</ui:define>
