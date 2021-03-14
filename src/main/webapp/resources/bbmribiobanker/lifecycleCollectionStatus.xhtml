@@ -85,7 +85,9 @@
                         }
                         if(data.value == 'accessConditions.indicateAccessConditions') {
                             $("#toggleModalIndicateAccessConditions").click();
-                            updateIdsForIndicateAccessConditions('#{cc.attrs.collectionId}', '#{cc.attrs.biobankId}', #{cc.attrs.formIdPrefix});
+                            console.log('prefix: ' + '#{cc.attrs.formIdPrefix}');
+                            console.log('AL1: ' + '#{cc.attrs.collectionId}');
+                            updateIdsForIndicateAccessConditions('#{cc.attrs.collectionId}', '#{cc.attrs.biobankId}', '#{cc.attrs.formIdPrefix}');
                         } else {
                             $("#indicateAccessConditions#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                         }
