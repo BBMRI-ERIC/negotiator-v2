@@ -81,8 +81,9 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
                 NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Adding Mapping collectionId and personId " +
                         collectionId + " - " + personId);
             } else {
-                NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Mapping for collectionId and personId" +
-                        collectionId + " - " + personId + " already exists.");
+                //NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Mapping for collectionId and personId" +
+                //        collectionId + " - " + personId + " already exists.");
+                NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"records.size(): " + records.size());
                 return addedResult;
             }
         } catch (Exception ex) {
