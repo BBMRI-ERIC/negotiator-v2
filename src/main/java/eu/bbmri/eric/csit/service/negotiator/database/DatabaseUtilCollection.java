@@ -76,6 +76,7 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
                 PersonCollectionRecord record = database.newRecord(Tables.PERSON_COLLECTION);
                 record.setPersonId(personId);
                 record.setCollectionId(collectionId);
+                record.store();
             } else {
                 return addedResult;
             }

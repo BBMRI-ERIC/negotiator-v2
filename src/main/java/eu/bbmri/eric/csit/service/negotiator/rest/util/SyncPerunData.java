@@ -36,6 +36,7 @@ public class SyncPerunData extends Thread {
         if(mappings != null) {
             NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Syncronice Perun Mappings.");
             syncMappingPersonCollections();
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Syncronice Perun Mappings.... done");
         }
         if(users != null) {
             syncUsers();
