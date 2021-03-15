@@ -77,7 +77,12 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
                 record.setPersonId(personId);
                 record.setCollectionId(collectionId);
                 record.store();
+                conn.commit();
+                NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Adding Mapping collectionId and personId " +
+                        collectionId + " - " + personId);
             } else {
+                NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Mapping for collectionId and personId" +
+                        collectionId + " - " + personId + " already exists.");
                 return addedResult;
             }
         } catch (Exception ex) {
