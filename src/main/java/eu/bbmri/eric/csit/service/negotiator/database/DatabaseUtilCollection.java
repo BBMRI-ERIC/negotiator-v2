@@ -72,7 +72,7 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
             Result<PersonCollectionRecord> records = database.selectFrom(Tables.PERSON_COLLECTION)
                     .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId).and(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId)))
                     .fetch();
-            if(records == null || records.isNotEmpty()) {
+            if(records == null || records.isNotEmpty() || records.size() == 0) {
                 PersonCollectionRecord record = database.newRecord(Tables.PERSON_COLLECTION);
                 record.setPersonId(personId);
                 record.setCollectionId(collectionId);
