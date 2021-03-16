@@ -4,6 +4,8 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -57,6 +59,8 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
                     .execute();
         } catch (Exception ex) {
             logger.error("60c5ab668428-DatabaseUtilCollection ERROR-NG-0000083: Error deleting users from collection mapping {}.", collectionId);
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION, "60c5ab668428-DatabaseUtilCollection " +
+                    "ERROR-NG-0000083: Error deleting users from collection mapping " + collectionId);
             logger.error("context", ex);
         }
         return deletedResult;
@@ -68,15 +72,19 @@ public class DatabaseUtilCollection extends DatabaseUtilBase{
             Result<PersonCollectionRecord> records = database.selectFrom(Tables.PERSON_COLLECTION)
                     .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(personId).and(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId)))
                     .fetch();
-            if(records == null || records.isNotEmpty()) {
+            if(records == null || records.isNotEmpty() || records.size() == 0) {
                 PersonCollectionRecord record = database.newRecord(Tables.PERSON_COLLECTION);
                 record.setPersonId(personId);
                 record.setCollectionId(collectionId);
+                record.store();
+                conn.commit();
             } else {
                 return addedResult;
             }
         } catch (Exception ex) {
-            logger.error("60c5ab668428-DatabaseUtilCollection ERROR-NG-0000091: Error deleting users from collection mapping {}.", collectionId);
+            logger.error("60c5ab668428-DatabaseUtilCollection ERROR-NG-0000091: Inserting mapping for collectionId: {} and personId: {}.", collectionId, personId);
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION, "60c5ab668428-DatabaseUtilCollection " +
+                    "ERROR-NG-0000091: Inserting mapping for collectionId and personId: " + collectionId + ", " + personId);
             logger.error("context", ex);
         }
         return addedResult;
