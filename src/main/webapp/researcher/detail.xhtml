@@ -320,8 +320,10 @@
 
                                     <script type="text/javascript" >
                                         function invokeCommandLink(collectionId, biobankId, formIdPrefix) {
+                                            console.log("collectionId: " + collectionId + " formIdPrefix: " + formIdPrefix);
                                             var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
                                             var offer = $("#offer" + formIdPrefix + collectionId).find("textarea").val();
+                                            console.log("Selector: " + "#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId + " nextCollectionLifecycleStatusStatus: " + nextCollectionLifecycleStatusStatus);
 
                                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:offer").value = offer;
