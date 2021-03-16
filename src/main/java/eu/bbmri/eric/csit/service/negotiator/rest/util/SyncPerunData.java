@@ -5,6 +5,8 @@ import de.samply.bbmri.negotiator.rest.dto.PerunMappingDTO;
 import de.samply.bbmri.negotiator.rest.dto.PerunPersonDTO;
 import de.samply.string.util.StringUtil;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,7 +34,9 @@ public class SyncPerunData extends Thread {
         databaseUtil = new DatabaseUtil();
 
         if(mappings != null) {
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Syncronice Perun Mappings.");
             syncMappingPersonCollections();
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Syncronice Perun Mappings.... done");
         }
         if(users != null) {
             syncUsers();
@@ -59,6 +63,8 @@ public class SyncPerunData extends Thread {
     private boolean checkMappingEntry(PerunMappingDTO mappingEntry) {
         if(StringUtil.isEmpty(mappingEntry.getId()) || StringUtil.isEmpty(mappingEntry.getName())) {
             logger.error("b559e340e87f-SyncPerunData ERROR-NG-0000080: Perun mapping has no ID or no name: {}, {}.", mappingEntry.getId(), mappingEntry.getName());
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,"b559e340e87f-SyncPerunData ERROR-NG-0000080: Perun mapping has no ID or no name:" +
+                    mappingEntry.getId() + ", " + mappingEntry.getName() + ".");
             return false;
         }
         return true;

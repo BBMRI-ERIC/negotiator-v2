@@ -9,6 +9,7 @@ import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatu
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
