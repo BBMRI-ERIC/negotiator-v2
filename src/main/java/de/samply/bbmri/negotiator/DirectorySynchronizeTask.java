@@ -26,6 +26,8 @@
 
 package de.samply.bbmri.negotiator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -55,6 +57,10 @@ public class DirectorySynchronizeTask extends TimerTask {
     
     private Negotiator negotiatorConfig_;
 
+    private List<String> defaultNationalNodes = new ArrayList<>(Arrays.asList(
+       "no", "se", "fi", "ee", "lv", "lt", "pl", "de", "nl", "uk","be", "cz", "at", "ch", "bg", "it", "ee", "mt", "gr","tr", "cy"
+    ));
+
     @Override
     public void run() {
         try(Config config = ConfigFactory.get()) {
@@ -77,6 +83,7 @@ public class DirectorySynchronizeTask extends TimerTask {
                     }
                 }
             }
+            updateDefaultNetworks(config);
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, "Biobanks: " + biobanks + ", Collections: " + collections + ", Networks: " + networks);
             DataCache dataCache = DataCache.getInstance();
             dataCache.createUpdateBiobankList();
@@ -102,7 +109,6 @@ public class DirectorySynchronizeTask extends TimerTask {
             int numberOfNetworks = synchronizeNetworks(directoryId, config, client, updateNetworks);
             int numberOfBiobanks = synchronizeBiobanks(directoryId, config, client, updateNetworks);
             int numberOfCollections = synchronizedCollections(directoryId, config, client, updateNetworks);
-            //updateBbmriEricNationalNodes(config, directoryId, bbmriEricNationalNetworks);
 
             logger.info("Synchronization with the directory finished. Biobanks: " + numberOfBiobanks + ", Collections:" + numberOfCollections + ", Networks: " + numberOfNetworks);
             config.commit();
@@ -213,60 +219,34 @@ public class DirectorySynchronizeTask extends TimerTask {
         }
     }
 
-    private void updateBbmriEricNationalNodes(Config config, int listOfDirectoriesId, Boolean bbmriEricNationalNetworks) {
+    private void updateDefaultNetworks(Config config) {
         try {
-            if(bbmriEricNationalNetworks == null || !bbmriEricNationalNetworks) {
-                return;
-            }
-            DbUtil.updateNetworkBiobankLinks(config, "GBA", "bbmri-eric:ID:DE%");
-            DbUtil.updateNetworkBiobankLinks(config, "SBP", "bbmri-eric:ID:CH%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.FI", "bbmri-eric:ID:FI%");
-            DbUtil.updateNetworkBiobankLinks(config, "bbmri.no", "bbmri-eric:ID:NO%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.PL", "bbmri-eric:ID:PL%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.AU", "bbmri-eric:ID:AU%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.EE", "bbmri-eric:ID:EE%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.SE", "bbmri-eric:ID:SE%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.LV", "bbmri-eric:ID:LV%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.PT", "bbmri-eric:ID:PT%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.GR", "bbmri-eric:ID:GR%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.EU", "bbmri-eric:ID:EU%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.MT", "bbmri-eric:ID:MT%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.BE", "bbmri-eric:ID:BE%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.NL", "bbmri-eric:ID:NL%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.BG", "bbmri-eric:ID:BG%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.CZ", "bbmri-eric:ID:CZ%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.IT", "bbmri-eric:ID:IT%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.AT", "bbmri-eric:ID:AT%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.CY", "bbmri-eric:ID:CY%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.UK", "bbmri-eric:ID:UK%");
-            DbUtil.updateNetworkBiobankLinks(config, "BBMRI.FR", "bbmri-eric:ID:FR%");
-
-            DbUtil.updateNetworkCollectionLinks(config, "GBA", "bbmri-eric:ID:DE%");
-            DbUtil.updateNetworkCollectionLinks(config, "SBP", "bbmri-eric:ID:CH%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.FI", "bbmri-eric:ID:FI%");
-            DbUtil.updateNetworkCollectionLinks(config, "bbmri.no", "bbmri-eric:ID:NO%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.PL", "bbmri-eric:ID:PL%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.AU", "bbmri-eric:ID:AU%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.EE", "bbmri-eric:ID:EE%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.SE", "bbmri-eric:ID:SE%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.LV", "bbmri-eric:ID:LV%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.PT", "bbmri-eric:ID:PT%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.GR", "bbmri-eric:ID:GR%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.EU", "bbmri-eric:ID:EU%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.MT", "bbmri-eric:ID:MT%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.BE", "bbmri-eric:ID:BE%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.NL", "bbmri-eric:ID:NL%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.BG", "bbmri-eric:ID:BG%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.CZ", "bbmri-eric:ID:CZ%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.IT", "bbmri-eric:ID:IT%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.AT", "bbmri-eric:ID:AT%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.CY", "bbmri-eric:ID:CY%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.UK", "bbmri-eric:ID:UK%");
-            DbUtil.updateNetworkCollectionLinks(config, "BBMRI.FR", "bbmri-eric:ID:FR%");
-
+            createDefaultNetworks(config);
+            updateDefaultNetworksLinks(config);
         } catch (Exception e) {
-            System.err.println("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000047: Problem updating BBMRI-ERIC National Nodes for listOfDirectoriesId: " + listOfDirectoriesId + ".");
+            System.err.println("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000094: Problem creating default National Node Networks.");
             e.printStackTrace();
         }
     }
+
+    private void createDefaultNetworks(Config config) {
+        for(String networkEnding : defaultNationalNodes) {
+            String network = "BBMRI." + networkEnding;
+            DirectoryNetwork networkDto = new DirectoryNetwork();
+            networkDto.setId("internal:ID:" + network);
+            networkDto.setName(network);
+            networkDto.setDescription("Internal Network for the National Node of " + network);
+            networkDto.setAcronym(network);
+            DbUtil.synchronizeNetwork(config, networkDto, '1');
+        }
+    }
+
+    private void updateDefaultNetworksLinks(Config config) {
+        for(String networkEnding : defaultNationalNodes) {
+            String networkname =  "internal:ID:BBMRI." + networkEnding;
+            DbUtil.updateNetworkBiobankLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
+            DbUtil.updateNetworkCollectionLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
+        }
+    }
+
 }
