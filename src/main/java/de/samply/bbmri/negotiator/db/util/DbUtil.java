@@ -1364,24 +1364,24 @@ public class DbUtil {
 
     public static void updateNetworkBiobankLinks(Config config, String nnacronym, String directoryIdStart) {
         config.dsl().execute("INSERT INTO public.network_biobank_link(biobank_id, network_id) " +
-                "SELECT bio.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "SELECT bio.id, (SELECT id FROM public.network WHERE directory_id = '" + nnacronym + "') " +
                 "FROM public.biobank bio WHERE bio.directory_id ILIKE '" + directoryIdStart + "' " +
                 "AND id NOT IN ( " +
                 "SELECT b.id FROM public.biobank b " +
                 "JOIN public.network_biobank_link nb ON nb.biobank_id = b.id " +
                 "JOIN public.network n ON nb.network_id = n.id " +
-                "WHERE n.acronym = '" + nnacronym + "')");
+                "WHERE n.directory_id = '" + nnacronym + "')");
     }
 
     public static void updateNetworkCollectionLinks(Config config, String nnacronym, String directoryIdStart) {
         config.dsl().execute("INSERT INTO public.network_collection_link(collection_id, network_id) " +
-                "SELECT col.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "SELECT col.id, (SELECT id FROM public.network WHERE directory_id = '" + nnacronym + "') " +
                 "FROM public.collection col WHERE col.directory_id ILIKE '" + directoryIdStart + "' " +
                 "AND id NOT IN ( " +
                 "SELECT c.id FROM public.collection c " +
                 "JOIN public.network_collection_link nc ON nc.collection_id = c.id " +
                 "JOIN public.network n ON nc.network_id = n.id " +
-                "WHERE n.acronym = '" + nnacronym + "')");
+                "WHERE n.directory_id = '" + nnacronym + "')");
     }
 
     public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollection(Config config, Integer collectionId) {
