@@ -26,6 +26,7 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -66,6 +67,9 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.slf4j.Logger;
@@ -281,6 +285,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 				sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
 			}
 		}
+	}
+
+	public String getRequestPDF() {
+		try {
+			PDDocument pDDocument = PDDocument.load(new File("D:\\tmp\\Untitled1.pdf"));
+			PDAcroForm pDAcroForm = pDDocument.getDocumentCatalog().getAcroForm();
+			PDField field = pDAcroForm.getField("RequestName");
+			field.setValue("This is a first field printed by Java");
+			pDDocument.save("D:\\tmp\\Untitled2.pdf");
+			pDDocument.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println(" ");
+		return "";
 	}
 
     /**

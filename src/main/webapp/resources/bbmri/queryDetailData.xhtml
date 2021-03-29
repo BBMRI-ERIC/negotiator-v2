@@ -48,16 +48,28 @@
         <h2 style="margin-top: 0px; margin-bottom: 0px; text-align: left;border-bottom: 1px solid #7a7a7a;">
             #{cc.attrs.bean.selectedQuery.title}
         </h2>
-        <h:panelGroup layout="block" style="font-size: smaller ">
+        <h:panelGroup layout="block" style="font-size: smaller;width: 40%;float: left;">
             <h:outputText
                     title="#{label['queryview.queryitem.datetime.creation']}"
                     value="#{cc.attrs.bean.selectedQuery.queryCreationTime}">
                 <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
             </h:outputText><br/>
             RequestID: #{cc.attrs.bean.selectedQuery.id}
+
         </h:panelGroup>
+
+        <h:panelGroup layout="block" style="font-size: smaller;width: 40%;float: right;alignment: right;">
+            <h:form>
+                <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
+                               title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+                               action="#{cc.attrs.bean.getRequestPDF()}">
+                    Save as PDF <span class="glyphicon glyphicon-save-file"></span>
+                </h:commandLink>
+            </h:form>
+        </h:panelGroup>
+        <br />
         <!--        Function for the show more button        -->
-        <h4>#{label['queryview.title.text']}</h4>
+        <h4 style="width: 100%;">#{label['queryview.title.text']}</h4>
         <div style="white-space: pre-wrap"><span class="more">#{cc.attrs.bean.selectedQuery.text}</span></div>
         <h:outputStylesheet>
             .morecontent span {
