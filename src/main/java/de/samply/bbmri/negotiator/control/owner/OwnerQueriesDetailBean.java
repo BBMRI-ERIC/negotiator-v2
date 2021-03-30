@@ -26,9 +26,7 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
@@ -41,6 +39,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -179,6 +178,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Part dtaFile;
 	private Part otherAccessFile;
 
+	private static final int DEFAULT_BUFFER_SIZE = 10240;
+
 	private final FileUtil fileUtil = new FileUtil();
 	private List<FacesMessage> fileValidationMessages = new ArrayList<>();
 	Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
@@ -287,19 +288,49 @@ public class OwnerQueriesDetailBean implements Serializable {
 		}
 	}
 
-	public String getRequestPDF() {
+	public void getRequestPDF() throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
 		try {
-			PDDocument pDDocument = PDDocument.load(new File("D:\\tmp\\Untitled1.pdf"));
+			PDDocument pDDocument = PDDocument.load(new File("/tmp/FormRequest.pdf"));
 			PDAcroForm pDAcroForm = pDDocument.getDocumentCatalog().getAcroForm();
 			PDField field = pDAcroForm.getField("RequestName");
 			field.setValue("This is a first field printed by Java");
-			pDDocument.save("D:\\tmp\\Untitled2.pdf");
+			PDField field1 = pDAcroForm.getField("RequestDescription");
+			field1.setValue("Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante. Etiam sit amet orci eget eros faucibus tincidunt. Duis leo. Sed fringilla mauris sit amet nibh. Donec sodales sagittis magna. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc,");
+			PDField field2 = pDAcroForm.getField("RequestDescription1");
+			field2.setValue("This is a first field printed by Java");
+
+			pDDocument.save("/tmp/FormRequest2.pdf");
 			pDDocument.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println(" ");
-		return "";
+
+		File file = new File("/tmp/FormRequest2.pdf");
+
+		response.reset();
+		response.setBufferSize(DEFAULT_BUFFER_SIZE);
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Length", String.valueOf(file.length()));
+		response.setHeader("Content-Disposition", "attachment;filename=\""+ file.getName() + "\"");
+		BufferedInputStream input = null;
+		BufferedOutputStream output = null;
+		try {
+			input = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+			output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
+			byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+			int length;
+			while ((length = input.read(buffer)) > 0) {
+				output.write(buffer, 0, length);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			input.close();
+			output.close();
+		}
+		context.responseComplete();
 	}
 
     /**
