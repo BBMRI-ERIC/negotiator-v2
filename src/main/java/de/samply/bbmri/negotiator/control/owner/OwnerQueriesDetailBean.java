@@ -28,8 +28,11 @@ package de.samply.bbmri.negotiator.control.owner;
 
 import java.io.*;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -293,12 +296,26 @@ public class OwnerQueriesDetailBean implements Serializable {
 		}
 	}
 
-	// Creating well formed document
-	private org.w3c.dom.Document createWellFormedHtml(File inputHTML) throws IOException {
-		Document document = Jsoup.parse(inputHTML, "UTF-8");
-		document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
-		System.out.println("HTML parsing done...");
-		return new W3CDom().fromJsoup(document);
+	private String replaceNotNull(String htmlTemplate, String replace, String replaceWith) {
+		if(replaceWith != null) {
+			return htmlTemplate.replaceAll(replace, replaceWith);
+		}
+		return htmlTemplate;
+	}
+
+	private String replaceTemplate(String htmlTemplate) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__RequestTitle", selectedQuery.getTitle());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Date", dateFormat.format(selectedQuery.getQueryCreationTime()));
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__ID", selectedQuery.getId().toString());
+
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Researcher", selectedQuery.getResearcherName());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Email", selectedQuery.getResearcherEmail());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Organistion", selectedQuery.getResearcherOrganization());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Description", selectedQuery.getRequestDescription());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Ethics", selectedQuery.getEthicsVote());
+
+		return htmlTemplate;
 	}
 
 	public void getRequestPDF() throws IOException {
@@ -306,11 +323,17 @@ public class OwnerQueriesDetailBean implements Serializable {
 		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
 		try {
 			File inputHTML = new File(getClass().getClassLoader().getResource("pdfTemplate").getPath(), "RequestTemplate.html");
-			String outputPdf = "/tmp/FormRequest2.pdf";
-			org.w3c.dom.Document doc = createWellFormedHtml(inputHTML);
+			byte[] encoded = Files.readAllBytes(Paths.get(inputHTML.getAbsolutePath()));
+			String htmlTemplate = new String(encoded, "UTF-8");
+			htmlTemplate = replaceTemplate(htmlTemplate);
 
+			Document document = Jsoup.parse(htmlTemplate);
+			document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+			org.w3c.dom.Document doc = new W3CDom().fromJsoup(document);
+
+			String outputPdf = "/tmp/FormRequest2.pdf";
 			String baseUri = FileSystems.getDefault()
-					.getPath("/tmp", getClass().getClassLoader().getResource("pdfTemplate").getPath())
+					.getPath("D:")
 					.toUri()
 					.toString();
 			OutputStream os = new FileOutputStream(outputPdf);
