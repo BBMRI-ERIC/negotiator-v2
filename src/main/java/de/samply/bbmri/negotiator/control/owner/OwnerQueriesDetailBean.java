@@ -26,10 +26,13 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,9 +43,11 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
@@ -66,8 +71,14 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.W3CDom;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,6 +186,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Part dtaFile;
 	private Part otherAccessFile;
 
+	private static final int DEFAULT_BUFFER_SIZE = 10240;
+
 	private final FileUtil fileUtil = new FileUtil();
 	private List<FacesMessage> fileValidationMessages = new ArrayList<>();
 	Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
@@ -281,6 +294,86 @@ public class OwnerQueriesDetailBean implements Serializable {
 				sortedCollections.get(collectionLifeCycleStatus.getStatus().getStatus()).add(collectionLifeCycleStatus);
 			}
 		}
+	}
+
+	private String replaceNotNull(String htmlTemplate, String replace, String replaceWith) {
+		if(replaceWith != null) {
+			return htmlTemplate.replaceAll(replace, replaceWith);
+		} else {
+			return htmlTemplate.replaceAll(replace, "-");
+		}
+	}
+
+	private String replaceTemplate(String htmlTemplate) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__RequestTitle", selectedQuery.getTitle());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Date", dateFormat.format(selectedQuery.getQueryCreationTime()));
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__ID", selectedQuery.getId().toString());
+
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Researcher", selectedQuery.getResearcherName());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Email", selectedQuery.getResearcherEmail());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Organisation", selectedQuery.getResearcherOrganization());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Description", selectedQuery.getRequestDescription());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Projectdescription", selectedQuery.getText());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Ethics", selectedQuery.getEthicsVote());
+
+		return htmlTemplate;
+	}
+
+	public void getRequestPDF() throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+		try {
+			File inputHTML = new File(getClass().getClassLoader().getResource("pdfTemplate").getPath(), "RequestTemplate.html");
+			byte[] encoded = Files.readAllBytes(Paths.get(inputHTML.getAbsolutePath()));
+			String htmlTemplate = new String(encoded, "UTF-8");
+			htmlTemplate = replaceTemplate(htmlTemplate);
+
+			Document document = Jsoup.parse(htmlTemplate);
+			document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+			org.w3c.dom.Document doc = new W3CDom().fromJsoup(document);
+
+			String outputPdf = "/tmp/FormRequest2.pdf";
+			String baseUri = FileSystems.getDefault()
+					.getPath("D:")
+					.toUri()
+					.toString();
+			OutputStream os = new FileOutputStream(outputPdf);
+			PdfRendererBuilder builder = new PdfRendererBuilder();
+			builder.toStream(os);
+			builder.withW3cDocument(doc, baseUri);
+			builder.run();
+			os.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+
+		File file = new File("/tmp/FormRequest2.pdf");
+
+		response.reset();
+		response.setBufferSize(DEFAULT_BUFFER_SIZE);
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Length", String.valueOf(file.length()));
+		response.setHeader("Content-Disposition", "attachment;filename=\""+ file.getName() + "\"");
+		BufferedInputStream input = null;
+		BufferedOutputStream output = null;
+		try {
+			input = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+			output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
+			byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+			int length;
+			while ((length = input.read(buffer)) > 0) {
+				output.write(buffer, 0, length);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			input.close();
+			output.close();
+		}
+		context.responseComplete();
 	}
 
     /**

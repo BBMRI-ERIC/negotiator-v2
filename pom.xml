@@ -34,11 +34,11 @@
         <version.samply.share.dto>4.0.0</version.samply.share.dto>
         <version.swagger.core>2.1.4</version.swagger.core>
 
-        <!--<database.server>negotiator-db</database.server>
+        <database.server>negotiator-db</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>saher</database.username>
-        <database.password>saher</database.password>-->
+        <database.password>saher</database.password>
 
         <!--<database.server>localhost</database.server>
         <database.port>5433</database.port>
@@ -46,11 +46,11 @@
         <database.username>negotiator</database.username>
         <database.password>negotiator</database.password>-->
 
-        <database.server>localhost</database.server>
+        <!--<database.server>localhost</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
-        <database.password>negotiator</database.password>
+        <database.password>negotiator</database.password>-->
         <!--<database.name>neg-20190910</database.name>-->
         <!--<database.password>0bpCP58yTJnNQmKqO9mX</database.password>-->
 
@@ -83,6 +83,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.22</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/javax.el/javax.el-api -->
         <dependency>
             <groupId>javax.el</groupId>
@@ -95,6 +101,23 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>5.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-core</artifactId>
+            <version>1.0.6</version>
+        </dependency>
+        <!--supports PDF output with Apache PDF-BOX -->
+        <dependency>
+            <groupId>com.openhtmltopdf</groupId>
+            <artifactId>openhtmltopdf-pdfbox</artifactId>
+            <version>1.0.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.13.1</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson
