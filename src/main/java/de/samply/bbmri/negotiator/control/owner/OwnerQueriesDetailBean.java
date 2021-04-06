@@ -299,8 +299,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private String replaceNotNull(String htmlTemplate, String replace, String replaceWith) {
 		if(replaceWith != null) {
 			return htmlTemplate.replaceAll(replace, replaceWith);
+		} else {
+			return htmlTemplate.replaceAll(replace, "-");
 		}
-		return htmlTemplate;
 	}
 
 	private String replaceTemplate(String htmlTemplate) {
@@ -311,8 +312,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Researcher", selectedQuery.getResearcherName());
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Email", selectedQuery.getResearcherEmail());
-		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Organistion", selectedQuery.getResearcherOrganization());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Organisation", selectedQuery.getResearcherOrganization());
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Description", selectedQuery.getRequestDescription());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Projectdescription", selectedQuery.getText());
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Ethics", selectedQuery.getEthicsVote());
 
 		return htmlTemplate;
