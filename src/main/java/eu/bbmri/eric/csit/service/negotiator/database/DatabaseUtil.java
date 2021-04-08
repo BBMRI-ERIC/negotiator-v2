@@ -1,11 +1,5 @@
 package eu.bbmri.eric.csit.service.negotiator.database;
 
-import javax.annotation.Resource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 public class DatabaseUtil {
 
     private DatabaseUtilNotification databaseUtilNotification;
