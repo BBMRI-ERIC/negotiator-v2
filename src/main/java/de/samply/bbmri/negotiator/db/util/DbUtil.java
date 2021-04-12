@@ -2702,4 +2702,16 @@ public class DbUtil {
                     "notreachable", "contact", "", new Date(), userId);
         }
     }
+
+    public static List<QueryRecord> getAllRequestsToUpdate(Config config) {
+        Result<QueryRecord> result = config.dsl()
+                .selectFrom(Tables.QUERY)
+                .fetch();
+
+        return config.map(result, QueryRecord.class);
+    }
+
+    public static void updateQueryRecord(Config config, QueryRecord queryRecord) {
+        queryRecord.update();
+    }
 }
