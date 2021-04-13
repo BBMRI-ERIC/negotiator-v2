@@ -329,7 +329,7 @@ public class QueryBean implements Serializable {
             externalContext.redirect(url);
         } else if(mode.equals("edit")) {
             saveEditChangesTemporarily();
-            externalContext.redirect(url + "?nToken=" + qtoken + "__search__");
+            externalContext.redirect(url + "#/?nToken=" + qtoken + "__search__");
         }else{
             externalContext.redirect(url);
         }
