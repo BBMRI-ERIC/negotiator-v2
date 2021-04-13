@@ -286,6 +286,9 @@ public class QueryBean implements Serializable {
    }
 
    private void checkLifeCycleStatus(Config config, Integer queryId, boolean testRequest) {
+       if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null) {
+           return;
+       }
        if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
            requestLifeCycleStatus.contactCollectionRepresentativesIfNotContacted(userBean.getUserId(), getQueryUrlForBiobanker(queryId));
        }
