@@ -42,7 +42,7 @@ public class NotificationCreateRequest extends Notification {
     }
 
     private void prepareNotificationForBBMRIERIC(String subject) {
-        String bbmriemail = "negotiator@helpdesk.bbmri-eric.eu";
+        String bbmriemail = "negotiator-requests@helpdesk.bbmri-eric.eu";
         try {
             String body = getMailBody(getSoyParameters());
 

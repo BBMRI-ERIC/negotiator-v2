@@ -42,7 +42,7 @@ public class NotificationCollectionUnreachable extends Notification {
         try {
             String body = getMailBody(getSoyParameters(notreachableCollections));
 
-            String bbmriemail = "negotiator@helpdesk.bbmri-eric.eu";
+            String bbmriemail = "negotiator-requests@helpdesk.bbmri-eric.eu";
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(bbmriemail, subject, body);
             if(checkSendNotificationImmediatelyForUser(bbmriemail, NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION)) {
                 sendMailNotification(mailNotificationRecord.getMailNotificationId(), bbmriemail, subject, body);
