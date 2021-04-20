@@ -306,13 +306,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private String replaceTemplate(String htmlTemplate) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		Person researcher = getUserDataForResearcher(selectedQuery.getResearcherId());
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__RequestTitle", selectedQuery.getTitle());
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Date", dateFormat.format(selectedQuery.getQueryCreationTime()));
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__ID", selectedQuery.getId().toString());
 
-		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Researcher", selectedQuery.getResearcherName());
-		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Email", selectedQuery.getResearcherEmail());
-		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Organisation", selectedQuery.getResearcherOrganization());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Researcher", researcher.getAuthName());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Email", researcher.getAuthEmail());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Organisation", researcher.getOrganization());
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Description", selectedQuery.getRequestDescription());
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Projectdescription", selectedQuery.getText());
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Ethics", selectedQuery.getEthicsVote());
