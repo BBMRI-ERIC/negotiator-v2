@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
@@ -61,19 +62,18 @@ import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
-import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.OfferPersonDTO;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
-import org.apache.pdfbox.pdmodel.interactive.form.PDField;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.docx4j.Docx4J;
+import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jsoup.Jsoup;
@@ -324,6 +324,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public void getRequestPDF() throws IOException {
 		FacesContext context = FacesContext.getCurrentInstance();
 		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+
+		// Build pdf of request
+		String tempPdfOutputFilePath = "/tmp/" + UUID.randomUUID().toString() + ".pdf";
 		try {
 			File inputHTML = new File(getClass().getClassLoader().getResource("pdfTemplate").getPath(), "RequestTemplate.html");
 			byte[] encoded = Files.readAllBytes(Paths.get(inputHTML.getAbsolutePath()));
@@ -334,25 +337,43 @@ public class OwnerQueriesDetailBean implements Serializable {
 			document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
 			org.w3c.dom.Document doc = new W3CDom().fromJsoup(document);
 
-			String outputPdf = "/tmp/FormRequest2.pdf";
 			String baseUri = FileSystems.getDefault()
 					.getPath("D:")
 					.toUri()
 					.toString();
-			OutputStream os = new FileOutputStream(outputPdf);
+			OutputStream os = new FileOutputStream(tempPdfOutputFilePath);
 			PdfRendererBuilder builder = new PdfRendererBuilder();
 			builder.toStream(os);
 			builder.withW3cDocument(doc, baseUri);
 			builder.run();
 			os.close();
 		} catch (IOException e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000096: Problem creating pdf for request, query: " + queryId);
 			e.printStackTrace();
 		}
 
 
+		// Merge uploaded pdf attachments of the query
+		try(Config config = ConfigFactory.get()) {
+			List<QueryAttachmentDTO> attachments = DbUtil.getQueryAttachmentRecords(config, queryId);
+			PDFMergerUtility PDFmerger = new PDFMergerUtility();
+			PDFmerger.setDestinationFileName(tempPdfOutputFilePath);
+			File file = new File(tempPdfOutputFilePath);
+			PDFmerger.addSource(file);
+			for(QueryAttachmentDTO attachment : attachments) {
+				File file_attachment = extracted(attachment);
+				if(file_attachment != null) {
+					PDFmerger.addSource(file_attachment);
+				}
+			}
+			PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+		} catch (Exception e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000095: Problem getting and Merging query attachments for query: " + queryId);
+			e.printStackTrace();
+		}
 
-		File file = new File("/tmp/FormRequest2.pdf");
-
+		// return pdf file to download
+		File file = new File(tempPdfOutputFilePath);
 		response.reset();
 		response.setBufferSize(DEFAULT_BUFFER_SIZE);
 		response.setContentType("application/octet-stream");
@@ -369,6 +390,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 				output.write(buffer, 0, length);
 			}
 		} catch (Exception e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000097: Problem creating pdf for download, query: " + queryId);
 			e.printStackTrace();
 		} finally {
 			input.close();
@@ -377,7 +399,29 @@ public class OwnerQueriesDetailBean implements Serializable {
 		context.responseComplete();
 	}
 
-    /**
+	private File extracted(QueryAttachmentDTO attachment) {
+		if(attachment.getAttachment().endsWith(".pdf")) {
+			return new File(negotiator.getAttachmentPath(), attachment.getAttachment());
+		}
+		if(attachment.getAttachment().endsWith(".xlsx")) {
+			try {
+				String outputfilepath = "/tmp/" + UUID.randomUUID().toString() + ".pdf";
+				FileOutputStream os = new FileOutputStream(outputfilepath);
+				WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(new File(negotiator.getAttachmentPath(), attachment.getAttachment()));
+				Docx4J.toPDF(wordMLPackage, os);
+				os.flush();
+				os.close();
+				return new File(outputfilepath);
+			} catch (Docx4JException | FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	/**
      * Leave query as a bio bank owner.
      *
      * @param queryDto

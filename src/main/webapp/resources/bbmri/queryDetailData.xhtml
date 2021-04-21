@@ -58,7 +58,9 @@
 
         </h:panelGroup>
 
-        <h:panelGroup layout="block" style="font-size: smaller;width: 40%;float: right;alignment: right;" rendered="#{userBean.isAdmin()}">
+        <!-- rendered="#{userBean.isAdmin()}" -->
+
+        <h:panelGroup layout="block" style="font-size: smaller;width: 40%;float: right;alignment: right;" >
             <h:form>
                 <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
                                title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
