@@ -49,6 +49,8 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
@@ -69,8 +71,6 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jsoup.Jsoup;
@@ -357,12 +357,12 @@ public class OwnerQueriesDetailBean implements Serializable {
 			PDFmerger.setDestinationFileName(tempPdfOutputFilePath);
 			File file = new File(tempPdfOutputFilePath);
 			PDFmerger.addSource(file);
-			/*for(QueryAttachmentDTO attachment : attachments) {
+			for(QueryAttachmentDTO attachment : attachments) {
 				File file_attachment = extracted(attachment);
 				if(file_attachment != null) {
 					PDFmerger.addSource(file_attachment);
 				}
-			}*/
+			}
 			PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
 		} catch (Exception e) {
 			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000095: Problem getting and Merging query attachments for query: " + queryId);
@@ -396,7 +396,29 @@ public class OwnerQueriesDetailBean implements Serializable {
 		context.responseComplete();
 	}
 
-    /**
+	private File extracted(QueryAttachmentDTO attachment) {
+		if(attachment.getAttachment().endsWith(".pdf")) {
+			return new File(negotiator.getAttachmentPath(), attachment.getAttachment());
+		}
+		/*if(attachment.getAttachment().endsWith(".xlsx")) {
+			try {
+				String outputfilepath = "/tmp/" + UUID.randomUUID().toString() + ".pdf";
+				FileOutputStream os = new FileOutputStream(outputfilepath);
+				WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(new File(negotiator.getAttachmentPath(), attachment.getAttachment()));
+				Docx4J.toPDF(wordMLPackage, os);
+				os.flush();
+				os.close();
+				return new File(outputfilepath);
+			} catch (Docx4JException | FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}*/
+		return null;
+	}
+
+	/**
      * Leave query as a bio bank owner.
      *
      * @param queryDto
