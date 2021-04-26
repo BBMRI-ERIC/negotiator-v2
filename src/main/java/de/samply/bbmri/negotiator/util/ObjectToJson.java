@@ -28,7 +28,6 @@ package de.samply.bbmri.negotiator.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.JsTreeJson;
 

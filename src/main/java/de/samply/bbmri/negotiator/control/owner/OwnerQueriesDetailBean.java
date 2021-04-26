@@ -49,6 +49,8 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
@@ -69,11 +71,9 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.docx4j.Docx4J;
-import org.docx4j.openpackaging.exceptions.Docx4JException;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+//import org.docx4j.Docx4J;
+//import org.docx4j.openpackaging.exceptions.Docx4JException;
+//import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jsoup.Jsoup;
@@ -403,7 +403,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 		if(attachment.getAttachment().endsWith(".pdf")) {
 			return new File(negotiator.getAttachmentPath(), attachment.getAttachment());
 		}
-		if(attachment.getAttachment().endsWith(".xlsx")) {
+		/*if(attachment.getAttachment().endsWith(".xlsx")) {
 			try {
 				String outputfilepath = "/tmp/" + UUID.randomUUID().toString() + ".pdf";
 				FileOutputStream os = new FileOutputStream(outputfilepath);
@@ -417,7 +417,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+		}*/
 		return null;
 	}
 

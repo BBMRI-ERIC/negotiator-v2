@@ -195,7 +195,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             logger.info("All Collections: " + allCollections.size());
 
             for(DirectoryCollection directoryCollection : allCollections) {
-                logger.info("Run col: " + listOfDirectoriesId);
+                //logger.info("Run col: " + listOfDirectoriesId);
                 CollectionRecord collectionRecord = DbUtil.synchronizeCollection(config, directoryCollection, listOfDirectoriesId);
                 syncroniceCollectionNetworkLink(config, directoryCollection, listOfDirectoriesId, updateNetworks, collectionRecord.getId());
             }
