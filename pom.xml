@@ -89,27 +89,6 @@
             <version>2.0.22</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.docx4j/docx4j-core -->
-        <dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j-core</artifactId>
-            <version>8.2.9</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.docx4j/docx4j-JAXB-ReferenceImpl -->
-        <dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
-            <version>8.2.9</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/org.docx4j/docx4j-export-fo -->
-        <dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j-export-fo</artifactId>
-            <version>8.2.9</version>
-        </dependency>
-
         <!-- https://mvnrepository.com/artifact/javax.el/javax.el-api -->
         <dependency>
             <groupId>javax.el</groupId>

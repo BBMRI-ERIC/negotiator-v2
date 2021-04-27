@@ -71,9 +71,6 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
-//import org.docx4j.Docx4J;
-//import org.docx4j.openpackaging.exceptions.Docx4JException;
-//import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.jsoup.Jsoup;
