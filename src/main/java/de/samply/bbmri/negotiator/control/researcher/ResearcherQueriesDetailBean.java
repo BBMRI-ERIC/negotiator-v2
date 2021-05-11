@@ -82,6 +82,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private static final int MAX_UPLOAD_SIZE =  512 * 1024 * 1024; // .5 GB
     private static final int DEFAULT_BUFFER_SIZE = 10240;
     Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
+    private final FileUtil fileUtil = new FileUtil();
 
     private final Logger logger = LoggerFactory.getLogger(ResearcherQueriesDetailBean.class);
 
@@ -589,10 +590,12 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     private File extracted(QueryAttachmentDTO attachment) {
         if(attachment.getAttachment().endsWith(".pdf")) {
-            return new File(negotiator.getAttachmentPath(), attachment.getAttachment());
+            String filename = fileUtil.getStorageFileName(queryId, attachment.getId(), ".pdf");
+            return new File(negotiator.getAttachmentPath(), filename);
         }
         if(attachment.getAttachment().endsWith(".docx")) {
-            return new File(negotiator.getAttachmentPath(), attachment.getAttachment() + ".pdf");
+            String filename = fileUtil.getStorageFileName(queryId, attachment.getId(), ".docx");
+            return new File(negotiator.getAttachmentPath(), filename + ".pdf");
         }
         return null;
     }
