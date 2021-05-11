@@ -400,21 +400,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 		if(attachment.getAttachment().endsWith(".pdf")) {
 			return new File(negotiator.getAttachmentPath(), attachment.getAttachment());
 		}
-		/*if(attachment.getAttachment().endsWith(".xlsx")) {
-			try {
-				String outputfilepath = "/tmp/" + UUID.randomUUID().toString() + ".pdf";
-				FileOutputStream os = new FileOutputStream(outputfilepath);
-				WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(new File(negotiator.getAttachmentPath(), attachment.getAttachment()));
-				Docx4J.toPDF(wordMLPackage, os);
-				os.flush();
-				os.close();
-				return new File(outputfilepath);
-			} catch (Docx4JException | FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}*/
+		if(attachment.getAttachment().endsWith(".docx")) {
+			return new File(negotiator.getAttachmentPath(), attachment.getAttachment() + ".pdf");
+		}
 		return null;
 	}
 
