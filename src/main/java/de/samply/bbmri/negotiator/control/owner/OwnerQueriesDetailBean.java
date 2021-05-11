@@ -398,10 +398,12 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private File extracted(QueryAttachmentDTO attachment) {
 		if(attachment.getAttachment().endsWith(".pdf")) {
-			return new File(negotiator.getAttachmentPath(), attachment.getAttachment());
+			String filename = fileUtil.getStorageFileName(queryId, attachment.getId(), ".pdf");
+			return new File(negotiator.getAttachmentPath(), filename);
 		}
 		if(attachment.getAttachment().endsWith(".docx")) {
-			return new File(negotiator.getAttachmentPath(), attachment.getAttachment() + ".pdf");
+			String filename = fileUtil.getStorageFileName(queryId, attachment.getId(), ".docx");
+			return new File(negotiator.getAttachmentPath(), filename + ".pdf");
 		}
 		return null;
 	}
