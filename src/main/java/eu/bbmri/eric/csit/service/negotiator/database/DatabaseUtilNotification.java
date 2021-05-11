@@ -38,7 +38,6 @@ public class DatabaseUtilNotification {
             record.setNotificationType(NotificationType.getNotificationType(notificationType));
             record.setCreateDate(new Timestamp(new Date().getTime()));
             record.store();
-            config.close();
             return record;
         } catch (Exception ex) {
             System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000030: Error add Notification Entry for " +
