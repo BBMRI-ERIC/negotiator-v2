@@ -55,7 +55,7 @@ public class NotificationScheduledExecutor extends TimerTask {
     private boolean inTimeWindow() {
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("HHmm");
-        return Integer.parseInt(formatter.format(now)) >= 2000 && Integer.parseInt(formatter.format(now)) <= 2010;
+        return Integer.parseInt(formatter.format(now)) >= 2000 && Integer.parseInt(formatter.format(now)) <= 2005;
     }
 
     private String generateAggregateEmail(String emailAddress) {
@@ -101,7 +101,11 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     public long getDelay() {
-        return getDelay10Minutes();
+        return getDelay5Minutes();
+    }
+
+    public long getDelay5Minutes() {
+        return 1000L * 60L * 5L;
     }
 
     public long getDelay10Minutes() {
@@ -126,7 +130,9 @@ public class NotificationScheduledExecutor extends TimerTask {
         return millisecounds;
     }
 
-    public long getInterval() { return getInterval10Minutes(); }
+    public long getInterval() { return getInterval5Minutes(); }
+
+    public long getInterval5Minutes() { return 1000L * 60L * 5L; }
 
     public long getInterval10Minutes() { return 1000L * 60L * 10L; }
 
