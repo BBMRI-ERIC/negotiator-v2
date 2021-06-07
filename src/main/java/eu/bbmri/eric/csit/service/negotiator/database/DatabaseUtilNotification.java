@@ -282,12 +282,13 @@ public class DatabaseUtilNotification {
         return null;
     }
 
-    public Map<String, String> getCollectionEmailAddresses(Integer collectionId) {
+    public Map<String, String> getCollectionEmailAddressesStillInNegotiation(Integer collectionId) {
         try (Config config = ConfigFactory.get()) {
             Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
-                    .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
+                    .join(Tables.QUERY_LIFECYCLE_COLLECTION).on(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
+                    .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId)).and(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS)
                     .fetch();
             return mapEmailAddressesAndNames(record);
         } catch (Exception ex) {
