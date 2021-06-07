@@ -113,9 +113,9 @@ public class ObjectToJson {
         for(int i = 0; i < collectionBiobankDTOS.size(); i++) {
 
             JsTreeJson jsTreeJson = new JsTreeJson();
-            jsTreeJson.setId(collectionBiobankDTOS.get(i).getCollection().getName());
+            jsTreeJson.setId("negoid_" + collectionBiobankDTOS.get(i).getCollection().getId());
             jsTreeJson.setParent(collectionBiobankDTOS.get(i).getBiobank().getId().toString());
-            jsTreeJson.setText(collectionBiobankDTOS.get(i).getCollection().getName() + " [" + collectionBiobankDTOS.get(i).getCollection().getDirectoryId() + "]");
+            jsTreeJson.setText(collectionBiobankDTOS.get(i).getCollection().getName() + "");
             if(collectionBiobankDTOS.get(i).isContacable()) {
                 jsTreeJson.setIcon("fa fa-envelope-open");
             } else {
