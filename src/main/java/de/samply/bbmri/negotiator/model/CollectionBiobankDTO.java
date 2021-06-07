@@ -36,6 +36,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 
 public class CollectionBiobankDTO implements Serializable {
 
@@ -71,7 +72,7 @@ public class CollectionBiobankDTO implements Serializable {
         if(getCollection() != null) {
             int collectioId = getCollection().getId();
             try(Config config = ConfigFactory.get()) {
-                List<CollectionOwner> listCollectionOwner = DbUtil.getUsersForCollection(config, collectioId);
+                List<Person> listCollectionOwner = DbUtil.getPersonsContactsForCollection(config, collectioId);
                 if(listCollectionOwner.size() > 0) {
                     return true;
                 }
