@@ -1591,22 +1591,6 @@ public class DbUtil {
     }
 
     /**
-     * Returns the list of users for a given collection.
-     * @param config the current configuration
-     * @param collectionId the collection ID
-     * @return
-     */
-    public static List<CollectionOwner> getUsersForCollection(Config config, int collectionId) {
-        Result<Record> result = config.dsl().select(getFields(Tables.PERSON))
-                .from(Tables.PERSON)
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
-                .fetch();
-        List<CollectionOwner> users = config.map(result, CollectionOwner.class);
-        return users;
-    }
-
-    /**
      * Returns the list of collections which the specified collectionId.
      * @param config the current configuration
      * @param collectionId the person ID
