@@ -48,6 +48,8 @@ public class NotificationMail {
             Properties prop = new Properties();
             prop.put("mail.smtp.auth", true);
             prop.put("mail.smtp.starttls.enable", "true");
+            prop.put("mail.smtp.starttls.required", "true");
+            prop.put("mail.smtp.ssl.protocols", "TLSv1.2");
             prop.put("mail.smtp.host", host);
             prop.put("mail.smtp.port", port);
             prop.put("mail.smtp.ssl.trust", host);
@@ -65,7 +67,7 @@ public class NotificationMail {
             message.setSubject(subject);
 
             MimeBodyPart mimeBodyPart = new MimeBodyPart();
-            mimeBodyPart.setContent(body, "text/plain; charset=utf-8");
+            mimeBodyPart.setContent(body, "text/html; charset=utf-8");
 
             Multipart multipart = new MimeMultipart();
             multipart.addBodyPart(mimeBodyPart);

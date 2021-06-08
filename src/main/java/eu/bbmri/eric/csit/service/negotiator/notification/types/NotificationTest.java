@@ -28,8 +28,10 @@ public class NotificationTest extends Notification {
             createMailBodyBuilder("TEST_NOTIFICATION.soy");
             Map<String, String> parameters = new HashMap<>();
             parameters.put("testString", "<a href=\"https://negotiator.bbmri-eric.eu/\">Test Link</a>");
+            parameters.put("url", "https://negotiator.bbmri-eric.eu/");
+            parameters.put("queryName", "Request Title");
             String body = getMailBody(parameters);
-            body = body.replace("ReplaceTextWithLinkesReplcae", "<a href=\"https://negotiator.bbmri-eric.eu/>Test Link</a>\"");
+            body = body.replace("ReplaceTextWithLinkesReplcae", "<a href=\"https://negotiator.bbmri-eric.eu\">Test Link</a>");
 
 
             // Test sending email directly
