@@ -4,6 +4,7 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ public class NotificationAggregatedNotification extends Notification {
             parameters.put("body", this.body);
             parameters.put("linklist", extractLinkCollectionFromBody(this.body));
             String bodyFinal = getMailBody(parameters);
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION, bodyFinal);
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(contactEmailAddresse, subject, bodyFinal);
             if(checkSendNotificationImmediatelyForUser(contactEmailAddresse, NotificationType.AGGREGATED_NOTIFICATION)) {
                 sendMailNotification(mailNotificationRecord.getMailNotificationId(), contactEmailAddresse, subject, bodyFinal);
@@ -73,9 +75,24 @@ public class NotificationAggregatedNotification extends Notification {
             urls.add(matches.group());
         }
         StringBuilder returnResult = new StringBuilder();
+        Pattern patternRequestId = Pattern.compile("queryId=(\\d+)");
         for(String url : urls) {
+            Matcher matchesRequestId = pattern.matcher(url);
+            String requestTitle = "to request";
+            while(matchesRequestId.find()) {
+                try {
+                    Integer urlQueryId = Integer.getInteger(matchesRequestId.group(1));
+                    queryRecord = databaseUtil.getDatabaseUtilRequest().getQuery(urlQueryId);
+                    requestTitle = queryRecord.getTitle();
+                } catch(Exception e) {
+                    logger.error("Problem converting Matched String for aggregation.");
+                }
+            }
+            returnResult.append("<a href=\"");
             returnResult.append(url);
-            returnResult.append("\n");
+            returnResult.append("\">");
+            returnResult.append(requestTitle);
+            returnResult.append("</a><br>");
         }
         return returnResult.toString();
     }
