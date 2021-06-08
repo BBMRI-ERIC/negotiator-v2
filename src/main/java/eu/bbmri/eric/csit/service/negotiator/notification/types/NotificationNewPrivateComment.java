@@ -41,19 +41,20 @@ public class NotificationNewPrivateComment extends Notification {
             setResearcherContact();
             setCommenterContact();
             setComment();
+
             Map<String, String> emailAddressesAndNames = getBiobankEmailAddressesAndNames();
             emailAddressesAndNames.remove(researcherEmailAddresse);
             emailAddressesAndNames.remove(commenterEmailAddresse);
 
             String subject = "[BBMRI-ERIC Negotiator] New private comment on request: " + queryRecord.getTitle();
+
             createMailBodyBuilder("PRIVATE_COMMAND_NOTIFICATION.soy");
-            if(!commenterEmailAddresse.equals(researcherEmailAddresse)) {
-                prepareNotificationForResearcher(subject);
-            }
+
+            prepareNotificationForResearcher(subject);
             prepareNotificationPerUser(emailAddressesAndNames, subject);
         } catch (Exception ex) {
             logger.error("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000025: Error in NotificationNewPrivateComment.");
-            logger.error("context", ex);
+            logger.error("Context ERROR-NG-0000025: ", ex);
         }
     }
 
@@ -73,6 +74,9 @@ public class NotificationNewPrivateComment extends Notification {
 
     private void prepareNotificationForResearcher(String subject) {
         try {
+            if (commenterEmailAddresse.equals(researcherEmailAddresse)) {
+                return;
+            }
             String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId;
             String body = getMailBody(getSoyParameters(url, researcherName));
 
@@ -89,7 +93,7 @@ public class NotificationNewPrivateComment extends Notification {
             }
         } catch (Exception ex) {
             logger.error(String.format("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000026: Error creating a notification for researcher %s.", researcherEmailAddresse));
-            logger.error("context", ex);
+            logger.error("Context ERROR-NG-0000026: ", ex);
         }
     }
 
@@ -114,7 +118,7 @@ public class NotificationNewPrivateComment extends Notification {
                 }
             } catch (Exception ex) {
                 logger.error(String.format("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000027: Error creating a notification for %s.", emailAddress));
-                logger.error("context", ex);
+                logger.error("Context ERROR-NG-0000027: ", ex);
             }
         }
     }

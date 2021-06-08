@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,7 +22,7 @@ import java.util.Set;
 public abstract class Notification extends Thread {
 
     private static final Logger abstractLogger = LoggerFactory.getLogger(Notification.class);
-    private final String mainMailTemplate = "NegotiatorMainMailTemplate.soy";
+    private static final String MAIN_MAIL_TEMPLATE = "NegotiatorMainMailTemplate.soy";
     private final File templateFolder = new File(getClass().getClassLoader().getResource("mailTemplate").getPath());
     private SoyTofu.Renderer mailBodyRenderer;
 
@@ -43,9 +42,8 @@ public abstract class Notification extends Thread {
 
     }
 
-    protected MailNotificationRecord saveMailNotificationToDatabase(String emailAddress, String subject, String body) throws SQLException {
-        MailNotificationRecord mailNotificationRecord = databaseUtil.getDatabaseUtilNotification().addMailNotificationEntry(emailAddress, notificationRecord.getNotificationId(), notificationRecord.getPersonId(), "created", subject, body);
-        return mailNotificationRecord;
+    protected MailNotificationRecord saveMailNotificationToDatabase(String emailAddress, String subject, String body) {
+        return databaseUtil.getDatabaseUtilNotification().addMailNotificationEntry(emailAddress, notificationRecord.getNotificationId(), notificationRecord.getPersonId(), "created", subject, body);
     }
 
     protected void sendMailNotification(Integer mailNotificationId, String recipient, String subject, String body) {
@@ -53,7 +51,7 @@ public abstract class Notification extends Thread {
         notificationMailSendQueue.addNotificationEmailMassages(mailNotificationId, new NotificationEmailMassage(mailNotificationId, recipient, subject, body));
     }
 
-    protected void updateMailNotificationInDatabase(Integer mailNotificationRecordId, String status) throws SQLException {
+    protected void updateMailNotificationInDatabase(Integer mailNotificationRecordId, String status) {
         databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(mailNotificationRecordId, status);
     }
 
@@ -64,6 +62,7 @@ public abstract class Notification extends Thread {
         }
         if(notificationType == null) {
             abstractLogger.info("NotificationType Not Set");
+            return false;
         }
         switch(notificationType) {
             case NotificationType.APPROVE_REQUEST_NOTIFICATION:
@@ -89,7 +88,7 @@ public abstract class Notification extends Thread {
             case NotificationType.ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION:
                 return true;
             default:
-                System.err.println("ERROR-NG-0000089: Notification Type Not defined");
+                abstractLogger.error("ERROR-NG-0000089: Notification Type Not defined");
                 return true;
         }
     }
@@ -97,7 +96,7 @@ public abstract class Notification extends Thread {
     protected void createMailBodyBuilder(String mailTemplateFile) {
         try {
             SoyFileSet.Builder builder = SoyFileSet.builder();
-            builder.add(new File(templateFolder.getAbsolutePath(), mainMailTemplate));
+            builder.add(new File(templateFolder.getAbsolutePath(), MAIN_MAIL_TEMPLATE));
             builder.add(new File(templateFolder.getAbsolutePath(), mailTemplateFile));
             SoyFileSet soyFileSet = builder.build();
             SoyTofu soyTofu = soyFileSet.compileToTofu();

@@ -38,6 +38,7 @@ public class NotificationStatusChanged extends Notification {
             setQuery();
             setResearcherContact();
             setStatusChangerContact();
+
             Map<String, String> emailAddressesAndNames = getCollectionssEmailAddressesAndNames();
             emailAddressesAndNames.remove(researcherEmailAddresse);
             emailAddressesAndNames.remove(statusChangerContactEmailAddresse);

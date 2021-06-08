@@ -31,6 +31,7 @@ public class NotificationCollectionUnreachable extends Notification {
 
             String subject = "[BBMRI-ERIC Negotiator] Collections not reachable for request: " + queryRecord.getTitle();
             createMailBodyBuilder("BBMRI_COLLECTION_NOT_REACHABLE_NOTIFICATION.soy");
+
             prepareNotificationForBBMRIERIC(subject);
         } catch (Exception ex) {
             logger.error("c09480781c00-NotificationCreateRequest ERROR-NG-0000041: Error in NotificationCreateRequest.");

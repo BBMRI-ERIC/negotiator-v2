@@ -27,17 +27,20 @@ public class NotificationApproveRequest extends Notification {
             setQuery();
             setResearcherContact();
 
-            String subject = "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + "has been approved.";
-
-            if(queryRecord.getTestRequest()) {
-                subject = "[BBMRI-ERIC Negotiator] TEST Request: " + queryRecord.getTitle() + "has been approved.";
-            }
-
             createMailBodyBuilder("REQUEST_APPROVED.soy");
-            prepareNotification(subject);
+
+            prepareNotification(getMailSubject());
         } catch (Exception ex) {
             logger.error("8fc97b6f5a1a-NotificationApproveRequest ERROR-NG-0000060: Error in NotificationApproveRequest.");
             logger.error("context", ex);
+        }
+    }
+
+    private String getMailSubject() {
+        if(queryRecord.getTestRequest()) {
+            return "[BBMRI-ERIC Negotiator] TEST Request: " + queryRecord.getTitle() + "has been approved.";
+        } else {
+            return "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + "has been approved.";
         }
     }
 

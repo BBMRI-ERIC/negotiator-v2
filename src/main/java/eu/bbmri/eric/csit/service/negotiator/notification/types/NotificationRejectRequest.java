@@ -27,17 +27,20 @@ public class NotificationRejectRequest extends Notification {
             setQuery();
             setResearcherContact();
 
-            String subject = "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + " has been rejected.";
-
-            if(queryRecord.getTestRequest()) {
-                subject = "[BBMRI-ERIC Negotiator] TEST Request: " + queryRecord.getTitle() + "has been rejected.";
-            }
-
             createMailBodyBuilder("REQUEST_REJECTED.soy");
-            prepareNotification(subject);
+
+            prepareNotification(getMailSubject());
         } catch (Exception ex) {
             logger.error("97fdbf0f7bc2-NotificationRejectRequest ERROR-NG-0000061: Error in NotificationRejectRequest.");
             logger.error("context", ex);
+        }
+    }
+
+    private String getMailSubject() {
+        if(queryRecord.getTestRequest()) {
+            return "[BBMRI-ERIC Negotiator] TEST Request: " + queryRecord.getTitle() + "has been rejected.";
+        } else {
+            return "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + " has been rejected.";
         }
     }
 
