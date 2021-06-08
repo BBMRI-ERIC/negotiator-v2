@@ -32,11 +32,14 @@ public class NotificationTest extends Notification {
             body = body.replace("ReplaceTextWithLinkesReplcae", "<a href=\"https://negotiator.bbmri-eric.eu/>Test Link</a>\"");
 
 
-
+            // Test sending email directly
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
-            if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.TEST_NOTIFICATION)) {
-                sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
-            }
+            sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
+
+            // Test sending email in aggregation
+            mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
+            updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "pending");
+
         } catch (Exception ex) {
             logger.error("b9e5a6aa1e9b-NotificationTest ERROR-NG-0000024: Error in NotificationTest.");
             logger.error(ex.getMessage());

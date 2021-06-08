@@ -1,10 +1,13 @@
-package eu.bbmri.eric.csit.service.negotiator.notification.util;
+package eu.bbmri.eric.csit.service.negotiator.notification;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
-import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationEmailMassage;
 import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationMailStatusUpdate;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMailSendQueue;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +58,7 @@ public class NotificationScheduledExecutor extends TimerTask {
     private boolean inTimeWindow() {
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("HHmm");
-        return Integer.parseInt(formatter.format(now)) >= 2000 && Integer.parseInt(formatter.format(now)) <= 2010;
+        return Integer.parseInt(formatter.format(now)) >= 0600 && Integer.parseInt(formatter.format(now)) <= 0605;
     }
 
     private String generateAggregateEmail(String emailAddress) {
@@ -101,7 +104,11 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     public long getDelay() {
-        return getDelay10Minutes();
+        return getDelay5Minutes();
+    }
+
+    public long getDelay5Minutes() {
+        return 1000L * 60L * 5L;
     }
 
     public long getDelay10Minutes() {
@@ -126,7 +133,9 @@ public class NotificationScheduledExecutor extends TimerTask {
         return millisecounds;
     }
 
-    public long getInterval() { return getInterval10Minutes(); }
+    public long getInterval() { return getInterval5Minutes(); }
+
+    public long getInterval5Minutes() { return 1000L * 60L * 5L; }
 
     public long getInterval10Minutes() { return 1000L * 60L * 10L; }
 

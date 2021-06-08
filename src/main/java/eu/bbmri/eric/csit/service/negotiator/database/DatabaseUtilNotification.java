@@ -38,7 +38,6 @@ public class DatabaseUtilNotification {
             record.setNotificationType(NotificationType.getNotificationType(notificationType));
             record.setCreateDate(new Timestamp(new Date().getTime()));
             record.store();
-            config.close();
             return record;
         } catch (Exception ex) {
             System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000030: Error add Notification Entry for " +
@@ -283,16 +282,41 @@ public class DatabaseUtilNotification {
         return null;
     }
 
-    public Map<String, String> getCollectionEmailAddresses(Integer collectionId) {
+    public Map<String, String> getCollectionEmailAddressesStillInNegotiation(Integer requestId, Integer collectionId) {
         try (Config config = ConfigFactory.get()) {
-            Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
-                    .from(Tables.PERSON)
-                    .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
-                    .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
+            Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
+                    "JOIN person_collection pc ON p.id = pc.person_id\n" +
+                    "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
+                    "WHERE qc.collection_id = " + collectionId + " AND pc.collection_id NOT IN \n" +
+                    "(SELECT collection_id FROM \n" +
+                    "(SELECT collection_id, status FROM query_lifecycle_collection WHERE query_id = " + requestId +
+                    " AND collection_id = " + collectionId + " ORDER BY status_date DESC LIMIT 1) AS subcollectionsstatus\n" +
+                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "');")
                     .fetch();
-            return mapEmailAddressesAndNames(record);
+
+            return map2EmailAddressesAndNames(record);
         } catch (Exception ex) {
             System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000066: Error listing email-addresses for collectionId: " + collectionId + ".");
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public Map<String, String> getEmailAddressesStillInNegotiation(Integer requestId) {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
+                    "JOIN person_collection pc ON p.id = pc.person_id\n" +
+                    "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
+                    "WHERE qc.query_id = " + requestId + " AND pc.collection_id NOT IN \n" +
+                    "(SELECT collection_id FROM \n" +
+                    "(SELECT collection_id, status FROM query_lifecycle_collection WHERE query_id = " + requestId +
+                    " ORDER BY status_date DESC LIMIT 1) AS subcollectionsstatus\n" +
+                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "');")
+                    .fetch();
+
+            return map2EmailAddressesAndNames(record);
+        } catch (Exception ex) {
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000066: Error listing email-addresses of collections still in negotiation for requestId: " + requestId + ".");
             ex.printStackTrace();
         }
         return null;

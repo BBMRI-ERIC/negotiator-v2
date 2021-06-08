@@ -8,9 +8,9 @@ import java.util.Queue;
 
 public class NotificationMailSendQueue {
 
-    private static volatile NotificationMailSendQueue notificationMailSendQueue;
+    private static NotificationMailSendQueue notificationMailSendQueue;
     private final Queue<Integer> notificationQueue = new LinkedList<>();
-    private final HashMap<Integer, NotificationEmailMassage> notificationEmailMassages = new HashMap<Integer, NotificationEmailMassage>();
+    private final HashMap<Integer, NotificationEmailMassage> notificationEmailMassages = new HashMap<>();
 
     private NotificationMailSendQueue() {
 

@@ -44,15 +44,15 @@ public class NotificationNewPublicComment extends Notification {
             setResearcherContact();
             setCommenterContact();
             setComment();
+
             Map<String, String> emailAddressesAndNames = this.notificationContacts.getBiobanksEmailAddressesAndNames();
             emailAddressesAndNames.remove(researcherEmailAddresse);
             emailAddressesAndNames.remove(commenterEmailAddresse);
 
             String subject = "[BBMRI-ERIC Negotiator] New comment on request: " + queryRecord.getTitle();
             createMailBodyBuilder("PUBLIC_COMMAND_NOTIFICATION.soy");
-            if(!commenterEmailAddresse.equals(researcherEmailAddresse)) {
-                prepareNotificationForResearcher(subject);
-            }
+
+            prepareNotificationForResearcher(subject);
             prepareNotificationPerUser(emailAddressesAndNames, subject);
         } catch (Exception ex) {
             logger.error("7fb9050532fa-NotificationNewPublicComment ERROR-NG-0000023: Error in NotificationNewPublicComment.");
@@ -61,7 +61,7 @@ public class NotificationNewPublicComment extends Notification {
     }
 
     private Map<String, String> getBiobanksEmailAddressesAndNames() {
-        return databaseUtil.getDatabaseUtilNotification().getEmailAddressesForQuery(requestId);
+        return databaseUtil.getDatabaseUtilNotification().getEmailAddressesStillInNegotiation(requestId);
     }
 
     private void setCommenterContact() {
@@ -76,6 +76,9 @@ public class NotificationNewPublicComment extends Notification {
 
     private void prepareNotificationForResearcher(String subject) {
         try {
+            if(commenterEmailAddresse.equals(researcherEmailAddresse)) {
+                return;
+            }
             String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId;
             String body = getMailBody(getSoyParameters(url, researcherName));
 

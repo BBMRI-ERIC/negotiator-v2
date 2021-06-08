@@ -38,6 +38,7 @@ public class NotificationStatusChanged extends Notification {
             setQuery();
             setResearcherContact();
             setStatusChangerContact();
+
             Map<String, String> emailAddressesAndNames = getCollectionssEmailAddressesAndNames();
             emailAddressesAndNames.remove(researcherEmailAddresse);
             emailAddressesAndNames.remove(statusChangerContactEmailAddresse);
@@ -61,7 +62,7 @@ public class NotificationStatusChanged extends Notification {
     }
 
     private Map<String, String> getCollectionssEmailAddressesAndNames() {
-        return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddresses(collectionId);
+        return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddressesStillInNegotiation(requestId, collectionId);
     }
 
     private void prepareNotificationForResearcher(String subject) {
