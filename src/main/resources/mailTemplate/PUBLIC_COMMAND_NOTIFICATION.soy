@@ -15,11 +15,10 @@
     {switch $locale}
         {default}
 			A new comment has been added from {$commentPoster} at {$dateOfComment} to the request "{$queryName}".
-			{\n}Comment made is:
-			{\n} "{$comment}"
-			{\n}To view or add comments, please use the following link:
-			{\n}{\n}
-            {$url}
+			<br>Comment made is:
+			<br> "{$comment}"
+			<br>To view or add comments, please use the following link: <a href="{$url}">here</a>
+			<br>
 
     {/switch}
 {/deltemplate}
