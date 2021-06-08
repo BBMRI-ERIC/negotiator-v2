@@ -282,6 +282,7 @@ public class DatabaseUtilNotification {
         return null;
     }
 
+    //TODO: Update Query
     public Map<String, String> getCollectionEmailAddressesStillInNegotiation(Integer collectionId) {
         try (Config config = ConfigFactory.get()) {
             Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
