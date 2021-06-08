@@ -1,10 +1,13 @@
-package eu.bbmri.eric.csit.service.negotiator.notification.util;
+package eu.bbmri.eric.csit.service.negotiator.notification;
 
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
-import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationEmailMassage;
 import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationMailStatusUpdate;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMailSendQueue;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

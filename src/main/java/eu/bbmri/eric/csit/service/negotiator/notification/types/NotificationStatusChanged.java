@@ -61,7 +61,7 @@ public class NotificationStatusChanged extends Notification {
     }
 
     private Map<String, String> getCollectionssEmailAddressesAndNames() {
-        return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddresses(collectionId);
+        return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddressesStillInNegotiation(collectionId);
     }
 
     private void prepareNotificationForResearcher(String subject) {
