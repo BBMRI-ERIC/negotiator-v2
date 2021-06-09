@@ -162,7 +162,6 @@ public class DirectorySynchronizeTask extends TimerTask {
             logger.info("All Biobanks: " + allBiobanks.size());
 
             for(DirectoryBiobank directoryBiobank : allBiobanks) {
-                logger.info("Run: " + listOfDirectoriesId);
                 BiobankRecord biobankRecord = DbUtil.synchronizeBiobank(config, directoryBiobank, listOfDirectoriesId);
                 syncroniceBiobankNetworkLink(config, directoryBiobank, listOfDirectoriesId, updateNetworks, biobankRecord);
             }

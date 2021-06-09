@@ -52,10 +52,10 @@ public class NotificationAggregatedNotification extends Notification {
         try {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("name", contactName);
-            parameters.put("body", this.body);
-            parameters.put("linklist", extractLinkCollectionFromBody(this.body));
             String bodyFinal = getMailBody(parameters);
-            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION, bodyFinal);
+            bodyFinal = bodyFinal.replaceAll("LINKLIST", extractLinkCollectionFromBody(this.body));
+            bodyFinal = bodyFinal.replaceAll("BODYOFAGGREGATES", this.body);
+
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(contactEmailAddresse, subject, bodyFinal);
             if(checkSendNotificationImmediatelyForUser(contactEmailAddresse, NotificationType.AGGREGATED_NOTIFICATION)) {
                 sendMailNotification(mailNotificationRecord.getMailNotificationId(), contactEmailAddresse, subject, bodyFinal);
@@ -77,11 +77,14 @@ public class NotificationAggregatedNotification extends Notification {
         StringBuilder returnResult = new StringBuilder();
         Pattern patternRequestId = Pattern.compile("queryId=(\\d+)");
         for(String url : urls) {
-            Matcher matchesRequestId = pattern.matcher(url);
+            Matcher matchesRequestId = patternRequestId.matcher(url);
             String requestTitle = "to request";
             while(matchesRequestId.find()) {
                 try {
-                    Integer urlQueryId = Integer.getInteger(matchesRequestId.group(1));
+                    Integer urlQueryId = Integer.getInteger(matchesRequestId.group(1).trim());
+                    if(urlQueryId == null) {
+                        continue;
+                    }
                     queryRecord = databaseUtil.getDatabaseUtilRequest().getQuery(urlQueryId);
                     requestTitle = queryRecord.getTitle();
                 } catch(Exception e) {

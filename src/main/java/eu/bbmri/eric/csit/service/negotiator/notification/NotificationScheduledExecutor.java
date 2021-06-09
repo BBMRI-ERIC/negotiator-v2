@@ -56,9 +56,12 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     private boolean inTimeWindow() {
+        int starttime = 1620;
+        int endtime = starttime + 5;
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("HHmm");
-        return Integer.parseInt(formatter.format(now)) >= 0600 && Integer.parseInt(formatter.format(now)) <= 0605;
+        logger.info("Now: " + Integer.parseInt(formatter.format(now)) + " - " + (Integer.parseInt(formatter.format(now)) >= starttime && Integer.parseInt(formatter.format(now)) <= endtime));
+        return Integer.parseInt(formatter.format(now)) >= starttime && Integer.parseInt(formatter.format(now)) <= endtime;
     }
 
     private String generateAggregateEmail(String emailAddress) {
@@ -67,9 +70,9 @@ public class NotificationScheduledExecutor extends TimerTask {
         String aggregation_splitter = "";
         for(MailNotificationRecord pendingNotification : notificationsToAggregate) {
             aggregated_body += aggregation_splitter;
-            String body = pendingNotification.getBody().replaceAll("\nYours sincerely\nThe BBMRI-ERIC Team", "");
-            aggregated_body += body.replaceAll("Dear .*\n\n", "");
-            aggregation_splitter = "\n===============================\n";
+            String body = pendingNotification.getBody().replaceAll("Yours sincerely", "").replaceAll("The BBMRI-ERIC Team", "");
+            aggregated_body += body.replaceAll("Dear .*,", "");
+            aggregation_splitter = "<br><br>===============================<br><br>";
             // Update Database Status
             databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(pendingNotification.getMailNotificationId(),
                     NotificationStatus.getNotificationType(NotificationStatus.AGGREGATED));
@@ -94,10 +97,15 @@ public class NotificationScheduledExecutor extends TimerTask {
             return new HashSet<>();
         }
         for(NotificationMailStatusUpdate notificationMailStatusUpdate : sendUpdates) {
-            boolean dbUpdateSuccess = databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(notificationMailStatusUpdate.getMailNotificationId(),
-                    NotificationStatus.getNotificationType(notificationMailStatusUpdate.getStatus()), notificationMailStatusUpdate.getStatusDate());
-            if(dbUpdateSuccess) {
-                sendUpdates.remove(notificationMailStatusUpdate);
+            try {
+                boolean dbUpdateSuccess = databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(notificationMailStatusUpdate.getMailNotificationId(),
+                        NotificationStatus.getNotificationType(notificationMailStatusUpdate.getStatus()), notificationMailStatusUpdate.getStatusDate());
+                if (dbUpdateSuccess) {
+                    sendUpdates.remove(notificationMailStatusUpdate);
+                }
+            } catch (Exception e) {
+                logger.error("Error in updateSendNotifications");
+                logger.error(e.getMessage());
             }
         }
         return sendUpdates;
