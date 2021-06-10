@@ -11,9 +11,8 @@
 {deltemplate maincontent}
     {switch $locale}
         {default}
-            Your request with the title: {$queryName} has been rejected{\n}
-            You can check the status and resubmit it here: {\n}{\n}
-            {$url}
+            Your request with the title: {$queryName} has been rejected<br>
+            You can check the status and resubmit it here: <a href="{$url}">here</a><br>
 
     {/switch}
 {/deltemplate}

@@ -1326,9 +1326,6 @@ public class DbUtil {
     }
 
     public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId, int collectionId) {
-        if(directoryCollection.getNetworkLinks().size() > 0) {
-            System.out.println(directoryCollection.getName());
-        }
 
         config.dsl().deleteFrom(Tables.NETWORK_COLLECTION_LINK)
                 .where(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(collectionId))

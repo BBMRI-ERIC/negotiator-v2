@@ -4,6 +4,7 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +52,10 @@ public class NotificationAggregatedNotification extends Notification {
         try {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("name", contactName);
-            parameters.put("body", this.body);
-            parameters.put("linklist", extractLinkCollectionFromBody(this.body));
             String bodyFinal = getMailBody(parameters);
+            bodyFinal = bodyFinal.replaceAll("LINKLIST", extractLinkCollectionFromBody(this.body));
+            bodyFinal = bodyFinal.replaceAll("BODYOFAGGREGATES", this.body);
+
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(contactEmailAddresse, subject, bodyFinal);
             if(checkSendNotificationImmediatelyForUser(contactEmailAddresse, NotificationType.AGGREGATED_NOTIFICATION)) {
                 sendMailNotification(mailNotificationRecord.getMailNotificationId(), contactEmailAddresse, subject, bodyFinal);
@@ -73,9 +75,35 @@ public class NotificationAggregatedNotification extends Notification {
             urls.add(matches.group());
         }
         StringBuilder returnResult = new StringBuilder();
+        Pattern patternRequestId = Pattern.compile("queryId=(\\d+)");
         for(String url : urls) {
+            Matcher matchesRequestId = patternRequestId.matcher(url);
+            String requestTitle = "to request";
+            while(matchesRequestId.find()) {
+                try {
+                    logger.info("-------------------");
+                    logger.info("url: " + url);
+                    logger.info("Group: " + matchesRequestId.group());
+                    logger.info("Group1: " + matchesRequestId.group(1));
+                    Integer urlQueryId = Integer.parseInt(matchesRequestId.group(1).trim());
+                    if(urlQueryId == null) {
+                        continue;
+                    }
+                    logger.info("urlQueryId: " + urlQueryId);
+                    queryRecord = databaseUtil.getDatabaseUtilRequest().getQuery(urlQueryId);
+                    requestTitle = queryRecord.getTitle();
+                    logger.info("requestTitle: " + requestTitle);
+                    logger.info("-------------------");
+                } catch(Exception e) {
+                    logger.error("Problem converting Matched String for aggregation.");
+                }
+            }
+            returnResult.append("<a href=\"");
             returnResult.append(url);
-            returnResult.append("\n");
+            returnResult.append("\">");
+            returnResult.append(requestTitle);
+            logger.info("requestTitle added: " + requestTitle);
+            returnResult.append("</a><br>");
         }
         return returnResult.toString();
     }

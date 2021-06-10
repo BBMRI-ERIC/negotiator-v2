@@ -11,10 +11,9 @@
 {deltemplate maincontent}
     {switch $locale}
         {default}
-            Your request with the title: {$queryName} has been approved{\n}
+            Your request with the title: {$queryName} has been approved<br>
             and was send to the Biobank and Collection representatives.
-            {\n}{\n}You can check the status of the request and communicate with the representatives: {\n}{\n}
-            {$url}
+            <br><br>You can check the status of the request and communicate with the representatives: <a href="{$url}">here</a><br>
 
     {/switch}
 {/deltemplate}
