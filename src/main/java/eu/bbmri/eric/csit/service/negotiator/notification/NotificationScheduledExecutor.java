@@ -56,7 +56,7 @@ public class NotificationScheduledExecutor extends TimerTask {
     }
 
     private boolean inTimeWindow() {
-        int starttime = 1620;
+        int starttime = 600;
         int endtime = starttime + 5;
         Date now = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat("HHmm");

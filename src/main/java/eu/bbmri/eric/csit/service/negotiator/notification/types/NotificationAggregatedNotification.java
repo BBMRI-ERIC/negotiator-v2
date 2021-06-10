@@ -81,12 +81,19 @@ public class NotificationAggregatedNotification extends Notification {
             String requestTitle = "to request";
             while(matchesRequestId.find()) {
                 try {
-                    Integer urlQueryId = Integer.getInteger(matchesRequestId.group(1).trim());
+                    logger.info("-------------------");
+                    logger.info("url: " + url);
+                    logger.info("Group: " + matchesRequestId.group());
+                    logger.info("Group1: " + matchesRequestId.group(1));
+                    Integer urlQueryId = Integer.parseInt(matchesRequestId.group(1).trim());
                     if(urlQueryId == null) {
                         continue;
                     }
+                    logger.info("urlQueryId: " + urlQueryId);
                     queryRecord = databaseUtil.getDatabaseUtilRequest().getQuery(urlQueryId);
                     requestTitle = queryRecord.getTitle();
+                    logger.info("requestTitle: " + requestTitle);
+                    logger.info("-------------------");
                 } catch(Exception e) {
                     logger.error("Problem converting Matched String for aggregation.");
                 }
@@ -95,6 +102,7 @@ public class NotificationAggregatedNotification extends Notification {
             returnResult.append(url);
             returnResult.append("\">");
             returnResult.append(requestTitle);
+            logger.info("requestTitle added: " + requestTitle);
             returnResult.append("</a><br>");
         }
         return returnResult.toString();
