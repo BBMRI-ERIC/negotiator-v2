@@ -4,7 +4,6 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +52,12 @@ public class NotificationAggregatedNotification extends Notification {
             Map<String, String> parameters = new HashMap<>();
             parameters.put("name", contactName);
             String bodyFinal = getMailBody(parameters);
-            bodyFinal = bodyFinal.replaceAll("LINKLIST", extractLinkCollectionFromBody(this.body));
-            bodyFinal = bodyFinal.replaceAll("BODYOFAGGREGATES", this.body);
+            bodyFinal = bodyFinal.replace("LINKLIST", extractLinkCollectionFromBody(this.body));
+            bodyFinal = bodyFinal.replace("BODYOFAGGREGATES", this.body);
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(contactEmailAddresse, subject, bodyFinal);
             if(checkSendNotificationImmediatelyForUser(contactEmailAddresse, NotificationType.AGGREGATED_NOTIFICATION)) {
+                //TODO: Switch back to real email sending
                 sendMailNotification(mailNotificationRecord.getMailNotificationId(), "robert.reihs@bbmri-eric.eu", subject, bodyFinal);
                 //sendMailNotification(mailNotificationRecord.getMailNotificationId(), contactEmailAddresse, subject, bodyFinal);
             }
@@ -82,19 +82,12 @@ public class NotificationAggregatedNotification extends Notification {
             String requestTitle = "to request";
             while(matchesRequestId.find()) {
                 try {
-                    logger.info("-------------------");
-                    logger.info("url: " + url);
-                    logger.info("Group: " + matchesRequestId.group());
-                    logger.info("Group1: " + matchesRequestId.group(1));
                     Integer urlQueryId = Integer.parseInt(matchesRequestId.group(1).trim());
                     if(urlQueryId == null) {
                         continue;
                     }
-                    logger.info("urlQueryId: " + urlQueryId);
                     queryRecord = databaseUtil.getDatabaseUtilRequest().getQuery(urlQueryId);
                     requestTitle = queryRecord.getTitle();
-                    logger.info("requestTitle: " + requestTitle);
-                    logger.info("-------------------");
                 } catch(Exception e) {
                     logger.error("Problem converting Matched String for aggregation.");
                 }
@@ -103,7 +96,6 @@ public class NotificationAggregatedNotification extends Notification {
             returnResult.append(url);
             returnResult.append("\">");
             returnResult.append(requestTitle);
-            logger.info("requestTitle added: " + requestTitle);
             returnResult.append("</a><br>");
         }
         return returnResult.toString();
