@@ -27,7 +27,7 @@ public class NotificationScheduledExecutorTest {
     @Test
     @DisplayName("Test interval 1 day in milliseconds.")
     public void testDelayCalculationOneDayInMilliseconds() {
-        long interval = notificationScheduledExecutor.getInterval24Houers();
+        long interval = notificationScheduledExecutor.getInterval24Hours();
         assertEquals(86400000L, interval);
     }
 

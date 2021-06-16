@@ -10,6 +10,7 @@ public abstract class NotificationStatus {
     public static final int PENDING = 4;
     public static final int TEST = 5;
     public static final int SUCCESS = 6;
+    public static final int CANCELED = 7;
 
     public static String getNotificationType(Integer notificationStatus) {
         switch (notificationStatus) {
@@ -25,6 +26,8 @@ public abstract class NotificationStatus {
                 return "test";
             case NotificationStatus.SUCCESS:
                 return "success";
+            case NotificationStatus.CANCELED:
+                return "canceled";
             default:
                 return "ERROR-NG-0000086: ERROR: Type Not defined";
         }
@@ -48,6 +51,9 @@ public abstract class NotificationStatus {
         }
         if(notificationStatus.equals("success")) {
             return NotificationStatus.SUCCESS;
+        }
+        if(notificationStatus.equals("canceled")) {
+            return NotificationStatus.CANCELED;
         }
         System.err.println("ERROR-NG-0000087: ERROR: Type Not defined");
         return 0;
