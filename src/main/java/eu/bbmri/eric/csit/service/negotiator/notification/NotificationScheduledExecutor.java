@@ -44,6 +44,9 @@ public class NotificationScheduledExecutor extends TimerTask {
         List<String> emailAddresses = databaseUtil.getDatabaseUtilNotification().getNotificationMailAddressesForAggregation();
         for(String emailAddress : emailAddresses) {
             String aggregatedBody = generateAggregateEmail(emailAddress);
+            if(aggregatedBody.isEmpty()) {
+                continue;
+            }
             Integer personId = databaseUtil.getDatabaseUtilPerson().getPersonIdByEmailAddress(emailAddress);
             Map<String, String> parameters = new HashMap<>();
             parameters.put("body", aggregatedBody);
