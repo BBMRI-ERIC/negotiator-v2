@@ -65,10 +65,8 @@ public class DirectorySynchronizeTask extends TimerTask {
             DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
             List<ListOfDirectoriesRecord> directories = DbUtil.getDirectories(config);
             for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
-                if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
-                    logger.info("Synchronization with the directory: {0} - {1}", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
-                    directorySyncLoggingHelper.addSyncResult(runDirectorySync(listOfDirectoriesRecord));
-                }
+                logger.info("Synchronization with the directory: {0} - {1}", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
+                directorySyncLoggingHelper.addSyncResult(runDirectorySync(listOfDirectoriesRecord));
             }
             updateDefaultNetworks(config);
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, "Biobanks: " + directorySyncLoggingHelper.getSyncedBiobanks() +
@@ -84,6 +82,9 @@ public class DirectorySynchronizeTask extends TimerTask {
     public DirectorySyncLoggingHelper runDirectorySync(ListOfDirectoriesRecord listOfDirectoriesRecord) {
         logger.info("Starting synchronization with the directory: %d - %s", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
         DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
+        if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
+            return directorySyncLoggingHelper;
+        }
         try(Config config = ConfigFactory.get()) {
 
             boolean updateNetworks = false;
