@@ -1983,8 +1983,7 @@ public class DbUtil {
                 "FROM public.list_of_directories d LEFT JOIN public.list_of_directories d2 ON d2.name = d.directory_prefix " +
                 ") AS jsond;");
         Result<Record> result = resultQuery.fetch();
-        for(Record record : result) {
-            System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+        for(Record record : result) {//class org.postgresql.util.PGobject
 
             //PGobject jsonObject = record.getValue(0);
             return (String)record.getValue(0);
@@ -2580,8 +2579,6 @@ public class DbUtil {
                     "ON created_query.creation_date = initialized_query.creation_date ORDER BY creation_date) jsonc;");
             Result<Record> result = resultQuery.fetch();
             for(Record record : result) {
-                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
-
                 //PGobject jsonObject = record.getValue(0);
                 return (String)record.getValue(0);
             }
@@ -2599,8 +2596,6 @@ public class DbUtil {
                     "COUNT(*) FROM query q WHERE q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY readable) jsonc;");
             Result<Record> result = resultQuery.fetch();
             for(Record record : result) {
-                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
-
                 //PGobject jsonObject = record.getValue(0);
                 return (String)record.getValue(0);
             }

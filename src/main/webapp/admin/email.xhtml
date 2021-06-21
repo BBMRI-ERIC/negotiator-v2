@@ -70,10 +70,15 @@
 		</h:form>
 
 		<h3>List of Notifications:</h3>
+
+
 		<h:form styleClass="form-horizontal">
-			<h:commandButton action="#{adminEmailBean.loadNotifications()}" value="Load Notifications"
-							 styleClass="btn btn-default"/>
+			<ui:repeat value="#{adminEmailBean.emailSendDates}" var="createDates">
+				<h:commandButton action="#{adminEmailBean.loadNotifications(createDates)}" value="Load Notifications for #{createDates}"
+								 styleClass="btn btn-default"/>
+			</ui:repeat>
 		</h:form>
+
 
 		<h:dataTable rendered="#{adminEmailBean.notificationRecords.size() > 0}" value="#{adminEmailBean.notificationRecords}" var="notificationRecord">
 			<h:column>

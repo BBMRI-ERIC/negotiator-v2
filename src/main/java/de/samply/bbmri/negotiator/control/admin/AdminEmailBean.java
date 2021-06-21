@@ -6,14 +6,13 @@ import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import org.jetbrains.annotations.NotNull;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Sends an email to the given address.
@@ -27,7 +26,9 @@ public class AdminEmailBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
+    DatabaseUtil databaseUtil = new DatabaseUtil();
     List<NotificationRecord> notificationRecords;
+    List<Date> emailSendDates = loadNotificationDates();
     Map<Integer, String> userNotificationData;
 
     /**
@@ -75,12 +76,11 @@ public class AdminEmailBean implements Serializable {
         this.userBean = userBean;
     }
 
-    public void loadNotifications() {
+    public void loadNotifications(Date createDay) {
         try {
-            DatabaseUtil databaseUtil = new DatabaseUtil();
             notificationRecords = databaseUtil.getDatabaseUtilNotification().getNotificationRecords();
             userNotificationData = new HashMap<>();
-            for(MailNotificationRecord mailNotificationRecord : databaseUtil.getDatabaseUtilNotification().getMailNotificationRecords()) {
+            for(MailNotificationRecord mailNotificationRecord : databaseUtil.getDatabaseUtilNotification().getMailNotificationRecords(createDay)) {
                 if (!userNotificationData.containsKey(mailNotificationRecord.getNotificationId())) {
                     userNotificationData.put(mailNotificationRecord.getNotificationId(), mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 } else {
@@ -94,12 +94,29 @@ public class AdminEmailBean implements Serializable {
         }
     }
 
+    private List<Date> loadNotificationDates() {
+        try {
+            return databaseUtil.getDatabaseUtilNotification().getDatesNotificationsWhereSend();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
     public List<NotificationRecord> getNotificationRecords() {
         return notificationRecords;
     }
 
     public void setNotificationRecords(List<NotificationRecord> notificationRecords) {
         this.notificationRecords = notificationRecords;
+    }
+
+    public List<Date> getEmailSendDates() {
+        return emailSendDates;
+    }
+
+    public void setEmailSendDates(List<Date> emailSendDates) {
+        this.emailSendDates = emailSendDates;
     }
 
     public String getUserData(Integer notificationRecordId) {

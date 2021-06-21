@@ -5,6 +5,7 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
@@ -23,6 +24,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.jooq.impl.DSL.*;
@@ -101,6 +103,30 @@ public class DatabaseUtilNotification {
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public List<MailNotificationRecord> getMailNotificationRecords(Date createDay) {
+        List<MailNotificationRecord> returnRecords = new ArrayList<>();
+        try (Config config = ConfigFactory.get()) {
+            /*Result<MailNotificationRecord> records = config.dsl()
+                    .selectFrom(Tables.MAIL_NOTIFICATION)
+                    .where(Tables.MAIL_NOTIFICATION.CREATE_DATE.eq((java.sql.Date) createDay))
+                    .fetch();
+            for(MailNotificationRecord record : records) {
+                returnRecords.add(record);
+            }
+
+            */
+
+            Result<Record> record = config.dsl().resultQuery("SELECT *\n" +
+                    "\tFROM public.mail_notification WHERE create_date::date = " + createDay + ";").fetch();
+            return config.map(record, MailNotificationRecord.class);
+
+        } catch (Exception ex) {
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000033: Error listing Mail Notification Entries.");
+            ex.printStackTrace();
+        }
+        return returnRecords;
     }
 
     public List<MailNotificationRecord> getPendingNotifications() {
@@ -255,17 +281,6 @@ public class DatabaseUtilNotification {
         return new HashMap<>();
     }
 
-    @NotNull
-    private Map<String, String> map2EmailAddressesAndNames(Result<Record> record) {
-        Map<String, String> addressList = new HashMap<>();
-        for (Record record1 : record) {
-            if (!addressList.containsKey(record1.getValue(0))) {
-                addressList.put(record1.getValue(0).toString(), record1.getValue(1).toString());
-            }
-        }
-        return addressList;
-    }
-
     public Map<String, String> getBiobankEmailAddresses(Integer biobankId) {
         try (Config config = ConfigFactory.get()) {
             Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
@@ -322,12 +337,48 @@ public class DatabaseUtilNotification {
         return null;
     }
 
+    public List<Date> getDatesNotificationsWhereSend() {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> record = config.dsl().resultQuery("SELECT create_date::date\n" +
+                    "\tFROM public.mail_notification GROUP BY create_date::date;").fetch();
+            return mapDateList(record);
+        } catch (Exception ex) {
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000099: Error get dates where notifications where send.");
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<Date> mapDateList(Result<Record> records) {
+        List<Date> dateList = new ArrayList<>();
+        for(Record record : records) {
+            try {
+                dateList.add(new SimpleDateFormat("yyyy-MM-dd").parse(record.getValue("create_date").toString()));
+            } catch (Exception ex) {
+                System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000100: Error converting String to Date.");
+                ex.printStackTrace();
+            }
+        }
+        return dateList;
+    }
+
     @NotNull
     private Map<String, String> mapEmailAddressesAndNames(Result<Record2<String, String>> record) {
         Map<String, String> addressList = new HashMap<>();
         for (Record2<String, String> record1 : record) {
             if (!addressList.containsKey(record1.value1())) {
                 addressList.put(record1.value1(), record1.value2());
+            }
+        }
+        return addressList;
+    }
+
+    @NotNull
+    private Map<String, String> map2EmailAddressesAndNames(Result<Record> record) {
+        Map<String, String> addressList = new HashMap<>();
+        for (Record record1 : record) {
+            if (!addressList.containsKey(record1.getValue(0))) {
+                addressList.put(record1.getValue(0).toString(), record1.getValue(1).toString());
             }
         }
         return addressList;

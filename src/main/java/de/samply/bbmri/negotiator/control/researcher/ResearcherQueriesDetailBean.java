@@ -674,7 +674,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     public List<CollectionBiobankDTO> getMatchingBiobankCollection() {
-        System.out.println("--->>> get matchingBiobankCollection: " + matchingBiobankCollection.size());
         return matchingBiobankCollection;
     }
 
@@ -683,7 +682,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     public List<Integer> getBiobankWithOffer() {
-        System.out.println("--->>> get biobankWithOffer: " + biobankWithOffer.size());
         return biobankWithOffer;
     }
 
