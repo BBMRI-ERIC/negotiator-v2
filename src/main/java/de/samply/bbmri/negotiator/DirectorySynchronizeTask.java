@@ -36,12 +36,14 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryClients.DKFZSampleLocatorDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryClients.MolgenisDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 
@@ -85,19 +87,42 @@ public class DirectorySynchronizeTask extends TimerTask {
         if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
             return directorySyncLoggingHelper;
         }
-        try(Config config = ConfigFactory.get()) {
+        if(listOfDirectoriesRecord.getApiType().equalsIgnoreCase("Molgenis")) {
+            return syncMolgenisStyleDirectory(listOfDirectoriesRecord, directorySyncLoggingHelper);
+        }
+        if(listOfDirectoriesRecord.getApiType().equalsIgnoreCase("DKFZ-SampleLocator")) {
+            return syncDKFZSampleLocatorStyleDirectory(listOfDirectoriesRecord, directorySyncLoggingHelper);
+        }
+        return directorySyncLoggingHelper;
+    }
 
+    private DirectorySyncLoggingHelper syncDKFZSampleLocatorStyleDirectory(ListOfDirectoriesRecord listOfDirectoriesRecord, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
+        try(Config config = ConfigFactory.get()) {
+            DKFZSampleLocatorDirectoryClient directoryClient = getDKFZSampleLocatorStyleDirectoryClient(
+                    listOfDirectoriesRecord.getRestUrl(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
+
+            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
+            directorySyncLoggingHelper.setSyncedCollections(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
+        } catch (Exception e) {
+            logger.error("Synchronization of directory failed", e);
+            NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
+        }
+        return directorySyncLoggingHelper;
+    }
+
+    private DirectorySyncLoggingHelper syncMolgenisStyleDirectory(ListOfDirectoriesRecord listOfDirectoriesRecord, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
+        try(Config config = ConfigFactory.get()) {
             boolean updateNetworks = false;
             if(listOfDirectoriesRecord.getResourceNetworks() != null) {
                 updateNetworks = true;
             }
 
-            DirectoryClient client = getDirectoryClient(listOfDirectoriesRecord.getUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
+            MolgenisDirectoryClient directoryClient = getMolgenisDirectoryClient(listOfDirectoriesRecord.getUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
                     listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getResourceNetworks(),
                     listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword(), updateNetworks);
-            directorySyncLoggingHelper.setSyncedNetworks(synchronizeNetworks(listOfDirectoriesRecord.getId(), config, client, updateNetworks));
-            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, client, updateNetworks));
-            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectoriesRecord.getId(), config, client, updateNetworks));
+            directorySyncLoggingHelper.setSyncedNetworks(synchronizeNetworks(listOfDirectoriesRecord.getId(), config, directoryClient, updateNetworks));
+            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, updateNetworks));
+            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectoriesRecord.getId(), config, directoryClient, updateNetworks));
 
             logger.info("Synchronization with the directory finished. Biobanks: %d, Collections: %d, Networks: %d.",
                     directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
@@ -109,15 +134,19 @@ public class DirectorySynchronizeTask extends TimerTask {
         return directorySyncLoggingHelper;
     }
 
-    private DirectoryClient getDirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections,
-                                               String resourceNetworks, String username, String password, boolean updateNetworks) {
-        DirectoryClient client;
+    private DKFZSampleLocatorDirectoryClient getDKFZSampleLocatorStyleDirectoryClient(String dirBaseUrl, String username, String password) {
+        return new DKFZSampleLocatorDirectoryClient(dirBaseUrl, username, password);
+    }
+
+    private MolgenisDirectoryClient getMolgenisDirectoryClient(String dirBaseUrl, String resourceBiobanks, String resourceCollections,
+                                                               String resourceNetworks, String username, String password, boolean updateNetworks) {
+        MolgenisDirectoryClient client;
         if(!updateNetworks) {
-            client = new DirectoryClient(dirBaseUrl,
+            client = new MolgenisDirectoryClient(dirBaseUrl,
                     resourceBiobanks, resourceCollections,
                     username, password);
         } else {
-            client = new DirectoryClient(dirBaseUrl,
+            client = new MolgenisDirectoryClient(dirBaseUrl,
                     resourceBiobanks, resourceCollections, resourceNetworks,
                     username, password);
         }
