@@ -1,4 +1,4 @@
-package eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryClients;
+package eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients;
 
 import java.net.URI;
 import java.util.ArrayList;

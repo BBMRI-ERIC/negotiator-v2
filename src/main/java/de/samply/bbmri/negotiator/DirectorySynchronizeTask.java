@@ -37,13 +37,13 @@ import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryClients.DKFZSampleLocatorDirectoryClient;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.DKFZSampleLocatorDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryClients.MolgenisDirectoryClient;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.MolgenisDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 

@@ -1,4 +1,4 @@
-package eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryClients;
+package eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients;
 
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
@@ -14,6 +14,7 @@ public class DKFZSampleLocatorDirectoryClient implements DirectoryClient {
     private static final Logger logger = LoggerFactory.getLogger(DKFZSampleLocatorDirectoryClient.class);
 
     public DKFZSampleLocatorDirectoryClient(String dirBaseUrl, String username, String password) {
+        //TODO: Implement Client
     }
 
     @Override
