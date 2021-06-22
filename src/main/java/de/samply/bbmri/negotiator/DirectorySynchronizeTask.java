@@ -67,7 +67,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
             List<ListOfDirectoriesRecord> directories = DbUtil.getDirectories(config);
             for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
-                logger.info("Synchronization with the directory: {0} - {1}", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
+                logger.info(String.format("Synchronization with the directory: %d - %s", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName()));
                 directorySyncLoggingHelper.addSyncResult(runDirectorySync(listOfDirectoriesRecord));
             }
             updateDefaultNetworks(config);
