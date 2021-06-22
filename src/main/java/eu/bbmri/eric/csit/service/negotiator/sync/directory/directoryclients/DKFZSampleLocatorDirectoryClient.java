@@ -6,8 +6,6 @@ import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.*;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.internal.util.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -15,13 +13,11 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DKFZSampleLocatorDirectoryClient implements DirectoryClient {
 
-    private static final Logger logger = LoggerFactory.getLogger(DKFZSampleLocatorDirectoryClient.class);
     private final Client client;
     private final String dirBaseUrl;
     private final String username;

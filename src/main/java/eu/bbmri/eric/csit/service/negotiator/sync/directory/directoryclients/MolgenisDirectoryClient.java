@@ -326,10 +326,7 @@ public class MolgenisDirectoryClient implements DirectoryClient {
 
         DirectoryCollectionListing listing = request.get(DirectoryCollectionListing.class);
 
-        /**
-         * Get the list of collections while the next reference is not null, meaning until there are no more collections
-         * to retrieve.
-         */
+        // Get the list of collections while the next reference is not null, meaning until there are no more collections to retrieve.
         while(listing.getNextHref() != null) {
             logger.debug("Not all collections retrieved, getting next Href: " + listing.getNextHref());
             target.addAll(listing.getCollections());
@@ -373,29 +370,6 @@ public class MolgenisDirectoryClient implements DirectoryClient {
             return;
 
         request.header("Authorization", "Basic " + Base64.encodeAsString(username + ":" + password));
-    }
-
-    @Deprecated
-    protected final String getBioBankJSON(final String bioBankID) throws DirectoryInvalidResponseException, DirectoryConnectionException {
-        String path = getBaseURI() + "/" + BIOBANK_PATH + ":" + ID + ":" + bioBankID;
-        String json = getJsonFromDir(path);
-        if (json != null && !json.isEmpty()) {
-            return json;
-        } else {
-            throw new DirectoryInvalidResponseException("Unexpected response for biobank id " + bioBankID);
-        }
-    }
-
-    @Deprecated
-    final String getJsonFromDir(final String path) throws DirectoryConnectionException {
-        String string = null;
-        try {
-            string = getService().path(path).request(MediaType.APPLICATION_JSON).get(String.class);
-
-        } catch (Exception e) {
-            throw new DirectoryConnectionException(e.getMessage());
-        }
-        return string;
     }
 
     /**

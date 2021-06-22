@@ -46,6 +46,7 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.MolgenisDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
+import org.slf4j.Marker;
 
 /**
  * Handles the perdiodical synchonization between the directory and our negotiator.
@@ -56,6 +57,7 @@ public class DirectorySynchronizeTask extends TimerTask {
      *
      */
     private static final Logger logger = LoggerFactory.getLogger(DirectorySynchronizeTask.class);
+    Marker marker;
 
     private List<String> defaultNationalNodes = new ArrayList<>(Arrays.asList(
        "no", "se", "fi", "ee", "lv", "lt", "pl", "de", "nl", "uk","be", "cz", "at", "ch", "bg", "it", "ee", "mt", "gr","tr", "cy"
@@ -67,7 +69,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
             List<ListOfDirectoriesRecord> directories = DbUtil.getDirectories(config);
             for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
-                logger.info(String.format("Synchronization with the directory: %d - %s", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName()));
+                logger.info(marker, "Synchronization with the directory: {} - {}", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
                 directorySyncLoggingHelper.addSyncResult(runDirectorySync(listOfDirectoriesRecord));
             }
             updateDefaultNetworks(config);
@@ -76,13 +78,13 @@ public class DirectorySynchronizeTask extends TimerTask {
             DataCache dataCache = DataCache.getInstance();
             dataCache.createUpdateBiobankList();
         } catch (Exception e) {
-            logger.error("Synchronization of directories failed", e);
+            logger.error(marker, "Synchronization of directories failed: {}", e.getMessage());
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
         }
     }
 
     public DirectorySyncLoggingHelper runDirectorySync(ListOfDirectoriesRecord listOfDirectoriesRecord) {
-        logger.info("Starting synchronization with the directory: %d - %s", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
+        logger.info(marker, "Starting synchronization with the directory: {} - {}", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
         DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
         if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
             return directorySyncLoggingHelper;
@@ -104,7 +106,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
             directorySyncLoggingHelper.setSyncedCollections(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
         } catch (Exception e) {
-            logger.error("Synchronization of directory failed", e);
+            logger.error(marker, "Synchronization of directory failed: {}", e.getMessage());
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
         }
         return directorySyncLoggingHelper;
@@ -124,11 +126,11 @@ public class DirectorySynchronizeTask extends TimerTask {
             directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, updateNetworks));
             directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectoriesRecord.getId(), config, directoryClient, updateNetworks));
 
-            logger.info("Synchronization with the directory finished. Biobanks: %d, Collections: %d, Networks: %d.",
+            logger.info(marker, "Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
                     directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
             config.commit();
         } catch (Exception e) {
-            logger.error("Synchronization of directory failed", e);
+            logger.error(marker, "Synchronization of directory failed: {}", e.getMessage());
             NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
         }
         return directorySyncLoggingHelper;
@@ -159,13 +161,13 @@ public class DirectorySynchronizeTask extends TimerTask {
                 return 0;
             }
             List<DirectoryNetwork> allNetworks = client.getAllNetworks();
-            logger.info("All Networks: %d", allNetworks.size());
+            logger.info(marker, "All Networks: {}", allNetworks.size());
             for (DirectoryNetwork directoryNetwork : allNetworks) {
                 DbUtil.synchronizeNetwork(config, directoryNetwork, listOfDirectoriesId);
             }
             return allNetworks.size();
         } catch (Exception e) {
-            logger.error("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000042: Problem synchronizing Networks for listOfDirectoriesId: %d.", listOfDirectoriesId);
+            logger.error(marker, "d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000042: Problem synchronizing Networks for listOfDirectoriesId: {}.", listOfDirectoriesId);
             e.printStackTrace();
         }
         return 0;
@@ -174,7 +176,7 @@ public class DirectorySynchronizeTask extends TimerTask {
     private int synchronizeBiobanks(int listOfDirectoriesId, Config config, DirectoryClient client, boolean updateNetworks) {
         try {
             List<DirectoryBiobank> allBiobanks = client.getAllBiobanks();
-            logger.info("All Biobanks: %d", allBiobanks.size());
+            logger.info(marker, "All Biobanks: {}", allBiobanks.size());
 
             for(DirectoryBiobank directoryBiobank : allBiobanks) {
                 BiobankRecord biobankRecord = DbUtil.synchronizeBiobank(config, directoryBiobank, listOfDirectoriesId);
@@ -184,7 +186,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             logger.info("DirectoryBiobank done");
             return allBiobanks.size();
         } catch (Exception e) {
-            logger.error("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000043: Problem synchronizing Biobanks for listOfDirectoriesId: %d.", listOfDirectoriesId);
+            logger.error(marker, "d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000043: Problem synchronizing Biobanks for listOfDirectoriesId: {}.", listOfDirectoriesId);
             e.printStackTrace();
         }
         return 0;
@@ -197,7 +199,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             }
             DbUtil.updateBiobankNetworkLinks(config, directoryBiobank, listOfDirectoriesId, biobankRecord.getId());
         } catch (Exception e) {
-            logger.error("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000045: Problem synchronizing biobank network links for biobank: %d.", biobankRecord.getId());
+            logger.error(marker, "d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000045: Problem synchronizing biobank network links for biobank: {}.", biobankRecord.getId());
             e.printStackTrace();
         }
     }
@@ -205,7 +207,7 @@ public class DirectorySynchronizeTask extends TimerTask {
     private int synchronizedCollections(int listOfDirectoriesId, Config config, DirectoryClient client, boolean updateNetworks) {
         try {
             List<DirectoryCollection> allCollections = client.getAllCollections();
-            logger.info("All Collections: %d", allCollections.size());
+            logger.info(marker, "All Collections: {}", allCollections.size());
 
             for(DirectoryCollection directoryCollection : allCollections) {
                 CollectionRecord collectionRecord = DbUtil.synchronizeCollection(config, directoryCollection, listOfDirectoriesId);
@@ -213,7 +215,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             }
             return allCollections.size();
         } catch (Exception e) {
-            logger.error("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000044: Problem synchronizing collections for listOfDirectoriesId: %d.", listOfDirectoriesId);
+            logger.error(marker, "d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000044: Problem synchronizing collections for listOfDirectoriesId: {}.", listOfDirectoriesId);
             e.printStackTrace();
         }
         return 0;
@@ -226,7 +228,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             }
             DbUtil.updateCollectionNetworkLinks(config, directoryCollection, listOfDirectoriesId, collectionId);
         } catch (Exception e) {
-            logger.error("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000046: Problem synchronizing collection network links for collection: %d.", collectionId);
+            logger.error(marker, "d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000046: Problem synchronizing collection network links for collection: {}.", collectionId);
             e.printStackTrace();
         }
     }
