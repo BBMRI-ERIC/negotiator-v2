@@ -57,6 +57,9 @@ public class DKFZSampleLocatorDirectoryClient implements DirectoryClient {
         List<DirectoryBiobank> target = new ArrayList<>();
         List<DKFZSampleLocatorDirectoryBiobankAndCollection> resultList = getDataListBiobanksAndCollections();
         for(DKFZSampleLocatorDirectoryBiobankAndCollection entry : resultList) {
+            if(entry.getBiobankid() == null || entry.getBiobankid().isEmpty()) {
+                continue;
+            }
             DirectoryBiobank directoryBiobank = new DirectoryBiobank();
             directoryBiobank.setId(entry.getBiobankid());
             directoryBiobank.setName(entry.getName());
@@ -70,6 +73,12 @@ public class DKFZSampleLocatorDirectoryClient implements DirectoryClient {
         List<DirectoryCollection> target = new ArrayList<>();
         List<DKFZSampleLocatorDirectoryBiobankAndCollection> resultList = getDataListBiobanksAndCollections();
         for(DKFZSampleLocatorDirectoryBiobankAndCollection entry : resultList) {
+            if(entry.getBiobankid() == null || entry.getBiobankid().isEmpty()) {
+                continue;
+            }
+            if(entry.getCollectionid() == null || entry.getCollectionid().isEmpty()) {
+                continue;
+            }
             DirectoryBiobank directoryBiobank = new DirectoryBiobank();
             directoryBiobank.setId(entry.getBiobankid());
             directoryBiobank.setName(entry.getName());
