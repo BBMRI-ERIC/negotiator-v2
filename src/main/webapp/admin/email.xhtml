@@ -79,6 +79,11 @@
 			</ui:repeat>
 		</h:form>
 
+		<style>
+			table, th, td {
+				border: 1px solid black;
+			}
+		</style>
 
 		<h:dataTable rendered="#{adminEmailBean.mailNotificationRecords.size() > 0}" value="#{adminEmailBean.mailNotificationRecords}" var="notificationRecord">
 			<h:column>
@@ -111,7 +116,7 @@
 			</h:column>
 			<h:column>
 				<f:facet name="header">Body</f:facet>
-				#{adminEmailBean.getBody()}
+				#{notificationRecord.getBody()}
 			</h:column>
 		</h:dataTable>
 

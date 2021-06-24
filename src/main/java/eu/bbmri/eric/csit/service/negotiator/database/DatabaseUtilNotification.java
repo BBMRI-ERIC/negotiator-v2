@@ -117,9 +117,9 @@ public class DatabaseUtilNotification {
             }
 
             */
-
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
             Result<Record> record = config.dsl().resultQuery("SELECT *\n" +
-                    "\tFROM public.mail_notification WHERE create_date::date = " + createDay + ";").fetch();
+                    "\tFROM public.mail_notification WHERE create_date::date = '" + simpleDateFormat.format(createDay) + "';").fetch();
             return config.map(record, MailNotificationRecord.class);
 
         } catch (Exception ex) {
