@@ -12,6 +12,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -38,7 +39,7 @@ public class AdminEmailBean implements Serializable {
     }
 
     List<MailNotificationRecord> mailNotificationRecords;
-    List<Date> emailSendDates = loadNotificationDates();
+    List<String> emailSendDates = loadNotificationDates();
     Map<Integer, String> userNotificationData;
 
     /**
@@ -86,7 +87,7 @@ public class AdminEmailBean implements Serializable {
         this.userBean = userBean;
     }
 
-    public void loadNotifications(Date createDay) {
+    public void loadNotifications(String createDay) {
         try {
             notificationRecords = databaseUtil.getDatabaseUtilNotification().getNotificationRecords();
             userNotificationData = new HashMap<>();
@@ -105,9 +106,14 @@ public class AdminEmailBean implements Serializable {
         }
     }
 
-    private List<Date> loadNotificationDates() {
+    private List<String> loadNotificationDates() {
         try {
-            return databaseUtil.getDatabaseUtilNotification().getDatesNotificationsWhereSend();
+            List<String> dateList = new ArrayList<>();
+            for(Date createDate : databaseUtil.getDatabaseUtilNotification().getDatesNotificationsWhereSend()) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                dateList.add(simpleDateFormat.format(createDate));
+            }
+            return dateList;
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -122,11 +128,11 @@ public class AdminEmailBean implements Serializable {
         this.notificationRecords = notificationRecords;
     }
 
-    public List<Date> getEmailSendDates() {
+    public List<String> getEmailSendDates() {
         return emailSendDates;
     }
 
-    public void setEmailSendDates(List<Date> emailSendDates) {
+    public void setEmailSendDates(List<String> emailSendDates) {
         this.emailSendDates = emailSendDates;
     }
 

@@ -105,7 +105,7 @@ public class DatabaseUtilNotification {
         return null;
     }
 
-    public List<MailNotificationRecord> getMailNotificationRecords(Date createDay) {
+    public List<MailNotificationRecord> getMailNotificationRecords(String createDay) {
         List<MailNotificationRecord> returnRecords = new ArrayList<>();
         try (Config config = ConfigFactory.get()) {
             /*Result<MailNotificationRecord> records = config.dsl()
@@ -117,9 +117,9 @@ public class DatabaseUtilNotification {
             }
 
             */
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
             Result<Record> record = config.dsl().resultQuery("SELECT *\n" +
-                    "\tFROM public.mail_notification WHERE create_date::date = '" + simpleDateFormat.format(createDay) + "';").fetch();
+                    "\tFROM public.mail_notification WHERE create_date::date = '" + createDay + "';").fetch();
             return config.map(record, MailNotificationRecord.class);
 
         } catch (Exception ex) {

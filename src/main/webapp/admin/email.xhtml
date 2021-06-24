@@ -74,7 +74,7 @@
 
 		<h:form styleClass="form-horizontal">
 			<ui:repeat value="#{adminEmailBean.emailSendDates}" var="createDates">
-				<h:commandButton action="#{adminEmailBean.loadNotifications(createDates)}" value="Load Notifications for #{createDates.day}-#{createDates.month}-#{createDates.year}"
+				<h:commandButton action="#{adminEmailBean.loadNotifications(createDates)}" value="Load Notifications for #{createDates}"
 								 styleClass="btn btn-default"/>
 			</ui:repeat>
 		</h:form>
