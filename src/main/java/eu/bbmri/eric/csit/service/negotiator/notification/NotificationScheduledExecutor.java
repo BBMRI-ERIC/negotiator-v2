@@ -73,7 +73,7 @@ public class NotificationScheduledExecutor extends TimerTask {
                         NotificationStatus.getNotificationType(NotificationStatus.CANCELED));
                 continue;
             }
-            String body = pendingNotification.getBody().replaceAll("Dear .*,", "").replace("Yours sincerely", "").replace("The BBMRI-ERIC Team", "");
+            String body = pendingNotification.getBody().replaceAll("Dear .*?,", "").replace("Yours sincerely", "").replace("The BBMRI-ERIC Team", "");
             aggregatedBody.append(aggregationSplitter);
             aggregatedBody.append("Subject: ");
             aggregatedBody.append(pendingNotification.getSubject());

@@ -57,9 +57,7 @@ public class NotificationAggregatedNotification extends Notification {
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(contactEmailAddresse, subject, bodyFinal);
             if(checkSendNotificationImmediatelyForUser(contactEmailAddresse, NotificationType.AGGREGATED_NOTIFICATION)) {
-                //TODO: Switch back to real email sending
-                sendMailNotification(mailNotificationRecord.getMailNotificationId(), "robert.reihs@bbmri-eric.eu", subject, bodyFinal);
-                //sendMailNotification(mailNotificationRecord.getMailNotificationId(), contactEmailAddresse, subject, bodyFinal);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), contactEmailAddresse, subject, bodyFinal);
             }
         } catch (Exception ex) {
             logger.error(String.format("9389e532970f-NotificationAggregatedNotification ERROR-NG-0000072: Error creating a notification for %s.", contactEmailAddresse));
