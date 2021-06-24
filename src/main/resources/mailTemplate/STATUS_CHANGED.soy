@@ -9,13 +9,14 @@
  * @param? url The url of the query the comment is added to
  * @param? status New status of the request
  * @param? collectionName Name of the collection
+ * @param? changerName Name of user who has changed the status
  */
 {deltemplate maincontent}
     {switch $locale}
         {default}
             The status of the request {$queryName}
-            <br>has been changed for collection {$collectionName} to status: {$status}
-            <br>To view, please use the following link: <a href="{$url}">here</a><br>
+            <br><br>has been changed for collection {$collectionName} to status: {$status} by {$changerName}
+            <br><br>To view, please use the following link: <a href="{$url}">here</a><br>
 
     {/switch}
 {/deltemplate}

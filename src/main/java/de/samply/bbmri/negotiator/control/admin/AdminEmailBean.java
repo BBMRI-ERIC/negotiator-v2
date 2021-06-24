@@ -28,6 +28,16 @@ public class AdminEmailBean implements Serializable {
 
     DatabaseUtil databaseUtil = new DatabaseUtil();
     List<NotificationRecord> notificationRecords;
+
+    public List<MailNotificationRecord> getMailNotificationRecords() {
+        return mailNotificationRecords;
+    }
+
+    public void setMailNotificationRecords(List<MailNotificationRecord> mailNotificationRecords) {
+        this.mailNotificationRecords = mailNotificationRecords;
+    }
+
+    List<MailNotificationRecord> mailNotificationRecords;
     List<Date> emailSendDates = loadNotificationDates();
     Map<Integer, String> userNotificationData;
 
@@ -80,7 +90,8 @@ public class AdminEmailBean implements Serializable {
         try {
             notificationRecords = databaseUtil.getDatabaseUtilNotification().getNotificationRecords();
             userNotificationData = new HashMap<>();
-            for(MailNotificationRecord mailNotificationRecord : databaseUtil.getDatabaseUtilNotification().getMailNotificationRecords(createDay)) {
+            mailNotificationRecords = databaseUtil.getDatabaseUtilNotification().getMailNotificationRecords(createDay);
+            for(MailNotificationRecord mailNotificationRecord : mailNotificationRecords) {
                 if (!userNotificationData.containsKey(mailNotificationRecord.getNotificationId())) {
                     userNotificationData.put(mailNotificationRecord.getNotificationId(), mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 } else {

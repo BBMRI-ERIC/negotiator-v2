@@ -19,6 +19,7 @@ public class NotificationStatusChanged extends Notification {
     private String statusChangerContactEmailAddress;
     private final String newRequestStatus;
     private final String collectionName;
+    private String statusChangerName;
 
     public NotificationStatusChanged(NotificationRecord notificationRecord, Integer requestId, Integer personId, Integer collectionId, String collectionName, String newRequestStatus) {
         logger.info("97fdbf0f7bc2-NotificationStatusChanged status changed for request.");
@@ -57,6 +58,7 @@ public class NotificationStatusChanged extends Notification {
     private void setStatusChangerContact() {
         PersonRecord statusChangerContact = databaseUtil.getDatabaseUtilPerson().getPerson(personId);
         statusChangerContactEmailAddress = statusChangerContact.getAuthEmail();
+        statusChangerName = statusChangerContact.getAuthName();
     }
 
     private Map<String, String> getCollectionssEmailAddressesAndNames() {
@@ -116,6 +118,7 @@ public class NotificationStatusChanged extends Notification {
         parameters.put("name", contactName);
         parameters.put("status", newRequestStatus);
         parameters.put("collectionName", collectionName);
+        parameters.put("changerName", statusChangerName);
         return parameters;
     }
 
