@@ -86,7 +86,8 @@ public class DirectorySynchronizeTask extends TimerTask {
     public DirectorySyncLoggingHelper runDirectorySync(ListOfDirectoriesRecord listOfDirectoriesRecord) {
         logger.info(marker, "Starting synchronization with the directory: {} - {}", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
         DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
-        if (listOfDirectoriesRecord.getSyncActive() != null && listOfDirectoriesRecord.getSyncActive()) {
+        Boolean sync = listOfDirectoriesRecord.getSyncActive();
+        if (listOfDirectoriesRecord.getSyncActive() != null && !listOfDirectoriesRecord.getSyncActive()) {
             return directorySyncLoggingHelper;
         }
         if(listOfDirectoriesRecord.getApiType().equalsIgnoreCase("Molgenis")) {

@@ -116,6 +116,8 @@ public class Perun {
 
         logger.info("Finished Perun user collection mapping.");
         NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Finished Perun user collection mapping.");
+        NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING,
+                "Finished Perun user collection mapping.");
         return Response.ok().build();
     }
 
