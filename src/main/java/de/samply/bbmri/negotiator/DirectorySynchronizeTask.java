@@ -105,7 +105,7 @@ public class DirectorySynchronizeTask extends TimerTask {
                     listOfDirectoriesRecord.getRestUrl(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
 
             directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
-            directorySyncLoggingHelper.setSyncedCollections(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
+            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectoriesRecord.getId(), config, directoryClient, false));
             logger.info(marker, "Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
                     directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
             config.commit();
