@@ -1,88 +1,60 @@
 package eu.bbmri.eric.csit.service.negotiator.database;
 
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.rest.dto.PerunMappingDTO;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Resource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
 import java.sql.Connection;
-import java.util.List;
 
 public class DatabaseUtilPerson {
 
-    private final DataSource dataSource;
-
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseUtilPerson.class);
     private final DatabaseModelMapper databaseModelMapper = new DatabaseModelMapper();
 
-    public DatabaseUtilPerson(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     public PersonRecord getPerson(Integer personId) {
-        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
-            Record record = database.selectFrom(Tables.PERSON)
+        try (Config config = ConfigFactory.get()) {
+            Record record = config.dsl().selectFrom(Tables.PERSON)
                     .where(Tables.PERSON.ID.eq(personId))
                     .fetchOne();
             return databaseModelMapper.map(record, PersonRecord.class);
         } catch (Exception ex) {
-            logger.error("8ed18878-DatabaseUtilPerson ERROR-NG-0000040: Error get person with personId: {}.", personId);
-            logger.error("context", ex);
+            System.err.println("8ed18878-DatabaseUtilPerson ERROR-NG-0000040: Error get person with personId: " + personId + ".");
+            ex.printStackTrace();
         }
         return null;
     }
 
     public Integer getPersonIdByEmailAddress(String emailAddress) {
-        try (Connection conn = dataSource.getConnection(); DSLContext database = DSL.using(conn, SQLDialect.POSTGRES)) {
-            Integer personId = database.select(Tables.PERSON.ID)
+        try (Config config = ConfigFactory.get()) {
+            Integer personId = config.dsl().select(Tables.PERSON.ID)
                     .from(Tables.PERSON)
                     .where(Tables.PERSON.AUTH_EMAIL.eq(emailAddress))
                     .limit(1)
                     .fetchOne(Tables.PERSON.ID);
             return personId;
         } catch (Exception ex) {
-            logger.error("8ed18878-DatabaseUtilPerson ERROR-NG-0000073: Error get person with emailAddress: {}.", emailAddress);
-            logger.error("context", ex);
+            System.err.println("8ed18878-DatabaseUtilPerson ERROR-NG-0000073: Error get person with emailAddress: " + emailAddress + ".");
+            ex.printStackTrace();
         }
         return null;
     }
 
     public Integer getPersonIdByAuthSubjectId(String authSubjectId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Integer personId = database.select(Tables.PERSON.ID)
+        try (Config config = ConfigFactory.get()) {
+            Integer personId = config.dsl().select(Tables.PERSON.ID)
                     .from(Tables.PERSON)
                     .where(Tables.PERSON.AUTH_SUBJECT.eq(authSubjectId))
                     .fetchOne(Tables.PERSON.ID);
             return personId;
         } catch (Exception ex) {
-            logger.error("8ed18878-DatabaseUtilPerson ERROR-NG-0000084: Error get person with authSubjectId: {}.", authSubjectId);
-            logger.error("context", ex);
+            System.err.println("8ed18878-DatabaseUtilPerson ERROR-NG-0000084: Error get person with authSubjectId: " + authSubjectId + ".");
+            ex.printStackTrace();
         }
         return null;
     }
 
-    public void updatePersonCollectionMapping(PerunMappingDTO mapping) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            String collectionId = mapping.getName();
-
-
-
-        } catch (Exception ex) {
-            logger.error("8ed18878-DatabaseUtilPerson ERROR-NG-0000081: Error updating person collection mapping.");
-            logger.error("context", ex);
-        }
-    }
 }

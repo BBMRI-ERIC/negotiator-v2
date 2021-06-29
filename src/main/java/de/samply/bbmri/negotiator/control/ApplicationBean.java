@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.control;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -39,6 +40,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +116,27 @@ public class ApplicationBean implements Serializable {
     public String updateLifecycleStatusProblem() {
         try (Config config = ConfigFactory.get()) {
             DbUtil.getCollectionsWithLifeCycleStatusProblem(config, -1);
+        } catch (Exception e) {
+            System.err.println("Error Fixing LifeCycle Status Problems!");
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public String updateDirectoryLink_V_4_2_8() {
+        try (Config config = ConfigFactory.get()) {
+            List<QueryRecord> querylist = DbUtil.getAllRequestsToUpdate(config);
+            for(QueryRecord queryRecord : querylist) {
+                String json = queryRecord.getJsonText();
+                if(json.contains("directory.bbmri-eric.eu")) {
+                    json = json.replaceAll("https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/biobankexplorer", "https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/");
+                    json = json.replaceAll("https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/", "https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/#/");
+                    json = json.replaceAll("https://directory.bbmri-eric.eu/menu/main/dataexplorer", "https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/#/");
+                    queryRecord.setJsonText(json);
+                    DbUtil.updateQueryRecord(config, queryRecord);
+                }
+            }
+            config.commit();
         } catch (Exception e) {
             System.err.println("Error Fixing LifeCycle Status Problems!");
             e.printStackTrace();

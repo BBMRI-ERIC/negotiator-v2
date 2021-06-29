@@ -26,11 +26,15 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
@@ -40,9 +44,13 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
@@ -56,10 +64,7 @@ import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
-import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.OfferPersonDTO;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
@@ -68,6 +73,9 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.W3CDom;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -174,6 +182,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Part  mtaFile;
 	private Part dtaFile;
 	private Part otherAccessFile;
+
+	private static final int DEFAULT_BUFFER_SIZE = 10240;
 
 	private final FileUtil fileUtil = new FileUtil();
 	private List<FacesMessage> fileValidationMessages = new ArrayList<>();
@@ -283,7 +293,122 @@ public class OwnerQueriesDetailBean implements Serializable {
 		}
 	}
 
-    /**
+	private String replaceNotNull(String htmlTemplate, String replace, String replaceWith) {
+		if(replaceWith != null) {
+			return htmlTemplate.replaceAll(replace, replaceWith);
+		} else {
+			return htmlTemplate.replaceAll(replace, "-");
+		}
+	}
+
+	private String replaceTemplate(String htmlTemplate) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		Person researcher = getUserDataForResearcher(selectedQuery.getResearcherId());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__RequestTitle", selectedQuery.getTitle());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Date", dateFormat.format(selectedQuery.getQueryCreationTime()));
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__ID", selectedQuery.getId().toString());
+
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Researcher", researcher.getAuthName());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Email", researcher.getAuthEmail());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Organisation", researcher.getOrganization());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Description", selectedQuery.getRequestDescription());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Projectdescription", selectedQuery.getText());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Ethics", selectedQuery.getEthicsVote());
+
+		return htmlTemplate;
+	}
+
+	public void getRequestPDF() throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+
+		// Build pdf of request
+		String tempPdfOutputFilePath = "/tmp/" + UUID.randomUUID().toString() + ".pdf";
+		try {
+			File inputHTML = new File(getClass().getClassLoader().getResource("pdfTemplate").getPath(), "RequestTemplate.html");
+			byte[] encoded = Files.readAllBytes(Paths.get(inputHTML.getAbsolutePath()));
+			String htmlTemplate = new String(encoded, "UTF-8");
+			htmlTemplate = replaceTemplate(htmlTemplate);
+
+			Document document = Jsoup.parse(htmlTemplate);
+			document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+			org.w3c.dom.Document doc = new W3CDom().fromJsoup(document);
+
+			String baseUri = FileSystems.getDefault()
+					.getPath("D:")
+					.toUri()
+					.toString();
+			OutputStream os = new FileOutputStream(tempPdfOutputFilePath);
+			PdfRendererBuilder builder = new PdfRendererBuilder();
+			builder.toStream(os);
+			builder.withW3cDocument(doc, baseUri);
+			builder.run();
+			os.close();
+		} catch (IOException e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000096: Problem creating pdf for request, query: " + queryId);
+			e.printStackTrace();
+		}
+
+
+		// Merge uploaded pdf attachments of the query
+		try(Config config = ConfigFactory.get()) {
+			List<QueryAttachmentDTO> attachments = DbUtil.getQueryAttachmentRecords(config, queryId);
+			PDFMergerUtility PDFmerger = new PDFMergerUtility();
+			PDFmerger.setDestinationFileName(tempPdfOutputFilePath);
+			File file = new File(tempPdfOutputFilePath);
+			PDFmerger.addSource(file);
+			for(QueryAttachmentDTO attachment : attachments) {
+				File file_attachment = extracted(attachment);
+				if(file_attachment != null) {
+					PDFmerger.addSource(file_attachment);
+				}
+			}
+			PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+		} catch (Exception e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000095: Problem getting and Merging query attachments for query: " + queryId);
+			e.printStackTrace();
+		}
+
+		// return pdf file to download
+		File file = new File(tempPdfOutputFilePath);
+		response.reset();
+		response.setBufferSize(DEFAULT_BUFFER_SIZE);
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Length", String.valueOf(file.length()));
+		response.setHeader("Content-Disposition", "attachment;filename=\""+ file.getName() + "\"");
+		BufferedInputStream input = null;
+		BufferedOutputStream output = null;
+		try {
+			input = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+			output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
+			byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+			int length;
+			while ((length = input.read(buffer)) > 0) {
+				output.write(buffer, 0, length);
+			}
+		} catch (Exception e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000097: Problem creating pdf for download, query: " + queryId);
+			e.printStackTrace();
+		} finally {
+			input.close();
+			output.close();
+		}
+		context.responseComplete();
+	}
+
+	private File extracted(QueryAttachmentDTO attachment) {
+		if(attachment.getAttachment().endsWith(".pdf")) {
+			String filename = fileUtil.getStorageFileName(queryId, attachment.getId(), ".pdf");
+			return new File(negotiator.getAttachmentPath(), filename);
+		}
+		if(attachment.getAttachment().endsWith(".docx")) {
+			String filename = fileUtil.getStorageFileName(queryId, attachment.getId(), ".docx");
+			return new File(negotiator.getAttachmentPath(), filename + ".pdf");
+		}
+		return null;
+	}
+
+	/**
      * Leave query as a bio bank owner.
      *
      * @param queryDto

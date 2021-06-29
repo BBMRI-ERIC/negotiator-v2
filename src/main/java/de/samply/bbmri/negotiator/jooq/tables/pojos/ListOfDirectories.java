@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class ListOfDirectories implements Serializable {
 
-	private static final long serialVersionUID = 782410780;
+	private static final long serialVersionUID = 86151027;
 
 	private Integer id;
 	private String  name;
@@ -39,6 +39,7 @@ public class ListOfDirectories implements Serializable {
 	private String  directoryPrefix;
 	private String  resourceNetworks;
 	private Boolean bbmriEricNationalNodes;
+	private String  apiType;
 
 	public ListOfDirectories() {}
 
@@ -58,6 +59,7 @@ public class ListOfDirectories implements Serializable {
 		this.directoryPrefix = value.directoryPrefix;
 		this.resourceNetworks = value.resourceNetworks;
 		this.bbmriEricNationalNodes = value.bbmriEricNationalNodes;
+		this.apiType = value.apiType;
 	}
 
 	public ListOfDirectories(
@@ -75,7 +77,8 @@ public class ListOfDirectories implements Serializable {
 		Boolean syncActive,
 		String  directoryPrefix,
 		String  resourceNetworks,
-		Boolean bbmriEricNationalNodes
+		Boolean bbmriEricNationalNodes,
+		String  apiType
 	) {
 		this.id = id;
 		this.name = name;
@@ -92,6 +95,7 @@ public class ListOfDirectories implements Serializable {
 		this.directoryPrefix = directoryPrefix;
 		this.resourceNetworks = resourceNetworks;
 		this.bbmriEricNationalNodes = bbmriEricNationalNodes;
+		this.apiType = apiType;
 	}
 
 	public Integer getId() {
@@ -212,5 +216,13 @@ public class ListOfDirectories implements Serializable {
 
 	public void setBbmriEricNationalNodes(Boolean bbmriEricNationalNodes) {
 		this.bbmriEricNationalNodes = bbmriEricNationalNodes;
+	}
+
+	public String getApiType() {
+		return this.apiType;
+	}
+
+	public void setApiType(String apiType) {
+		this.apiType = apiType;
 	}
 }

@@ -27,22 +27,25 @@ public class NotificationCreateRequest extends Notification {
             setQuery();
             setResearcherContact();
 
-            String subject = "[BBMRI-ERIC Negotiator] New request created for review: " + queryRecord.getTitle();
-
-            if(queryRecord.getTestRequest()) {
-                subject = "[BBMRI-ERIC Negotiator] TESTREQUEST: New request created for review: " + queryRecord.getTitle();
-            }
-
             createMailBodyBuilder("BBMRI_CREATE_REQUEST.soy");
-            prepareNotificationForBBMRIERIC(subject);
+
+            prepareNotificationForBBMRIERIC(getMailSubject());
         } catch (Exception ex) {
             logger.error("919bbece7131-NotificationCreateRequest ERROR-NG-0000058: Error in NotificationCreateRequest.");
             logger.error("context", ex);
         }
     }
 
+    private String getMailSubject() {
+        if(queryRecord.getTestRequest()) {
+            return "[BBMRI-ERIC Negotiator] TEST Request: New request created for review: " + queryRecord.getTitle();
+        } else {
+            return "[BBMRI-ERIC Negotiator] New request created for review: " + queryRecord.getTitle();
+        }
+    }
+
     private void prepareNotificationForBBMRIERIC(String subject) {
-        String bbmriemail = "negotiator@helpdesk.bbmri-eric.eu";
+        String bbmriemail = "negotiator-requests@helpdesk.bbmri-eric.eu";
         try {
             String body = getMailBody(getSoyParameters());
 

@@ -155,9 +155,7 @@ public class ResearcherQueriesBean implements Serializable {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
             if(queries == null) {
-                System.err.println("#################>  DEBUGG: queries == null");
             }
-            System.err.println("#################>  DEBUGG: " + queries.size());
 
             for (int i = 0; i < queries.size(); ++i) {
                 getPrivateNegotiationCountAndTime(i);

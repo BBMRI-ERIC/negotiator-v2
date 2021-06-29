@@ -31,6 +31,7 @@ public class NotificationCollectionUnreachable extends Notification {
 
             String subject = "[BBMRI-ERIC Negotiator] Collections not reachable for request: " + queryRecord.getTitle();
             createMailBodyBuilder("BBMRI_COLLECTION_NOT_REACHABLE_NOTIFICATION.soy");
+
             prepareNotificationForBBMRIERIC(subject);
         } catch (Exception ex) {
             logger.error("c09480781c00-NotificationCreateRequest ERROR-NG-0000041: Error in NotificationCreateRequest.");
@@ -42,7 +43,7 @@ public class NotificationCollectionUnreachable extends Notification {
         try {
             String body = getMailBody(getSoyParameters(notreachableCollections));
 
-            String bbmriemail = "negotiator@helpdesk.bbmri-eric.eu";
+            String bbmriemail = "negotiator-requests@helpdesk.bbmri-eric.eu";
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(bbmriemail, subject, body);
             if(checkSendNotificationImmediatelyForUser(bbmriemail, NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION)) {
                 sendMailNotification(mailNotificationRecord.getMailNotificationId(), bbmriemail, subject, body);

@@ -1326,9 +1326,6 @@ public class DbUtil {
     }
 
     public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId, int collectionId) {
-        if(directoryCollection.getNetworkLinks().size() > 0) {
-            System.out.println(directoryCollection.getName());
-        }
 
         config.dsl().deleteFrom(Tables.NETWORK_COLLECTION_LINK)
                 .where(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(collectionId))
@@ -1364,24 +1361,24 @@ public class DbUtil {
 
     public static void updateNetworkBiobankLinks(Config config, String nnacronym, String directoryIdStart) {
         config.dsl().execute("INSERT INTO public.network_biobank_link(biobank_id, network_id) " +
-                "SELECT bio.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "SELECT bio.id, (SELECT id FROM public.network WHERE directory_id = '" + nnacronym + "') " +
                 "FROM public.biobank bio WHERE bio.directory_id ILIKE '" + directoryIdStart + "' " +
                 "AND id NOT IN ( " +
                 "SELECT b.id FROM public.biobank b " +
                 "JOIN public.network_biobank_link nb ON nb.biobank_id = b.id " +
                 "JOIN public.network n ON nb.network_id = n.id " +
-                "WHERE n.acronym = '" + nnacronym + "')");
+                "WHERE n.directory_id = '" + nnacronym + "')");
     }
 
     public static void updateNetworkCollectionLinks(Config config, String nnacronym, String directoryIdStart) {
         config.dsl().execute("INSERT INTO public.network_collection_link(collection_id, network_id) " +
-                "SELECT col.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "SELECT col.id, (SELECT id FROM public.network WHERE directory_id = '" + nnacronym + "') " +
                 "FROM public.collection col WHERE col.directory_id ILIKE '" + directoryIdStart + "' " +
                 "AND id NOT IN ( " +
                 "SELECT c.id FROM public.collection c " +
                 "JOIN public.network_collection_link nc ON nc.collection_id = c.id " +
                 "JOIN public.network n ON nc.network_id = n.id " +
-                "WHERE n.acronym = '" + nnacronym + "')");
+                "WHERE n.directory_id = '" + nnacronym + "')");
     }
 
     public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollection(Config config, Integer collectionId) {
@@ -1588,22 +1585,6 @@ public class DbUtil {
                                 .join(Tables.PERSON_COLLECTION)
                                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 )).fetch(), Collection.class);
-    }
-
-    /**
-     * Returns the list of users for a given collection.
-     * @param config the current configuration
-     * @param collectionId the collection ID
-     * @return
-     */
-    public static List<CollectionOwner> getUsersForCollection(Config config, int collectionId) {
-        Result<Record> result = config.dsl().select(getFields(Tables.PERSON))
-                .from(Tables.PERSON)
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
-                .fetch();
-        List<CollectionOwner> users = config.map(result, CollectionOwner.class);
-        return users;
     }
 
     /**
@@ -2002,8 +1983,7 @@ public class DbUtil {
                 "FROM public.list_of_directories d LEFT JOIN public.list_of_directories d2 ON d2.name = d.directory_prefix " +
                 ") AS jsond;");
         Result<Record> result = resultQuery.fetch();
-        for(Record record : result) {
-            System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+        for(Record record : result) {//class org.postgresql.util.PGobject
 
             //PGobject jsonObject = record.getValue(0);
             return (String)record.getValue(0);
@@ -2600,8 +2580,6 @@ public class DbUtil {
                     "ON created_query.creation_date = initialized_query.creation_date ORDER BY creation_date) jsonc;");
             Result<Record> result = resultQuery.fetch();
             for(Record record : result) {
-                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
-
                 //PGobject jsonObject = record.getValue(0);
                 return (String)record.getValue(0);
             }
@@ -2619,8 +2597,6 @@ public class DbUtil {
                     "COUNT(*) FROM query q WHERE q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY readable) jsonc;");
             Result<Record> result = resultQuery.fetch();
             for(Record record : result) {
-                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
-
                 //PGobject jsonObject = record.getValue(0);
                 return (String)record.getValue(0);
             }
@@ -2702,5 +2678,17 @@ public class DbUtil {
             saveUpdateCollectionRequestStatus(null, (Integer)record.getValue(0), (Integer)record.getValue(1),
                     "notreachable", "contact", "", new Date(), userId);
         }
+    }
+
+    public static List<QueryRecord> getAllRequestsToUpdate(Config config) {
+        Result<QueryRecord> result = config.dsl()
+                .selectFrom(Tables.QUERY)
+                .fetch();
+
+        return config.map(result, QueryRecord.class);
+    }
+
+    public static void updateQueryRecord(Config config, QueryRecord queryRecord) {
+        queryRecord.update();
     }
 }

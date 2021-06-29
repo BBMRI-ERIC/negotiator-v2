@@ -659,6 +659,7 @@
                         }
 
                         function updateIdsForIndicateAccessConditions(collectionId, biobankId, formIdPrefix) {
+                            console.log('AL2: ' + collectionId);
                             var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;

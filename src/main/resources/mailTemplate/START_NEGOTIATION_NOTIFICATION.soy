@@ -12,16 +12,15 @@
     {switch $locale}
         {case 'de', 'de_DE'}
            A new request has been added.
-           {\n}The title of the request is: {$queryName}
-            {\n}To start negotiating, please use the following link: {\n}{\n}
-            {$url}
+           <br>The title of the request is: {$queryName}
+            <br>To start negotiating, please use the following link: <a href="{$url}">here</a><br>
 
 
         {default}
             A new request has been added.
-            {\n}The title of the request is: {$queryName}
-            {\n}{\n}To start negotiating, please use the following link: {\n}{\n}
-            {$url}
+            <br>The title of the request is: {$queryName}
+            <br><br>To start negotiating, please use the following link: <a href="{$url}">here</a><br>
+
 
     {/switch}
 {/deltemplate}

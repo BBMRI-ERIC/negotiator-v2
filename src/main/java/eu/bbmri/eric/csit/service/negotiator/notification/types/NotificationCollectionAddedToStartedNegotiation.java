@@ -29,8 +29,10 @@ public class NotificationCollectionAddedToStartedNegotiation extends Notificatio
     public void run() {
         try {
             setQuery();
+
             String subject = "[BBMRI-ERIC Negotiator] Request has been added: " + queryRecord.getTitle();
             createMailBodyBuilder("START_NEGOTIATION_NOTIFICATION.soy");
+
             prepareNotificationPerUser(emailAddressesAndNames, subject);
         } catch (Exception ex) {
             logger.error("4ef8802a4fcf-NotificationCollectionAddedToStartedNegotiation ERROR-NG-0000092: Error in NotificationCollectionAddedToStartedNegotiation.");

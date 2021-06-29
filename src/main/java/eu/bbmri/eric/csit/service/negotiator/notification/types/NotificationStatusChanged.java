@@ -16,10 +16,10 @@ public class NotificationStatusChanged extends Notification {
     private static final Logger logger = LoggerFactory.getLogger(NotificationStatusChanged.class);
 
     private final Integer collectionId;
-    private String statusChangerContactName;
-    private String statusChangerContactEmailAddresse;
+    private String statusChangerContactEmailAddress;
     private final String newRequestStatus;
     private final String collectionName;
+    private String statusChangerName;
 
     public NotificationStatusChanged(NotificationRecord notificationRecord, Integer requestId, Integer personId, Integer collectionId, String collectionName, String newRequestStatus) {
         logger.info("97fdbf0f7bc2-NotificationStatusChanged status changed for request.");
@@ -38,9 +38,10 @@ public class NotificationStatusChanged extends Notification {
             setQuery();
             setResearcherContact();
             setStatusChangerContact();
+
             Map<String, String> emailAddressesAndNames = getCollectionssEmailAddressesAndNames();
             emailAddressesAndNames.remove(researcherEmailAddresse);
-            emailAddressesAndNames.remove(statusChangerContactEmailAddresse);
+            emailAddressesAndNames.remove(statusChangerContactEmailAddress);
 
             String subject = "[BBMRI-ERIC Negotiator] Status for request: " + queryRecord.getTitle() + "has changed.";
 
@@ -50,23 +51,23 @@ public class NotificationStatusChanged extends Notification {
             prepareNotificationForCollectionRepresentative(emailAddressesAndNames, subject);
         } catch (Exception ex) {
             logger.error("97fdbf0f7bc2-NotificationStatusChanged ERROR-NG-0000064: Error in NotificationStatusChanged.");
-            logger.error("context", ex);
+            logger.error("ERROR-NG-0000064: ", ex);
         }
     }
 
     private void setStatusChangerContact() {
         PersonRecord statusChangerContact = databaseUtil.getDatabaseUtilPerson().getPerson(personId);
-        statusChangerContactName = statusChangerContact.getAuthName();
-        statusChangerContactEmailAddresse = statusChangerContact.getAuthEmail();
+        statusChangerContactEmailAddress = statusChangerContact.getAuthEmail();
+        statusChangerName = statusChangerContact.getAuthName();
     }
 
     private Map<String, String> getCollectionssEmailAddressesAndNames() {
-        return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddresses(collectionId);
+        return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddressesStillInNegotiation(requestId, collectionId);
     }
 
     private void prepareNotificationForResearcher(String subject) {
         try {
-            if (statusChangerContactEmailAddresse.equals(researcherEmailAddresse)) {
+            if (statusChangerContactEmailAddress.equals(researcherEmailAddresse)) {
                 return;
             }
             String url = NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId;
@@ -79,7 +80,7 @@ public class NotificationStatusChanged extends Notification {
             }
         } catch (Exception ex) {
             logger.error(String.format("97fdbf0f7bc2-NotificationStatusChanged ERROR-NG-0000067: Error creating a notification for researcher %s.", researcherEmailAddresse));
-            logger.error("context", ex);
+            logger.error("ERROR-NG-0000067: ", ex);
         }
 
     }
@@ -117,6 +118,7 @@ public class NotificationStatusChanged extends Notification {
         parameters.put("name", contactName);
         parameters.put("status", newRequestStatus);
         parameters.put("collectionName", collectionName);
+        parameters.put("changerName", statusChangerName);
         return parameters;
     }
 
