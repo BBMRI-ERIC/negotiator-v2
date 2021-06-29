@@ -14,6 +14,8 @@ import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import org.jooq.tools.json.JSONArray;
+import org.jooq.tools.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -233,17 +235,28 @@ public class RequestLifeCycleStatus {
         return returnvalue;
     }
 
-    public String toHistoryTable() {
-        String htmldable = "<table class=\"table table-striped\"><thead><tr>\n" +
-                "<th scope=\"col\">Date</th>\n" +
-                "<th scope=\"col\">Status</th>\n" +
-                "<th scope=\"col\">Info</th>\n" +
-                "</tr></thead><tbody>";
+    public String getRequestLifecycleHistory() {
+        return getRequestLifecycleHistory(null);
+    }
+
+    public String getRequestLifecycleHistory(Person person) {
+        JSONArray returnValue = new JSONArray();
         for(Long statusid : statusTree.keySet()) {
-            htmldable += statusTree.get(statusid).getTableRow();
+            JSONObject statusObject = statusTree.get(statusid).getJsonEntry();
+            statusObject.put("Biobank Name", "-");
+            statusObject.put("Collection Name", "-");
+            statusObject.put("User", dataCache.getUserName((Integer)statusObject.get("UserId")));
+            returnValue.add(statusObject);
         }
-        htmldable += "</tbody></table>";
-        return htmldable;
+        for(Integer collectionKey : collectionStatusList.keySet()) {
+            if(person != null) {
+                if(!collectionStatusList.get(collectionKey).checkUserInCollection(person)) {
+                    continue;
+                }
+            }
+            returnValue.addAll(collectionStatusList.get(collectionKey).getRequestLifecycleHistoryForCollection());
+        }
+        return returnValue.toString();
     }
 
     private Query getQueryFromDb() {

@@ -18,6 +18,7 @@ public class RequestStatusShippedSamplesData implements RequestStatus {
     private final String statusType = LifeCycleRequestStatusType.SHIPPED_SAMPLES;
     private String statusText = "Shipped Samples/Data.";
     private Date statusDate = null;
+    private final Integer userId;
     private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
     private final List allowedNextStatusResearcher = LifeCycleStatusUtilNextStatus.getAllowedNextStatusResearcher(this.getClass().getName());
@@ -25,6 +26,7 @@ public class RequestStatusShippedSamplesData implements RequestStatus {
     public RequestStatusShippedSamplesData(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
+        userId = collectionRequestStatusDTO.getStatusUserId();
         if(status.equals(LifeCycleRequestStatusStatus.SHIPPED)) {
             statusText = "Shipped Number: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "shippedNumber");
         }
@@ -71,8 +73,13 @@ public class RequestStatusShippedSamplesData implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>contacted</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 
     private String getStatusTextFromJson(String statusJsonString, String jsonKey) {

@@ -25,6 +25,7 @@ public class RequestStatusAccessConditions implements RequestStatus {
 
     private final FileUtil fileUtil = new FileUtil();
     Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
+    private final Integer userId;
 
     private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
@@ -33,6 +34,7 @@ public class RequestStatusAccessConditions implements RequestStatus {
     public RequestStatusAccessConditions(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
+        userId = collectionRequestStatusDTO.getStatusUserId();
         if(status.equals("indicateAccessConditions")) {
             statusText = "Access Condition: " + getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "indicateAccessConditions");
             statusText += getStatusFilesFromJson(collectionRequestStatusDTO.getStatusJson());
@@ -80,8 +82,13 @@ public class RequestStatusAccessConditions implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>contacted</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 
     private String getStatusTextFromJson(String statusJsonString, String jsonKey) {

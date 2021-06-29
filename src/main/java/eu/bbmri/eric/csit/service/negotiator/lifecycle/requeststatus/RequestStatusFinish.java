@@ -1,6 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import org.jooq.tools.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -12,9 +13,11 @@ public class RequestStatusFinish implements RequestStatus {
     private final String statusText = "Request finished";
     private Date statusDate = null;
     private final List allowedNextStatus = Arrays.asList("review");
+    private final Integer userId;
 
     public RequestStatusFinish(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
+        userId = requestStatus.getStatusUserId();
     }
 
     @Override
@@ -58,7 +61,12 @@ public class RequestStatusFinish implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>finish</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 }

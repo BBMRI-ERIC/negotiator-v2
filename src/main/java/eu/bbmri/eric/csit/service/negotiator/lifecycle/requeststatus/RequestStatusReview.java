@@ -19,10 +19,12 @@ public class RequestStatusReview implements RequestStatus {
     private String statusText = "Request under review";
     private Date statusDate = null;
     private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
+    private final Integer userId;
 
     public RequestStatusReview(RequestStatusDTO requestStatus) {
         statusDate = requestStatus.getStatusDate();
         status = requestStatus.getStatus();
+        userId = requestStatus.getStatusUserId();
         if(status == null) {
             status = LifeCycleRequestStatusStatus.UNDER_REVIEW;
         } else if(status.equals(LifeCycleRequestStatusStatus.REJECTED)) {
@@ -89,7 +91,12 @@ public class RequestStatusReview implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>review</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 }

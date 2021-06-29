@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import org.jooq.tools.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -14,6 +15,7 @@ public class RequestStatusMTASigned implements RequestStatus {
     private final String statusType = LifeCycleRequestStatusType.MTA_SIGNED;
     private final String statusText = "MTA and Paperwork for shipping signed.";
     private Date statusDate = null;
+    private final Integer userId;
 
     private final List allowedNextStatus = LifeCycleStatusUtilNextStatus.getAllowedNextStatus(this.getClass().getName());
     private final List allowedNextStatusBiobanker = LifeCycleStatusUtilNextStatus.getAllowedNextStatusBiobanker(this.getClass().getName());
@@ -22,6 +24,7 @@ public class RequestStatusMTASigned implements RequestStatus {
     public RequestStatusMTASigned(CollectionRequestStatusDTO collectionRequestStatusDTO) {
         statusDate = collectionRequestStatusDTO.getStatusDate();
         status = collectionRequestStatusDTO.getStatus();
+        userId = collectionRequestStatusDTO.getStatusUserId();
     }
 
     @Override
@@ -65,7 +68,12 @@ public class RequestStatusMTASigned implements RequestStatus {
     }
 
     @Override
-    public String getTableRow() {
-        return "<tr><td>" + statusDate + "</td><td>contacted</td><td></td><td></tr>";
+    public JSONObject getJsonEntry() {
+        JSONObject statusJson = new JSONObject();
+        statusJson.put("Status", getStatus());
+        statusJson.put("Description", getStatusText());
+        statusJson.put("Date", dateFormat.format(getStatusDate()));
+        statusJson.put("UserId", userId);
+        return statusJson;
     }
 }
