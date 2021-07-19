@@ -281,13 +281,14 @@ public class DatabaseUtilNotification {
         return new HashMap<>();
     }
 
-    public Map<String, String> getBiobankEmailAddresses(Integer biobankId) {
+    public Map<String, String> getCollectionEmailAddressesByBiobankIdAndRequestId(Integer biobankId, Integer requestId) {
         try (Config config = ConfigFactory.get()) {
             Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                     .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                    .where(Tables.COLLECTION.BIOBANK_ID.eq(biobankId))
+                    .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                    .where(Tables.COLLECTION.BIOBANK_ID.eq(biobankId).and(Tables.QUERY_COLLECTION.QUERY_ID.eq(requestId)))
                     .fetch();
             return mapEmailAddressesAndNames(record);
         } catch (Exception ex) {

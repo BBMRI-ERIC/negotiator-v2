@@ -42,7 +42,7 @@ public class NotificationNewPrivateComment extends Notification {
             setCommenterContact();
             setComment();
 
-            Map<String, String> emailAddressesAndNames = getBiobankEmailAddressesAndNames();
+            Map<String, String> emailAddressesAndNames = getCollectionEmailAddressesAndNames();
             emailAddressesAndNames.remove(researcherEmailAddresse);
             emailAddressesAndNames.remove(commenterEmailAddresse);
 
@@ -68,8 +68,8 @@ public class NotificationNewPrivateComment extends Notification {
         commentRecord = databaseUtil.getDatabaseUtilRequest().getPrivateComment(commentId);
     }
 
-    private Map<String, String> getBiobankEmailAddressesAndNames() {
-        return databaseUtil.getDatabaseUtilNotification().getBiobankEmailAddresses(commentRecord.getBiobankInPrivateChat());
+    private Map<String, String> getCollectionEmailAddressesAndNames() {
+        return databaseUtil.getDatabaseUtilNotification().getCollectionEmailAddressesByBiobankIdAndRequestId(commentRecord.getBiobankInPrivateChat(), requestId);
     }
 
     private void prepareNotificationForResearcher(String subject) {
