@@ -199,7 +199,7 @@ public class DbUtil {
      */
     public static ListOfDirectoriesRecord getDirectoryByUrl(Config config, String url) {
         int endindex = url.indexOf("/", 9);
-        if(endindex == -1) {
+        if (endindex == -1) {
             endindex = url.length();
         }
         url = url.substring(0, endindex);

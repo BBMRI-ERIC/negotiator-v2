@@ -244,6 +244,7 @@ public class QueryBean implements Serializable {
        }
        catch (Exception e) {
            logger.error("Loading by url faild url: " + url + " jsonQueryId: " + jsonQueryId, e);
+           e.printStackTrace();
        }
        return "";
    }
@@ -254,6 +255,11 @@ public class QueryBean implements Serializable {
    public String saveQuery() throws SQLException {
        try (Config config = ConfigFactory.get()) {
            /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
+
+           // Hack for Locator
+           jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
+           jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
+
            if(id != null) {
                DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest);
                requestLifeCycleStatus = new RequestLifeCycleStatus(id);

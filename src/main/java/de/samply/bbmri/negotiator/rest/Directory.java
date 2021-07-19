@@ -186,6 +186,10 @@ public class Directory {
                  * Update the existing query in the next step (newQuery.xhtml page) and return the new URL back to the directory.
                  */
 
+                // Hack for Locator
+                queryString = queryString.replaceAll("collectionid", "collectionId");
+                queryString = queryString.replaceAll("biobankid", "biobankId");
+
                 JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
                 jsonQueryRecord.setJsonText(queryString);
                 jsonQueryRecord.store();
