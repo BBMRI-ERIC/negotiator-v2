@@ -94,7 +94,7 @@
 					<span class="searchparametertooltiparea">
 						<ui:repeat value="#{directoryBean.directories}" var="directory">
 							<h:form>
-								<h:commandLink action="#{queryBean.addSearchParameters(directory.restUrl)}"	styleClass="btn btn-primary searchparametertooltipareabtn"
+								<h:commandLink action="#{queryBean.addSearchParameters(directory.url)}"	styleClass="btn btn-primary searchparametertooltipareabtn"
 											   title="#{directory.name}">
 									#{directory.name}
 								</h:commandLink>
