@@ -74,72 +74,59 @@
         <br />
         <!--        Function for the show more button        -->
         <h4 style="width: 100%;">#{label['queryview.title.text']}</h4>
-        <div style="white-space: pre-wrap"><span class="more">#{cc.attrs.bean.selectedQuery.text}</span></div>
         <h:outputStylesheet>
-            .morecontent span {
+            .request_description p {
+                display: -webkit-box;
+                -webkit-line-clamp: 3;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            .request_description input[name="togglerequest"]:checked ~ p {
+                -webkit-line-clamp: unset;
+            }
+            .request_description input[name="togglerequestdescription"]:checked ~ p {
+                -webkit-line-clamp: unset;
+            }
+            .request_description input[name="togglerequestethics"]:checked ~ p {
+                -webkit-line-clamp: unset;
+            }
+            .request_description label::after {
+                Content: "show more";
+            }
+            .request_description input[name="togglerequest"]:checked ~ label::after {
+                Content: "show less";
+            }
+            .request_description input[name="togglerequestdescription"]:checked ~ label::after {
+                Content: "show less";
+            }
+            .request_description input[name="togglerequestethics"]:checked ~ label::after {
+                Content: "show less";
+            }
+            .request_description label {
                 display: none;
             }
-            .morelink {
+            .request_description p.truncated + label {
                 display: block;
             }
         </h:outputStylesheet>
-        <h:outputScript>
-            $(document).ready(function() {
-
-                var moretext = "Show full text";
-                var lesstext = "Show less";
-
-                // read the lines of the span
-                var lines = [];
-                $.each($('.more').text().split(/\n/), function(i, line){
-                    if(line){
-                        lines.push(line);
-                    } else {
-                        lines.push("");
-                    }
-                });
-
-                // how many lines we want to display (2 more are grayed out)
-                var showLines = 5;
-
-                if(lines.length > showLines + 2) {
-                    var shownContent = lines.slice(0, showLines).join("\n");
-                    var grayedOutLines = lines.slice(showLines, showLines+2).join("\n");
-                    var hiddenContent = lines.slice(showLines+2).join("\n");
 
 
-                    var html = shownContent +
-                        '<div id="grayoutarea" class="a-expander-content-fade">' + grayedOutLines + '</div>' +
-                        '<span class="moreellipses">&nbsp;</span><span class="morecontent"><span>' + hiddenContent + '</span>&nbsp;&nbsp;<a  style="width: 100px" class="morelink label label-default">' + moretext + '</a></span>';
-
-
-                    $('.more').html(html);
-                }
-
-
-
-
-                $(".morelink").click(function(){
-                    if($(this).hasClass("less")) {
-                        $(this).removeClass("less");
-                        $(this).html(moretext);
-                        // add grayout
-                        $("#grayoutarea").addClass("a-expander-content-fade");
-                    } else {
-                        $(this).addClass("less");
-                        $(this).html(lesstext);
-                        // remove grayout
-                        $("#grayoutarea").removeClass("a-expander-content-fade");
-                }
-                $(this).parent().prev().toggle();
-                $(this).prev().toggle();
-                return false;
-                });
-            });
-        </h:outputScript>
+        <div class="box request_description">
+            <input type="checkbox" name="togglerequest" id="togglerequest" style="display: none;" />
+            <p>#{cc.attrs.bean.selectedQuery.text}</p>
+            <label for = "togglerequest"></label>
+        </div>
 
         <h4>#{label['queryview.title.requestdescription']}</h4>
-        <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.requestDescription}</p>
+        <div class="box request_description">
+            <input type="checkbox" name="togglerequestdescription" id="togglerequestdescription" style="display: none;" />
+            <p>#{cc.attrs.bean.selectedQuery.requestDescription}</p>
+            <label for = "togglerequestdescription"></label>
+        </div>
+
+
+
+
 
         <h4>#{label['queryview.title.requesterDetails']}</h4>
         <c:set var="requesterDetails" value="#{cc.attrs.bean.getUserDataForResearcher(cc.attrs.bean.selectedQuery.researcherId)}" />
@@ -149,10 +136,20 @@
             <p class="pre-wrap">#{requesterDetails.organization}</p>
         </c:if>
 
-
-
         <h4>#{label['queryview.title.ethicsVote']}</h4>
-        <p class="pre-wrap">#{cc.attrs.bean.selectedQuery.ethicsVote}</p>
+        <div class="box request_description">
+            <input type="checkbox" name="togglerequestethics" id="togglerequestethics" style="display: none;" />
+            <p>#{cc.attrs.bean.selectedQuery.ethicsVote}</p>
+            <label for = "togglerequestethics"></label>
+        </div>
+
+        <h:outputScript>
+            let list = document.querySelectorAll("p");
+
+            list.forEach(item => {
+                item.classList[item.scrollHeight > item.offsetHeight ? "add" : "remove"]("truncated");
+            });
+        </h:outputScript>
 
         <h:panelGroup styleClass="text" layout="block">
             <h:outputLabel value="#{label['queryview.title.searchParameters']}"/>
