@@ -147,27 +147,13 @@ public class OAuth2ClientConfig {
                                         String state, Scope... scopes) throws UnsupportedEncodingException {
         String redirectUri = getLocalRedirectUrl(config, scheme, serverName, port, contextPath, redirectUrl);
 
-        String host = getHost(config, serverName);
+        String host = "https://perun.bbmri-eric.eu";//getHost(config, serverName);
 
         StringBuilder builder = new StringBuilder(host);
-        builder.append("/registrar");
-        builder.append("?client_id=").append(URLEncoder.encode(config.getClientId(), StandardCharsets.UTF_8.displayName()));
-        builder.append("&scope=").append(URLEncoder.encode(StringUtil.join(scopes, " ", new Builder<Scope>() {
-            @Override
-            public String build(Scope o) {
-                return o.getIdentifier();
-            }
-        }), StandardCharsets.UTF_8.displayName()));
-        builder.append("&vo=bbmri");
+        builder.append("/fed/registrar");
+        builder.append("?vo=bbmri");
         builder.append("&targetnew=").append(redirectUri);
         builder.append("&targetexisting=").append(redirectUri);
-        builder.append("&redirect_uri=").append(redirectUri);
-
-        if(!StringUtil.isEmpty(state)) {
-            builder.append("&state=").append(URLEncoder.encode(state, StandardCharsets.UTF_8.displayName()));
-        }
-
-        builder.append("&response_type=code");
 
         return builder.toString();
     }
