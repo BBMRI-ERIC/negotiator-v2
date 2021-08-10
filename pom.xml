@@ -40,7 +40,7 @@
         <database.username>saher</database.username>
         <database.password>saher</database.password>-->
 
-        <database.server>localhost</database.server>
+        <database.server>192.168.51.14</database.server>
         <database.port>5433</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
@@ -94,6 +94,12 @@
             <groupId>javax.el</groupId>
             <artifactId>javax.el-api</artifactId>
             <version>3.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->

@@ -23,12 +23,19 @@
         <c:if test='${cc.attrs.formIdPrefix.equals("_sortStatus_")}'>
             #{cc.attrs.collectionLifeCycleStatus.biobankName} -
         </c:if>
-        #{cc.attrs.collectionLifeCycleStatus.collectionName}
+        #{cc.attrs.collectionLifeCycleStatus.collectionName}<br/>
+        <span style="font-size: 12px; font-style: italic;">
+            #{label['lifecycleCollectionStatus.contacts.representedBy']}:
+            <!-- Display the list of the contacts as tooltip after hovering the number icon-->
+            <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.contacts[0].authName}" escape="false" />
+        </span>
     </div>
     <div class="col-sm-3 col-lg-3">
         #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
         <span style="font-size: 12px; font-style: italic;">
-            <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" />
+            <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" /><br/>
+            #{label['lifecycleCollectionStatus.status.changedBy']}:
+            <h:outputText value="Value for person who changed status" escape="false" />
         </span>
     </div>
     <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
