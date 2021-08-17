@@ -960,40 +960,16 @@ ul {
     -webkit-text-fill-color: transparent;
 }
 
-.moreItemsTooltip {
-    border: 1px solid #c0ccda;
-    background-color: #eee;
-    border-radius: 10px;
+.more-items-tooltip {
     position: relative;
-    display: inline-block;
-    color: #333;
-    padding: 4px 6px;
-    margin-bottom: 0;
     text-align: center;
-    vertical-align: middle;
     cursor: default;
-    line-height: 1.42857143;
-}
-
-.moreItemsTooltip .moreItemsTooltipArea {
-    visibility: hidden;
-    background-color: #eee;
-    color: #333;
-    text-align: left;
-    border-radius: 6px;
     border: 1px solid #c0ccda;
-    padding: 10px;
-    margin: 5px;
-    top: 20px;
+    line-height: 1.42857143;
+    border-radius: 10px;
+    color: #333;
+    padding: 1px 6px;
     white-space: nowrap;
-    overflow: hidden;
-    max-width: 400px;
-
-    /* Position the tooltip */
-    z-index: 1;
-    position: absolute;
-}
-
-.moreItemsTooltip:hover .moreItemsTooltipArea {
-    visibility: visible;
+    text-overflow: ellipsis;
+    margin-left: 5px;
 }
