@@ -46,6 +46,7 @@ import de.samply.bbmri.negotiator.model.QueryCollection;
 import de.samply.share.model.bbmri.BbmriResult;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
+import org.apache.commons.lang.time.StopWatch;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.exception.DataAccessException;
@@ -657,7 +658,7 @@ public class DbUtil {
         List<QueryStatsDTO> result = new ArrayList<QueryStatsDTO>();
         for(Record record : records) {
             QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
-            de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
+            /*de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
             de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
             query.setId((Integer) record.getValue("query_id"));
             query.setTitle((String) record.getValue("query_title"));
@@ -672,16 +673,16 @@ public class DbUtil {
             query.setRequestDescription((String) record.getValue("query_request_description"));
             query.setEthicsVote((String) record.getValue("query_ethics_vote"));
             query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
-            query.setTestRequest((Boolean) record.getValue("query_test_request"));
-            queryStatsDTO.setQuery(query);
-            queryAuthor.setId((Integer) record.getValue("query_author_id"));
+            query.setTestRequest((Boolean) record.getValue("query_test_request"));*/
+            queryStatsDTO.setQuery(mapRequestQuery(record));
+            /*queryAuthor.setId((Integer) record.getValue("query_author_id"));
             queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
             queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
             queryAuthor.setAuthEmail((String) record.getValue("query_author_auth_email"));
             queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
             queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
-            queryAuthor.setOrganization((String) record.getValue("query_author_organization"));
-            queryStatsDTO.setQueryAuthor(queryAuthor);
+            queryAuthor.setOrganization((String) record.getValue("query_author_organization"));*/
+            queryStatsDTO.setQueryAuthor(mapRequestPerson(record));
             queryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
             queryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
             queryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
@@ -786,8 +787,8 @@ public class DbUtil {
         List<OwnerQueryStatsDTO> result = new ArrayList<OwnerQueryStatsDTO>();
         for(Record record : records) {
             OwnerQueryStatsDTO ownerQueryStatsDTO = new OwnerQueryStatsDTO();
-            ownerQueryStatsDTO.setQuery(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class));
-            ownerQueryStatsDTO.setQueryAuthor(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            ownerQueryStatsDTO.setQuery(mapRequestQuery(record));
+            ownerQueryStatsDTO.setQueryAuthor(mapRequestPerson(record));
             ownerQueryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
             ownerQueryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
             ownerQueryStatsDTO.setFlag((Flag) record.getValue("flag"));
@@ -797,6 +798,36 @@ public class DbUtil {
         return result;
     }
 
+    private static de.samply.bbmri.negotiator.jooq.tables.pojos.Query mapRequestQuery(Record record) {
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
+        query.setId((Integer) record.getValue("query_id"));
+        query.setTitle((String) record.getValue("query_title"));
+        query.setText((String) record.getValue("query_text"));
+        query.setQueryXml((String) record.getValue("query_query_xml"));
+        query.setQueryCreationTime((Timestamp) record.getValue("query_query_creation_time"));
+        query.setResearcherId((Integer) record.getValue("query_researcher_id"));
+        query.setJsonText((String) record.getValue("query_json_text"));
+        query.setNumAttachments((Integer) record.getValue("query_num_attachments"));
+        query.setNegotiatorToken((String) record.getValue("query_negotiator_token"));
+        query.setValidQuery((Boolean) record.getValue("query_valid_query"));
+        query.setRequestDescription((String) record.getValue("query_request_description"));
+        query.setEthicsVote((String) record.getValue("query_ethics_vote"));
+        query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
+        query.setTestRequest((Boolean) record.getValue("query_test_request"));
+        return query;
+    }
+
+    private static de.samply.bbmri.negotiator.jooq.tables.pojos.Person mapRequestPerson(Record record) {
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
+        queryAuthor.setId((Integer) record.getValue("query_author_id"));
+        queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
+        queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
+        queryAuthor.setAuthEmail((String) record.getValue("query_author_auth_email"));
+        queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
+        queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
+        queryAuthor.setOrganization((String) record.getValue("query_author_organization"));
+        return queryAuthor;
+    }
 
     /**
      * Returns a list of QueryAttachmentDTO for a specific query.
