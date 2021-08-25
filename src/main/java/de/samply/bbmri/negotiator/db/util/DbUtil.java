@@ -737,7 +737,7 @@ public class DbUtil {
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return MappingDbUtil.mapRecordResultOwnerQueryStatsDTOList(config, fetch);
+        return MappingDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
 
     /**
