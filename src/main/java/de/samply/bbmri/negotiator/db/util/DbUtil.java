@@ -79,8 +79,8 @@ public class DbUtil {
      * @return
      */
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
-        Result<ListOfDirectoriesRecord> records = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
-        return config.map(records, ListOfDirectoriesRecord.class);
+        Result<Record> records = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).fetch();
+        return MappingListDbUtil.mapRecordListOfDirectoriesRecords(records);
     }
 
     /**
@@ -91,8 +91,8 @@ public class DbUtil {
      */
     public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) {
         try {
-            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
-            return config.map(record, ListOfDirectoriesRecord.class);
+            Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
+            return MappingDbUtil.mapRecordListOfDirectoriesRecord(record);
         } catch (IllegalArgumentException e) {
             logger.error("No Directory Entry found for ID: " + listOfDirectoryId);
             e.printStackTrace();
@@ -102,8 +102,8 @@ public class DbUtil {
 
     public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) {
         try {
-            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
-            return config.map(record, ListOfDirectoriesRecord.class);
+            Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
+            return MappingDbUtil.mapRecordListOfDirectoriesRecord(record);
         } catch (IllegalArgumentException e) {
             logger.error("No Directory Entry found for DirectoryName: " + directoryName);
             e.printStackTrace();
@@ -203,7 +203,7 @@ public class DbUtil {
         }
         url = url.substring(0, endindex);
         Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
-        return config.map(record, ListOfDirectoriesRecord.class);
+        return MappingDbUtil.mapRecordListOfDirectoriesRecord(record);
     }
 
     /**
@@ -277,22 +277,7 @@ public class DbUtil {
                 .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
                 .fetch();
 
-          // The mapper does not map the query_xml at all, why?
-//        return config.map(result, QueryDetail.class);
-
-        // So doing this manually
-        List<QueryDetail> queryDetails = new ArrayList<>();
-        for (Record record : result) {
-            QueryDetail queryDetail = new QueryDetail();
-            queryDetail.setQueryId(record.getValue("query_id", Integer.class));
-            queryDetail.setQueryText(record.getValue("query_text", String.class));
-            queryDetail.setQueryTitle(record.getValue("query_title", String.class));
-            queryDetail.setQueryXml(record.getValue("query_xml", String.class));
-
-            queryDetails.add(queryDetail);
-        }
-
-        return queryDetails;
+        return MappingListDbUtil.getQueryDetails(result);
     }
 
     /**
@@ -356,20 +341,20 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord getQueryFromId(Config config, Integer queryId) {
-        Record result = config.dsl()
-                .selectFrom(Tables.QUERY)
+        Record result = config.dsl().select(getFields(Tables.QUERY, "query"))
+                .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(queryId))
                 .fetchOne();
 
-        return config.map(result, QueryRecord.class);
+        return MappingDbUtil.mapRecordQueryRecord(result);
     }
 
     public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getQueryFromIdAsQuery(Config config, Integer queryId) {
-        Record result = config.dsl()
-                .selectFrom(Tables.QUERY)
+        Record result = config.dsl().select(getFields(Tables.QUERY, "query"))
+                .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(queryId))
                 .fetchOne();
-
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Query q1 = MappingDbUtil.mapRequestQuery(result);
         return config.map(result, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
     }
 
@@ -649,7 +634,7 @@ public class DbUtil {
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return MappingDbUtil.mapRecordResultQueryStatsDTOList(records);
+        return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
     }
 
     /**
@@ -737,7 +722,7 @@ public class DbUtil {
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return MappingDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
+        return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
 
     /**
@@ -2558,7 +2543,7 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
                 .or(Tables.PERSON.IS_ADMIN.isTrue()))
                 .fetch();
-        return MappingDbUtil.mapResultPerson(record);
+        return MappingListDbUtil.mapResultPerson(record);
     }
 
     public static void getCollectionsWithLifeCycleStatusProblem(Config config, Integer userId) {

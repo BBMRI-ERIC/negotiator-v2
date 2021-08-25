@@ -1,18 +1,14 @@
 package de.samply.bbmri.negotiator.db.util;
 
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryLifecycleCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.RequestStatusRecord;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import org.jooq.Record;
-import org.jooq.Result;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MappingDbUtil {
 
@@ -51,35 +47,6 @@ public class MappingDbUtil {
         return queryAuthor;
     }
 
-    public static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> dbRecords) {
-        List<QueryStatsDTO> result = new ArrayList<>();
-        for(Record dbRecord : dbRecords) {
-            QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
-            queryStatsDTO.setQuery(mapRequestQuery(dbRecord));
-            queryStatsDTO.setQueryAuthor(mapRequestPerson(dbRecord));
-            queryStatsDTO.setLastCommentTime((Timestamp) dbRecord.getValue("last_comment_time"));
-            queryStatsDTO.setCommentCount((Integer) dbRecord.getValue("comment_count"));
-            queryStatsDTO.setUnreadCommentCount((Integer) dbRecord.getValue("unread_comment_count"));
-            result.add(queryStatsDTO);
-        }
-        return result;
-    }
-
-    public static List<OwnerQueryStatsDTO> mapRecordResultOwnerQueryStatsDTOList(Result<Record> dbRecords) {
-        List<OwnerQueryStatsDTO> result = new ArrayList<>();
-        for(Record dbRecord : dbRecords) {
-            OwnerQueryStatsDTO ownerQueryStatsDTO = new OwnerQueryStatsDTO();
-            ownerQueryStatsDTO.setQuery(mapRequestQuery(dbRecord));
-            ownerQueryStatsDTO.setQueryAuthor(mapRequestPerson(dbRecord));
-            ownerQueryStatsDTO.setCommentCount((Integer) dbRecord.getValue("comment_count"));
-            ownerQueryStatsDTO.setLastCommentTime((Timestamp) dbRecord.getValue("last_comment_time"));
-            ownerQueryStatsDTO.setFlag((Flag) dbRecord.getValue("flag"));
-            ownerQueryStatsDTO.setUnreadCommentCount((Integer) dbRecord.getValue("unread_comment_count"));
-            result.add(ownerQueryStatsDTO);
-        }
-        return result;
-    }
-
     public static RequestStatusDTO mapRequestStatusDTO(RequestStatusRecord requestStatusRecord) {
         RequestStatusDTO requestStatusDTO = new RequestStatusDTO();
         requestStatusDTO.setId(requestStatusRecord.getId());
@@ -105,19 +72,43 @@ public class MappingDbUtil {
         return collectionRequestStatusDTO;
     }
 
-    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> mapResultPerson(Result<Record> dbRecords) {
-        List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> result = new ArrayList<>();
-        for(Record dbRecord : dbRecords) {
-            de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
-            if(dbRecord.getValue("person_id") == null) {
-                continue;
-            }
-            person.setId(dbRecord.getValue("person_id", Integer.class));
-            person.setAuthEmail(dbRecord.getValue("person_auth_email", String.class));
-            person.setAuthName(dbRecord.getValue("person_auth_name", String.class));
-            person.setOrganization(dbRecord.getValue("person_organization", String.class));
-            result.add(person);
-        }
-        return result;
+    public static ListOfDirectoriesRecord mapRecordListOfDirectoriesRecord(Record dbRecord) {
+        ListOfDirectoriesRecord listOfDirectoriesRecord = new ListOfDirectoriesRecord();
+        listOfDirectoriesRecord.setId(dbRecord.getValue("list_of_directories_id", Integer.class));
+        listOfDirectoriesRecord.setName(dbRecord.getValue("list_of_directories_name", String.class));
+        listOfDirectoriesRecord.setUrl(dbRecord.getValue("list_of_directories_url", String.class));
+        listOfDirectoriesRecord.setRestUrl(dbRecord.getValue("list_of_directories_rest_url", String.class));
+        listOfDirectoriesRecord.setUsername(dbRecord.getValue("list_of_directories_username", String.class));
+        listOfDirectoriesRecord.setPassword(dbRecord.getValue("list_of_directories_password", String.class));
+        listOfDirectoriesRecord.setApiUsername(dbRecord.getValue("list_of_directories_api_username", String.class));
+        listOfDirectoriesRecord.setApiPassword(dbRecord.getValue("list_of_directories_api_password", String.class));
+        listOfDirectoriesRecord.setResourceBiobanks(dbRecord.getValue("list_of_directories_resource_biobanks", String.class));
+        listOfDirectoriesRecord.setResourceCollections(dbRecord.getValue("list_of_directories_resource_collections", String.class));
+        listOfDirectoriesRecord.setDescription(dbRecord.getValue("list_of_directories_description", String.class));
+        listOfDirectoriesRecord.setSyncActive(dbRecord.getValue("list_of_directories_sync_active", Boolean.class));
+        listOfDirectoriesRecord.setDirectoryPrefix(dbRecord.getValue("list_of_directories_directory_prefix", String.class));
+        listOfDirectoriesRecord.setResourceNetworks(dbRecord.getValue("list_of_directories_resource_networks", String.class));
+        listOfDirectoriesRecord.setBbmriEricNationalNodes(dbRecord.getValue("list_of_directories_bbmri_eric_national_nodes", Boolean.class));
+        listOfDirectoriesRecord.setApiType(dbRecord.getValue("list_of_directories_api_type", String.class));
+        return listOfDirectoriesRecord;
+    }
+
+    public static QueryRecord mapRecordQueryRecord(Record dbRecord) {
+        QueryRecord queryRecord = new QueryRecord();
+        queryRecord.setId((Integer) dbRecord.getValue("query_id"));
+        queryRecord.setTitle((String) dbRecord.getValue("query_title"));
+        queryRecord.setText((String) dbRecord.getValue("query_text"));
+        queryRecord.setQueryXml((String) dbRecord.getValue("query_query_xml"));
+        queryRecord.setQueryCreationTime((Timestamp) dbRecord.getValue("query_query_creation_time"));
+        queryRecord.setResearcherId((Integer) dbRecord.getValue("query_researcher_id"));
+        queryRecord.setJsonText((String) dbRecord.getValue("query_json_text"));
+        queryRecord.setNumAttachments((Integer) dbRecord.getValue("query_num_attachments"));
+        queryRecord.setNegotiatorToken((String) dbRecord.getValue("query_negotiator_token"));
+        queryRecord.setValidQuery((Boolean) dbRecord.getValue("query_valid_query"));
+        queryRecord.setRequestDescription((String) dbRecord.getValue("query_request_description"));
+        queryRecord.setEthicsVote((String) dbRecord.getValue("query_ethics_vote"));
+        queryRecord.setNegotiationStartedTime((Timestamp) dbRecord.getValue("query_negotiation_started_time"));
+        queryRecord.setTestRequest((Boolean) dbRecord.getValue("query_test_request"));
+        return queryRecord;
     }
 }
