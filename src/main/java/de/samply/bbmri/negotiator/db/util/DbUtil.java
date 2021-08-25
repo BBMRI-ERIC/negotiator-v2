@@ -43,10 +43,8 @@ import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
-import de.samply.share.model.bbmri.BbmriResult;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
-import org.apache.commons.lang.time.StopWatch;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.exception.DataAccessException;
@@ -651,44 +649,7 @@ public class DbUtil {
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return mapRecordResultQueryStatsDTOList(records);
-    }
-
-    private static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> records) {
-        List<QueryStatsDTO> result = new ArrayList<QueryStatsDTO>();
-        for(Record record : records) {
-            QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
-            /*de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
-            de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
-            query.setId((Integer) record.getValue("query_id"));
-            query.setTitle((String) record.getValue("query_title"));
-            query.setText((String) record.getValue("query_text"));
-            query.setQueryXml((String) record.getValue("query_query_xml"));
-            query.setQueryCreationTime((Timestamp) record.getValue("query_query_creation_time"));
-            query.setResearcherId((Integer) record.getValue("query_researcher_id"));
-            query.setJsonText((String) record.getValue("query_json_text"));
-            query.setNumAttachments((Integer) record.getValue("query_num_attachments"));
-            query.setNegotiatorToken((String) record.getValue("query_negotiator_token"));
-            query.setValidQuery((Boolean) record.getValue("query_valid_query"));
-            query.setRequestDescription((String) record.getValue("query_request_description"));
-            query.setEthicsVote((String) record.getValue("query_ethics_vote"));
-            query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
-            query.setTestRequest((Boolean) record.getValue("query_test_request"));*/
-            queryStatsDTO.setQuery(mapRequestQuery(record));
-            /*queryAuthor.setId((Integer) record.getValue("query_author_id"));
-            queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
-            queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
-            queryAuthor.setAuthEmail((String) record.getValue("query_author_auth_email"));
-            queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
-            queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
-            queryAuthor.setOrganization((String) record.getValue("query_author_organization"));*/
-            queryStatsDTO.setQueryAuthor(mapRequestPerson(record));
-            queryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
-            queryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
-            queryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
-            result.add(queryStatsDTO);
-        }
-        return result;
+        return MappingDbUtil.mapRecordResultQueryStatsDTOList(records);
     }
 
     /**
@@ -776,57 +737,7 @@ public class DbUtil {
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        //List<OwnerQueryStatsDTO> t1 = config.map(fetch, OwnerQueryStatsDTO.class);
-        //List<OwnerQueryStatsDTO> t2 = mapRecordResultOwnerQueryStatsDTOList(config, fetch);
-
-		//return config.map(fetch, OwnerQueryStatsDTO.class);
-        return mapRecordResultOwnerQueryStatsDTOList(config, fetch);
-    }
-
-    private static List<OwnerQueryStatsDTO> mapRecordResultOwnerQueryStatsDTOList(Config config, Result<Record> records) {
-        List<OwnerQueryStatsDTO> result = new ArrayList<OwnerQueryStatsDTO>();
-        for(Record record : records) {
-            OwnerQueryStatsDTO ownerQueryStatsDTO = new OwnerQueryStatsDTO();
-            ownerQueryStatsDTO.setQuery(mapRequestQuery(record));
-            ownerQueryStatsDTO.setQueryAuthor(mapRequestPerson(record));
-            ownerQueryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
-            ownerQueryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
-            ownerQueryStatsDTO.setFlag((Flag) record.getValue("flag"));
-            ownerQueryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
-            result.add(ownerQueryStatsDTO);
-        }
-        return result;
-    }
-
-    private static de.samply.bbmri.negotiator.jooq.tables.pojos.Query mapRequestQuery(Record record) {
-        de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
-        query.setId((Integer) record.getValue("query_id"));
-        query.setTitle((String) record.getValue("query_title"));
-        query.setText((String) record.getValue("query_text"));
-        query.setQueryXml((String) record.getValue("query_query_xml"));
-        query.setQueryCreationTime((Timestamp) record.getValue("query_query_creation_time"));
-        query.setResearcherId((Integer) record.getValue("query_researcher_id"));
-        query.setJsonText((String) record.getValue("query_json_text"));
-        query.setNumAttachments((Integer) record.getValue("query_num_attachments"));
-        query.setNegotiatorToken((String) record.getValue("query_negotiator_token"));
-        query.setValidQuery((Boolean) record.getValue("query_valid_query"));
-        query.setRequestDescription((String) record.getValue("query_request_description"));
-        query.setEthicsVote((String) record.getValue("query_ethics_vote"));
-        query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
-        query.setTestRequest((Boolean) record.getValue("query_test_request"));
-        return query;
-    }
-
-    private static de.samply.bbmri.negotiator.jooq.tables.pojos.Person mapRequestPerson(Record record) {
-        de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
-        queryAuthor.setId((Integer) record.getValue("query_author_id"));
-        queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
-        queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
-        queryAuthor.setAuthEmail((String) record.getValue("query_author_auth_email"));
-        queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
-        queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
-        queryAuthor.setOrganization((String) record.getValue("query_author_organization"));
-        return queryAuthor;
+        return MappingDbUtil.mapRecordResultOwnerQueryStatsDTOList(config, fetch);
     }
 
     /**
@@ -2274,21 +2185,9 @@ public class DbUtil {
                 .fetch();
         List<RequestStatusDTO> returnList = new ArrayList<RequestStatusDTO>();
         for(RequestStatusRecord requestStatusRecord : fetch) {
-            returnList.add(mapRequestStatusDTO(requestStatusRecord));
+            returnList.add(MappingDbUtil.mapRequestStatusDTO(requestStatusRecord));
         }
         return returnList;
-    }
-
-    private static RequestStatusDTO mapRequestStatusDTO(RequestStatusRecord requestStatusRecord) {
-        RequestStatusDTO requestStatusDTO = new RequestStatusDTO();
-        requestStatusDTO.setId(requestStatusRecord.getId());
-        requestStatusDTO.setQueryId(requestStatusRecord.getQueryId());
-        requestStatusDTO.setStatus(requestStatusRecord.getStatus());
-        requestStatusDTO.setStatusDate(requestStatusRecord.getStatusDate());
-        requestStatusDTO.setStatusType(requestStatusRecord.getStatusType());
-        requestStatusDTO.setStatusJson(requestStatusRecord.getStatusJson());
-        requestStatusDTO.setStatusUserId(requestStatusRecord.getStatusUserId());
-        return requestStatusDTO;
     }
 
     public static List<CollectionRequestStatusDTO> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
@@ -2299,22 +2198,9 @@ public class DbUtil {
                 .fetch();
         List<CollectionRequestStatusDTO> returnList = new ArrayList<CollectionRequestStatusDTO>();
         for(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord : fetch) {
-            returnList.add(mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
+            returnList.add(MappingDbUtil.mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
         }
         return returnList;
-    }
-
-    private static CollectionRequestStatusDTO mapCollectionRequestStatusDTO(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord) {
-        CollectionRequestStatusDTO collectionRequestStatusDTO = new CollectionRequestStatusDTO();
-        collectionRequestStatusDTO.setId(queryLifecycleCollectionRecord.getId());
-        collectionRequestStatusDTO.setQueryId(queryLifecycleCollectionRecord.getQueryId());
-        collectionRequestStatusDTO.setCollectionId(queryLifecycleCollectionRecord.getCollectionId());
-        collectionRequestStatusDTO.setStatus(queryLifecycleCollectionRecord.getStatus());
-        collectionRequestStatusDTO.setStatusDate(queryLifecycleCollectionRecord.getStatusDate());
-        collectionRequestStatusDTO.setStatusType(queryLifecycleCollectionRecord.getStatusType());
-        collectionRequestStatusDTO.setStatusJson(queryLifecycleCollectionRecord.getStatusJson());
-        collectionRequestStatusDTO.setStatusUserId(queryLifecycleCollectionRecord.getStatusUserId());
-        return collectionRequestStatusDTO;
     }
 
     /*
@@ -2345,7 +2231,7 @@ public class DbUtil {
                 requestStatus = config.dsl().selectFrom(Tables.REQUEST_STATUS)
                         .where(Tables.REQUEST_STATUS.ID.eq(requestStatusId)).fetchOne();
             }
-            return mapRequestStatusDTO(requestStatus);
+            return MappingDbUtil.mapRequestStatusDTO(requestStatus);
         } catch (SQLException e) {
             System.err.println("ERROR saving/updating Request Status.");
             e.printStackTrace();
@@ -2394,7 +2280,7 @@ public class DbUtil {
                 collectionRequestStatus = config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
                         .where(Tables.QUERY_LIFECYCLE_COLLECTION.ID.eq(collectionRequestStatusId)).fetchOne();
             }
-            return mapCollectionRequestStatusDTO(collectionRequestStatus);
+            return MappingDbUtil.mapCollectionRequestStatusDTO(collectionRequestStatus);
         } catch (SQLException e) {
             System.err.println("ERROR saving/updating Request Status.");
             e.printStackTrace();
@@ -2672,23 +2558,7 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
                 .or(Tables.PERSON.IS_ADMIN.isTrue()))
                 .fetch();
-        return mapResultPerson(record);
-    }
-
-    private static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> mapResultPerson(Result<Record> records) {
-        List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> result = new ArrayList<>();
-        for(Record record : records) {
-            de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
-            if(record.getValue("person_id") == null) {
-                continue;
-            }
-            person.setId(record.getValue("person_id", Integer.class));
-            person.setAuthEmail(record.getValue("person_auth_email", String.class));
-            person.setAuthName(record.getValue("person_auth_name", String.class));
-            person.setOrganization(record.getValue("person_organization", String.class));
-            result.add(person);
-        }
-        return result;
+        return MappingDbUtil.mapResultPerson(record);
     }
 
     public static void getCollectionsWithLifeCycleStatusProblem(Config config, Integer userId) {
