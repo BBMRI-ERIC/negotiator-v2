@@ -51,8 +51,10 @@
                 #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
                 <span style="font-size: 12px; font-style: italic;">
                     <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" /><br/>
-                    #{label['lifecycleCollectionStatus.status.changedBy']}:<br/>
-                    <h:outputText value="Value for person who changed status" escape="false" />
+                    <ui:fragment rendered="#{not empty cc.attrs.collectionLifeCycleStatus.lastStatusUsername}">
+                        #{label['lifecycleCollectionStatus.status.changedBy']}:<br/>
+                        <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.lastStatusUsername}" escape="false" />
+                    </ui:fragment>
                 </span>
             </div>
             <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">

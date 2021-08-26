@@ -206,4 +206,9 @@ public class CollectionLifeCycleStatus {
     public boolean checkUserInCollection(Person person) {
         return contactIds.contains(person.getId());
     }
+
+    public String getLastStatusUsername() {
+        RequestStatus status = statusTree.lastEntry().getValue();
+        return dataCache.getUserName((Integer) status.getJsonEntry().get("UserId"));
+    }
 }
