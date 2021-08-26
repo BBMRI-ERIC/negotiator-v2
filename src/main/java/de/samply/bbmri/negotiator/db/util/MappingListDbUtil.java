@@ -1,10 +1,11 @@
 package de.samply.bbmri.negotiator.db.util;
 
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryDetail;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import de.samply.bbmri.negotiator.model.*;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -77,11 +78,59 @@ public class MappingListDbUtil {
         return queryDetails;
     }
 
-    public static List<ListOfDirectoriesRecord> mapRecordListOfDirectoriesRecords(Result<Record> dbRecords) {
+    public static List<ListOfDirectoriesRecord> mapRecordsListOfDirectoriesRecords(Result<Record> dbRecords) {
         List<ListOfDirectoriesRecord> listOfDirectoriesRecords = new ArrayList<>();
         for (Record dbRecord : dbRecords) {
             listOfDirectoriesRecords.add(MappingDbUtil.mapRecordListOfDirectoriesRecord(dbRecord));
         }
         return listOfDirectoriesRecords;
+    }
+
+    public static List<QueryAttachmentDTO> mapRecordsQueryAttachmentDTO(Result<Record> dbRecords) {
+        List<QueryAttachmentDTO> queryAttachmentDTOs = new ArrayList<>();
+        for (Record dbRecord : dbRecords) {
+            queryAttachmentDTOs.add(MappingDbUtil.mapRecordQueryAttachmentDTO(dbRecord));
+        }
+        return queryAttachmentDTOs;
+    }
+
+    public static List<PrivateAttachmentDTO> mapRecordsPrivateAttachmentDTO(Result<Record> dbRecords) {
+        List<PrivateAttachmentDTO> privateAttachmentDTOs = new ArrayList<>();
+        for (Record dbRecord : dbRecords) {
+            privateAttachmentDTOs.add(MappingDbUtil.mapRecordPrivateAttachmentDTO(dbRecord));
+        }
+        return privateAttachmentDTOs;
+    }
+
+    public static List<CommentAttachmentDTO> mapRecordsCommentAttachmentDTO(Result<Record> dbRecords) {
+        List<CommentAttachmentDTO> commentAttachmentDTOs = new ArrayList<>();
+        for (Record dbRecord : dbRecords) {
+            commentAttachmentDTOs.add(MappingDbUtil.mapRecordCommentAttachmentDTO(dbRecord));
+        }
+        return commentAttachmentDTOs;
+    }
+
+    public static List<Collection> mapRecordsCollections(Result<Record> dbRecords) {
+        List<Collection> collections = new ArrayList<>();
+        for (Record dbRecord : dbRecords) {
+            collections.add(MappingDbUtil.mapRecordCollection(dbRecord));
+        }
+        return collections;
+    }
+
+    public static List<BiobankRecord> mapRecordsBiobankRecords(Result<Record> dbRecords) {
+        List<BiobankRecord> biobankRecords = new ArrayList<>();
+        for (Record dbRecord : dbRecords) {
+            biobankRecords.add(MappingDbUtil.mapRecordBiobankRecord(dbRecord));
+        }
+        return biobankRecords;
+    }
+
+    public static List<PersonRecord> mapRecordsPersonRecord(Result<Record> dbRecords) {
+        List<PersonRecord> personRecords = new ArrayList<>();
+        for (Record dbRecord : dbRecords) {
+            personRecords.add(MappingDbUtil.mapRequestPersonRecord(dbRecord));
+        }
+        return personRecords;
     }
 }

@@ -80,7 +80,7 @@ public class DbUtil {
      */
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
         Result<Record> records = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).fetch();
-        return MappingListDbUtil.mapRecordListOfDirectoriesRecords(records);
+        return MappingListDbUtil.mapRecordsListOfDirectoriesRecords(records);
     }
 
     /**
@@ -202,7 +202,12 @@ public class DbUtil {
             endindex = url.length();
         }
         url = url.substring(0, endindex);
-        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
+        Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories"))
+                .from(Tables.LIST_OF_DIRECTORIES)
+                .where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
+        if(record == null) {
+            return null;
+        }
         return MappingDbUtil.mapRecordListOfDirectoriesRecord(record);
     }
 
@@ -354,10 +359,10 @@ public class DbUtil {
                 .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(queryId))
                 .fetchOne();
-        de.samply.bbmri.negotiator.jooq.tables.pojos.Query q1 = MappingDbUtil.mapRequestQuery(result);
-        return config.map(result, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+        return MappingDbUtil.mapRequestQuery(result);
     }
 
+    // TODO: Rework Mapping
     /**
      * Edits/Updates title, description and jsonText of a query.
      * @param title title of the query
@@ -615,7 +620,7 @@ public class DbUtil {
 
         Result<Record> records = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
-                .select(getFields(Tables.PERSON, "query_author"))
+                .select(getFields(Tables.PERSON, "person"))
                 .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
@@ -678,7 +683,7 @@ public class DbUtil {
 
     	Result<Record> fetch = config.dsl()
 				.select(getFields(Tables.QUERY, "query"))
-				.select(getFields(queryAuthor, "query_author"))
+				.select(getFields(queryAuthor, "person"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
@@ -733,91 +738,44 @@ public class DbUtil {
      */
     public static List<QueryAttachmentDTO> getQueryAttachmentRecords(Config config, int queryId) {
         Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY_ATTACHMENT, "attachment"))
+                .select(getFields(Tables.QUERY_ATTACHMENT, "query_attachment"))
                 .from(Tables.QUERY_ATTACHMENT)
                 .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT.ID.asc()).fetch();
-
-        return config.map(result, QueryAttachmentDTO.class);
+        return MappingListDbUtil.mapRecordsQueryAttachmentDTO(result);
     }
 
     public static List<PrivateAttachmentDTO> getPrivateAttachmentRecords(Config config, int queryId) {
         Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY_ATTACHMENT_PRIVATE, "privateAttachment"))
+                .select(getFields(Tables.QUERY_ATTACHMENT_PRIVATE, "query_attachment_private"))
                 .from(Tables.QUERY_ATTACHMENT_PRIVATE)
                 .where(Tables.QUERY_ATTACHMENT_PRIVATE.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT_PRIVATE.ID.asc()).fetch();
 
-        List<PrivateAttachmentDTO> privateAttachmentDTOList = new ArrayList<PrivateAttachmentDTO>();
-        for (Record record : result) {
-            try {
-                PrivateAttachmentDTO privateAttachmentDTO = new PrivateAttachmentDTO();
-                privateAttachmentDTO.setId((Integer) record.getValue("privateAttachment_id"));
-                privateAttachmentDTO.setPersonId((Integer) record.getValue("privateAttachment_person_id"));
-                privateAttachmentDTO.setQueryId((Integer) record.getValue("privateAttachment_query_id"));
-                privateAttachmentDTO.setBiobank_in_private_chat((Integer) record.getValue("privateAttachment_biobank_in_private_chat"));
-                privateAttachmentDTO.setAttachment_time((Timestamp) record.getValue("privateAttachment_attachment_time"));
-                privateAttachmentDTO.setAttachment((String) record.getValue("privateAttachment_attachment"));
-                privateAttachmentDTO.setAttachmentType((String) record.getValue("privateAttachment_attachment_type"));
-                privateAttachmentDTOList.add(privateAttachmentDTO);
-            } catch (Exception ex) {
-                System.err.println("Exception converting record to PrivateAttachmentDTO");
-                ex.printStackTrace();
-            }
-        }
-
-        return privateAttachmentDTOList;
+        return MappingListDbUtil.mapRecordsPrivateAttachmentDTO(result);
     }
 
     public static List<CommentAttachmentDTO> getCommentAttachmentRecords(Config config, int queryId) {
         Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "commentAttachment"))
+                .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "query_attachment_comment"))
                 .from(Tables.QUERY_ATTACHMENT_COMMENT)
                 .where(Tables.QUERY_ATTACHMENT_COMMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT_COMMENT.ID.asc()).fetch();
 
-        List<CommentAttachmentDTO> commentAttachmentDTOList = new ArrayList<CommentAttachmentDTO>();
-        for (Record record : result) {
-            try {
-                CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
-                commentAttachmentDTO.setId((Integer) record.getValue("commentAttachment_id"));
-                commentAttachmentDTO.setQueryId((Integer) record.getValue("commentAttachment_query_id"));
-                commentAttachmentDTO.setCommentId((Integer) record.getValue("commentAttachment_comment_id"));
-                commentAttachmentDTO.setAttachment((String) record.getValue("commentAttachment_attachment"));
-                commentAttachmentDTO.setAttachmentType((String) record.getValue("commentAttachment_attachment_type"));
-                commentAttachmentDTOList.add(commentAttachmentDTO);
-            } catch (Exception ex) {
-                System.err.println("Exception converting record to CommentAttachmentDTO");
-                ex.printStackTrace();
-            }
-        }
-
-        return commentAttachmentDTOList;
+        return MappingListDbUtil.mapRecordsCommentAttachmentDTO(result);
     }
 
     public static List<CommentAttachmentDTO> getCommentAttachments(Config config, Integer commentId) {
-        List<QueryAttachmentCommentRecord> list = config.dsl().selectFrom(Tables.QUERY_ATTACHMENT_COMMENT)
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "query_attachment_comment"))
+                .from(Tables.QUERY_ATTACHMENT_COMMENT)
                 .where(Tables.QUERY_ATTACHMENT_COMMENT.COMMENT_ID.eq(commentId))
                 .fetch();
 
-        List<CommentAttachmentDTO> commentAttachmentList = new ArrayList<CommentAttachmentDTO>();
-        for(QueryAttachmentCommentRecord queryAttachmentCommentRecord : list) {
-            try {
-                CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
-                commentAttachmentDTO.setId(queryAttachmentCommentRecord.getId());
-                commentAttachmentDTO.setCommentId(queryAttachmentCommentRecord.getCommentId());
-                commentAttachmentDTO.setQueryId(queryAttachmentCommentRecord.getQueryId());
-                commentAttachmentDTO.setAttachment(queryAttachmentCommentRecord.getAttachment());
-                commentAttachmentDTO.setAttachmentType(queryAttachmentCommentRecord.getAttachmentType());
-                commentAttachmentList.add(commentAttachmentDTO);
-            } catch (Exception ex) {
-                System.err.println("Exception converting record to CommentAttachmentDTO");
-                ex.printStackTrace();
-            }
-        }
-        return commentAttachmentList;
+        return MappingListDbUtil.mapRecordsCommentAttachmentDTO(result);
     }
 
+    // TODO: Spped sink?
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config
@@ -844,11 +802,12 @@ public class DbUtil {
 
         for(Record record : commentsAndCommenter) {
             CommentPersonDTO commentPersonDTO = new CommentPersonDTO();
-            commentPersonDTO.setComment(config.map(record, Comment.class));
+            commentPersonDTO.setComment(MappingDbUtil.mapRecordComment(record));
             commentPersonDTO.getComment().setId(Integer.parseInt(record.getValue("comment_id").toString()));
-            commentPersonDTO.setPerson(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            commentPersonDTO.setPerson(MappingDbUtil.mapRequestPerson(record));
             commentPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
             commentPersonDTO.setCommentRead(record.getValue("personcomment_read") == null || (boolean) record.getValue("personcomment_read"));
+
             Integer commenterId = commentPersonDTO.getPerson().getId();
             if(!personCollections.containsKey(commenterId)) {
                 Result<Record> collections = config.dsl()
@@ -860,7 +819,7 @@ public class DbUtil {
                                 .and(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                         .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
                         .fetch();
-                personCollections.put(commenterId, config.map(collections, Collection.class));
+                personCollections.put(commenterId, MappingListDbUtil.mapRecordsCollections(collections));
             }
             commentPersonDTO.setCollections(personCollections.get(commenterId));
             result.add(commentPersonDTO);
@@ -1079,12 +1038,12 @@ public class DbUtil {
 
     // Create Script to collect all biobanknames for a query
     public static List<BiobankRecord> getBiobanks(Config config) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.BIOBANK))
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.BIOBANK, "biobank"))
                     .from(Tables.BIOBANK)
                     .orderBy(Tables.BIOBANK.ID)
                     .fetch();
 
-        return config.map(record, BiobankRecord.class);
+        return MappingListDbUtil.mapRecordsBiobankRecords(record);
     }
 
     /**
@@ -1103,7 +1062,7 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId)).and(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
                 .orderBy(Tables.BIOBANK.ID).fetch();
 
-          return config.map(record, BiobankRecord.class);
+          return MappingListDbUtil.mapRecordsBiobankRecords(record);
 
     }
 
@@ -1117,7 +1076,7 @@ public class DbUtil {
                 config.dsl().select(getFields(Tables.PERSON, "person")).from(Tables.PERSON).orderBy(Tables.PERSON
                         .AUTH_NAME).fetch();
 
-        return config.map(record, PersonRecord.class);
+        return MappingListDbUtil.mapRecordsPersonRecord(record);
     }
 
     /**

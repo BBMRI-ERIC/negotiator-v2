@@ -1,11 +1,11 @@
 package de.samply.bbmri.negotiator.db.util;
 
-import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryLifecycleCollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.RequestStatusRecord;
-import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
-import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.jooq.tables.records.*;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.model.*;
 import org.jooq.Record;
 
 import java.sql.Timestamp;
@@ -16,8 +16,8 @@ public class MappingDbUtil {
 
     }
 
-    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query mapRequestQuery(Record dbRecord) {
-        de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
+    public static Query mapRequestQuery(Record dbRecord) {
+        Query query = new Query();
         query.setId((Integer) dbRecord.getValue("query_id"));
         query.setTitle((String) dbRecord.getValue("query_title"));
         query.setText((String) dbRecord.getValue("query_text"));
@@ -35,16 +35,28 @@ public class MappingDbUtil {
         return query;
     }
 
-    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Person mapRequestPerson(Record dbRecord) {
-        de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
-        queryAuthor.setId((Integer) dbRecord.getValue("query_author_id"));
-        queryAuthor.setAuthSubject((String) dbRecord.getValue("query_author_auth_subject"));
-        queryAuthor.setAuthName((String) dbRecord.getValue("query_author_auth_name"));
-        queryAuthor.setAuthEmail((String) dbRecord.getValue("query_author_auth_email"));
-        queryAuthor.setPersonImage((byte[]) dbRecord.getValue("query_author_person_image"));
-        queryAuthor.setIsAdmin((Boolean) dbRecord.getValue("query_author_is_admin"));
-        queryAuthor.setOrganization((String) dbRecord.getValue("query_author_organization"));
-        return queryAuthor;
+    public static Person mapRequestPerson(Record dbRecord) {
+        Person person = new Person();
+        person.setId((Integer) dbRecord.getValue("person_id"));
+        person.setAuthSubject((String) dbRecord.getValue("person_auth_subject"));
+        person.setAuthName((String) dbRecord.getValue("person_auth_name"));
+        person.setAuthEmail((String) dbRecord.getValue("person_auth_email"));
+        person.setPersonImage((byte[]) dbRecord.getValue("person_person_image"));
+        person.setIsAdmin((Boolean) dbRecord.getValue("person_is_admin"));
+        person.setOrganization((String) dbRecord.getValue("person_organization"));
+        return person;
+    }
+
+    public static PersonRecord mapRequestPersonRecord(Record dbRecord) {
+        PersonRecord personRecord = new PersonRecord();
+        personRecord.setId((Integer) dbRecord.getValue("person_id"));
+        personRecord.setAuthSubject((String) dbRecord.getValue("person_auth_subject"));
+        personRecord.setAuthName((String) dbRecord.getValue("person_auth_name"));
+        personRecord.setAuthEmail((String) dbRecord.getValue("person_auth_email"));
+        personRecord.setPersonImage((byte[]) dbRecord.getValue("person_person_image"));
+        personRecord.setIsAdmin((Boolean) dbRecord.getValue("person_is_admin"));
+        personRecord.setOrganization((String) dbRecord.getValue("person_organization"));
+        return personRecord;
     }
 
     public static RequestStatusDTO mapRequestStatusDTO(RequestStatusRecord requestStatusRecord) {
@@ -110,5 +122,68 @@ public class MappingDbUtil {
         queryRecord.setNegotiationStartedTime((Timestamp) dbRecord.getValue("query_negotiation_started_time"));
         queryRecord.setTestRequest((Boolean) dbRecord.getValue("query_test_request"));
         return queryRecord;
+    }
+
+    public static QueryAttachmentDTO mapRecordQueryAttachmentDTO(Record dbRecord) {
+        QueryAttachmentDTO queryAttachmentDTO = new QueryAttachmentDTO();
+        queryAttachmentDTO.setId(dbRecord.getValue("query_attachment_id", Integer.class));
+        queryAttachmentDTO.setQueryId(dbRecord.getValue("query_attachment_query_id", Integer.class));
+        queryAttachmentDTO.setAttachment(dbRecord.getValue("query_attachment_attachment", String.class));
+        queryAttachmentDTO.setAttachmentType(dbRecord.getValue("query_attachment_attachment_type", String.class));
+        return queryAttachmentDTO;
+    }
+
+    public static PrivateAttachmentDTO mapRecordPrivateAttachmentDTO(Record dbRecord) {
+        PrivateAttachmentDTO privateAttachmentDTO = new PrivateAttachmentDTO();
+        privateAttachmentDTO.setId(dbRecord.getValue("query_attachment_private_id", Integer.class));
+        privateAttachmentDTO.setPersonId(dbRecord.getValue("query_attachment_private_person_id", Integer.class));
+        privateAttachmentDTO.setQueryId(dbRecord.getValue("query_attachment_private_query_id", Integer.class));
+        privateAttachmentDTO.setBiobank_in_private_chat(dbRecord.getValue("query_attachment_private_biobank_in_private_chat", Integer.class));
+        privateAttachmentDTO.setAttachment_time(dbRecord.getValue("query_attachment_private_attachment_time", Timestamp.class));
+        privateAttachmentDTO.setAttachment(dbRecord.getValue("query_attachment_private_attachment", String.class));
+        privateAttachmentDTO.setAttachmentType(dbRecord.getValue("query_attachment_private_attachment_type", String.class));
+        return privateAttachmentDTO;
+    }
+
+    public static CommentAttachmentDTO mapRecordCommentAttachmentDTO(Record dbRecord) {
+        CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
+        commentAttachmentDTO.setId(dbRecord.getValue("query_attachment_comment_id", Integer.class));
+        commentAttachmentDTO.setQueryId(dbRecord.getValue("query_attachment_comment_query_id", Integer.class));
+        commentAttachmentDTO.setCommentId(dbRecord.getValue("query_attachment_comment_comment_id", Integer.class));
+        commentAttachmentDTO.setAttachment(dbRecord.getValue("query_attachment_comment_attachment", String.class));
+        commentAttachmentDTO.setAttachmentType(dbRecord.getValue("query_attachment_comment_attachment_type", String.class));
+        return commentAttachmentDTO;
+    }
+
+    public static Comment mapRecordComment(Record dbRecord) {
+        Comment comment = new Comment();
+        comment.setId(dbRecord.getValue("comment_id", Integer.class));
+        comment.setQueryId(dbRecord.getValue("comment_query_id", Integer.class));
+        comment.setPersonId(dbRecord.getValue("comment_person_id", Integer.class));
+        comment.setCommentTime(dbRecord.getValue("comment_comment_time", Timestamp.class));
+        comment.setText(dbRecord.getValue("comment_text", String.class));
+        comment.setAttachment(dbRecord.getValue("comment_attachment", Boolean.class));
+        comment.setStatus(dbRecord.getValue("comment_status", String.class));
+        return comment;
+    }
+
+    public static Collection mapRecordCollection(Record dbRecord) {
+        Collection collection = new Collection();
+        collection.setId(dbRecord.getValue("collection_id", Integer.class));
+        collection.setName(dbRecord.getValue("collection_name", String.class));
+        collection.setDirectoryId(dbRecord.getValue("collection_directory_id", String.class));
+        collection.setBiobankId(dbRecord.getValue("collection_biobank_id", Integer.class));
+        collection.setListOfDirectoriesId(dbRecord.getValue("collection_list_of_directories_id", Integer.class));
+        return collection;
+    }
+
+    public static BiobankRecord mapRecordBiobankRecord(Record dbRecord) {
+        BiobankRecord biobankRecord = new BiobankRecord();
+        biobankRecord.setId(dbRecord.getValue("biobank_id", Integer.class));
+        biobankRecord.setName(dbRecord.getValue("biobank_name", String.class));
+        biobankRecord.setDescription(dbRecord.getValue("biobank_description", String.class));
+        biobankRecord.setDirectoryId(dbRecord.getValue("biobank_directory_id", String.class));
+        biobankRecord.setListOfDirectoriesId(dbRecord.getValue("biobank_list_of_directories_id", Integer.class));
+        return biobankRecord;
     }
 }
