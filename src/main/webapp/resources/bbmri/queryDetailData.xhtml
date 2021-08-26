@@ -73,7 +73,7 @@
         </h:panelGroup>
         <br />
         <!--        Function for the show more button        -->
-        <h4 style="width: 100%;">#{label['queryview.title.text']}</h4>
+        <h4 style="padding-top: 20px;float: none;clear: both;text-align: left;border-bottom: 1px dotted #7a7a7a;">#{label['queryview.title.text']}</h4>
         <h:outputStylesheet>
             .request_description p {
                 display: -webkit-box;
@@ -117,7 +117,7 @@
             <label for = "togglerequest"></label>
         </div>
 
-        <h4>#{label['queryview.title.requestdescription']}</h4>
+        <h4 style="text-align: left;border-bottom:1px dotted #7a7a7a;">#{label['queryview.title.requestdescription']}</h4>
         <div class="box request_description">
             <input type="checkbox" name="togglerequestdescription" id="togglerequestdescription" style="display: none;" />
             <p>#{cc.attrs.bean.selectedQuery.requestDescription}</p>
@@ -128,7 +128,7 @@
 
 
 
-        <h4>#{label['queryview.title.requesterDetails']}</h4>
+        <h4 style="text-align: left;border-bottom:1px dotted #7a7a7a;">#{label['queryview.title.requesterDetails']}</h4>
         <c:set var="requesterDetails" value="#{cc.attrs.bean.getUserDataForResearcher(cc.attrs.bean.selectedQuery.researcherId)}" />
         <c:if test="#{requesterDetails != Null}">
             <p class="pre-wrap">#{requesterDetails.authName}</p>
@@ -136,7 +136,7 @@
             <p class="pre-wrap">#{requesterDetails.organization}</p>
         </c:if>
 
-        <h4>#{label['queryview.title.ethicsVote']}</h4>
+        <h4 style="text-align: left;border-bottom:1px dotted #7a7a7a;">#{label['queryview.title.ethicsVote']}</h4>
         <div class="box request_description">
             <input type="checkbox" name="togglerequestethics" id="togglerequestethics" style="display: none;" />
             <p>#{cc.attrs.bean.selectedQuery.ethicsVote}</p>
@@ -152,7 +152,7 @@
         </h:outputScript>
 
         <h:panelGroup styleClass="text" layout="block">
-            <h:outputLabel value="#{label['queryview.title.searchParameters']}"/>
+            <h4 style="text-align: left;border-bottom:1px dotted #7a7a7a;">#{label['queryview.title.searchParameters']}"</h4>
             <h:outputText
                     value="#{cc.attrs.bean.humanReadableQuery}"
                     style="margin-left: 22px;"

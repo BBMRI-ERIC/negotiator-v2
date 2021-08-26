@@ -32,6 +32,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.QueryBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,18 +98,27 @@ public class QueryDTO {
     }
 
     public String getHumanReadable() {
-        String humanReadable = "";
+        StringBuilder humanReadable = new StringBuilder();
         try(Config config = ConfigFactory.get()) {
             for (QuerySearchDTO querySearchDTO : searchQueries) {
                 String humanReadableString = querySearchDTO.getHumanReadable();
                 int numberOfCollections = querySearchDTO.getNumberOfCollections();
-                String directory = DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl()).getName();
-                humanReadable += directory + " (" + numberOfCollections + "): " + humanReadableString + "<br>";
+                ListOfDirectoriesRecord listOfDirectoriesRecord = DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl());
+                String directory = "-";
+                if(listOfDirectoriesRecord != null) {
+                    directory = listOfDirectoriesRecord.getName();
+                }
+                humanReadable.append(directory);
+                humanReadable.append(" (");
+                humanReadable.append(numberOfCollections);
+                humanReadable.append("): ");
+                humanReadable.append(humanReadableString);
+                humanReadable.append("<br>");
             }
         } catch (Exception e) {
             logger.error("Falid generating HumanReadable form", e);
             return "-";
         }
-        return humanReadable;
+        return humanReadable.toString();
     }
 }
