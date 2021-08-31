@@ -111,7 +111,7 @@ public class ServletListener implements ServletContextListener {
             logger.info("Starting directory synchronize task timer");
 
             timer = new Timer();
-           // timer.schedule(new DirectorySynchronizeTask(), 10000, 1000 * 60 * 60);
+            timer.schedule(new DirectorySynchronizeTask(), 10000, 1000 * 60 * 60);
 
             notificationScheduledExecutorTimer = new Timer();
             NotificationScheduledExecutor notificationScheduledExecutor = new NotificationScheduledExecutor();
