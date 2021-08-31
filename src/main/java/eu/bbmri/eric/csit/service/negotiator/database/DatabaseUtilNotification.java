@@ -263,7 +263,9 @@ public class DatabaseUtilNotification {
             Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
                     "JOIN person_collection pc ON p.id = pc.person_id\n" +
                     "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
-                    "WHERE qc.query_id = " + requestId + " AND pc.collection_id NOT IN \n" +
+                    "LEFT JOIN public.flagged_query fq ON qc.query_id = fq.query_id AND pc.person_id = fq.person_id " +
+                    "WHERE qc.query_id = " + requestId + " AND (fq.flag != 'ARCHIVED' OR fq.flag IS NULL)" +
+                    " AND pc.collection_id NOT IN \n" +
                     "(SELECT collection_id FROM \n" +
                     "(SELECT collection_id, status FROM query_lifecycle_collection WHERE query_id = " + requestId + " ORDER BY status_date DESC LIMIT 1) AS subcollectionsstatus\n" +
                     "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "' AND " +
