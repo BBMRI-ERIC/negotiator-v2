@@ -266,7 +266,9 @@ public class DatabaseUtilNotification {
                     "WHERE qc.query_id = " + requestId + " AND pc.collection_id NOT IN \n" +
                     "(SELECT collection_id FROM \n" +
                     "(SELECT collection_id, status FROM query_lifecycle_collection WHERE query_id = " + requestId + " ORDER BY status_date DESC LIMIT 1) AS subcollectionsstatus\n" +
-                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "');")
+                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "' AND " +
+                    "status ILIKE '" + LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE + "' AND " +
+                    "status ILIKE '" + LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_NOT_ACCESSIBLE +"');")
                     .fetch();
 
             return map2EmailAddressesAndNames(record);
