@@ -1734,6 +1734,7 @@ public class DbUtil {
                 .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
                 .select(Tables.PERSON_OFFER.READ.count().as("unread_private_negotiation_count"))
+                .select(Tables.COLLECTION.ID.countDistinct().as("number_of_collections"))
                 .from(Tables.OFFER)
                 .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT))
                 .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))

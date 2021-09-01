@@ -549,7 +549,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
 			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
-			queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
+			int unread_private_negotiation_count = result.get(0).getValue("unread_private_negotiation_count", Integer.class) / result.get(0).getValue("number_of_collections", Integer.class);
+			queries.get(index).setUnreadPrivateNegotiationCount(unread_private_negotiation_count);
 		} catch (SQLException e) {
 			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
 			e.printStackTrace();
