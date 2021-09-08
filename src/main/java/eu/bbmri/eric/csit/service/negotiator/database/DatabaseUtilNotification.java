@@ -258,7 +258,7 @@ public class DatabaseUtilNotification {
         return null;
     }
 
-    public Map<String, String> getFilterdBiobanksEmailAddressesAndNamesForRequest(Integer requestId, Integer personId) {
+    public Map<String, String> getFilterdBiobanksEmailAddressesAndNamesForRequest(Integer requestId) {
         try (Config config = ConfigFactory.get()) {
             Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
                     "JOIN person_collection pc ON p.id = pc.person_id\n" +
@@ -267,19 +267,23 @@ public class DatabaseUtilNotification {
                     "WHERE qc.query_id = " + requestId + " AND (fq.flag != 'ARCHIVED' OR fq.flag IS NULL)" +
                     " AND pc.collection_id NOT IN \n" +
                     "(SELECT collection_id FROM \n" +
-                    "(SELECT collection_id, status FROM query_lifecycle_collection WHERE query_id = " + requestId + " ORDER BY status_date DESC LIMIT 1) AS subcollectionsstatus\n" +
-                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "' AND " +
-                    "status ILIKE '" + LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE + "' AND " +
-                    "status ILIKE '" + LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_NOT_ACCESSIBLE +"');")
+                    "(SELECT collection_id, LAST_VALUE(status) OVER( PARTITION BY collection_id ORDER BY status_date RANGE BETWEEN \n" +
+                            "            UNBOUNDED PRECEDING AND \n" +
+                            "            UNBOUNDED FOLLOWING) status " +
+                            "FROM query_lifecycle_collection WHERE query_id = " + requestId + ") AS subcollectionsstatus\n" +
+                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "' OR " +
+                    "status ILIKE '" + LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE + "' OR " +
+                    "status ILIKE '" + LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_NOT_ACCESSIBLE +"')" +
+                    " GROUP BY auth_email, auth_name;")
                     .fetch();
 
             return map2EmailAddressesAndNames(record);
         } catch (Exception ex) {
             NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,
                     "8882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for requestId: " +
-                            requestId + ", removing all from same collection as personId: " + personId + ".");
+                            requestId + ".");
             System.err.println("8882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for requestId: " +
-                    requestId + ", removing all from same collection as personId: " + personId + ".");
+                    requestId + ".");
             ex.printStackTrace();
         }
         return new HashMap<>();

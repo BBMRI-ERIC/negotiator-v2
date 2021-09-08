@@ -23,7 +23,7 @@ public class NotificationContacts {
         if(triggerPerson == null) {
             return new HashMap<>();
         }
-        return databaseUtil.getDatabaseUtilNotification().getFilterdBiobanksEmailAddressesAndNamesForRequest(requestId, triggerPerson.getId());
+        return databaseUtil.getDatabaseUtilNotification().getFilterdBiobanksEmailAddressesAndNamesForRequest(requestId);
     }
 
     public Integer getNotificationType() {
