@@ -8,6 +8,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
       xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri">
 
 <composite:interface>
@@ -25,17 +26,35 @@
          alt=""/>
 
         <h:form id="status-form">
-
             <div class="col-sm-3 col-lg-3">
                 <c:if test='${cc.attrs.formIdPrefix.equals("_sortStatus_")}'>
                     #{cc.attrs.collectionLifeCycleStatus.biobankName} -
                 </c:if>
-                #{cc.attrs.collectionLifeCycleStatus.collectionName}
+                #{cc.attrs.collectionLifeCycleStatus.collectionName}<br/>
+                <span style="font-size: 12px; font-style: italic;">
+                    #{label['lifecycleCollectionStatus.contacts.representedBy']}:<br/>
+                    <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.contacts[0].authName}" escape="false"/>
+                    <ui:fragment rendered="#{cc.attrs.collectionLifeCycleStatus.contacts.size() > 1}">
+                        <h:outputText id="tooltip-area" styleClass="more-items-tooltip" value="+#{cc.attrs.collectionLifeCycleStatus.contacts.size()-1}" escape="false"/>
+                        <p:tooltip for="tooltip-area">
+                            <ui:repeat value="#{cc.attrs.collectionLifeCycleStatus.contacts}" var="cotact" varStatus="status">
+                                <ui:fragment rendered="#{status.index gt 0}">
+                                    <h:outputText value="#{cotact.authName}"/>
+                                    <br/>
+                                </ui:fragment>
+                            </ui:repeat>
+                        </p:tooltip>
+                    </ui:fragment>
+                </span>
             </div>
             <div class="col-sm-3 col-lg-3">
                 #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
                 <span style="font-size: 12px; font-style: italic;">
-                    <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" />
+                    <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" /><br/>
+                    <ui:fragment rendered="#{not empty cc.attrs.collectionLifeCycleStatus.lastStatusUsername}">
+                        #{label['lifecycleCollectionStatus.status.changedBy']}:<br/>
+                        <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.lastStatusUsername}" escape="false" />
+                    </ui:fragment>
                 </span>
             </div>
             <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">

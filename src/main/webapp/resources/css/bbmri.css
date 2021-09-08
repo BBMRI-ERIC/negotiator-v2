@@ -959,3 +959,17 @@ ul {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
+
+.more-items-tooltip {
+    position: relative;
+    text-align: center;
+    cursor: default;
+    border: 1px solid #c0ccda;
+    line-height: 1.42857143;
+    border-radius: 10px;
+    color: #333;
+    padding: 1px 6px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-left: 5px;
+}

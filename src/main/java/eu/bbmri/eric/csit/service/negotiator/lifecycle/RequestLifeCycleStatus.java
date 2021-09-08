@@ -314,4 +314,9 @@ public class RequestLifeCycleStatus {
         }
         return returnList;
     }
+
+    public String getLastStatusUsername() {
+        RequestStatus status = statusTree.lastEntry().getValue();
+        return dataCache.getUserName((Integer) status.getJsonEntry().get("UserId"));
+    }
 }
