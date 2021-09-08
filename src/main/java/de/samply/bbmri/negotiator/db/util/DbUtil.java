@@ -1298,9 +1298,14 @@ public class DbUtil {
      */
     public static QueryRecord saveQuery(Config config, String title,
                                         String text, String requestDescription, String jsonText, String ethicsVote, int researcherId,
+                                        String nToken,
                                         Boolean validQuery, String researcher_name, String researcher_email, String researcher_organization,
                                         Boolean testRequest) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
+
+        if(nToken == null || nToken.isEmpty()) {
+            nToken = UUID.randomUUID().toString().replace("-", "");
+        }
 
         queryRecord.setJsonText(jsonText);
         queryRecord.setQueryCreationTime(new Timestamp(new Date().getTime()));
@@ -1309,7 +1314,7 @@ public class DbUtil {
         queryRecord.setTitle(title);
         queryRecord.setEthicsVote(ethicsVote);
         queryRecord.setResearcherId(researcherId);
-        queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
+        queryRecord.setNegotiatorToken(nToken);
         queryRecord.setNumAttachments(0);
         queryRecord.setValidQuery(validQuery);
         queryRecord.setResearcherName(researcher_name);

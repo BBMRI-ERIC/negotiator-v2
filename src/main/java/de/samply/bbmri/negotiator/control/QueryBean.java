@@ -50,6 +50,10 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONAware;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -272,8 +276,11 @@ public class QueryBean implements Serializable {
                config.commit();
                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
            } else {
+               if(jsonQuery.contains("nToken")) {
+                   this.qtoken = getRequestToken(jsonQuery);
+               }
                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                       jsonQuery, ethicsVote, userBean.getUserId(),
+                       jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
                        true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                        testRequest);
                config.commit();
@@ -289,6 +296,24 @@ public class QueryBean implements Serializable {
            e.printStackTrace();
        }
        return "/researcher/index";
+   }
+
+   private String getRequestToken(String jsonString) {
+       String token = "";
+       try {
+           JSONParser parser = new JSONParser(JSONParser.MODE_PERMISSIVE);
+           JSONObject elements = (JSONObject) parser.parse(jsonString);
+           String array = elements.getAsString("searchQueries");
+           JSONArray elementsArray = (JSONArray) parser.parse(array);
+           for (Object element : elementsArray) {
+               JSONObject object = (JSONObject) element;
+               token = object.getAsString("nToken");
+           }
+           token = token.replaceAll("__search__.*", "");
+       } catch (Exception e) {
+           System.err.println("Count not create nToken");
+       }
+       return token;
    }
 
    private void checkLifeCycleStatus(Config config, Integer queryId, boolean testRequest) {
@@ -481,8 +506,11 @@ public class QueryBean implements Serializable {
 
         try (Config config = ConfigFactory.get()) {
             if (id == null) {
+                if(jsonQuery.contains("nToken")) {
+                    this.qtoken = getRequestToken(jsonQuery);
+                }
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, ethicsVote, userBean.getUserId(),
+                        jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
                         false, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                         testRequest);
                 config.commit();
