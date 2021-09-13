@@ -30,8 +30,10 @@
                 <c:if test='${cc.attrs.formIdPrefix.equals("_sortStatus_")}'>
                     #{cc.attrs.collectionLifeCycleStatus.biobankName} -
                 </c:if>
-                #{cc.attrs.collectionLifeCycleStatus.collectionName}<br/>
-                <span style="font-size: 12px; font-style: italic;">
+                <span style="font-weight: bold;">
+                    #{cc.attrs.collectionLifeCycleStatus.collectionName}
+                </span><br/><br/>
+                <span style="font-size: 12px; font-style: italic; padding-left: 2rem; display: inline-block">
                     #{label['lifecycleCollectionStatus.contacts.representedBy']}:<br/>
                     <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.contacts[0].authName}" escape="false"/>
                     <ui:fragment rendered="#{cc.attrs.collectionLifeCycleStatus.contacts.size() > 1}">
@@ -52,8 +54,10 @@
                 <span style="font-size: 12px; font-style: italic;">
                     <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" /><br/>
                     <ui:fragment rendered="#{not empty cc.attrs.collectionLifeCycleStatus.lastStatusUsername}">
-                        #{label['lifecycleCollectionStatus.status.changedBy']}:<br/>
-                        <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.lastStatusUsername}" escape="false" />
+                        <span style="padding-left: 2rem; display: inline-block">
+                            #{label['lifecycleCollectionStatus.status.changedBy']}:<br/>
+                            <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.lastStatusUsername}" escape="false" />
+                        </span>
                     </ui:fragment>
                 </span>
             </div>
@@ -61,7 +65,7 @@
                 #{label['lifecycleCollectionStatus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
                 <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
                                  class="form-control"
-                                 style="width: 100%;height: 2rem;"
+                                 style="width: 90%; height: 2rem;"
                                  value="#{lifeCycleStatusBean.nextCollectionLifecycleStatusStatus}"
                                  onchange="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(this);"
                                  onload="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(this);">
@@ -136,8 +140,6 @@
                     #{label['lifecycleCollectionStatus.form.button.updateCollectionsBiobank']}
                 </button>
             </div>
-
-
         </h:form>
 
 </composite:implementation>
