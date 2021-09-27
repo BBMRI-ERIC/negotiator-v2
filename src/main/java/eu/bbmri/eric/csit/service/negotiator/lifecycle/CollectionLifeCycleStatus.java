@@ -208,7 +208,11 @@ public class CollectionLifeCycleStatus {
     }
 
     public String getLastStatusUsername() {
-        RequestStatus status = statusTree.lastEntry().getValue();
-        return dataCache.getUserName((Integer) status.getJsonEntry().get("UserId"));
+        try {
+            RequestStatus status = statusTree.lastEntry().getValue();
+            return dataCache.getUserName((Integer) status.getJsonEntry().get("UserId"));
+        } catch (Exception e) {
+            return "-";
+        }
     }
 }
