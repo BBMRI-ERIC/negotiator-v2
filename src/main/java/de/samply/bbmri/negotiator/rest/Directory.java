@@ -65,6 +65,32 @@ public class Directory {
     private static final Logger logger = LoggerFactory.getLogger(Directory.class);
 
     @OPTIONS
+    @Path("/create_query_finder_v1")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response createQueryBCPlatforms(String queryString, @Context HttpServletRequest request) {
+        try (Config config = ConfigFactory.get()) {
+            checkAuthentication(request);
+
+
+
+            return Response
+                    .status(200)
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                    .header("Access-Control-Allow-Credentials", "true")
+                    .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                    .build();
+        } catch (ForbiddenException e) {
+            logger.info("Authentication error: " + e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @OPTIONS
     @Path("/create_query")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -92,11 +118,7 @@ public class Directory {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createQuery(String queryString, @Context HttpServletRequest request) {
         try(Config config = ConfigFactory.get()) {
-            /**
-             * Check authentication
-             */
-            Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
-            AuthenticationService.authenticate(request, negotiator.getMolgenisUsername(), negotiator.getMolgenisPassword());
+            checkAuthentication(request);
 
             /**
              * Convert the string to an object, so that we can check the filters and collections.
@@ -234,5 +256,10 @@ public class Directory {
         String strPort = request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "";
         return request.getScheme() + "://" + request.getServerName() + strPort +
                 request.getContextPath();
+    }
+
+    private void checkAuthentication(HttpServletRequest request) throws ForbiddenException {
+        Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
+        AuthenticationService.authenticate(request, negotiator.getMolgenisUsername(), negotiator.getMolgenisPassword());
     }
 }

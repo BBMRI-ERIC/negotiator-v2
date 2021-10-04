@@ -40,17 +40,17 @@
         <database.username>saher</database.username>
         <database.password>saher</database.password>-->
 
-        <!--<database.server>localhost</database.server>
+        <database.server>localhost</database.server>
         <database.port>5433</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
-        <database.password>negotiator</database.password>-->
+        <database.password>negotiator</database.password>
 
-        <database.server>localhost</database.server>
+        <!--<database.server>localhost</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
-        <database.password>negotiator</database.password>
+        <database.password>negotiator</database.password>-->
         <!--<database.name>neg-20190910</database.name>-->
         <!--<database.password>0bpCP58yTJnNQmKqO9mX</database.password>-->
 
