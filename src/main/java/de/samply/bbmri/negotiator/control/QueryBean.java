@@ -363,7 +363,11 @@ public class QueryBean implements Serializable {
             externalContext.redirect(url);
         } else if(mode.equals("edit")) {
             saveEditChangesTemporarily();
-            externalContext.redirect(url + "#/?nToken=" + qtoken + "__search__");
+            String urlEnd = "/";
+            if(url.endsWith("/")) {
+                urlEnd = "";
+            }
+            externalContext.redirect(url + urlEnd + "#/?nToken=" + qtoken + "__search__");
         }else{
             externalContext.redirect(url);
         }
