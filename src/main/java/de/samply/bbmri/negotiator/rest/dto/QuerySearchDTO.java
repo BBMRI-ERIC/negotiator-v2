@@ -1,8 +1,12 @@
 package de.samply.bbmri.negotiator.rest.dto;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * The Query object with the structured data as received from the directory.
@@ -57,6 +61,13 @@ public class QuerySearchDTO {
 
     public void setCollections(Collection<CollectionDTO> collections) {
         this.collections = collections;
+    }
+
+    public void addCollection(CollectionDTO collections) {
+        if(this.collections == null) {
+            this.collections = new ArrayList<>();
+        }
+        this.collections.add(collections);
     }
 
     public String getHumanReadable() {
