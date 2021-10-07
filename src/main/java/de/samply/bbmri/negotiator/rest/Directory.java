@@ -38,6 +38,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTOHelper;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,7 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 public class Directory {
 
     private static final Logger logger = LoggerFactory.getLogger(Directory.class);
+    QuerySearchDTOHelper querySearchDTOHelper = new QuerySearchDTOHelper();
 
     @OPTIONS
     @Path("/create_query_finder_v1")
@@ -71,16 +74,9 @@ public class Directory {
     public Response createQueryBCPlatforms(String queryString, @Context HttpServletRequest request) {
         try (Config config = ConfigFactory.get()) {
             checkAuthentication(request);
+            QuerySearchDTO querySearchDTO = querySearchDTOHelper.generateQuerySearchDTOFromFinderV1(queryString);
 
 
-
-            return Response
-                    .status(200)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-                    .header("Access-Control-Allow-Credentials", "true")
-                    .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-                    .build();
         } catch (ForbiddenException e) {
             logger.info("Authentication error: " + e.getMessage());
             throw e;
@@ -119,118 +115,14 @@ public class Directory {
     public Response createQuery(String queryString, @Context HttpServletRequest request) {
         try(Config config = ConfigFactory.get()) {
             checkAuthentication(request);
+            QuerySearchDTO querySearchDTO = querySearchDTOHelper.generateQuerySearchDTOFromDirectory(queryString);
 
-            /**
-             * Convert the string to an object, so that we can check the filters and collections.
-             * They must not be empty!
-             */
-            RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
-            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-            QuerySearchDTO querySearchDTO = mapper.readValue(queryString, QuerySearchDTO.class);
-
-            if(querySearchDTO == null || querySearchDTO.getUrl() == null || querySearchDTO.getHumanReadable() == null || querySearchDTO.getCollections() == null) {
-                logger.error("Directory posted empty URL, no human readable text or no collections, aborting");
-                throw new BadRequestException();
-            }
-
-            // No URL Checking
-            /*if(!negotiator.getDevelopment().getMolgenisAcceptInvalidUrl()) {
-                    //&&
-                    //DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl().toLowerCase().replaceAll("/.*", "")) != null)  {
-                    //!querySearchDTO.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
-                logger.error("Directory posted wrong redirect URL, aborting");
-                throw new BadRequestException();
-            }*/
-
-            if(querySearchDTO.getCollections().size() < 1) {
-                logger.error("Directory posted empty list of collections, aborting");
-                throw new BadRequestException();
-            }
-
-            /**
-             * At this point we need to decide on wether to update an existing query or
-             * create a new json query object. This decision is made based on the negotiator token from
-             * the query
-             */
             if(querySearchDTO.getToken() == null  || querySearchDTO.getToken().equals("")) {
-
-                /**
-                 * Create the json_query object itself and store it in the database.
-                 */
-                JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
-                jsonQueryRecord.setJsonText(queryString);
-                System.out.println("queryString: " + queryString);
-                jsonQueryRecord.store();
-                config.commit();
-
-                CreateQueryResultDTO result = new CreateQueryResultDTO();
-
-                String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
-
-                result.setRedirectUri(builder);
-
-                return Response.created(new URI(builder)).entity(result)
-                        .header("Access-Control-Allow-Origin", "*")
-                        .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-                        .header("Access-Control-Allow-Credentials", "true")
-                        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-                        .build();
+                return getResponseForQueryWithNoToken(queryString, request, config);
             } else {
-                // get the id of the query from the structure, the compleat token is still in the request
-                String qTocken = querySearchDTO.getToken().replaceAll("__search__.*", "");
-                QueryRecord queryRecord = DbUtil.getQuery(config, qTocken);
-
-                if(queryRecord == null) {
-                    /**
-                     * Create the json_query object itself and store it in the database.
-                     */
-                    JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
-                    jsonQueryRecord.setJsonText(queryString);
-                    System.out.println("queryString: " + queryString);
-                    jsonQueryRecord.store();
-                    config.commit();
-
-                    CreateQueryResultDTO result = new CreateQueryResultDTO();
-
-                    String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
-
-                    result.setRedirectUri(builder);
-
-                    return Response.created(new URI(builder)).entity(result)
-                            .header("Access-Control-Allow-Origin", "*")
-                            .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-                            .header("Access-Control-Allow-Credentials", "true")
-                            .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-                            .build();
-                }
-
-                /**
-                 * Update the existing query in the next step (newQuery.xhtml page) and return the new URL back to the directory.
-                 */
-
-                // Hack for Locator
-                queryString = queryString.replaceAll("collectionid", "collectionId");
-                queryString = queryString.replaceAll("biobankid", "biobankId");
-
-                JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
-                jsonQueryRecord.setJsonText(queryString);
-                jsonQueryRecord.store();
-                config.commit();
-
-                CreateQueryResultDTO result = new CreateQueryResultDTO();
-
-                String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId="+ jsonQueryRecord.getId();
-
-                result.setRedirectUri(builder);
-
-                return Response.accepted(result)
-                        .header("Access-Control-Allow-Origin", "*")
-                        .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
-                        .header("Access-Control-Allow-Credentials", "true")
-                        .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
-                        .location(new URI(builder)).build();
+                return getResponseForQueryWithToken(queryString, request, config, querySearchDTO);
             }
-        } catch (IOException | URISyntaxException e) {
+        } catch (URISyntaxException e) {
             System.err.println("-------Error API");
             e.printStackTrace();
             throw new BadRequestException();
@@ -238,6 +130,52 @@ public class Directory {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private Response getResponseForQueryWithToken(String queryString, HttpServletRequest request, Config config, QuerySearchDTO querySearchDTO) throws SQLException, URISyntaxException {
+        String qTocken = querySearchDTO.getToken().replaceAll("__search__.*", "");
+        QueryRecord queryRecord = DbUtil.getQuery(config, qTocken);
+
+        if(queryRecord == null) {
+            return getResponseForQueryWithNoToken(queryString, request, config);
+        }
+
+        JsonQueryRecord jsonQueryRecord = getJsonQueryRecord(queryString, config);
+        String redirectUrl = getLocalUrl(request) + "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId="+ jsonQueryRecord.getId();
+        return getResponse(redirectUrl);
+    }
+
+    private Response getResponseForQueryWithNoToken(String queryString, @Context HttpServletRequest request, Config config) throws SQLException, URISyntaxException {
+        JsonQueryRecord jsonQueryRecord = getJsonQueryRecord(queryString, config);
+        String redirectUrl = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
+        return getResponse(redirectUrl);
+    }
+
+    private Response getResponse(String redirectUrl) throws URISyntaxException {
+        CreateQueryResultDTO result = new CreateQueryResultDTO();
+
+        result.setRedirectUri(redirectUrl);
+
+        return Response.accepted(result)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .location(new URI(redirectUrl)).build();
+    }
+
+    @NotNull
+    private JsonQueryRecord getJsonQueryRecord(String queryString, Config config) throws SQLException {
+        // Hack for Locator
+        queryString = queryString.replaceAll("collectionid", "collectionId");
+        queryString = queryString.replaceAll("biobankid", "biobankId");
+
+        JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
+        jsonQueryRecord.setJsonText(queryString);
+        jsonQueryRecord.store();
+        config.commit();
+
+        return jsonQueryRecord;
     }
 
     /**
