@@ -24,6 +24,7 @@ public class QuerySearchDTOHelper {
             querySearchDTO.setHumanReadable(elements.getAsString("description"));
 
             String nTocken = UUID.randomUUID().toString().replace("-", "") + "__search__" + elements.getAsString("query_id");
+            querySearchDTO.setToken(nTocken);
 
             String cohort = elements.getAsString("cohort");
             JSONObject cohortElements = (JSONObject) parser.parse(cohort);

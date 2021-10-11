@@ -75,7 +75,13 @@ public class Directory {
         try (Config config = ConfigFactory.get()) {
             checkAuthentication(request);
             QuerySearchDTO querySearchDTO = querySearchDTOHelper.generateQuerySearchDTOFromFinderV1(queryString);
+            String newQueryString = querySearchDTO.generateQueryJsonString();
 
+            if(querySearchDTO.getToken() == null  || querySearchDTO.getToken().equals("")) {
+                return getResponseForQueryWithNoToken(newQueryString, request, config);
+            } else {
+                return getResponseForQueryWithToken(newQueryString, request, config, querySearchDTO);
+            }
 
         } catch (ForbiddenException e) {
             logger.info("Authentication error: " + e.getMessage());
