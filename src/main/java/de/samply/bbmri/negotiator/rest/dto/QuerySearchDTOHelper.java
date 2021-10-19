@@ -15,6 +15,14 @@ public class QuerySearchDTOHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(QuerySearchDTOHelper.class);
 
+    private String updateExternalId(String externalId) {
+        externalId = externalId.replace("Graz", "bbmri-eric:ID:AT_MUG:collection:FFPEslidesCollection");
+        externalId = externalId.replace("BCP_TEST", "bbmri-eric:ID:EU_BBMRI-ERIC:collection:CRC-Cohort");
+        externalId = externalId.replace("Nottingham", "bbmri-eric:ID:UK_GBR-1-22:collection:1");
+        externalId = externalId.replace("Brno", "bbmri-eric:ID:CZ_MU_ICS:collection:THALAMOSS");
+        return externalId;
+    }
+
     public QuerySearchDTO generateQuerySearchDTOFromFinderV1(String queryString) throws BadRequestException {
         QuerySearchDTO querySearchDTO = new QuerySearchDTO();
 
@@ -28,15 +36,15 @@ public class QuerySearchDTOHelper {
 
             String cohort = elements.getAsString("cohort");
             JSONObject cohortElements = (JSONObject) parser.parse(cohort);
-            querySearchDTO.setUrl(elements.getAsString("query_url"));
+            querySearchDTO.setUrl(cohortElements.getAsString("query_url"));
 
-            String input = elements.getAsString("input");
-            JSONObject inputElements = (JSONObject) parser.parse(cohort);
+            String input = cohortElements.getAsString("input");
+            JSONObject inputElements = (JSONObject) parser.parse(input);
             String collections = inputElements.getAsString("collections");
             JSONArray collectionsArray = (JSONArray) parser.parse(collections);
             for (Object collection : collectionsArray) {
                 JSONObject collectionElements = (JSONObject) collection;
-                String externalId = collectionElements.getAsString("external_id");
+                String externalId = updateExternalId(collectionElements.getAsString("external_id"));
                 CollectionDTO collectionDTO = new CollectionDTO();
                 collectionDTO.setCollectionID(externalId);
                 /*

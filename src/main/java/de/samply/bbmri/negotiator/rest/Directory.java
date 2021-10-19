@@ -67,7 +67,7 @@ public class Directory {
     private static final Logger logger = LoggerFactory.getLogger(Directory.class);
     QuerySearchDTOHelper querySearchDTOHelper = new QuerySearchDTOHelper();
 
-    @OPTIONS
+    @POST
     @Path("/create_query_finder_v1")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
