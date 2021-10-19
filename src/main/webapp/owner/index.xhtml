@@ -82,7 +82,7 @@
                                     <f:param name="queryId" value="#{queryDto.query.id}"/>
                                     <f:param name="flag" value="#{ownerQueriesBean.flagFilter}"/>
                                     <f:param name="testRequest" value="#{ownerQueriesBean.isTestRequest}"/>
-                                    <h:outputText value="#{queryDto.query.title}"/>
+                                    <h:outputText value="[#{queryDto.query.id}] #{queryDto.query.title}"/>
                                 </h:link>
 
                                 <h:panelGroup styleClass="pull-right">

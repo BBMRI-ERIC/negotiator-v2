@@ -67,7 +67,7 @@
                                 styleClass="detailLink">
                             <f:param name="queryId" value="#{cc.attrs.item.query.id}" />
                             <f:param name="flag" value="#{ownerQueriesBean.flagFilter}" />
-                            <h:outputText value="#{cc.attrs.item.query.title}" />
+                            <h:outputText value="[#{cc.attrs.item.query.id}] #{cc.attrs.item.query.title}" />
                         </h:link>
                     </div>
 

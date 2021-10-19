@@ -52,7 +52,7 @@
             <h:panelGroup layout="block" styleClass="#{cc.attrs.item.query.testRequest ? 'test-query-heading' : ''} panel-heading container" style="width: 100%;">
                 <div class="row" >
                     <div class="col-sm-6 col-xs-12" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding-right: 0;">
-                        <h:link outcome="detail" styleClass="detailLink" value="#{cc.attrs.item.query.title}">
+                        <h:link outcome="detail" styleClass="detailLink" value="[#{cc.attrs.item.query.id}] #{cc.attrs.item.query.title}">
                             <f:param name="queryId" value="#{cc.attrs.item.query.id}"/>
                         </h:link>
                     </div>

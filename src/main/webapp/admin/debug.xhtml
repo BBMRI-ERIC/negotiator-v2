@@ -170,30 +170,6 @@
         </p:dataTable>
 
             <br/>
-        <h:form>
-        <h:commandLink>
-            <h:commandLink>
-                Export Excel (will only export loaded lists)
-                <p:dataExporter type="xls" target="queryTable" fileName="queryTable"/>
-            </h:commandLink>
-            <br/>
-            <h:commandLink>
-                Export XML (will only export loaded lists)
-                <p:dataExporter type="xml" target="queryTable" fileName="queryTable"/>
-            </h:commandLink>
-            <br/>
-            <h:commandLink>
-                Export PDF (will only export loaded lists)
-                <p:dataExporter type="pdf" target="queryTable" fileName="queryTable"/>
-            </h:commandLink>
-            <br/>
-            <h:commandLink>
-                Export XLSX (will only export loaded lists)
-                <p:dataExporter type="xlsxstream" target="queryTable" fileName="queryTable"/>
-            </h:commandLink>
-            <br/>
-        </h:commandLink>
-        </h:form>
 
         <button id="toggleModalIndicateAccessConditions" type="button" style="display: none;" class="btn btn-primary" data-toggle="modal" data-target="#transferResearcherModal">
             Transfer request
