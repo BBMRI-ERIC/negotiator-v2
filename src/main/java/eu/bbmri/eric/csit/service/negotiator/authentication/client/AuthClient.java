@@ -90,9 +90,9 @@ public class AuthClient {
     }
 
     public JWTAccessToken getNewAccessToken() throws JWTException, InvalidTokenException, InvalidKeyException {
-        logger.error("Requesting new access token, base URL: " + this.baseUrl);
+        logger.debug("Requesting new access token, base URL: " + this.baseUrl);
         if (this.code != null) {
-            logger.error("This is a client with an ID, a secret and a code.");
+            logger.debug("This is a client with an ID, a secret and a code.");
             AccessTokenRequestDTO dto = new AccessTokenRequestDTO();
             logger.debug("No refresh token available yet");
             dto.setClientId(this.clientId);
@@ -106,10 +106,10 @@ public class AuthClient {
             Response response = builder.header("Authorization", BasicAuth.getAuthorizationHeader(this.clientId, this.clientSecret)).post(Entity.form(form), Response.class);
             if (response.getStatus() == 200) {
                 AccessTokenDTO tokenDTO = response.readEntity(AccessTokenDTO.class);
-                logger.error("Got a response from Perun");
-                logger.error("Access token: {}", tokenDTO.getAccessToken());
-                logger.error("Scope: {}", tokenDTO.getScope());
-                logger.error("ID token: {}", tokenDTO.getIdToken());
+                logger.debug("Got a response from Perun");
+                logger.debug("Access token: {}", tokenDTO.getAccessToken());
+                logger.debug("Scope: {}", tokenDTO.getScope());
+                logger.debug("ID token: {}", tokenDTO.getIdToken());
                 this.accessToken = new JWTAccessToken(this.publicKey, tokenDTO.getAccessToken());
                 if (!this.accessToken.isValid()) {
                     logger.error("The access token we got was not valid. Throw an exception.");
@@ -124,7 +124,7 @@ public class AuthClient {
                     }
                 }
 
-                logger.error("Got new valid access token using a code!");
+                logger.debug("Got new valid access token using a code!");
             } else {
                 logger.error("Error from the Identity Provider: {}, {}", response.getStatus(), response.readEntity(String.class));
             }

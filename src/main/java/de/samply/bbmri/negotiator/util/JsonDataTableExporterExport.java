@@ -17,6 +17,7 @@ import org.primefaces.component.datatable.export.DataTableExporter;
 import org.primefaces.component.export.ExportConfiguration;
 import org.primefaces.util.ComponentUtils;
 import org.primefaces.util.EscapeUtils;
+import org.json.simple.JSONObject;
 
 public class JsonDataTableExporterExport extends DataTableExporter {
 
@@ -36,6 +37,7 @@ public class JsonDataTableExporterExport extends DataTableExporter {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
         String date = simpleDateFormat.format(new Date());
+        JSONObject jsonObject = new JSONObject();
 
         ExternalContext externalContext = context.getExternalContext();
         this.configureResponse(externalContext, exportConfiguration.getOutputFileName(), exportConfiguration.getEncodingType());
@@ -46,7 +48,7 @@ public class JsonDataTableExporterExport extends DataTableExporter {
 
         this.sb.append("], date: '" + date + "'}");
         Writer writer = externalContext.getResponseOutputWriter();
-        writer.write(this.sb.toString());
+        writer.write(jsonObject.escape(this.sb.toString()));
         writer.flush();
         writer.close();
     }

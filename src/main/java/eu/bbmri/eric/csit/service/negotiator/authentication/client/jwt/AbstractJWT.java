@@ -159,21 +159,14 @@ public abstract class AbstractJWT implements Serializable {
      * @return a boolean.
      */
     public boolean isValid() {
-        logger.error("Token validation:");
         Date now = new Date();
-        logger.error("signatureValid " + signatureValid);
-
-        logger.error("Date: " + now.toString());
         if(getClaimsSet().getExpirationTime() != null) {
-            logger.error("if1 " + getClaimsSet().getExpirationTime());
             signatureValid = signatureValid && now.before(getClaimsSet().getExpirationTime());
         }
 
         if(getClaimsSet().getNotBeforeTime() != null) {
-            logger.error("if2 " + getClaimsSet().getNotBeforeTime());
             signatureValid = signatureValid && now.after(getClaimsSet().getNotBeforeTime());
         }
-        logger.error("return " + signatureValid);
         return signatureValid;
     }
 
