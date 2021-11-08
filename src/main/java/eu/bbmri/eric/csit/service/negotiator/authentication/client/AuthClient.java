@@ -20,11 +20,13 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AuthClient {
-    private static final Logger logger = LoggerFactory.getLogger(eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient.class);
+    private static final Logger logger = LogManager.getLogger(eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient.class);
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private final String baseUrl;
     private final PublicKey publicKey;
@@ -88,9 +90,9 @@ public class AuthClient {
     }
 
     public JWTAccessToken getNewAccessToken() throws JWTException, InvalidTokenException, InvalidKeyException {
-        logger.debug("Requesting new access token, base URL: " + this.baseUrl);
+        logger.error("Requesting new access token, base URL: " + this.baseUrl);
         if (this.code != null) {
-            logger.debug("This is a client with an ID, a secret and a code.");
+            logger.error("This is a client with an ID, a secret and a code.");
             AccessTokenRequestDTO dto = new AccessTokenRequestDTO();
             logger.debug("No refresh token available yet");
             dto.setClientId(this.clientId);
@@ -104,25 +106,25 @@ public class AuthClient {
             Response response = builder.header("Authorization", BasicAuth.getAuthorizationHeader(this.clientId, this.clientSecret)).post(Entity.form(form), Response.class);
             if (response.getStatus() == 200) {
                 AccessTokenDTO tokenDTO = response.readEntity(AccessTokenDTO.class);
-                logger.debug("Got a response from Perun");
-                logger.debug("Access token: {}", tokenDTO.getAccessToken());
-                logger.debug("Scope: {}", tokenDTO.getScope());
-                logger.debug("ID token: {}", tokenDTO.getIdToken());
+                logger.error("Got a response from Perun");
+                logger.error("Access token: {}", tokenDTO.getAccessToken());
+                logger.error("Scope: {}", tokenDTO.getScope());
+                logger.error("ID token: {}", tokenDTO.getIdToken());
                 this.accessToken = new JWTAccessToken(this.publicKey, tokenDTO.getAccessToken());
                 if (!this.accessToken.isValid()) {
-                    logger.debug("The access token we got was not valid. Throw an exception.");
+                    logger.error("The access token we got was not valid. Throw an exception.");
                     throw new InvalidTokenException();
                 }
 
                 if (!StringUtil.isEmpty(tokenDTO.getIdToken())) {
                     this.idToken = new JWTIDToken(this.clientId, this.publicKey, tokenDTO.getIdToken());
                     if (!this.idToken.isValid()) {
-                        logger.debug("The ID token we got was not valid. Throw an exception.");
+                        logger.error("The ID token we got was not valid. Throw an exception.");
                         throw new InvalidTokenException();
                     }
                 }
 
-                logger.debug("Got new valid access token using a code!");
+                logger.error("Got new valid access token using a code!");
             } else {
                 logger.error("Error from the Identity Provider: {}, {}", response.getStatus(), response.readEntity(String.class));
             }

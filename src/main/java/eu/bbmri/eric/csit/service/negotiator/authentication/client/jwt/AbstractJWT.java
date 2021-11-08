@@ -41,6 +41,8 @@ import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.samply.common.config.OAuth2Client;
 
@@ -50,6 +52,8 @@ import de.samply.common.config.OAuth2Client;
  *
  */
 public abstract class AbstractJWT implements Serializable {
+
+    private final Logger logger = LogManager.getLogger(AbstractJWT.class);
 
     /**
      *
@@ -155,14 +159,21 @@ public abstract class AbstractJWT implements Serializable {
      * @return a boolean.
      */
     public boolean isValid() {
+        logger.error("Token validation:");
         Date now = new Date();
+        logger.error("signatureValid " + signatureValid);
+
+        logger.error("Date: " + now.toString());
         if(getClaimsSet().getExpirationTime() != null) {
+            logger.error("if1 " + getClaimsSet().getExpirationTime());
             signatureValid = signatureValid && now.before(getClaimsSet().getExpirationTime());
         }
 
         if(getClaimsSet().getNotBeforeTime() != null) {
+            logger.error("if2 " + getClaimsSet().getNotBeforeTime());
             signatureValid = signatureValid && now.after(getClaimsSet().getNotBeforeTime());
         }
+        logger.error("return " + signatureValid);
         return signatureValid;
     }
 

@@ -137,6 +137,8 @@ public class OAuth2Filter implements Filter {
                         userBean.login(client);
                     }
                 } catch (InvalidTokenException | InvalidKeyException e) {
+                    e.printStackTrace();
+                    logger.error(e.getMessage());
                     logger.error("The token was invalid, aborting");
                 } catch (NotFoundException e) {
                     /**

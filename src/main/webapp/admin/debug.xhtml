@@ -60,7 +60,11 @@
         <h:form>
             <h:commandLink>
                 Export Json (will only export loaded lists)
-                <p:dataExporter type="json" target="queryTable" fileName="queryTable" exporter="#{adminDebugBean.jsonExporter}"/>
+                <p:dataExporter type="json" target="queryTable" fileName="queryTable" exporter="#{adminDebugBean.jsonExporter}" encoding="utf-8"/>
+            </h:commandLink>
+            <h:commandLink>
+                Export XML (will only export loaded lists)
+                <p:dataExporter type="xml" target="queryTable" fileName="queryTable" encoding="utf-8"/>
             </h:commandLink>
         </h:form>
 
@@ -98,6 +102,10 @@
             <p:column style="width: 150px;max-height: 75px;">
                 <f:facet name="header">ResearcherId</f:facet>
                 <h:outputText value="#{adminDebugBean.getUserName(query.getResearcherId())}" />
+            </p:column>
+            <p:column style="width: 150px;max-height: 75px;">
+                <f:facet name="header">ResearcherEmail</f:facet>
+                <h:outputText value="#{query.getResearcherEmail()}" />
             </p:column>
             <p:column exportable="false"  style="width: 100px;max-height: 75px;">
                 <f:facet name="header">Transfer request</f:facet>
