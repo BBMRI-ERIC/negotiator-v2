@@ -49,19 +49,19 @@
 
         <h:form styleClass="form-horizontal">
             <h:commandButton action="#{adminDebugBean.loadQueries(true)}" value="#{label['admin.debug.click.filter']}"
-                             styleClass="btn btn-success"/><br/>
+                             styleClass="btn btn-success"/>
 
             <h:commandButton style="margin-left: 25px;" action="#{adminDebugBean.loadQueries(false)}" value="#{label['admin.debug.click.nofilter']}"
-                             styleClass="btn btn-default"/><br/>
+                             styleClass="btn btn-default"/>
         </h:form>
 
         <br/>
 
         <h:form>
-            <h:commandLink>
+            <!--<h:commandLink>
                 Export Json (will only export loaded lists)
                 <p:dataExporter type="json" target="queryTable" fileName="queryTable" exporter="#{adminDebugBean.jsonExporter}" encoding="utf-8"/>
-            </h:commandLink>
+            </h:commandLink><br/>-->
             <h:commandLink>
                 Export XML (will only export loaded lists)
                 <p:dataExporter type="xml" target="queryTable" fileName="queryTable" encoding="utf-8"/>

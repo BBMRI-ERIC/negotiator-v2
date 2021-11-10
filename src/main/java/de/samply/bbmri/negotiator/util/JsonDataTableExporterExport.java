@@ -10,6 +10,9 @@ import javax.faces.FacesException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
 import org.primefaces.component.api.DynamicColumn;
 import org.primefaces.component.api.UIColumn;
 import org.primefaces.component.datatable.DataTable;
@@ -48,9 +51,28 @@ public class JsonDataTableExporterExport extends DataTableExporter {
 
         this.sb.append("], date: '" + date + "'}");
         Writer writer = externalContext.getResponseOutputWriter();
-        writer.write(jsonObject.escape(this.sb.toString()));
+
+        JSONParser parser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
+        JSONObject elements = new JSONObject();
+        try {
+            String s = this.sb.toString();
+            elements = (JSONObject) parser.parse(this.sb.toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        writer.write(jsonObject.escape(elements.toJSONString()));
         writer.flush();
         writer.close();
+    }
+
+    void createJsonObject(FacesContext context, DataTable table) {
+        int first = table.getFirst();
+        int rowCount = table.getRowCount();
+        int rows = table.getRows();
+        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+            exportRow(table, rowIndex);
+        }
     }
 
     @Override
