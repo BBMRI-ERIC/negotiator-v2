@@ -26,6 +26,8 @@ public class QuerySearchDTOHelper {
 
     public QuerySearchDTO generateQuerySearchDTOFromFinderV1(String queryString) throws BadRequestException {
         QuerySearchDTO querySearchDTO = new QuerySearchDTO();
+        logger.debug(queryString);
+        System.out.println(queryString);
 
         try {
             JSONParser parser = new JSONParser(JSONParser.MODE_PERMISSIVE);

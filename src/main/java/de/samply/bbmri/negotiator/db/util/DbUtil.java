@@ -2537,7 +2537,9 @@ public class DbUtil {
             Result<Record> result = resultQuery.fetch();
             if(!result.isEmpty()) {
                 for (Record record : result) {
-                    return record.getValue(1, String.class);
+                    String requestToken = record.getValue(0, String.class);
+                    logger.debug(requestToken);
+                    return requestToken;
                 }
             }
         } catch (SQLException e) {
