@@ -1,6 +1,7 @@
 package de.samply.bbmri.negotiator.rest.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -31,7 +32,8 @@ public class QuerySearchDTOHelper {
             JSONObject elements = (JSONObject) parser.parse(queryString);
             querySearchDTO.setHumanReadable(elements.getAsString("description"));
 
-            String nTocken = UUID.randomUUID().toString().replace("-", "") + "__search__" + elements.getAsString("query_id");
+            String requestToken = DbUtil.getRequestToken(elements.getAsString("query_id"));
+            String nTocken = requestToken + "__search__" + elements.getAsString("query_id");
             querySearchDTO.setToken(nTocken);
 
             String cohort = elements.getAsString("cohort");
