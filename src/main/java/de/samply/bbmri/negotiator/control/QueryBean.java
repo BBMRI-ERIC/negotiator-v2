@@ -367,7 +367,12 @@ public class QueryBean implements Serializable {
             if(url.endsWith("/")) {
                 urlEnd = "";
             }
-            externalContext.redirect(url + urlEnd + "#/?nToken=" + qtoken + "__search__");
+            url = url + urlEnd + "#/?nToken=" + qtoken + "__search__";
+            if(url.contains("locator")) {
+                url.replaceAll("#/", "");
+            }
+            externalContext.redirect(url);
+
         }else{
             externalContext.redirect(url);
         }
