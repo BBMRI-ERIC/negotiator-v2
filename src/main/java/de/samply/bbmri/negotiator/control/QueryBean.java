@@ -340,8 +340,18 @@ public class QueryBean implements Serializable {
         */
        if(mode.equals("edit")) {
            saveEditChangesTemporarily();
-           externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
+           if(url.contains("finder-dev.bbmri-eric.eu")) {
+               logger.info("URL1.4: " + url);
+               System.out.println("URL1.4: " + url);
+               externalContext.redirect(url);
+           } else {
+               logger.info("URL1.8: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
+               System.out.println("URL1.8: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
+               externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
+           }
        }else{
+           logger.info("URL2: " + url);
+           System.out.println("URL2: " + url);
            externalContext.redirect(url);
        }
    }
