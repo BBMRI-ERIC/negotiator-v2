@@ -360,6 +360,7 @@ public class QueryBean implements Serializable {
          * query and it has not been saved in the Query table hence no token is used.
          */
         if(mode == null) {
+            logger.info("URL 5:" + url);
             externalContext.redirect(url);
         } else if(mode.equals("edit")) {
             saveEditChangesTemporarily();
@@ -368,12 +369,16 @@ public class QueryBean implements Serializable {
                 urlEnd = "";
             }
             url = url + urlEnd + "#/?nToken=" + qtoken + "__search__";
+            logger.info("URL 1:" + url);
+
             if(url.contains("locator")) {
                 url.replaceAll("#/", "");
+                logger.info("URL 2:" + url);
             }
+            logger.info("URL 3:" + url);
             externalContext.redirect(url);
-
         }else{
+            logger.info("URL 4:" + url);
             externalContext.redirect(url);
         }
     }
