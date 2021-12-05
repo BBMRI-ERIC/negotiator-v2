@@ -38,6 +38,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,6 +156,9 @@ public class Directory {
                         .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
                         .build();
             } else {
+
+                // TODO: Save updated query to query json structure
+
                 // get the id of the query from the structure, the compleat token is still in the request
                 String qTocken = querySearchDTO.getToken().replaceAll("__search__.*", "");
                 QueryRecord queryRecord = DbUtil.getQuery(config, qTocken);
@@ -169,6 +174,16 @@ public class Directory {
                     config.commit();
 
                     CreateQueryResultDTO result = new CreateQueryResultDTO();
+
+                    try {
+                        String jsonStringOriginal = jsonQueryRecord.getJsonText();
+                        JSONParser parser = new JSONParser();
+                        Object obj = parser.parse(jsonStringOriginal);
+                        JSONArray array = (JSONArray) obj;
+                    } catch (Exception ex) {
+                        logger.error("Directory::createQuery: Error Parsing JSON String");
+                        ex.printStackTrace();
+                    }
 
                     String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
 

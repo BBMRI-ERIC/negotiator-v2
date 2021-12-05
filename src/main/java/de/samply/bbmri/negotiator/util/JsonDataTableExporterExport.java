@@ -1,16 +1,6 @@
 package de.samply.bbmri.negotiator.util;
 
-import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import javax.faces.FacesException;
-import javax.faces.component.UIComponent;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-
+import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
 import org.primefaces.component.api.DynamicColumn;
@@ -20,7 +10,17 @@ import org.primefaces.component.datatable.export.DataTableExporter;
 import org.primefaces.component.export.ExportConfiguration;
 import org.primefaces.util.ComponentUtils;
 import org.primefaces.util.EscapeUtils;
-import org.json.simple.JSONObject;
+import javax.faces.FacesException;
+import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 public class JsonDataTableExporterExport extends DataTableExporter {
 

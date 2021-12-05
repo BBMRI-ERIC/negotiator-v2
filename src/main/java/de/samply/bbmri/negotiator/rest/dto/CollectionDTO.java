@@ -46,6 +46,9 @@ public class CollectionDTO implements Serializable {
     @XmlElement(name ="collectionId")
     private String collectionId;
 
+    @XmlElement(name ="redirectUrl")
+    private String locatorRedirectUrl;
+
     public String getCollectionID() {
         return collectionId;
     }
@@ -60,5 +63,13 @@ public class CollectionDTO implements Serializable {
 
     public void setBiobankID(String biobankID) {
         this.biobankId = biobankID;
+    }
+
+    public String getLocatorRedirectUrl() {
+        return locatorRedirectUrl;
+    }
+
+    public void setLocatorRedirectUrl(String locatorRedirectUrl) {
+        this.locatorRedirectUrl = locatorRedirectUrl;
     }
 }
