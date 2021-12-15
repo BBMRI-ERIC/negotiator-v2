@@ -12,6 +12,8 @@ import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jooq.tools.json.JSONArray;
@@ -66,7 +68,7 @@ public class RequestLifeCycleStatus {
     }
 
     public void createStatus(Integer status_user_id) {
-        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, "created", "created", null, new Date(), status_user_id);
+        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.CREATED, null, new Date(), status_user_id);
         requestStatusFactory(requestStatusDTO);
     }
 

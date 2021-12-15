@@ -48,14 +48,15 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONAware;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -79,7 +80,7 @@ public class QueryBean implements Serializable {
 
    private Integer jsonQueryId;
 
-   private static final Logger logger = LoggerFactory.getLogger(QueryBean.class);
+   private static final Logger logger = LogManager.getLogger(QueryBean.class);
 
    @ManagedProperty(value = "#{userBean}")
    private UserBean userBean;
@@ -269,7 +270,10 @@ public class QueryBean implements Serializable {
                requestLifeCycleStatus = new RequestLifeCycleStatus(id);
                if(!requestLifeCycleStatus.statusCreated()) {
                    requestLifeCycleStatus.createStatus(userBean.getUserId());
-                   requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+                   requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
+                   NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
+               } else if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
+                   requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
                    NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
                }
                checkLifeCycleStatus(config, id, testRequest);
@@ -286,7 +290,7 @@ public class QueryBean implements Serializable {
                config.commit();
                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
                requestLifeCycleStatus.createStatus(userBean.getUserId());
-               requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
+               requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
                checkLifeCycleStatus(config, record.getId(), testRequest);
                config.commit();
                NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, record.getId(), null, userBean.getUserId());
@@ -342,7 +346,27 @@ public class QueryBean implements Serializable {
            saveEditChangesTemporarily();
            externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
        }else{
-           externalContext.redirect(url);
+           try (Config config = ConfigFactory.get()) {
+               // Hack for Locator
+               jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
+               jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
+               if(jsonQuery.contains("nToken")) {
+                   this.qtoken = getRequestToken(jsonQuery);
+               }
+               QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                       jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
+                       true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                       testRequest);
+               config.commit();
+               requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
+               requestLifeCycleStatus.createStatus(userBean.getUserId());
+               config.commit();
+           } catch (Exception e) {
+               logger.error("QueryBean::editSearchParameters: Problem creating request!");
+               e.printStackTrace();
+           }
+           // Status created, not review
+           externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
        }
    }
 
@@ -360,9 +384,9 @@ public class QueryBean implements Serializable {
          * query and it has not been saved in the Query table hence no token is used.
          */
         if(mode == null) {
-            logger.info("URL 5:" + url);
-            externalContext.redirect(url);
-        } else if(mode.equals("edit")) {
+            mode = "newQuery";
+        }
+        if(mode.equals("edit")) {
             saveEditChangesTemporarily();
             String urlEnd = "/";
             if(url.endsWith("/")) {
@@ -377,8 +401,35 @@ public class QueryBean implements Serializable {
             }
             logger.info("URL 3:" + url);
             externalContext.redirect(url);
-        }else{
-            logger.info("URL 4:" + url);
+        } else {
+            try (Config config = ConfigFactory.get()) {
+                // Hack for Locator
+                jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
+                jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
+                if(jsonQuery.contains("nToken")) {
+                    this.qtoken = getRequestToken(jsonQuery);
+                }
+                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                        jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
+                        true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                        testRequest);
+                config.commit();
+                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
+                requestLifeCycleStatus.createStatus(userBean.getUserId());
+                config.commit();
+            } catch (Exception e) {
+                logger.error("QueryBean::editSearchParameters: Problem creating request!");
+                e.printStackTrace();
+            }
+            // Status created, not review
+            String urlEnd = "/";
+            if(url.endsWith("/")) {
+                urlEnd = "";
+            }
+            url = url + urlEnd + "#/?nToken=" + qtoken + "__search__";
+            if(url.contains("locator")) {
+                url.replaceAll("#/", "");
+            }
             externalContext.redirect(url);
         }
     }
@@ -508,7 +559,7 @@ public class QueryBean implements Serializable {
 
         return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
                 context.getRequestServerPort(), context.getRequestContextPath(),
-                "/owner/detail.xhtml?queryId=" + getId());
+                "/owner/detail.xhtml?queryId=" + queryId);
     }
 
     /*

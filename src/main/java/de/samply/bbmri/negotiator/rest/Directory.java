@@ -31,14 +31,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,14 +119,9 @@ public class Directory {
                 throw new BadRequestException();
             }
 
-            // No URL Checking
-            /*if(!negotiator.getDevelopment().getMolgenisAcceptInvalidUrl()) {
-                    //&&
-                    //DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl().toLowerCase().replaceAll("/.*", "")) != null)  {
-                    //!querySearchDTO.getUrl().toLowerCase().startsWith(NegotiatorConfig.get().getNegotiator().getMolgenisUrl().toLowerCase())) {
-                logger.error("Directory posted wrong redirect URL, aborting");
-                throw new BadRequestException();
-            }*/
+            // Hack for Locator
+            queryString = queryString.replaceAll("collectionid", "collectionId");
+            queryString = queryString.replaceAll("biobankid", "biobankId");
 
             if(querySearchDTO.getCollections().size() < 1) {
                 logger.error("Directory posted empty list of collections, aborting");
@@ -160,7 +161,8 @@ public class Directory {
                 // TODO: Save updated query to query json structure
 
                 // get the id of the query from the structure, the compleat token is still in the request
-                String qTocken = querySearchDTO.getToken().replaceAll("__search__.*", "");
+                String requestQueryNToken = querySearchDTO.getToken();
+                String qTocken = requestQueryNToken.replaceAll("__search__.*", "");
                 QueryRecord queryRecord = DbUtil.getQuery(config, qTocken);
 
                 if(queryRecord == null) {
@@ -175,15 +177,7 @@ public class Directory {
 
                     CreateQueryResultDTO result = new CreateQueryResultDTO();
 
-                    try {
-                        String jsonStringOriginal = jsonQueryRecord.getJsonText();
-                        JSONParser parser = new JSONParser();
-                        Object obj = parser.parse(jsonStringOriginal);
-                        JSONArray array = (JSONArray) obj;
-                    } catch (Exception ex) {
-                        logger.error("Directory::createQuery: Error Parsing JSON String");
-                        ex.printStackTrace();
-                    }
+
 
                     String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
 
@@ -197,13 +191,40 @@ public class Directory {
                             .build();
                 }
 
+                JSONObject newRequestJson = new JSONObject();
+                Boolean update = false;
+
+                try {
+                    String jsonStringOriginal = queryRecord.getJsonText();
+                    JSONParser parser = new JSONParser();
+                    JSONObject jsonObject = (JSONObject) parser.parse(jsonStringOriginal);
+
+                    JSONArray newSearchQueriesArray = new JSONArray();
+
+                    JSONArray searchQueriesJson = (JSONArray)jsonObject.get("searchQueries");
+                    for(Object queryJson : searchQueriesJson) {
+                        JSONObject queryJsonObject = (JSONObject)queryJson;
+                        String nToken = (String) queryJsonObject.get("token");
+                        if(nToken != null && requestQueryNToken.contains("__search__" + nToken)) {
+                            JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
+                            tmpQueryObject.remove("nToken");
+                            tmpQueryObject.put("token", nToken);
+                            newSearchQueriesArray.add(tmpQueryObject);
+                            update = true;
+                        } else {
+                            newSearchQueriesArray.add(queryJsonObject);
+                        }
+                    }
+
+                    newRequestJson.put("searchQueries", newSearchQueriesArray);
+                } catch (Exception ex) {
+                    logger.error("Directory::createQuery: Error Parsing JSON String");
+                    ex.printStackTrace();
+                }
+
                 /**
                  * Update the existing query in the next step (newQuery.xhtml page) and return the new URL back to the directory.
                  */
-
-                // Hack for Locator
-                queryString = queryString.replaceAll("collectionid", "collectionId");
-                queryString = queryString.replaceAll("biobankid", "biobankId");
 
                 JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
                 jsonQueryRecord.setJsonText(queryString);
@@ -212,7 +233,16 @@ public class Directory {
 
                 CreateQueryResultDTO result = new CreateQueryResultDTO();
 
-                String builder = getLocalUrl(request) + "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId="+ jsonQueryRecord.getId();
+                String builder = getLocalUrl(request);
+
+                if(update) {
+                    queryRecord.setJsonText(newRequestJson.toJSONString());
+                    queryRecord.update();
+                    builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
+                    checkLifeCycleStatus(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId());
+                } else {
+                    builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId=" + jsonQueryRecord.getId();
+                }
 
                 result.setRedirectUri(builder);
 
@@ -224,13 +254,36 @@ public class Directory {
                         .location(new URI(builder)).build();
             }
         } catch (IOException | URISyntaxException e) {
-            System.err.println("-------Error API");
+            System.err.println("Directory::createQuery: IOException | URISyntaxException");
             e.printStackTrace();
             throw new BadRequestException();
         } catch (SQLException e) {
+            System.err.println("Directory::createQuery: SQLException");
+            e.printStackTrace();
+            throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            System.err.println("Directory::createQuery: Exception");
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private void checkLifeCycleStatus(Config config, Integer queryId, boolean testRequest, int userId) {
+        RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+        if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null) {
+            return;
+        }
+        if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
+            requestLifeCycleStatus.contactCollectionRepresentativesIfNotContacted(userId, getQueryUrlForBiobanker(queryId));
+        }
+    }
+
+    public String getQueryUrlForBiobanker(Integer queryId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/owner/detail.xhtml?queryId=" + queryId);
     }
 
     /**

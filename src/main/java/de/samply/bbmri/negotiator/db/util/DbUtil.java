@@ -2527,7 +2527,7 @@ public class DbUtil {
         for(Record record : result) {
             System.out.println("Updating status for collection" + (Integer)record.getValue(1) + " in request " + (Integer)record.getValue(0));
             saveUpdateCollectionRequestStatus(null, (Integer)record.getValue(0), (Integer)record.getValue(1),
-                    "notreachable", "contact", "", new Date(), userId);
+                    "contacted", "contact", "", new Date(), userId);
         }
     }
 
