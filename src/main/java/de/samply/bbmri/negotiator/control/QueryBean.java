@@ -76,60 +76,60 @@ import de.samply.bbmri.negotiator.rest.Directory;
 @ViewScoped
 public class QueryBean implements Serializable {
 
-   private static final long serialVersionUID = -611428463046308071L;
+    private static final long serialVersionUID = -611428463046308071L;
 
-   private Integer jsonQueryId;
+    private Integer jsonQueryId;
 
-   private static final Logger logger = LogManager.getLogger(QueryBean.class);
+    private static final Logger logger = LogManager.getLogger(QueryBean.class);
 
-   @ManagedProperty(value = "#{userBean}")
-   private UserBean userBean;
+    @ManagedProperty(value = "#{userBean}")
+    private UserBean userBean;
 
-   private RequestLifeCycleStatus requestLifeCycleStatus;
+    private RequestLifeCycleStatus requestLifeCycleStatus;
 
-   /**
-    * Session bean use to store transient edit query values
-    */
-   @ManagedProperty(value = "#{sessionBean}")
-   private SessionBean sessionBean;
+    /**
+     * Session bean use to store transient edit query values
+     */
+    @ManagedProperty(value = "#{sessionBean}")
+    private SessionBean sessionBean;
 
     @ManagedProperty(value = "#{fileUploadBean}")
     private FileUploadBean fileUploadBean;
 
-   /**
-    * The query id if user is in the edit mode.
-    */
-   private Integer id = null;
+    /**
+     * The query id if user is in the edit mode.
+     */
+    private Integer id = null;
 
-   /**
-    * The description of the query.
-    */
-   private String queryText;
+    /**
+     * The description of the query.
+     */
+    private String queryText;
 
     /**
      * The description of the request.
      */
-   private String queryRequestDescription;
+    private String queryRequestDescription;
 
-   /**
-    * The title of the query.
-    */
-   private String queryTitle;
+    /**
+     * The title of the query.
+     */
+    private String queryTitle;
 
-   /**
-    * The jsonText of the query.
-    */
-   private String jsonQuery;
+    /**
+     * The jsonText of the query.
+     */
+    private String jsonQuery;
 
-   /**
-    * The mode of the page - editing or creating a new query
-    */
-   private String mode = null;
+    /**
+     * The mode of the page - editing or creating a new query
+     */
+    private String mode = null;
 
-   /**
-    * The token sent to directory for authentication.
-    */
-   private String qtoken;
+    /**
+     * The token sent to directory for authentication.
+     */
+    private String qtoken;
 
     /**
      * String containing ethics code, if available.
@@ -148,45 +148,45 @@ public class QueryBean implements Serializable {
 
     private boolean testRequest;
 
-   /**
-    * Initializes this bean by registering email notification observer
-    */
-   public void initialize() {
-       try(Config config = ConfigFactory.get()) {
-           /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
-           if(id != null)
-           {
-               requestLifeCycleStatus = new RequestLifeCycleStatus(id);
-               setMode("edit");
-               QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
+    /**
+     * Initializes this bean by registering email notification observer
+     */
+    public void initialize() {
+        try(Config config = ConfigFactory.get()) {
+            /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
+            if(id != null)
+            {
+                requestLifeCycleStatus = new RequestLifeCycleStatus(id);
+                setMode("edit");
+                QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
 
-               /**
-                * Save query title and text temporarily when a file is being uploaded.
-                */
-               if(sessionBean.isSaveTransientState() == false){
-                   getSavedValuesFromDatabaseObject(config, queryRecord);
-               }else {
+                /**
+                 * Save query title and text temporarily when a file is being uploaded.
+                 */
+                if(sessionBean.isSaveTransientState() == false){
+                    getSavedValuesFromDatabaseObject(config, queryRecord);
+                }else {
                     // Get the values of the fields before page was refreshed - for file upload or changing query from directory
-                   getSavedValuesFromSessionBean();
-               }
-               qtoken = queryRecord.getNegotiatorToken();
+                    getSavedValuesFromSessionBean();
+                }
+                qtoken = queryRecord.getNegotiatorToken();
 
-           }
-           else{
-               setMode("newQuery");
-               String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-               // Add Token to query String
-               searchJsonQuery = searchJsonQuery.replace("\"URL\"", "\"token\":\"" + UUID.randomUUID().toString().replace("-", "") + "\",\"URL\"");
-               jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
-           }
-           logger.debug("jsonQuery: " + jsonQuery);
-           QueryDTO queryDTO = Directory.getQueryDTO(jsonQuery);
-           searchQueries = new ArrayList<QuerySearchDTO>(queryDTO.getSearchQueries());
-       }
-       catch (Exception e) {
-           logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
-       }
-   }
+            }
+            else{
+                setMode("newQuery");
+                String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+                // Add Token to query String
+                searchJsonQuery = searchJsonQuery.replace("\"URL\"", "\"token\":\"" + UUID.randomUUID().toString().replace("-", "") + "\",\"URL\"");
+                jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
+            }
+            logger.debug("jsonQuery: " + jsonQuery);
+            QueryDTO queryDTO = Directory.getQueryDTO(jsonQuery);
+            searchQueries = new ArrayList<QuerySearchDTO>(queryDTO.getSearchQueries());
+        }
+        catch (Exception e) {
+            logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
+        }
+    }
 
     private void getSavedValuesFromDatabaseObject(Config config, QueryRecord queryRecord) {
         queryTitle = queryRecord.getTitle();
@@ -234,141 +234,155 @@ public class QueryBean implements Serializable {
         return null;
     }
 
-   public List<QuerySearchDTO> getSearchQueries() {
+    public List<QuerySearchDTO> getSearchQueries() {
         return searchQueries;
-   }
+    }
 
-   public String getDirectoryNameByUrl(String url) {
-       try(Config config = ConfigFactory.get()) {
-           if(url.equals("")) {
-               logger.info("Problem URL is empty");
-               return "URL is empty";
-           } else {
-               return DbUtil.getDirectoryByUrl(config, url).getName();
-           }
-       }
-       catch (Exception e) {
-           logger.error("Loading by url faild url: " + url + " jsonQueryId: " + jsonQueryId, e);
-           e.printStackTrace();
-       }
-       return "";
-   }
+    public String getDirectoryNameByUrl(String url) {
+        try(Config config = ConfigFactory.get()) {
+            if(url.equals("")) {
+                logger.info("Problem URL is empty");
+                return "URL is empty";
+            } else {
+                return DbUtil.getDirectoryByUrl(config, url).getName();
+            }
+        }
+        catch (Exception e) {
+            logger.error("Loading by url faild url: " + url + " jsonQueryId: " + jsonQueryId, e);
+            e.printStackTrace();
+        }
+        return "";
+    }
 
-   /**
-    * Saves the newly created or edited query in the database.
-    */
-   public String saveQuery() throws SQLException {
-       try (Config config = ConfigFactory.get()) {
-           /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
+    /**
+     * Saves the newly created or edited query in the database.
+     */
+    public String saveQuery() throws SQLException {
+        try (Config config = ConfigFactory.get()) {
+            /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
 
-           // Hack for Locator
-           jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
-           jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
+            // Hack for Locator
+            jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
+            jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
 
-           if(id != null) {
-               DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest);
-               requestLifeCycleStatus = new RequestLifeCycleStatus(id);
-               if(!requestLifeCycleStatus.statusCreated()) {
-                   requestLifeCycleStatus.createStatus(userBean.getUserId());
-                   requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
-                   NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
-               } else if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
-                   requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
-                   NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
-               }
-               checkLifeCycleStatus(config, id, testRequest);
-               config.commit();
-               return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
-           } else {
-               if(jsonQuery.contains("nToken")) {
-                   this.qtoken = getRequestToken(jsonQuery);
-               }
-               QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                       jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
-                       true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
-                       testRequest);
-               config.commit();
-               requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
-               requestLifeCycleStatus.createStatus(userBean.getUserId());
-               requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
-               checkLifeCycleStatus(config, record.getId(), testRequest);
-               config.commit();
-               NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, record.getId(), null, userBean.getUserId());
-               return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
-           }
-       } catch (IOException e) {
-           e.printStackTrace();
-       }
-       return "/researcher/index";
-   }
+            if(id != null) {
+                DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest);
+                requestLifeCycleStatus = new RequestLifeCycleStatus(id);
+                if(!requestLifeCycleStatus.statusCreated()) {
+                    requestLifeCycleStatus.createStatus(userBean.getUserId());
+                    requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
+                    NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
+                } else if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
+                    requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
+                    NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
+                }
+                checkLifeCycleStatus(config, id, testRequest);
+                config.commit();
+                return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
+            } else {
+                if(jsonQuery.contains("nToken")) {
+                    this.qtoken = getRequestToken(jsonQuery);
+                }
+                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                        jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
+                        true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                        testRequest);
+                config.commit();
+                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
+                requestLifeCycleStatus.createStatus(userBean.getUserId());
+                requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
+                checkLifeCycleStatus(config, record.getId(), testRequest);
+                config.commit();
+                NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, record.getId(), null, userBean.getUserId());
+                return "/researcher/detail?queryId=" + record.getId() + "&faces-redirect=true";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "/researcher/index";
+    }
 
-   private String getRequestToken(String jsonString) {
-       String token = "";
-       try {
-           JSONParser parser = new JSONParser(JSONParser.MODE_PERMISSIVE);
-           JSONObject elements = (JSONObject) parser.parse(jsonString);
-           String array = elements.getAsString("searchQueries");
-           JSONArray elementsArray = (JSONArray) parser.parse(array);
-           for (Object element : elementsArray) {
-               JSONObject object = (JSONObject) element;
-               token = object.getAsString("nToken");
-           }
-           token = token.replaceAll("__search__.*", "");
-       } catch (Exception e) {
-           System.err.println("Count not create nToken");
-       }
-       return token;
-   }
+    private String getRequestToken(String jsonString) {
+        String token = "";
+        try {
+            JSONParser parser = new JSONParser(JSONParser.MODE_PERMISSIVE);
+            JSONObject elements = (JSONObject) parser.parse(jsonString);
+            String array = elements.getAsString("searchQueries");
+            JSONArray elementsArray = (JSONArray) parser.parse(array);
+            for (Object element : elementsArray) {
+                JSONObject object = (JSONObject) element;
+                token = object.getAsString("nToken");
+            }
+            token = token.replaceAll("__search__.*", "");
+        } catch (Exception e) {
+            System.err.println("Count not create nToken");
+        }
+        return token;
+    }
 
-   private void checkLifeCycleStatus(Config config, Integer queryId, boolean testRequest) {
-       if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null) {
-           return;
-       }
-       if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
-           requestLifeCycleStatus.contactCollectionRepresentativesIfNotContacted(userBean.getUserId(), getQueryUrlForBiobanker(queryId));
-       }
-   }
+    private void checkLifeCycleStatus(Config config, Integer queryId, boolean testRequest) {
+        if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null) {
+            return;
+        }
+        if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
+            requestLifeCycleStatus.contactCollectionRepresentativesIfNotContacted(userBean.getUserId(), getQueryUrlForBiobanker(queryId));
+        }
+    }
 
-   /**
-    * Redirects the user to directory for editing the query
- * @throws IOException
- * @throws JsonMappingException
- * @throws JsonParseException
-    */
-   public void editSearchParameters(String url, String searchToken) throws JsonParseException, JsonMappingException, IOException {
-       ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+    /**
+     * Redirects the user to directory for editing the query
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonParseException
+     */
+    public void editSearchParameters(String url, String searchToken) throws JsonParseException, JsonMappingException, IOException {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 
-       /**
-        * Add token if an existing query is being edited. Else the user is still in the process of creating a
-        * query and it has not been saved in the Query table hence no token is used.
-        */
-       if(mode.equals("edit")) {
-           saveEditChangesTemporarily();
-           externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
-       }else{
-           try (Config config = ConfigFactory.get()) {
-               // Hack for Locator
-               jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
-               jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
-               if(jsonQuery.contains("nToken")) {
-                   this.qtoken = getRequestToken(jsonQuery);
-               }
-               QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                       jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
-                       true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
-                       testRequest);
-               config.commit();
-               requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
-               requestLifeCycleStatus.createStatus(userBean.getUserId());
-               config.commit();
-           } catch (Exception e) {
-               logger.error("QueryBean::editSearchParameters: Problem creating request!");
-               e.printStackTrace();
-           }
-           // Status created, not review
-           externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
-       }
-   }
+        /**
+         * Add token if an existing query is being edited. Else the user is still in the process of creating a
+         * query and it has not been saved in the Query table hence no token is used.
+         */
+        if(mode.equals("edit")) {
+            saveEditChangesTemporarily();
+            if(url.contains("finder-dev.bbmri-eric.eu")) {
+                logger.info("URL1.4: " + url);
+                System.out.println("URL1.4: " + url);
+                externalContext.redirect(url);
+            } else {
+                logger.info("URL1.8: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
+                System.out.println("URL1.8: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
+                externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
+            }
+        }else{
+//<<<<<<< HEAD
+            try (Config config = ConfigFactory.get()) {
+                // Hack for Locator
+                jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
+                jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
+                if(jsonQuery.contains("nToken")) {
+                    this.qtoken = getRequestToken(jsonQuery);
+                }
+                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                        jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
+                        true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                        testRequest);
+                config.commit();
+                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
+                requestLifeCycleStatus.createStatus(userBean.getUserId());
+                config.commit();
+            } catch (Exception e) {
+                logger.error("QueryBean::editSearchParameters: Problem creating request!");
+                e.printStackTrace();
+            }
+            // Status created, not review
+            externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
+/*=======
+           logger.info("URL2: " + url);
+           System.out.println("URL2: " + url);
+           externalContext.redirect(url);
+>>>>>>> feature/new-api-endpoint-for-finder*/
+        }
+    }
 
     /**
      * Redirects the user to directory for editing the query
@@ -439,7 +453,7 @@ public class QueryBean implements Serializable {
      * @param searchJsonQuery
      * @return
      */
-   private String generateJsonQuery(String searchJsonQuery) {
+    private String generateJsonQuery(String searchJsonQuery) {
         try (Config config = ConfigFactory.get()) {
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
@@ -469,7 +483,7 @@ public class QueryBean implements Serializable {
             e.printStackTrace();
         }
         return  jsonQuery;
-   }
+    }
 
     /**
      * Generate the JSON including the new search query String
@@ -506,47 +520,47 @@ public class QueryBean implements Serializable {
         return  jsonQuery;
     }
 
-   /**
-    * Save title and text in session bean when uploading attachment.
-    */
-   public void saveEditChangesTemporarily() {
-       sessionBean.setTransientQueryTitle(queryTitle);
-       sessionBean.setTransientQueryText(queryText);
-       sessionBean.setTransientQueryJson(jsonQuery);
-       sessionBean.setTransientQueryRequestDescription(queryRequestDescription);
-       sessionBean.setTransientEthicsCode(ethicsVote);
-       sessionBean.setTransientQueryTestRequest(testRequest);
-       sessionBean.setSaveTransientState(true);
-   }
+    /**
+     * Save title and text in session bean when uploading attachment.
+     */
+    public void saveEditChangesTemporarily() {
+        sessionBean.setTransientQueryTitle(queryTitle);
+        sessionBean.setTransientQueryText(queryText);
+        sessionBean.setTransientQueryJson(jsonQuery);
+        sessionBean.setTransientQueryRequestDescription(queryRequestDescription);
+        sessionBean.setTransientEthicsCode(ethicsVote);
+        sessionBean.setTransientQueryTestRequest(testRequest);
+        sessionBean.setSaveTransientState(true);
+    }
 
-   /**
-    * Clear title and text from session bean once the attachment is uploaded and the initialize function .
-    * has updated values.
-    */
-   public void clearEditChanges() {
-       sessionBean.setTransientQueryTitle(null);
-       sessionBean.setTransientQueryText(null);
-       sessionBean.setTransientQueryRequestDescription(null);
-       sessionBean.setTransientQueryJson(null);
-       sessionBean.setTransientEthicsCode(null);
-       sessionBean.setTransientQueryTestRequest(null);
-       sessionBean.setSaveTransientState(false);
+    /**
+     * Clear title and text from session bean once the attachment is uploaded and the initialize function .
+     * has updated values.
+     */
+    public void clearEditChanges() {
+        sessionBean.setTransientQueryTitle(null);
+        sessionBean.setTransientQueryText(null);
+        sessionBean.setTransientQueryRequestDescription(null);
+        sessionBean.setTransientQueryJson(null);
+        sessionBean.setTransientEthicsCode(null);
+        sessionBean.setTransientQueryTestRequest(null);
+        sessionBean.setSaveTransientState(false);
 
-   }
+    }
 
-   /**
-    * Build url to be able to navigate to the query with id=queryId
-    *
-    * @param queryId
-    * @return
-    */
-   public String getQueryUrl(Integer queryId) {
-       ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+    /**
+     * Build url to be able to navigate to the query with id=queryId
+     *
+     * @param queryId
+     * @return
+     */
+    public String getQueryUrl(Integer queryId) {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 
-       return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
-               context.getRequestServerPort(), context.getRequestContextPath(),
-               "/researcher/detail.xhtml?queryId=" + getId());
-   }
+        return ServletUtil.getLocalRedirectUrl(context.getRequestScheme(), context.getRequestServerName(),
+                context.getRequestServerPort(), context.getRequestContextPath(),
+                "/researcher/detail.xhtml?queryId=" + getId());
+    }
 
     /**
      * Build url to be able to navigate to the query with id=queryId for a biobanker
@@ -643,13 +657,13 @@ public class QueryBean implements Serializable {
         this.fileUploadBean = fileUploadBean;
     }
 
-	public String getQueryTitle() {
-		return queryTitle;
-	}
+    public String getQueryTitle() {
+        return queryTitle;
+    }
 
-	public void setQueryTitle(String queryTitle) {
-		this.queryTitle = queryTitle;
-	}
+    public void setQueryTitle(String queryTitle) {
+        this.queryTitle = queryTitle;
+    }
 
     public Integer getId() {
         return id;

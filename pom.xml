@@ -41,7 +41,7 @@
         <database.password>saher</database.password>
 
         <!--<database.server>localhost</database.server>
-        <database.port>5433</database.port>
+        <database.port>5434</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
         <database.password>negotiator</database.password>-->
@@ -72,20 +72,20 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.3.1</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.3.1</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>5.3.1</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -130,13 +130,13 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.23.4</version>
+            <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>2.23.4</version>
+            <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
 
