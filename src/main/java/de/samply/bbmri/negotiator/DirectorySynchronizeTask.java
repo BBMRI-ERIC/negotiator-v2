@@ -37,6 +37,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.BCPlatformFinderDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.DKFZSampleLocatorDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import org.slf4j.Logger;
@@ -95,6 +96,26 @@ public class DirectorySynchronizeTask extends TimerTask {
         }
         if(listOfDirectoriesRecord.getApiType().equalsIgnoreCase("DKFZ-SampleLocator")) {
             return syncDKFZSampleLocatorStyleDirectory(listOfDirectoriesRecord, directorySyncLoggingHelper);
+        }
+        if(listOfDirectoriesRecord.getApiType().equalsIgnoreCase("BCPlatform-Finder")) {
+            return syncBCPlatformFinderStyleDirectory(listOfDirectoriesRecord, directorySyncLoggingHelper);
+        }
+        return directorySyncLoggingHelper;
+    }
+
+    private DirectorySyncLoggingHelper syncBCPlatformFinderStyleDirectory(ListOfDirectoriesRecord listOfDirectoriesRecord, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
+        try(Config config = ConfigFactory.get()) {
+            BCPlatformFinderDirectoryClient directoryClient = new BCPlatformFinderDirectoryClient(
+                    listOfDirectoriesRecord.getRestUrl(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
+
+            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
+            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectoriesRecord.getId(), config, directoryClient, false));
+            logger.info(marker, "Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
+                    directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
+            config.commit();
+        } catch (Exception e) {
+            logger.error(marker, "Synchronization of directory failed: {}", e.getMessage());
+            NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, e.getMessage());
         }
         return directorySyncLoggingHelper;
     }

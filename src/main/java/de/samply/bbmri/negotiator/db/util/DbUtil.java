@@ -2531,6 +2531,24 @@ public class DbUtil {
         }
     }
 
+    public static String getRequestToken(String queryToken) {
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT negotiator_token FROM public.query WHERE json_text ILIKE '%" + queryToken + "%';");
+            Result<Record> result = resultQuery.fetch();
+            if(!result.isEmpty()) {
+                for (Record record : result) {
+                    String requestToken = record.getValue(0, String.class);
+                    logger.debug(requestToken);
+                    return requestToken;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting RequestToken from QueryToken.");
+            e.printStackTrace();
+        }
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
     public static List<QueryRecord> getAllRequestsToUpdate(Config config) {
         Result<QueryRecord> result = config.dsl()
                 .selectFrom(Tables.QUERY)
