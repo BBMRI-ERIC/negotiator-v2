@@ -26,8 +26,8 @@ public class QuerySearchDTOHelper {
             querySearchDTO.setHumanReadable(elements.getAsString("request_id"));
 
             // Check if ntocken alredy exists for update
-            String requestToken = DbUtil.getRequestToken(elements.getAsString("query_id"));
-            String nTocken = searchNTokenFromQueryToken(requestToken, config);
+            String queryToken = elements.getAsString("query_id");
+            String nTocken = searchNTokenFromQueryToken(queryToken, config);
             querySearchDTO.setToken(nTocken);
 
             String cohort = elements.getAsString("cohort");
@@ -60,10 +60,14 @@ public class QuerySearchDTOHelper {
         return querySearchDTO;
     }
 
+    protected String getRequestToken(String queryToken) {
+        return DbUtil.getRequestToken(queryToken);
+    }
+
     private String searchNTokenFromQueryToken(String queryToken, Config config) {
-        String requestToken = DbUtil.getRequestToken(queryToken);
+        String requestToken = getRequestToken(queryToken);
         String nTocken = requestToken + "__search__" + queryToken;
-        return queryToken;
+        return nTocken;
     }
 
     private String updateExternalId(String externalId) {

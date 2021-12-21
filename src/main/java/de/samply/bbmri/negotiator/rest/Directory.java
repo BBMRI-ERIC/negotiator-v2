@@ -107,91 +107,6 @@ public class Directory {
         }
     }
 
-    private void checkAuthentication(HttpServletRequest request) throws ForbiddenException {
-        Negotiator negotiator = getNegotiatorConfig();
-        AuthenticationService.authenticate(request, negotiator.getMolgenisUsername(), negotiator.getMolgenisPassword());
-    }
-
-    private Response getResponseForQueryWithNoToken(String queryString, @Context HttpServletRequest request, String apiCallId, Config config) throws SQLException, URISyntaxException {
-        JsonQueryRecord jsonQueryRecord = saveJsonQueryRecord(queryString, config);
-        String redirectUrl = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
-        logger.info(apiCallId + " redirectUrl: " + redirectUrl);
-        return createResponse(redirectUrl);
-    }
-
-    private Response getResponseForQueryWithToken(String queryString, HttpServletRequest request, String apiCallId, Config config, QuerySearchDTO querySearchDTO) throws SQLException, URISyntaxException {
-        String requestQueryNToken = querySearchDTO.getToken();
-        String rTocken = requestQueryNToken.replaceAll("__search__.*", "");
-        String qTocken = requestQueryNToken.replaceAll(".*__search__", "");
-        QueryRecord queryRecord = DbUtil.getQuery(config, rTocken);
-
-        if(queryRecord == null) {
-            return getResponseForQueryWithNoToken(queryString, request, apiCallId, config);
-        }
-
-        JSONObject newRequestJson = new JSONObject();
-        Boolean update = false;
-
-        try {
-            String jsonStringOriginal = queryRecord.getJsonText();
-            JSONParser parser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) parser.parse(jsonStringOriginal);
-
-            JSONArray newSearchQueriesArray = new JSONArray();
-
-            JSONArray searchQueriesJson = (JSONArray)jsonObject.get("searchQueries");
-            for(Object queryJson : searchQueriesJson) {
-                JSONObject queryJsonObject = (JSONObject)queryJson;
-                String nToken = (String) queryJsonObject.get("token");
-                if(nToken != null && requestQueryNToken.contains("__search__" + nToken)) {
-                    JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
-                    tmpQueryObject.remove("nToken");
-                    tmpQueryObject.put("token", nToken);
-                    newSearchQueriesArray.add(tmpQueryObject);
-                    update = true;
-                } else {
-                    newSearchQueriesArray.add(queryJsonObject);
-                }
-            }
-
-            newRequestJson.put("searchQueries", newSearchQueriesArray);
-        } catch (Exception ex) {
-            logger.error("Directory::createQuery: Error Parsing JSON String");
-            ex.printStackTrace();
-        }
-
-        /**
-         * Update the existing query in the next step (newQuery.xhtml page) and return the new URL back to the directory.
-         */
-
-        JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
-        jsonQueryRecord.setJsonText(queryString);
-        jsonQueryRecord.store();
-        config.commit();
-
-        CreateQueryResultDTO result = new CreateQueryResultDTO();
-
-        String builder = getLocalUrl(request);
-
-        if(update) {
-            queryRecord.setJsonText(newRequestJson.toJSONString());
-            queryRecord.update();
-            builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
-            checkLifeCycleStatus(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId());
-        } else {
-            builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId=" + jsonQueryRecord.getId();
-        }
-
-        String redirectUrl = getLocalUrl(request) + builder;
-        logger.info(apiCallId + " redirectUrl: " + redirectUrl);
-        return createResponse(redirectUrl);
-    }
-
-    private static String getLocalUrl(HttpServletRequest request) {
-        String strPort = request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "";
-        return request.getScheme() + "://" + request.getServerName() + strPort + request.getContextPath();
-    }
-
     @OPTIONS
     @Path("/create_query")
     @Produces(MediaType.APPLICATION_JSON)
@@ -239,6 +154,102 @@ public class Directory {
         }
     }
 
+    private void checkAuthentication(HttpServletRequest request) throws ForbiddenException {
+        Negotiator negotiator = getNegotiatorConfig();
+        AuthenticationService.authenticate(request, negotiator.getMolgenisUsername(), negotiator.getMolgenisPassword());
+    }
+
+    private Response getResponseForQueryWithNoToken(String queryString, @Context HttpServletRequest request, String apiCallId, Config config) throws SQLException, URISyntaxException {
+        JsonQueryRecord jsonQueryRecord = saveJsonQueryRecord(queryString, config);
+        String redirectUrl = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
+        logger.info(apiCallId + " redirectUrl: " + redirectUrl);
+        return createResponse(redirectUrl);
+    }
+
+    private Response getResponseForQueryWithToken(String queryString, HttpServletRequest request, String apiCallId, Config config, QuerySearchDTO querySearchDTO) throws SQLException, URISyntaxException {
+        String requestQueryNToken = querySearchDTO.getToken();
+        String rTocken = requestQueryNToken.replaceAll("__search__.*", "");
+        String qTocken = requestQueryNToken.replaceAll(".*__search__", "");
+        QueryRecord queryRecord = DbUtil.getQuery(config, rTocken);
+
+        // if no queryRecord exist just create the jsonRecord with a redirect url
+        if(queryRecord == null) {
+            return getResponseForQueryWithNoToken(queryString, request, apiCallId, config);
+        }
+
+        JSONObject newRequestJson = new JSONObject();
+        Boolean update = false;
+
+        try {
+            String jsonStringOriginal = queryRecord.getJsonText();
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) parser.parse(jsonStringOriginal);
+
+            JSONArray newSearchQueriesArray = new JSONArray();
+
+            JSONArray searchQueriesJson = (JSONArray)jsonObject.get("searchQueries");
+            for(Object queryJson : searchQueriesJson) {
+                JSONObject queryJsonObject = (JSONObject)queryJson;
+                String nToken = (String) queryJsonObject.get("token");
+                if(nToken != null && requestQueryNToken.contains("__search__" + nToken)) {
+                    JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
+                    tmpQueryObject.remove("nToken");
+                    tmpQueryObject.put("token", nToken);
+                    newSearchQueriesArray.add(tmpQueryObject);
+                    update = true;
+                } else {
+                    newSearchQueriesArray.add(queryJsonObject);
+                }
+            }
+
+            if(!update) {
+                /*String nToken = (String) queryJsonObject.get("token");
+                JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
+                tmpQueryObject.remove("nToken");
+                tmpQueryObject.put("token", nToken);
+                newSearchQueriesArray.add(tmpQueryObject);*/
+            }
+
+            newRequestJson.put("searchQueries", newSearchQueriesArray);
+        } catch (Exception ex) {
+            logger.error("Directory::createQuery: Error Parsing JSON String");
+            ex.printStackTrace();
+        }
+
+        /**
+         * Update the existing query in the next step (newQuery.xhtml page) and return the new URL back to the directory.
+         */
+
+        JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
+        jsonQueryRecord.setJsonText(queryString);
+        jsonQueryRecord.store();
+        config.commit();
+
+        CreateQueryResultDTO result = new CreateQueryResultDTO();
+
+        String builder = getLocalUrl(request);
+
+        if(update) {
+            queryRecord.setJsonText(newRequestJson.toJSONString());
+            queryRecord.update();
+            builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
+            checkLifeCycleStatus(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId());
+        } else {
+            builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId=" + jsonQueryRecord.getId();
+        }
+
+        String redirectUrl = getLocalUrl(request) + builder;
+        logger.info(apiCallId + " redirectUrl: " + redirectUrl);
+        return createResponse(redirectUrl);
+    }
+
+    private static String getLocalUrl(HttpServletRequest request) {
+        String strPort = request.getServerPort() != 80 && request.getServerPort() != 443 ? ":" + request.getServerPort() : "";
+        return request.getScheme() + "://" + request.getServerName() + strPort + request.getContextPath();
+    }
+
+
+
     /**
      * Convert the string to an object, so that we can store it in the database.
      * @throws IOException
@@ -251,7 +262,7 @@ public class Directory {
         return mapper.readValue(queryString, QueryDTO.class);
     }
 
-    private JsonQueryRecord saveJsonQueryRecord(String queryString, Config config) throws SQLException {
+    protected JsonQueryRecord saveJsonQueryRecord(String queryString, Config config) throws SQLException {
         // Hack for Locator
         queryString = queryString.replaceAll("collectionid", "collectionId");
         queryString = queryString.replaceAll("biobankid", "biobankId");
