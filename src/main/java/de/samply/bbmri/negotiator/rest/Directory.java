@@ -42,6 +42,7 @@ import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import de.samply.bbmri.negotiator.util.NToken;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import org.json.simple.JSONArray;
@@ -167,10 +168,8 @@ public class Directory {
     }
 
     private Response getResponseForQueryWithToken(String queryString, HttpServletRequest request, String apiCallId, Config config, QuerySearchDTO querySearchDTO) throws SQLException, URISyntaxException {
-        String requestQueryNToken = querySearchDTO.getToken();
-        String rTocken = requestQueryNToken.replaceAll("__search__.*", "");
-        String qTocken = requestQueryNToken.replaceAll(".*__search__", "");
-        QueryRecord queryRecord = DbUtil.getQuery(config, rTocken);
+        NToken nToken = new NToken(querySearchDTO.getToken());
+        QueryRecord queryRecord = DbUtil.getQuery(config, nToken.getRequestToken());
 
         // if no queryRecord exist just create the jsonRecord with a redirect url
         if(queryRecord == null) {
@@ -183,18 +182,18 @@ public class Directory {
         try {
             String jsonStringOriginal = queryRecord.getJsonText();
             JSONParser parser = new JSONParser();
-            JSONObject jsonObject = (JSONObject) parser.parse(jsonStringOriginal);
+            JSONObject jsonObjectOriginalRequest = (JSONObject) parser.parse(jsonStringOriginal);
 
             JSONArray newSearchQueriesArray = new JSONArray();
 
-            JSONArray searchQueriesJson = (JSONArray)jsonObject.get("searchQueries");
+            JSONArray searchQueriesJson = (JSONArray)jsonObjectOriginalRequest.get("searchQueries");
             for(Object queryJson : searchQueriesJson) {
                 JSONObject queryJsonObject = (JSONObject)queryJson;
-                String nToken = (String) queryJsonObject.get("token");
-                if(nToken != null && requestQueryNToken.contains("__search__" + nToken)) {
+                String queryTokenOriginalJson = (String) queryJsonObject.get("token");
+                if(queryTokenOriginalJson != null && nToken.getQueryToken().equals(queryTokenOriginalJson)) {
                     JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
                     tmpQueryObject.remove("nToken");
-                    tmpQueryObject.put("token", nToken);
+                    tmpQueryObject.put("token", nToken.getQueryToken());
                     newSearchQueriesArray.add(tmpQueryObject);
                     update = true;
                 } else {
@@ -202,12 +201,18 @@ public class Directory {
                 }
             }
 
+            // Add json if it is a new query with a set token
             if(!update) {
-                /*String nToken = (String) queryJsonObject.get("token");
                 JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
                 tmpQueryObject.remove("nToken");
-                tmpQueryObject.put("token", nToken);
-                newSearchQueriesArray.add(tmpQueryObject);*/
+                tmpQueryObject.put("token", nToken.getQueryToken());
+                newSearchQueriesArray.add(tmpQueryObject);
+
+            }
+
+            // Set status to abandoned for removed collections
+            if(update) {
+                // TODO: Update lifecycle status for collections
             }
 
             newRequestJson.put("searchQueries", newSearchQueriesArray);
@@ -224,8 +229,6 @@ public class Directory {
         jsonQueryRecord.setJsonText(queryString);
         jsonQueryRecord.store();
         config.commit();
-
-        CreateQueryResultDTO result = new CreateQueryResultDTO();
 
         String builder = getLocalUrl(request);
 
