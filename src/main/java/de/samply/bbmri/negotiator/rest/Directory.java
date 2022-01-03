@@ -176,7 +176,7 @@ public class Directory {
 
     private Response getResponseForQueryWithToken(String queryString, HttpServletRequest request, String apiCallId, Config config, QuerySearchDTO querySearchDTO) throws SQLException, URISyntaxException {
         NToken nToken = new NToken(querySearchDTO.getToken());
-        QueryRecord queryRecord = DbUtil.getQuery(config, nToken.getRequestToken());
+        QueryRecord queryRecord = getQueryRecord(config, nToken.getRequestToken());
 
         // if no queryRecord exist just create the jsonRecord with a redirect url
         if(queryRecord == null) {
@@ -360,5 +360,9 @@ public class Directory {
 
     protected Negotiator getNegotiatorConfig() {
         return NegotiatorConfig.get().getNegotiator();
+    }
+
+    protected QueryRecord getQueryRecord(Config config, String reuestToken) {
+        return DbUtil.getQuery(config, reuestToken);
     }
 }
