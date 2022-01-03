@@ -65,7 +65,7 @@ class DirectoryAPITest {
         // Test call
         Response response = directorySpy.createQuery(queryJsonNoNToken, request);
 
-        assertEquals(response.getStatus(), 202);
+        assertEquals(202, response.getStatus());
     }
 
     @Test
@@ -89,7 +89,7 @@ class DirectoryAPITest {
         // Test call
         Response response = directorySpy.createQuery(queryJsonNToken, request);
 
-        assertEquals(response.getStatus(), 202);
+        assertEquals(202, response.getStatus());
     }
 
     private String finderJson = "{\n   \"query_start_timestamp\":\"2021-08-10T08:04:51.019\",\n   \"access_duration\":{\n      \"end_date\":\"\",\n      \"start_date\":\"\"\n   },\n   \"query_id\":\"RQ-37d68fc0-4d67-480a-9419-2580335cabc7\",\n   \"user_email\":\"anni.ahonen-bishopp@bcplatforms.com\",\n   \"user_id\":\"115715892511411738289\",\n   \"description\":\"my description of the cohort\",\n   \"cohort\":{\n      \"result\":{\n         \"counts\":[\n            {\n               \"rquest_id\":\"RQ-CC-e7c7d4d0-2a81-4833-b5b4-ac2a0c1a3e6f\",\n               \"count\":\"1030\"\n            }\n         ]\n      },\n      \"input\":{\n         \"collections\":[\n            {\n               \"rquest_id\":\"RQ-CC-e7c7d4d0-2a81-4833-b5b4-ac2a0c1a3e6f\",\n               \"external_id\":\"Graz\"\n            }\n         ],\n         \"cohorts\":[\n            {\n               \"name\":\"cases\",\n               \"groups\":[\n                  {\n                     \"rules\":[\n                        {\n                           \"type\":\"ALT\",\n                           \"varname\":\"SAMPLES\",\n                           \"value\":\"1\"\n                        }\n                     ],\n                     \"rules_oper\":\"AND\"\n                  }\n               ],\n               \"groups_oper\":\"OR\"\n            }\n         ],\n         \"time_window\":\"2018-01-01|\"\n      },\n      \"application\":\"bcrquest_server\",\n      \"searched_codes\":{\n         \n      },\n      \"query_url\":\"https://rquest-dev2.bcplatforms.cloud/bcrquest/#!search-results/RQ-37d68fc0-4d67-480a-9419-2580335cabc7\"\n   },\n   \"request_id\":\"How many subjects with samples\",\n   \"items\":[\n      \n   ]\n}";

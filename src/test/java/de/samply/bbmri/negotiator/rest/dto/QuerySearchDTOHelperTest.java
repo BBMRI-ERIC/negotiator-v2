@@ -40,14 +40,14 @@ class QuerySearchDTOHelperTest {
         // Test call
         QuerySearchDTO querySearchDTO = querySearchDTOHelperSpy.generateQuerySearchDTOFromFinderV1(finderJson, apiCallId, config);
 
-        assertEquals(querySearchDTO.getToken(), "39e7a80dc1ff4e9db9aaca40332d03ee__search__RQ-37d68fc0-4d67-480a-9419-2580335cabc7");
-        assertEquals(querySearchDTO.getUrl(), "https://rquest-dev2.bcplatforms.cloud/bcrquest/#!search-results/RQ-37d68fc0-4d67-480a-9419-2580335cabc7");
-        assertEquals(querySearchDTO.getHumanReadable(), "How many subjects with samples");
-        assertEquals(querySearchDTO.getNumberOfCollections(), 1);
+        assertEquals("39e7a80dc1ff4e9db9aaca40332d03ee__search__RQ-37d68fc0-4d67-480a-9419-2580335cabc7", querySearchDTO.getToken());
+        assertEquals("https://rquest-dev2.bcplatforms.cloud/bcrquest/#!search-results/RQ-37d68fc0-4d67-480a-9419-2580335cabc7", querySearchDTO.getUrl());
+        assertEquals("How many subjects with samples", querySearchDTO.getHumanReadable());
+        assertEquals(1, querySearchDTO.getNumberOfCollections());
         Collection<CollectionDTO> collections = querySearchDTO.getCollections();
         for(CollectionDTO collectionDTO : collections) {
-            assertEquals(collectionDTO.getBiobankID(), "bbmri-eric:ID:AT_MUG");
-            assertEquals(collectionDTO.getCollectionID(), "bbmri-eric:ID:AT_MUG:collection:FFPEslidesCollection");
+            assertEquals("bbmri-eric:ID:AT_MUG", collectionDTO.getBiobankID());
+            assertEquals("bbmri-eric:ID:AT_MUG:collection:FFPEslidesCollection", collectionDTO.getCollectionID());
         }
     }
 
@@ -60,13 +60,13 @@ class QuerySearchDTOHelperTest {
         QuerySearchDTO querySearchDTO = querySearchDTOHelper.generateQuerySearchDTOFromDirectory(queryJsonNoNToken, apiCallId);
 
         assertNull(querySearchDTO.getToken());
-        assertEquals(querySearchDTO.getUrl(), "http://d1.ref.development.bibbox.org");
-        assertEquals(querySearchDTO.getHumanReadable(), "test");
-        assertEquals(querySearchDTO.getNumberOfCollections(), 1);
+        assertEquals("http://d1.ref.development.bibbox.org", querySearchDTO.getUrl());
+        assertEquals("test", querySearchDTO.getHumanReadable());
+        assertEquals(1, querySearchDTO.getNumberOfCollections());
         Collection<CollectionDTO> collections = querySearchDTO.getCollections();
         for(CollectionDTO collectionDTO : collections) {
-            assertEquals(collectionDTO.getBiobankID(), "bbmri-eric:ID:UK_GBR-1-19");
-            assertEquals(collectionDTO.getCollectionID(), "bbmri-eric:ID:UK_GBR-1-19:collection:542");
+            assertEquals("bbmri-eric:ID:UK_GBR-1-19", collectionDTO.getBiobankID());
+            assertEquals("bbmri-eric:ID:UK_GBR-1-19:collection:542", collectionDTO.getCollectionID());
         }
     }
 
@@ -78,14 +78,14 @@ class QuerySearchDTOHelperTest {
         // Test call
         QuerySearchDTO querySearchDTO = querySearchDTOHelper.generateQuerySearchDTOFromDirectory(queryJsonNToken, apiCallId);
 
-        assertEquals(querySearchDTO.getToken(), "79ad527ff0bb448783461fd35b9c21d5__search__5c1a16eaf2b14213a32c1ecf6d155dbe");
-        assertEquals(querySearchDTO.getUrl(), "http://d1.ref.development.bibbox.org");
-        assertEquals(querySearchDTO.getHumanReadable(), "test");
-        assertEquals(querySearchDTO.getNumberOfCollections(), 1);
+        assertEquals("79ad527ff0bb448783461fd35b9c21d5__search__5c1a16eaf2b14213a32c1ecf6d155dbe", querySearchDTO.getToken());
+        assertEquals("http://d1.ref.development.bibbox.org", querySearchDTO.getUrl());
+        assertEquals("test", querySearchDTO.getHumanReadable());
+        assertEquals(1, querySearchDTO.getNumberOfCollections());
         Collection<CollectionDTO> collections = querySearchDTO.getCollections();
         for(CollectionDTO collectionDTO : collections) {
-            assertEquals(collectionDTO.getBiobankID(), "bbmri-eric:ID:UK_GBR-1-19");
-            assertEquals(collectionDTO.getCollectionID(), "bbmri-eric:ID:UK_GBR-1-19:collection:542");
+            assertEquals("bbmri-eric:ID:UK_GBR-1-19", collectionDTO.getBiobankID());
+            assertEquals("bbmri-eric:ID:UK_GBR-1-19:collection:542", collectionDTO.getCollectionID());
         }
     }
 
