@@ -18,6 +18,8 @@ public class JsonCollectionUpdateHelper {
     private HashSet<String> newCollectionList = new HashSet<>();
     private HashSet<String> oldCollectionList = new HashSet<>();
 
+    private String serviceUrl;
+
     public void addUnchangedCollectionJsonString(String collections) {
         try {
             JSONParser parser = new JSONParser();
@@ -94,5 +96,13 @@ public class JsonCollectionUpdateHelper {
 
     public HashSet<String> getOldCollections() {
         return oldCollectionList;
+    }
+
+    public String getServiceUrl() {
+        return serviceUrl;
+    }
+
+    public void setServiceUrl(String serviceUrl) {
+        this.serviceUrl = serviceUrl;
     }
 }

@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 import javax.faces.context.ExternalContext;
@@ -41,10 +43,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.ServletUtil;
+import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import de.samply.bbmri.negotiator.util.JsonCollectionUpdateHelper;
 import de.samply.bbmri.negotiator.util.NToken;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -184,6 +191,8 @@ public class Directory {
             JSONParser parser = new JSONParser();
             JSONObject jsonObjectOriginalRequest = (JSONObject) parser.parse(jsonStringOriginal);
 
+            JsonCollectionUpdateHelper jsonCollectionUpdateHelper = new JsonCollectionUpdateHelper();
+
             JSONArray newSearchQueriesArray = new JSONArray();
 
             JSONArray searchQueriesJson = (JSONArray)jsonObjectOriginalRequest.get("searchQueries");
@@ -195,9 +204,13 @@ public class Directory {
                     tmpQueryObject.remove("nToken");
                     tmpQueryObject.put("token", nToken.getQueryToken());
                     newSearchQueriesArray.add(tmpQueryObject);
+                    jsonCollectionUpdateHelper.addNewCollectionJson((JSONArray)tmpQueryObject.get("collections"));
+                    jsonCollectionUpdateHelper.addOldCollectionJson((JSONArray)queryJsonObject.get("collections"));
+                    jsonCollectionUpdateHelper.setServiceUrl(tmpQueryObject.get("URL").toString());
                     update = true;
                 } else {
                     newSearchQueriesArray.add(queryJsonObject);
+                    jsonCollectionUpdateHelper.addUnchangedCollectionJson((JSONArray)queryJsonObject.get("collections"));
                 }
             }
 
@@ -212,7 +225,8 @@ public class Directory {
 
             // Set status to abandoned for removed collections
             if(update) {
-                // TODO: Update lifecycle status for collections
+                HashSet<String> collectionsToRemove = jsonCollectionUpdateHelper.getCollectionsToRemove();
+                removeCollectionsFromRequestOrChangeSataus(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId(), collectionsToRemove, jsonCollectionUpdateHelper.getServiceUrl());
             }
 
             newRequestJson.put("searchQueries", newSearchQueriesArray);
@@ -236,7 +250,7 @@ public class Directory {
             queryRecord.setJsonText(newRequestJson.toJSONString());
             queryRecord.update();
             builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
-            checkLifeCycleStatus(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId());
+            checkLifeCycleStatusAndConntactIfStarted(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId());
         } else {
             builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId=" + jsonQueryRecord.getId();
         }
@@ -291,13 +305,43 @@ public class Directory {
                 .location(new URI(redirectUrl)).build();
     }
 
-    private void checkLifeCycleStatus(Config config, Integer queryId, boolean testRequest, int userId) {
+    private void checkLifeCycleStatusAndConntactIfStarted(Config config, Integer queryId, boolean testRequest, int userId) {
         RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
         if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null) {
             return;
         }
         if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
             requestLifeCycleStatus.contactCollectionRepresentativesIfNotContacted(userId, getQueryUrlForBiobanker(queryId));
+        }
+    }
+
+    private void removeCollectionsFromRequestOrChangeSataus(Config config, Integer queryId, boolean testRequest, int userId, HashSet<String> collections, String serviceURL) {
+        if(collections.isEmpty()) {
+            return;
+        }
+        RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+        if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null) {
+            ListOfDirectoriesRecord serviceRecord = DbUtil.getDirectoryByUrl(config, serviceURL);
+            for(String collectionId : collections) {
+                List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
+                for(CollectionRecord collectionRecord : collectionsList) {
+                    DbUtil.removeCollectionRequestMapping(config, queryId, collectionRecord.getId());
+                }
+            }
+        }
+        if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
+            ListOfDirectoriesRecord serviceRecord = DbUtil.getDirectoryByUrl(config, serviceURL);
+            for(String collectionId : collections) {
+                List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
+                for(CollectionRecord collectionRecord : collectionsList) {
+                    List<CollectionLifeCycleStatus> listCollectionLifeStatus = requestLifeCycleStatus.getCollectionsForBiobank(collectionRecord.getBiobankId());
+                    for(CollectionLifeCycleStatus collectionLifeCycleStatus : listCollectionLifeStatus) {
+                        if(collectionLifeCycleStatus.getCollectionId() == collectionRecord.getId()) {
+                            collectionLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.NOT_INTERESTED_RESEARCHER, LifeCycleRequestStatusType.ABANDONED, "", userId);
+                        }
+                    }
+                }
+            }
         }
     }
 

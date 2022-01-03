@@ -2560,4 +2560,8 @@ public class DbUtil {
     public static void updateQueryRecord(Config config, QueryRecord queryRecord) {
         queryRecord.update();
     }
+
+    public static void removeCollectionRequestMapping(Config config, Integer queryId, Integer collectionId) {
+        config.dsl().deleteFrom(Tables.QUERY_COLLECTION).where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId))).execute();
+    }
 }
