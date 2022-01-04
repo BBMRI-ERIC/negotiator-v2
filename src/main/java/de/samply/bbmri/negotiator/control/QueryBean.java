@@ -272,7 +272,7 @@ public class QueryBean implements Serializable {
                     requestLifeCycleStatus.createStatus(userBean.getUserId());
                     requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
                     NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
-                } else if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
+                } else if(requestLifeCycleStatus.getStatus() != null && requestLifeCycleStatus.getStatus().getStatus() != null && requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
                     requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
                     NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
                 }
