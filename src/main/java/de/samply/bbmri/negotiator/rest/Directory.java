@@ -213,6 +213,7 @@ public class Directory {
                     update = true;
                 } else {
                     newSearchQueriesArray.add(queryJsonObject);
+                    logger.info(queryJsonObject);
                     jsonCollectionUpdateHelper.addUnchangedCollectionJson((JSONArray)queryJsonObject.get("collections"));
                 }
             }
