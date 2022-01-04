@@ -238,20 +238,18 @@ public class Directory {
         /**
          * Update the existing query in the next step (newQuery.xhtml page) and return the new URL back to the directory.
          */
-
-        JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
-        jsonQueryRecord.setJsonText(queryString);
-        jsonQueryRecord.store();
-        config.commit();
-
         String builder = getLocalUrl(request);
 
         if(update) {
             queryRecord.setJsonText(newRequestJson.toJSONString());
-            queryRecord.update();
+            updateRecord(queryRecord);
             builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
             checkLifeCycleStatusAndConntactIfStarted(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId());
         } else {
+            JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
+            jsonQueryRecord.setJsonText(queryString);
+            jsonQueryRecord.store();
+            config.commit();
             builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId=" + jsonQueryRecord.getId();
         }
 
@@ -364,5 +362,9 @@ public class Directory {
 
     protected QueryRecord getQueryRecord(Config config, String reuestToken) {
         return DbUtil.getQuery(config, reuestToken);
+    }
+
+    protected void updateRecord(QueryRecord queryRecord) {
+        queryRecord.update();
     }
 }
