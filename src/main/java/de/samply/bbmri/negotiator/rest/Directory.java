@@ -148,15 +148,18 @@ public class Directory {
                 return getResponseForQueryWithToken(queryString, request, apiCallId, config, querySearchDTO);
             }
         } catch (URISyntaxException e) {
-            System.err.println("Directory::createQuery: IOException | URISyntaxException");
+            logger.error(LOGGING_PREFIX + "ERROR-NG-0000110: " + apiCallId + " URISyntax Error creating query");
+            System.err.println(LOGGING_PREFIX + "ERROR-NG-0000110: " + apiCallId + " URISyntax Error creating query");
             e.printStackTrace();
             throw new BadRequestException();
         } catch (SQLException e) {
-            System.err.println("Directory::createQuery: SQLException");
+            logger.error(LOGGING_PREFIX + "ERROR-NG-0000111: " + apiCallId + " SQLException Error creating query");
+            System.err.println(LOGGING_PREFIX + "ERROR-NG-0000111: " + apiCallId + " SQLException Error creating query");
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            System.err.println("Directory::createQuery: Exception");
+            logger.error(LOGGING_PREFIX + "ERROR-NG-0000112: " + apiCallId + " Error creating query");
+            System.err.println(LOGGING_PREFIX + "ERROR-NG-0000112: " + apiCallId + " Error creating query");
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -231,7 +234,7 @@ public class Directory {
 
             newRequestJson.put("searchQueries", newSearchQueriesArray);
         } catch (Exception ex) {
-            logger.error("Directory::createQuery: Error Parsing JSON String");
+            logger.error(LOGGING_PREFIX + "ERROR-NG-0000113: " + apiCallId + " Error Parsing JSON String");
             ex.printStackTrace();
         }
 
