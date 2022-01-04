@@ -214,7 +214,8 @@ public class Directory {
                 } else {
                     newSearchQueriesArray.add(queryJsonObject);
                     logger.info(queryJsonObject);
-                    jsonCollectionUpdateHelper.addUnchangedCollectionJson((JSONArray)queryJsonObject.get("collections"));
+                    JSONArray tmpArray = (JSONArray)queryJsonObject.get("collections");
+                    jsonCollectionUpdateHelper.addUnchangedCollectionJson(tmpArray);
                 }
             }
 
