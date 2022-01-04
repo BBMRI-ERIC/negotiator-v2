@@ -34,17 +34,17 @@
         <version.samply.share.dto>4.0.0</version.samply.share.dto>
         <version.swagger.core>2.1.4</version.swagger.core>
 
-        <database.server>negotiator-db</database.server>
+        <!--<database.server>negotiator-db</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>saher</database.username>
-        <database.password>saher</database.password>
+        <database.password>saher</database.password>-->
 
-        <!--<database.server>localhost</database.server>
+        <database.server>localhost</database.server>
         <database.port>5434</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
-        <database.password>negotiator</database.password>-->
+        <database.password>negotiator</database.password>
 
         <!--<database.server>localhost</database.server>
         <database.port>5432</database.port>
@@ -139,6 +139,28 @@
             <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>4.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
+        <dependency>
+            <groupId>io.github.bonigarcia</groupId>
+            <artifactId>webdrivermanager</artifactId>
+            <version>5.0.3</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.9.3</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.primefaces</groupId>
@@ -429,6 +451,12 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>19.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.13</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
