@@ -171,6 +171,7 @@ public class Directory {
     }
 
     private Response getResponseForQueryWithNoToken(String queryString, @Context HttpServletRequest request, String apiCallId, Config config) throws SQLException, URISyntaxException {
+        queryString = queryString.replaceAll("collectionID", "collectionId").replaceAll("biobankID", "biobankId");
         JsonQueryRecord jsonQueryRecord = saveJsonQueryRecord(queryString, config);
         String redirectUrl = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
         logger.info(apiCallId + " redirectUrl: " + redirectUrl);
@@ -181,6 +182,8 @@ public class Directory {
         NToken nToken = new NToken(querySearchDTO.getToken());
         QueryRecord queryRecord = getQueryRecord(config, nToken.getRequestToken());
 
+        queryString = queryString.replaceAll("collectionID", "collectionId").replaceAll("biobankID", "biobankId");
+
         // if no queryRecord exist just create the jsonRecord with a redirect url
         if(queryRecord == null) {
             return getResponseForQueryWithNoToken(queryString, request, apiCallId, config);
@@ -190,7 +193,7 @@ public class Directory {
         Boolean update = false;
 
         try {
-            String jsonStringOriginal = queryRecord.getJsonText();
+            String jsonStringOriginal = queryRecord.getJsonText().replaceAll("collectionID", "collectionId").replaceAll("biobankID", "biobankId");
             JSONParser parser = new JSONParser();
             JSONObject jsonObjectOriginalRequest = (JSONObject) parser.parse(jsonStringOriginal);
 
