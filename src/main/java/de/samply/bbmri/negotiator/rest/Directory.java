@@ -255,6 +255,7 @@ public class Directory {
             queryRecord.setJsonText(newRequestJson.toJSONString());
             logger.info(apiCallId + " saved query string:" + newRequestJson);
             updateRecord(queryRecord);
+            config.commit();
             builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
             checkLifeCycleStatusAndConntactIfStarted(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId());
         } else {
