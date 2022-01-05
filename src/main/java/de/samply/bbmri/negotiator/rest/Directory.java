@@ -253,6 +253,7 @@ public class Directory {
 
         if(update) {
             queryRecord.setJsonText(newRequestJson.toJSONString());
+            logger.info(apiCallId + " saved query string:" + newRequestJson);
             updateRecord(queryRecord);
             builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId();
             checkLifeCycleStatusAndConntactIfStarted(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId());
