@@ -213,10 +213,12 @@ public class Directory {
                     jsonCollectionUpdateHelper.addNewCollectionJson((JSONArray)tmpQueryObject.get("collections"));
                     jsonCollectionUpdateHelper.addOldCollectionJson((JSONArray)queryJsonObject.get("collections"));
                     jsonCollectionUpdateHelper.setServiceUrl(tmpQueryObject.get("URL").toString());
+                    logger.info(apiCallId + " old Query String: " + queryJsonObject);
+                    logger.info(apiCallId + " updated Query String: " + tmpQueryObject);
                     update = true;
                 } else {
                     newSearchQueriesArray.add(queryJsonObject);
-                    logger.info(queryJsonObject);
+                    logger.info(apiCallId + " unchanged query string:" + queryJsonObject);
                     JSONArray tmpArray = (JSONArray)queryJsonObject.get("collections");
                     jsonCollectionUpdateHelper.addUnchangedCollectionJson(tmpArray);
                 }
@@ -228,13 +230,14 @@ public class Directory {
                 tmpQueryObject.remove("nToken");
                 tmpQueryObject.put("token", nToken.getQueryToken());
                 newSearchQueriesArray.add(tmpQueryObject);
-
+                logger.info(apiCallId + " new query string:" + tmpQueryObject);
             }
 
             // Set status to abandoned for removed collections
             if(update) {
                 HashSet<String> collectionsToRemove = jsonCollectionUpdateHelper.getCollectionsToRemove();
-                removeCollectionsFromRequestOrChangeSataus(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId(), collectionsToRemove, jsonCollectionUpdateHelper.getServiceUrl());
+                logger.info(apiCallId + " removing:" + collectionsToRemove.size() + " collections");
+                removeCollectionsFromRequestOrChangeSataus(config, queryRecord.getId(), queryRecord.getTestRequest(), queryRecord.getResearcherId(), collectionsToRemove, jsonCollectionUpdateHelper.getServiceUrl(), apiCallId);
             }
 
             newRequestJson.put("searchQueries", newSearchQueriesArray);
@@ -321,12 +324,17 @@ public class Directory {
         }
     }
 
-    private void removeCollectionsFromRequestOrChangeSataus(Config config, Integer queryId, boolean testRequest, int userId, HashSet<String> collections, String serviceURL) {
+    private void removeCollectionsFromRequestOrChangeSataus(Config config, Integer queryId, boolean testRequest, int userId, HashSet<String> collections, String serviceURL, String apiCallId) {
         if(collections.isEmpty()) {
             return;
         }
         RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+        if(requestLifeCycleStatus != null && requestLifeCycleStatus.getStatus() != null && requestLifeCycleStatus.getStatus().getStatus() != null) {
+            logger.info(apiCallId + " Status of request: " + requestLifeCycleStatus.getStatus().getStatus());
+        }
+
         if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null || requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
+            logger.info(apiCallId + " removing collections from Mapping");
             ListOfDirectoriesRecord serviceRecord = DbUtil.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
                 List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
@@ -335,6 +343,7 @@ public class Directory {
                 }
             }
         } else if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
+            logger.info(apiCallId + " changing status of collections");
             ListOfDirectoriesRecord serviceRecord = DbUtil.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
                 List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
