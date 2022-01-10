@@ -76,8 +76,8 @@ import org.jooq.Result;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Manages the query detail view for owners
@@ -88,7 +88,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LoggerFactory.getLogger(OwnerQueriesDetailBean.class);
+	private static final Logger logger = LogManager.getLogger(OwnerQueriesDetailBean.class);
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -183,6 +183,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Part dtaFile;
 	private Part otherAccessFile;
 
+	private boolean showLocatorLink = false;
+
 	private static final int DEFAULT_BUFFER_SIZE = 10240;
 
 	private final FileUtil fileUtil = new FileUtil();
@@ -201,7 +203,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId(), userBean.getUserId()));
+				BiobankRecord biobank = associatedBiobanks.get(i);
+				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
+				//biobank.getDirectoryId()
 			}
 
 			/**
@@ -316,6 +320,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Ethics", selectedQuery.getEthicsVote());
 
 		return htmlTemplate;
+	}
+
+	public boolean displayLocatorUrl() {
+		return this.showLocatorLink;
 	}
 
 	public void getRequestPDF() throws IOException {
