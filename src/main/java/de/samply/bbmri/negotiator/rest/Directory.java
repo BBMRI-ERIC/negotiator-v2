@@ -266,7 +266,7 @@ public class Directory {
             builder += "/researcher/newQuery.xhtml?queryId=" + queryRecord.getId() + "&jsonQueryId=" + jsonQueryRecord.getId();
         }
 
-        String redirectUrl = getLocalUrl(request) + builder;
+        String redirectUrl = builder;
         logger.info(apiCallId + " redirectUrl: " + redirectUrl);
         return createResponse(redirectUrl);
     }
@@ -305,6 +305,8 @@ public class Directory {
 
     private Response createResponse(String redirectUrl) throws URISyntaxException {
         CreateQueryResultDTO result = new CreateQueryResultDTO();
+
+        logger.info("redirectUrl: " + redirectUrl);
 
         result.setRedirectUri(redirectUrl);
 
