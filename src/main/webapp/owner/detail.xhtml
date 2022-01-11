@@ -127,7 +127,7 @@
 
                     <!-- Locator Link-->
                     <c:if test="#{ownerQueriesDetailBean.displayLocatorUrl()}">
-                        <h4>Link for Locator</h4>
+                        <h4 style="text-align: left;border-bottom:1px dotted #7a7a7a;">Link to local bridgehead of Locator</h4>
                         <ui:repeat value="#{ownerQueriesDetailBean.getLocatorURLList().keySet().toArray()}" var="biobankNames">
                             <a href="#{ownerQueriesDetailBean.getLocatorURLList().get(biobankNames)}">#{biobankNames}</a><br/>
                         </ui:repeat>
