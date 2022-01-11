@@ -73,6 +73,10 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
@@ -89,6 +93,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = LogManager.getLogger(OwnerQueriesDetailBean.class);
+	private String LOGGING_PREFIX = "97776fdc5f92-OwnerQueriesDetailBean ";
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -183,7 +188,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Part dtaFile;
 	private Part otherAccessFile;
 
-	private boolean showLocatorLink = false;
+	private HashMap<String, String> locatorRedirectUrls = new HashMap<>();
+	private HashMap<String, String> locatorRedirectUrlsDisplayList = new HashMap<>();
 
 	private static final int DEFAULT_BUFFER_SIZE = 10240;
 
@@ -200,14 +206,6 @@ public class OwnerQueriesDetailBean implements Serializable {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
 
-			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
-
-			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				BiobankRecord biobank = associatedBiobanks.get(i);
-				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
-				//biobank.getDirectoryId()
-			}
-
 			/**
 			 * Get the selected(clicked on) query from the list of queries for the owner
 			 */
@@ -217,6 +215,40 @@ public class OwnerQueriesDetailBean implements Serializable {
 					setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
 				}
 			}
+
+			if(selectedQuery != null) {
+				try {
+					JSONParser parser = new JSONParser();
+					JSONObject jsonObjectOriginalRequest = (JSONObject) parser.parse(selectedQuery.getJsonText());
+					JSONArray searchQueriesJson = (JSONArray)jsonObjectOriginalRequest.get("searchQueries");
+					for(Object queryJson : searchQueriesJson) {
+						JSONObject queryJsonObject = (JSONObject)queryJson;
+						JSONArray collections = (JSONArray)queryJsonObject.get("collections");
+						for(Object collectionObject : collections) {
+							JSONObject collection = (JSONObject) collectionObject;
+							Object locatorBacklinkUrl = collection.get("locatorRedirectUrl");
+							if(locatorBacklinkUrl != null && !locatorBacklinkUrl.toString().isEmpty()) {
+								locatorRedirectUrls.put((String) collection.get("biobankId"), locatorBacklinkUrl.toString());
+							}
+						}
+					}
+				} catch (ParseException e) {
+					logger.error(LOGGING_PREFIX + "ERROR-NG-0000114: Parsing json for query: " + queryId + " - " + selectedQuery.getJsonText());
+					e.printStackTrace();
+				}
+			}
+
+			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
+
+			for (int i = 0; i < associatedBiobanks.size(); ++i) {
+				BiobankRecord biobank = associatedBiobanks.get(i);
+				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
+				if(locatorRedirectUrls.containsKey(biobank.getDirectoryId())) {
+					locatorRedirectUrlsDisplayList.put(biobank.getName(), locatorRedirectUrls.get(biobank.getDirectoryId()));
+				}
+			}
+
+
 
             if(selectedQuery != null) {
 				RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
@@ -323,7 +355,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 	}
 
 	public boolean displayLocatorUrl() {
-		return this.showLocatorLink;
+		if(locatorRedirectUrlsDisplayList.isEmpty()) {
+			return false;
+		}
+		return true;
+	}
+
+	public HashMap<String, String> getLocatorURLList() {
+		return locatorRedirectUrlsDisplayList;
 	}
 
 	public void getRequestPDF() throws IOException {
