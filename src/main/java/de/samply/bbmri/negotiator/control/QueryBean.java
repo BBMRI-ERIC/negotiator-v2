@@ -270,10 +270,10 @@ public class QueryBean implements Serializable {
                 requestLifeCycleStatus = new RequestLifeCycleStatus(id);
                 if(!requestLifeCycleStatus.statusCreated()) {
                     requestLifeCycleStatus.createStatus(userBean.getUserId());
-                    requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
+                    requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.UNDER_REVIEW, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
                     NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
                 } else if(requestLifeCycleStatus.getStatus() != null && requestLifeCycleStatus.getStatus().getStatus() != null && requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
-                    requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
+                    requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.UNDER_REVIEW, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
                     NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, id, null, userBean.getUserId());
                 }
                 checkLifeCycleStatus(config, id, testRequest);
@@ -290,7 +290,7 @@ public class QueryBean implements Serializable {
                 config.commit();
                 requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
                 requestLifeCycleStatus.createStatus(userBean.getUserId());
-                requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
+                requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.UNDER_REVIEW, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());
                 checkLifeCycleStatus(config, record.getId(), testRequest);
                 config.commit();
                 NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, record.getId(), null, userBean.getUserId());
