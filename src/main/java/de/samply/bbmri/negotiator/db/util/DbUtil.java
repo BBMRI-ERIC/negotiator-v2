@@ -2564,4 +2564,19 @@ public class DbUtil {
     public static void removeCollectionRequestMapping(Config config, Integer queryId, Integer collectionId) {
         config.dsl().deleteFrom(Tables.QUERY_COLLECTION).where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId))).execute();
     }
+
+    public static HashSet<Integer> getQueriesWithStatusError_20220124(Config config) {
+        HashSet<Integer> queryIds = new HashSet<>();
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT query_id\n" +
+                "FROM (SELECT query_id, STRING_AGG(status, ',') status_string FROM request_status GROUP BY query_id) AS sub\n" +
+                " WHERE (status_string ILIKE '%created%' AND status_string NOT ILIKE '%under_review%') AND \n" +
+                " (status_string ILIKE '%created%' AND status_string NOT ILIKE '%abandoned%');");
+        Result<Record> result = resultQuery.fetch();
+        if(!result.isEmpty()) {
+            for (Record record : result) {
+                queryIds.add(record.getValue(0, Integer.class));
+            }
+        }
+        return queryIds;
+    }
 }

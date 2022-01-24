@@ -28,6 +28,7 @@ package de.samply.bbmri.negotiator.control;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.sql.ResultSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -111,6 +112,20 @@ public class ApplicationBean implements Serializable {
             e.printStackTrace();
             NegotiatorConfig.get().setMaintenanceMode(true);
         }
+    }
+
+    public String updateLifecycleStatusProblem_20220124() {
+        try (Config config = ConfigFactory.get()) {
+            HashSet<Integer> queryIds = DbUtil.getQueriesWithStatusError_20220124(config);
+            for(Integer queryId : queryIds) {
+                QueryRecord queryRecord = DbUtil.getQueryFromId(config, queryId);
+                //TODO: Fix LifeCycle Status
+            }
+        } catch (Exception e) {
+            System.err.println("Error Fixing LifeCycle Status Problems!");
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public String updateLifecycleStatusProblem() {

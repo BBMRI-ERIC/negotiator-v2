@@ -65,13 +65,13 @@
 		</div>
 
 		<div class="card" style="margin-top: 45px;">
-			<div class="card-header bg-warning" style="padding: 5px;">Update LifeCycle Problems</div>
-			<div class="card-body" style="padding: 5px;	height: 80px;">
+			<div class="card-header bg-warning" style="padding: 5px;">System problem Updater</div>
+			<div class="card-body" style="padding: 5px;height: 220px;">
 				<h:form styleClass="form-horizontal">
 					<div class="col-md-12">
 						<div class="form-group">
 							<div class="col-sm-offset-2 col-sm-10">
-								Fix LifeCyle Issue where collections ar not inizialized correctly: <br/>
+								Fix LifeCycle Issue where collections ar not inizialized correctly: <br/>
 								<h:commandButton action="#{applicationBean.updateLifecycleStatusProblem}" value="#{label['admin.lifecycle.fixIssues']}" styleClass="btn btn-default"/>
 							</div>
 						</div>
@@ -81,6 +81,14 @@
 							<div class="col-sm-offset-2 col-sm-10">
 								Fix URLs for directory V4.2.8: <br/>
 								<h:commandButton action="#{applicationBean.updateDirectoryLink_V_4_2_8}" value="#{label['admin.lifecycle.fixDirectoryUrls']}" styleClass="btn btn-default"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="form-group">
+							<div class="col-sm-offset-2 col-sm-10">
+								Fix LifeCycle Issue approvel not correctly started (2022-01-24): <br/>
+								<h:commandButton action="#{applicationBean.updateLifecycleStatusProblem_20220124}" value="#{label['admin.lifecycle.fixDirectoryUrls']}" styleClass="btn btn-default"/>
 							</div>
 						</div>
 					</div>
