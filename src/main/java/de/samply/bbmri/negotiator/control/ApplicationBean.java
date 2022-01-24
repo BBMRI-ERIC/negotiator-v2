@@ -123,13 +123,29 @@ public class ApplicationBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
             HashSet<Integer> queryIds = DbUtil.getQueriesWithStatusError_20220124(config);
             for(Integer queryId : queryIds) {
-                QueryRecord queryRecord = DbUtil.getQueryFromId(config, queryId);
-                RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
-                requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.UNDER_REVIEW, LifeCycleRequestStatusType.REVIEW, null, queryRecord.getResearcherId());
-                NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, queryId, null, queryRecord.getResearcherId());
+                System.err.println("queryId: " + queryId);
+                try {
+                    QueryRecord queryRecord = DbUtil.getQueryFromId(config, queryId);
+                    Integer researcherId = 1;
+                    if (queryRecord != null) {
+                        researcherId = queryRecord.getResearcherId();
+                        if (researcherId != null) {
+                            researcherId = 1;
+                        }
+                    }
+                    RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+                    if(!requestLifeCycleStatus.statusCreated()) {
+                        requestLifeCycleStatus.createStatus(researcherId);
+                    }
+                    requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.UNDER_REVIEW, LifeCycleRequestStatusType.REVIEW, null, researcherId);
+                    NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, queryId, null, researcherId);
+                 }catch (Exception e) {
+                    System.err.println("Error Fixing LifeCycle Status Problems updateLifecycleStatusProblem_20220124!");
+                    e.printStackTrace();
+                }
             }
         } catch (Exception e) {
-            System.err.println("Error Fixing LifeCycle Status Problems!");
+            System.err.println("Error Fixing LifeCycle Status Problems updateLifecycleStatusProblem_20220124!");
             e.printStackTrace();
         }
         return "";
