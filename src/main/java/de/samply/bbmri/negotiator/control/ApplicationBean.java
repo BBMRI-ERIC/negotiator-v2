@@ -42,6 +42,11 @@ import javax.servlet.ServletContext;
 
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,7 +124,9 @@ public class ApplicationBean implements Serializable {
             HashSet<Integer> queryIds = DbUtil.getQueriesWithStatusError_20220124(config);
             for(Integer queryId : queryIds) {
                 QueryRecord queryRecord = DbUtil.getQueryFromId(config, queryId);
-                //TODO: Fix LifeCycle Status
+                RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+                requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.UNDER_REVIEW, LifeCycleRequestStatusType.REVIEW, null, queryRecord.getResearcherId());
+                NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, queryId, null, queryRecord.getResearcherId());
             }
         } catch (Exception e) {
             System.err.println("Error Fixing LifeCycle Status Problems!");
