@@ -268,6 +268,7 @@ public class QueryBean implements Serializable {
             if(id != null) {
                 DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest);
                 requestLifeCycleStatus = new RequestLifeCycleStatus(id);
+                requestLifeCycleStatus.initialise();
                 if(!requestLifeCycleStatus.statusCreated()) {
                     requestLifeCycleStatus.createStatus(userBean.getUserId());
                     requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.UNDER_REVIEW, LifeCycleRequestStatusType.REVIEW, null, userBean.getUserId());

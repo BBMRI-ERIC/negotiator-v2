@@ -134,6 +134,7 @@ public class ApplicationBean implements Serializable {
                         }
                     }
                     RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+                    requestLifeCycleStatus.initialise();
                     if(!requestLifeCycleStatus.statusCreated()) {
                         requestLifeCycleStatus.createStatus(researcherId);
                     }
