@@ -112,3 +112,14 @@ function showResearcherHelp() {
     document.getElementById('researchers-crashcourse').style.display = 'block';
     document.getElementById('biobankers-crashcourse').style.display = 'none';
 }
+
+function publicCommentReadUpdate(commentId) {
+    // Update comment area
+    var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
+    document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
+    document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
+    // Trigger the ajax call to set comment as read (in every comment block is one of this)
+    updateCommentReadStatus[0].click();
+    // Update the orange views to match the update
+    var tabSection = document.getElementById("second");
+}
