@@ -131,3 +131,16 @@ function publicCommentReadUpdate(commentId) {
     // Update overview table left side
     document.getElementsByClassName("selected-query")[0].getElementsByClassName("queryNumberResponsesBadge")[0].innerHTML = '<i class="glyphicon glyphicon-bullhorn"></i>   '+unredcount+'/'+tabSection.split('/')[1];
 }
+
+function publicCommentReadAllReadUpdate() {
+    var elements = document.querySelectorAll('[class^="updateCommentReadForComment"]');
+    for(var i = 0; i < elements.length; i++)
+    {
+        var elementUpdateId = elements[i].className.replaceAll('updateCommentReadForComment', '');
+        if(document.getElementsByClassName("updateCommentReadForCommentShowElement" + elementUpdateId)[0].style.display == "none") {
+            //console.log(elementUpdateId)
+        } else {
+            publicCommentReadUpdate(elementUpdateId);
+        }
+    }
+}

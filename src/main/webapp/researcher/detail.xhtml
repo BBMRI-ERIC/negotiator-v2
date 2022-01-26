@@ -517,9 +517,15 @@
                                     fileUploadBean="#{fileUploadBean}"/>
                             </div>
 
+                            <span class="btn btn-default updateCommentReadForCommentShowMarkAsReadButtonForAll" style="margin-top: 0px;margin-left:15px;#{researcherQueriesDetailBean.unreadCommentCount == 0 ? 'display:none;': '' }" onclick="publicCommentReadAllReadUpdate();">
+                                Mark all as read
+                            </span>
+
                             <div class="col-xs-12 row">
                                 <hr/>
                             </div>
+
+
 
                             <div class="row" style="margin: 10px;">
                                 <ui:repeat value="#{researcherQueriesDetailBean.comments}"

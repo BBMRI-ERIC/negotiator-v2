@@ -412,9 +412,15 @@
                                                   query="#{ownerQueriesDetailBean.selectedQuery}" componentQueryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}"/>
                             </div>
 
+                            <span class="btn btn-default updateCommentReadForCommentShowMarkAsReadButtonForAll" style="margin-top: 0px;margin-left:15px;#{ownerQueriesDetailBean.unreadCommentCount == 0 ? 'display:none;': '' }" onclick="publicCommentReadAllReadUpdate();">
+                                Mark all as read
+                            </span>
+
+
                             <div class="col-xs-12 row">
                                 <hr></hr>
                             </div>
+
 
                             <div class="row" style="margin: 10px;">
                                 <ui:repeat value="#{ownerQueriesDetailBean.comments}"
