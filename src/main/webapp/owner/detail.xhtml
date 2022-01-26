@@ -217,7 +217,7 @@
                                     #{label['querydetail.title.status']}
                                 </a>
                             </li>
-                            <li>
+                            <li id="second">
                                 <a data-toggle="tab" href="#comments">
                                     #{label['querydetail.title.comments']}
                                     <div class="badge queryNumberResponsesBadge pull-right"
@@ -232,7 +232,7 @@
                                 </a>
                             </li>
                             <ui:fragment rendered="#{ownerQueriesDetailBean.nonConfidential == false}">
-                                <li>
+                                <li id="third">
                                     <a data-toggle="tab" href="#sampleAvailability">
                                         #{label['querydetail.title.privateNegotiation']}
                                         <div class="badge queryNumberResponsesBadge pull-right"
