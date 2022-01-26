@@ -122,11 +122,12 @@ function publicCommentReadUpdate(commentId) {
     updateCommentReadStatus[0].click();
     // Update the orange views to match the update
     var tabSection = document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].innerText;
-    //alert(tabSection);//(unread/read)
     var unredcount = tabSection.split('/')[0]-1;
     if(unredcount<=0) {
         document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].style.backgroundColor = "#000000";
+        document.getElementsByClassName("selected-query")[0].getElementsByClassName("queryNumberResponsesBadge")[0].style.backgroundColor = "#000000";
     }
     document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].innerHTML = '<i class="glyphicon glyphicon-bullhorn"></i>   '+unredcount+'/'+tabSection.split('/')[1];
-    //alert('innerHTML>><i class="glyphicon glyphicon-bullhorn"></i>'+unredcount+'/'+tabSection.split('/')[1]);
+    // Update overview table left side
+    document.getElementsByClassName("selected-query")[0].getElementsByClassName("queryNumberResponsesBadge")[0].innerHTML = '<i class="glyphicon glyphicon-bullhorn"></i>   '+unredcount+'/'+tabSection.split('/')[1];
 }
