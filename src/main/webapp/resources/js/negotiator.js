@@ -119,8 +119,14 @@ function publicCommentReadUpdate(commentId) {
     document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
     document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
     // Trigger the ajax call to set comment as read (in every comment block is one of this)
-    //updateCommentReadStatus[0].click();
+    updateCommentReadStatus[0].click();
     // Update the orange views to match the update
     var tabSection = document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].innerText;
-    alert(tabSection);//(unread/read)
+    //alert(tabSection);//(unread/read)
+    var unredcount = tabSection.split('/')[0]-1;
+    if(unredcount<=0) {
+        document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].style.backgroundColor = "#000000";
+    }
+    document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].innerHTML = '<i class="glyphicon glyphicon-bullhorn"></i>   '+unredcount+'/'+tabSection.split('/')[1];
+    //alert('innerHTML>><i class="glyphicon glyphicon-bullhorn"></i>'+unredcount+'/'+tabSection.split('/')[1]);
 }
