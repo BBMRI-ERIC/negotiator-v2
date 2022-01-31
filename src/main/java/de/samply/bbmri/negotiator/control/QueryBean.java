@@ -175,8 +175,6 @@ public class QueryBean implements Serializable {
             else{
                 setMode("newQuery");
                 String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-                // Add Token to query String
-                searchJsonQuery = searchJsonQuery.replace("\"URL\"", "\"token\":\"" + UUID.randomUUID().toString().replace("-", "") + "\",\"URL\"");
                 jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
             }
             logger.debug("jsonQuery: " + jsonQuery);
