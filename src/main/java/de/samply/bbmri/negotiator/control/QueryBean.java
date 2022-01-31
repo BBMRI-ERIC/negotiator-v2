@@ -411,7 +411,7 @@ public class QueryBean implements Serializable {
             logger.info("URL 1:" + url);
 
             if(url.contains("locator")) {
-                url.replaceAll("#/", "");
+                url = url.replaceAll("#/", "").replaceAll("nToken", "ntoken");
                 logger.info("URL 2:" + url);
             }
             logger.info("URL 3:" + url);
