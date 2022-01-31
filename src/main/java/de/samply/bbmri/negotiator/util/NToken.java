@@ -1,5 +1,7 @@
 package de.samply.bbmri.negotiator.util;
 
+import java.util.UUID;
+
 public class NToken {
     private String requestToken;
     private String queryToken;
@@ -15,6 +17,10 @@ public class NToken {
         requestToken = "";
         queryToken = "";
         nToken = "";
+    }
+
+    public String getNewQueryToken() {
+        return UUID.randomUUID().toString();
     }
 
     public String getRequestToken() {

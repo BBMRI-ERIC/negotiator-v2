@@ -46,6 +46,8 @@ import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import de.samply.bbmri.negotiator.util.NToken;
+import de.samply.bbmri.negotiator.util.RedirectUrlGenerator;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
@@ -405,19 +407,13 @@ public class QueryBean implements Serializable {
         }
         if(mode.equals("edit")) {
             saveEditChangesTemporarily();
-            String urlEnd = "/";
-            if(url.endsWith("/")) {
-                urlEnd = "";
-            }
-            url = url + urlEnd + "#/?nToken=" + qtoken + "__search__";
-            logger.info("URL 1:" + url);
-
-            if(url.contains("locator")) {
-                url = url.replaceAll("#/", "").replaceAll("nToken", "ntoken");
-                logger.info("URL 2:" + url);
-            }
-            logger.info("URL 3:" + url);
-            externalContext.redirect(url);
+            NToken nToken = new NToken();
+            nToken.setRequestToken(qtoken);
+            RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
+            redirectUrlGenerator.setUrl(url);
+            String resirectUrl = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
+            logger.info("resirectUrl: " + resirectUrl);
+            externalContext.redirect(resirectUrl);
         } else {
             try (Config config = ConfigFactory.get()) {
                 // Hack for Locator
