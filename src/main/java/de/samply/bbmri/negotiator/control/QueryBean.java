@@ -349,13 +349,22 @@ public class QueryBean implements Serializable {
                 logger.info("URL1.4: " + url);
                 System.out.println("URL1.4: " + url);
                 externalContext.redirect(url);
+            } else if(url.contains("locator")) {
+                if(url.contains("ntoken")) {
+                    logger.info("URL1.6.1: " + url);
+                    System.out.println("URL1.6.1: " + url);
+                    externalContext.redirect(url);
+                } else {
+                    logger.info("URL1.6.2: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
+                    System.out.println("URL1.6.2: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
+                    externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
+                }
             } else {
                 logger.info("URL1.8: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
                 System.out.println("URL1.8: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
                 externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
             }
         }else{
-//<<<<<<< HEAD
             try (Config config = ConfigFactory.get()) {
                 // Hack for Locator
                 jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
@@ -377,11 +386,6 @@ public class QueryBean implements Serializable {
             }
             // Status created, not review
             externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
-/*=======
-           logger.info("URL2: " + url);
-           System.out.println("URL2: " + url);
-           externalContext.redirect(url);
->>>>>>> feature/new-api-endpoint-for-finder*/
         }
     }
 
