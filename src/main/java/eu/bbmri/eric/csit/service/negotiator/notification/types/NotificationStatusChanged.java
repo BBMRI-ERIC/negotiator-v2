@@ -43,7 +43,7 @@ public class NotificationStatusChanged extends Notification {
             emailAddressesAndNames.remove(researcherEmailAddresse);
             emailAddressesAndNames.remove(statusChangerContactEmailAddress);
 
-            String subject = "[BBMRI-ERIC Negotiator] Status for request: " + queryRecord.getTitle() + "has changed.";
+            String subject = "[BBMRI-ERIC Negotiator] Status for request: " + queryRecord.getTitle() + " has changed.";
 
             createMailBodyBuilder("STATUS_CHANGED.soy");
 
@@ -94,7 +94,7 @@ public class NotificationStatusChanged extends Notification {
                 String body = getMailBody(getSoyParameters(url, contactName));
                 MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
 
-                if(queryRecord.getTestRequest()) {
+                if(Boolean.TRUE.equals(queryRecord.getTestRequest())) {
                     updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), "test");
                 } else {
                     if(checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.STATUS_CHANGED_NOTIFICATION)) {
