@@ -169,7 +169,7 @@ public class QueryBean implements Serializable {
                     getSavedValuesFromDatabaseObject(config, queryRecord);
                 }else {
                     // Get the values of the fields before page was refreshed - for file upload or changing query from directory
-                    getSavedValuesFromSessionBean();
+                    getSavedValuesFromSessionBean(queryRecord);
                 }
                 qtoken = queryRecord.getNegotiatorToken();
 
@@ -204,7 +204,7 @@ public class QueryBean implements Serializable {
     /**
      * Gets values from session bean that are saved before page is refreshed - for file upload or changing query from directory.
      */
-    public void getSavedValuesFromSessionBean() {
+    public void getSavedValuesFromSessionBean(QueryRecord queryRecord) {
         queryTitle = sessionBean.getTransientQueryTitle();
         queryText = sessionBean.getTransientQueryText();
         queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
@@ -217,11 +217,12 @@ public class QueryBean implements Serializable {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        } else if(id != null && queryRecord != null) {
+            jsonQuery = queryRecord.getJsonText();
         } else {
             jsonQuery = sessionBean.getTransientQueryJson();
         }
         clearEditChanges();
-
     }
 
     public List<ListOfDirectoriesRecord> getDirectories() {
