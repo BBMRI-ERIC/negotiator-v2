@@ -469,7 +469,7 @@
                                     <div id="heading#{i}" class="panel-heading" data-toggle="collapse" data-target="#hh#{i}" >
                                         <h4 class="panel-title">
                                             <a> #{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name} </a>
-                                            <span id='biobankNotificationClass#{biobankName.replaceAll(" ", "")}' class='glyphicon glyphicon-envelope showUnreadMarkerOnBiobank' style="margin:0 0 0 15px;"></span>
+                                            <span id='biobankNotificationClass#{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name.replaceAll(" ", "")}' class='glyphicon glyphicon-envelope showUnreadMarkerOnBiobank' style="margin:0 0 0 15px;"></span>
                                         </h4>
                                     </div>
                                     <div id="hh#{i}"
@@ -491,7 +491,7 @@
                                                     var="offers">
 
                                                 <h:outputScript>
-                                                    window.onload = onLoadShowNotificationsOnBiobank("#{biobankName.replaceAll(" ", "")}", "#{offers.commentRead}");
+                                                    window.onload = onLoadShowNotificationsOnBiobank("#{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name.replaceAll(" ", "")}", "#{offers.commentRead}");
                                                 </h:outputScript>
 
                                                 <bbmricc:comment comment="#{offers.offer}"

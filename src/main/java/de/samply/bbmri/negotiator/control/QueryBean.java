@@ -173,8 +173,7 @@ public class QueryBean implements Serializable {
                 }
                 qtoken = queryRecord.getNegotiatorToken();
 
-            }
-            else{
+            } else{
                 setMode("newQuery");
                 String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
                 jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
