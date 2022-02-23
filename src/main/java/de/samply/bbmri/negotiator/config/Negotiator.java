@@ -470,5 +470,23 @@ public class Negotiator implements Serializable {
         public void setMolgenisAcceptInvalidUrl(boolean molgenisAcceptInvalidUrl) {
             this.molgenisAcceptInvalidUrl = molgenisAcceptInvalidUrl;
         }
+
+        /**
+         * The list of contacts, that will be notified when a new request is created.
+         */
+
     }
+
+    @XmlElementWrapper( name="newRequestContacts" )
+    @XmlElement( name="contact" )
+    private List<String> newRequestContactList;
+
+    public List<String> getNewRequestContactList() {
+        return newRequestContactList;
+    }
+
+    public void setNewRequestContactList(List<String> newRequestContactList) {
+        this.newRequestContactList = newRequestContactList;
+    }
+
 }
