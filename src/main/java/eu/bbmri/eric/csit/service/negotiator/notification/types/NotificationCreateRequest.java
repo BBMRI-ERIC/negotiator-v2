@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class NotificationCreateRequest extends Notification {
@@ -27,9 +28,11 @@ public class NotificationCreateRequest extends Notification {
             setQuery();
             setResearcherContact();
 
+            Map<String, String> emailAddressesAndNames = getEmailAddressesAndNames();
+
             createMailBodyBuilder("BBMRI_CREATE_REQUEST.soy");
 
-            prepareNotificationForBBMRIERIC(getMailSubject());
+            prepareNotificationForBBMRIERIC(emailAddressesAndNames, getMailSubject());
         } catch (Exception ex) {
             logger.error("919bbece7131-NotificationCreateRequest ERROR-NG-0000058: Error in NotificationCreateRequest.");
             logger.error("context", ex);
@@ -43,19 +46,29 @@ public class NotificationCreateRequest extends Notification {
             return "[BBMRI-ERIC Negotiator] New request created for review: " + queryRecord.getTitle();
         }
     }
-
     private void prepareNotificationForBBMRIERIC(String subject) {
         String bbmriemail = "negotiator-requests@helpdesk.bbmri-eric.eu";
-        try {
-            String body = getMailBody(getSoyParameters());
+        Map<String, String> defaultaddressList = new HashMap<>();
+        defaultaddressList.put(bbmriemail, "BBMRI-ERIC");
+        prepareNotificationForBBMRIERIC(defaultaddressList,subject);
+    }
 
-            MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(bbmriemail, subject, body);
-            if(checkSendNotificationImmediatelyForUser(bbmriemail, NotificationType.CREATE_REQUEST_NOTIFICATION)) {
-                sendMailNotification(mailNotificationRecord.getMailNotificationId(), bbmriemail, subject, body);
+    private void prepareNotificationForBBMRIERIC(Map<String, String> emailAddressesAndNames, String subject) {
+        //String bbmriemail = "negotiator-requests@helpdesk.bbmri-eric.eu";
+        for(Map.Entry<String, String> contact : emailAddressesAndNames.entrySet()) {
+            String emailAddress = contact.getKey();
+            String contactName = contact.getValue();
+            try {
+                String body = getMailBody(getSoyParameters());
+
+                MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(emailAddress, subject, body);
+                if (checkSendNotificationImmediatelyForUser(emailAddress, NotificationType.CREATE_REQUEST_NOTIFICATION)) {
+                    sendMailNotification(mailNotificationRecord.getMailNotificationId(), emailAddress, subject, body);
+                }
+            } catch (Exception ex) {
+                logger.error(String.format("919bbece7131-NotificationCreateRequest ERROR-NG-0000059: Error creating a notification for reviewer %s.", emailAddress));
+                logger.error("context", ex);
             }
-        } catch (Exception ex) {
-            logger.error(String.format("919bbece7131-NotificationCreateRequest ERROR-NG-0000059: Error creating a notification for reviewer %s.", bbmriemail));
-            logger.error("context", ex);
         }
     }
 
@@ -65,5 +78,14 @@ public class NotificationCreateRequest extends Notification {
         parameters.put("queryId", queryRecord.getId().toString());
         parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "reviewer/review.xhtml");
         return parameters;
+    }
+
+    private Map<String, String> getEmailAddressesAndNames() {
+        List<String> contacts = NegotiatorConfig.get().getNegotiator().getNewRequestContactList();
+        Map<String, String> addressList = new HashMap<>();
+        for (String contact : contacts) {
+            addressList.put(contact, contact.split("@")[0]);
+        }
+        return addressList;
     }
 }
