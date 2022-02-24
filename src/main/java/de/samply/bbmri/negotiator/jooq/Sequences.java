@@ -26,90 +26,90 @@ public class Sequences {
 	/**
 	 * The sequence <code>public.biobank_id_seq</code>
 	 */
-	public static final Sequence<Long> BIOBANK_ID_SEQ = new SequenceImpl<Long>("biobank_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> BIOBANK_ID_SEQ = new SequenceImpl<Integer>("biobank_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.collection_id_seq</code>
 	 */
-	public static final Sequence<Long> COLLECTION_ID_SEQ = new SequenceImpl<Long>("collection_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> COLLECTION_ID_SEQ = new SequenceImpl<Integer>("collection_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.comment_id_seq</code>
 	 */
-	public static final Sequence<Long> COMMENT_ID_SEQ = new SequenceImpl<Long>("comment_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> COMMENT_ID_SEQ = new SequenceImpl<Integer>("comment_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.connector_log_id_seq</code>
 	 */
-	public static final Sequence<Long> CONNECTOR_LOG_ID_SEQ = new SequenceImpl<Long>("connector_log_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> CONNECTOR_LOG_ID_SEQ = new SequenceImpl<Integer>("connector_log_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.json_query_id_seq</code>
 	 */
-	public static final Sequence<Long> JSON_QUERY_ID_SEQ = new SequenceImpl<Long>("json_query_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> JSON_QUERY_ID_SEQ = new SequenceImpl<Integer>("json_query_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.list_of_directories_id_seq</code>
 	 */
-	public static final Sequence<Long> LIST_OF_DIRECTORIES_ID_SEQ = new SequenceImpl<Long>("list_of_directories_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> LIST_OF_DIRECTORIES_ID_SEQ = new SequenceImpl<Integer>("list_of_directories_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.mail_notification_mail_notification_id_seq</code>
 	 */
-	public static final Sequence<Long> MAIL_NOTIFICATION_MAIL_NOTIFICATION_ID_SEQ = new SequenceImpl<Long>("mail_notification_mail_notification_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> MAIL_NOTIFICATION_MAIL_NOTIFICATION_ID_SEQ = new SequenceImpl<Integer>("mail_notification_mail_notification_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.network_id_seq</code>
 	 */
-	public static final Sequence<Long> NETWORK_ID_SEQ = new SequenceImpl<Long>("network_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> NETWORK_ID_SEQ = new SequenceImpl<Integer>("network_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.notification_notification_id_seq</code>
 	 */
-	public static final Sequence<Long> NOTIFICATION_NOTIFICATION_ID_SEQ = new SequenceImpl<Long>("notification_notification_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> NOTIFICATION_NOTIFICATION_ID_SEQ = new SequenceImpl<Integer>("notification_notification_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.notification_setting_notification_setting_id_seq</code>
 	 */
-	public static final Sequence<Long> NOTIFICATION_SETTING_NOTIFICATION_SETTING_ID_SEQ = new SequenceImpl<Long>("notification_setting_notification_setting_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> NOTIFICATION_SETTING_NOTIFICATION_SETTING_ID_SEQ = new SequenceImpl<Integer>("notification_setting_notification_setting_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.offer_id_seq</code>
 	 */
-	public static final Sequence<Long> OFFER_ID_SEQ = new SequenceImpl<Long>("offer_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> OFFER_ID_SEQ = new SequenceImpl<Integer>("offer_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.person_id_seq</code>
 	 */
-	public static final Sequence<Long> PERSON_ID_SEQ = new SequenceImpl<Long>("person_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> PERSON_ID_SEQ = new SequenceImpl<Integer>("person_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.query_attachment_comment_id_seq</code>
 	 */
-	public static final Sequence<Long> QUERY_ATTACHMENT_COMMENT_ID_SEQ = new SequenceImpl<Long>("query_attachment_comment_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> QUERY_ATTACHMENT_COMMENT_ID_SEQ = new SequenceImpl<Integer>("query_attachment_comment_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.query_attachment_id_seq</code>
 	 */
-	public static final Sequence<Long> QUERY_ATTACHMENT_ID_SEQ = new SequenceImpl<Long>("query_attachment_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> QUERY_ATTACHMENT_ID_SEQ = new SequenceImpl<Integer>("query_attachment_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.query_attachment_private_id_seq</code>
 	 */
-	public static final Sequence<Long> QUERY_ATTACHMENT_PRIVATE_ID_SEQ = new SequenceImpl<Long>("query_attachment_private_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> QUERY_ATTACHMENT_PRIVATE_ID_SEQ = new SequenceImpl<Integer>("query_attachment_private_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.query_id_seq</code>
 	 */
-	public static final Sequence<Long> QUERY_ID_SEQ = new SequenceImpl<Long>("query_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> QUERY_ID_SEQ = new SequenceImpl<Integer>("query_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.query_lifecycle_collection_id_seq</code>
 	 */
-	public static final Sequence<Long> QUERY_LIFECYCLE_COLLECTION_ID_SEQ = new SequenceImpl<Long>("query_lifecycle_collection_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> QUERY_LIFECYCLE_COLLECTION_ID_SEQ = new SequenceImpl<Integer>("query_lifecycle_collection_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 
 	/**
 	 * The sequence <code>public.request_status_id_seq</code>
 	 */
-	public static final Sequence<Long> REQUEST_STATUS_ID_SEQ = new SequenceImpl<Long>("request_status_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+	public static final Sequence<Integer> REQUEST_STATUS_ID_SEQ = new SequenceImpl<Integer>("request_status_id_seq", Public.PUBLIC, org.jooq.impl.SQLDataType.INTEGER.nullable(false));
 }

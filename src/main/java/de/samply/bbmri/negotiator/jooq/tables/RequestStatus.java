@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class RequestStatus extends TableImpl<RequestStatusRecord> {
 
-	private static final long serialVersionUID = 1906484642;
+	private static final long serialVersionUID = -393584718;
 
 	/**
 	 * The reference instance of <code>public.request_status</code>
@@ -66,6 +66,11 @@ public class RequestStatus extends TableImpl<RequestStatusRecord> {
 	public final TableField<RequestStatusRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
 	/**
+	 * The column <code>public.request_status.status_type</code>.
+	 */
+	public final TableField<RequestStatusRecord, String> STATUS_TYPE = createField("status_type", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+	/**
 	 * The column <code>public.request_status.status_date</code>.
 	 */
 	public final TableField<RequestStatusRecord, Timestamp> STATUS_DATE = createField("status_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
@@ -74,11 +79,6 @@ public class RequestStatus extends TableImpl<RequestStatusRecord> {
 	 * The column <code>public.request_status.status_user_id</code>.
 	 */
 	public final TableField<RequestStatusRecord, Integer> STATUS_USER_ID = createField("status_user_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
-
-	/**
-	 * The column <code>public.request_status.status_type</code>.
-	 */
-	public final TableField<RequestStatusRecord, String> STATUS_TYPE = createField("status_type", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
 	/**
 	 * The column <code>public.request_status.status_json</code>.
