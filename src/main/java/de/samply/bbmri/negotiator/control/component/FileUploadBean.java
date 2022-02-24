@@ -8,13 +8,10 @@ import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentCommentRecord;
 import de.samply.bbmri.negotiator.model.AttachmentDTO;
 import de.samply.bbmri.negotiator.model.CommentAttachmentDTO;
 import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
-import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationMailStatusUpdate;
-import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +26,9 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -228,7 +223,9 @@ public class FileUploadBean implements Serializable {
             File file = new File(filePath, filename);
             if(file.delete()){
                 config.commit();
-                removeAttachmentFromSession(attachmentMapKey);
+                if(fileScope.equals("commentAttachment")) {
+                    removeCommentAttachmentFromSession(attachmentMapKey);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -501,7 +498,7 @@ public class FileUploadBean implements Serializable {
         this.userBean = userBean;
     }
 
-    private void removeAttachmentFromSession(String attachmentKey){
+    private void removeCommentAttachmentFromSession(String attachmentKey){
         HashMap<String, String> CommentAttachment = sessionBean.getTransientCommentAttachmentMap();
 
         for(Iterator<HashMap.Entry<String,String>>  i = CommentAttachment.entrySet().iterator(); i.hasNext(); ) {
