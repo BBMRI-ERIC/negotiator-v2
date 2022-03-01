@@ -28,16 +28,16 @@ package de.samply.bbmri.negotiator.db.util;
 
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jdbc.ResourceManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Migration {
-    private static final Logger logger = LoggerFactory.getLogger(Migration.class);
+    private static final Logger logger = LogManager.getLogger(Migration.class);
     private static Flyway flyway;
 
     private Migration() {

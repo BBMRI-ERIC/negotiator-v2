@@ -26,6 +26,9 @@
 package de.samply.bbmri.negotiator.filter;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.rest.Directory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.faces.application.ResourceHandler;
 import javax.servlet.*;
@@ -41,6 +44,7 @@ import java.io.IOException;
  */
 @WebFilter(filterName = "MaintenanceFilter")
 public class MaintenanceFilter implements Filter {
+    private static final Logger logger = LogManager.getLogger(Directory.class);
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()
@@ -55,6 +59,8 @@ public class MaintenanceFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+
+        logger.info("Maintenance Mode is set to: " + NegotiatorConfig.get().isMaintenanceMode());
 
         if (NegotiatorConfig.get().isMaintenanceMode()) {
             String path = ((HttpServletRequest) request).getRequestURI();

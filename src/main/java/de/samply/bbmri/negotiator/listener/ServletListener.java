@@ -40,10 +40,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import de.samply.bbmri.negotiator.db.util.Migration;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationScheduledExecutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.flywaydb.core.api.FlywayException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
@@ -62,7 +62,7 @@ import de.samply.string.util.StringUtil;
 public class ServletListener implements ServletContextListener {
 
     /** The Constant logger. */
-    private static final Logger logger = LoggerFactory.getLogger(ServletListener.class);
+    private static final Logger logger = LogManager.getLogger(ServletListener.class);
 
     private static Timer timer;
 
