@@ -264,7 +264,7 @@ public class DatabaseUtilNotification {
                     "JOIN person_collection pc ON p.id = pc.person_id\n" +
                     "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
                     "LEFT JOIN public.flagged_query fq ON qc.query_id = fq.query_id AND pc.person_id = fq.person_id " +
-                    "WHERE qc.query_id = " + requestId + " AND (fq.flag != 'ARCHIVED' OR fq.flag IS NULL)" +
+                    "WHERE qc.query_id = " + requestId + " AND ((fq.flag != 'IGNORED' AND fq.flag != 'ARCHIVED') OR fq.flag IS NULL)" +
                     " AND pc.collection_id NOT IN \n" +
                     "(SELECT collection_id FROM \n" +
                     "(SELECT collection_id, LAST_VALUE(status) OVER( PARTITION BY collection_id ORDER BY status_date RANGE BETWEEN \n" +
