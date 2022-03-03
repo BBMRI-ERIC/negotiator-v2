@@ -28,16 +28,27 @@
 -->
 <Configuration
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:noNamespaceSchemaLocation="http://log4j2.apache.org/Log4j2.xsd"
-		xsi:schemaLocation="http://log4j2.apache.org/Log4j2 http://log4j2.apache.org/Log4j2.xsd">
+		xsi:schemaLocation="http://logging.apache.org/log4j/2.0/config
+           https://raw.githubusercontent.com/apache/logging-log4j2/master/log4j-core/src/main/resources/Log4j-config.xsd">
 	<Appenders>
 		<Console name="STDOUT" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
 		</Console>
+		<File name="errorfile" fileName="/var/log/tomcat7/negotiator-error.log">
+			<PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
+		</File>
+		<File name="maillog" fileName="/var/log/tomcat7/negotiator-mail.log">
+			<PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
+		</File>
+
 	</Appenders>
 	<Loggers>
 		<Root level="debug">
 			<AppenderRef ref="STDOUT" />
+			<AppenderRef ref="errorfile" level="DEBUG"/>
 		</Root>
+		<Logger name="de.samply.bbmri.negotiator" level="debug" additivity="false">
+			<AppenderRef ref="maillog"/>
+		</Logger>
 	</Loggers>
 </Configuration>
