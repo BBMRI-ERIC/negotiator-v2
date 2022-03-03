@@ -26,6 +26,8 @@
 package de.samply.bbmri.negotiator.listener;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -76,6 +78,21 @@ public class ServletListener implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent event) {
+        System.out.println("Ding: ");
+        try {
+            String fileData = "yourContent";
+            FileOutputStream fos = new FileOutputStream("/tmp/yourFile.txt");
+
+                fos.write(fileData.getBytes());
+
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            System.err.println("FileProblem!!");
+            e.printStackTrace();
+        }
+
+
         try {
 
             String projectName = event.getServletContext().getInitParameter("projectName");
@@ -95,18 +112,17 @@ public class ServletListener implements ServletContextListener {
             NegotiatorConfig.setNewDatabaseInstallation(newDatabaseInstallation);
 
             logger.info("Starting directory synchronize task timer");
-
             timer = new Timer();
             timer.schedule(new DirectorySynchronizeTask(), 10000, 1000L * 60L * 60L);
 
             logger.info("Starting notification task timer");
-
             notificationScheduledExecutorTimer = new Timer();
             NotificationScheduledExecutor notificationScheduledExecutor = new NotificationScheduledExecutor();
             notificationScheduledExecutorTimer.schedule(notificationScheduledExecutor, notificationScheduledExecutor.getDelay(), notificationScheduledExecutor.getInterval());
 
             logger.info("Context initialized");
         } catch (FileNotFoundException | JAXBException | SAXException | ParserConfigurationException e) {
+            logger.info("Error initializing Context for Negotiator");
             e.printStackTrace();
         }
     }
