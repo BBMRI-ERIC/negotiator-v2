@@ -60,9 +60,6 @@ public class MaintenanceFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        logger.info("Maintenance Mode is set to: " + NegotiatorConfig.get().isMaintenanceMode());
-        System.out.println("Maintenance Mode is set to: " + NegotiatorConfig.get().isMaintenanceMode());
-
         if (NegotiatorConfig.get().isMaintenanceMode()) {
             String path = ((HttpServletRequest) request).getRequestURI();
 

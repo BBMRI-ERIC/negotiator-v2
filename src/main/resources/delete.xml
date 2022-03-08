@@ -34,10 +34,10 @@
 		<Console name="STDOUT" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
 		</Console>
-		<File name="errorfile" fileName="/var/log/negotiator/negotiator-error.log">
+		<File name="errorfile" fileName="${sys:catalina.base}/logs/negotiator-error.log">
 			<PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
 		</File>
-		<File name="maillog" fileName="/var/log/negotiator/negotiator-mail.log">
+		<File name="maillog" fileName="${sys:catalina.base}/logs/negotiator-mail.log">
 			<PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
 		</File>
 
