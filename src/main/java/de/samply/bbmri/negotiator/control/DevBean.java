@@ -1,5 +1,9 @@
 package de.samply.bbmri.negotiator.control;
 
+import de.samply.bbmri.negotiator.filter.MaintenanceFilter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.Serializable;
 
 import javax.faces.bean.ManagedBean;
@@ -14,6 +18,7 @@ import javax.faces.bean.ViewScoped;
 public class DevBean implements Serializable {
 
     private static final long serialVersionUID = 6262195644236838475L;
+    private static final Logger logger = LogManager.getLogger(DevBean.class);
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -23,22 +28,26 @@ public class DevBean implements Serializable {
      * @return
      */
     public String choseBiobankOwner() {
-        userBean.fakeUser(UserBean.DUMMY_DATA_SUBJECT_BIOBANK_OWNER);
+        logger.info("Set dev user to biobanker-000.");
+        userBean.fakeUser("biobanker-O00");
         return "/owner/index.xhtml?faces-redirect=true";
     }
 
     public String choseBiobankOwner1() {
-        userBean.fakeUser("usertest-biobanker1");
+        logger.info("Set dev user to biobanker-001.");
+        userBean.fakeUser("biobanker-001");
         return "/owner/index.xhtml?faces-redirect=true";
     }
 
     public String choseBiobankOwner2() {
-        userBean.fakeUser("usertest-biobanker2");
+        logger.info("Set dev user to biobanker-002.");
+        userBean.fakeUser("biobanker-002");
         return "/owner/index.xhtml?faces-redirect=true";
     }
 
     public String choseBiobankOwner3() {
-        userBean.fakeUser("usertest-biobanker3");
+        logger.info("Set dev user to biobanker-003.");
+        userBean.fakeUser("biobanker-003");
         return "/owner/index.xhtml?faces-redirect=true";
     }
 
@@ -47,17 +56,20 @@ public class DevBean implements Serializable {
      * @return
      */
     public String choseResearcher() {
-        userBean.fakeUser(UserBean.DUMMY_DATA_SUBJECT_RESEARCHER);
+        logger.info("Set dev user to researcher-001.");
+        userBean.fakeUser("researcher-001");
         return "/researcher/index.xhtml?faces-redirect=true";
     }
 
     public String choseNationalNodeRepresentative() {
-        userBean.fakeUser(UserBean.DUMMY_DATA_SUBJECT_NATIONAL_NODE_REPRESENTATIVE);
+        logger.info("Set dev user to national-node-001.");
+        userBean.fakeUser("national-node-001");
         return "/nationalnode/index.xhtml?faces-redirect=true";
     }
 
     public String choseAdmin() {
-        userBean.fakeUser("admin001");
+        logger.info("Set dev user to admin-001.");
+        userBean.fakeUser("admin-001");
         return "/admin/index.xhtml?faces-redirect=true";
     }
 

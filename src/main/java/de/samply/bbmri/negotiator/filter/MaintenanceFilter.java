@@ -44,7 +44,7 @@ import java.io.IOException;
  */
 @WebFilter(filterName = "MaintenanceFilter")
 public class MaintenanceFilter implements Filter {
-    private static final Logger logger = LogManager.getLogger(Directory.class);
+    private static final Logger logger = LogManager.getLogger(MaintenanceFilter.class);
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()
