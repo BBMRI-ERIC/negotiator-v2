@@ -23,38 +23,12 @@ public class DevBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
-    /**
-     * Choses the biobank owner as a user
-     * @return
-     */
     public String choseBiobankOwner() {
         logger.info("Set dev user to biobanker-000.");
         userBean.fakeUser("biobanker-O00");
         return "/owner/index.xhtml?faces-redirect=true";
     }
 
-    public String choseBiobankOwner1() {
-        logger.info("Set dev user to biobanker-001.");
-        userBean.fakeUser("biobanker-001");
-        return "/owner/index.xhtml?faces-redirect=true";
-    }
-
-    public String choseBiobankOwner2() {
-        logger.info("Set dev user to biobanker-002.");
-        userBean.fakeUser("biobanker-002");
-        return "/owner/index.xhtml?faces-redirect=true";
-    }
-
-    public String choseBiobankOwner3() {
-        logger.info("Set dev user to biobanker-003.");
-        userBean.fakeUser("biobanker-003");
-        return "/owner/index.xhtml?faces-redirect=true";
-    }
-
-    /**
-     * Choses the researcher as a user
-     * @return
-     */
     public String choseResearcher() {
         logger.info("Set dev user to researcher-001.");
         userBean.fakeUser("researcher-001");
