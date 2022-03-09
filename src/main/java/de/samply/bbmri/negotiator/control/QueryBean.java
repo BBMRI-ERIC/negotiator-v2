@@ -261,7 +261,7 @@ public class QueryBean implements Serializable {
     public String saveQuery() throws SQLException {
         try (Config config = ConfigFactory.get()) {
             /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
-
+            logger.info("saveQuery");
             // Hack for Locator
             jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
             jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
@@ -722,4 +722,17 @@ public class QueryBean implements Serializable {
     public void setTestRequest(boolean testRequest) {
         this.testRequest = testRequest;
     }
+
+    public boolean isValidQuery () {
+        boolean validQuery = true;
+        for (QuerySearchDTO searchQuery : searchQueries) {
+            String directoryName = getDirectoryNameByUrl(searchQuery.getUrl());
+            if( directoryName.isEmpty() ||  directoryName.equals("URL is empty")){
+                validQuery = false;
+            }
+        }
+
+        return validQuery;
+    }
+
 }

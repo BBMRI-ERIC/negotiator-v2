@@ -31,6 +31,7 @@
 				xmlns:f="http://xmlns.jcp.org/jsf/core"
 				xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
 				xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+				xmlns:c="http://java.sun.com/jsp/jstl/core"
 				template="../components/default.xhtml">
 
 	<f:metadata>
@@ -57,7 +58,19 @@
 					Then fill out the form below, giving your query a title and describing both the project you are working
 					on and adding more detailed information for this request in particular.<br />
 					If you have additional information, you can attach files to this request.<br />
-				<p />
+					<p />
+					<br/>
+					<ui:repeat value="#{queryBean.searchQueries}" var="searchQuery">
+						<c:set var="directoryName" value="#{queryBean.getDirectoryNameByUrl(searchQuery.url)}" />
+						<c:set var="isDirectoryValid" value="#{not empty directoryName || not directoryName == 'URL is empty'}" />
+
+						<ui:fragment rendered="#{not isDirectoryValid}">
+							<div class="panel panel-warning">
+								<div class="panel-heading">WARNING DIRECTORY DOES NOT EXIST!!!</div>
+								<div class="panel-body">The directory with the URL "#{searchQuery.url}" is not registered with Negotiator.</div>
+							</div>
+						</ui:fragment>
+					</ui:repeat>
 					<br/>
 				</h:panelGroup>
 				<h:panelGroup layout="block">
@@ -74,7 +87,7 @@
 						<tbody>
 						<ui:repeat value="#{queryBean.searchQueries}" var="searchQuery">
 							<tr>
-								<td>#{queryBean.getDirectoryNameByUrl(searchQuery.url)}</td>
+								<td>#{directoryName}</td>
 								<td>#{searchQuery.humanReadable}</td>
 								<td>#{searchQuery.numberOfCollections}<div style="display:none;">| #{searchQuery.token}</div></td>
 								<td>
@@ -241,11 +254,18 @@
 
 							<f:param name="queryId" value="#{queryBean.id}" />
 						</h:button>
-
-						<h:commandButton action="#{queryBean.saveQuery()}"
-							value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
-							title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"
-							styleClass="btn btn-primary" />
+						<h:commandButton disabled="#{not queryBean.isValidQuery()}"
+										 value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
+										 title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"
+										 styleClass="btn btn-primary" />
+						<!--
+						<ui:repeat value="#{queryBean.searchQueries}" var="searchQuery">
+							<h:commandButton disabled="#{not isDirectoryValid}"
+								value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
+								title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"
+								styleClass="btn btn-primary" />
+						</ui:repeat>
+						-->
 					</h:panelGroup>
 
 					<div class="modal fade" id="modal-from-delete-file-confirm-dom" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
