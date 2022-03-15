@@ -25,7 +25,7 @@ public class DevBean implements Serializable {
 
     public String choseBiobankOwner() {
         logger.info("Set dev user to biobanker-000.");
-        userBean.fakeUser("biobanker-O00");
+        userBean.fakeUser("biobanker-000");
         return "/owner/index.xhtml?faces-redirect=true";
     }
 

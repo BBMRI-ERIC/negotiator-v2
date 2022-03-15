@@ -315,6 +315,9 @@ public class QueryBean implements Serializable {
                 token = object.getAsString("nToken");
             }
             token = token.replaceAll("__search__.*", "");
+            if(token.equals("null")) {
+                token = "";
+            }
         } catch (Exception e) {
             System.err.println("Count not create nToken");
         }
