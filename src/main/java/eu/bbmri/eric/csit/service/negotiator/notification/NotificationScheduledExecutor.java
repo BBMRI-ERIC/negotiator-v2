@@ -103,12 +103,15 @@ public class NotificationScheduledExecutor extends TimerTask {
         if(sendUpdates == null) {
             return new HashSet<>();
         }
-        for(NotificationMailStatusUpdate notificationMailStatusUpdate : sendUpdates) {
+        //for(NotificationMailStatusUpdate notificationMailStatusUpdate : sendUpdates) {
+        for(Iterator<NotificationMailStatusUpdate> i = sendUpdates.iterator(); i.hasNext(); ) {
             try {
+                NotificationMailStatusUpdate notificationMailStatusUpdate = i.next();
                 boolean dbUpdateSuccess = databaseUtil.getDatabaseUtilNotification().updateMailNotificationEntryStatus(notificationMailStatusUpdate.getMailNotificationId(),
                         NotificationStatus.getNotificationType(notificationMailStatusUpdate.getStatus()), notificationMailStatusUpdate.getStatusDate());
                 if (dbUpdateSuccess) {
-                    sendUpdates.remove(notificationMailStatusUpdate);
+                    //sendUpdates.remove(notificationMailStatusUpdate);
+                    i.remove();
                 }
             } catch (Exception e) {
                 logger.error("Error in updateSendNotifications");
