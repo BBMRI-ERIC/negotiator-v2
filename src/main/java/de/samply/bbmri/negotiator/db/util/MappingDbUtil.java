@@ -121,6 +121,9 @@ public class MappingDbUtil {
         queryRecord.setEthicsVote((String) dbRecord.getValue("query_ethics_vote"));
         queryRecord.setNegotiationStartedTime((Timestamp) dbRecord.getValue("query_negotiation_started_time"));
         queryRecord.setTestRequest((Boolean) dbRecord.getValue("query_test_request"));
+        queryRecord.setResearcherName((String) dbRecord.getValue("query_researcher_name"));
+        queryRecord.setResearcherEmail((String) dbRecord.getValue("query_researcher_email"));
+        queryRecord.setResearcherOrganization((String) dbRecord.getValue("query_researcher_organization"));
         return queryRecord;
     }
 

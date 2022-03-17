@@ -80,7 +80,7 @@
             <h:panelGroup styleClass="pull-right">
                 <h:form id="deleteComment" enctype="multipart/form-data">
 
-                    <span class="btn btn-default updateCommentReadForCommentShowMarkAsReadButton#{cc.attrs.comment.id}" style="margin-top: -6px;#{cc.attrs.commentRead ? 'display:none;': ''}" onclick="publicCommentReadUpdate('#{cc.attrs.comment.id}');">
+                    <span class="btn btn-default updateCommentReadForCommentShowMarkAsReadButton#{cc.attrs.comment.id}" style="margin-top: -6px;#{cc.attrs.commentRead ? 'display:none;': ''}" onclick="commentReadUpdate('#{cc.attrs.comment.id}', '#{cc.attrs.scope}');">
                         Mark as read
                     </span>
                     <span style="margin-right: 5px;#{cc.attrs.commentRead ? 'display:none;': ''}" class="glyphicon glyphicon-envelope updateCommentReadForCommentShowElement#{cc.attrs.comment.id}" aria-hidden="true" />

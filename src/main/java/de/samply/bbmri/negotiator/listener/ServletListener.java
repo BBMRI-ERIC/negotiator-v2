@@ -26,6 +26,8 @@
 package de.samply.bbmri.negotiator.listener;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -40,10 +42,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import de.samply.bbmri.negotiator.db.util.Migration;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationScheduledExecutor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.flywaydb.core.api.FlywayException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
@@ -62,9 +64,9 @@ import de.samply.string.util.StringUtil;
 public class ServletListener implements ServletContextListener {
 
     /** The Constant logger. */
-    private static final Logger logger = LoggerFactory.getLogger(ServletListener.class);
+    private static final Logger logger = LogManager.getLogger(ServletListener.class);
 
-    private static Timer timer;
+    private Timer timer;
 
     private Timer notificationScheduledExecutorTimer;
 
@@ -76,6 +78,21 @@ public class ServletListener implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent event) {
+        System.out.println("Ding: ");
+        try {
+            String fileData = "yourContent";
+            FileOutputStream fos = new FileOutputStream("/tmp/yourFile.txt");
+
+                fos.write(fileData.getBytes());
+
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            System.err.println("FileProblem!!");
+            e.printStackTrace();
+        }
+
+
         try {
 
             String projectName = event.getServletContext().getInitParameter("projectName");
@@ -84,23 +101,9 @@ public class ServletListener implements ServletContextListener {
             }
 
             String fallback = event.getServletContext().getRealPath("/WEB-INF");
-
             Configurator.initialize(null, FileFinderUtil.findFile("delete.xml", projectName, fallback).getAbsolutePath());
 
-            logger.info("Registering PostgreSQL driver");
-            Class.forName("org.postgresql.Driver").newInstance();
-
-            // Check for DB changes
-            logger.debug("DB upgrade start");
-            Boolean newDatabaseInstallation = false;
-            try {
-                newDatabaseInstallation = Migration.doUpgrade();
-            } catch(FlywayException | SQLException e) {
-                logger.error("Could not initialize or migrate database", e);
-                NegotiatorConfig.get().setMaintenanceMode(true);
-                e.printStackTrace();
-            }
-            logger.debug("DB upgrade end");
+            Boolean newDatabaseInstallation = migrateDatabaseInstallationCheckForNewInstallation();
 
             /**
              * Initialize the configuration singleton
@@ -109,19 +112,34 @@ public class ServletListener implements ServletContextListener {
             NegotiatorConfig.setNewDatabaseInstallation(newDatabaseInstallation);
 
             logger.info("Starting directory synchronize task timer");
-
             timer = new Timer();
-            timer.schedule(new DirectorySynchronizeTask(), 10000, 1000 * 60 * 60);
+            timer.schedule(new DirectorySynchronizeTask(), 10000, 1000L * 60L * 60L);
 
+            logger.info("Starting notification task timer");
             notificationScheduledExecutorTimer = new Timer();
             NotificationScheduledExecutor notificationScheduledExecutor = new NotificationScheduledExecutor();
             notificationScheduledExecutorTimer.schedule(notificationScheduledExecutor, notificationScheduledExecutor.getDelay(), notificationScheduledExecutor.getInterval());
 
             logger.info("Context initialized");
-        } catch (FileNotFoundException | JAXBException | SAXException | ParserConfigurationException
-                | InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (FileNotFoundException | JAXBException | SAXException | ParserConfigurationException e) {
+            logger.info("Error initializing Context for Negotiator");
             e.printStackTrace();
         }
+    }
+
+    private Boolean migrateDatabaseInstallationCheckForNewInstallation() {
+        // Check for DB changes
+        logger.info("DB upgrade start");
+        Boolean newDatabaseInstallation = false;
+        try {
+            newDatabaseInstallation = Migration.doUpgrade();
+        } catch(FlywayException | SQLException e) {
+            logger.error("Could not initialize or migrate database", e);
+            NegotiatorConfig.get().setMaintenanceMode(true);
+            e.printStackTrace();
+        }
+        logger.info("DB upgrade end");
+        return newDatabaseInstallation;
     }
 
     /**
@@ -138,13 +156,20 @@ public class ServletListener implements ServletContextListener {
             logger.debug("Canceling directory synchronize timer");
         }
 
+        if(notificationScheduledExecutorTimer != null) {
+            notificationScheduledExecutorTimer.cancel();
+            logger.debug("Canceling notification timer");
+        }
+
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
             try {
                 DriverManager.deregisterDriver(driver);
-                logger.info("Unregistering driver " + driver.toString());
+                String msg = "Unregistering driver " +  driver.toString();
+                logger.info(msg);
             } catch (SQLException e) {
+                logger.error("Unregistering driver %s failed.", driver.toString());
             }
         }
     }

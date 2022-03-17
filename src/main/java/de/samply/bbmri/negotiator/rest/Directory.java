@@ -141,7 +141,7 @@ public class Directory {
             logger.info(apiCallId + " query string: " + queryString);
             QuerySearchDTO querySearchDTO = querySearchDTOHelper.generateQuerySearchDTOFromDirectory(queryString, apiCallId);
 
-            if(querySearchDTO.getToken() == null  || querySearchDTO.getToken().equals("")) {
+            if(querySearchDTO.getToken() == null  || querySearchDTO.getToken().equals("") || querySearchDTO.getToken().startsWith("null")) {
                 return getResponseForQueryWithNoToken(queryString, request, apiCallId, config);
             } else {
                 // Updated and compressed version

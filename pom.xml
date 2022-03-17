@@ -7,6 +7,7 @@
     <version>2.1.3-SNAPSHOT</version>
 
 
+
     <parent> 
         <artifactId>parent</artifactId>
         <groupId>de.samply</groupId>
@@ -87,6 +88,12 @@
             <artifactId>junit-jupiter-params</artifactId>
             <version>5.8.2</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.2</version>
         </dependency>
 
         <dependency>
@@ -445,7 +452,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.3.2</version>
+            <version>42.3.3</version>
             <scope>runtime</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
@@ -532,7 +539,7 @@
                     <dependency>
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
-                        <version>9.4.1208</version>
+                        <version>42.3.3</version>
                     </dependency>
                     <dependency>
                         <groupId>javax.xml.bind</groupId>
