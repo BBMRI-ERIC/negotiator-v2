@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = 754798798;
+	private static final long serialVersionUID = 1546296737;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -83,6 +83,11 @@ public class Person extends TableImpl<PersonRecord> {
 	 * The column <code>public.person.organization</code>.
 	 */
 	public final TableField<PersonRecord, String> ORGANIZATION = createField("organization", org.jooq.impl.SQLDataType.VARCHAR, this, "");
+
+	/**
+	 * The column <code>public.person.synced_directory</code>.
+	 */
+	public final TableField<PersonRecord, Boolean> SYNCED_DIRECTORY = createField("synced_directory", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
 
 	/**
 	 * Create a <code>public.person</code> table reference

@@ -125,7 +125,7 @@ public class Keys {
 	public static final UniqueKey<PersonRecord> PERSON_PKEY = UniqueKeys0.PERSON_PKEY;
 	public static final UniqueKey<PersonRecord> PERSON_AUTH_SUBJECT_KEY = UniqueKeys0.PERSON_AUTH_SUBJECT_KEY;
 	public static final UniqueKey<PersonCollectionRecord> PERSON_COLLECTION_PKEY = UniqueKeys0.PERSON_COLLECTION_PKEY;
-	public static final UniqueKey<PersonCommentRecord> PERSON_COMMENT_ID = UniqueKeys0.PERSON_COMMENT_ID;
+	public static final UniqueKey<PersonCommentRecord> PERSON_COMMENT_PK = UniqueKeys0.PERSON_COMMENT_PK;
 	public static final UniqueKey<PersonNetworkRecord> PERSON_NETWORK_PK = UniqueKeys0.PERSON_NETWORK_PK;
 	public static final UniqueKey<PersonOfferRecord> PERSON_OFFER_PK = UniqueKeys0.PERSON_OFFER_PK;
 	public static final UniqueKey<QueryRecord> QUERY_PKEY = UniqueKeys0.QUERY_PKEY;
@@ -201,7 +201,7 @@ public class Keys {
 		public static final UniqueKey<PersonRecord> PERSON_PKEY = createUniqueKey(Person.PERSON, Person.PERSON.ID);
 		public static final UniqueKey<PersonRecord> PERSON_AUTH_SUBJECT_KEY = createUniqueKey(Person.PERSON, Person.PERSON.AUTH_SUBJECT);
 		public static final UniqueKey<PersonCollectionRecord> PERSON_COLLECTION_PKEY = createUniqueKey(PersonCollection.PERSON_COLLECTION, PersonCollection.PERSON_COLLECTION.PERSON_ID, PersonCollection.PERSON_COLLECTION.COLLECTION_ID);
-		public static final UniqueKey<PersonCommentRecord> PERSON_COMMENT_ID = createUniqueKey(PersonComment.PERSON_COMMENT, PersonComment.PERSON_COMMENT.PERSON_ID, PersonComment.PERSON_COMMENT.COMMENT_ID);
+		public static final UniqueKey<PersonCommentRecord> PERSON_COMMENT_PK = createUniqueKey(PersonComment.PERSON_COMMENT, PersonComment.PERSON_COMMENT.PERSON_ID, PersonComment.PERSON_COMMENT.COMMENT_ID);
 		public static final UniqueKey<PersonNetworkRecord> PERSON_NETWORK_PK = createUniqueKey(PersonNetwork.PERSON_NETWORK, PersonNetwork.PERSON_NETWORK.PERSON_ID, PersonNetwork.PERSON_NETWORK.NETWORK_ID);
 		public static final UniqueKey<PersonOfferRecord> PERSON_OFFER_PK = createUniqueKey(PersonOffer.PERSON_OFFER, PersonOffer.PERSON_OFFER.PERSON_ID, PersonOffer.PERSON_OFFER.OFFER_ID);
 		public static final UniqueKey<QueryRecord> QUERY_PKEY = createUniqueKey(Query.QUERY, Query.QUERY.ID);
