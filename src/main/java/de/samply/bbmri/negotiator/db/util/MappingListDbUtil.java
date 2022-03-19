@@ -2,6 +2,7 @@ package de.samply.bbmri.negotiator.db.util;
 
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
@@ -126,8 +127,8 @@ public class MappingListDbUtil {
         return biobankRecords;
     }
 
-    public static List<PersonRecord> mapRecordsPersonRecord(Result<Record> dbRecords) {
-        List<PersonRecord> personRecords = new ArrayList<>();
+    public static List<Person> mapRecordsPersonRecord(Result<Record> dbRecords) {
+        List<Person> personRecords = new ArrayList<>();
         for (Record dbRecord : dbRecords) {
             personRecords.add(MappingDbUtil.mapRequestPersonRecord(dbRecord));
         }
