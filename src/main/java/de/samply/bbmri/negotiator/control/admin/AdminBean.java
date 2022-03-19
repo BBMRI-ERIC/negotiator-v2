@@ -4,7 +4,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class AdminBean implements Serializable {
 
     private Map<String, String> all = new HashMap<>();
 
-    private List<PersonRecord> allUsers = new ArrayList<>();
+    private List<Person> allUsers = new ArrayList<>();
 
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
@@ -68,7 +68,7 @@ public class AdminBean implements Serializable {
 
             all = new HashMap<>();
 
-            for(PersonRecord user : allUsers) {
+            for(Person user : allUsers) {
                 all.put(user.getAuthName(), user.getAuthSubject());
             }
 
@@ -104,11 +104,11 @@ public class AdminBean implements Serializable {
         return all;
     }
 
-    public List<PersonRecord> getAllUsers() {
+    public List<Person> getAllUsers() {
         return allUsers;
     }
 
-    public void setAllUsers(List<PersonRecord> allUsers) {
+    public void setAllUsers(List<Person> allUsers) {
         this.allUsers = allUsers;
     }
 //endregion

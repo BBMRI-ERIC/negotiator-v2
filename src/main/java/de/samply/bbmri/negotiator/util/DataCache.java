@@ -6,7 +6,6 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 
 import java.sql.SQLException;
@@ -69,8 +68,8 @@ public class DataCache {
             userNames_ = new HashMap<Integer, String>();
         }
         try(Config config = ConfigFactory.get()) {
-            List<PersonRecord> persons = DbUtil.getAllUsers(config);
-            for(PersonRecord person : persons) {
+            List<Person> persons = DbUtil.getAllUsers(config);
+            for(Person person : persons) {
                 userNames_.put(person.getId(), person.getAuthName());
             }
         }catch (SQLException e) {

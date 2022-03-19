@@ -33,7 +33,6 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
@@ -75,7 +74,7 @@ public class AdminDebugBean implements Serializable {
      * The list of queries
      */
     private List<QueryRecord> queries;
-    private HashMap<Integer, PersonRecord> users;
+    private HashMap<Integer, Person> users;
 
     //---------------------------------
     // START Collection Assostiations
@@ -131,7 +130,7 @@ public class AdminDebugBean implements Serializable {
         return users.get(id).getAuthName();
     }
 
-    public HashMap<Integer, PersonRecord> getUser() {
+    public HashMap<Integer, Person> getUser() {
         return users;
     }
 
@@ -180,8 +179,8 @@ public class AdminDebugBean implements Serializable {
     public void loadQueries(Boolean filterRemoveTestRequests) {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueries(config, filterRemoveTestRequests);
-            users = new HashMap<Integer, PersonRecord>();
-            for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
+            users = new HashMap<Integer, Person>();
+            for(Person personRecord : DbUtil.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
             }
         } catch(SQLException e) {

@@ -1071,7 +1071,7 @@ public class DbUtil {
      * @param config
      * @return
      */
-    public static List<PersonRecord> getAllUsers(Config config) {
+    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getAllUsers(Config config) {
         Result<Record> record =
                 config.dsl().select(getFields(Tables.PERSON, "person")).from(Tables.PERSON).orderBy(Tables.PERSON
                         .AUTH_NAME).fetch();
