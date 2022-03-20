@@ -1,8 +1,8 @@
 package eu.bbmri.eric.csit.service.negotiator.mapping;
 
+import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTOHelper;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;;
 import org.jooq.Record;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +38,8 @@ class DatabaseObjectMapperTest {
     private static Stream<Arguments> provideClassesForMapping() {
         return Stream.of(
                 Arguments.of(new Query(), Query.class.toString()),
-                Arguments.of(new Person(), Person.class.toString())
+                Arguments.of(new Person(), Person.class.toString()),
+                Arguments.of(new ListOfDirectories(), ListOfDirectories.class.toString())
         );
     }
 
@@ -120,5 +121,47 @@ class DatabaseObjectMapperTest {
         assertEquals(true, result.getIsAdmin());
         assertEquals("EU Uni", result.getOrganization());
         assertEquals(false, result.getSyncedDirectory());
+    }
+
+    @Test
+    @DisplayName("Test mapping list of directories")
+    void testMappingOfListOfDirectories() {
+        Mockito.when(dbRecord.getValue("list_of_directories_id", Integer.class)).thenReturn(8);
+        Mockito.when(dbRecord.getValue("list_of_directories_name", String.class)).thenReturn("BBMRI-ERIC Directory");
+        Mockito.when(dbRecord.getValue("list_of_directories_url", String.class)).thenReturn("https://directory.bbmri-eric.eu");
+        Mockito.when(dbRecord.getValue("list_of_directories_rest_url", String.class)).thenReturn("https://directory.bbmri-eric.eu/api");
+        Mockito.when(dbRecord.getValue("list_of_directories_username", String.class)).thenReturn("");
+        Mockito.when(dbRecord.getValue("list_of_directories_password", String.class)).thenReturn("password");
+        Mockito.when(dbRecord.getValue("list_of_directories_api_username", String.class)).thenReturn("api username");
+        Mockito.when(dbRecord.getValue("list_of_directories_api_password", String.class)).thenReturn("api password");
+        Mockito.when(dbRecord.getValue("list_of_directories_resource_biobanks", String.class)).thenReturn("eu_resource_biobanks");
+        Mockito.when(dbRecord.getValue("list_of_directories_resource_collections", String.class)).thenReturn("eu_resource_collections");
+        Mockito.when(dbRecord.getValue("list_of_directories_description", String.class)).thenReturn("Lorem ipsum dolor sit amet consectetur adipisicing elit.");
+        Mockito.when(dbRecord.getValue("list_of_directories_sync_active", Boolean.class)).thenReturn(true);
+        Mockito.when(dbRecord.getValue("list_of_directories_directory_prefix", String.class)).thenReturn("BBMRI-ERIC");
+        Mockito.when(dbRecord.getValue("list_of_directories_resource_networks", String.class)).thenReturn("eu_resource_networks");
+        Mockito.when(dbRecord.getValue("list_of_directories_bbmri_eric_national_nodes", Boolean.class)).thenReturn(false);
+        Mockito.when(dbRecord.getValue("list_of_directories_api_type", String.class)).thenReturn("Molgenis");
+
+        ListOfDirectories result = databaseObjectMapper.map(dbRecord, new ListOfDirectories());
+
+        assertEquals(ListOfDirectories.class, result.getClass());
+
+        assertEquals(8, result.getId());
+        assertEquals("BBMRI-ERIC Directory", result.getName());
+        assertEquals("https://directory.bbmri-eric.eu", result.getUrl());
+        assertEquals("https://directory.bbmri-eric.eu/api", result.getRestUrl());
+        assertEquals("", result.getUsername());
+        assertEquals("password", result.getPassword());
+        assertEquals("api username", result.getApiUsername());
+        assertEquals("api password", result.getApiPassword());
+        assertEquals("eu_resource_biobanks", result.getResourceBiobanks());
+        assertEquals("eu_resource_collections", result.getResourceCollections());
+        assertEquals("Lorem ipsum dolor sit amet consectetur adipisicing elit.", result.getDescription());
+        assertEquals(true, result.getSyncActive());
+        assertEquals("BBMRI-ERIC", result.getDirectoryPrefix());
+        assertEquals("eu_resource_networks", result.getResourceNetworks());
+        assertEquals(false, result.getBbmriEricNationalNodes());
+        assertEquals("Molgenis", result.getApiType());
     }
 }
