@@ -35,8 +35,8 @@ import de.samply.bbmri.negotiator.helper.model.DirectorySyncLoggingHelper;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.BCPlatformFinderDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.DKFZSampleLocatorDirectoryClient;
@@ -69,7 +69,7 @@ public class DirectorySynchronizeTask extends TimerTask {
     public void run() {
         try(Config config = ConfigFactory.get()) {
             DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
-            List<ListOfDirectories> directories = DbUtil.getDirectories(config);
+            List<ListOfDirectories> directories = DbUtilListOfDirectories.getDirectories(config);
             for(ListOfDirectories listOfDirectories : directories) {
                 logger.info(marker, "Synchronization with the directory: {} - {}", listOfDirectories.getId(), listOfDirectories.getName());
                 directorySyncLoggingHelper.addSyncResult(runDirectorySync(listOfDirectories));

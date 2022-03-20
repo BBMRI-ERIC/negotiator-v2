@@ -3,9 +3,8 @@ package de.samply.bbmri.negotiator.control.admin;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
-import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -23,7 +22,7 @@ public class DirectoryBean {
 
     public List<ListOfDirectories> getDirectories() {
         try(Config config = ConfigFactory.get()) {
-            List<ListOfDirectories> list = DbUtil.getDirectories(config);
+            List<ListOfDirectories> list = DbUtilListOfDirectories.getDirectories(config);
             logger.info(marker, "Number of Directories {}", list.size());
             return list;
         } catch(SQLException e) {

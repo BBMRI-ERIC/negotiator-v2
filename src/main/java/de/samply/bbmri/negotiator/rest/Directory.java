@@ -43,11 +43,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.ServletUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import de.samply.bbmri.negotiator.util.JsonCollectionUpdateHelper;
 import de.samply.bbmri.negotiator.util.NToken;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
@@ -339,7 +341,7 @@ public class Directory {
 
         if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null || requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
             logger.info(apiCallId + " removing collections from Mapping");
-            ListOfDirectoriesRecord serviceRecord = DbUtil.getDirectoryByUrl(config, serviceURL);
+            ListOfDirectories serviceRecord = DbUtilListOfDirectories.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
                 List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
                 for(CollectionRecord collectionRecord : collectionsList) {
@@ -348,7 +350,7 @@ public class Directory {
             }
         } else if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
             logger.info(apiCallId + " changing status of collections");
-            ListOfDirectoriesRecord serviceRecord = DbUtil.getDirectoryByUrl(config, serviceURL);
+            ListOfDirectories serviceRecord = DbUtilListOfDirectories.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
                 List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
                 for(CollectionRecord collectionRecord : collectionsList) {

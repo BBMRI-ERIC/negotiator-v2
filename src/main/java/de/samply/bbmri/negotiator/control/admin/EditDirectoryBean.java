@@ -4,15 +4,15 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
@@ -110,7 +110,7 @@ public class EditDirectoryBean implements Serializable {
             if(id != null)
             {
                 setMode("edit");
-                ListOfDirectoriesRecord directoryRecord = DbUtil.getDirectory(config, id);
+                ListOfDirectories directoryRecord = DbUtilListOfDirectories.getDirectory(config, id);
 
                 directoryName = directoryRecord.getName();
                 directoryDescription = directoryRecord.getDescription();
@@ -140,12 +140,12 @@ public class EditDirectoryBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
             /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
             if(id != null) {
-                DbUtil.editDirectory(config, id, directoryName, directoryDescription, directoryUrl, directoryUsername,
+                DbUtilListOfDirectories.editDirectory(config, id, directoryName, directoryDescription, directoryUrl, directoryUsername,
                         directoryPassword, directoryResturl, directoryUsernameApi,
                         directoryPasswordApi, directoryResourceBiobanks, directoryResourceCollections, directorySyncActive);
                 config.commit();
             } else {
-                ListOfDirectoriesRecord record = DbUtil.saveDirectory(config, directoryName, directoryDescription, directoryUrl, directoryUsername,
+                ListOfDirectoriesRecord record = DbUtilListOfDirectories.saveDirectory(config, directoryName, directoryDescription, directoryUrl, directoryUsername,
                         directoryPassword, directoryResturl, directoryUsernameApi,
                         directoryPasswordApi, directoryResourceBiobanks, directoryResourceCollections, directorySyncActive);
                 config.commit();

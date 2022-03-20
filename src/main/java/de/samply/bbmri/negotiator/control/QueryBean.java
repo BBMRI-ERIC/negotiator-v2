@@ -43,19 +43,18 @@ import javax.faces.context.FacesContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
-import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import de.samply.bbmri.negotiator.util.NToken;
 import de.samply.bbmri.negotiator.util.RedirectUrlGenerator;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONAware;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import org.apache.logging.log4j.LogManager;
@@ -227,7 +226,7 @@ public class QueryBean implements Serializable {
 
     public List<ListOfDirectories> getDirectories() {
         try(Config config = ConfigFactory.get()) {
-            List<ListOfDirectories> list = DbUtil.getDirectories(config);
+            List<ListOfDirectories> list = DbUtilListOfDirectories.getDirectories(config);
             return list;
         } catch(SQLException e) {
             e.printStackTrace();
@@ -245,7 +244,7 @@ public class QueryBean implements Serializable {
                 logger.info("Problem URL is empty");
                 return "URL is empty";
             } else {
-                return DbUtil.getDirectoryByUrl(config, url).getName();
+                return DbUtilListOfDirectories.getDirectoryByUrl(config, url).getName();
             }
         }
         catch (Exception e) {
