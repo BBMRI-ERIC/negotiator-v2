@@ -42,6 +42,7 @@ import javax.faces.context.FacesContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -224,9 +225,9 @@ public class QueryBean implements Serializable {
         clearEditChanges();
     }
 
-    public List<ListOfDirectoriesRecord> getDirectories() {
+    public List<ListOfDirectories> getDirectories() {
         try(Config config = ConfigFactory.get()) {
-            List<ListOfDirectoriesRecord> list = DbUtil.getDirectories(config);
+            List<ListOfDirectories> list = DbUtil.getDirectories(config);
             return list;
         } catch(SQLException e) {
             e.printStackTrace();

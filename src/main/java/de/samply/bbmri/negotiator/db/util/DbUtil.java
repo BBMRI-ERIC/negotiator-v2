@@ -35,14 +35,13 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.*;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
+import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseListMapper;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
 import org.jooq.*;
@@ -72,15 +71,17 @@ import static org.jooq.impl.DSL.field;
 public class DbUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
+    private static DatabaseListMapper databaseListMapper = new DatabaseListMapper();
 
     /**
      * Retunrs the list of all Directories
      * @param config database configuration
      * @return
      */
-    public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
+    public static List<ListOfDirectories> getDirectories(Config config) {
         Result<Record> records = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).fetch();
-        return MappingListDbUtil.mapRecordsListOfDirectoriesRecords(records);
+        List<ListOfDirectories> test = databaseListMapper.map(records, new ListOfDirectories());
+        return databaseListMapper.map(records, new ListOfDirectories());
     }
 
     /**
