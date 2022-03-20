@@ -18,14 +18,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.sql.Timestamp;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DisplayName("Test record mapper")
+@DisplayName("Test database record mapper")
 @ExtendWith(MockitoExtension.class)
 class DatabaseObjectMapperTest {
 
     private DatabaseObjectMapper databaseObjectMapper;
+    private ObjectMappingTestHelper objectMappingTestHelper = new ObjectMappingTestHelper();
 
     @Mock
     private Record dbRecord;
@@ -54,23 +54,7 @@ class DatabaseObjectMapperTest {
     @Test
     @DisplayName("Test mapping of query")
     void testMappingOfQuery() {
-        Mockito.when(dbRecord.getValue("query_id")).thenReturn(1);
-        Mockito.when(dbRecord.getValue("query_title")).thenReturn("Test Query");
-        Mockito.when(dbRecord.getValue("query_text")).thenReturn("Longer query text;");
-        Mockito.when(dbRecord.getValue("query_query_xml")).thenReturn("");
-        Mockito.when(dbRecord.getValue("query_query_creation_time")).thenReturn(new Timestamp(1647619247620L));
-        Mockito.when(dbRecord.getValue("query_researcher_id")).thenReturn(15);
-        Mockito.when(dbRecord.getValue("query_json_text")).thenReturn("{\"URL\":\"http://www.dadi.com\"}");
-        Mockito.when(dbRecord.getValue("query_num_attachments")).thenReturn(5);
-        Mockito.when(dbRecord.getValue("query_negotiator_token")).thenReturn("36f71886-bd13-4eec-b3c4-1842e95a97d");
-        Mockito.when(dbRecord.getValue("query_valid_query")).thenReturn(true);
-        Mockito.when(dbRecord.getValue("query_request_description")).thenReturn("query_request_description test");
-        Mockito.when(dbRecord.getValue("query_ethics_vote")).thenReturn("Ethic vote text");
-        Mockito.when(dbRecord.getValue("query_negotiation_started_time")).thenReturn(new Timestamp(1647619471L));
-        Mockito.when(dbRecord.getValue("query_test_request")).thenReturn(false);
-        Mockito.when(dbRecord.getValue("query_researcher_name")).thenReturn("Researcher Sinco");
-        Mockito.when(dbRecord.getValue("query_researcher_email")).thenReturn("sinco@uni.eu");
-        Mockito.when(dbRecord.getValue("query_researcher_organization")).thenReturn("EU Uni");
+        dbRecord = objectMappingTestHelper.getMockedQuery(dbRecord);
 
         Query result = databaseObjectMapper.map(dbRecord, new Query());
 
@@ -99,15 +83,7 @@ class DatabaseObjectMapperTest {
     @DisplayName("Test mapping of person")
     void testMappingOfPerson() {
         byte[] image = new byte[] {};
-
-        Mockito.when(dbRecord.getValue("person_id")).thenReturn(5);
-        Mockito.when(dbRecord.getValue("person_auth_subject")).thenReturn("auth Subject");
-        Mockito.when(dbRecord.getValue("person_auth_name")).thenReturn("Max Musterman");
-        Mockito.when(dbRecord.getValue("person_auth_email")).thenReturn("max.musterman@email.com");
-        Mockito.when(dbRecord.getValue("person_person_image")).thenReturn(image);
-        Mockito.when(dbRecord.getValue("person_is_admin")).thenReturn(true);
-        Mockito.when(dbRecord.getValue("person_organization")).thenReturn("EU Uni");
-        Mockito.when(dbRecord.getValue("person_synced_directory")).thenReturn(false);
+        dbRecord = objectMappingTestHelper.getMockedPerson(dbRecord);
 
         Person result = databaseObjectMapper.map(dbRecord, new Person());
 
@@ -126,22 +102,7 @@ class DatabaseObjectMapperTest {
     @Test
     @DisplayName("Test mapping list of directories")
     void testMappingOfListOfDirectories() {
-        Mockito.when(dbRecord.getValue("list_of_directories_id", Integer.class)).thenReturn(8);
-        Mockito.when(dbRecord.getValue("list_of_directories_name", String.class)).thenReturn("BBMRI-ERIC Directory");
-        Mockito.when(dbRecord.getValue("list_of_directories_url", String.class)).thenReturn("https://directory.bbmri-eric.eu");
-        Mockito.when(dbRecord.getValue("list_of_directories_rest_url", String.class)).thenReturn("https://directory.bbmri-eric.eu/api");
-        Mockito.when(dbRecord.getValue("list_of_directories_username", String.class)).thenReturn("");
-        Mockito.when(dbRecord.getValue("list_of_directories_password", String.class)).thenReturn("password");
-        Mockito.when(dbRecord.getValue("list_of_directories_api_username", String.class)).thenReturn("api username");
-        Mockito.when(dbRecord.getValue("list_of_directories_api_password", String.class)).thenReturn("api password");
-        Mockito.when(dbRecord.getValue("list_of_directories_resource_biobanks", String.class)).thenReturn("eu_resource_biobanks");
-        Mockito.when(dbRecord.getValue("list_of_directories_resource_collections", String.class)).thenReturn("eu_resource_collections");
-        Mockito.when(dbRecord.getValue("list_of_directories_description", String.class)).thenReturn("Lorem ipsum dolor sit amet consectetur adipisicing elit.");
-        Mockito.when(dbRecord.getValue("list_of_directories_sync_active", Boolean.class)).thenReturn(true);
-        Mockito.when(dbRecord.getValue("list_of_directories_directory_prefix", String.class)).thenReturn("BBMRI-ERIC");
-        Mockito.when(dbRecord.getValue("list_of_directories_resource_networks", String.class)).thenReturn("eu_resource_networks");
-        Mockito.when(dbRecord.getValue("list_of_directories_bbmri_eric_national_nodes", Boolean.class)).thenReturn(false);
-        Mockito.when(dbRecord.getValue("list_of_directories_api_type", String.class)).thenReturn("Molgenis");
+        dbRecord = objectMappingTestHelper.getMockedListOfDirectories(dbRecord);
 
         ListOfDirectories result = databaseObjectMapper.map(dbRecord, new ListOfDirectories());
 

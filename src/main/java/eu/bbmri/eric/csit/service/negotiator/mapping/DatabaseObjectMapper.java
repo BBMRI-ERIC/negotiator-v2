@@ -1,6 +1,5 @@
 package eu.bbmri.eric.csit.service.negotiator.mapping;
 
-import de.samply.bbmri.negotiator.db.util.MappingDbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -8,8 +7,6 @@ import eu.bbmri.eric.csit.service.negotiator.mapping.mapper.ListOfDirectoriesMap
 import eu.bbmri.eric.csit.service.negotiator.mapping.mapper.PersonMapper;
 import eu.bbmri.eric.csit.service.negotiator.mapping.mapper.QueryMapper;
 import org.jooq.Record;
-
-import java.io.Serializable;
 
 public class DatabaseObjectMapper {
 
