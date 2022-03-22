@@ -296,7 +296,7 @@ public class DbUtilRequest {
         Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
         Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("reque_ststatus_table_abandon");
 
-    	Result<Record> fetch = config.dsl()
+    	Result<Record> records = config.dsl()
 				.select(FieldHelper.getFields(Tables.QUERY, "query"))
 				.select(FieldHelper.getFields(queryAuthor, "person"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
@@ -342,7 +342,7 @@ public class DbUtilRequest {
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
+        return databaseListMapper.map(records, new OwnerQueryStatsDTO());
     }
 
     public static List<QueryAttachmentDTO> getQueryAttachmentRecords(Config config, int queryId) {
@@ -351,6 +351,6 @@ public class DbUtilRequest {
                 .from(Tables.QUERY_ATTACHMENT)
                 .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT.ID.asc()).fetch();
-        return MappingListDbUtil.mapRecordsQueryAttachmentDTO(result);
+        return databaseListMapper.map(result, new QueryAttachmentDTO());
     }
 }

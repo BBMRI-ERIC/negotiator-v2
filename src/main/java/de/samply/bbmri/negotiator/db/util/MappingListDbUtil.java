@@ -20,20 +20,6 @@ public class MappingListDbUtil {
 
     }
 
-    public static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> dbRecords) {
-        List<QueryStatsDTO> result = new ArrayList<>();
-        for(Record dbRecord : dbRecords) {
-            QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
-            queryStatsDTO.setQuery(MappingDbUtil.mapRequestQuery(dbRecord));
-            queryStatsDTO.setQueryAuthor(MappingDbUtil.mapRequestPerson(dbRecord));
-            queryStatsDTO.setLastCommentTime((Timestamp) dbRecord.getValue("last_comment_time"));
-            queryStatsDTO.setCommentCount((Integer) dbRecord.getValue("comment_count"));
-            queryStatsDTO.setUnreadCommentCount((Integer) dbRecord.getValue("unread_comment_count"));
-            result.add(queryStatsDTO);
-        }
-        return result;
-    }
-
     public static List<OwnerQueryStatsDTO> mapRecordResultOwnerQueryStatsDTOList(Result<Record> dbRecords) {
         List<OwnerQueryStatsDTO> result = new ArrayList<>();
         for(Record dbRecord : dbRecords) {
