@@ -38,8 +38,8 @@ import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
-import org.apache.logging.log4j.util.StringBuilders;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.export.Exporter;
 
@@ -141,7 +141,7 @@ public class AdminDebugBean implements Serializable {
 
     public String restNegotiation(Integer id) {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.restNegotiation(config, id);
+            DbUtilRequest.restNegotiation(config, id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -150,9 +150,9 @@ public class AdminDebugBean implements Serializable {
 
     public String resendNotifications(Integer requestId) {
         try (Config config = ConfigFactory.get()) {
-            Query query = DbUtil.getQueryFromIdAsQuery(config, requestId);
+            Query query = DbUtilRequest.getQueryFromIdAsQuery(config, requestId);
             if(query.getNegotiationStartedTime() == null) {
-                DbUtil.startNegotiation(config, requestId);
+                DbUtilRequest.startNegotiation(config, requestId);
             }
             RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(requestId);
             requestLifeCycleStatus.setQuery(query);
@@ -190,8 +190,8 @@ public class AdminDebugBean implements Serializable {
 
     public void transferRequest() {
         try (Config config = ConfigFactory.get()) {
-            QueryRecord queryRecord = DbUtil.getQueryFromId(config, transferQueryId);
-            Person researcher_old = DbUtil.getPersonDetails(config, queryRecord.getResearcherId());
+            Query query = DbUtilRequest.getQueryFromId(config, transferQueryId);
+            Person researcher_old = DbUtil.getPersonDetails(config, query.getResearcherId());
             Person researcher_new = DbUtil.getPersonDetails(config, transferQueryToUserId);
             StringBuilder commentMessage = new StringBuilder();
             commentMessage.append("---- System message ----\n\n");
@@ -200,7 +200,7 @@ public class AdminDebugBean implements Serializable {
             commentMessage.append(" to ");
             commentMessage.append(researcher_new.getAuthName());
             commentMessage.append(".");
-            DbUtil.transferQuery(config, transferQueryId, transferQueryToUserId);
+            DbUtilRequest.transferQuery(config, transferQueryId, transferQueryToUserId);
             DbUtil.addComment(config, transferQueryId, userBean.getUserId(), commentMessage.toString(), "published", false);
         } catch (SQLException e) {
             System.err.println("3f0113dc7f4c-AdminDebugBean ERROR-NG-0000076: Error Transferring Request " + transferQueryId + " to user " + transferQueryToUserId + ".");

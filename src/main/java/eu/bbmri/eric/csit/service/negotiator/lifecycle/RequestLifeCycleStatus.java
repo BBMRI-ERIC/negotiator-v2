@@ -11,6 +11,7 @@ import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
@@ -263,24 +264,7 @@ public class RequestLifeCycleStatus {
 
     private Query getQueryFromDb() {
         try (Config config = ConfigFactory.get()) {
-            QueryRecord queryRecord = DbUtil.getQueryFromId(config, query_id);
-            Query query = new Query();
-            query.setId(queryRecord.getId());
-            query.setTitle(queryRecord.getTitle());
-            query.setText(queryRecord.getText());
-            query.setQueryXml(queryRecord.getQueryXml());
-            query.setQueryCreationTime(queryRecord.getQueryCreationTime());
-            query.setResearcherId(queryRecord.getResearcherId());
-            query.setJsonText(queryRecord.getJsonText());
-            query.setNumAttachments(queryRecord.getNumAttachments());
-            query.setNegotiatorToken(queryRecord.getNegotiatorToken());
-            query.setValidQuery(queryRecord.getValidQuery());
-            query.setRequestDescription(queryRecord.getRequestDescription());
-            query.setEthicsVote(queryRecord.getEthicsVote());
-            query.setNegotiationStartedTime(queryRecord.getNegotiationStartedTime());
-            query.setResearcherEmail(queryRecord.getResearcherEmail());
-            query.setResearcherEmail(queryRecord.getResearcherEmail());
-            query.setResearcherOrganization(queryRecord.getResearcherOrganization());
+            Query query = DbUtilRequest.getQueryFromId(config, query_id);
             return query;
         } catch (Exception e) {
             logger.error("ERROR-NG-0000008: Error getting query. queryId:" + query_id);

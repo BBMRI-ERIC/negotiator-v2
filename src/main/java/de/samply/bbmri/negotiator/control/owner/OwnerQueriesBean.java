@@ -44,6 +44,7 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -177,7 +178,7 @@ public class OwnerQueriesBean implements Serializable {
 		if (queries == null || queries.isEmpty()) {
 			try (Config config = ConfigFactory.get()) {
 
-			    queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
+			    queries = DbUtilRequest.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
 					        flagFilter, isTestRequest);
 
 				for (int i = 0; i < queries.size(); ++i) {

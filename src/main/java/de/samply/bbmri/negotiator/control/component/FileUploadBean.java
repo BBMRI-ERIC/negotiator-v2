@@ -12,6 +12,7 @@ import de.samply.bbmri.negotiator.model.AttachmentDTO;
 import de.samply.bbmri.negotiator.model.CommentAttachmentDTO;
 import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +141,7 @@ public class FileUploadBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
             String originalFileName = fileUtil.getOriginalFileNameFromPart(file);
             fileDTO.setAttachment(originalFileName);
-            Integer fileId = DbUtil.insertQueryAttachmentRecord(config, fileDTO);
+            Integer fileId = DbUtilRequest.insertQueryAttachmentRecord(config, fileDTO);
             fileDTO.setId(fileId);
             if (fileId == null) {
                 // something went wrong in db
@@ -211,7 +212,7 @@ public class FileUploadBean implements Serializable {
 
         try (Config config = ConfigFactory.get()) {
             if(fileScope.equals("queryAttachment")) {
-                DbUtil.deleteQueryAttachmentRecord(config, queryId, fileIdInteger);
+                DbUtilRequest.deleteQueryAttachmentRecord(config, queryId, fileIdInteger);
             } else if(fileScope.equals("privateAttachment")) {
                 DbUtil.deletePrivateCommentAttachment(config, fileIdInteger);
             } else if(fileScope.equals("commentAttachment")) {
@@ -442,7 +443,7 @@ public class FileUploadBean implements Serializable {
         this.queryId = queryId;
         try(Config config = ConfigFactory.get()) {
             if(queryId != null) {
-                setAttachments(DbUtil.getQueryAttachmentRecords(config, queryId));
+                setAttachments(DbUtilRequest.getQueryAttachmentRecords(config, queryId));
                 setPrivateAttachments(DbUtil.getPrivateAttachmentRecords(config, queryId));
                 setCommentAttachments(DbUtil.getCommentAttachmentRecords(config, queryId));
             }

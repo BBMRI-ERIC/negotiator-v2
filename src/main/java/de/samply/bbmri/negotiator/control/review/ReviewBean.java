@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class ReviewBean implements Serializable {
     private int rejectedRequests = 0;
     private List reviewRequest;
     private final HashMap<Integer, RequestLifeCycleStatus> requestStatusList = new HashMap<Integer, RequestLifeCycleStatus>();
-    private final List<QueryRecord> queryRecordList = new ArrayList<QueryRecord>();
+    private final List<Query> queryRecordList = new ArrayList<>();
     private String reviewComment = "";
     private QueryRecord selectedQueryRecord = null;
 
@@ -72,7 +73,7 @@ public class ReviewBean implements Serializable {
             for(RequestStatusDTO request : requestlist) {
                 if(!requestStatusList.containsKey(request.getQuery_id())) {
                     requestStatusList.put(request.getQuery_id(), new RequestLifeCycleStatus(request.getQuery_id()));
-                    queryRecordList.add(DbUtil.getQueryFromId(config, request.getQuery_id()));
+                    queryRecordList.add(DbUtilRequest.getQueryFromId(config, request.getQuery_id()));
                 }
                 requestStatusList.get(request.getQuery_id()).initialise(requestlist);
             }
@@ -86,8 +87,8 @@ public class ReviewBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
             requestStatusList.get(queryRecordId).nextStatus("approved", "review", "{\"statusApprovedText\":\"" + reviewComment + "\"}", userBean.getUserId());
             requestStatusList.get(queryRecordId).nextStatus("waitingstart", "start", null, userBean.getUserId());
-            DbUtil.startNegotiation(config, queryRecordId);
-            Query selectedQuery = DbUtil.getQueryFromIdAsQuery(config, queryRecordId);
+            DbUtilRequest.startNegotiation(config, queryRecordId);
+            Query selectedQuery = DbUtilRequest.getQueryFromIdAsQuery(config, queryRecordId);
             requestStatusList.get(queryRecordId).nextStatus("started", "start", null, userBean.getUserId());
             requestStatusList.get(queryRecordId).setQuery(selectedQuery);
             requestStatusList.get(queryRecordId).contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker(queryRecordId));
@@ -136,7 +137,7 @@ public class ReviewBean implements Serializable {
         this.userBean = userBean;
     }
 
-    public List<QueryRecord> getQueryRecordList() {
+    public List<Query> getQueryRecordList() {
         return queryRecordList;
     }
 

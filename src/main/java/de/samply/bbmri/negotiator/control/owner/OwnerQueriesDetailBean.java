@@ -49,6 +49,7 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import de.samply.bbmri.negotiator.Config;
@@ -399,7 +400,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 		// Merge uploaded pdf attachments of the query
 		try(Config config = ConfigFactory.get()) {
-			List<QueryAttachmentDTO> attachments = DbUtil.getQueryAttachmentRecords(config, queryId);
+			List<QueryAttachmentDTO> attachments = DbUtilRequest.getQueryAttachmentRecords(config, queryId);
 			PDFMergerUtility PDFmerger = new PDFMergerUtility();
 			PDFmerger.setDestinationFileName(tempPdfOutputFilePath);
 			File file = new File(tempPdfOutputFilePath);
@@ -577,7 +578,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, isTestRequest);
+				queries = DbUtilRequest.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, isTestRequest);
 
 				for (int i = 0; i < queries.size(); ++i) {
 					getPrivateNegotiationCountAndTime(i);

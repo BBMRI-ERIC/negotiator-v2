@@ -38,8 +38,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.validation.constraints.Null;
 
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -153,7 +153,7 @@ public class ResearcherQueriesBean implements Serializable {
 
     public List<QueryStatsDTO> getQueries() {
         try(Config config = ConfigFactory.get()) {
-            queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+            queries = DbUtilRequest.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
             if(queries == null) {
             }
 

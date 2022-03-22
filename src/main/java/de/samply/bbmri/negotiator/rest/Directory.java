@@ -45,11 +45,11 @@ import javax.ws.rs.core.Response;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import de.samply.bbmri.negotiator.util.JsonCollectionUpdateHelper;
 import de.samply.bbmri.negotiator.util.NToken;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
@@ -383,7 +383,7 @@ public class Directory {
     }
 
     protected QueryRecord getQueryRecord(Config config, String reuestToken) {
-        return DbUtil.getQuery(config, reuestToken);
+        return DbUtilRequest.getQuery(config, reuestToken);
     }
 
     protected void updateRecord(QueryRecord queryRecord) {

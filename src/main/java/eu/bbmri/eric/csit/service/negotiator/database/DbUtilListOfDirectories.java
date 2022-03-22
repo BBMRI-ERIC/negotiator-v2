@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.db.util.MappingDbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.utils.FieldHelper;
 import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseListMapper;
 import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseObjectMapper;
 import org.apache.logging.log4j.LogManager;
@@ -30,7 +31,7 @@ public class DbUtilListOfDirectories {
 
     public static List<ListOfDirectories> getDirectories(Config config) {
         try {
-            Result<Record> records = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).fetch();
+            Result<Record> records = config.dsl().select(FieldHelper.getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).fetch();
             return databaseListMapper.map(records, new ListOfDirectories());
         } catch (IllegalArgumentException e) {
             logger.error("IllegalArgumentException: Problem getting list of ListOfDirectories.");
@@ -46,7 +47,7 @@ public class DbUtilListOfDirectories {
 
     public static ListOfDirectories getDirectory(Config config, int listOfDirectoryId) {
         try {
-            Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
+            Record record = config.dsl().select(FieldHelper.getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
             return databaseObjectMapper.map(record, new ListOfDirectories());
         } catch (IllegalArgumentException e) {
             logger.error("IllegalArgumentException: No Directory Entry found for ID: " + listOfDirectoryId);
@@ -62,7 +63,7 @@ public class DbUtilListOfDirectories {
 
     public static ListOfDirectories getDirectory(Config config, String directoryName) {
         try {
-            Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
+            Record record = config.dsl().select(FieldHelper.getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
             return databaseObjectMapper.map(record, new ListOfDirectories());
         } catch (IllegalArgumentException e) {
             logger.error("IllegalArgumentException: No Directory Entry found for DirectoryName: " + directoryName);
@@ -82,7 +83,7 @@ public class DbUtilListOfDirectories {
             endindex = url.length();
         }
         url = url.substring(0, endindex);
-        Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories"))
+        Record record = config.dsl().select(FieldHelper.getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories"))
                 .from(Tables.LIST_OF_DIRECTORIES)
                 .where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
         if(record == null) {
@@ -134,14 +135,5 @@ public class DbUtilListOfDirectories {
         config.commit();
 
         return listOfDirectoriesRecord;
-    }
-
-    private static List<Field<?>> getFields(Table<?> table, String prefix) {
-        List<Field<?>> target = new ArrayList<>();
-        for(Field<?> f : table.fields()) {
-            target.add(f.as(prefix + "_" + f.getName()));
-        }
-
-        return target;
     }
 }

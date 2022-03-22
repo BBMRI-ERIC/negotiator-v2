@@ -27,7 +27,6 @@ package de.samply.bbmri.negotiator.control;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,9 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
@@ -125,10 +126,10 @@ public class ApplicationBean implements Serializable {
             for(Integer queryId : queryIds) {
                 System.err.println("queryId: " + queryId);
                 try {
-                    QueryRecord queryRecord = DbUtil.getQueryFromId(config, queryId);
+                    Query query = DbUtilRequest.getQueryFromId(config, queryId);
                     Integer researcherId = 1;
-                    if (queryRecord != null) {
-                        researcherId = queryRecord.getResearcherId();
+                    if (query != null) {
+                        researcherId = query.getResearcherId();
                         if (researcherId != null) {
                             researcherId = 1;
                         }

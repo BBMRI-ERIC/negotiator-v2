@@ -48,6 +48,7 @@ import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
@@ -311,7 +312,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     public String startNegotiation() {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.startNegotiation(config, selectedQuery.getId());
+            DbUtilRequest.startNegotiation(config, selectedQuery.getId());
             requestLifeCycleStatus.nextStatus("started", "start", null, userBean.getUserId());
             requestLifeCycleStatus.setQuery(selectedQuery);
             requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
@@ -374,7 +375,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public List<QueryStatsDTO> getQueries() {
         if (queries == null) {
             try (Config config = ConfigFactory.get()) {
-                queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+                queries = DbUtilRequest.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
                 for (int i = 0; i < queries.size(); ++i) {
                     getPrivateNegotiationCountAndTime(i);
                 }
@@ -544,7 +545,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
         // Merge uploaded pdf attachments of the query
         try(Config config = ConfigFactory.get()) {
-            List<QueryAttachmentDTO> attachments = DbUtil.getQueryAttachmentRecords(config, queryId);
+            List<QueryAttachmentDTO> attachments = DbUtilRequest.getQueryAttachmentRecords(config, queryId);
             PDFMergerUtility PDFmerger = new PDFMergerUtility();
             PDFmerger.setDestinationFileName(tempPdfOutputFilePath);
             File file = new File(tempPdfOutputFilePath);
