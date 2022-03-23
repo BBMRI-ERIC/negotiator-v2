@@ -1,5 +1,6 @@
 package eu.bbmri.eric.csit.service.negotiator.mapping;
 
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -78,8 +79,17 @@ public class ObjectMappingTestHelper {
         return dbRecord;
     }
 
-    public Result<Record> getListOfListOfDirectories(Result<Record> resultList, Record dbRecord) {
-        resultList.add(getMockedListOfDirectories(dbRecord));
-        return resultList;
+    public Record getMockedOwnerQueryStatsDTO(Record dbRecord) {
+        dbRecord = getMockedQueryStatsDTO(dbRecord);
+        Mockito.when(dbRecord.getValue("flag", Flag.class)).thenReturn(Flag.ARCHIVED);
+        return dbRecord;
+    }
+
+    public Record getQueryAttachmentDTO(Record dbRecord) {
+        Mockito.when(dbRecord.getValue("query_attachment_id", Integer.class)).thenReturn(6);
+        Mockito.when(dbRecord.getValue("query_attachment_query_id", Integer.class)).thenReturn(8);
+        Mockito.when(dbRecord.getValue("query_attachment_attachment", String.class)).thenReturn("Attachment Name");
+        Mockito.when(dbRecord.getValue("query_attachment_attachment_type", String.class)).thenReturn("Project Description");
+        return dbRecord;
     }
 }
