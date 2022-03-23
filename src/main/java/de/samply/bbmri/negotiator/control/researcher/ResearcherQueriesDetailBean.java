@@ -48,6 +48,7 @@ import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
@@ -192,7 +193,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     public String initialize() {
         try(Config config = ConfigFactory.get()) {
-            setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
+            setComments(DbUtilComment.getComments(config, queryId, userBean.getUserId()));
             setBiobankWithOffer(DbUtil.getOfferMakers(config, queryId));
 
             for (int i = 0; i < biobankWithOffer.size(); ++i) {

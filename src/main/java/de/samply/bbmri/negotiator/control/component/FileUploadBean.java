@@ -7,11 +7,11 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.model.AttachmentDTO;
 import de.samply.bbmri.negotiator.model.CommentAttachmentDTO;
 import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -214,9 +214,9 @@ public class FileUploadBean implements Serializable {
             if(fileScope.equals("queryAttachment")) {
                 DbUtilRequest.deleteQueryAttachmentRecord(config, queryId, fileIdInteger);
             } else if(fileScope.equals("privateAttachment")) {
-                DbUtil.deletePrivateCommentAttachment(config, fileIdInteger);
+                DbUtilComment.deletePrivateCommentAttachment(config, fileIdInteger);
             } else if(fileScope.equals("commentAttachment")) {
-                DbUtil.deleteCommentAttachment(config, fileIdInteger);
+                DbUtilComment.deleteCommentAttachment(config, fileIdInteger);
             }
 
             String filePath = negotiator.getAttachmentPath();
@@ -266,7 +266,7 @@ public class FileUploadBean implements Serializable {
     public HashMap<String, String> getCommentAttachmentMap(Integer commentId) {
         HashMap<String, String> attachments = new HashMap<String, String>();
         try (Config config = ConfigFactory.get()) {
-            List<CommentAttachmentDTO> attachmentsList = DbUtil.getCommentAttachments(config, commentId);
+            List<CommentAttachmentDTO> attachmentsList = DbUtilComment.getCommentAttachments(config, commentId);
             for(CommentAttachmentDTO commentAttachmentDTO : attachmentsList) {
                 String uploadName = generateUploadFileName(commentAttachmentDTO, "commentAttachment");
                 attachments.put(uploadName, commentAttachmentDTO.getAttachment());
@@ -381,7 +381,7 @@ public class FileUploadBean implements Serializable {
 
         try (Config config = ConfigFactory.get()) {
 
-            DbUtil.deleteCommentAttachment(config, fileIdInteger);
+            DbUtilComment.deleteCommentAttachment(config, fileIdInteger);
             config.commit();
 
             commentAttachmentToBeRemoved = null;
@@ -444,8 +444,8 @@ public class FileUploadBean implements Serializable {
         try(Config config = ConfigFactory.get()) {
             if(queryId != null) {
                 setAttachments(DbUtilRequest.getQueryAttachmentRecords(config, queryId));
-                setPrivateAttachments(DbUtil.getPrivateAttachmentRecords(config, queryId));
-                setCommentAttachments(DbUtil.getCommentAttachmentRecords(config, queryId));
+                setPrivateAttachments(DbUtilComment.getPrivateAttachmentRecords(config, queryId));
+                setCommentAttachments(DbUtilComment.getCommentAttachmentRecords(config, queryId));
             }
         } catch (Exception e) {
             e.printStackTrace();

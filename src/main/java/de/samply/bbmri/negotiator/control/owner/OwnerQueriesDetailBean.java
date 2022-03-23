@@ -49,6 +49,7 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -205,7 +206,7 @@ public class OwnerQueriesDetailBean implements Serializable {
         setNonConfidential(false);
 
         try(Config config = ConfigFactory.get()) {
-            setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
+            setComments(DbUtilComment.getComments(config, queryId, userBean.getUserId()));
 
 			/**
 			 * Get the selected(clicked on) query from the list of queries for the owner

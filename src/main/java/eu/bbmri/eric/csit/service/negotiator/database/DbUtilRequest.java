@@ -1,7 +1,5 @@
 package eu.bbmri.eric.csit.service.negotiator.database;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
@@ -27,7 +25,6 @@ import org.apache.logging.log4j.Logger;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -171,11 +168,11 @@ public class DbUtilRequest {
             return insertQueryAttachmentRecord(config, queryFileDTO.getQueryId(), queryFileDTO.getAttachment(), queryFileDTO.getAttachmentType());
         } else if (fileDTO.getClass().equals(PrivateAttachmentDTO.class)) {
             PrivateAttachmentDTO privateFileDTO = (PrivateAttachmentDTO)fileDTO;
-            return DbUtil.insertPrivateAttachmentRecord(config, privateFileDTO.getQueryId(), privateFileDTO.getAttachment(), privateFileDTO.getAttachmentType(),
+            return DbUtilComment.insertPrivateAttachmentRecord(config, privateFileDTO.getQueryId(), privateFileDTO.getAttachment(), privateFileDTO.getAttachmentType(),
                     privateFileDTO.getPersonId(), privateFileDTO.getBiobank_in_private_chat(), privateFileDTO.getAttachment_time());
         } else if (fileDTO.getClass().equals(CommentAttachmentDTO.class)) {
             CommentAttachmentDTO commentFileDTO = (CommentAttachmentDTO)fileDTO;
-            return DbUtil.insertCommentAttachmentRecord(config, commentFileDTO.getQueryId(), commentFileDTO.getAttachment(),
+            return DbUtilComment.insertCommentAttachmentRecord(config, commentFileDTO.getQueryId(), commentFileDTO.getAttachment(),
                     commentFileDTO.getAttachmentType(), commentFileDTO.getCommentId());
         } else {
             logger.error("Error insertQueryAttachmentRecord: No matching Attachment Class.");

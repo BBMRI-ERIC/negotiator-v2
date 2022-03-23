@@ -38,6 +38,7 @@ import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.primefaces.component.datatable.DataTable;
@@ -201,7 +202,7 @@ public class AdminDebugBean implements Serializable {
             commentMessage.append(researcher_new.getAuthName());
             commentMessage.append(".");
             DbUtilRequest.transferQuery(config, transferQueryId, transferQueryToUserId);
-            DbUtil.addComment(config, transferQueryId, userBean.getUserId(), commentMessage.toString(), "published", false);
+            DbUtilComment.addComment(config, transferQueryId, userBean.getUserId(), commentMessage.toString(), "published", false);
         } catch (SQLException e) {
             System.err.println("3f0113dc7f4c-AdminDebugBean ERROR-NG-0000076: Error Transferring Request " + transferQueryId + " to user " + transferQueryToUserId + ".");
             e.printStackTrace();
