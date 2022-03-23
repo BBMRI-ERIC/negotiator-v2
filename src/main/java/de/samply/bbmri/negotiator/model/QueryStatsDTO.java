@@ -57,11 +57,11 @@ public class QueryStatsDTO implements Serializable {
     /**
      * The number of comments for this query.
      */
-    private int commentCount;
-    private int unreadCommentCount = 0;
+    private Integer commentCount;
+    private Integer unreadCommentCount = 0;
 
-    private int privateNegotiationCount;
-    private int unreadPrivateNegotiationCount = 0;
+    private Integer privateNegotiationCount;
+    private Integer unreadPrivateNegotiationCount = 0;
 
     public Query getQuery() {
         return query;
@@ -85,19 +85,19 @@ public class QueryStatsDTO implements Serializable {
         }
     }
 
-    public int getCommentCount() {
+    public Integer getCommentCount() {
         return commentCount;
     }
 
-    public void setCommentCount(int commentCount) {
+    public void setCommentCount(Integer commentCount) {
         this.commentCount = commentCount;
     }
 
-    public int getPrivateNegotiationCount() {
+    public Integer getPrivateNegotiationCount() {
         return privateNegotiationCount;
     }
 
-    public void setPrivateNegotiationCount(int privateNegotiationCount) {
+    public void setPrivateNegotiationCount(Integer privateNegotiationCount) {
         this.privateNegotiationCount = privateNegotiationCount;
     }
 
@@ -109,19 +109,19 @@ public class QueryStatsDTO implements Serializable {
         this.queryAuthor = queryAuthor;
     }
 
-    public int getUnreadCommentCount() {
+    public Integer getUnreadCommentCount() {
         return unreadCommentCount;
     }
 
-    public void setUnreadCommentCount(int unreadCommentCount) {
+    public void setUnreadCommentCount(Integer unreadCommentCount) {
         this.unreadCommentCount = unreadCommentCount;
     }
 
-    public int getUnreadPrivateNegotiationCount() {
+    public Integer getUnreadPrivateNegotiationCount() {
         return unreadPrivateNegotiationCount;
     }
 
-    public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
+    public void setUnreadPrivateNegotiationCount(Integer unreadPrivateNegotiationCount) {
         this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
     }
 }

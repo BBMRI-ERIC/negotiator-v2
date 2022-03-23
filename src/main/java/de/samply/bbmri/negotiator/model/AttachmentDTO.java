@@ -1,22 +1,22 @@
 package de.samply.bbmri.negotiator.model;
 
 public class AttachmentDTO {
-    private int queryId;
-    private int id;
+    private Integer queryId;
+    private Integer id;
     private String attachment;
     private String attachmentType;
 
-    public int getQueryId() {
+    public Integer getQueryId() {
         return queryId;
     }
-    public void setQueryId(int queryId) {
+    public void setQueryId(Integer queryId) {
         this.queryId = queryId;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

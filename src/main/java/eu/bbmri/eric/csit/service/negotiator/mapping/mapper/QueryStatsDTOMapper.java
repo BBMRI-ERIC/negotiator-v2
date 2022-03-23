@@ -18,9 +18,9 @@ public class QueryStatsDTOMapper {
     public static QueryStatsDTO map(Record dbRecord, QueryStatsDTO queryStatsDTO) {
         queryStatsDTO.setQuery(databaseObjectMapper.map(dbRecord, new Query()));
         queryStatsDTO.setQueryAuthor(databaseObjectMapper.map(dbRecord, new Person()));
-        queryStatsDTO.setLastCommentTime((Timestamp) dbRecord.getValue("last_comment_time"));
-        queryStatsDTO.setCommentCount((Integer) dbRecord.getValue("comment_count"));
-        queryStatsDTO.setUnreadCommentCount((Integer) dbRecord.getValue("unread_comment_count"));
+        queryStatsDTO.setLastCommentTime(dbRecord.getValue("last_comment_time", Timestamp.class));
+        queryStatsDTO.setCommentCount(dbRecord.getValue("comment_count", Integer.class));
+        queryStatsDTO.setUnreadCommentCount(dbRecord.getValue("unread_comment_count", Integer.class));
         return queryStatsDTO;
     }
 }

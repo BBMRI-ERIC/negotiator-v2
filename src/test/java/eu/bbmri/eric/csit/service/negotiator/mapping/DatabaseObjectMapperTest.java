@@ -3,6 +3,9 @@ package eu.bbmri.eric.csit.service.negotiator.mapping;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
+import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.Record;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +41,10 @@ class DatabaseObjectMapperTest {
         return Stream.of(
                 Arguments.of(new Query(), Query.class.toString()),
                 Arguments.of(new Person(), Person.class.toString()),
-                Arguments.of(new ListOfDirectories(), ListOfDirectories.class.toString())
+                Arguments.of(new ListOfDirectories(), ListOfDirectories.class.toString()),
+                Arguments.of(new QueryStatsDTO(), QueryStatsDTO.class.toString()),
+                Arguments.of(new OwnerQueryStatsDTO(), OwnerQueryStatsDTO.class.toString()),
+                Arguments.of(new QueryAttachmentDTO(), QueryAttachmentDTO.class.toString())
         );
     }
 
@@ -81,7 +87,6 @@ class DatabaseObjectMapperTest {
     @Test
     @DisplayName("Test mapping of person")
     void testMappingOfPerson() {
-        byte[] image = new byte[] {};
         dbRecord = objectMappingTestHelper.getMockedPerson(dbRecord);
 
         Person result = databaseObjectMapper.map(dbRecord, new Person());
@@ -92,7 +97,7 @@ class DatabaseObjectMapperTest {
         assertEquals("auth Subject", result.getAuthSubject());
         assertEquals("Max Musterman", result.getAuthName());
         assertEquals("max.musterman@email.com", result.getAuthEmail());
-        assertEquals(image, result.getPersonImage());
+        assertEquals(objectMappingTestHelper.IMAGE, result.getPersonImage());
         assertEquals(true, result.getIsAdmin());
         assertEquals("EU Uni", result.getOrganization());
         assertEquals(false, result.getSyncedDirectory());
@@ -123,5 +128,47 @@ class DatabaseObjectMapperTest {
         assertEquals("eu_resource_networks", result.getResourceNetworks());
         assertEquals(false, result.getBbmriEricNationalNodes());
         assertEquals("Molgenis", result.getApiType());
+    }
+
+    @Test
+    @DisplayName("Test mapping for QueryStatsDTO")
+    void testMappingQueryStatsDTO() {
+
+        dbRecord = objectMappingTestHelper.getMockedQueryStatsDTO(dbRecord);
+
+        QueryStatsDTO result = databaseObjectMapper.map(dbRecord, new QueryStatsDTO());
+
+        assertEquals(QueryStatsDTO.class, result.getClass());
+
+        assertEquals(1, result.getQuery().getId());
+        assertEquals("Test Query", result.getQuery().getTitle());
+        assertEquals("Longer query text;", result.getQuery().getText());
+        assertEquals("", result.getQuery().getQueryXml());
+        assertEquals(new Timestamp(1647619247620L), result.getQuery().getQueryCreationTime());
+        assertEquals(15, result.getQuery().getResearcherId());
+        assertEquals("{\"URL\":\"http://www.dadi.com\"}", result.getQuery().getJsonText());
+        assertEquals(5, result.getQuery().getNumAttachments());
+        assertEquals("36f71886-bd13-4eec-b3c4-1842e95a97d", result.getQuery().getNegotiatorToken());
+        assertEquals(true, result.getQuery().getValidQuery());
+        assertEquals("query_request_description test", result.getQuery().getRequestDescription());
+        assertEquals("Ethic vote text", result.getQuery().getEthicsVote());
+        assertEquals(new Timestamp(1647619471L), result.getQuery().getNegotiationStartedTime());
+        assertEquals(false, result.getQuery().getTestRequest());
+        assertEquals("Researcher Sinco", result.getQuery().getResearcherName());
+        assertEquals("sinco@uni.eu", result.getQuery().getResearcherEmail());
+        assertEquals("EU Uni", result.getQuery().getResearcherOrganization());
+
+        assertEquals(5, result.getQueryAuthor().getId());
+        assertEquals("auth Subject", result.getQueryAuthor().getAuthSubject());
+        assertEquals("Max Musterman", result.getQueryAuthor().getAuthName());
+        assertEquals("max.musterman@email.com", result.getQueryAuthor().getAuthEmail());
+        assertEquals(objectMappingTestHelper.IMAGE, result.getQueryAuthor().getPersonImage());
+        assertEquals(true, result.getQueryAuthor().getIsAdmin());
+        assertEquals("EU Uni", result.getQueryAuthor().getOrganization());
+        assertEquals(false, result.getQueryAuthor().getSyncedDirectory());
+
+        assertEquals(new Timestamp(1647948185), result.getLastCommentTime());
+        assertEquals(3, result.getCommentCount());
+        assertEquals(2, result.getUnreadCommentCount());
     }
 }

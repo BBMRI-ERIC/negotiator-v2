@@ -12,6 +12,8 @@ import java.util.List;
 
 public class ObjectMappingTestHelper {
 
+    public byte[] IMAGE = new byte[] {};
+
     public Record getMockedQuery(Record dbRecord) {
         Mockito.when(dbRecord.getValue("query_id")).thenReturn(1);
         Mockito.when(dbRecord.getValue("query_title")).thenReturn("Test Query");
@@ -34,13 +36,12 @@ public class ObjectMappingTestHelper {
     }
 
     public Record getMockedPerson(Record dbRecord) {
-        byte[] image = new byte[] {};
 
         Mockito.when(dbRecord.getValue("person_id")).thenReturn(5);
         Mockito.when(dbRecord.getValue("person_auth_subject")).thenReturn("auth Subject");
         Mockito.when(dbRecord.getValue("person_auth_name")).thenReturn("Max Musterman");
         Mockito.when(dbRecord.getValue("person_auth_email")).thenReturn("max.musterman@email.com");
-        Mockito.when(dbRecord.getValue("person_person_image")).thenReturn(image);
+        Mockito.when(dbRecord.getValue("person_person_image")).thenReturn(IMAGE);
         Mockito.when(dbRecord.getValue("person_is_admin")).thenReturn(true);
         Mockito.when(dbRecord.getValue("person_organization")).thenReturn("EU Uni");
         Mockito.when(dbRecord.getValue("person_synced_directory")).thenReturn(false);
@@ -64,6 +65,16 @@ public class ObjectMappingTestHelper {
         Mockito.when(dbRecord.getValue("list_of_directories_resource_networks", String.class)).thenReturn("eu_resource_networks");
         Mockito.when(dbRecord.getValue("list_of_directories_bbmri_eric_national_nodes", Boolean.class)).thenReturn(false);
         Mockito.when(dbRecord.getValue("list_of_directories_api_type", String.class)).thenReturn("Molgenis");
+        return dbRecord;
+    }
+
+    public Record getMockedQueryStatsDTO(Record dbRecord) {
+        dbRecord = getMockedQuery(dbRecord);
+        dbRecord = getMockedPerson(dbRecord);
+
+        Mockito.when(dbRecord.getValue("last_comment_time", Timestamp.class)).thenReturn(new Timestamp(1647948185));
+        Mockito.when(dbRecord.getValue("comment_count", Integer.class)).thenReturn(3);
+        Mockito.when(dbRecord.getValue("unread_comment_count", Integer.class)).thenReturn(2);
         return dbRecord;
     }
 
