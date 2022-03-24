@@ -5,6 +5,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.Record;
@@ -45,7 +46,8 @@ class DatabaseObjectMapperTest {
                 Arguments.of(new ListOfDirectories(), ListOfDirectories.class.toString()),
                 Arguments.of(new QueryStatsDTO(), QueryStatsDTO.class.toString()),
                 Arguments.of(new OwnerQueryStatsDTO(), OwnerQueryStatsDTO.class.toString()),
-                Arguments.of(new QueryAttachmentDTO(), QueryAttachmentDTO.class.toString())
+                Arguments.of(new QueryAttachmentDTO(), QueryAttachmentDTO.class.toString()),
+                Arguments.of(new PrivateAttachmentDTO(), PrivateAttachmentDTO.class.toString())
         );
     }
 
@@ -225,6 +227,24 @@ class DatabaseObjectMapperTest {
 
         assertEquals(6, result.getId());
         assertEquals(8, result.getQueryId());
+        assertEquals("Attachment Name", result.getAttachment());
+        assertEquals("Project Description", result.getAttachmentType());
+    }
+
+    @Test
+    @DisplayName("Test mapping for PrivateAttachmentDTO")
+    void testMappingPrivateAttachmentDTO() {
+        dbRecord = objectMappingTestHelper.getPrivateAttachmentDTO(dbRecord);
+
+        PrivateAttachmentDTO result = databaseObjectMapper.map(dbRecord, new PrivateAttachmentDTO());
+
+        assertEquals(PrivateAttachmentDTO.class, result.getClass());
+
+        assertEquals(7, result.getId());
+        assertEquals(9, result.getPersonId());
+        assertEquals(15, result.getQueryId());
+        assertEquals(7, result.getBiobank_in_private_chat());
+        assertEquals(new Timestamp(1648117169), result.getAttachment_time());
         assertEquals("Attachment Name", result.getAttachment());
         assertEquals("Project Description", result.getAttachmentType());
     }

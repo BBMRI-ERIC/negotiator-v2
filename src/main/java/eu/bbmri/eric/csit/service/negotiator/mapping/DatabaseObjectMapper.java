@@ -4,6 +4,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import eu.bbmri.eric.csit.service.negotiator.mapping.mapper.*;
@@ -30,6 +31,8 @@ public class DatabaseObjectMapper {
                 return (T) OwnerQueryStatsDTOMapper.map(dbRecord, (OwnerQueryStatsDTO) mappedClass);
             case "class de.samply.bbmri.negotiator.model.QueryAttachmentDTO":
                 return (T) QueryAttachmentDTOMapper.map(dbRecord, (QueryAttachmentDTO) mappedClass);
+            case "class de.samply.bbmri.negotiator.model.PrivateAttachmentDTO":
+                return (T) PrivateAttachmentDTOMapper.map(dbRecord, (PrivateAttachmentDTO) mappedClass);
             default:
                 throw new UnsupportedOperationException("Mapper not implemented yet for class: " + mappedClass.getClass().toString());
         }
