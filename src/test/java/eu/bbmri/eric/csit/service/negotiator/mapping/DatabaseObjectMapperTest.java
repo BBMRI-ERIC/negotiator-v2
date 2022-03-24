@@ -4,10 +4,7 @@ import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
-import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.bbmri.negotiator.model.*;
 import org.jooq.Record;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,7 +44,8 @@ class DatabaseObjectMapperTest {
                 Arguments.of(new QueryStatsDTO(), QueryStatsDTO.class.toString()),
                 Arguments.of(new OwnerQueryStatsDTO(), OwnerQueryStatsDTO.class.toString()),
                 Arguments.of(new QueryAttachmentDTO(), QueryAttachmentDTO.class.toString()),
-                Arguments.of(new PrivateAttachmentDTO(), PrivateAttachmentDTO.class.toString())
+                Arguments.of(new PrivateAttachmentDTO(), PrivateAttachmentDTO.class.toString()),
+                Arguments.of(new CommentAttachmentDTO(), CommentAttachmentDTO.class.toString())
         );
     }
 
@@ -245,6 +243,22 @@ class DatabaseObjectMapperTest {
         assertEquals(15, result.getQueryId());
         assertEquals(7, result.getBiobank_in_private_chat());
         assertEquals(new Timestamp(1648117169), result.getAttachment_time());
+        assertEquals("Attachment Name", result.getAttachment());
+        assertEquals("Project Description", result.getAttachmentType());
+    }
+
+    @Test
+    @DisplayName("Test mapping for CommentAttachmentDTO")
+    void testMappingCommentAttachmentDTO() {
+        dbRecord = objectMappingTestHelper.getCommentAttachmentDTO(dbRecord);
+
+        CommentAttachmentDTO result = databaseObjectMapper.map(dbRecord, new CommentAttachmentDTO());
+
+        assertEquals(CommentAttachmentDTO.class, result.getClass());
+
+        assertEquals(7, result.getId());
+        assertEquals(9, result.getQueryId());
+        assertEquals(15, result.getCommentId());
         assertEquals("Attachment Name", result.getAttachment());
         assertEquals("Project Description", result.getAttachmentType());
     }

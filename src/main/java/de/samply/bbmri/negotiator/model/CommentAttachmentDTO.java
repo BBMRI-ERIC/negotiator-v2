@@ -1,13 +1,13 @@
 package de.samply.bbmri.negotiator.model;
 
 public class CommentAttachmentDTO extends AttachmentDTO {
-    private int commentId;
+    private Integer commentId;
 
-    public int getCommentId() {
+    public Integer getCommentId() {
         return commentId;
     }
 
-    public void setCommentId(int commentId) {
+    public void setCommentId(Integer commentId) {
         this.commentId = commentId;
     }
 }

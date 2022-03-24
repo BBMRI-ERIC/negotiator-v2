@@ -86,7 +86,7 @@ public class DbUtilComment {
                 .where(Tables.QUERY_ATTACHMENT_PRIVATE.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT_PRIVATE.ID.asc()).fetch();
 
-        return MappingListDbUtil.mapRecordsPrivateAttachmentDTO(result);
+        return databaseListMapper.map(result, new PrivateAttachmentDTO());
     }
 
     public static List<CommentAttachmentDTO> getCommentAttachmentRecords(Config config, int queryId) {
@@ -96,7 +96,7 @@ public class DbUtilComment {
                 .where(Tables.QUERY_ATTACHMENT_COMMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT_COMMENT.ID.asc()).fetch();
 
-        return MappingListDbUtil.mapRecordsCommentAttachmentDTO(result);
+        return databaseListMapper.map(result, new CommentAttachmentDTO());
     }
 
     public static List<CommentAttachmentDTO> getCommentAttachments(Config config, Integer commentId) {
@@ -106,15 +106,9 @@ public class DbUtilComment {
                 .where(Tables.QUERY_ATTACHMENT_COMMENT.COMMENT_ID.eq(commentId))
                 .fetch();
 
-        return MappingListDbUtil.mapRecordsCommentAttachmentDTO(result);
+        return databaseListMapper.map(result, new CommentAttachmentDTO());
     }
 
-    /**
-     * Returns a list of CommentPersonDTOs for a specific query.
-     * @param config
-     * @param queryId
-     * @return
-     */
     public static List<CommentPersonDTO> getComments(Config config, int queryId, int personId) {
 
         List<CommentPersonDTO> result = new ArrayList<>();

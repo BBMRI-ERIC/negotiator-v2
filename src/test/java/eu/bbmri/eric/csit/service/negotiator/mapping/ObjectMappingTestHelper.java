@@ -103,4 +103,13 @@ public class ObjectMappingTestHelper {
         Mockito.when(dbRecord.getValue("query_attachment_private_attachment_type", String.class)).thenReturn("Project Description");
         return dbRecord;
     }
+
+    public Record getCommentAttachmentDTO(Record dbRecord) {
+        Mockito.when(dbRecord.getValue("query_attachment_comment_id", Integer.class)).thenReturn(7);
+        Mockito.when(dbRecord.getValue("query_attachment_comment_query_id", Integer.class)).thenReturn(9);
+        Mockito.when(dbRecord.getValue("query_attachment_comment_comment_id", Integer.class)).thenReturn(15);
+        Mockito.when(dbRecord.getValue("query_attachment_comment_attachment", String.class)).thenReturn("Attachment Name");
+        Mockito.when(dbRecord.getValue("query_attachment_comment_attachment_type", String.class)).thenReturn("Project Description");
+        return dbRecord;
+    }
 }
