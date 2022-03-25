@@ -1,10 +1,8 @@
 package eu.bbmri.eric.csit.service.negotiator.mapping;
 
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.*;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.*;
 import org.jooq.Record;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +45,8 @@ class DatabaseObjectMapperTest {
                 Arguments.of(new QueryAttachmentDTO(), QueryAttachmentDTO.class.toString()),
                 Arguments.of(new PrivateAttachmentDTO(), PrivateAttachmentDTO.class.toString()),
                 Arguments.of(new CommentAttachmentDTO(), CommentAttachmentDTO.class.toString()),
-                Arguments.of(new Collection(), Collection.class.toString())
+                Arguments.of(new Collection(), Collection.class.toString()),
+                Arguments.of(new Biobank(), Biobank.class.toString())
         );
     }
 
@@ -278,6 +277,22 @@ class DatabaseObjectMapperTest {
         assertEquals("Collection 123 C50.9", result.getName());
         assertEquals("f2d0aa9b-f31e-424c-83d3-b2663844ccff", result.getDirectoryId());
         assertEquals(9, result.getBiobankId());
+        assertEquals(3, result.getListOfDirectoriesId());
+    }
+
+    @Test
+    @DisplayName("Test mapping for Collection")
+    void testMappingBiobank() {
+        dbRecord = objectMappingTestHelper.getBiobank(dbRecord);
+
+        Biobank result = databaseObjectMapper.map(dbRecord, new Biobank());
+
+        assertEquals(Biobank.class, result.getClass());
+
+        assertEquals(7, result.getId());
+        assertEquals("Biobank 12", result.getName());
+        assertEquals("biobank description", result.getDescription());
+        assertEquals("f2d0aa9b-f31e-424c-83d3-b2663844ccff", result.getDirectoryId());
         assertEquals(3, result.getListOfDirectoriesId());
     }
 }

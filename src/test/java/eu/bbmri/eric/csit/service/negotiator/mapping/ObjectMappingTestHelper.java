@@ -121,4 +121,13 @@ public class ObjectMappingTestHelper {
         Mockito.when(dbRecord.getValue("collection_list_of_directories_id", Integer.class)).thenReturn(3);
         return dbRecord;
     }
+
+    public Record getBiobank(Record dbRecord) {
+        Mockito.when(dbRecord.getValue("biobank_id", Integer.class)).thenReturn(7);
+        Mockito.when(dbRecord.getValue("biobank_name", String.class)).thenReturn("Biobank 12");
+        Mockito.when(dbRecord.getValue("biobank_description", String.class)).thenReturn("biobank description");
+        Mockito.when(dbRecord.getValue("biobank_directory_id", String.class)).thenReturn("f2d0aa9b-f31e-424c-83d3-b2663844ccff");
+        Mockito.when(dbRecord.getValue("biobank_list_of_directories_id", Integer.class)).thenReturn(3);
+        return dbRecord;
+    }
 }
