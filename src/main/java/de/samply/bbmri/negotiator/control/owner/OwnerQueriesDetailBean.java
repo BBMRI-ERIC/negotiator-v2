@@ -49,6 +49,7 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
@@ -146,7 +147,7 @@ public class OwnerQueriesDetailBean implements Serializable {
     /**
      * The list of biobanks this owner is associated with
      */
-    private List<BiobankRecord> associatedBiobanks;
+    private List<Biobank> associatedBiobanks;
 
 	private final HashMap<Integer, String> biobankNames = null;
 
@@ -244,7 +245,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			associatedBiobanks = DbUtilBiobank.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				BiobankRecord biobank = associatedBiobanks.get(i);
+				Biobank biobank = associatedBiobanks.get(i);
 				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
 				if(locatorRedirectUrls.containsKey(biobank.getDirectoryId())) {
 					locatorRedirectUrlsDisplayList.put(biobank.getName(), locatorRedirectUrls.get(biobank.getDirectoryId()));
@@ -301,7 +302,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			requestLifeCycleStatus.initialise();
 			requestLifeCycleStatus.initialiseCollectionStatus();
 
-			for(BiobankRecord biobankRecord : associatedBiobanks) {
+			for(Biobank biobankRecord : associatedBiobanks) {
 				createCollectionListSortedByStatus(biobankRecord.getId());
 			}
 
@@ -839,11 +840,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 		this.flagFilter = flagFilter;
 	}
 
-    public List<BiobankRecord> getAssociatedBiobanks() {
+    public List<Biobank> getAssociatedBiobanks() {
         return associatedBiobanks;
     }
 
-    public void setAssociatedBiobanks(List<BiobankRecord> associatedBiobanks) {
+    public void setAssociatedBiobanks(List<Biobank> associatedBiobanks) {
         this.associatedBiobanks = associatedBiobanks;
     }
 

@@ -3,6 +3,7 @@ package de.samply.bbmri.negotiator.util;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,27 +33,27 @@ public class DataCacheTest {
     @Mock
     private Config config;
 
-    private final List<BiobankRecord> biobankRecords = null;
+    private final List<Biobank> biobanks = null;
 
     @BeforeEach
     void setUp() {
-        List<BiobankRecord> biobankRecords = new ArrayList<BiobankRecord>();
-        BiobankRecord br1 = new BiobankRecord();
+        List<Biobank> biobanks = new ArrayList<>();
+        Biobank br1 = new Biobank();
         br1.setId(1);
         br1.setName("Test BB 1");
-        BiobankRecord br2 = new BiobankRecord();
+        Biobank br2 = new Biobank();
         br2.setId(2);
         br2.setName("Test BB 2");
-        BiobankRecord br3 = new BiobankRecord();
+        Biobank br3 = new Biobank();
         br3.setId(3);
         br3.setName("Test BB 3");
-        BiobankRecord br4 = new BiobankRecord();
+        Biobank br4 = new Biobank();
         br4.setId(4);
         br4.setName("Test BB 4");
-        biobankRecords.add(br1);
-        biobankRecords.add(br2);
-        biobankRecords.add(br3);
-        biobankRecords.add(br4);
+        biobanks.add(br1);
+        biobanks.add(br2);
+        biobanks.add(br3);
+        biobanks.add(br4);
     }
 
     @Test
@@ -66,7 +67,7 @@ public class DataCacheTest {
 
 
             PowerMockito.mockStatic(DbUtil.class);
-            when(DbUtilBiobank.getBiobanks(config)).thenReturn(biobankRecords);
+            when(DbUtilBiobank.getBiobanks(config)).thenReturn(biobanks);
 
             PowerMockito.verifyStatic(ConfigFactory.class, Mockito.times(1));
             PowerMockito.verifyStatic(DbUtil.class, Mockito.times(1));

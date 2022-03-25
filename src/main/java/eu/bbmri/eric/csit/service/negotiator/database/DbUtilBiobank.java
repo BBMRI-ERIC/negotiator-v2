@@ -3,9 +3,12 @@ package eu.bbmri.eric.csit.service.negotiator.database;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.db.util.MappingListDbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.BiobankCollections;
 import eu.bbmri.eric.csit.service.negotiator.database.utils.FieldHelper;
+import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseListMapper;
+import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseObjectMapper;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +22,9 @@ import java.util.List;
 
 public class DbUtilBiobank {
     private final static Logger logger = LogManager.getLogger(DbUtilBiobank.class);
+
+    private static DatabaseListMapper databaseListMapper = new DatabaseListMapper();
+    private static DatabaseObjectMapper databaseObjectMapper = new DatabaseObjectMapper();
 
     public static BiobankRecord getBiobank(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.BIOBANK)
@@ -60,20 +66,16 @@ public class DbUtilBiobank {
         return biobankname;
     }
 
-    // Create Script to collect all biobanknames for a query
-    public static List<BiobankRecord> getBiobanks(Config config) {
+    public static List<Biobank> getBiobanks(Config config) {
         Result<Record> record = config.dsl().selectDistinct(FieldHelper.getFields(Tables.BIOBANK, "biobank"))
                     .from(Tables.BIOBANK)
                     .orderBy(Tables.BIOBANK.ID)
                     .fetch();
 
-        return MappingListDbUtil.mapRecordsBiobankRecords(record);
+        return databaseListMapper.map(record, new Biobank());
     }
 
-    /**
-     * Returns a list of all biobanks relevant to this query and this biobank owner
-     */
-    public static List<BiobankRecord> getAssociatedBiobanks(Config config, Integer queryId, Integer userId) {
+    public static List<Biobank> getAssociatedBiobanks(Config config, Integer queryId, Integer userId) {
         Result<Record> record =
 
                 config.dsl().selectDistinct(FieldHelper.getFields(Tables.BIOBANK, "biobank"))
@@ -86,17 +88,10 @@ public class DbUtilBiobank {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId)).and(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
                 .orderBy(Tables.BIOBANK.ID).fetch();
 
-          return MappingListDbUtil.mapRecordsBiobankRecords(record);
+        return databaseListMapper.map(record, new Biobank());
 
     }
 
-    /**
-     * Synchronizes the given Biobank from the directory with the Biobank in the database.
-     * @param config database configuration
-     * @param directoryBiobank biobank from the directory
-     * @param listOfDirectoryId ID of the directory the biobank belongs to
-     * @return
-     */
     public static BiobankRecord synchronizeBiobank(Config config, DirectoryBiobank directoryBiobank, int listOfDirectoryId) {
         BiobankRecord record = getBiobank(config, directoryBiobank.getId(), listOfDirectoryId);
 
@@ -119,11 +114,6 @@ public class DbUtilBiobank {
         return record;
     }
 
-    /**
-     * Gets a list of all biobanks and their collections
-     * @param config    DB access handle
-     * @return
-     */
     public static List<BiobankCollections> getBiobanksAndTheirCollection(Config config) {
         Result<Record> result = config.dsl()
                 .select(FieldHelper.getFields(Tables.BIOBANK))

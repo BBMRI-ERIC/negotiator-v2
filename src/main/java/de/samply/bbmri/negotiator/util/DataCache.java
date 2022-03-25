@@ -3,9 +3,9 @@ package de.samply.bbmri.negotiator.util;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class DataCache {
     private static DataCache dataCache = null;
 
-    List<BiobankRecord> biobankRecords_ = null;
+    List<Biobank> biobanks_ = null;
     HashMap<Integer, String> biobankNames_ = null;
     HashMap<Integer, CollectionContactsDTO> collectionPersons_ = null;
     HashMap<Integer, String> userNames_ = null;
@@ -80,14 +80,14 @@ public class DataCache {
     }
 
     public void createUpdateBiobankList() {
-        List<BiobankRecord> biobankRecords = null;
+        List<Biobank> biobanks = null;
         HashMap<Integer, String> biobankNames = new HashMap<Integer, String>();
         try(Config config = ConfigFactory.get()) {
-            biobankRecords = DbUtilBiobank.getBiobanks(config);
-            for(BiobankRecord biobankRecord : biobankRecords) {
-                biobankNames.put(biobankRecord.getId(), biobankRecord.getName());
+            biobanks = DbUtilBiobank.getBiobanks(config);
+            for(Biobank biobank : biobanks) {
+                biobankNames.put(biobank.getId(), biobank.getName());
             }
-            biobankRecords_ = biobankRecords;
+            biobanks_ = biobanks;
             biobankNames_ = biobankNames;
         } catch (SQLException e) {
             System.err.println("ERROR-NG-0000006: DataCache::createUpdateBiobankList()");
