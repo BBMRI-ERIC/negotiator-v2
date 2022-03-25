@@ -112,4 +112,13 @@ public class ObjectMappingTestHelper {
         Mockito.when(dbRecord.getValue("query_attachment_comment_attachment_type", String.class)).thenReturn("Project Description");
         return dbRecord;
     }
+
+    public Record getCollection(Record dbRecord) {
+        Mockito.when(dbRecord.getValue("collection_id", Integer.class)).thenReturn(7);
+        Mockito.when(dbRecord.getValue("collection_name", String.class)).thenReturn("Collection 123 C50.9");
+        Mockito.when(dbRecord.getValue("collection_directory_id", String.class)).thenReturn("f2d0aa9b-f31e-424c-83d3-b2663844ccff");
+        Mockito.when(dbRecord.getValue("collection_biobank_id", Integer.class)).thenReturn(9);
+        Mockito.when(dbRecord.getValue("collection_list_of_directories_id", Integer.class)).thenReturn(3);
+        return dbRecord;
+    }
 }

@@ -1,5 +1,6 @@
 package eu.bbmri.eric.csit.service.negotiator.mapping;
 
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -21,6 +22,8 @@ public class DatabaseObjectMapper {
                 return (T) PersonMapper.map(dbRecord, (Person) mappedClass);
             case "class de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories":
                 return (T) ListOfDirectoriesMapper.map(dbRecord, (ListOfDirectories) mappedClass);
+            case "class de.samply.bbmri.negotiator.jooq.tables.pojos.Collection":
+                return (T) CollectionMapper.map(dbRecord, (Collection) mappedClass);
 
             case "class de.samply.bbmri.negotiator.model.QueryStatsDTO":
                 return (T) QueryStatsDTOMapper.map(dbRecord, (QueryStatsDTO) mappedClass);

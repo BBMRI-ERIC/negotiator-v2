@@ -1,6 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.mapping;
 
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -45,7 +46,8 @@ class DatabaseObjectMapperTest {
                 Arguments.of(new OwnerQueryStatsDTO(), OwnerQueryStatsDTO.class.toString()),
                 Arguments.of(new QueryAttachmentDTO(), QueryAttachmentDTO.class.toString()),
                 Arguments.of(new PrivateAttachmentDTO(), PrivateAttachmentDTO.class.toString()),
-                Arguments.of(new CommentAttachmentDTO(), CommentAttachmentDTO.class.toString())
+                Arguments.of(new CommentAttachmentDTO(), CommentAttachmentDTO.class.toString()),
+                Arguments.of(new Collection(), Collection.class.toString())
         );
     }
 
@@ -261,5 +263,21 @@ class DatabaseObjectMapperTest {
         assertEquals(15, result.getCommentId());
         assertEquals("Attachment Name", result.getAttachment());
         assertEquals("Project Description", result.getAttachmentType());
+    }
+
+    @Test
+    @DisplayName("Test mapping for Collection")
+    void testMappingCollection() {
+        dbRecord = objectMappingTestHelper.getCollection(dbRecord);
+
+        Collection result = databaseObjectMapper.map(dbRecord, new Collection());
+
+        assertEquals(Collection.class, result.getClass());
+
+        assertEquals(7, result.getId());
+        assertEquals("Collection 123 C50.9", result.getName());
+        assertEquals("f2d0aa9b-f31e-424c-83d3-b2663844ccff", result.getDirectoryId());
+        assertEquals(9, result.getBiobankId());
+        assertEquals(3, result.getListOfDirectoriesId());
     }
 }

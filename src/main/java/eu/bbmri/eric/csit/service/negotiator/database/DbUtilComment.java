@@ -146,7 +146,7 @@ public class DbUtilComment {
                                 .and(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                         .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
                         .fetch();
-                personCollections.put(commenterId, MappingListDbUtil.mapRecordsCollections(collections));
+                personCollections.put(commenterId, databaseListMapper.map(collections, new Collection()));
             }
             commentPersonDTO.setCollections(personCollections.get(commenterId));
             result.add(commentPersonDTO);
