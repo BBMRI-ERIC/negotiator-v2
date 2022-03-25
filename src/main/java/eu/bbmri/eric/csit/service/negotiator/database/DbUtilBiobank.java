@@ -1,13 +1,14 @@
 package eu.bbmri.eric.csit.service.negotiator.database;
 
 import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.db.util.MappingListDbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.BiobankCollections;
 import eu.bbmri.eric.csit.service.negotiator.database.utils.FieldHelper;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jooq.JoinType;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DbUtilBiobank {
+    private final static Logger logger = LogManager.getLogger(DbUtilBiobank.class);
 
     public static BiobankRecord getBiobank(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.BIOBANK)
@@ -102,11 +104,11 @@ public class DbUtilBiobank {
             /**
              * Create the location, because it doesnt exist yet
              */
-            DbUtil.logger.debug("Found new biobank, with id {}, adding it to the database" , directoryBiobank.getId());
+            logger.debug("Found new biobank, with id {}, adding it to the database" , directoryBiobank.getId());
             record = config.dsl().newRecord(Tables.BIOBANK);
             record.setDirectoryId(directoryBiobank.getId());
         } else {
-            DbUtil.logger.debug("Biobank {} already exists, updating fields", directoryBiobank.getId());
+            logger.debug("Biobank {} already exists, updating fields", directoryBiobank.getId());
         }
 
         record.setDescription(directoryBiobank.getDescription());
