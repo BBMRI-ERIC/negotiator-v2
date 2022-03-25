@@ -41,9 +41,9 @@ import javax.faces.context.FacesContext;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
@@ -78,7 +78,7 @@ public class OfferBean implements Serializable {
 
             String biobankName = "";
             try {
-                biobankName = DbUtil.getBiobankName(config, offerFrom);
+                biobankName = DbUtilBiobank.getBiobankName(config, offerFrom);
             } catch (Exception e) {
                 System.err.println("Error getting Biobank Name from offer ID: " + offerFrom);
                 e.printStackTrace();

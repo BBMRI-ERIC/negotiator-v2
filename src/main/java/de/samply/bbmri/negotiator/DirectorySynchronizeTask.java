@@ -36,6 +36,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.BCPlatformFinderDirectoryClient;
@@ -205,7 +206,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             logger.info(marker, "All Biobanks: {}", allBiobanks.size());
 
             for(DirectoryBiobank directoryBiobank : allBiobanks) {
-                BiobankRecord biobankRecord = DbUtil.synchronizeBiobank(config, directoryBiobank, listOfDirectoriesId);
+                BiobankRecord biobankRecord = DbUtilBiobank.synchronizeBiobank(config, directoryBiobank, listOfDirectoriesId);
                 syncroniceBiobankNetworkLink(config, directoryBiobank, listOfDirectoriesId, updateNetworks, biobankRecord);
             }
 

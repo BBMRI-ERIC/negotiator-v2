@@ -49,6 +49,7 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -240,7 +241,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 				}
 			}
 
-			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
+			associatedBiobanks = DbUtilBiobank.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
 				BiobankRecord biobank = associatedBiobanks.get(i);

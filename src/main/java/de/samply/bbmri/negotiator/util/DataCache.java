@@ -7,6 +7,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -82,7 +83,7 @@ public class DataCache {
         List<BiobankRecord> biobankRecords = null;
         HashMap<Integer, String> biobankNames = new HashMap<Integer, String>();
         try(Config config = ConfigFactory.get()) {
-            biobankRecords = DbUtil.getBiobanks(config);
+            biobankRecords = DbUtilBiobank.getBiobanks(config);
             for(BiobankRecord biobankRecord : biobankRecords) {
                 biobankNames.put(biobankRecord.getId(), biobankRecord.getName());
             }

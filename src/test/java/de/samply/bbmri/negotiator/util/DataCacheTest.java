@@ -4,23 +4,19 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.PowerMockUtils;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -70,7 +66,7 @@ public class DataCacheTest {
 
 
             PowerMockito.mockStatic(DbUtil.class);
-            when(DbUtil.getBiobanks(config)).thenReturn(biobankRecords);
+            when(DbUtilBiobank.getBiobanks(config)).thenReturn(biobankRecords);
 
             PowerMockito.verifyStatic(ConfigFactory.class, Mockito.times(1));
             PowerMockito.verifyStatic(DbUtil.class, Mockito.times(1));

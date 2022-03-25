@@ -7,10 +7,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FieldHelper {
+
     public static List<Field<?>> getFields(Table<?> table, String prefix) {
         List<Field<?>> target = new ArrayList<>();
         for(Field<?> f : table.fields()) {
             target.add(f.as(prefix + "_" + f.getName()));
+        }
+
+        return target;
+    }
+
+    public static List<Field<?>> getFields(Table<?> table) {
+        List<Field<?>> target = new ArrayList<>();
+        for(Field<?> f : table.fields()) {
+            target.add(f.as(f.getName()));
         }
 
         return target;

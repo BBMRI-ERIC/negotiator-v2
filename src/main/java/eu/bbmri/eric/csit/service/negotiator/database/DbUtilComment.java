@@ -154,19 +154,6 @@ public class DbUtilComment {
         return result;
     }
 
-    public static void updateCommentReadForUser(Config config, Integer userId, Integer commentId) {
-        PersonCommentRecord record = config.dsl().selectFrom(Tables.PERSON_COMMENT)
-                .where(Tables.PERSON_COMMENT.COMMENT_ID.eq(commentId))
-                .and(Tables.PERSON_COMMENT.PERSON_ID.eq(userId))
-                .fetchOne();
-
-        if(record != null && !record.getRead()) {
-            record.setRead(true);
-            record.setDateRead(new Timestamp(new Date().getTime()));
-            record.update();
-        }
-    }
-
     public static void addCommentReadForComment(Config config, Integer commentId, Integer commenterId) {
         config.dsl().resultQuery("INSERT INTO public.person_comment (person_id, comment_id, read) " +
                 "(SELECT person_id, " + commentId + ", false FROM " +
@@ -183,6 +170,19 @@ public class DbUtilComment {
                 "GROUP BY person_id)").execute();
 
         updateCommentReadForUser(config, commenterId, commentId);
+    }
+
+    public static void updateCommentReadForUser(Config config, Integer userId, Integer commentId) {
+        PersonCommentRecord record = config.dsl().selectFrom(Tables.PERSON_COMMENT)
+                .where(Tables.PERSON_COMMENT.COMMENT_ID.eq(commentId))
+                .and(Tables.PERSON_COMMENT.PERSON_ID.eq(userId))
+                .fetchOne();
+
+        if(record != null && !record.getRead()) {
+            record.setRead(true);
+            record.setDateRead(new Timestamp(new Date().getTime()));
+            record.update();
+        }
     }
 
     public static void addOfferCommentReadForComment(Config config, Integer offertId, Integer commenterId, Integer biobankId) {
@@ -215,14 +215,6 @@ public class DbUtilComment {
         }
     }
 
-    /**
-     * Adds an offer comment for the given queryId, personId, offerFrom with the given text.
-     * @param config
-     * @param queryId
-     * @param personId
-     * @param comment
-     * @param biobankInPrivateChat biobank id
-     */
     public static OfferRecord addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
         OfferRecord record = config.dsl().newRecord(Tables.OFFER);
         record.setQueryId(queryId);
@@ -235,12 +227,6 @@ public class DbUtilComment {
         return record;
     }
 
-    /**
-     * Adds a comment for the given queryId and personId with the given text.
-     * @param queryId
-     * @param personId
-     * @param comment
-     */
     public static CommentRecord addComment(Config config, int queryId, int personId, String comment, String status, boolean attachment) throws SQLException {
         CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
         record.setQueryId(queryId);
