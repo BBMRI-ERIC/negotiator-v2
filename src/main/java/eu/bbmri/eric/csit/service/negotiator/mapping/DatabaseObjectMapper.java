@@ -35,6 +35,10 @@ public class DatabaseObjectMapper {
                 return (T) PrivateAttachmentDTOMapper.map(dbRecord, (PrivateAttachmentDTO) mappedClass);
             case "class de.samply.bbmri.negotiator.model.CommentAttachmentDTO":
                 return (T) CommentAttachmentDTOMapper.map(dbRecord, (CommentAttachmentDTO) mappedClass);
+            case "class de.samply.bbmri.negotiator.model.CollectionBiobankDTO":
+                return (T) CollectionBiobankDTOMapper.map(dbRecord, (CollectionBiobankDTO) mappedClass);
+            case "class de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO":
+                return (T) CollectionRequestStatusDTOMapper.map(dbRecord, (CollectionRequestStatusDTO) mappedClass);
             default:
                 throw new UnsupportedOperationException("Mapper not implemented yet for class: " + mappedClass.getClass().toString());
         }

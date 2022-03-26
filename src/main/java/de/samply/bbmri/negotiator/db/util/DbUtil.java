@@ -439,9 +439,9 @@ public class DbUtil {
 
             String collectionId = mapping.getName();
 
-            List<CollectionRecord> collections = DbUtilCollection.getCollections(config, collectionId, mapping.getDirectory());
+            List<Collection> collections = DbUtilCollection.getCollections(config, collectionId, mapping.getDirectory());
 
-            for (CollectionRecord collection : collections) {
+            for (Collection collection : collections) {
                 if (collection != null) {
                     logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
                     dsl.deleteFrom(Tables.PERSON_COLLECTION)

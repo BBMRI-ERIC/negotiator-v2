@@ -43,6 +43,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.ServletUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
@@ -343,8 +344,8 @@ public class Directory {
             logger.info(apiCallId + " removing collections from Mapping");
             ListOfDirectories serviceRecord = DbUtilListOfDirectories.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
-                List<CollectionRecord> collectionsList = DbUtilCollection.getCollections(config, collectionId, serviceRecord.getId());
-                for(CollectionRecord collectionRecord : collectionsList) {
+                List<Collection> collectionsList = DbUtilCollection.getCollections(config, collectionId, serviceRecord.getId());
+                for(Collection collectionRecord : collectionsList) {
                     DbUtilCollection.removeCollectionRequestMapping(config, queryId, collectionRecord.getId());
                 }
             }
@@ -352,8 +353,8 @@ public class Directory {
             logger.info(apiCallId + " changing status of collections");
             ListOfDirectories serviceRecord = DbUtilListOfDirectories.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
-                List<CollectionRecord> collectionsList = DbUtilCollection.getCollections(config, collectionId, serviceRecord.getId());
-                for(CollectionRecord collectionRecord : collectionsList) {
+                List<Collection> collectionsList = DbUtilCollection.getCollections(config, collectionId, serviceRecord.getId());
+                for(Collection collectionRecord : collectionsList) {
                     List<CollectionLifeCycleStatus> listCollectionLifeStatus = requestLifeCycleStatus.getCollectionsForBiobank(collectionRecord.getBiobankId());
                     for(CollectionLifeCycleStatus collectionLifeCycleStatus : listCollectionLifeStatus) {
                         if(collectionLifeCycleStatus.getCollectionId() == collectionRecord.getId()) {

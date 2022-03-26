@@ -29,12 +29,6 @@ public class DbUtilCollection {
     private static DatabaseListMapper databaseListMapper = new DatabaseListMapper();
     private static DatabaseObjectMapper databaseObjectMapper = new DatabaseObjectMapper();
 
-    /**
-     * Returns the collection for the given directory ID.
-     * @param config database configuration
-     * @param directoryId directory collection ID
-     * @return
-     */
     public static CollectionRecord getCollection(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryId))
@@ -42,13 +36,6 @@ public class DbUtilCollection {
                 .fetchOne();
     }
 
-    /**
-     * Synchronizes the given Collection from the directory with the Collection in the database.
-     * @param config database configuration
-     * @param directoryCollection collection from the directory
-     * @param listOfDirectoryId ID of the directory the collection belongs to
-     * @return
-     */
     public static CollectionRecord synchronizeCollection(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId) {
         CollectionRecord record = getCollection(config, directoryCollection.getId(), listOfDirectoryId);
 
@@ -84,7 +71,7 @@ public class DbUtilCollection {
                 .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
                 .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
                 .fetch();
-        return config.map(record, Person.class);
+        return databaseListMapper.map(record, new Person());
     }
 
     public static List<Person> getPersonsContactsForBiobank(Config config, Integer biobankId) {
@@ -95,64 +82,57 @@ public class DbUtilCollection {
                 .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
                 .where(Tables.BIOBANK.ID.eq(biobankId))
                 .fetch();
-        return config.map(record, Person.class);
+        return databaseListMapper.map(record, new Person());
     }
 
-    /**
-     * Returns the list of collections which the given user is responsible for.
-     * @param config the current configuration
-     * @param userId the person ID
-     * @return
-     */
     public static List<Collection> getCollections(Config config, int userId) {
-        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
+        Result<Record> record = config.dsl().select(FieldHelper.getFields(Tables.COLLECTION, "collection"))
+                .from(Tables.COLLECTION)
                 .where(Tables.COLLECTION.ID.in(
                         config.dsl().select(Tables.COLLECTION.ID)
                                 .from(Tables.COLLECTION)
                                 .join(Tables.PERSON_COLLECTION)
                                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                                 .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
-                )).fetch(), Collection.class);
+                )).fetch();
+
+        return databaseListMapper.map(record, new Collection());
     }
 
     public static List<Collection> getCollections(Config config) {
-        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
+        Result<Record> record = config.dsl().select(FieldHelper.getFields(Tables.COLLECTION, "collection"))
+                .from(Tables.COLLECTION)
                 .where(Tables.COLLECTION.ID.in(
                         config.dsl().select(Tables.COLLECTION.ID)
                                 .from(Tables.COLLECTION)
                                 .join(Tables.PERSON_COLLECTION)
                                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                )).fetch(), Collection.class);
+                )).fetch();
+
+        return databaseListMapper.map(record, new Collection());
     }
 
-    /**
-     * Returns the list of collections which the specified collectionId.
-     * @param config the current configuration
-     * @param collectionId the person ID
-     * @return
-     */
-    public static List<CollectionRecord> getCollections(Config config, String collectionId, int listOfDirectoriesId) {
-        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
+    public static List<Collection> getCollections(Config config, String collectionId, int listOfDirectoriesId) {
+        Result<Record> record = config.dsl().select(FieldHelper.getFields(Tables.COLLECTION, "collection"))
+                .from(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
                 .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoriesId))
-                .fetch(), CollectionRecord.class);
+                .fetch();
+
+        return databaseListMapper.map(record, new Collection());
     }
 
-    public static List<CollectionRecord> getCollections(Config config, String collectionId, String directoryName) {
-        return config.map(config.dsl().select(FieldHelper.getFields(Tables.COLLECTION))
+    public static List<Collection> getCollections(Config config, String collectionId, String directoryName) {
+        Result<Record> record = config.dsl().select(FieldHelper.getFields(Tables.COLLECTION))
                 .from(Tables.COLLECTION)
                 .join(Tables.LIST_OF_DIRECTORIES).on(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
                 .and(Tables.LIST_OF_DIRECTORIES.DIRECTORY_PREFIX.eq(directoryName))
-                .fetch(), CollectionRecord.class);
+                .fetch();
+
+        return databaseListMapper.map(record, new Collection());
     }
 
-    /**
-     * Returns the list of suitable collections for the given query ID.
-     * @param config current connection
-     * @param queryId the query ID
-     * @return
-     */
     public static List<CollectionBiobankDTO> getCollectionsForQuery(Config config, int queryId) {
         Result<Record> fetch = config.dsl().select(FieldHelper.getFields(Tables.COLLECTION, "collection"))
                 .select(FieldHelper.getFields(Tables.BIOBANK, "biobank"))
@@ -164,49 +144,16 @@ public class DbUtilCollection {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                 .orderBy(Tables.COLLECTION.BIOBANK_ID, Tables.COLLECTION.NAME)
                 .fetch();
-        /** config.dsl().select(Tables.COLLECTION.fields())
-                .from(Tables.COLLECTION)
-                .join(Tables.QUERY_COLLECTION)
-                .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .fetch();**/
 
-        return config.map(fetch, CollectionBiobankDTO.class);
+        return databaseListMapper.map(fetch, new CollectionBiobankDTO());
     }
 
-    /**
-     * Gets a list of Persons who are responsible for a given collection
-     * @param config    DB access handle
-     * @param collectionDirectoryId   the Directory ID of a Collection
-     * @return
-     */
-    public static List<CollectionOwner> getCollectionOwners(Config config, String collectionDirectoryId) {
-        Result<Record> result = config.dsl().select(FieldHelper.getFields(Tables.PERSON))
-                .from(Tables.PERSON)
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq
-                        (Tables.PERSON.ID))
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq
-                        (Tables.COLLECTION.ID))
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionDirectoryId))
-                .fetch();
-
-        List<CollectionOwner> users = config.map(result, CollectionOwner.class);
-        return users;
-    }
-
-    /**
-     * Gets the collectionId of a collectionDirectoryId
-     * @param config    DB access handle
-     * @param directoryCollectionId
-     * @return
-     */
     public static Integer getCollectionId(Config config, String directoryCollectionId) {
         Record1<Integer> result = config.dsl().select(Tables.COLLECTION.ID)
                 .from(Tables.COLLECTION)
                 .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryCollectionId))
                 .fetchOne();
 
-        // unknown directoryCollectionId
         if(result == null)
             return null;
 
@@ -214,25 +161,13 @@ public class DbUtilCollection {
     }
 
     public static List<CollectionRequestStatusDTO> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
-        Result<QueryLifecycleCollectionRecord> fetch = config.dsl()
-                .selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
+        Result<Record> fetch = config.dsl()
+                .select(FieldHelper.getFields(Tables.QUERY_LIFECYCLE_COLLECTION, "collection_request_status"))
+                .from(Tables.QUERY_LIFECYCLE_COLLECTION)
                 .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
                 .and(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID.eq(collectionId))
                 .fetch();
-        List<CollectionRequestStatusDTO> returnList = new ArrayList<CollectionRequestStatusDTO>();
-        for(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord : fetch) {
-            returnList.add(MappingDbUtil.mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
-        }
-        return returnList;
-    }
-
-    public static List<CollectionRecord> getCollectionsForNetwork(Config config, Integer networkId) {
-        Result<Record> record = config.dsl().select(FieldHelper.getFields(Tables.COLLECTION))
-                .from(Tables.COLLECTION)
-                .join(Tables.NETWORK_COLLECTION_LINK).on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .where(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID.eq(networkId))
-                .fetch();
-        return config.map(record, CollectionRecord.class);
+        return databaseListMapper.map(fetch, new CollectionRequestStatusDTO());
     }
 
     public static String getCollectionForNetworkAsJson(Config config, Integer networkId) {

@@ -46,7 +46,8 @@ class DatabaseObjectMapperTest {
                 Arguments.of(new PrivateAttachmentDTO(), PrivateAttachmentDTO.class.toString()),
                 Arguments.of(new CommentAttachmentDTO(), CommentAttachmentDTO.class.toString()),
                 Arguments.of(new Collection(), Collection.class.toString()),
-                Arguments.of(new Biobank(), Biobank.class.toString())
+                Arguments.of(new Biobank(), Biobank.class.toString()),
+                Arguments.of(new CollectionBiobankDTO(), CollectionBiobankDTO.class.toString())
         );
     }
 
@@ -294,5 +295,28 @@ class DatabaseObjectMapperTest {
         assertEquals("biobank description", result.getDescription());
         assertEquals("f2d0aa9b-f31e-424c-83d3-b2663844ccff", result.getDirectoryId());
         assertEquals(3, result.getListOfDirectoriesId());
+    }
+
+    @Test
+    @DisplayName("Test mapping for CollectionBiobankDTO")
+    void testMappingCollectionBiobankDTO() {
+        dbRecord = objectMappingTestHelper.getBiobank(dbRecord);
+        dbRecord = objectMappingTestHelper.getCollection(dbRecord);
+
+        CollectionBiobankDTO result = databaseObjectMapper.map(dbRecord, new CollectionBiobankDTO());
+
+        assertEquals(CollectionBiobankDTO.class, result.getClass());
+
+        assertEquals(7, result.getBiobank().getId());
+        assertEquals("Biobank 12", result.getBiobank().getName());
+        assertEquals("biobank description", result.getBiobank().getDescription());
+        assertEquals("f2d0aa9b-f31e-424c-83d3-b2663844ccff", result.getBiobank().getDirectoryId());
+        assertEquals(3, result.getBiobank().getListOfDirectoriesId());
+
+        assertEquals(7, result.getCollection().getId());
+        assertEquals("Collection 123 C50.9", result.getCollection().getName());
+        assertEquals("f2d0aa9b-f31e-424c-83d3-b2663844ccff", result.getCollection().getDirectoryId());
+        assertEquals(9, result.getCollection().getBiobankId());
+        assertEquals(3, result.getCollection().getListOfDirectoriesId());
     }
 }
