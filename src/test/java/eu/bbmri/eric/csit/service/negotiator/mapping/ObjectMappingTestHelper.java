@@ -130,4 +130,16 @@ public class ObjectMappingTestHelper {
         Mockito.when(dbRecord.getValue("biobank_list_of_directories_id", Integer.class)).thenReturn(3);
         return dbRecord;
     }
+
+    public Record getCollectionRequestStatusDTO(Record dbRecord) {
+        Mockito.when(dbRecord.getValue("collection_request_status_id", Integer.class)).thenReturn(7);
+        Mockito.when(dbRecord.getValue("collection_request_status_query_id", Integer.class)).thenReturn(8);
+        Mockito.when(dbRecord.getValue("collection_request_status_collection_id", Integer.class)).thenReturn(9);
+        Mockito.when(dbRecord.getValue("collection_request_status_status", String.class)).thenReturn("started");
+        Mockito.when(dbRecord.getValue("collection_request_status_status_date", Timestamp.class)).thenReturn(new Timestamp(1648330905));
+        Mockito.when(dbRecord.getValue("collection_request_status_status_type", String.class)).thenReturn("status");
+        Mockito.when(dbRecord.getValue("collection_request_status_status_json", String.class)).thenReturn("{}");
+        Mockito.when(dbRecord.getValue("collection_request_status_status_user_id", Integer.class)).thenReturn(10);
+        return dbRecord;
+    }
 }

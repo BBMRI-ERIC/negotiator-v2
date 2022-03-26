@@ -47,7 +47,8 @@ class DatabaseObjectMapperTest {
                 Arguments.of(new CommentAttachmentDTO(), CommentAttachmentDTO.class.toString()),
                 Arguments.of(new Collection(), Collection.class.toString()),
                 Arguments.of(new Biobank(), Biobank.class.toString()),
-                Arguments.of(new CollectionBiobankDTO(), CollectionBiobankDTO.class.toString())
+                Arguments.of(new CollectionBiobankDTO(), CollectionBiobankDTO.class.toString()),
+                Arguments.of(new CollectionRequestStatusDTO(), CollectionRequestStatusDTO.class.toString())
         );
     }
 
@@ -318,5 +319,24 @@ class DatabaseObjectMapperTest {
         assertEquals("f2d0aa9b-f31e-424c-83d3-b2663844ccff", result.getCollection().getDirectoryId());
         assertEquals(9, result.getCollection().getBiobankId());
         assertEquals(3, result.getCollection().getListOfDirectoriesId());
+    }
+
+    @Test
+    @DisplayName("Test mapping for CollectionRequestStatusDTO")
+    void testMappingCollectionRequestStatusDTO() {
+        dbRecord = objectMappingTestHelper.getCollectionRequestStatusDTO(dbRecord);
+
+        CollectionRequestStatusDTO result = databaseObjectMapper.map(dbRecord, new CollectionRequestStatusDTO());
+
+        assertEquals(CollectionRequestStatusDTO.class, result.getClass());
+
+        assertEquals(7, result.getId());
+        assertEquals(8, result.getQueryId());
+        assertEquals(9, result.getCollectionId());
+        assertEquals("started", result.getStatus());
+        assertEquals(new Timestamp(1648330905), result.getStatusDate());
+        assertEquals("status", result.getStatusType());
+        assertEquals("{}", result.getStatusJson());
+        assertEquals(10, result.getStatusUserId());
     }
 }
