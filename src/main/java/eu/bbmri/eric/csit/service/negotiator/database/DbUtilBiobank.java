@@ -113,36 +113,4 @@ public class DbUtilBiobank {
 
         return record;
     }
-
-    public static List<BiobankCollections> getBiobanksAndTheirCollection(Config config) {
-        Result<Record> result = config.dsl()
-                .select(FieldHelper.getFields(Tables.BIOBANK))
-                .select(FieldHelper.getFields(Tables.COLLECTION, "collection"))
-                .from(Tables.BIOBANK)
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.COLLECTION.BIOBANK_ID.eq(Tables
-                        .BIOBANK.ID))
-                .orderBy(Tables.BIOBANK.NAME.asc()).fetch();
-
-        List<BiobankCollections> map = config.map(result, BiobankCollections.class);
-        List<BiobankCollections> target = new ArrayList<>();
-        /**
-         * Now we have to do weird things, grouping them together manually
-         */
-        HashMap<Integer, BiobankCollections> mapped = new HashMap<>();
-
-        for(BiobankCollections dto : map) {
-            if(!mapped.containsKey(dto.getId())) {
-                mapped.put(dto.getId(), dto);
-
-                if(dto.getCollections() != null) {
-                    dto.getCollections().add(dto.getCollection());
-                }
-
-                target.add(dto);
-            } else {
-                mapped.get(dto.getId()).getCollections().add(dto.getCollection());
-            }
-        }
-        return target;
-    }
 }
