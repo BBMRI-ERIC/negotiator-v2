@@ -6,11 +6,11 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
@@ -85,7 +85,7 @@ public class RequestLifeCycleStatus {
             biobankCollectionLink = new HashMap<Integer, HashSet<Integer>>();
         }
         try(Config config = ConfigFactory.get()) {
-            List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtil.getCollectionsForQuery(config, query_id);
+            List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtilCollection.getCollectionsForQuery(config, query_id);
             for(CollectionBiobankDTO collectionBiobankDTO : collectionBiobankDTOList) {
                 setBiobankCollectionLink(collectionBiobankDTO.getBiobank().getId(), collectionBiobankDTO.getCollection().getId());
                 collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId(), getCollectionReadableID(collectionBiobankDTO.getCollection())));

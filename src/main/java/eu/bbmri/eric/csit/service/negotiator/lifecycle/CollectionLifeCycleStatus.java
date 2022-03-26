@@ -7,6 +7,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
@@ -40,8 +41,8 @@ public class CollectionLifeCycleStatus {
 
     public void initialise() {
         try(Config config = ConfigFactory.get()) {
-            initialise(DbUtil.getCollectionRequestStatus(config, query_id, collection_id));
-            initialiseContacts(DbUtil.getPersonsContactsForCollection(config, collection_id));
+            initialise(DbUtilCollection.getCollectionRequestStatus(config, query_id, collection_id));
+            initialiseContacts(DbUtilCollection.getPersonsContactsForCollection(config, collection_id));
         } catch (Exception e) {
             logger.error("ERROR-NG-0000001: Error initialising CollectionLifeCycleStatus::initialise() from database.");
             e.printStackTrace();

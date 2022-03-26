@@ -97,7 +97,7 @@ public class DbUtilRequest {
             for(QuerySearchDTO querySearchDTO : queryDTO.getSearchQueries()) {
                 ListOfDirectories listOfDirectories = DbUtilListOfDirectories.getDirectoryByUrl(config, querySearchDTO.getUrl());
                 // collections already saved for this query
-                List<CollectionBiobankDTO> alreadySavedCollectiontsList = DbUtil.getCollectionsForQuery(config, queryId);
+                List<CollectionBiobankDTO> alreadySavedCollectiontsList = DbUtilCollection.getCollectionsForQuery(config, queryId);
                 HashMap<Integer, Boolean> alreadySavedCollections = new HashMap<>();
                 for (CollectionBiobankDTO savedOne : alreadySavedCollectiontsList) {
                     alreadySavedCollections.put(savedOne.getCollection().getId(), true);
@@ -107,7 +107,7 @@ public class DbUtilRequest {
                         && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
                     logger.info("Faking collections from the directory.");
                     for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
-                        CollectionRecord dbCollection = DbUtil.getCollection(config, collection, listOfDirectories.getId());
+                        CollectionRecord dbCollection = DbUtilCollection.getCollection(config, collection, listOfDirectories.getId());
 
                         if (dbCollection != null) {
                             if (!alreadySavedCollections.containsKey(dbCollection.getId())) {
@@ -118,7 +118,7 @@ public class DbUtilRequest {
                     }
                 } else {
                     for (CollectionDTO collection : querySearchDTO.getCollections()) {
-                        CollectionRecord dbCollection = DbUtil.getCollection(config, collection.getCollectionID(), listOfDirectories.getId());
+                        CollectionRecord dbCollection = DbUtilCollection.getCollection(config, collection.getCollectionID(), listOfDirectories.getId());
 
                         if (dbCollection != null) {
                             if (!alreadySavedCollections.containsKey(dbCollection.getId())) {

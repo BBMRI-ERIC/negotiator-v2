@@ -48,6 +48,7 @@ import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import de.samply.bbmri.negotiator.util.JsonCollectionUpdateHelper;
 import de.samply.bbmri.negotiator.util.NToken;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
@@ -69,7 +70,6 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
@@ -343,16 +343,16 @@ public class Directory {
             logger.info(apiCallId + " removing collections from Mapping");
             ListOfDirectories serviceRecord = DbUtilListOfDirectories.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
-                List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
+                List<CollectionRecord> collectionsList = DbUtilCollection.getCollections(config, collectionId, serviceRecord.getId());
                 for(CollectionRecord collectionRecord : collectionsList) {
-                    DbUtil.removeCollectionRequestMapping(config, queryId, collectionRecord.getId());
+                    DbUtilCollection.removeCollectionRequestMapping(config, queryId, collectionRecord.getId());
                 }
             }
         } else if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
             logger.info(apiCallId + " changing status of collections");
             ListOfDirectories serviceRecord = DbUtilListOfDirectories.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
-                List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
+                List<CollectionRecord> collectionsList = DbUtilCollection.getCollections(config, collectionId, serviceRecord.getId());
                 for(CollectionRecord collectionRecord : collectionsList) {
                     List<CollectionLifeCycleStatus> listCollectionLifeStatus = requestLifeCycleStatus.getCollectionsForBiobank(collectionRecord.getBiobankId());
                     for(CollectionLifeCycleStatus collectionLifeCycleStatus : listCollectionLifeStatus) {

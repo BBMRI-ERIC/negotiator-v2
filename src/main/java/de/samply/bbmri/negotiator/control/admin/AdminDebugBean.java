@@ -38,6 +38,7 @@ import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
@@ -237,7 +238,7 @@ public class AdminDebugBean implements Serializable {
             listOfSampleOffers.get(queryId).add(offerPersonDTO);
         }
 
-        matchingBiobankCollection.put(queryId, DbUtil.getCollectionsForQuery(config, queryId));
+        matchingBiobankCollection.put(queryId, DbUtilCollection.getCollectionsForQuery(config, queryId));
         setMatchingBiobanks(queryId, ObjectToJson.getUniqueBiobanks(matchingBiobankCollection.get(queryId)).size());
         /**
          * This is done to remove the repitition of biobanks in the list because of multiple collection

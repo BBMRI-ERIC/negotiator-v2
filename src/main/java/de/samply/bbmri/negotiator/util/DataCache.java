@@ -8,6 +8,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -100,7 +101,7 @@ public class DataCache {
             collectionPersons_ = new HashMap<Integer, CollectionContactsDTO>();
         }
         try(Config config = ConfigFactory.get()) {
-            List<Collection> collections = DbUtil.getCollections(config);
+            List<Collection> collections = DbUtilCollection.getCollections(config);
             for(Collection collection : collections) {
                 collectionPersons_.put(collection.getId(), createCollectionContactsDTO(config, collection));
             }
@@ -113,7 +114,7 @@ public class DataCache {
     private CollectionContactsDTO createCollectionContactsDTO(Config config, Collection collection) {
         CollectionContactsDTO collectionContactsDTO = new CollectionContactsDTO();
         collectionContactsDTO.setCollectionId(collection.getId());
-        collectionContactsDTO.setContacts(DbUtil.getPersonsContactsForBiobank(config, collection.getId()));
+        collectionContactsDTO.setContacts(DbUtilCollection.getPersonsContactsForBiobank(config, collection.getId()));
         return collectionContactsDTO;
     }
 }

@@ -41,9 +41,10 @@ import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseListMapper;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
 import org.jooq.*;
@@ -58,7 +59,6 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.rest.Directory;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 
 import static org.jooq.impl.DSL.field;
 
@@ -116,19 +116,6 @@ public class DbUtil {
         return MappingListDbUtil.mapRecordsPersonRecord(record);
     }
 
-    /**
-     * Returns the collection for the given directory ID.
-     * @param config database configuration
-     * @param directoryId directory collection ID
-     * @return
-     */
-    public static CollectionRecord getCollection(Config config, String directoryId, int listOfDirectoryId) {
-        return config.dsl().selectFrom(Tables.COLLECTION)
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryId))
-                .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
-                .fetchOne();
-    }
-
     private static NetworkRecord getNetwork(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.NETWORK)
                 .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
@@ -183,57 +170,6 @@ public class DbUtil {
         return config.map(record, NetworkBiobankLinkRecord.class);
     }
 
-    /**
-     * Synchronizes the given Collection from the directory with the Collection in the database.
-     * @param config database configuration
-     * @param directoryCollection collection from the directory
-     * @param listOfDirectoryId ID of the directory the collection belongs to
-     * @return
-     */
-    public static CollectionRecord synchronizeCollection(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId) {
-        CollectionRecord record = DbUtil.getCollection(config, directoryCollection.getId(), listOfDirectoryId);
-
-        if(record == null) {
-            /**
-             * Create the collection, because it doesnt exist yet
-             */
-            logger.debug("Found new collection, with id {}, adding it to the database" , directoryCollection.getId());
-            record = config.dsl().newRecord(Tables.COLLECTION);
-            record.setDirectoryId(directoryCollection.getId());
-            record.setListOfDirectoriesId(listOfDirectoryId);
-        } else {
-            logger.debug("Biobank {} already exists, updating fields", directoryCollection.getId());
-        }
-
-        if(directoryCollection.getBiobank() == null) {
-            logger.debug("Biobank is null. A collection without a biobank?!");
-        } else {
-            BiobankRecord biobankRecord = DbUtilBiobank.getBiobank(config, directoryCollection.getBiobank().getId(), listOfDirectoryId);
-
-            record.setBiobankId(biobankRecord.getId());
-        }
-
-        record.setName(directoryCollection.getName());
-        record.store();
-
-        return record;
-    }
-
-    public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId, int collectionId) {
-
-        config.dsl().deleteFrom(Tables.NETWORK_COLLECTION_LINK)
-                .where(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(collectionId))
-                .execute();
-
-        for(DirectoryNetworkLink directoryNetworkLink : directoryCollection.getNetworkLinks()) {
-            NetworkCollectionLinkRecord record = config.dsl().newRecord(Tables.NETWORK_COLLECTION_LINK);
-            record.setCollectionId(collectionId);
-            NetworkRecord networkRecord = DbUtil.getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
-            record.setNetworkId(networkRecord.getId());
-            record.store();
-        }
-    }
-
     public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int listOfDirectoriesId) {
         NetworkRecord record = DbUtil.getNetwork(config, directoryNetwork.getId(), listOfDirectoriesId);
         if(record == null) {
@@ -273,26 +209,6 @@ public class DbUtil {
                 "JOIN public.network_collection_link nc ON nc.collection_id = c.id " +
                 "JOIN public.network n ON nc.network_id = n.id " +
                 "WHERE n.directory_id = '" + nnacronym + "')");
-    }
-
-    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollection(Config config, Integer collectionId) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.PERSON_COLLECTION)
-                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
-                .fetch();
-        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
-    }
-
-    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForBiobank(Config config, Integer biobankId) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.BIOBANK)
-                .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
-                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.BIOBANK.ID.eq(biobankId))
-                .fetch();
-        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
     }
 
     /**
@@ -342,7 +258,7 @@ public class DbUtil {
                     && NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList() != null) {
                 logger.info("Faking collections from the directory.");
                 for (String collection : NegotiatorConfig.get().getNegotiator().getDevelopment().getCollectionList()) {
-                    CollectionRecord dbCollection = getCollection(config, collection, listOfDirectories.getId());
+                    CollectionRecord dbCollection = DbUtilCollection.getCollection(config, collection, listOfDirectories.getId());
 
                     if (dbCollection != null) {
                         addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
@@ -351,7 +267,7 @@ public class DbUtil {
             } else {
 
                 for (CollectionDTO collection : querySearchDTO.getCollections()) {
-                    CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectories.getId());
+                    CollectionRecord dbCollection = DbUtilCollection.getCollection(config, collection.getCollectionID(), listOfDirectories.getId());
 
                     if (dbCollection != null) {
                         addQueryToCollection(config, queryRecord.getId(), dbCollection.getId());
@@ -448,23 +364,6 @@ public class DbUtil {
         }
     }
 
-    /**
-     * Returns the list of collections which the given user is responsible for.
-     * @param config the current configuration
-     * @param userId the person ID
-     * @return
-     */
-    public static List<Collection> getCollections(Config config, int userId) {
-        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
-                .where(Tables.COLLECTION.ID.in(
-                        config.dsl().select(Tables.COLLECTION.ID)
-                                .from(Tables.COLLECTION)
-                                .join(Tables.PERSON_COLLECTION)
-                                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                                .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
-                )).fetch(), Collection.class);
-    }
-
     public static List<Network> getNetworks(Config config, int userId) {
         return config.map(config.dsl().selectFrom(Tables.NETWORK)
                 .where(Tables.NETWORK.ID.in(
@@ -474,38 +373,6 @@ public class DbUtil {
                                 .on(Tables.PERSON_NETWORK.NETWORK_ID.eq(Tables.NETWORK.ID))
                                 .where(Tables.PERSON_NETWORK.PERSON_ID.eq(userId))
                 )).fetch(), Network.class);
-    }
-
-    public static List<Collection> getCollections(Config config) {
-        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
-                .where(Tables.COLLECTION.ID.in(
-                        config.dsl().select(Tables.COLLECTION.ID)
-                                .from(Tables.COLLECTION)
-                                .join(Tables.PERSON_COLLECTION)
-                                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                )).fetch(), Collection.class);
-    }
-
-    /**
-     * Returns the list of collections which the specified collectionId.
-     * @param config the current configuration
-     * @param collectionId the person ID
-     * @return
-     */
-    public static List<CollectionRecord> getCollections(Config config, String collectionId, int listOfDirectoriesId) {
-        return config.map(config.dsl().selectFrom(Tables.COLLECTION)
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
-                .and(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoriesId))
-                .fetch(), CollectionRecord.class);
-    }
-
-    public static List<CollectionRecord> getCollections(Config config, String collectionId, String directoryName) {
-        return config.map(config.dsl().select(getFields(Tables.COLLECTION))
-                .from(Tables.COLLECTION)
-                .join(Tables.LIST_OF_DIRECTORIES).on(Tables.COLLECTION.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionId))
-                .and(Tables.LIST_OF_DIRECTORIES.DIRECTORY_PREFIX.eq(directoryName))
-                .fetch(), CollectionRecord.class);
     }
 
     /**
@@ -572,7 +439,7 @@ public class DbUtil {
 
             String collectionId = mapping.getName();
 
-            List<CollectionRecord> collections = getCollections(config, collectionId, mapping.getDirectory());
+            List<CollectionRecord> collections = DbUtilCollection.getCollections(config, collectionId, mapping.getDirectory());
 
             for (CollectionRecord collection : collections) {
                 if (collection != null) {
@@ -618,33 +485,6 @@ public class DbUtil {
             System.err.println("-->BUG0000105--> savePerunMapping outer");
             ex.printStackTrace();
         }
-    }
-
-    /**
-     * Returns the list of suitable collections for the given query ID.
-     * @param config current connection
-     * @param queryId the query ID
-     * @return
-     */
-    public static List<CollectionBiobankDTO> getCollectionsForQuery(Config config, int queryId) {
-        Result<Record> fetch = config.dsl().select(getFields(Tables.COLLECTION, "collection"))
-                .select(getFields(Tables.BIOBANK, "biobank"))
-                .from(Tables.QUERY_COLLECTION)
-                .join(Tables.COLLECTION)
-                .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .join(Tables.BIOBANK)
-                .on(Tables.COLLECTION.BIOBANK_ID.eq(Tables.BIOBANK.ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .orderBy(Tables.COLLECTION.BIOBANK_ID, Tables.COLLECTION.NAME)
-                .fetch();
-        /** config.dsl().select(Tables.COLLECTION.fields())
-                .from(Tables.COLLECTION)
-                .join(Tables.QUERY_COLLECTION)
-                .on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .fetch();**/
-
-        return config.map(fetch, CollectionBiobankDTO.class);
     }
 
     /**
@@ -762,26 +602,6 @@ public class DbUtil {
         return result;
     }
 
-
-    /**
-     * Gets a list of Persons who are responsible for a given collection
-     * @param config    DB access handle
-     * @param collectionDirectoryId   the Directory ID of a Collection
-     * @return
-     */
-    public static List<CollectionOwner> getCollectionOwners(Config config, String collectionDirectoryId) {
-        Result<Record> result = config.dsl().select(getFields(Tables.PERSON))
-                .from(Tables.PERSON)
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq
-                        (Tables.PERSON.ID))
-                .join(Tables.COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq
-                        (Tables.COLLECTION.ID))
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(collectionDirectoryId))
-                .fetch();
-
-        List<CollectionOwner> users = config.map(result, CollectionOwner.class);
-        return users;
-    }
 
     /**
      * Gets a list of all the queries from the database
@@ -908,25 +728,6 @@ public class DbUtil {
     }
 
     /**
-     * Gets the collectionId of a collectionDirectoryId
-     * @param config    DB access handle
-     * @param directoryCollectionId
-     * @return
-     */
-    public static Integer getCollectionId(Config config, String directoryCollectionId) {
-        Record1<Integer> result = config.dsl().select(Tables.COLLECTION.ID)
-                .from(Tables.COLLECTION)
-                .where(Tables.COLLECTION.DIRECTORY_ID.eq(directoryCollectionId))
-                .fetchOne();
-
-        // unknown directoryCollectionId
-        if(result == null)
-            return null;
-
-        return result.value1();
-    }
-
-    /**
      * A confidential biobanker decides to participate in a query, so we have to add all his collections
      * to the query_collection table.
      * If the entry already exists, update the entry to expect results from the connector
@@ -991,7 +792,7 @@ public class DbUtil {
      * @return List<QueryDetail> list of queries
      */
     public static List<QueryCollection> getAllNewNegotiations(Config config, Timestamp timestamp, String directoryCollectionId) {
-        Integer collectionId = getCollectionId(config, directoryCollectionId);
+        Integer collectionId = DbUtilCollection.getCollectionId(config, directoryCollectionId);
 
         Result<Record> result = config.dsl()
                 .select(Tables.QUERY.ID.as("queryId"))
@@ -1107,19 +908,6 @@ public class DbUtil {
         List<RequestStatusDTO> returnList = new ArrayList<RequestStatusDTO>();
         for(RequestStatusRecord requestStatusRecord : fetch) {
             returnList.add(MappingDbUtil.mapRequestStatusDTO(requestStatusRecord));
-        }
-        return returnList;
-    }
-
-    public static List<CollectionRequestStatusDTO> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
-        Result<QueryLifecycleCollectionRecord> fetch = config.dsl()
-                .selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
-                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId))
-                .and(Tables.QUERY_LIFECYCLE_COLLECTION.COLLECTION_ID.eq(collectionId))
-                .fetch();
-        List<CollectionRequestStatusDTO> returnList = new ArrayList<CollectionRequestStatusDTO>();
-        for(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord : fetch) {
-            returnList.add(MappingDbUtil.mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
         }
         return returnList;
     }
@@ -1299,35 +1087,6 @@ public class DbUtil {
         return config.map(record, QueryRecord.class);
     }
 
-    public static List<CollectionRecord> getCollectionsForNetwork(Config config, Integer networkId) {
-        Result<Record> record = config.dsl().select(getFields(Tables.COLLECTION))
-                .from(Tables.COLLECTION)
-                .join(Tables.NETWORK_COLLECTION_LINK).on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .where(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID.eq(networkId))
-                .fetch();
-        return config.map(record, CollectionRecord.class);
-    }
-
-    public static String getCollectionForNetworkAsJson(Config config, Integer networkId) {
-        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
-                "SELECT directory, collection_id, biobank_name, collection_name, STRING_AGG(user_name, '<br>') collection_users FROM ( " +
-                "SELECT lod.name directory, c.directory_id collection_id, b.name biobank_name, c.name collection_name, p.auth_name || ' (' || p.auth_email || ')' user_name " +
-                "FROM public.collection c " +
-                "JOIN public.network_collection_link ncl ON c.id = ncl.collection_id " +
-                "LEFT JOIN public.person_collection pc ON c.id = pc.collection_id " +
-                "LEFT JOIN public.person p ON pc.person_id = p.id " +
-                "JOIN biobank b ON c.biobank_id = b.id " +
-                "JOIN list_of_directories lod ON c.list_of_directories_id = lod.id " +
-                "WHERE ncl.network_id = " + networkId + " ) sub " +
-                "GROUP BY directory, collection_id, biobank_name, collection_name " +
-                ") jsonc;");
-        Result<Record> result = resultQuery.fetch();
-        for(Record record : result) {
-            return (String)record.getValue(0);
-        }
-        return "";
-    }
-
     public static String getRequestsForNetworkAsJson(Config config, Integer networkId) {
         ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsonc))) AS varchar) FROM ( " +
                 "SELECT q.id query_id, q.title query_title, b.id biobank_id, b.name biobank_name, b.directory_id biobank_directory_id, " +
@@ -1482,26 +1241,6 @@ public class DbUtil {
         return MappingListDbUtil.mapResultPerson(record);
     }
 
-    public static void getCollectionsWithLifeCycleStatusProblem(Config config, Integer userId) {
-        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT qc_f.query_id, qc_f.collection_id\n" +
-                "FROM public.query_collection qc_f\n" +
-                "JOIN public.request_status rs_f ON rs_f.query_id = qc_f.query_id\n" +
-                "WHERE rs_f.status = 'started' AND (qc_f.query_id, qc_f.collection_id) NOT IN\n" +
-                "(SELECT q.id, qlc.collection_id\n" +
-                "FROM public.query q\n" +
-                "JOIN public.request_status rs ON q.id = rs.query_id\n" +
-                "JOIN public.query_collection qc ON q.id = qc.query_id\n" +
-                "JOIN public.query_lifecycle_collection qlc ON q.id = qlc.query_id AND qc.collection_id = qlc.collection_id\n" +
-                "WHERE rs.status = 'started'\n" +
-                "GROUP BY q.id, qlc.collection_id);");
-        Result<Record> result = resultQuery.fetch();
-        for(Record record : result) {
-            System.out.println("Updating status for collection" + (Integer)record.getValue(1) + " in request " + (Integer)record.getValue(0));
-            saveUpdateCollectionRequestStatus(null, (Integer)record.getValue(0), (Integer)record.getValue(1),
-                    "contacted", "contact", "", new Date(), userId);
-        }
-    }
-
     public static String getRequestToken(String queryToken) {
         try (Config config = ConfigFactory.get()) {
             ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT negotiator_token FROM public.query WHERE json_text ILIKE '%" + queryToken + "%';");
@@ -1532,10 +1271,6 @@ public class DbUtil {
         queryRecord.update();
     }
 
-    public static void removeCollectionRequestMapping(Config config, Integer queryId, Integer collectionId) {
-        config.dsl().deleteFrom(Tables.QUERY_COLLECTION).where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId))).execute();
-    }
-
     public static HashSet<Integer> getQueriesWithStatusError_20220124(Config config) {
         HashSet<Integer> queryIds = new HashSet<>();
         ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT query_id\n" +
@@ -1549,5 +1284,20 @@ public class DbUtil {
             }
         }
         return queryIds;
+    }
+
+    public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId, int collectionId) {
+
+        config.dsl().deleteFrom(Tables.NETWORK_COLLECTION_LINK)
+                .where(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(collectionId))
+                .execute();
+
+        for(DirectoryNetworkLink directoryNetworkLink : directoryCollection.getNetworkLinks()) {
+            NetworkCollectionLinkRecord record = config.dsl().newRecord(Tables.NETWORK_COLLECTION_LINK);
+            record.setCollectionId(collectionId);
+            NetworkRecord networkRecord = getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
+            record.setNetworkId(networkRecord.getId());
+            record.store();
+        }
     }
 }

@@ -42,6 +42,7 @@ import javax.servlet.ServletContext;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
@@ -155,7 +156,7 @@ public class ApplicationBean implements Serializable {
 
     public String updateLifecycleStatusProblem() {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.getCollectionsWithLifeCycleStatusProblem(config, -1);
+            DbUtilCollection.getCollectionsWithLifeCycleStatusProblem(config, -1);
         } catch (Exception e) {
             System.err.println("Error Fixing LifeCycle Status Problems!");
             e.printStackTrace();

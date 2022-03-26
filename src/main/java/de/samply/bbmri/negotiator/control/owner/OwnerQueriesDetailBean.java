@@ -224,15 +224,17 @@ public class OwnerQueriesDetailBean implements Serializable {
 				try {
 					JSONParser parser = new JSONParser();
 					JSONObject jsonObjectOriginalRequest = (JSONObject) parser.parse(selectedQuery.getJsonText());
-					JSONArray searchQueriesJson = (JSONArray)jsonObjectOriginalRequest.get("searchQueries");
-					for(Object queryJson : searchQueriesJson) {
-						JSONObject queryJsonObject = (JSONObject)queryJson;
-						JSONArray collections = (JSONArray)queryJsonObject.get("collections");
-						for(Object collectionObject : collections) {
-							JSONObject collection = (JSONObject) collectionObject;
-							Object locatorBacklinkUrl = collection.get("locatorRedirectUrl");
-							if(locatorBacklinkUrl != null && !locatorBacklinkUrl.toString().isEmpty()) {
-								locatorRedirectUrls.put((String) collection.get("biobankId"), locatorBacklinkUrl.toString());
+					JSONArray searchQueriesJson = (JSONArray) jsonObjectOriginalRequest.get("searchQueries");
+					if (searchQueriesJson != null) {
+						for (Object queryJson : searchQueriesJson) {
+							JSONObject queryJsonObject = (JSONObject) queryJson;
+							JSONArray collections = (JSONArray) queryJsonObject.get("collections");
+							for (Object collectionObject : collections) {
+								JSONObject collection = (JSONObject) collectionObject;
+								Object locatorBacklinkUrl = collection.get("locatorRedirectUrl");
+								if (locatorBacklinkUrl != null && !locatorBacklinkUrl.toString().isEmpty()) {
+									locatorRedirectUrls.put((String) collection.get("biobankId"), locatorBacklinkUrl.toString());
+								}
 							}
 						}
 					}
