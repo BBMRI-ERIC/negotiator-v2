@@ -2,13 +2,13 @@ package de.samply.bbmri.negotiator.util;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionContactsDTO;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -70,7 +70,7 @@ public class DataCache {
             userNames_ = new HashMap<Integer, String>();
         }
         try(Config config = ConfigFactory.get()) {
-            List<Person> persons = DbUtil.getAllUsers(config);
+            List<Person> persons = DbUtilPerson.getAllUsers(config);
             for(Person person : persons) {
                 userNames_.put(person.getId(), person.getAuthName());
             }

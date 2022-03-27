@@ -50,6 +50,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
@@ -279,7 +280,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     private void setPersonListForRequest(Config config, Integer queryId) {
-        personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+        personList = DbUtilPerson.getPersonsContactsForRequest(config, queryId);
     }
 
     private void createCollectionListSortedByStatus() {

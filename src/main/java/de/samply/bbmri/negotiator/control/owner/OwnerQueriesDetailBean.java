@@ -52,6 +52,7 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.io.MemoryUsageSetting;
@@ -67,7 +68,6 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -288,7 +288,7 @@ public class OwnerQueriesDetailBean implements Serializable {
                     // convienience
                     OwnerQueryStatsDTO addme = new OwnerQueryStatsDTO();
                     addme.setQuery(query);
-                    Person queryAuthor = DbUtil.getPersonDetails(config, query.getResearcherId());
+                    Person queryAuthor = DbUtilPerson.getPersonDetails(config, query.getResearcherId());
                     addme.setQueryAuthor(queryAuthor);
 					queries.add(0, addme);
 					return null;
@@ -316,7 +316,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	}
 
 	private void setPersonListForRequest(Config config, Integer queryId) {
-		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+		personList = DbUtilPerson.getPersonsContactsForRequest(config, queryId);
 	}
 
 	private void createCollectionListSortedByStatus(Integer biobankIds) {
@@ -906,7 +906,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public Person getUserDataForResearcher(Integer researcherId) {
     	if(selectedQuery != null) {
 			try (Config config = ConfigFactory.get()) {
-				return DbUtil.getPersonDetails(config, researcherId);
+				return DbUtilPerson.getPersonDetails(config, researcherId);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

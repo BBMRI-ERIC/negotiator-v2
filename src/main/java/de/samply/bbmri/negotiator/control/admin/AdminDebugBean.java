@@ -40,6 +40,7 @@ import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.primefaces.component.datatable.DataTable;
@@ -182,7 +183,7 @@ public class AdminDebugBean implements Serializable {
         try(Config config = ConfigFactory.get()) {
             queries = DbUtil.getQueries(config, filterRemoveTestRequests);
             users = new HashMap<Integer, Person>();
-            for(Person personRecord : DbUtil.getAllUsers(config)) {
+            for(Person personRecord : DbUtilPerson.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
             }
         } catch(SQLException e) {
@@ -193,8 +194,8 @@ public class AdminDebugBean implements Serializable {
     public void transferRequest() {
         try (Config config = ConfigFactory.get()) {
             Query query = DbUtilRequest.getQueryFromId(config, transferQueryId);
-            Person researcher_old = DbUtil.getPersonDetails(config, query.getResearcherId());
-            Person researcher_new = DbUtil.getPersonDetails(config, transferQueryToUserId);
+            Person researcher_old = DbUtilPerson.getPersonDetails(config, query.getResearcherId());
+            Person researcher_new = DbUtilPerson.getPersonDetails(config, transferQueryToUserId);
             StringBuilder commentMessage = new StringBuilder();
             commentMessage.append("---- System message ----\n\n");
             commentMessage.append("The ownership of this request has been transferred from ");

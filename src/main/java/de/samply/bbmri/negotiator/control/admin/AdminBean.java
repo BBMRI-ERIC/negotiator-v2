@@ -3,8 +3,8 @@ package de.samply.bbmri.negotiator.control.admin;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class AdminBean implements Serializable {
 
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
-           setAllUsers( DbUtil.getAllUsers(config) );
+           setAllUsers( DbUtilPerson.getAllUsers(config) );
 
             all = new HashMap<>();
 

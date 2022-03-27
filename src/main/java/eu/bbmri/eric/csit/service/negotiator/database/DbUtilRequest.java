@@ -137,7 +137,7 @@ public class DbUtilRequest {
     }
 
     public static void transferQuery(Config config, Integer queryId, Integer researcherId) {
-        de.samply.bbmri.negotiator.jooq.tables.pojos.Person researcher = DbUtil.getPersonDetails(config, researcherId);
+        de.samply.bbmri.negotiator.jooq.tables.pojos.Person researcher = DbUtilPerson.getPersonDetails(config, researcherId);
         config.dsl().update(Tables.QUERY)
                 .set(Tables.QUERY.RESEARCHER_ID, researcherId)
                 .set(Tables.QUERY.RESEARCHER_EMAIL, researcher.getAuthEmail())

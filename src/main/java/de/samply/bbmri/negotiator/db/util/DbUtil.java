@@ -103,27 +103,14 @@ public class DbUtil {
         return target;
     }
 
-    /**
-     * Returns all users
-     * @param config
-     * @return
-     */
-    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getAllUsers(Config config) {
-        Result<Record> record =
-                config.dsl().select(getFields(Tables.PERSON, "person")).from(Tables.PERSON).orderBy(Tables.PERSON
-                        .AUTH_NAME).fetch();
-
-        return MappingListDbUtil.mapRecordsPersonRecord(record);
-    }
-
-    private static NetworkRecord getNetwork(Config config, String directoryId, int listOfDirectoryId) {
+    public static NetworkRecord getNetwork(Config config, String directoryId, int listOfDirectoryId) {
         return config.dsl().selectFrom(Tables.NETWORK)
                 .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
                 .and(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq((listOfDirectoryId)))
                 .fetchOne();
     }
 
-    private static NetworkRecord getNetwork(Config config, String directoryId, String directoryName) {
+    public static NetworkRecord getNetwork(Config config, String directoryId, String directoryName) {
         Record result = config.dsl().select(getFields(Tables.NETWORK))
                 .from(Tables.NETWORK)
                 .join(Tables.LIST_OF_DIRECTORIES).on(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
@@ -376,118 +363,6 @@ public class DbUtil {
     }
 
     /**
-     * Saves the given Perun User into the database or updates the user, if he already exists
-     * @param config
-     * @param personDTO
-     */
-    public static void savePerunUser(Config config, PerunPersonDTO personDTO) {
-        DSLContext dsl = config.dsl();
-        PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(personDTO.getId())).fetchOne();
-
-        if (personRecord == null) {
-            personRecord = dsl.newRecord(Tables.PERSON);
-            personRecord.setAuthSubject(personDTO.getId());
-        }
-
-        personRecord.setAuthEmail(personDTO.getMail());
-        personRecord.setAuthName(personDTO.getDisplayName());
-        personRecord.setOrganization(personDTO.getOrganization());
-        personRecord.store();
-    }
-
-    public static void savePerunNetworkMapping(Config config, PerunMappingDTO mapping) {
-        try {
-            DSLContext dsl = config.dsl();
-            String networkId = mapping.getName();
-            NetworkRecord network = getNetwork(config, networkId, "BBMRI-ERIC Directory");
-            if(network != null) {
-                dsl.deleteFrom(Tables.PERSON_NETWORK)
-                        .where(Tables.PERSON_NETWORK.NETWORK_ID.eq(network.getId()))
-                        .execute();
-
-                for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                    PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
-                    if(personRecord != null) {
-                        PersonNetworkRecord personNetworkRecordExists = dsl.selectFrom(Tables.PERSON_NETWORK)
-                                .where(Tables.PERSON_NETWORK.NETWORK_ID.eq(network.getId()))
-                                .and(Tables.PERSON_NETWORK.PERSON_ID.eq(personRecord.getId())).fetchOne();
-                        if(personNetworkRecordExists == null) {
-                            PersonNetworkRecord personNetworkRecord = dsl.newRecord(Tables.PERSON_NETWORK);
-                            personNetworkRecord.setNetworkId(network.getId());
-                            personNetworkRecord.setPersonId(personRecord.getId());
-                            personNetworkRecord.store();
-                            config.commit();
-                        }
-                    }
-                }
-            }
-
-        } catch (Exception ex) {
-            logger.error("5299a9df3532-DbUtil ERROR-NG-0000057: Error updating user network mapping from perun.");
-            ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Saves the given perun mapping into the database.
-     * @param config
-     * @param mapping
-     */
-    public static void savePerunMapping(Config config, PerunMappingDTO mapping) {
-        try {
-            DSLContext dsl = config.dsl();
-
-            String collectionId = mapping.getName();
-
-            List<Collection> collections = DbUtilCollection.getCollections(config, collectionId, mapping.getDirectory());
-
-            for (Collection collection : collections) {
-                if (collection != null) {
-                    logger.debug("Deleting old person collection relationships for {}, {}", collectionId, collection.getId());
-                    dsl.deleteFrom(Tables.PERSON_COLLECTION)
-                            .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId()))
-                            .execute();
-
-                    for (PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                        logger.info("-->BUG0000068--> Perun mapping Members: {}", member.getUserId());
-                        PersonRecord personRecord = dsl.selectFrom(Tables.PERSON).where(Tables.PERSON.AUTH_SUBJECT.eq(member.getUserId())).fetchOne();
-
-                        try {
-                            config.commit();
-                            if (personRecord != null) {
-                                PersonCollectionRecord personCollectionRecordExists = dsl.selectFrom(Tables.PERSON_COLLECTION)
-                                        .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collection.getId())).
-                                                and(Tables.PERSON_COLLECTION.PERSON_ID.eq(personRecord.getId())).fetchOne();
-                                if (personCollectionRecordExists == null) {
-                                    logger.debug("Adding {} (Perun ID {}) to collection {}", personRecord.getId(), personRecord.getAuthSubject(), collection.getId());
-                                    PersonCollectionRecord personCollectionRecord = dsl.newRecord(Tables.PERSON_COLLECTION);
-                                    personCollectionRecord.setCollectionId(collection.getId());
-                                    personCollectionRecord.setPersonId(personRecord.getId());
-                                    personCollectionRecord.store();
-                                    config.commit();
-                                } else {
-                                    logger.info("-->BUG0000068--> Perun mapping Members alredy exists: COLLECTION_ID - {} PERSON_ID - {}", collection.getId(), personRecord.getId());
-                                }
-                            }
-                        } catch (Exception ex) {
-                            System.err.println("-->BUG0000068--> savePerunMapping inner");
-                            ex.printStackTrace();
-                            /*try {
-                                config.rollback();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }*/
-                        }
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            System.err.println("-->BUG0000105--> savePerunMapping outer");
-            ex.printStackTrace();
-        }
-    }
-
-    /**
      * Returns a list of Biobanker's id's who made the sample offers for a given query.
      * @param config
      * @param queryId
@@ -672,23 +547,6 @@ public class DbUtil {
             return (String)record.getValue(0);
         }
         return "ERROR";
-    }
-
-    /**
-     * Gets details of a person/user
-     * @param config    DB access handle
-     * @param personId  the person ID
-     * @return
-     */
-    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Person getPersonDetails(Config config, int personId) {
-        Result<Record> record = config.dsl()
-                .select(getFields(Tables.PERSON))
-                .from(Tables.PERSON)
-                .where(Tables.PERSON.ID.eq(personId)).fetch();
-
-        de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = config.map(record.get(0), de.samply.bbmri
-                .negotiator.jooq.tables.pojos.Person.class);
-        return person;
     }
 
     /**
@@ -1227,18 +1085,6 @@ public class DbUtil {
 
     public static void toggleRequestTestState(Config config, Integer queryId) {
         config.dsl().execute("UPDATE public.query SET test_request= NOT test_request WHERE id=" + queryId);
-    }
-
-    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForRequest(Config config, Integer queryId) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.PERSON)
-                .fullOuterJoin(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
-                .fullOuterJoin(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .fullOuterJoin(Tables.QUERY).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
-                .or(Tables.PERSON.IS_ADMIN.isTrue()))
-                .fetch();
-        return MappingListDbUtil.mapResultPerson(record);
     }
 
     public static String getRequestToken(String queryToken) {
