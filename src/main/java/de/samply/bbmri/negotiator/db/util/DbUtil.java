@@ -43,9 +43,9 @@ import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
 import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseListMapper;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
 import org.jooq.*;
 import org.jooq.Record;
@@ -58,7 +58,6 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.rest.Directory;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 
 import static org.jooq.impl.DSL.field;
 
@@ -101,101 +100,6 @@ public class DbUtil {
         }
 
         return target;
-    }
-
-    public static NetworkRecord getNetwork(Config config, String directoryId, int listOfDirectoryId) {
-        return config.dsl().selectFrom(Tables.NETWORK)
-                .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
-                .and(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq((listOfDirectoryId)))
-                .fetchOne();
-    }
-
-    public static NetworkRecord getNetwork(Config config, String directoryId, String directoryName) {
-        Record result = config.dsl().select(getFields(Tables.NETWORK))
-                .from(Tables.NETWORK)
-                .join(Tables.LIST_OF_DIRECTORIES).on(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
-                .where(Tables.NETWORK.DIRECTORY_ID.eq(directoryId))
-                .and(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName))
-                .fetchOne();
-        if(result == null) {
-            Record listOfDirectoriesRecord = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES)
-                    .where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName))
-                    .fetchOne();
-
-            NetworkRecord networkRecord = config.dsl().newRecord(Tables.NETWORK);
-            networkRecord.setDirectoryId(directoryId);
-            networkRecord.setName(directoryId.replaceAll("bbmri-eric:networkID:", ""));
-            networkRecord.setAcronym(directoryId.replaceAll("bbmri-eric:networkID:", ""));
-            networkRecord.setListOfDirectoriesId(listOfDirectoriesRecord.getValue(Tables.LIST_OF_DIRECTORIES.ID));
-            networkRecord.store();
-            return networkRecord;
-        }
-        return config.map(result, NetworkRecord.class);
-    }
-
-    public static void updateBiobankNetworkLinks(Config config, DirectoryBiobank directoryBiobank, int listOfDirectoryId, int biobankId) {
-        config.dsl().deleteFrom(Tables.NETWORK_BIOBANK_LINK)
-                .where(Tables.NETWORK_BIOBANK_LINK.BIOBANK_ID.eq(biobankId))
-                .execute();
-
-        for(DirectoryNetworkLink directoryNetworkLink : directoryBiobank.getNetworkLinks()) {
-            NetworkBiobankLinkRecord record = config.dsl().newRecord(Tables.NETWORK_BIOBANK_LINK);
-            record.setBiobankId(biobankId);
-            NetworkRecord networkRecord = DbUtil.getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
-            record.setNetworkId(networkRecord.getId());
-            record.store();
-        }
-    }
-    
-    public static List<NetworkBiobankLinkRecord> getBiobankNetworkLinks(Config config, String directoryBiobankId, int listOfDirectoryId) {
-        Result<Record> record = config.dsl().select(getFields(Tables.NETWORK_BIOBANK_LINK))
-                .from(Tables.NETWORK_BIOBANK_LINK)
-                .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.NETWORK_BIOBANK_LINK.BIOBANK_ID))
-                .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryBiobankId))
-                .and(Tables.BIOBANK.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
-                .fetch();
-        return config.map(record, NetworkBiobankLinkRecord.class);
-    }
-
-    public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int listOfDirectoriesId) {
-        NetworkRecord record = DbUtil.getNetwork(config, directoryNetwork.getId(), listOfDirectoriesId);
-        if(record == null) {
-            logger.debug("Found new network, with id {}, adding it to the database" , directoryNetwork.getId());
-            record = config.dsl().newRecord(Tables.NETWORK);
-            record.setDirectoryId(directoryNetwork.getId());
-            record.setName(directoryNetwork.getName());
-            record.setAcronym(directoryNetwork.getAcronym());
-            record.setDescription(directoryNetwork.getDescription());
-            record.setListOfDirectoriesId(listOfDirectoriesId);
-        } else {
-            record.setName(directoryNetwork.getName());
-            record.setAcronym(directoryNetwork.getAcronym());
-            record.setDescription(directoryNetwork.getDescription());
-            record.setListOfDirectoriesId(listOfDirectoriesId);
-        }
-        record.store();
-    }
-
-    public static void updateNetworkBiobankLinks(Config config, String nnacronym, String directoryIdStart) {
-        config.dsl().execute("INSERT INTO public.network_biobank_link(biobank_id, network_id) " +
-                "SELECT bio.id, (SELECT id FROM public.network WHERE directory_id = '" + nnacronym + "') " +
-                "FROM public.biobank bio WHERE bio.directory_id ILIKE '" + directoryIdStart + "' " +
-                "AND id NOT IN ( " +
-                "SELECT b.id FROM public.biobank b " +
-                "JOIN public.network_biobank_link nb ON nb.biobank_id = b.id " +
-                "JOIN public.network n ON nb.network_id = n.id " +
-                "WHERE n.directory_id = '" + nnacronym + "')");
-    }
-
-    public static void updateNetworkCollectionLinks(Config config, String nnacronym, String directoryIdStart) {
-        config.dsl().execute("INSERT INTO public.network_collection_link(collection_id, network_id) " +
-                "SELECT col.id, (SELECT id FROM public.network WHERE directory_id = '" + nnacronym + "') " +
-                "FROM public.collection col WHERE col.directory_id ILIKE '" + directoryIdStart + "' " +
-                "AND id NOT IN ( " +
-                "SELECT c.id FROM public.collection c " +
-                "JOIN public.network_collection_link nc ON nc.collection_id = c.id " +
-                "JOIN public.network n ON nc.network_id = n.id " +
-                "WHERE n.directory_id = '" + nnacronym + "')");
     }
 
     /**
@@ -349,17 +253,6 @@ public class DbUtil {
         } catch (Exception e) {
             System.err.println("ERROR: flagQuery(Config, OwnerQueryStatsDTO, Flag, int)");
         }
-    }
-
-    public static List<Network> getNetworks(Config config, int userId) {
-        return config.map(config.dsl().selectFrom(Tables.NETWORK)
-                .where(Tables.NETWORK.ID.in(
-                        config.dsl().select(Tables.NETWORK.ID)
-                                .from(Tables.NETWORK)
-                                .join(Tables.PERSON_NETWORK)
-                                .on(Tables.PERSON_NETWORK.NETWORK_ID.eq(Tables.NETWORK.ID))
-                                .where(Tables.PERSON_NETWORK.PERSON_ID.eq(userId))
-                )).fetch(), Network.class);
     }
 
     /**
@@ -1141,7 +1034,7 @@ public class DbUtil {
         for(DirectoryNetworkLink directoryNetworkLink : directoryCollection.getNetworkLinks()) {
             NetworkCollectionLinkRecord record = config.dsl().newRecord(Tables.NETWORK_COLLECTION_LINK);
             record.setCollectionId(collectionId);
-            NetworkRecord networkRecord = getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
+            NetworkRecord networkRecord = DbUtilNetwork.getNetwork(config, directoryNetworkLink.getId(), listOfDirectoryId);
             record.setNetworkId(networkRecord.getId());
             record.store();
         }

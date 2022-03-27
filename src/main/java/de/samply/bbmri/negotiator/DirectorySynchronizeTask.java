@@ -39,6 +39,7 @@ import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.BCPlatformFinderDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.DKFZSampleLocatorDirectoryClient;
@@ -191,7 +192,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             List<DirectoryNetwork> allNetworks = client.getAllNetworks();
             logger.info(marker, "All Networks: {}", allNetworks.size());
             for (DirectoryNetwork directoryNetwork : allNetworks) {
-                DbUtil.synchronizeNetwork(config, directoryNetwork, listOfDirectoriesId);
+                DbUtilNetwork.synchronizeNetwork(config, directoryNetwork, listOfDirectoriesId);
             }
             return allNetworks.size();
         } catch (Exception e) {
@@ -225,7 +226,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             if(!updateNetworks) {
                 return;
             }
-            DbUtil.updateBiobankNetworkLinks(config, directoryBiobank, listOfDirectoriesId, biobankRecord.getId());
+            DbUtilNetwork.updateBiobankNetworkLinks(config, directoryBiobank, listOfDirectoriesId, biobankRecord.getId());
         } catch (Exception e) {
             logger.error(marker, "d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000045: Problem synchronizing biobank network links for biobank: {}.", biobankRecord.getId());
             e.printStackTrace();
@@ -280,15 +281,15 @@ public class DirectorySynchronizeTask extends TimerTask {
             networkDto.setName(network);
             networkDto.setDescription("Internal Network for the National Node of " + network);
             networkDto.setAcronym(network);
-            DbUtil.synchronizeNetwork(config, networkDto, '1');
+            DbUtilNetwork.synchronizeNetwork(config, networkDto, '1');
         }
     }
 
     private void updateDefaultNetworksLinks(Config config) {
         for(String networkEnding : defaultNationalNodes) {
             String networkname =  "internal:ID:BBMRI." + networkEnding;
-            DbUtil.updateNetworkBiobankLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
-            DbUtil.updateNetworkCollectionLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
+            DbUtilNetwork.updateNetworkBiobankLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
+            DbUtilNetwork.updateNetworkCollectionLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
         }
     }
 

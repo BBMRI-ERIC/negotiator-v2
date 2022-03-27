@@ -24,6 +24,8 @@ public class DatabaseObjectMapper {
                 return (T) CollectionMapper.map(dbRecord, (Collection) mappedClass);
             case "class de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank":
                 return (T) BiobankMapper.map(dbRecord, (Biobank) mappedClass);
+            case "class de.samply.bbmri.negotiator.jooq.tables.pojos.Network":
+                return (T) NetworkMapper.map(dbRecord, (Network) mappedClass);
 
             case "class de.samply.bbmri.negotiator.model.QueryStatsDTO":
                 return (T) QueryStatsDTOMapper.map(dbRecord, (QueryStatsDTO) mappedClass);

@@ -55,7 +55,6 @@ import eu.bbmri.eric.csit.service.negotiator.authentication.utils.OAuth2ClientCo
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
@@ -66,6 +65,7 @@ import de.samply.string.util.StringUtil;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -508,7 +508,7 @@ public class UserBean implements Serializable {
             biobankOwner = collections.size() > 0;
 
             // Check if user is NationalNodeRepresentative
-			networks = DbUtil.getNetworks(config, person.getId());
+			networks = DbUtilNetwork.getNetworks(config, person.getId());
 			nationalNodeRepresentative = networks.size() > 0;
 
             this.person = config.map(person, Person.class);

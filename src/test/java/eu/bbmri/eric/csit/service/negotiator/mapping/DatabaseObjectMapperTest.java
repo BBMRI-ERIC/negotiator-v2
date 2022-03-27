@@ -48,7 +48,8 @@ class DatabaseObjectMapperTest {
                 Arguments.of(new Collection(), Collection.class.toString()),
                 Arguments.of(new Biobank(), Biobank.class.toString()),
                 Arguments.of(new CollectionBiobankDTO(), CollectionBiobankDTO.class.toString()),
-                Arguments.of(new CollectionRequestStatusDTO(), CollectionRequestStatusDTO.class.toString())
+                Arguments.of(new CollectionRequestStatusDTO(), CollectionRequestStatusDTO.class.toString()),
+                Arguments.of(new Network(), Network.class.toString())
         );
     }
 
@@ -338,5 +339,22 @@ class DatabaseObjectMapperTest {
         assertEquals("status", result.getStatusType());
         assertEquals("{}", result.getStatusJson());
         assertEquals(10, result.getStatusUserId());
+    }
+
+    @Test
+    @DisplayName("Test mapping for Network")
+    void testMappingNetwork() {
+        dbRecord = objectMappingTestHelper.getNetwork(dbRecord);
+
+        Network result = databaseObjectMapper.map(dbRecord, new Network());
+
+        assertEquals(Network.class, result.getClass());
+
+        assertEquals(10, result.getId());
+        assertEquals("Network 1", result.getName());
+        assertEquals("The network", result.getDescription());
+        assertEquals("TN1", result.getAcronym());
+        assertEquals("4f675da7-1bc4-4184-aa83-d4a604c2c9eb", result.getDirectoryId());
+        assertEquals(20, result.getListOfDirectoriesId());
     }
 }

@@ -142,4 +142,14 @@ public class ObjectMappingTestHelper {
         Mockito.when(dbRecord.getValue("collection_request_status_status_user_id", Integer.class)).thenReturn(10);
         return dbRecord;
     }
+
+    public Record getNetwork(Record dbRecord) {
+        Mockito.when(dbRecord.getValue("network_id", Integer.class)).thenReturn(10);
+        Mockito.when(dbRecord.getValue("network_name", String.class)).thenReturn("Network 1");
+        Mockito.when(dbRecord.getValue("network_description", String.class)).thenReturn("The network");
+        Mockito.when(dbRecord.getValue("network_acronym", String.class)).thenReturn("TN1");
+        Mockito.when(dbRecord.getValue("network_directory_id", String.class)).thenReturn("4f675da7-1bc4-4184-aa83-d4a604c2c9eb");
+        Mockito.when(dbRecord.getValue("network_list_of_directories_id", Integer.class)).thenReturn(20);
+        return dbRecord;
+    }
 }
