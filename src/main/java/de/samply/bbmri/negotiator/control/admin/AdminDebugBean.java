@@ -38,10 +38,7 @@ import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
+import eu.bbmri.eric.csit.service.negotiator.database.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.export.Exporter;
@@ -76,7 +73,7 @@ public class AdminDebugBean implements Serializable {
     /**
      * The list of queries
      */
-    private List<QueryRecord> queries;
+    private List<Query> queries;
     private HashMap<Integer, Person> users;
 
     //---------------------------------
@@ -120,11 +117,11 @@ public class AdminDebugBean implements Serializable {
     //---------------------------------
 
     //region properties
-    public List<QueryRecord> getQueries() {
+    public List<Query> getQueries() {
         return queries;
     }
 
-    public void setQueries(List<QueryRecord> queries) {
+    public void setQueries(List<Query> queries) {
         this.queries = queries;
     }
 //endregion
@@ -181,7 +178,7 @@ public class AdminDebugBean implements Serializable {
      */
     public void loadQueries(Boolean filterRemoveTestRequests) {
         try(Config config = ConfigFactory.get()) {
-            queries = DbUtil.getQueries(config, filterRemoveTestRequests);
+            queries = DbUtilQuery.getQueries(config, filterRemoveTestRequests);
             users = new HashMap<Integer, Person>();
             for(Person personRecord : DbUtilPerson.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
@@ -214,7 +211,7 @@ public class AdminDebugBean implements Serializable {
     public void switchTestRequest(Integer queryId) {
         try (Config config = ConfigFactory.get()) {
             DbUtil.toggleRequestTestState(config, queryId);
-            for(QueryRecord query : queries) {
+            for(Query query : queries) {
                 if(query.getId() == queryId) {
                     query.setTestRequest(!query.getTestRequest());
                     return;

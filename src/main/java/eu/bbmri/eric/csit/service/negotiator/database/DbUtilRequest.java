@@ -111,7 +111,7 @@ public class DbUtilRequest {
 
                         if (dbCollection != null) {
                             if (!alreadySavedCollections.containsKey(dbCollection.getId())) {
-                                DbUtil.addQueryToCollection(config, queryId, dbCollection.getId());
+                                DbUtilQuery.addQueryToCollection(config, queryId, dbCollection.getId());
                                 alreadySavedCollections.put(dbCollection.getId(), true);
                             }
                         }
@@ -122,7 +122,7 @@ public class DbUtilRequest {
 
                         if (dbCollection != null) {
                             if (!alreadySavedCollections.containsKey(dbCollection.getId())) {
-                                DbUtil.addQueryToCollection(config, queryId, dbCollection.getId());
+                                DbUtilQuery.addQueryToCollection(config, queryId, dbCollection.getId());
                                 alreadySavedCollections.put(dbCollection.getId(), true);
                             }
                         }

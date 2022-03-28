@@ -50,10 +50,7 @@ import javax.servlet.http.Part;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
-import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
+import eu.bbmri.eric.csit.service.negotiator.database.*;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import de.samply.bbmri.negotiator.Config;
@@ -266,7 +263,7 @@ public class OwnerQueriesDetailBean implements Serializable {
             	/*
             	 * Check why the selected query is null. There could be two possibilities.
             	 */
-                Query query = DbUtil.checkIfQueryExists(config, queryId);
+                Query query = DbUtilQuery.checkIfQueryExists(config, queryId);
             	if(query == null){
 
 					/**
@@ -500,7 +497,7 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     private void flagQuery(OwnerQueryStatsDTO queryDto, Flag flag) {
         try (Config config = ConfigFactory.get()) {
-			DbUtil.flagQuery(config, queryDto, flag, userBean.getUserId());
+			DbUtilQuery.flagQuery(config, queryDto, flag, userBean.getUserId());
             config.get().commit();
             queries = null;
         } catch (SQLException e) {
@@ -862,7 +859,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 		try (Config config = ConfigFactory.get()) {
 		    //TODO: have the biobanker decide which of his (possibly) many collections he wants to participate with.
             //      For now all will participate
-            DbUtil.participateInQueryAndExpectResults(config, queryId, userBean.getCollections());
+            DbUtilQuery.participateInQueryAndExpectResults(config, queryId, userBean.getCollections());
 
             // reload
             initialize();

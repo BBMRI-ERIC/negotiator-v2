@@ -50,6 +50,7 @@ import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import de.samply.bbmri.negotiator.util.NToken;
 import de.samply.bbmri.negotiator.util.RedirectUrlGenerator;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilQuery;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
@@ -286,7 +287,7 @@ public class QueryBean implements Serializable {
                 if(jsonQuery.contains("nToken")) {
                     this.qtoken = getRequestToken(jsonQuery);
                 }
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                QueryRecord record = DbUtilQuery.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
                         true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                         testRequest);
@@ -377,7 +378,7 @@ public class QueryBean implements Serializable {
                 if(jsonQuery.contains("nToken")) {
                     this.qtoken = getRequestToken(jsonQuery);
                 }
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                QueryRecord record = DbUtilQuery.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
                         true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                         testRequest);
@@ -427,7 +428,7 @@ public class QueryBean implements Serializable {
                 if(jsonQuery.contains("nToken")) {
                     this.qtoken = getRequestToken(jsonQuery);
                 }
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                QueryRecord record = DbUtilQuery.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
                         true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                         testRequest);
@@ -592,7 +593,7 @@ public class QueryBean implements Serializable {
                 if(jsonQuery.contains("nToken")) {
                     this.qtoken = getRequestToken(jsonQuery);
                 }
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                QueryRecord record = DbUtilQuery.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
                         false, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                         testRequest);
