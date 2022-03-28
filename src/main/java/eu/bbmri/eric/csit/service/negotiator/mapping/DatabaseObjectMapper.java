@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.mapping;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.*;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.model.*;
+import eu.bbmri.eric.csit.service.negotiator.database.RequestStatusDTOMapper;
 import eu.bbmri.eric.csit.service.negotiator.mapping.mapper.*;
 import org.jooq.Record;
 
@@ -41,6 +42,8 @@ public class DatabaseObjectMapper {
                 return (T) CollectionBiobankDTOMapper.map(dbRecord, (CollectionBiobankDTO) mappedClass);
             case "class de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO":
                 return (T) CollectionRequestStatusDTOMapper.map(dbRecord, (CollectionRequestStatusDTO) mappedClass);
+            case "class de.samply.bbmri.negotiator.model.RequestStatusDTO":
+                return (T) RequestStatusDTOMapper.map(dbRecord, (RequestStatusDTO) mappedClass);
             default:
                 throw new UnsupportedOperationException("Mapper not implemented yet for class: " + mappedClass.getClass().toString());
         }

@@ -4,10 +4,10 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilLifecycle;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class ReviewBean implements Serializable {
     }
 
     private void collectLifecycleStatistic() {
-        HashMap<String, String> requestsList = DbUtil.getOpenRequests();
+        HashMap<String, String> requestsList = DbUtilLifecycle.getOpenRequests();
         if(requestsList.containsKey("rejected")) {
             rejectedRequests = Integer.parseInt(requestsList.get("rejected"));
         }
@@ -68,7 +68,7 @@ public class ReviewBean implements Serializable {
     }
 
     private void createRequestStatusQueriesToReview() {
-        List<RequestStatusDTO> requestlist = DbUtil.getRequestStatusDTOToReview();
+        List<RequestStatusDTO> requestlist = DbUtilLifecycle.getRequestStatusDTOToReview();
         try (Config config = ConfigFactory.get()) {
             for(RequestStatusDTO request : requestlist) {
                 if(!requestStatusList.containsKey(request.getQuery_id())) {

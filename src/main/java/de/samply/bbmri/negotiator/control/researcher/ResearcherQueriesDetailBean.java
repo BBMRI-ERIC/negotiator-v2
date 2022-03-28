@@ -65,7 +65,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -196,11 +195,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public String initialize() {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtilComment.getComments(config, queryId, userBean.getUserId()));
-            setBiobankWithOffer(DbUtil.getOfferMakers(config, queryId));
+            setBiobankWithOffer(DbUtilComment.getOfferMakers(config, queryId));
 
             for (int i = 0; i < biobankWithOffer.size(); ++i) {
                 List<OfferPersonDTO> offerPersonDTO;
-                offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i), userBean.getUserId());
+                offerPersonDTO = DbUtilComment.getOffers(config, queryId, biobankWithOffer.get(i), userBean.getUserId());
                 listOfSampleOffers.add(offerPersonDTO);
             }
 
@@ -391,7 +390,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+            Result<Record> result = DbUtilComment.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
             queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
             queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));

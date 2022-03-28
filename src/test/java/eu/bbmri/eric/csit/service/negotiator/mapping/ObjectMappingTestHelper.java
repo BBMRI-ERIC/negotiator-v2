@@ -9,11 +9,13 @@ import org.mockito.Mockito;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ObjectMappingTestHelper {
 
     public byte[] IMAGE = new byte[] {};
+    public Date DATE_NOW = new Date();
 
     public Record getMockedQuery(Record dbRecord) {
         Mockito.when(dbRecord.getValue("query_id")).thenReturn(1);
@@ -150,6 +152,17 @@ public class ObjectMappingTestHelper {
         Mockito.when(dbRecord.getValue("network_acronym", String.class)).thenReturn("TN1");
         Mockito.when(dbRecord.getValue("network_directory_id", String.class)).thenReturn("4f675da7-1bc4-4184-aa83-d4a604c2c9eb");
         Mockito.when(dbRecord.getValue("network_list_of_directories_id", Integer.class)).thenReturn(20);
+        return dbRecord;
+    }
+
+    public Record getRequestStatusDTO(Record dbRecord) {
+        Mockito.when(dbRecord.getValue("request_status_id", Integer.class)).thenReturn(10);
+        Mockito.when(dbRecord.getValue("request_status_query_id", Integer.class)).thenReturn(15);
+        Mockito.when(dbRecord.getValue("request_status_status", String.class)).thenReturn("rejected");
+        Mockito.when(dbRecord.getValue("request_status_status_type", String.class)).thenReturn("waiting_for_review");
+        Mockito.when(dbRecord.getValue("request_status_status_json", String.class)).thenReturn("{\"id\":10}");
+        Mockito.when(dbRecord.getValue("request_status_status_date", Date.class)).thenReturn(DATE_NOW);
+        Mockito.when(dbRecord.getValue("request_status_status_user_id", Integer.class)).thenReturn(20);
         return dbRecord;
     }
 }

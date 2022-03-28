@@ -49,7 +49,8 @@ class DatabaseObjectMapperTest {
                 Arguments.of(new Biobank(), Biobank.class.toString()),
                 Arguments.of(new CollectionBiobankDTO(), CollectionBiobankDTO.class.toString()),
                 Arguments.of(new CollectionRequestStatusDTO(), CollectionRequestStatusDTO.class.toString()),
-                Arguments.of(new Network(), Network.class.toString())
+                Arguments.of(new Network(), Network.class.toString()),
+                Arguments.of(new RequestStatusDTO(), RequestStatusDTO.class.toString())
         );
     }
 
@@ -356,5 +357,23 @@ class DatabaseObjectMapperTest {
         assertEquals("TN1", result.getAcronym());
         assertEquals("4f675da7-1bc4-4184-aa83-d4a604c2c9eb", result.getDirectoryId());
         assertEquals(20, result.getListOfDirectoriesId());
+    }
+
+    @Test
+    @DisplayName("Test mapping for RequestStatusDTO")
+    void testMappingRequestStatusDTO() {
+        dbRecord = objectMappingTestHelper.getRequestStatusDTO(dbRecord);
+
+        RequestStatusDTO result = databaseObjectMapper.map(dbRecord, new RequestStatusDTO());
+
+        assertEquals(RequestStatusDTO.class, result.getClass());
+
+        assertEquals(10, result.getId());
+        assertEquals(15, result.getQuery_id());
+        assertEquals("rejected", result.getStatus());
+        assertEquals("waiting_for_review", result.getStatusType());
+        assertEquals("{\"id\":10}", result.getStatusJson());
+        assertEquals(objectMappingTestHelper.DATE_NOW, result.getStatusDate());
+        assertEquals(20, result.getStatusUserId());
     }
 }

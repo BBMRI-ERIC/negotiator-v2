@@ -4,13 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilLifecycle;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
@@ -42,7 +42,7 @@ public class RequestLifeCycleStatus {
 
     public void initialise() {
         try(Config config = ConfigFactory.get()) {
-            initialise(DbUtil.getRequestStatus(config, query_id));
+            initialise(DbUtilLifecycle.getRequestStatus(config, query_id));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -69,12 +69,12 @@ public class RequestLifeCycleStatus {
     }
 
     public void createStatus(Integer status_user_id) {
-        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.CREATED, null, new Date(), status_user_id);
+        RequestStatusDTO requestStatusDTO = DbUtilLifecycle.saveUpdateRequestStatus(null, query_id, LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.CREATED, null, new Date(), status_user_id);
         requestStatusFactory(requestStatusDTO);
     }
 
     public boolean statusCreated() {
-        return DbUtil.requestStatusForRequestExists(query_id);
+        return DbUtilLifecycle.requestStatusForRequestExists(query_id);
     }
 
     public void initialiseCollectionStatus() {
@@ -203,7 +203,7 @@ public class RequestLifeCycleStatus {
     }
 
     private RequestStatusDTO createRequestStatusInDB(String status, String statusType, String status_json, Integer status_user_id) {
-        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, status, statusType, status_json, new Date(), status_user_id);
+        RequestStatusDTO requestStatusDTO = DbUtilLifecycle.saveUpdateRequestStatus(null, query_id, status, statusType, status_json, new Date(), status_user_id);
         return requestStatusDTO;
     }
 

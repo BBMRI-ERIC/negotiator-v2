@@ -1,14 +1,11 @@
 package eu.bbmri.eric.csit.service.negotiator.database;
 
 import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.db.util.MappingDbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
-import de.samply.bbmri.negotiator.model.CollectionOwner;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.database.utils.FieldHelper;
 import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseListMapper;
@@ -18,7 +15,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jooq.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -205,7 +201,7 @@ public class DbUtilCollection {
         Result<Record> result = resultQuery.fetch();
         for(Record record : result) {
             System.out.println("Updating status for collection" + (Integer)record.getValue(1) + " in request " + (Integer)record.getValue(0));
-            DbUtil.saveUpdateCollectionRequestStatus(null, (Integer)record.getValue(0), (Integer)record.getValue(1),
+            DbUtilLifecycle.saveUpdateCollectionRequestStatus(null, (Integer)record.getValue(0), (Integer)record.getValue(1),
                     "contacted", "contact", "", new Date(), userId);
         }
     }

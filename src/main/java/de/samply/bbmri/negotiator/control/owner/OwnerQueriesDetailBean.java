@@ -61,7 +61,6 @@ import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
@@ -245,7 +244,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
 				Biobank biobank = associatedBiobanks.get(i);
-				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
+				listOfSampleOffers.add(DbUtilComment.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
 				if(locatorRedirectUrls.containsKey(biobank.getDirectoryId())) {
 					locatorRedirectUrlsDisplayList.put(biobank.getName(), locatorRedirectUrls.get(biobank.getDirectoryId()));
 				}
@@ -596,7 +595,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void getPrivateNegotiationCountAndTime(int index){
 		try(Config config = ConfigFactory.get()) {
-			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+			Result<Record> result = DbUtilComment.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
 			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
 			int collection_counts = result.get(0).getValue("number_of_collections", Integer.class);

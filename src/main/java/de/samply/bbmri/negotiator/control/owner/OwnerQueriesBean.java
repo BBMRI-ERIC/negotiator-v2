@@ -41,9 +41,9 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilQuery;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.jooq.Record;
@@ -196,7 +196,7 @@ public class OwnerQueriesBean implements Serializable {
 	}
 
 	public void getPrivateNegotiationCountAndTime(Config config, int index){
-		Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+		Result<Record> result = DbUtilComment.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 		queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
 		queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
 	}

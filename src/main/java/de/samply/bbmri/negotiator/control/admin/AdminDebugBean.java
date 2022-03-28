@@ -33,7 +33,6 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
@@ -228,11 +227,11 @@ public class AdminDebugBean implements Serializable {
         biobankWithoutOffer.put(queryId, new ArrayList<CollectionBiobankDTO>());
         listOfSampleOffers.put(queryId, new ArrayList<List<OfferPersonDTO>>());
 
-        setBiobankWithOffer(queryId, DbUtil.getOfferMakers(config, queryId));
+        setBiobankWithOffer(queryId, DbUtilComment.getOfferMakers(config, queryId));
 
         for (int i = 0; i < biobankWithOffer.get(queryId).size(); ++i) {
             List<OfferPersonDTO> offerPersonDTO;
-            offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(queryId).get(i), userBean.getUserId());
+            offerPersonDTO = DbUtilComment.getOffers(config, queryId, biobankWithOffer.get(queryId).get(i), userBean.getUserId());
             listOfSampleOffers.get(queryId).add(offerPersonDTO);
         }
 
