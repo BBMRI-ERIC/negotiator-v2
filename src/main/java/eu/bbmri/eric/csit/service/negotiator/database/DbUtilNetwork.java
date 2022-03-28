@@ -34,7 +34,7 @@ public class DbUtilNetwork {
         try {
             DSLContext dsl = config.dsl();
             String networkId = mapping.getName();
-            NetworkRecord network = getNetwork(config, networkId, "BBMRI-ERIC Directory");
+            Network network = getNetwork(config, networkId, "BBMRI-ERIC Directory");
             if(network != null) {
                 dsl.deleteFrom(Tables.PERSON_NETWORK)
                         .where(Tables.PERSON_NETWORK.NETWORK_ID.eq(network.getId()))
@@ -70,7 +70,7 @@ public class DbUtilNetwork {
                 .fetchOne();
     }
 
-    public static NetworkRecord getNetwork(Config config, String directoryId, String directoryName) {
+    public static Network getNetwork(Config config, String directoryId, String directoryName) {
         Record result = config.dsl().select(FieldHelper.getFields(Tables.NETWORK))
                 .from(Tables.NETWORK)
                 .join(Tables.LIST_OF_DIRECTORIES).on(Tables.NETWORK.LIST_OF_DIRECTORIES_ID.eq(Tables.LIST_OF_DIRECTORIES.ID))
@@ -88,9 +88,18 @@ public class DbUtilNetwork {
             networkRecord.setAcronym(directoryId.replaceAll("bbmri-eric:networkID:", ""));
             networkRecord.setListOfDirectoriesId(listOfDirectoriesRecord.getValue(Tables.LIST_OF_DIRECTORIES.ID));
             networkRecord.store();
-            return networkRecord;
+
+            Network newNetwork = new Network();
+            newNetwork.setId(networkRecord.getId());
+            newNetwork.setName(networkRecord.getName());
+            newNetwork.setDescription(networkRecord.getDescription());
+            newNetwork.setAcronym(networkRecord.getAcronym());
+            newNetwork.setDirectoryId(networkRecord.getDirectoryId());
+            newNetwork.setListOfDirectoriesId(networkRecord.getListOfDirectoriesId());
+
+            return newNetwork;
         }
-        return config.map(result, NetworkRecord.class);
+        return databaseObjectMapper.map(result, new Network());
     }
 
     public static void updateBiobankNetworkLinks(Config config, DirectoryBiobank directoryBiobank, int listOfDirectoryId, int biobankId) {
@@ -105,16 +114,6 @@ public class DbUtilNetwork {
             record.setNetworkId(networkRecord.getId());
             record.store();
         }
-    }
-
-    public static List<NetworkBiobankLinkRecord> getBiobankNetworkLinks(Config config, String directoryBiobankId, int listOfDirectoryId) {
-        Result<Record> record = config.dsl().select(FieldHelper.getFields(Tables.NETWORK_BIOBANK_LINK))
-                .from(Tables.NETWORK_BIOBANK_LINK)
-                .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.NETWORK_BIOBANK_LINK.BIOBANK_ID))
-                .where(Tables.BIOBANK.DIRECTORY_ID.eq(directoryBiobankId))
-                .and(Tables.BIOBANK.LIST_OF_DIRECTORIES_ID.eq(listOfDirectoryId))
-                .fetch();
-        return config.map(record, NetworkBiobankLinkRecord.class);
     }
 
     public static void synchronizeNetwork(Config config, DirectoryNetwork directoryNetwork, int listOfDirectoriesId) {
@@ -159,13 +158,16 @@ public class DbUtilNetwork {
     }
 
     public static List<Network> getNetworks(Config config, int userId) {
-        return config.map(config.dsl().selectFrom(Tables.NETWORK)
+        Result<Record> records = config.dsl().select(FieldHelper.getFields(Tables.NETWORK, "network"))
+                .from(Tables.NETWORK)
                 .where(Tables.NETWORK.ID.in(
                         config.dsl().select(Tables.NETWORK.ID)
                                 .from(Tables.NETWORK)
                                 .join(Tables.PERSON_NETWORK)
                                 .on(Tables.PERSON_NETWORK.NETWORK_ID.eq(Tables.NETWORK.ID))
                                 .where(Tables.PERSON_NETWORK.PERSON_ID.eq(userId))
-                )).fetch(), Network.class);
+                )).fetch();
+
+        return databaseListMapper.map(records, new Network());
     }
 }
