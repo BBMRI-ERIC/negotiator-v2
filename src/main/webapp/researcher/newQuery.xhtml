@@ -254,10 +254,11 @@
 
 							<f:param name="queryId" value="#{queryBean.id}" />
 						</h:button>
-						<h:commandButton disabled="#{not queryBean.isValidQuery()}"
+						<h:commandButton disabled="#{not queryBean.isValidQuery()}" action="#{queryBean.saveQuery()}"
 										 value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
 										 title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"
 										 styleClass="btn btn-primary" />
+
 						<!--
 						<ui:repeat value="#{queryBean.searchQueries}" var="searchQuery">
 							<h:commandButton disabled="#{not isDirectoryValid}"
