@@ -111,6 +111,7 @@ public class DbUtilLifecycle {
                         .where(Tables.QUERY_LIFECYCLE_COLLECTION.ID.eq(collectionRequestStatusId)).fetchOne();
             }
             //TODO: Test
+            CollectionRequestStatusDTO dr = databaseObjectMapper.map(collectionRequestStatus, new CollectionRequestStatusDTO());
             return databaseObjectMapper.map(collectionRequestStatus, new CollectionRequestStatusDTO());
         } catch (SQLException e) {
             System.err.println("ERROR saving/updating Request Status.");
@@ -141,12 +142,15 @@ public class DbUtilLifecycle {
 
     public static List<RequestStatusDTO> getRequestStatusDTOToReview() {
         try (Config config = ConfigFactory.get()) {
-            Result<Record> fetch = config.dsl().resultQuery("SELECT * FROM public.request_status WHERE query_id IN \n" +
+            Result<Record> fetch = config.dsl().resultQuery("SELECT " +
+                    "request_status.id request_status_id, request_status.query_id request_status_query_id, request_status.status request_status_status, " +
+                    "request_status.status_date request_status_status_date, request_status.status_user_id request_status_status_user_id, request_status.status_type " +
+                    "request_status_status_type, request_status.status_json request_status_status_json" +
+                    " FROM public.request_status WHERE query_id IN \n" +
                     "(SELECT query_id\n" +
                     "FROM public.request_status\n" +
                     "WHERE status ILIKE 'under_review' AND (query_id, status_date) IN (SELECT query_id, MAX(status_date)\n" +
                     "FROM public.request_status GROUP BY query_id) ORDER BY status_date) ORDER BY query_id, status_date;").fetch();
-            //TODO: Test
             return databaseListMapper.map(fetch, new RequestStatusDTO());
         } catch (SQLException e) {
             System.err.println("ERROR getting open Request Status.");

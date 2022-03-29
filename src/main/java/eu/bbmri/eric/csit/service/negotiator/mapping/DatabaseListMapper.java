@@ -5,6 +5,7 @@ import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import org.jooq.Record;
 import org.jooq.Result;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +19,19 @@ public class DatabaseListMapper {
 
     private <T> List<T> mapListFactory(Result<Record> dbRecords, T mappedClass) {
         List<T> resultList = new ArrayList<>();
-        for (Record dbRecord : dbRecords) {
-            resultList.add(databaseObjectMapper.map(dbRecord, mappedClass));
+        try {
+            Class clazz = mappedClass.getClass();
+            Constructor<?> cons = clazz.getConstructor();
+
+            for (Record dbRecord : dbRecords) {
+                resultList.add(databaseObjectMapper.map(dbRecord, (T)clazz.newInstance()));
+            }
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
         return resultList;
     }

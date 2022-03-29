@@ -68,8 +68,8 @@ public class ReviewBean implements Serializable {
     }
 
     private void createRequestStatusQueriesToReview() {
-        List<RequestStatusDTO> requestlist = DbUtilLifecycle.getRequestStatusDTOToReview();
         try (Config config = ConfigFactory.get()) {
+            List<RequestStatusDTO> requestlist = DbUtilLifecycle.getRequestStatusDTOToReview();
             for(RequestStatusDTO request : requestlist) {
                 if(!requestStatusList.containsKey(request.getQuery_id())) {
                     requestStatusList.put(request.getQuery_id(), new RequestLifeCycleStatus(request.getQuery_id()));
@@ -77,7 +77,7 @@ public class ReviewBean implements Serializable {
                 }
                 requestStatusList.get(request.getQuery_id()).initialise(requestlist);
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             System.err.println("ERROR getting Query Record.");
             e.printStackTrace();
         }

@@ -163,13 +163,13 @@ public class DbUtilQuery {
         Result<Record> result = null;
         if(filterTestRequests) {
             result = config.dsl()
-                    .select(FieldHelper.getFields(Tables.QUERY))
+                    .select(FieldHelper.getFields(Tables.QUERY, "query"))
                     .from(Tables.QUERY)
                     .where(Tables.QUERY.TEST_REQUEST.eq(false))
                     .orderBy(Tables.QUERY.ID.asc()).fetch();
         } else {
             result = config.dsl()
-                    .select(FieldHelper.getFields(Tables.QUERY))
+                    .select(FieldHelper.getFields(Tables.QUERY, "query"))
                     .from(Tables.QUERY)
                     .orderBy(Tables.QUERY.ID.asc()).fetch();
         }
