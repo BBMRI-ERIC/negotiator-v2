@@ -226,7 +226,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 						JSONArray collections = (JSONArray)queryJsonObject.get("collections");
 						for(Object collectionObject : collections) {
 							JSONObject collection = (JSONObject) collectionObject;
-							Object locatorBacklinkUrl = collection.get("locatorRedirectUrl");
+							Object locatorBacklinkUrl = collection.get("redirectUrl");
 							if(locatorBacklinkUrl != null && !locatorBacklinkUrl.toString().isEmpty()) {
 								locatorRedirectUrls.put((String) collection.get("biobankId"), locatorBacklinkUrl.toString());
 							}
