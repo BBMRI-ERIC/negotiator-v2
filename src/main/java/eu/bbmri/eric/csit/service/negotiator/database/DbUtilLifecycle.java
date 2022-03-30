@@ -110,7 +110,6 @@ public class DbUtilLifecycle {
                 collectionRequestStatus = config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
                         .where(Tables.QUERY_LIFECYCLE_COLLECTION.ID.eq(collectionRequestStatusId)).fetchOne();
             }
-            //TODO: Test
             CollectionRequestStatusDTO dr = databaseObjectMapper.map(collectionRequestStatus, new CollectionRequestStatusDTO());
             return databaseObjectMapper.map(collectionRequestStatus, new CollectionRequestStatusDTO());
         } catch (SQLException e) {
