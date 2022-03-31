@@ -30,7 +30,6 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
@@ -209,7 +208,7 @@ public class AdminDebugBean implements Serializable {
 
     public void switchTestRequest(Integer queryId) {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.toggleRequestTestState(config, queryId);
+            DbUtilAdmin.toggleRequestTestState(config, queryId);
             for(Query query : queries) {
                 if(query.getId() == queryId) {
                     query.setTestRequest(!query.getTestRequest());

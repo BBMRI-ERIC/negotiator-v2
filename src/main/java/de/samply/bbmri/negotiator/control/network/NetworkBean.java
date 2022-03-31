@@ -4,15 +4,13 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.List;
 
 @ManagedBean
 @ViewScoped
@@ -45,11 +43,11 @@ public class NetworkBean implements Serializable {
             return;
         }
         try(Config config = ConfigFactory.get()) {
-            jsonQueryForNetwork = DbUtil.getNetworkDashboardStatiticForNetwork(config, networkId);
-            numberOfBiobanks = DbUtil.getNumberOfBiobanksInNetwork(config, networkId);
-            numberOfCollections = DbUtil.getNumberOfCollectionsInNetwork(config, networkId);
-            numberOfAssociatedUsers = DbUtil.getNumberOfAssociatedUsersInNetwork(config, networkId);
-            jsonHumanReadableForNetwork = DbUtil.getHumanReadableStatisticsForNetwork(config, networkId);
+            jsonQueryForNetwork = DbUtilNetwork.getNetworkDashboardStatiticForNetwork(config, networkId);
+            numberOfBiobanks = DbUtilNetwork.getNumberOfBiobanksInNetwork(config, networkId);
+            numberOfCollections = DbUtilNetwork.getNumberOfCollectionsInNetwork(config, networkId);
+            numberOfAssociatedUsers = DbUtilNetwork.getNumberOfAssociatedUsersInNetwork(config, networkId);
+            jsonHumanReadableForNetwork = DbUtilNetwork.getHumanReadableStatisticsForNetwork(config, networkId);
         } catch (Exception e) {
             System.err.println("5303c8e4aa09-NetworkBean ERROR-NG-0000048: Error initializing NetworkBean.");
             e.printStackTrace();

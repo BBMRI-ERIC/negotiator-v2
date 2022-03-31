@@ -4,7 +4,7 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -38,7 +38,7 @@ public class RequestOverviewBean implements Serializable {
             return;
         }
         try (Config config = ConfigFactory.get()) {
-            requestForNetwork = DbUtil.getRequestsForNetworkAsJson(config, networkId);
+            requestForNetwork = DbUtilNetwork.getRequestsForNetworkAsJson(config, networkId);
         } catch (Exception e) {
             System.err.println("e78d57bd6fa0-RequestOverviewBean ERROR-NG-0000050: Error initializing RequestOverviewBean.");
             e.printStackTrace();

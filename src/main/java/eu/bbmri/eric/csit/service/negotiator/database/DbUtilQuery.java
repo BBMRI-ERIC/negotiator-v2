@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.database;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
@@ -261,5 +262,23 @@ public class DbUtilQuery {
             }
         }
         return queryIds;
+    }
+
+    public static String getRequestToken(String queryToken) {
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT negotiator_token FROM public.query WHERE json_text ILIKE '%" + queryToken + "%';");
+            Result<Record> result = resultQuery.fetch();
+            if(!result.isEmpty()) {
+                for (Record record : result) {
+                    String requestToken = record.getValue(0, String.class);
+                    logger.debug(requestToken);
+                    return requestToken;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting RequestToken from QueryToken.");
+            e.printStackTrace();
+        }
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }

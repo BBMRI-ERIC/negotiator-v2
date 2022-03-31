@@ -47,7 +47,6 @@ import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.MolgenisDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
@@ -255,7 +254,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             if(!updateNetworks) {
                 return;
             }
-            DbUtil.updateCollectionNetworkLinks(config, directoryCollection, listOfDirectoriesId, collectionId);
+            DbUtilNetwork.updateCollectionNetworkLinks(config, directoryCollection, listOfDirectoriesId, collectionId);
         } catch (Exception e) {
             logger.error(marker, "d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000046: Problem synchronizing collection network links for collection: {}.", collectionId);
             e.printStackTrace();
