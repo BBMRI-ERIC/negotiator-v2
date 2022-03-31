@@ -39,6 +39,7 @@ import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.database.tmpDbUtil;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.apache.logging.log4j.util.StringBuilders;
 import org.primefaces.component.datatable.DataTable;
@@ -50,11 +51,13 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import java.io.Serializable;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created on 7/25/2017.
@@ -135,9 +138,42 @@ public class AdminDebugBean implements Serializable {
         return users;
     }
 
+    private static final int DEFAULT_BUFFER_SIZE = 10240;
+
     @PostConstruct
     public void init() {
         jsonExporter = new JsonDataTableExporterExport();
+    }
+
+    public void getJsonExport() throws IOException {
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+        String json = "{}";
+        try(Config config = ConfigFactory.get()) {
+            json = tmpDbUtil.getHumanReadableStatisticsForNetwork(config);
+        } catch (Exception e) {
+            System.err.println("Error creating json for export.");
+            e.printStackTrace();
+        }
+
+        response.reset();
+        response.setBufferSize(DEFAULT_BUFFER_SIZE);
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Length", String.valueOf(json.length()));
+        response.setHeader("Content-Disposition", "attachment;filename=\"negotiator\"");
+        BufferedInputStream input = null;
+        BufferedOutputStream output = null;
+        try {
+            output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
+            output.write(json.getBytes());
+        } catch (Exception e) {
+            System.err.println("Error writing json export file for admin.");
+            e.printStackTrace();
+        } finally {
+            output.close();
+        }
+
+        context.responseComplete();
     }
 
     public String restNegotiation(Integer id) {
