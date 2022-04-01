@@ -47,6 +47,16 @@
 
         <h3>#{label['admin.debug.query']}</h3>
 
+        <h:form>
+            <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
+                           title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+                           value="Download all data as json"
+                           id="getDownload"
+                           action="#{adminDebugBean.getJsonExport}">
+                <span class="glyphicon glyphicon-save-file"></span>
+            </h:commandLink>
+        </h:form>
+
         <h:form styleClass="form-horizontal">
             <h:commandButton action="#{adminDebugBean.loadQueries(true)}" value="#{label['admin.debug.click.filter']}"
                              styleClass="btn btn-success"/>
