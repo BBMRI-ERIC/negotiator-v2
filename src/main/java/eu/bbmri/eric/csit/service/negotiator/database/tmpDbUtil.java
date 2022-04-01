@@ -8,7 +8,7 @@ import org.jooq.ResultQuery;
 public class tmpDbUtil {
 
     public static String getHumanReadableStatisticsForNetwork(Config config) {
-        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT array_to_json(array_agg(main_query_1)) FROM (SELECT json_build_object('requestId', as_request.id, \n" +
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(main_query_1)) AS varchar) FROM (SELECT json_build_object('requestId', as_request.id, \n" +
                 "\t\t\t\t\t\t 'requestTitle', as_request.title, \n" +
                 "\t\t\t\t\t\t 'requestText', as_request.text, \n" +
                 "\t\t\t\t\t\t 'requestCreation', as_request.query_creation_time, \n" +

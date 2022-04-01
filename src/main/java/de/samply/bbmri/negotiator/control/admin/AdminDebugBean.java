@@ -160,7 +160,7 @@ public class AdminDebugBean implements Serializable {
         response.setBufferSize(DEFAULT_BUFFER_SIZE);
         response.setContentType("application/octet-stream");
         response.setHeader("Content-Length", String.valueOf(json.length()));
-        response.setHeader("Content-Disposition", "attachment;filename=\"negotiator\"");
+        response.setHeader("Content-Disposition", "attachment;filename=\"negotiator.json\"");
         BufferedInputStream input = null;
         BufferedOutputStream output = null;
         try {
