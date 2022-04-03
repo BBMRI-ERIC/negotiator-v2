@@ -41,6 +41,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import de.samply.bbmri.negotiator.db.util.Migration;
+import eu.bbmri.eric.csit.service.negotiator.admin.CreateAdminFilesForDownload;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationScheduledExecutor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,6 +68,8 @@ public class ServletListener implements ServletContextListener {
     private static final Logger logger = LogManager.getLogger(ServletListener.class);
 
     private Timer timer;
+
+    private Timer timerGenerator;
 
     private Timer notificationScheduledExecutorTimer;
 
@@ -114,6 +117,10 @@ public class ServletListener implements ServletContextListener {
             logger.info("Starting directory synchronize task timer");
             timer = new Timer();
             timer.schedule(new DirectorySynchronizeTask(), 10000, 1000L * 60L * 60L);
+
+            logger.info("Starting Admin file export generator timer");
+            timerGenerator = new Timer();
+            timerGenerator.schedule(new CreateAdminFilesForDownload(), 10000, 1000L * 60L * 60L);
 
             logger.info("Starting notification task timer");
             notificationScheduledExecutorTimer = new Timer();

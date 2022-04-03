@@ -148,24 +148,24 @@ public class AdminDebugBean implements Serializable {
     public void getJsonExport() throws IOException {
         FacesContext context = FacesContext.getCurrentInstance();
         HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
-        String json = "{}";
-        try(Config config = ConfigFactory.get()) {
-            json = tmpDbUtil.getHumanReadableStatisticsForNetwork(config);
-        } catch (Exception e) {
-            System.err.println("Error creating json for export.");
-            e.printStackTrace();
-        }
 
+        String tempPdfOutputFilePath = "/tmp/negotiatorExport.json";
+        File file = new File(tempPdfOutputFilePath);
         response.reset();
         response.setBufferSize(DEFAULT_BUFFER_SIZE);
         response.setContentType("application/octet-stream");
-        response.setHeader("Content-Length", String.valueOf(json.length()));
-        response.setHeader("Content-Disposition", "attachment;filename=\"negotiator.json\"");
+        response.setHeader("Content-Length", String.valueOf(file.length()));
+        response.setHeader("Content-Disposition", "attachment;filename=\"negotiatorExport.json\"");
         BufferedInputStream input = null;
         BufferedOutputStream output = null;
         try {
+            input = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
             output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
-            output.write(json.getBytes());
+            byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+            int length;
+            while ((length = input.read(buffer)) > 0) {
+                output.write(buffer, 0, length);
+            }
         } catch (Exception e) {
             System.err.println("Error writing json export file for admin.");
             e.printStackTrace();
