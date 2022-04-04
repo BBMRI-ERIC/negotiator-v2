@@ -119,6 +119,14 @@ public class QueryBean implements Serializable {
     private String queryTitle;
 
     /**
+     * The type of the query.
+     */
+    private RequestType queryType;
+
+
+    private List<RequestType> queryTypes;
+
+    /**
      * The jsonText of the query.
      */
     private String jsonQuery;
@@ -138,6 +146,9 @@ public class QueryBean implements Serializable {
      */
     private String ethicsVote;
 
+
+    private String organisationType;
+
     /**
      * List of faces messages
      */
@@ -155,6 +166,12 @@ public class QueryBean implements Serializable {
      */
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
+            // <!-- TODO define stnadard values-->
+            queryTypes = new ArrayList<RequestType>();
+            queryTypes.add(new RequestType(1, "Only data","data_only"));
+            queryTypes.add(new RequestType(2, "Biosamples/Data","biosample+data"));
+            queryTypes.add(new RequestType(3, "Metadata","metadata"));
+
             /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
             if(id != null)
             {
@@ -684,6 +701,41 @@ public class QueryBean implements Serializable {
         this.queryText = queryText;
     }
 
+
+    public RequestType getQueryType() {
+        if(queryType != null){
+            logger.info("getQueryType id:" + queryType.getId());
+        }else{
+            logger.info("getQueryType null");
+        }
+        return queryType;
+    }
+
+    public RequestType getQueryTypeFromList(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("no id provided");
+        }
+        for (RequestType queryType : queryTypes) {
+            if (id.equals(queryType.getId())) {
+                return queryType;
+            }
+        }
+        return null;
+    }
+
+    public void setQueryType(RequestType queryType) {
+        logger.info("setQueryType");
+        this.queryType = queryType;
+    }
+
+    public List<RequestType> getQueryTypes() {
+        return queryTypes;
+    }
+
+    public void setQueryTypes(List<RequestType> queryTypes) {
+        this.queryTypes = queryTypes;
+    }
+
     public String getMode() {
         return mode;
     }
@@ -715,6 +767,14 @@ public class QueryBean implements Serializable {
         this.ethicsVote = ethicsVote;
     }
 
+
+    public String getOrganisationType() {
+        return organisationType;
+    }
+
+    public void setOrganisationType(String organisationType) {
+        this.organisationType = organisationType;
+    }
     public String getQtoken() { return qtoken; }
 
     public boolean isTestRequest() {
@@ -738,3 +798,4 @@ public class QueryBean implements Serializable {
     }
 
 }
+
