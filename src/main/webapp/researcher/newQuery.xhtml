@@ -227,39 +227,39 @@
 									</h:panelGroup> -->
 									<c:if test="#{queryBean.queryType.type == 'biosample+data'}">
 										<span class="required">
-											Requested biosamples <i class="fa fa-pencil-square-o" />
+											#{label['queryview.title.requestedBiosample']}<i class="fa fa-pencil-square-o" />
 										</span>
 										<b:panelGrid columns="2" columnClasses="query-biosample-column1,query-biosample-column2" style="width:80%">
 											<h:outputLabel value=" Number of subjects:"/>
-											<h:inputText value="TODO"
+											<h:inputText value="#{queryBean.numberSubject}"
 														 styleClass="form-control"
 														 validatorMessage="#{label['error.invalidTitleLength']}">
 												<f:validateLength maximum="250" />
 											</h:inputText>
 
 											<h:outputLabel value=" Sample type(s) and number of samples per subject:"/>
-											<h:inputText value="TODO"
+											<h:inputText value="#{queryBean.sampleType}"
 														 styleClass="form-control"
 														 validatorMessage="#{label['error.invalidTitleLength']}">
 												<f:validateLength maximum="250" />
 											</h:inputText>
 
 											<h:outputLabel value=" Inclusion Criteria:"/>
-											<h:inputText value="TODO"
+											<h:inputText value="#{queryBean.inclusionCriteria}"
 														 styleClass="form-control"
 														 validatorMessage="#{label['error.invalidTitleLength']}">
 												<f:validateLength maximum="250" />
 											</h:inputText>
 
 											<h:outputLabel value=" Exclusion Criteria:"/>
-											<h:inputText value="TODO"
+											<h:inputText value="#{queryBean.exclusionCriteria}"
 														 styleClass="form-control"
 														 validatorMessage="#{label['error.invalidTitleLength']}">
 												<f:validateLength maximum="250" />
 											</h:inputText>
 
 											<h:outputLabel value=" Specific requirements:"/>
-											<h:inputText value="TODO"
+											<h:inputText value="#{queryBean.specificRequirements}"
 														 styleClass="form-control"
 														 validatorMessage="#{label['error.invalidTitleLength']}">
 												<f:validateLength maximum="250" />
@@ -271,25 +271,26 @@
 
 									<c:if test="#{queryBean.queryType.type == 'biosample+data' || queryBean.queryType.type == 'data_only'}">
 										<span class="required">
-											Requested data <i class="fa fa-pencil-square-o" />
+											#{label['queryview.title.requestedData']} <i class="fa fa-pencil-square-o" />
 										</span>
 										<b:panelGrid columns="2" columnClasses="query-biosample-column1,query-biosample-column2" style="width:80%">
-											<h:outputLabel value=" Number of subjects:"/>
-											<h:inputText value="TODO"
-														 styleClass="form-control"
-														 validatorMessage="#{label['error.invalidTitleLength']}">
-												<f:validateLength maximum="250" />
-											</h:inputText>
-
+											<c:if test="#{queryBean.queryType.type != 'biosample+data'}">
+												<h:outputLabel value=" Number of subjects:"/>
+												<h:inputText value="#{queryBean.numberSubject}"
+															 styleClass="form-control"
+															 validatorMessage="#{label['error.invalidTitleLength']}">
+													<f:validateLength maximum="250" />
+												</h:inputText>
+											</c:if>
 											<h:outputLabel value=" Variable selection :"/>
-											<h:inputText value="TODO"
+											<h:inputText value="#{queryBean.variableSelection}"
 														 styleClass="form-control"
 														 validatorMessage="#{label['error.invalidTitleLength']}">
 												<f:validateLength maximum="250" />
 											</h:inputText>
 
 											<h:outputLabel value=" Type of data use:"/>
-											<h:inputText value="TODO"
+											<h:inputText value="#{queryBean.dataUses}"
 														 styleClass="form-control"
 														 validatorMessage="#{label['error.invalidTitleLength']}">
 												<f:validateLength maximum="250" />
@@ -325,49 +326,80 @@
 
 						<br/>
 						<!-- TODO eventuell mit objects https://mkyong.com/jsf2/jsf-2-radio-buttons-example/-->
+						<p:panelGrid columns="1" layout="grid"
+									 styleClass="showcase-text-align-left">
 						Oragnisation Type
-						<h:selectOneRadio value="#{queryBean.organisationType}" layout="pageDirection" >
-							<f:selectItem itemValue="profit" itemLabel="for profit" />
-							<f:selectItem itemValue="non-profit" itemLabel="None profit" />
+						<h:selectOneRadio value="#{queryBean.organisationType}" layout="pageDirection"  style="align-items: left">
+						<!--  <p:selectOneRadio value="#{queryBean.organisationType}" layout="grid" columns="1" styleClass="grid-radio" > -->
+							<f:selectItem itemValue="profit" itemLabel=" for profit" />
+							<f:selectItem itemValue="non-profit" itemLabel=" non-profit" />
 						</h:selectOneRadio>
+						</p:panelGrid>
+
 						<br/>
-						Remarks
-						<b:panelGrid columns="2" columnClasses="query-biosample-column1,query-biosample-column2" style="width:80%">
-							<h:outputLabel value=" Material type:"/>
-							<h:inputText value="TODO"
-										 styleClass="form-control"
-										 validatorMessage="#{label['error.invalidTitleLength']}">
-								<f:validateLength maximum="250" />
-							</h:inputText>
+						#{label['queryview.title.remarks']}
+						<h:panelGroup layout="block">
 
-							<h:outputLabel value=" Volume of requested material / number of tissue slides + thickness of tissue slides :"/>
-							<h:inputText value="TODO"
-										 styleClass="form-control"
-										 validatorMessage="#{label['error.invalidTitleLength']}">
-								<f:validateLength maximum="250" />
-							</h:inputText>
+							<table class="table">
+								<tbody>
+									<tr>
+										<td><h:outputLabel value="#{label['queryview.title.remarks.materialType']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.materialType}"
+														styleClass="form-control"
+														validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
 
-							<h:outputLabel value=" Tumour entity:"/>
-							<h:inputText value="TODO"
-										 styleClass="form-control"
-										 validatorMessage="#{label['error.invalidTitleLength']}">
-								<f:validateLength maximum="250" />
-							</h:inputText>
+									<tr>
+										<td><h:outputLabel value="#{label['queryview.title.remarks.materialVolume']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.materialVolume}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
 
-							<h:outputLabel value=" ICD-10 code of disease:"/>
-							<h:inputText value="TODO"
-										 styleClass="form-control"
-										 validatorMessage="#{label['error.invalidTitleLength']}">
-								<f:validateLength maximum="250" />
-							</h:inputText>
+									<tr>
+										<td><h:outputLabel value="#{label['queryview.title.remarks.tumourEntity']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.tumorEntity}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
 
-							<h:outputLabel value=" Number of (different) patients:"/>
-							<h:inputText value="TODO"
-										 styleClass="form-control"
-										 validatorMessage="#{label['error.invalidTitleLength']}">
-								<f:validateLength maximum="250" />
-							</h:inputText>
-						</b:panelGrid>
+									<tr>
+										<td><h:outputLabel value=" #{label['queryview.title.remarks.diseaseICD10']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.diseaseICD10}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
+
+									<tr>
+										<td><h:outputLabel value="  #{label['queryview.title.remarks.numberPatients']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.numberPatients}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</h:panelGroup>
+
 						<br/> #{label['queryview.title.attachments']}
 
 						<!-- Attachments for a query -->

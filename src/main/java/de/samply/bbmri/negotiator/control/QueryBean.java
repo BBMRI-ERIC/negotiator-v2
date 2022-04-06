@@ -42,6 +42,7 @@ import javax.faces.context.FacesContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
+import de.samply.bbmri.negotiator.control.researcher.RequestType;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -54,7 +55,6 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStat
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONAware;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import org.apache.logging.log4j.LogManager;
@@ -160,6 +160,26 @@ public class QueryBean implements Serializable {
     private List<QuerySearchDTO> searchQueries = new ArrayList<>();
 
     private boolean testRequest;
+
+    /**
+     * data and biosample Requests
+     */
+    private String numberSubject;
+    private String sampleType;
+    private String inclusionCriteria;
+    private String exclusionCriteria;
+    private String specificRequirements;
+    private String variableSelection;
+    private String dataUses;
+
+    /**
+     * Remark variables
+     */
+    private String materialType;
+    private String materialVolume;
+    private String tumorEntity;
+    private String diseaseICD10;
+    private String numberPatients;
 
     /**
      * Initializes this bean by registering email notification observer
@@ -797,5 +817,100 @@ public class QueryBean implements Serializable {
         return validQuery;
     }
 
+    public String getMaterialType() {
+        return materialType;
+    }
+
+    public void setMaterialType(String materialType) {
+        this.materialType = materialType;
+    }
+
+    public String getMaterialVolume() {
+        return materialVolume;
+    }
+
+    public void setMaterialVolume(String materialVolume) {
+        this.materialVolume = materialVolume;
+    }
+
+    public String getTumorEntity() {
+        return tumorEntity;
+    }
+
+    public void setTumorEntity(String tumorEntity) {
+        this.tumorEntity = tumorEntity;
+    }
+
+    public String getDiseaseICD10() {
+        return diseaseICD10;
+    }
+
+    public void setDiseaseICD10(String diseaseICD10) {
+        this.diseaseICD10 = diseaseICD10;
+    }
+
+    public String getNumberPatients() {
+        return numberPatients;
+    }
+
+    public void setNumberPatients(String numberPatients) {
+        this.numberPatients = numberPatients;
+    }
+
+    public String getNumberSubject() {
+        return numberSubject;
+    }
+
+    public void setNumberSubject(String numberSubject) {
+        this.numberSubject = numberSubject;
+    }
+
+    public String getSampleType() {
+        return sampleType;
+    }
+
+    public void setSampleType(String sampleType) {
+        this.sampleType = sampleType;
+    }
+
+    public String getInclusionCriteria() {
+        return inclusionCriteria;
+    }
+
+    public void setInclusionCriteria(String inclusionCriteria) {
+        this.inclusionCriteria = inclusionCriteria;
+    }
+
+    public String getExclusionCriteria() {
+        return exclusionCriteria;
+    }
+
+    public void setExclusionCriteria(String exclusionCriteria) {
+        this.exclusionCriteria = exclusionCriteria;
+    }
+
+    public String getSpecificRequirements() {
+        return specificRequirements;
+    }
+
+    public void setSpecificRequirements(String specificRequirements) {
+        this.specificRequirements = specificRequirements;
+    }
+
+    public String getVariableSelection() {
+        return variableSelection;
+    }
+
+    public void setVariableSelection(String variableSelection) {
+        this.variableSelection = variableSelection;
+    }
+
+    public String getDataUses() {
+        return dataUses;
+    }
+
+    public void setDataUses(String dataUses) {
+        this.dataUses = dataUses;
+    }
 }
 
