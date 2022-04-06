@@ -28,6 +28,10 @@ public class RequestTypeConverter implements Converter {
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object queryType) {
         logger.info("getAsString:" + queryType);
+        if(queryType == null){
+            logger.warn("queryType is NULL!");
+            return null;
+        }
         return ((RequestType) queryType).getId().toString();
     }
 }

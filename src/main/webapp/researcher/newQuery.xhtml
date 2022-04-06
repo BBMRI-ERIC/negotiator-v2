@@ -209,6 +209,7 @@
 						<b:form>
  							<!-- Maybe use binding to reference backing bean component-->
 								<b:selectOneMenu id="type" value="#{queryBean.queryType}" required='true' styleClass="form-control" ajax="true" process="@this" update="request_biosample" converter="requestTypeConverter" style="height: 30px;font-size: 11px;">
+									<f:selectItem itemLabel="Select a RequestType..." />
 									<f:selectItems value="#{queryBean.queryTypes}" var="queryType"
 												   itemValue="#{querType}" itemLabel="#{queryType.label}" />
 
