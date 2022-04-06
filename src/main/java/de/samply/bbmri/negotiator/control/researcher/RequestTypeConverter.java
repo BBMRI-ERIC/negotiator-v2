@@ -1,5 +1,6 @@
-package de.samply.bbmri.negotiator.control;
+package de.samply.bbmri.negotiator.control.researcher;
 
+import de.samply.bbmri.negotiator.control.QueryBean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

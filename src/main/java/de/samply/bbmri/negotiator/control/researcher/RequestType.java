@@ -1,12 +1,6 @@
-package de.samply.bbmri.negotiator.control;
+package de.samply.bbmri.negotiator.control.researcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
 
 public class RequestType {
 
