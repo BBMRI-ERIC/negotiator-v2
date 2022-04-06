@@ -16,7 +16,7 @@ public class RequestTypeConverter implements Converter {
 
     @Override
     public Object getAsObject(FacesContext ctx, UIComponent uiComponent, String queryTypeId) {
-        logger.info("getAsObject:" + queryTypeId);
+        //logger.info("getAsObject:" + queryTypeId);
 
         ValueExpression vex = ctx.getApplication().getExpressionFactory().createValueExpression(ctx.getELContext(),
                 "#{queryBean}", QueryBean.class);
@@ -27,7 +27,6 @@ public class RequestTypeConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object queryType) {
-        logger.info("getAsString:" + queryType);
         if(queryType == null){
             logger.warn("queryType is NULL!");
             return null;

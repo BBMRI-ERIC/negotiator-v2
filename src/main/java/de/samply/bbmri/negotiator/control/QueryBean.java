@@ -723,10 +723,8 @@ public class QueryBean implements Serializable {
 
 
     public RequestType getQueryType() {
-        if(queryType != null){
-            logger.info("getQueryType id:" + queryType.getId());
-        }else{
-            logger.info("getQueryType null");
+        if(queryType == null){
+            logger.warn("getQueryType null");
         }
         return queryType;
     }
