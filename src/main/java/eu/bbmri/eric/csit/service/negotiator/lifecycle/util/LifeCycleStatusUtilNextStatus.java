@@ -16,6 +16,7 @@ public class LifeCycleStatusUtilNextStatus {
     private static final String REQUEST_STATUS_START = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusStart";
     private static final String REQUEST_STATUS_CONTACT = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusContact";
     private static final String REQUEST_STATUS_INTERESTED = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusInterested";
+    private static final String REQUEST_STATUS_INSUFFICIENT = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusInsufficient";
     private static final String REQUEST_STATUS_AVAILABILITY = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusAvailability";
     private static final String REQUEST_STATUS_ACCESS_CONDITIONS = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusAccessConditions";
     private static final String REQUEST_STATUS_ACCEPT_CONDITIONS = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusAcceptConditions";
@@ -48,6 +49,13 @@ public class LifeCycleStatusUtilNextStatus {
             return Arrays.asList(LifeCycleRequestStatusStatus.STARTED,
                     LifeCycleRequestStatusStatus.ABANDONED);
         } else if(requestStatusClass.equals(REQUEST_STATUS_CONTACT)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.CONTACTED,
+                    LifeCycleRequestStatusStatus.NOTREACHABLE,
+                    LifeCycleRequestStatusStatus.INTERESTED,
+                    LifeCycleRequestStatusStatus.INSUFFICIENT,
+                    LifeCycleRequestStatusStatus.NOT_INTERESTED,
+                    LifeCycleRequestStatusStatus.NOT_INTERESTED_RESEARCHER);
+        } else if(requestStatusClass.equals(REQUEST_STATUS_INSUFFICIENT)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.CONTACTED,
                     LifeCycleRequestStatusStatus.NOTREACHABLE,
                     LifeCycleRequestStatusStatus.INTERESTED,
@@ -130,6 +138,11 @@ public class LifeCycleStatusUtilNextStatus {
         if(requestStatusClass.equals(REQUEST_STATUS_CONTACT)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED,
                     combineTypeAndStatus(LifeCycleRequestStatusType.INTEREST, LifeCycleRequestStatusStatus.INTERESTED),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.INSUFFICIENT, LifeCycleRequestStatusStatus.INSUFFICIENT),
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_INSUFFICIENT)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED,
+                    combineTypeAndStatus(LifeCycleRequestStatusType.INTEREST, LifeCycleRequestStatusStatus.INTERESTED),
                     combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED));
         } else if(requestStatusClass.equals(REQUEST_STATUS_INTERESTED)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_NOT_SELECTED,
@@ -207,6 +220,9 @@ public class LifeCycleStatusUtilNextStatus {
 
     public static List<String> getAllowedNextStatusResearcher(String requestStatusClass, String status) {
         if(requestStatusClass.equals(REQUEST_STATUS_CONTACT)) {
+            return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER,
+                    combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED_RESEARCHER));
+        } else if(requestStatusClass.equals(REQUEST_STATUS_INSUFFICIENT)) {
             return Arrays.asList(LifeCycleRequestStatusStatus.NOT_SELECTED_WAITING_FOR_RESPONSE_FROM_BIOBANKER,
                     combineTypeAndStatus(LifeCycleRequestStatusType.ABANDONED, LifeCycleRequestStatusStatus.NOT_INTERESTED_RESEARCHER));
         } else if(requestStatusClass.equals(REQUEST_STATUS_INTERESTED)) {

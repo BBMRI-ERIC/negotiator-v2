@@ -102,7 +102,10 @@ public class CollectionLifeCycleStatus {
         if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.CONTACT)) {
             RequestStatus status = new RequestStatusContact(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.INTEREST)) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.INSUFFICIENT)) {
+            RequestStatus status = new RequestStatusInsufficient(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        }else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.INTEREST)) {
             RequestStatus status = new RequestStatusInterested(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.AVAILABILITY)) {
