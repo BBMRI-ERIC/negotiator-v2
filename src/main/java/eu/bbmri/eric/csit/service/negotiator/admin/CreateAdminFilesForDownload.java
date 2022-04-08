@@ -25,6 +25,7 @@ public class CreateAdminFilesForDownload extends TimerTask {
             json = tmpDbUtil.getHumanReadableStatisticsForNetwork(config);
             logger.info(json);
             myWriter.write(json);
+            myWriter.close();
         } catch (IOException e) {
             System.out.println("Error creating file json file for download.");
             logger.info("Error creating file json file for download.");
