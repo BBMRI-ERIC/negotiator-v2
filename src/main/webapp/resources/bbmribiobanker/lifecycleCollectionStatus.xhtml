@@ -96,6 +96,16 @@
                                      pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.shippedNumber']}">
                     </h:inputTextarea>
                 </div>
+                <div id="abandaningReason#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" style="display: none;">
+                    Reason for abandoning <i class="fa fa-pencil-square-o" />
+                    <h:selectOneMenu id="abandaningReason"
+                                     class="form-control"
+                                     style="width: 100%; height: 2rem;"
+                                     value="#{lifeCycleStatusBean.abandoningReason}">
+                        <f:selectItem itemValue = "reason1" itemLabel = "Reason 1" />
+                        <f:selectItem itemValue = "reason2" itemLabel = "Reason 2" />
+                    </h:selectOneMenu>
+                </div>
                 <h:outputScript>
                     function showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(data) {
                         if(data.value == 'availability.sample_data_available_accessible') {
@@ -120,6 +130,11 @@
                             $("#shippedNumber#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").show();
                         } else {
                             $("#shippedNumber#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
+                        }
+                        if(data.value == "abandoned.not_interested"){
+                            $("#abandaningReason#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").show();
+                        } else {
+                            $("#abandaningReason#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                         }
                     }
 

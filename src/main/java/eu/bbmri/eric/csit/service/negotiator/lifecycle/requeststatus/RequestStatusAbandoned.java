@@ -6,6 +6,8 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStat
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import org.jooq.tools.json.JSONObject;
+import org.jooq.tools.json.JSONParser;
+import org.jooq.tools.json.ParseException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,7 +32,12 @@ public class RequestStatusAbandoned implements RequestStatus {
         status = collectionRequestStatusDTO.getStatus();
         userId = collectionRequestStatusDTO.getStatusUserId();
         if(status.equalsIgnoreCase(LifeCycleRequestStatusStatus.NOT_INTERESTED)) {
-            statusText = "Biobank stepped away";
+            //statusText = "Biobank stepped away";
+            String reason = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "abandoningReason");
+            if(reason != null && reason.length() > 0) {
+                statusText = "Biobank stepped away - Reason: " + reason;
+            }
+
         }
         if(status.equalsIgnoreCase(LifeCycleRequestStatusStatus.NOT_INTERESTED_RESEARCHER)) {
             statusText = "Researcher stepped away";
@@ -87,5 +94,21 @@ public class RequestStatusAbandoned implements RequestStatus {
         statusJson.put("Date", dateFormat.format(getStatusDate()));
         statusJson.put("UserId", userId);
         return statusJson;
+    }
+
+    private String getStatusTextFromJson(String statusJsonString, String jsonKey) {
+        String returnText = "";
+        if(statusJsonString == null) {
+            return returnText;
+        }
+        try {
+            JSONObject statusJson = (JSONObject)new JSONParser().parse(statusJsonString);
+            if(statusJson.containsKey(jsonKey)) {
+                returnText = statusJson.get(jsonKey).toString();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return returnText;
     }
 }

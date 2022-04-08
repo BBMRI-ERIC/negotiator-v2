@@ -33,6 +33,7 @@ public class LifeCycleStatusBean implements Serializable {
     private Integer numberOfPatientsAvailable;
     private String indicateAccessConditions;
     private String shippedNumber;
+    private String abandoningReason = "reason1";
     private Part mtaFilemulti;
 
     private static final Logger logger = LoggerFactory.getLogger(LifeCycleStatusBean.class);
@@ -138,5 +139,13 @@ public class LifeCycleStatusBean implements Serializable {
 
     public void setMtaFilemulti(Part mtaFilemulti) {
         this.mtaFilemulti = mtaFilemulti;
+    }
+
+    public String getAbandoningReason() {
+        return abandoningReason;
+    }
+
+    public void setAbandoningReason(String abandoningReason) {
+        this.abandoningReason = abandoningReason;
     }
 }
