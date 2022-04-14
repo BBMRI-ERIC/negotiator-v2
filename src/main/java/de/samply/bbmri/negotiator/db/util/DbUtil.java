@@ -859,10 +859,10 @@ public class DbUtil {
         updateCommentReadForUser(config, commenterId, commentId);
     }
 
-    public static void updateQueryLifecycleReadForUser(Config config, Integer userId, Integer requestId, String status, String statusType) {
+    public static void updateQueryLifecycleReadForUser(Config config, Integer userId, Integer requestId) {
 
-        PersonQuerylifecycleRecord record = config.dsl().selectFrom(Tables.PERSON_QUERYLIFECYCLE)
-                .where(Tables.PERSON_QUERYLIFECYCLE.QUERY_LIFECYCLE_COLLECTION_ID.eq(
+        Result<PersonQuerylifecycleRecord>  records = config.dsl().selectFrom(Tables.PERSON_QUERYLIFECYCLE)
+                .where(Tables.PERSON_QUERYLIFECYCLE.QUERY_LIFECYCLE_COLLECTION_ID.in(
                         select(Tables.QUERY_LIFECYCLE_COLLECTION.ID)
                                 .from(Tables.QUERY_LIFECYCLE_COLLECTION)
                                 .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId)
@@ -871,13 +871,17 @@ public class DbUtil {
                                 )))
                 .and(Tables.PERSON_QUERYLIFECYCLE.PERSON_ID.eq(userId))
                 .and(Tables.PERSON_QUERYLIFECYCLE.READ.eq(false))
-                .fetchOne();
-
-        if(record != null && !record.getRead()) {
-            record.setRead(true);
-            record.setDateRead(new Timestamp(new Date().getTime()));
-            record.update();
+                .fetch();
+        if(records != null){
+            for(PersonQuerylifecycleRecord record : records) {
+                if(record != null && !record.getRead()) {
+                    record.setRead(true);
+                    record.setDateRead(new Timestamp(new Date().getTime()));
+                    record.update();
+                }
+            }
         }
+
     }
 
     public static void addQueryLifecycleReadForUser(Config config, Integer requestId, Integer statusChangerId, String status, String statusType) {
@@ -896,7 +900,7 @@ public class DbUtil {
                 "WHERE qlc.query_id = " + requestId + " AND qlc.status = \'" + status + "\' AND qlc.status_type = \'" + statusType + "\')) sub " +
                 "GROUP BY person_id, query_lifecycle_collection_id)").execute();
 
-        updateQueryLifecycleReadForUser(config, statusChangerId, requestId, status, statusType);
+        updateQueryLifecycleReadForUser(config, statusChangerId, requestId);
     }
 
     public static void addOfferCommentReadForComment(Config config, Integer offertId, Integer commenterId, Integer biobankId) {
@@ -1795,6 +1799,19 @@ public class DbUtil {
         return result;
     }
 
+    public static Result<Record> getUnreadQueryLifecycleCountAndTime(Config config, Integer queryId, Integer personId){
+        Result<Record> result = config.dsl()
+                .select(Tables.PERSON_QUERYLIFECYCLE.READ.count().as("unread_query_lifecycle_changes_count"))
+                .select(Tables.PERSON_QUERYLIFECYCLE.DATE_READ.max().as("last_read_time"))
+                .from(Tables.PERSON_QUERYLIFECYCLE)
+                .join(Tables.QUERY_LIFECYCLE_COLLECTION).on(Tables.PERSON_QUERYLIFECYCLE.QUERY_LIFECYCLE_COLLECTION_ID.eq(Tables.QUERY_LIFECYCLE_COLLECTION.ID))
+                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(queryId))
+                .and(Tables.PERSON_QUERYLIFECYCLE.PERSON_ID.eq(personId))
+                .and(Tables.PERSON_QUERYLIFECYCLE.READ.eq(false))
+                .fetch();
+        return result;
+
+    }
 
     /**
      * Gets a list of Persons who are responsible for a given collection

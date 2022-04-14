@@ -215,6 +215,17 @@
                             <li class="active" id="first">
                                 <a data-toggle="tab" href="#status">
                                     #{label['querydetail.title.status']}
+                                    <c:if test="#{ownerQueriesDetailBean.unreadQueryCount > 0}">
+                                        <div class="badge queryNumberResponsesBadge pull-right"
+                                             style='margin-left: 4px;#{ownerQueriesDetailBean.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                                             data-toggle="tooltip"
+                                             data-placement="bottom"
+                                             title="#{ownerQueriesDetailBean.unreadQueryCount} unread status changes">
+
+                                            <i class="glyphicon glyphicon-refresh"></i>
+                                            <h:outputText value="   #{ownerQueriesDetailBean.unreadQueryCount}"/>
+                                        </div>
+                                    </c:if>
                                 </a>
                             </li>
                             <li id="second">
@@ -261,7 +272,10 @@
                             <h:panelGroup layout="block"
                                           style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
                                           rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
-
+                                <!--<f action="#{ownerQueriesDetailBean.markQueryLifecycleReadForUser()}" />-->
+                                <h:outputScript>
+                                    ownerQueriesDetailBean.markQueryLifecycleReadForUser();
+                                </h:outputScript>
                                 <b>#{label['querydetail.owner.associatedbiobanks']}</b>
 
                                 <div style="width: 100%;">
@@ -362,7 +376,7 @@
                                             <div class="card">
                                                 <div class="card-header" id="headingTwo">
                                                     <h5 class="mb-0">
-                                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
+                                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo" >
                                                             <i class="fa fa-plus"></i> #{biobank.name}
                                                         </button>
                                                     </h5>
