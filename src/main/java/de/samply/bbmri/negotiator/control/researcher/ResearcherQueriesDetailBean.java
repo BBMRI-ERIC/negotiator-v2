@@ -176,6 +176,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private int unreadPrivateNegotiationCount = 0;
     private List<Person> personList;
 
+    private int unreadQueryCount = 0;
     /**
      * Lifecycle Collection Data (Form, Structure)
      */
@@ -377,6 +378,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
                 for (int i = 0; i < queries.size(); ++i) {
                     getPrivateNegotiationCountAndTime(i);
+                    getUnreadQueryLifecycleChangesCountAndTime(i);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -397,11 +399,25 @@ public class ResearcherQueriesDetailBean implements Serializable {
         }
     }
 
+    public void getUnreadQueryLifecycleChangesCountAndTime(int index){
+        try(Config config = ConfigFactory.get()) {
+            Result<Record> result = DbUtil.getUnreadQueryLifecycleCountAndTime(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+            if(result.isNotEmpty()){
+                queries.get(index).setUnreadQueryCount((int) result.get(0).getValue("unread_query_lifecycle_changes_count"));
+            }
+
+        }catch (SQLException e) {
+            System.err.println("ERROR: ResearcherQueriesDetailBean::getUnreadQueryLifecycleChangesCountAndTime(int index)");
+            e.printStackTrace();
+        }
+
+    }
     private void setCommentCountAndUreadCommentCount(QueryStatsDTO query) {
         commentCount = query.getCommentCount();
         unreadCommentCount = query.getUnreadCommentCount();
         privateNegotiationCount = query.getPrivateNegotiationCount();
         unreadPrivateNegotiationCount = query.getUnreadPrivateNegotiationCount();
+        unreadQueryCount = query.getUnreadQueryCount();
     }
 
     /*
@@ -826,5 +842,22 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
         this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
+    }
+
+    public int getUnreadQueryCount() {
+        return unreadQueryCount;
+    }
+
+    public void setUnreadQueryCount(int unreadQueryCount) {
+        this.unreadQueryCount = unreadQueryCount;
+    }
+
+    public void markQueryLifecycleReadForUser() {
+
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.updateQueryLifecycleReadForUser(config, userBean.getUserId(), queryId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
