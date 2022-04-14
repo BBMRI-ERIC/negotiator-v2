@@ -33,8 +33,8 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.QueryBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,7 +49,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class QueryDTO {
 
-    private static Logger logger = LoggerFactory.getLogger(QueryDTO.class);
+    private static Logger logger = LogManager.getLogger(QueryDTO.class);
 
     /**
      * The negotiator token for the query. Only not null, if the user refines the query in the negotiator.

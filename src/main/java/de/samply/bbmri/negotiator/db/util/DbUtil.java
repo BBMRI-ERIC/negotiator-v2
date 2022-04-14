@@ -49,8 +49,8 @@ import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -71,7 +71,7 @@ import static org.jooq.impl.DSL.field;
  */
 public class DbUtil {
 
-    private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
+    private final static Logger logger = LogManager.getLogger(DbUtil.class);
 
     /**
      * Retunrs the list of all Directories

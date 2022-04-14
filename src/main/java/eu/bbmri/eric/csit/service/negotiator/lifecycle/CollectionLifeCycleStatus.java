@@ -14,13 +14,13 @@ import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import net.minidev.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 
 public class CollectionLifeCycleStatus {
-    private static final Logger logger = LoggerFactory.getLogger(CollectionLifeCycleStatus.class);
+    private static final Logger logger = LogManager.getLogger(CollectionLifeCycleStatus.class);
 
     private final TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
     private final RequestStatus collectionAbandonedRequest = null;

@@ -68,8 +68,8 @@ import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Manages the query detail view for owners
@@ -84,7 +84,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
     private final FileUtil fileUtil = new FileUtil();
 
-    private final Logger logger = LoggerFactory.getLogger(ResearcherQueriesDetailBean.class);
+    private final Logger logger = LogManager.getLogger(ResearcherQueriesDetailBean.class);
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;

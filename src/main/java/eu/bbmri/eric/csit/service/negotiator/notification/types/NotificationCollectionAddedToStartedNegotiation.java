@@ -5,14 +5,14 @@ import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationCollectionAddedToStartedNegotiation extends Notification {
-    private static final Logger logger = LoggerFactory.getLogger(NotificationCollectionAddedToStartedNegotiation.class);
+    private static final Logger logger = LogManager.getLogger(NotificationCollectionAddedToStartedNegotiation.class);
 
     private Map<String, String> emailAddressesAndNames;
 

@@ -5,9 +5,8 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -17,13 +16,12 @@ import java.util.List;
 @ManagedBean
 @SessionScoped
 public class DirectoryBean {
-    private final Logger logger = LoggerFactory.getLogger(DirectoryBean.class);
-    Marker marker;
+    private final Logger logger = LogManager.getLogger(DirectoryBean.class);
 
     public List<ListOfDirectoriesRecord> getDirectories() {
         try(Config config = ConfigFactory.get()) {
             List<ListOfDirectoriesRecord> list = DbUtil.getDirectories(config);
-            logger.info(marker, "Number of Directories {}", list.size());
+            logger.info("Number of Directories {}", list.size());
             return list;
         } catch(SQLException e) {
             e.printStackTrace();

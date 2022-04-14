@@ -1,7 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class LifeCycleStatusUtilNextStatus {
 
-    private static final Logger logger = LoggerFactory.getLogger(LifeCycleStatusUtilNextStatus.class);
+    private static final Logger logger = LogManager.getLogger(LifeCycleStatusUtilNextStatus.class);
 
     private static final String REQUEST_STATUS_CREATE = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusCreate";
     private static final String REQUEST_STATUS_REVIEW = "eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.RequestStatusReview";

@@ -5,15 +5,15 @@ import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationStartNegotiation extends Notification {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationStartNegotiation.class);
+    private static final Logger logger = LogManager.getLogger(NotificationStartNegotiation.class);
 
     public NotificationStartNegotiation(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
         logger.info("74d87f9648e5-NotificationStartNegotiation created for requestID: {}", requestId);

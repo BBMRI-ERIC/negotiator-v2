@@ -5,8 +5,8 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -54,7 +54,7 @@ public class AdminBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
-    private final Logger logger = LoggerFactory.getLogger(AdminBean.class);
+    private final Logger logger = LogManager.getLogger(AdminBean.class);
 
     private String sudo;
 

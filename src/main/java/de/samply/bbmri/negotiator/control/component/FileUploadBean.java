@@ -13,8 +13,8 @@ import de.samply.bbmri.negotiator.model.CommentAttachmentDTO;
 import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -45,7 +45,7 @@ public class FileUploadBean implements Serializable {
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
-    private static final Logger logger = LoggerFactory.getLogger(FileUploadBean.class);
+    private static final Logger logger = LogManager.getLogger(FileUploadBean.class);
 
     List<FacesMessage> msgs = null;
     Negotiator negotiator = NegotiatorConfig.get().getNegotiator();

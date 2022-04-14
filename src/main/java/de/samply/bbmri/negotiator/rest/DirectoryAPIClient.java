@@ -7,8 +7,8 @@ import de.samply.bbmri.negotiator.NegotiatorStatus;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import net.minidev.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +30,7 @@ public class DirectoryAPIClient {
     /**
      * The logger for all perun rest endpoints
      */
-    private final static Logger logger = LoggerFactory.getLogger(DirectoryAPIClient.class);
+    private final static Logger logger = LogManager.getLogger(DirectoryAPIClient.class);
 
     @javax.ws.rs.core.Context
     ServletContext context;

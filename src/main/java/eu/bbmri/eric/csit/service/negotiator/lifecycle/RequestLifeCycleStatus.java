@@ -18,14 +18,14 @@ import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 import java.util.*;
 
 public class RequestLifeCycleStatus {
-    private static final Logger logger = LoggerFactory.getLogger(RequestLifeCycleStatus.class);
+    private static final Logger logger = LogManager.getLogger(RequestLifeCycleStatus.class);
 
     private final TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
     private HashMap<Integer, CollectionLifeCycleStatus> collectionStatusList = null;

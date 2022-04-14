@@ -26,8 +26,8 @@
 package eu.bbmri.eric.csit.service.negotiator.authentication.client.jwt;
 
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.math.BigInteger;
 import java.security.KeyFactory;
@@ -48,7 +48,7 @@ public class KeyLoader {
 
     private static final String[] SUPPORTED_ALGORITHMS = new String[] {"RSA", "EC"};
 
-    private static final Logger logger = LoggerFactory.getLogger(KeyLoader.class);
+    private static final Logger logger = LogManager.getLogger(KeyLoader.class);
 
     /**
      * Disable instantiation.
