@@ -90,6 +90,15 @@ public class CollectionLifeCycleStatus {
                 parameters.put("collectionName", collectionBiobankDTO.getCollection().getName());
                 parameters.put("newRequestStatus", getStatus().getStatus());
                 NotificationService.sendNotification(NotificationType.STATUS_CHANGED_NOTIFICATION, query_id, null, status_user_id, parameters);
+                try (Config config = ConfigFactory.get()) {
+                    //DbUtil.updateCommentReadForUser(config, userId, commentId);
+                    //DbUtil.updateRequestStatusReadForUser(config,status_user_id,query_id);
+                    logger.info("Add to person_requeststatus table");
+                    DbUtil.addQueryLifecycleReadForUser(config,query_id,status_user_id,status,statusType);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         } else {
             System.err.println("ERROR-NG-0000004: Collection Request Status, wrong next status Provided.");

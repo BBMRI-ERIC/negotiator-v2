@@ -22,3 +22,7 @@ according line from the table. Just changing the file will result in an exceptio
 flyway checks for such errors.
 Removing the file will not disturb flyway, but make you run into problems once you add a new
 file with the same version number again, so do not do that.
+
+### Generate Classes
+Once the negotiators is redeployed the DB changes are applied. Once the DB is updated (and any new tables are added) 
+the classes can be generated with jooq: `mvn org.jooq:jooq-codegen-maven:generate`

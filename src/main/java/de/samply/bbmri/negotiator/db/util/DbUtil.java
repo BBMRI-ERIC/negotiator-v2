@@ -65,6 +65,7 @@ import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 
 import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.select;
 
 /**
  * The database util for basic queries.
@@ -856,6 +857,50 @@ public class DbUtil {
                 "GROUP BY person_id)").execute();
 
         updateCommentReadForUser(config, commenterId, commentId);
+    }
+
+    public static void updateQueryLifecycleReadForUser(Config config, Integer userId, Integer requestId) {
+
+        Result<PersonQuerylifecycleRecord>  records = config.dsl().selectFrom(Tables.PERSON_QUERYLIFECYCLE)
+                .where(Tables.PERSON_QUERYLIFECYCLE.QUERY_LIFECYCLE_COLLECTION_ID.in(
+                        select(Tables.QUERY_LIFECYCLE_COLLECTION.ID)
+                                .from(Tables.QUERY_LIFECYCLE_COLLECTION)
+                                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId)
+                                //        .and(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS.eq(status))
+                                //        .and(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_TYPE.eq(statusType))
+                                )))
+                .and(Tables.PERSON_QUERYLIFECYCLE.PERSON_ID.eq(userId))
+                .and(Tables.PERSON_QUERYLIFECYCLE.READ.eq(false))
+                .fetch();
+        if(records != null){
+            for(PersonQuerylifecycleRecord record : records) {
+                if(record != null && !record.getRead()) {
+                    record.setRead(true);
+                    record.setDateRead(new Timestamp(new Date().getTime()));
+                    record.update();
+                }
+            }
+        }
+
+    }
+
+    public static void addQueryLifecycleReadForUser(Config config, Integer requestId, Integer statusChangerId, String status, String statusType) {
+
+        config.dsl().resultQuery("INSERT INTO public.person_querylifecycle (person_id, query_lifecycle_collection_id, read) " +
+                "(SELECT person_id, query_lifecycle_collection_id, false FROM " +
+                "((SELECT pc.person_id person_id , qlc.id query_lifecycle_collection_id " +
+                "FROM public.query_lifecycle_collection qlc " +
+                "JOIN query_collection qc ON qlc.query_id = qc.query_id " +
+                "JOIN person_collection pc ON qc.collection_id = pc.collection_id " +
+                "WHERE qlc.query_id = " + requestId + " AND qlc.status = \'" + status + "\' AND qlc.status_type = \'" + statusType + "\') " +
+                "UNION " +
+                "(SELECT q.researcher_id person_id, qlc.id query_lifecycle_collection_id  " +
+                "FROM public.query_lifecycle_collection qlc " +
+                "JOIN query q ON qlc.query_id = q.id " +
+                "WHERE qlc.query_id = " + requestId + " AND qlc.status = \'" + status + "\' AND qlc.status_type = \'" + statusType + "\')) sub " +
+                "GROUP BY person_id, query_lifecycle_collection_id)").execute();
+
+        updateQueryLifecycleReadForUser(config, statusChangerId, requestId);
     }
 
     public static void addOfferCommentReadForComment(Config config, Integer offertId, Integer commenterId, Integer biobankId) {
@@ -1754,6 +1799,19 @@ public class DbUtil {
         return result;
     }
 
+    public static Result<Record> getUnreadQueryLifecycleCountAndTime(Config config, Integer queryId, Integer personId){
+        Result<Record> result = config.dsl()
+                .select(Tables.PERSON_QUERYLIFECYCLE.READ.count().as("unread_query_lifecycle_changes_count"))
+                .select(Tables.PERSON_QUERYLIFECYCLE.DATE_READ.max().as("last_read_time"))
+                .from(Tables.PERSON_QUERYLIFECYCLE)
+                .join(Tables.QUERY_LIFECYCLE_COLLECTION).on(Tables.PERSON_QUERYLIFECYCLE.QUERY_LIFECYCLE_COLLECTION_ID.eq(Tables.QUERY_LIFECYCLE_COLLECTION.ID))
+                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(queryId))
+                .and(Tables.PERSON_QUERYLIFECYCLE.PERSON_ID.eq(personId))
+                .and(Tables.PERSON_QUERYLIFECYCLE.READ.eq(false))
+                .fetch();
+        return result;
+
+    }
 
     /**
      * Gets a list of Persons who are responsible for a given collection

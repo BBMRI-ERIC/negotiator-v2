@@ -29,6 +29,7 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
                 template="../components/default.xhtml">
 
@@ -103,7 +104,15 @@
                                         </h:commandLink>
 
                                     </h:panelGroup>
+                                        <div class="badge queryNumberResponsesBadge"
+                                             style='#{queryDto.unreadQueryCount == 0 ? "display:none;" : "" }'
+                                             data-toggle="tooltip"
+                                             data-placement="bottom"
+                                             title="#{queryDto.unreadQueryCount} unread status changes">
 
+                                            <i class="glyphicon glyphicon-refresh"></i>
+                                            <h:outputText value="   #{queryDto.unreadQueryCount}"/>
+                                        </div>
                                     <div class="badge queryNumberResponsesBadge"
                                          style='#{queryDto.commentCount == 0 ? "display:none;" : "" }#{queryDto.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
                                          data-toggle="tooltip"
