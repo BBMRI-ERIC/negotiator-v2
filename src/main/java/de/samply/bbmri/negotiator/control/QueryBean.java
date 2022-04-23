@@ -42,6 +42,7 @@ import javax.faces.context.FacesContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
+import de.samply.bbmri.negotiator.control.researcher.RequestType;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -118,6 +119,14 @@ public class QueryBean implements Serializable {
     private String queryTitle;
 
     /**
+     * The type of the query.
+     */
+    private RequestType queryType;
+
+
+    private List<RequestType> queryTypes;
+
+    /**
      * The jsonText of the query.
      */
     private String jsonQuery;
@@ -137,6 +146,9 @@ public class QueryBean implements Serializable {
      */
     private String ethicsVote;
 
+
+    private String organisationType;
+
     /**
      * List of faces messages
      */
@@ -150,10 +162,36 @@ public class QueryBean implements Serializable {
     private boolean testRequest;
 
     /**
+     * data and biosample Requests
+     */
+    private String numberSubject;
+    private String sampleType;
+    private String inclusionCriteria;
+    private String exclusionCriteria;
+    private String specificRequirements;
+    private String variableSelection;
+    private String dataUses;
+
+    /**
+     * Remark variables
+     */
+    private String materialType;
+    private String materialVolume;
+    private String tumorEntity;
+    private String diseaseICD10;
+    private String numberPatients;
+
+    /**
      * Initializes this bean by registering email notification observer
      */
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
+            // <!-- TODO define stnadard values-->
+            queryTypes = new ArrayList<RequestType>();
+            queryTypes.add(new RequestType(1, "Only data","data_only"));
+            queryTypes.add(new RequestType(2, "Biosamples/Data","biosample+data"));
+            queryTypes.add(new RequestType(3, "Metadata","metadata"));
+
             /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
             if(id != null)
             {
@@ -683,6 +721,39 @@ public class QueryBean implements Serializable {
         this.queryText = queryText;
     }
 
+
+    public RequestType getQueryType() {
+        if(queryType == null){
+            logger.warn("getQueryType null");
+        }
+        return queryType;
+    }
+
+    public RequestType getQueryTypeFromList(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("no id provided");
+        }
+        for (RequestType queryType : queryTypes) {
+            if (id.equals(queryType.getId())) {
+                return queryType;
+            }
+        }
+        return null;
+    }
+
+    public void setQueryType(RequestType queryType) {
+        logger.info("setQueryType");
+        this.queryType = queryType;
+    }
+
+    public List<RequestType> getQueryTypes() {
+        return queryTypes;
+    }
+
+    public void setQueryTypes(List<RequestType> queryTypes) {
+        this.queryTypes = queryTypes;
+    }
+
     public String getMode() {
         return mode;
     }
@@ -714,6 +785,14 @@ public class QueryBean implements Serializable {
         this.ethicsVote = ethicsVote;
     }
 
+
+    public String getOrganisationType() {
+        return organisationType;
+    }
+
+    public void setOrganisationType(String organisationType) {
+        this.organisationType = organisationType;
+    }
     public String getQtoken() { return qtoken; }
 
     public boolean isTestRequest() {
@@ -736,4 +815,100 @@ public class QueryBean implements Serializable {
         return validQuery;
     }
 
+    public String getMaterialType() {
+        return materialType;
+    }
+
+    public void setMaterialType(String materialType) {
+        this.materialType = materialType;
+    }
+
+    public String getMaterialVolume() {
+        return materialVolume;
+    }
+
+    public void setMaterialVolume(String materialVolume) {
+        this.materialVolume = materialVolume;
+    }
+
+    public String getTumorEntity() {
+        return tumorEntity;
+    }
+
+    public void setTumorEntity(String tumorEntity) {
+        this.tumorEntity = tumorEntity;
+    }
+
+    public String getDiseaseICD10() {
+        return diseaseICD10;
+    }
+
+    public void setDiseaseICD10(String diseaseICD10) {
+        this.diseaseICD10 = diseaseICD10;
+    }
+
+    public String getNumberPatients() {
+        return numberPatients;
+    }
+
+    public void setNumberPatients(String numberPatients) {
+        this.numberPatients = numberPatients;
+    }
+
+    public String getNumberSubject() {
+        return numberSubject;
+    }
+
+    public void setNumberSubject(String numberSubject) {
+        this.numberSubject = numberSubject;
+    }
+
+    public String getSampleType() {
+        return sampleType;
+    }
+
+    public void setSampleType(String sampleType) {
+        this.sampleType = sampleType;
+    }
+
+    public String getInclusionCriteria() {
+        return inclusionCriteria;
+    }
+
+    public void setInclusionCriteria(String inclusionCriteria) {
+        this.inclusionCriteria = inclusionCriteria;
+    }
+
+    public String getExclusionCriteria() {
+        return exclusionCriteria;
+    }
+
+    public void setExclusionCriteria(String exclusionCriteria) {
+        this.exclusionCriteria = exclusionCriteria;
+    }
+
+    public String getSpecificRequirements() {
+        return specificRequirements;
+    }
+
+    public void setSpecificRequirements(String specificRequirements) {
+        this.specificRequirements = specificRequirements;
+    }
+
+    public String getVariableSelection() {
+        return variableSelection;
+    }
+
+    public void setVariableSelection(String variableSelection) {
+        this.variableSelection = variableSelection;
+    }
+
+    public String getDataUses() {
+        return dataUses;
+    }
+
+    public void setDataUses(String dataUses) {
+        this.dataUses = dataUses;
+    }
 }
+

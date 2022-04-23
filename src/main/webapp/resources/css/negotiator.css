@@ -319,6 +319,15 @@ a:hover {
     width: 5%;
 }
 
+.query-biosample-column1{
+    min-width: 180px;
+    width: 30%;
+}
+.query-biosample-column2{
+    min-width: 420px;
+    width: 70%;
+}
+
 .query-detail-attachments-table-attachment-type, .query-detail-attachments-table-attachment-type-header {
     width: 30%;
 }

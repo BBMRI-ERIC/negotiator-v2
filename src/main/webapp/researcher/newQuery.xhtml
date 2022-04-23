@@ -32,6 +32,8 @@
 				xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
 				xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
 				xmlns:c="http://java.sun.com/jsp/jstl/core"
+				xmlns:p="http://primefaces.org/ui"
+				xmlns:b="http://bootsfaces.net/ui"
 				template="../components/default.xhtml">
 
 	<f:metadata>
@@ -199,21 +201,121 @@
 						</h:inputTextarea>
 						<h:message for="description" style="color:red"
 							styleClass="pre-wrap" />
-
-						<br/>
 						<span class="required">
+							#{label['queryview.title.requesttype']} <i class="fa fa-pencil-square-o" />
+						</span>
+						<br/>
+						<!-- https://showcase.bootsfaces.net/forms/selectOneMenu.jsf -->
+						<b:form>
+ 							<!-- Maybe use binding to reference backing bean component-->
+								<b:selectOneMenu id="type" value="#{queryBean.queryType}" required='true' styleClass="form-control" ajax="true" process="@this" update="request_biosample" converter="requestTypeConverter" style="height: 30px;font-size: 11px;">
+									<f:selectItem itemLabel="Select a RequestType..." />
+									<f:selectItems value="#{queryBean.queryTypes}" var="queryType"
+												   itemValue="#{querType}" itemLabel="#{queryType.label}" />
+
+									<!--<f:selectItem itemValue = "data_only" itemLabel = "Only data" />
+									<f:selectItem itemValue = "biosample+data" itemLabel = "Biosample/Data" />
+									<p:ajax update="typeForm" />
+									<f:selectItem itemValue = "metadata" itemLabel = "Metadata" />-->
+								</b:selectOneMenu>
+								<br/>
+								<!-- https://showcase.bootsfaces.net/forms/selectOneMenu.jsf -->
+								<p:outputPanel id="request_biosample">
+									<!-- Id: #{queryBean.queryType.id} <br/>
+									Id: #{queryBean.queryType.type} <br/>
+									<h:panelGroup rendered="#{queryBean.queryType.type == 'biosample+data'}" >
+										Requested biosamples <i class="fa fa-pencil-square-o" />
+									</h:panelGroup> -->
+									<c:if test="#{queryBean.queryType.type == 'biosample+data'}">
+										<span class="required">
+											#{label['queryview.title.requestedBiosample']}<i class="fa fa-pencil-square-o" />
+										</span>
+										<b:panelGrid columns="2" columnClasses="query-biosample-column1,query-biosample-column2" style="width:80%">
+											<h:outputLabel value=" Number of subjects:"/>
+											<h:inputText value="#{queryBean.numberSubject}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+
+											<h:outputLabel value=" Sample type(s) and number of samples per subject:"/>
+											<h:inputText value="#{queryBean.sampleType}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+
+											<h:outputLabel value=" Inclusion Criteria:"/>
+											<h:inputText value="#{queryBean.inclusionCriteria}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+
+											<h:outputLabel value=" Exclusion Criteria:"/>
+											<h:inputText value="#{queryBean.exclusionCriteria}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+
+											<h:outputLabel value=" Specific requirements:"/>
+											<h:inputText value="#{queryBean.specificRequirements}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+
+										</b:panelGrid>
+										<br/>
+									</c:if>
+
+									<c:if test="#{queryBean.queryType.type == 'biosample+data' || queryBean.queryType.type == 'data_only'}">
+										<span class="required">
+											#{label['queryview.title.requestedData']} <i class="fa fa-pencil-square-o" />
+										</span>
+										<b:panelGrid columns="2" columnClasses="query-biosample-column1,query-biosample-column2" style="width:80%">
+											<c:if test="#{queryBean.queryType.type != 'biosample+data'}">
+												<h:outputLabel value=" Number of subjects:"/>
+												<h:inputText value="#{queryBean.numberSubject}"
+															 styleClass="form-control"
+															 validatorMessage="#{label['error.invalidTitleLength']}">
+													<f:validateLength maximum="250" />
+												</h:inputText>
+											</c:if>
+											<h:outputLabel value=" Variable selection :"/>
+											<h:inputText value="#{queryBean.variableSelection}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+
+											<h:outputLabel value=" Type of data use:"/>
+											<h:inputText value="#{queryBean.dataUses}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+
+										</b:panelGrid>
+										<br/>
+									</c:if>
+								</p:outputPanel>
+
+						</b:form>
+						<!--	<span class="required">
 							#{label['queryview.title.requestdescription']} <i class="fa fa-pencil-square-o" />
 						</span>
 						<h:inputTextarea id="requestdescription" value="#{queryBean.queryRequestDescription}"
-										 styleClass="form-control" rows="5"
-										 pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
-										 validatorMessage="#{label['error.invalidDescriptionLength']}">
-							<f:validateLength for="requestdescription" maximum="6000" />							<!-- LENGTH Increased -->
-						</h:inputTextarea>
+                                             styleClass="form-control" rows="5"
+                                             pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
+                                             validatorMessage="#{label['error.invalidDescriptionLength']}">
+                                <f:validateLength for="requestdescription" maximum="6000" /> -->							<!-- LENGTH Increased -->
+						<!-- </h:inputTextarea>
 						<h:message for="requestdescription" style="color:red"
 								   styleClass="pre-wrap" />
+						-->
 
-						<br/>
 						#{label['queryview.title.ethicsVote']}
 						<h:inputTextarea id="ethicsVote" value="#{queryBean.ethicsVote}"
 										 styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.ethicsVote']}"
@@ -222,6 +324,82 @@
 						</h:inputTextarea>
 						<h:message for="ethicsVote" style="color:red"
 								   styleClass="pre-wrap" />
+
+						<br/>
+						<!-- TODO eventuell mit objects https://mkyong.com/jsf2/jsf-2-radio-buttons-example/-->
+						<p:panelGrid columns="1" layout="grid"
+									 styleClass="showcase-text-align-left">
+						Oragnisation Type
+						<h:selectOneRadio value="#{queryBean.organisationType}" layout="pageDirection"  style="align-items: left">
+						<!--  <p:selectOneRadio value="#{queryBean.organisationType}" layout="grid" columns="1" styleClass="grid-radio" > -->
+							<f:selectItem itemValue="profit" itemLabel=" for profit" />
+							<f:selectItem itemValue="non-profit" itemLabel=" non-profit" />
+						</h:selectOneRadio>
+						</p:panelGrid>
+
+						<br/>
+						#{label['queryview.title.remarks']}
+						<h:panelGroup layout="block">
+
+							<table class="table">
+								<tbody>
+									<tr>
+										<td><h:outputLabel value="#{label['queryview.title.remarks.materialType']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.materialType}"
+														styleClass="form-control"
+														validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
+
+									<tr>
+										<td><h:outputLabel value="#{label['queryview.title.remarks.materialVolume']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.materialVolume}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
+
+									<tr>
+										<td><h:outputLabel value="#{label['queryview.title.remarks.tumourEntity']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.tumorEntity}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
+
+									<tr>
+										<td><h:outputLabel value=" #{label['queryview.title.remarks.diseaseICD10']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.diseaseICD10}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
+
+									<tr>
+										<td><h:outputLabel value="  #{label['queryview.title.remarks.numberPatients']}"/></td>
+										<td>
+											<h:inputText value="#{queryBean.numberPatients}"
+														 styleClass="form-control"
+														 validatorMessage="#{label['error.invalidTitleLength']}">
+												<f:validateLength maximum="250" />
+											</h:inputText>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</h:panelGroup>
 
 						<br/> #{label['queryview.title.attachments']}
 
