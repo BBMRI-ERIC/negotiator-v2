@@ -133,8 +133,8 @@
                         </ui:repeat>
                     </c:if>
 
-                </div>
-                <!-- Request Description Area end -->
+         </div>
+         <!-- Request Description Area end -->
 
                 <!-- LifeCycleHistory -->
                 <h:panelGroup styleClass="row" layout="block">
@@ -628,6 +628,7 @@
                                         <h:inputText style="display: none;" id="numberOfSamplesAvailable" value="#{ownerQueriesDetailBean.numberOfSamplesAvailable}"/>
                                         <h:inputText style="display: none;" id="numberOfPatientsAvailable" value="#{ownerQueriesDetailBean.numberOfPatientsAvailable}"/>
                                         <h:inputText style="display: none;" id="shippedNumber" value="#{ownerQueriesDetailBean.shippedNumber}"/>
+                                        <h:inputText style="..." id="abandoningReason" value="#{ownerQueriesDetailBean.abandoningReason}"/>
 
                                         <span style="font-weight: bold;margin: 5px;color: #004275;">
                                             #{label['lifecycleCollectionStatus.indicateAccessConditions.title']}
@@ -702,12 +703,15 @@
                             var indicateAccessConditions = $("#indicateAccessConditions" + formIdPrefix + collectionId).find("textarea").val();
                             var indicateAccessConditionsMTAFile = $("#indicateAccessConditionsMTAFile" + formIdPrefix + collectionId).find("input").val();
                             var shippedNumber = $("#shippedNumber" + formIdPrefix + collectionId).find("textarea").val();
+                            var abandoningReason = $("#abandoningReason" + formIdPrefix + collectionId).find("select").val();
+                            //var abandoningReason =  $("#abandoningReason_sortBiobank_15").find("select").val();
 
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfSamplesAvailable").value = numberOfAvailableSamples;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfPatientsAvailable").value = numberOfAvailablePatients;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:indicateAccessConditions").value = indicateAccessConditions;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:shippedNumber").value = shippedNumber;
+                            document.getElementById("lifeCycleStatusBeanUpdateStatusForm:abandoningReason").value = abandoningReason;
 
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;

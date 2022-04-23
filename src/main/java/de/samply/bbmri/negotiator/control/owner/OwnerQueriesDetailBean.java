@@ -186,6 +186,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Integer numberOfPatientsAvailable;
 	private String indicateAccessConditions;
 	private String shippedNumber;
+	private String abandoningReason;
 	private Part  mtaFile;
 	private Part dtaFile;
 	private Part otherAccessFile;
@@ -685,6 +686,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 			result += seperatorForJason + storeFilesForAccessCondition() + "}";
 			return result;
 		}
+		if(status.equals(LifeCycleRequestStatusStatus.NOT_INTERESTED)) {
+			return "{\"abandoningReason\":\"" + abandoningReason + "\"}";
+		}
 		if(shippedNumber != null && shippedNumber.length() > 0) {
 			return "{\"shippedNumber\":\"" + shippedNumber + "\"}";
 		}
@@ -1071,6 +1075,14 @@ public class OwnerQueriesDetailBean implements Serializable {
 		return sortedCollections.get(key);
 	}
 
+	public String getAbandoningReason() {
+		return abandoningReason;
+	}
+
+	public void setAbandoningReason(String abandoningReason) {
+		this.abandoningReason = abandoningReason;
+  }
+  
 	public int getUnreadQueryCount() {
 		return unreadQueryCount;
 	}
