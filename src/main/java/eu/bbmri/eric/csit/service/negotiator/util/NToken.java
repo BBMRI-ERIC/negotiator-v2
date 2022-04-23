@@ -1,4 +1,4 @@
-package de.samply.bbmri.negotiator.util;
+package eu.bbmri.eric.csit.service.negotiator.util;
 
 import java.util.UUID;
 
@@ -6,6 +6,8 @@ public class NToken {
     private String requestToken;
     private String queryToken;
     private String nToken;
+
+    private String tokenSplitter = "__search__";
 
     public NToken(String nToken) {
         this.nToken = nToken;
@@ -20,11 +22,34 @@ public class NToken {
     }
 
     public String getNewQueryToken() {
-        return UUID.randomUUID().toString();
+        queryToken = UUID.randomUUID().toString();
+        return queryToken;
     }
 
     public String getRequestToken() {
         return requestToken;
+    }
+
+    public String getNewRequestToken() {
+        requestToken = UUID.randomUUID().toString();
+        return requestToken;
+    }
+
+    public String getRequestTokenForUrl(String urlIdForNToken) {
+        if(requestToken.length() == 0) {
+            getNewRequestToken();
+        }
+        return urlIdForNToken + "=" + requestToken + tokenSplitter;
+    }
+
+    public String getNTokenForUrl(String urlIdForNToken) {
+        if(requestToken.length() == 0) {
+            requestToken = getNewRequestToken();
+        }
+        if(queryToken.length() == 0) {
+            getNewQueryToken();
+        }
+        return urlIdForNToken + "=" + requestToken + tokenSplitter + queryToken;
     }
 
     public void setRequestToken(String requestToken) {

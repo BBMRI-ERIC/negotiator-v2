@@ -46,15 +46,14 @@ import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
-import de.samply.bbmri.negotiator.util.NToken;
-import de.samply.bbmri.negotiator.util.RedirectUrlGenerator;
+import eu.bbmri.eric.csit.service.negotiator.util.NToken;
+import eu.bbmri.eric.csit.service.negotiator.util.RedirectUrlGenerator;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import net.minidev.json.JSONArray;
-import net.minidev.json.JSONAware;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import org.apache.logging.log4j.LogManager;
@@ -410,12 +409,15 @@ public class QueryBean implements Serializable {
         }
         if(mode.equals("edit")) {
             saveEditChangesTemporarily();
+
             NToken nToken = new NToken();
             nToken.setRequestToken(qtoken);
+
             RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
             redirectUrlGenerator.setUrl(url);
             String resirectUrl = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
-            logger.info("resirectUrl: " + resirectUrl);
+            logger.debug("resirectUrl created for edit request: " + resirectUrl);
+
             externalContext.redirect(resirectUrl);
         } else {
             try (Config config = ConfigFactory.get()) {
@@ -437,16 +439,13 @@ public class QueryBean implements Serializable {
                 logger.error("QueryBean::editSearchParameters: Problem creating request!");
                 e.printStackTrace();
             }
-            // Status created, not review
-            String urlEnd = "/";
-            if(url.endsWith("/")) {
-                urlEnd = "";
-            }
-            url = url + urlEnd + "#/?nToken=" + qtoken + "__search__";
-            if(url.contains("locator")) {
-                url.replaceAll("#/", "");
-            }
-            externalContext.redirect(url);
+
+            RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
+            redirectUrlGenerator.setUrl(url);
+            String resirectUrl = redirectUrlGenerator.getNewRequestUrl();
+            logger.debug("resirectUrl created for new request: " + resirectUrl);
+
+            externalContext.redirect(resirectUrl);
         }
     }
 
