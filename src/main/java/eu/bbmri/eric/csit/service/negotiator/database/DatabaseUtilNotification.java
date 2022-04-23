@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Resource;
 import javax.naming.Context;

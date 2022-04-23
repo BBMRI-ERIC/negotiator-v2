@@ -23,6 +23,7 @@ import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
 import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
 import de.samply.bbmri.negotiator.jooq.tables.PersonNetwork;
 import de.samply.bbmri.negotiator.jooq.tables.PersonOffer;
+import de.samply.bbmri.negotiator.jooq.tables.PersonQuerylifecycle;
 import de.samply.bbmri.negotiator.jooq.tables.Query;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
 import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
@@ -143,6 +144,11 @@ public class Tables {
 	 * The table public.person_offer
 	 */
 	public static final PersonOffer PERSON_OFFER = de.samply.bbmri.negotiator.jooq.tables.PersonOffer.PERSON_OFFER;
+
+	/**
+	 * The table public.person_querylifecycle
+	 */
+	public static final PersonQuerylifecycle PERSON_QUERYLIFECYCLE = de.samply.bbmri.negotiator.jooq.tables.PersonQuerylifecycle.PERSON_QUERYLIFECYCLE;
 
 	/**
 	 * query table to contain all  queries

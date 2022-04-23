@@ -66,6 +66,15 @@
                                       title="#{label['queryview.querycc.attrs.item.datetime.last.comment']}">
                             <f:convertDateTime pattern="dd/MM/yyyy hh:mm"/>
                         </h:outputText>
+                        <div class="badge queryNumberResponsesBadge"
+                             style='#{item.unreadQueryCount == 0 ? "display:none;" : "" }'
+                             data-toggle="tooltip"
+                             data-placement="bottom"
+                             title="#{item.unreadQueryCount} unread status changes">
+
+                            <i class="glyphicon glyphicon-refresh"></i>
+                            <h:outputText value="#{item.unreadQueryCount}"/>
+                        </div>
 
                         <div class="badge queryNumberResponsesBadge pull-right"
                              style='#{cc.attrs.item.commentCount == 0 ? "display:none;" : "" }#{cc.attrs.item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'

@@ -18,8 +18,8 @@ import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.*;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.internal.util.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -40,7 +40,7 @@ public class MolgenisDirectoryClient implements DirectoryClient {
     /**
      * The logger instance
      */
-    private static final Logger logger = LoggerFactory.getLogger(MolgenisDirectoryClient.class);
+    private static final Logger logger = LogManager.getLogger(MolgenisDirectoryClient.class);
 
     private static final String BIOBANK_PATH = "bbmri-eric";
     private static final String ID = "ID";

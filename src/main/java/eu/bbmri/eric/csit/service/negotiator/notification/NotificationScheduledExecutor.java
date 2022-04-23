@@ -8,15 +8,15 @@ import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMail;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMailSendQueue;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class NotificationScheduledExecutor extends TimerTask {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationScheduledExecutor.class);
+    private static final Logger logger = LogManager.getLogger(NotificationScheduledExecutor.class);
     private final DatabaseUtil databaseUtil = new DatabaseUtil();
     private final NotificationMailSendQueue notificationMailSendQueue = NotificationMailSendQueue.getNotificationSendQueue();
 

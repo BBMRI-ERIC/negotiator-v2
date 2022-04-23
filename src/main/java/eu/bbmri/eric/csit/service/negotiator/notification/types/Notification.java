@@ -11,8 +11,8 @@ import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationEmai
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationContacts;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMailSendQueue;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import java.util.Set;
 
 public abstract class Notification extends Thread {
 
-    private static final Logger abstractLogger = LoggerFactory.getLogger(Notification.class);
+    private static final Logger abstractLogger = LogManager.getLogger(Notification.class);
     private static final String MAIN_MAIL_TEMPLATE = "NegotiatorMainMailTemplate.soy";
     private final File templateFolder = new File(getClass().getClassLoader().getResource("mailTemplate").getPath());
     private SoyTofu.Renderer mailBodyRenderer;

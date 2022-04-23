@@ -14,13 +14,13 @@ import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import net.minidev.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 
 public class CollectionLifeCycleStatus {
-    private static final Logger logger = LoggerFactory.getLogger(CollectionLifeCycleStatus.class);
+    private static final Logger logger = LogManager.getLogger(CollectionLifeCycleStatus.class);
 
     private final TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
     private final RequestStatus collectionAbandonedRequest = null;
@@ -90,6 +90,15 @@ public class CollectionLifeCycleStatus {
                 parameters.put("collectionName", collectionBiobankDTO.getCollection().getName());
                 parameters.put("newRequestStatus", getStatus().getStatus());
                 NotificationService.sendNotification(NotificationType.STATUS_CHANGED_NOTIFICATION, query_id, null, status_user_id, parameters);
+                try (Config config = ConfigFactory.get()) {
+                    //DbUtil.updateCommentReadForUser(config, userId, commentId);
+                    //DbUtil.updateRequestStatusReadForUser(config,status_user_id,query_id);
+                    logger.info("Add to person_requeststatus table");
+                    DbUtil.addQueryLifecycleReadForUser(config,query_id,status_user_id,status,statusType);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         } else {
             System.err.println("ERROR-NG-0000004: Collection Request Status, wrong next status Provided.");
@@ -102,7 +111,10 @@ public class CollectionLifeCycleStatus {
         if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.CONTACT)) {
             RequestStatus status = new RequestStatusContact(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
-        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.INTEREST)) {
+        } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.INSUFFICIENT)) {
+            RequestStatus status = new RequestStatusInsufficient(collectionRequestStatusDTO);
+            statusTree.put(getIndex(status.getStatusDate()), status);
+        }else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.INTEREST)) {
             RequestStatus status = new RequestStatusInterested(collectionRequestStatusDTO);
             statusTree.put(getIndex(status.getStatusDate()), status);
         } else if(collectionRequestStatusDTO.getStatusType().equals(LifeCycleRequestStatusType.AVAILABILITY)) {

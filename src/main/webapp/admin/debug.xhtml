@@ -48,6 +48,12 @@
         <h3>#{label['admin.debug.query']}</h3>
 
         <h:form>
+
+            <h:commandLink value="Run json creation"
+                           id="runCreation"
+                           action="#{adminDebugBean.runCreation}">
+            </h:commandLink>
+
             <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
                            title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
                            value="Download all data as json"

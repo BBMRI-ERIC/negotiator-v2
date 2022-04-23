@@ -27,8 +27,8 @@ package de.samply.bbmri.negotiator.filter;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.faces.application.ResourceHandler;
 import javax.servlet.*;
@@ -46,7 +46,7 @@ import java.io.IOException;
 @WebFilter(filterName = "AuthorizationFilter")
 public class AuthorizationFilter implements Filter {
 
-    private final Logger logger = LoggerFactory.getLogger(AuthorizationFilter.class);
+    private final Logger logger = LogManager.getLogger(AuthorizationFilter.class);
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#destroy()

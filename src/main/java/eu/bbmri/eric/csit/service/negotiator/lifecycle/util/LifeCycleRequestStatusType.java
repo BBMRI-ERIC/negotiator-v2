@@ -9,6 +9,7 @@ public class LifeCycleRequestStatusType {
     public static final String ABANDONED = "abandoned";
     public static final String CONTACT = "contact";
     public static final String INTEREST = "interest";
+    public static final String INSUFFICIENT = "insufficient";
     public static final String AVAILABILITY = "availability";
     public static final String ACCESS_CONDITIONS = "accessConditions";
     public static final String ACCEPT_CONDITIONS = "acceptConditions";

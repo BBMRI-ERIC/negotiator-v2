@@ -39,6 +39,7 @@ import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.admin.CreateAdminFilesForDownload;
 import eu.bbmri.eric.csit.service.negotiator.database.tmpDbUtil;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import org.apache.logging.log4j.util.StringBuilders;
@@ -54,10 +55,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created on 7/25/2017.
@@ -143,6 +141,11 @@ public class AdminDebugBean implements Serializable {
     @PostConstruct
     public void init() {
         jsonExporter = new JsonDataTableExporterExport();
+    }
+
+    public void runCreation() {
+        Timer timer = new Timer();
+        timer.schedule(new CreateAdminFilesForDownload(), 1);
     }
 
     public void getJsonExport() throws IOException {
