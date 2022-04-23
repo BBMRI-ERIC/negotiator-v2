@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class PersonComment extends TableImpl<PersonCommentRecord> {
 
-	private static final long serialVersionUID = 290334659;
+	private static final long serialVersionUID = -388918333;
 
 	/**
 	 * The reference instance of <code>public.person_comment</code>
@@ -96,7 +96,7 @@ public class PersonComment extends TableImpl<PersonCommentRecord> {
 	 */
 	@Override
 	public UniqueKey<PersonCommentRecord> getPrimaryKey() {
-		return Keys.PERSON_COMMENT_ID;
+		return Keys.PERSON_COMMENT_PK;
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class PersonComment extends TableImpl<PersonCommentRecord> {
 	 */
 	@Override
 	public List<UniqueKey<PersonCommentRecord>> getKeys() {
-		return Arrays.<UniqueKey<PersonCommentRecord>>asList(Keys.PERSON_COMMENT_ID);
+		return Arrays.<UniqueKey<PersonCommentRecord>>asList(Keys.PERSON_COMMENT_PK);
 	}
 
 	/**

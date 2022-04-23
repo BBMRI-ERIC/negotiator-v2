@@ -181,6 +181,9 @@ public class Negotiator implements Serializable {
     @XmlElement
     private boolean developmentServer;
 
+    @XmlElement
+    private String slackSystemNotificationURL;
+
     /**
      * The list of collections, that will be faked.
      */
@@ -382,6 +385,14 @@ public class Negotiator implements Serializable {
         this.negotiatorUrl = negotiatorUrl;
     }
 
+    public String getSlackSystemNotificationURL() {
+        return slackSystemNotificationURL;
+    }
+
+    public void setSlackSystemNotificationURL(String slackSystemNotificationURL) {
+        this.slackSystemNotificationURL = slackSystemNotificationURL;
+    }
+
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Development implements Serializable {
 
@@ -459,5 +470,23 @@ public class Negotiator implements Serializable {
         public void setMolgenisAcceptInvalidUrl(boolean molgenisAcceptInvalidUrl) {
             this.molgenisAcceptInvalidUrl = molgenisAcceptInvalidUrl;
         }
+
+        /**
+         * The list of contacts, that will be notified when a new request is created.
+         */
+
     }
+
+    @XmlElementWrapper( name="newRequestContacts" )
+    @XmlElement( name="contact" )
+    private List<String> newRequestContactList;
+
+    public List<String> getNewRequestContactList() {
+        return newRequestContactList;
+    }
+
+    public void setNewRequestContactList(List<String> newRequestContactList) {
+        this.newRequestContactList = newRequestContactList;
+    }
+
 }

@@ -28,7 +28,6 @@ package de.samply.bbmri.negotiator.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.JsTreeJson;
 
@@ -114,7 +113,7 @@ public class ObjectToJson {
         for(int i = 0; i < collectionBiobankDTOS.size(); i++) {
 
             JsTreeJson jsTreeJson = new JsTreeJson();
-            jsTreeJson.setId(collectionBiobankDTOS.get(i).getCollection().getName());
+            jsTreeJson.setId("negoid_" + collectionBiobankDTOS.get(i).getCollection().getId());
             jsTreeJson.setParent(collectionBiobankDTOS.get(i).getBiobank().getId().toString());
             jsTreeJson.setText(collectionBiobankDTOS.get(i).getCollection().getName() + "");
             if(collectionBiobankDTOS.get(i).isContacable()) {

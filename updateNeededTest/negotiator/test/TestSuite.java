@@ -36,8 +36,8 @@ import de.samply.config.util.JAXBUtil;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.xml.sax.SAXException;
 
 import javax.naming.NamingException;
@@ -65,7 +65,7 @@ import java.sql.SQLException;
 public class TestSuite {
     public static final String FILE_POSTGRESQL = "bbmri.test.postgres.xml";
 
-    private static final Logger logger = LoggerFactory.getLogger(TestSuite.class);
+    private static final Logger logger = LogManager.getLogger(TestSuite.class);
 
     private static Postgresql postgresql;
 

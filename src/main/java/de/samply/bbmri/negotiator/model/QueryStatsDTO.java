@@ -63,6 +63,9 @@ public class QueryStatsDTO implements Serializable {
     private int privateNegotiationCount;
     private int unreadPrivateNegotiationCount = 0;
 
+    private int unreadQueryCount = 0;
+
+
     public Query getQuery() {
         return query;
     }
@@ -123,5 +126,13 @@ public class QueryStatsDTO implements Serializable {
 
     public void setUnreadPrivateNegotiationCount(int unreadPrivateNegotiationCount) {
         this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
+    }
+
+    public int getUnreadQueryCount() {
+        return unreadQueryCount;
+    }
+
+    public void setUnreadQueryCount(int unreadQueryCount) {
+        this.unreadQueryCount = unreadQueryCount;
     }
 }

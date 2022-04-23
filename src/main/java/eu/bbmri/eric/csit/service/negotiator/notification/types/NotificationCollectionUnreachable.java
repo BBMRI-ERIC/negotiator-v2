@@ -1,18 +1,16 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.types;
 
-import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationCollectionUnreachable extends Notification {
-    private static final Logger logger = LoggerFactory.getLogger(NotificationCollectionUnreachable.class);
+    private static final Logger logger = LogManager.getLogger(NotificationCollectionUnreachable.class);
 
     String notreachableCollections;
 
@@ -45,11 +43,10 @@ public class NotificationCollectionUnreachable extends Notification {
         try {
             String body = getMailBody(getSoyParameters(notreachableCollections));
 
-            String bbmriemail = "negotiator@helpdesk.bbmri-eric.eu";
+            String bbmriemail = "negotiator-requests@helpdesk.bbmri-eric.eu";
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(bbmriemail, subject, body);
             if(checkSendNotificationImmediatelyForUser(bbmriemail, NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION)) {
-                String status = sendMailNotification(bbmriemail, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), bbmriemail, subject, body);
             }
         } catch (Exception ex) {
             logger.error(String.format("0efe4b414a2c-NotificationNewPrivateComment ERROR-NG-0000026: Error creating a notification for researcher %s.", researcherEmailAddresse));

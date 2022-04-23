@@ -32,8 +32,9 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.QueryBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +49,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class QueryDTO {
 
-    private static Logger logger = LoggerFactory.getLogger(QueryDTO.class);
+    private static Logger logger = LogManager.getLogger(QueryDTO.class);
 
     /**
      * The negotiator token for the query. Only not null, if the user refines the query in the negotiator.
@@ -97,18 +98,27 @@ public class QueryDTO {
     }
 
     public String getHumanReadable() {
-        String humanReadable = "";
+        StringBuilder humanReadable = new StringBuilder();
         try(Config config = ConfigFactory.get()) {
             for (QuerySearchDTO querySearchDTO : searchQueries) {
                 String humanReadableString = querySearchDTO.getHumanReadable();
                 int numberOfCollections = querySearchDTO.getNumberOfCollections();
-                String directory = DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl()).getName();
-                humanReadable += directory + " (" + numberOfCollections + "): " + humanReadableString + "<br>";
+                ListOfDirectoriesRecord listOfDirectoriesRecord = DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl());
+                String directory = "-";
+                if(listOfDirectoriesRecord != null) {
+                    directory = listOfDirectoriesRecord.getName();
+                }
+                humanReadable.append(directory);
+                humanReadable.append(" (");
+                humanReadable.append(numberOfCollections);
+                humanReadable.append("): ");
+                humanReadable.append(humanReadableString);
+                humanReadable.append("<br>");
             }
         } catch (Exception e) {
             logger.error("Falid generating HumanReadable form", e);
             return "-";
         }
-        return humanReadable;
+        return humanReadable.toString();
     }
 }

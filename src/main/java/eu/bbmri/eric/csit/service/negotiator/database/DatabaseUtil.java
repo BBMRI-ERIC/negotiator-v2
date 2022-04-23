@@ -1,37 +1,20 @@
 package eu.bbmri.eric.csit.service.negotiator.database;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Resource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
 public class DatabaseUtil {
 
-    @Resource(name="jdbc/postgres")
-    private final DataSource dataSource;
-
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
-
-    private final DatabaseUtilNotification databaseUtilNotification;
-    private final DatabaseUtilRequest databaseUtilRequest;
-    private final DatabaseUtilPerson databaseUtilPerson;
+    private DatabaseUtilNotification databaseUtilNotification;
+    private DatabaseUtilRequest databaseUtilRequest;
+    private DatabaseUtilPerson databaseUtilPerson;
+    private DatabaseUtilCollection databaseUtilCollection;
 
     public DatabaseUtil() {
         try {
-            Context initContext = new InitialContext();
-            Context context = (Context) initContext.lookup("java:comp/env");
-            dataSource = (DataSource) context.lookup("jdbc/postgres");
-
-            databaseUtilNotification = new DatabaseUtilNotification(dataSource);
-            databaseUtilRequest = new DatabaseUtilRequest(dataSource);
-            databaseUtilPerson = new DatabaseUtilPerson(dataSource);
-
-        } catch (NamingException ex) {
-            throw new ExceptionInInitializerError("58fb0e87-DatabaseUtil: dataSource not initialized");
+            databaseUtilNotification = new DatabaseUtilNotification();
+            databaseUtilRequest = new DatabaseUtilRequest();
+            databaseUtilPerson = new DatabaseUtilPerson();
+            databaseUtilCollection = new DatabaseUtilCollection();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
@@ -45,5 +28,9 @@ public class DatabaseUtil {
 
     public DatabaseUtilPerson getDatabaseUtilPerson() {
         return databaseUtilPerson;
+    }
+
+    public DatabaseUtilCollection getDatabaseUtilCollection() {
+        return databaseUtilCollection;
     }
 }

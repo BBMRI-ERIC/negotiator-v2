@@ -1,5 +1,6 @@
 package eu.bbmri.eric.csit.service.negotiator.notification.util;
 
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationScheduledExecutor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class NotificationScheduledExecutorTest {
     @Test
     @DisplayName("Test interval 1 day in milliseconds.")
     public void testDelayCalculationOneDayInMilliseconds() {
-        long interval = notificationScheduledExecutor.getInterval24Houers();
+        long interval = notificationScheduledExecutor.getInterval24Hours();
         assertEquals(86400000L, interval);
     }
 

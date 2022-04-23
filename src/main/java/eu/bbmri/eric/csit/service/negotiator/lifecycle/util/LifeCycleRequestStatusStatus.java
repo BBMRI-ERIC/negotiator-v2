@@ -10,6 +10,7 @@ public class LifeCycleRequestStatusStatus {
     public static final String REJECTED = "rejected";
 
     public static final String INTERESTED = "interested";
+    public static final String INSUFFICIENT = "insufficient";
     public static final String WAITING_START = "waitingstart";
     public static final String STARTED = "started";
     public static final String CONTACTED = "contacted";

@@ -112,3 +112,62 @@ function showResearcherHelp() {
     document.getElementById('researchers-crashcourse').style.display = 'block';
     document.getElementById('biobankers-crashcourse').style.display = 'none';
 }
+
+function commentReadUpdate(commentId, scope) {
+    if(scope.startsWith('comment')) {
+        publicCommentReadUpdate(commentId);
+    } else if(scope.startsWith('private')) {
+        privateCommentReadUpdate(commentId);
+    }
+}
+
+function privateCommentReadUpdate(commentId) {
+    // Update comment area
+    var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
+    document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
+    document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
+    // Trigger the ajax call to set comment as read (in every comment block is one of this)
+    updateCommentReadStatus[0].click();
+    // Update the orange views to match the update
+    var tabSection = document.getElementById("third").getElementsByClassName("queryNumberResponsesBadge")[0].innerText;
+    var unredcount = tabSection.split('/')[0]-1;
+    if(unredcount<=0) {
+        document.getElementById("third").getElementsByClassName("queryNumberResponsesBadge")[0].style.backgroundColor = "#000000";
+        document.getElementsByClassName("selected-query")[0].getElementsByClassName("queryNumberResponsesBadge")[1].style.backgroundColor = "#000000";
+    }
+    document.getElementById("third").getElementsByClassName("queryNumberResponsesBadge")[0].innerHTML = '<i class="glyphicon glyphicon-tower"></i>   '+unredcount+'/'+tabSection.split('/')[1];
+    // Update overview table left side
+    document.getElementsByClassName("selected-query")[0].getElementsByClassName("queryNumberResponsesBadge")[1].innerHTML = '<i class="glyphicon glyphicon-tower"></i>   '+unredcount+'/'+tabSection.split('/')[1];
+}
+
+function publicCommentReadUpdate(commentId) {
+    // Update comment area
+    var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
+    document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
+    document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
+    // Trigger the ajax call to set comment as read (in every comment block is one of this)
+    updateCommentReadStatus[0].click();
+    // Update the orange views to match the update
+    var tabSection = document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].innerText;
+    var unredcount = tabSection.split('/')[0]-1;
+    if(unredcount<=0) {
+        document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].style.backgroundColor = "#000000";
+        document.getElementsByClassName("selected-query")[0].getElementsByClassName("queryNumberResponsesBadge")[0].style.backgroundColor = "#000000";
+    }
+    document.getElementById("second").getElementsByClassName("queryNumberResponsesBadge")[0].innerHTML = '<i class="glyphicon glyphicon-bullhorn"></i>   '+unredcount+'/'+tabSection.split('/')[1];
+    // Update overview table left side
+    document.getElementsByClassName("selected-query")[0].getElementsByClassName("queryNumberResponsesBadge")[0].innerHTML = '<i class="glyphicon glyphicon-bullhorn"></i>   '+unredcount+'/'+tabSection.split('/')[1];
+}
+
+function publicCommentReadAllReadUpdate() {
+    var elements = document.querySelectorAll('[class^="updateCommentReadForComment"]');
+    for(var i = 0; i < elements.length; i++)
+    {
+        var elementUpdateId = elements[i].className.replaceAll('updateCommentReadForComment', '');
+        if(document.getElementsByClassName("updateCommentReadForCommentShowElement" + elementUpdateId)[0].style.display == "none") {
+            //console.log(elementUpdateId)
+        } else {
+            publicCommentReadUpdate(elementUpdateId);
+        }
+    }
+}

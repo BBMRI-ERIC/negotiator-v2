@@ -59,40 +59,64 @@
 			</div>
 		</h:form>
 
-		<h3>List of Notifications:</h3>
 		<h:form styleClass="form-horizontal">
-			<h:commandButton action="#{adminEmailBean.loadNotifications()}" value="Load Notifications"
-							 styleClass="btn btn-default"/>
+			<div class="col-md-12">
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<h:commandButton action="#{adminEmailBean.sendSlackMsg}" value="#{label['admin.slack.send']}" styleClass="btn btn-default"/>
+					</div>
+				</div>
+			</div>
 		</h:form>
 
-		<h:dataTable rendered="#{adminEmailBean.notificationRecords.size() > 0}" value="#{adminEmailBean.notificationRecords}" var="notificationRecord">
+		<h3>List of Notifications:</h3>
+
+
+		<h:form styleClass="form-horizontal">
+			<ui:repeat value="#{adminEmailBean.emailSendDates}" var="createDates">
+				<h:commandButton action="#{adminEmailBean.loadNotifications(createDates)}" value="Load Notifications for #{createDates}"
+								 styleClass="btn btn-default"/>
+			</ui:repeat>
+		</h:form>
+
+		<style>
+			table, th, td {
+				border: 1px solid black;
+			}
+		</style>
+
+		<h:dataTable rendered="#{adminEmailBean.mailNotificationRecords.size() > 0}" value="#{adminEmailBean.mailNotificationRecords}" var="notificationRecord">
 			<h:column>
 				<f:facet name="header">Id</f:facet>
 				#{notificationRecord.getNotificationId()}
 			</h:column>
 			<h:column>
-				<f:facet name="header">QueryId</f:facet>
-				#{notificationRecord.getQueryId()}
+				<f:facet name="header">Mail Id</f:facet>
+				#{notificationRecord.getMailNotificationId()}
 			</h:column>
 			<h:column>
-				<f:facet name="header">CommentId</f:facet>
-				#{notificationRecord.getCommentId()}
+				<f:facet name="header">Email Address</f:facet>
+				#{notificationRecord.getEmailAddress()}
 			</h:column>
 			<h:column>
-				<f:facet name="header">PersonId</f:facet>
-				#{notificationRecord.getPersonId()}
+				<f:facet name="header">Status</f:facet>
+				#{notificationRecord.getStatus()}
 			</h:column>
 			<h:column>
-				<f:facet name="header">NotificationType</f:facet>
-				#{notificationRecord.getNotificationType()}
-			</h:column>
-			<h:column>
-				<f:facet name="header">CreateDate</f:facet>
+				<f:facet name="header">Create Date</f:facet>
 				#{notificationRecord.getCreateDate()}
 			</h:column>
 			<h:column>
-				<f:facet name="header">User Email/success</f:facet>
-				#{adminEmailBean.getUserData(notificationRecord.getNotificationId())}
+				<f:facet name="header">Send Date</f:facet>
+				#{notificationRecord.getSendDate()}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Subject</f:facet>
+				#{notificationRecord.getSubject()}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Body</f:facet>
+				#{notificationRecord.getBody()}
 			</h:column>
 		</h:dataTable>
 

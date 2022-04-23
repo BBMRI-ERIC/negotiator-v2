@@ -5,17 +5,17 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.util.DataCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import eu.bbmri.eric.csit.service.negotiator.rest.util.SyncPerunData;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
@@ -36,7 +36,7 @@ public class Perun {
     /**
      * The logger for all perun rest endpoints
      */
-    private static final Logger logger = LoggerFactory.getLogger(Perun.class);
+    private static final Logger logger = LogManager.getLogger(Perun.class);
     private final HashMap<String, Integer> mapping_updates_collections = new HashMap<String, Integer>();
 
     /**
@@ -50,16 +50,19 @@ public class Perun {
     @Produces(MediaType.APPLICATION_JSON)
     public Response postUsers(Collection<PerunPersonDTO> users, @Context HttpServletRequest request) {
         logger.debug("Checking perun authentication");
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Checking perun authentication.");
         Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
         AuthenticationService.authenticate(request, negotiator.getPerunUsername(), negotiator.getPerunPassword());
 
         logger.info("Synchronizing user data from Perun");
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Synchronizing user data from Perun.");
         try(Config config = ConfigFactory.get()) {
             for(PerunPersonDTO personDTO : users) {
                 if(StringUtil.isEmpty(personDTO.getId()) || StringUtil.isEmpty(personDTO.getDisplayName()) ||
                         StringUtil.isEmpty(personDTO.getMail())) {
                     logger.error("Perun user has no ID, no displayName or no mail: {}", personDTO.getId());
                     logger.error("Aborting synchronization");
+                    NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Perun user has no ID, no displayName or no mail: " + personDTO.getId());
                     NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, "No ID, name or mail: " + personDTO.getId());
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
@@ -67,6 +70,7 @@ public class Perun {
                 DbUtil.savePerunUser(config, personDTO);
             }
             logger.info("Synchronizing user data with Perun finished");
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Synchronizing user data with Perun finished." + "Users: " + users.size());
             config.commit();
 
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_USER,
@@ -86,49 +90,35 @@ public class Perun {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response postMapping(Collection<PerunMappingDTO> mappings, @Context HttpServletRequest request) {
-        logger.debug("Checking perun authentication");
+        logger.info("Starting Perun user collection mapping.");
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Starting Perun user collection mapping.");
         Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
-        AuthenticationService.authenticate(request, negotiator.getPerunUsername(), negotiator.getPerunPassword());
-
-        logger.info("Synchronizing user collection mapping from Perun");
-
-        try(Config config = ConfigFactory.get()) {
-            for(PerunMappingDTO mapping : mappings) {
-                if(StringUtil.isEmpty(mapping.getId()) || StringUtil.isEmpty(mapping.getName())) {
-                    logger.error("Perun mapping has no ID or no name: {}", mapping.getId());
-                    logger.error("Aborting synchronization");
-                    NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, "No ID or name: " + mapping.getId());
-                    //return Response.status(Response.Status.BAD_REQUEST).build();
-                }
-
-                logger.debug("-->INFO00001--> Directory: {} CollectionID: {}", mapping.getDirectory(), mapping.getName());
-                    String text = "";
-                    for(PerunMappingDTO.PerunMemberDTO member : mapping.getMembers()) {
-                        text += member.getUserId() + " ";
-                    }
-                    logger.debug("-->INFO00002--> Directory: {} CollectionID: {} -> {}", mapping.getDirectory(), mapping.getName(), text);
-                updateCollectionMappingCount(mapping.getDirectory());
-                DbUtil.savePerunMapping(config, mapping);
-            }
-            logger.info("Synchronizing user collection mapping with Perun finished");
-            String satusUpdateString = generateSatusUpdateString();
-            logger.debug("-->INFO00002" + satusUpdateString);
-            config.commit();
-
-            NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING,
-                    satusUpdateString);
-
-            logger.info("Updating Collection Contact Cache.");
-            DataCache cache = DataCache.getInstance();
-            cache.createUpdateCollectionPersons();
-
-            return Response.ok().build();
-        } catch (Exception e) {
-            logger.error("9bca4ebabf89-Perun ERROR-NG-0000056: Error syncing user collection mapping from perun.");
-            e.printStackTrace();
-            NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, e.getMessage());
+        try {
+            AuthenticationService.authenticate(request, negotiator.getPerunUsername(), negotiator.getPerunPassword());
+        } catch (ForbiddenException ex) {
+            logger.error("9bca4ebabf89-Perun ERROR-NG-0000078: Error authentication failed for user " + negotiator.getPerunUsername() + ".");
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"9bca4ebabf89-Perun ERROR-NG-0000078: Error authentication failed for user " + negotiator.getPerunUsername() + ".");
+            logger.error(ex.getMessage());
+            ex.printStackTrace();
+            return Response.status(javax.ws.rs.core.Response.Status.FORBIDDEN).build();
+        } catch (Exception ex) {
+            logger.error("9bca4ebabf89-Perun ERROR-NG-0000079: Error checking authentication for user " + negotiator.getPerunUsername() + ".");
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"9bca4ebabf89-Perun ERROR-NG-0000079: Error checking authentication for user " + negotiator.getPerunUsername() + ".");
+            logger.error(ex.getMessage());
+            ex.printStackTrace();
             return Response.serverError().build();
         }
+        logger.info("Synchronizing user collection mapping from Perun");
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Synchronizing user collection mapping from Perun");
+
+        SyncPerunData syncPerunData = new SyncPerunData(mappings, null);
+        syncPerunData.start();
+
+        logger.info("Finished Perun user collection mapping.");
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Finished Perun user collection mapping.");
+        NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING,
+                "Finished Perun user collection mapping.");
+        return Response.ok().build();
     }
 
     @POST

@@ -41,8 +41,8 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.modelmapper.convention.NameTokenizers;
 import org.modelmapper.jooq.RecordValueReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * The JOOQ Configuration wrapper with AutoClosable
@@ -51,7 +51,7 @@ public class Config extends DefaultConfiguration implements AutoCloseable {
 
     private static final long serialVersionUID = -915149314520303632L;
 
-    private static final Logger logger = LoggerFactory.getLogger(Config.class);
+    private static final Logger logger = LogManager.getLogger(Config.class);
 
     /**
      * The jOOQ DSLContext, initialized in the constructor.

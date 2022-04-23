@@ -3,8 +3,8 @@ package de.samply.bbmri.negotiator.control.component;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -33,9 +33,10 @@ public class LifeCycleStatusBean implements Serializable {
     private Integer numberOfPatientsAvailable;
     private String indicateAccessConditions;
     private String shippedNumber;
+    private String abandoningReason = "reason1";
     private Part mtaFilemulti;
 
-    private static final Logger logger = LoggerFactory.getLogger(LifeCycleStatusBean.class);
+    private static final Logger logger = LogManager.getLogger(LifeCycleStatusBean.class);
 
     private final RequestLifeCycleStatus requestLifeCycleStatus = null;
 
@@ -138,5 +139,13 @@ public class LifeCycleStatusBean implements Serializable {
 
     public void setMtaFilemulti(Part mtaFilemulti) {
         this.mtaFilemulti = mtaFilemulti;
+    }
+
+    public String getAbandoningReason() {
+        return abandoningReason;
+    }
+
+    public void setAbandoningReason(String abandoningReason) {
+        this.abandoningReason = abandoningReason;
     }
 }

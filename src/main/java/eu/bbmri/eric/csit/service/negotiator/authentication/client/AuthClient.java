@@ -20,11 +20,13 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
 import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.apache.logging.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AuthClient {
-    private static final Logger logger = LoggerFactory.getLogger(eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient.class);
+    private static final Logger logger = LogManager.getLogger(eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient.class);
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private final String baseUrl;
     private final PublicKey publicKey;
@@ -110,14 +112,14 @@ public class AuthClient {
                 logger.debug("ID token: {}", tokenDTO.getIdToken());
                 this.accessToken = new JWTAccessToken(this.publicKey, tokenDTO.getAccessToken());
                 if (!this.accessToken.isValid()) {
-                    logger.debug("The access token we got was not valid. Throw an exception.");
+                    logger.error("The access token we got was not valid. Throw an exception.");
                     throw new InvalidTokenException();
                 }
 
                 if (!StringUtil.isEmpty(tokenDTO.getIdToken())) {
                     this.idToken = new JWTIDToken(this.clientId, this.publicKey, tokenDTO.getIdToken());
                     if (!this.idToken.isValid()) {
-                        logger.debug("The ID token we got was not valid. Throw an exception.");
+                        logger.error("The ID token we got was not valid. Throw an exception.");
                         throw new InvalidTokenException();
                     }
                 }

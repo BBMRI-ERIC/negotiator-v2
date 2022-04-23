@@ -288,8 +288,21 @@
                 <h:panelGroup layout="block" rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}" style="margin-top:10px;">
 
                     <ul class="nav nav-tabs" id="myTab">
-                        <li class="active" id="first"><a data-toggle="tab"
-                                                         href="#status">#{label['querydetail.title.status']}</a>
+                        <li class="active" id="first">
+                            <a data-toggle="tab" href="#status">
+                                #{label['querydetail.title.status']}
+                                <c:if test="#{researcherQueriesDetailBean.unreadQueryCount > 0}">
+                                    <div class="badge queryNumberResponsesBadge"
+                                         style='margin-left: 4px;background-color: #333333;" }'
+                                         data-toggle="tooltip"
+                                         data-placement="bottom"
+                                         title="#{researcherQueriesDetailBean.unreadQueryCount} unread status changes">
+
+                                        <i class="glyphicon glyphicon-refresh"></i>
+                                        <h:outputText value="#{researcherQueriesDetailBean.unreadQueryCount}"/>
+                                    </div>
+                                </c:if>
+                            </a>
                         </li>
                         <li id="second">
                             <a data-toggle="tab" href="#comments">
@@ -321,13 +334,13 @@
                         </li>
                     </ul>
 
-                    <div class="tab-content">
+                    <div class="tab-content" style="padding-bottom: 35px;">
                         <!-- Status Tab -->
                         <div id="status" class="tab-pane fade in active">
                             <h:panelGroup layout="block"
                                           style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
                                           rendered="#{researcherQueriesDetailBean.selectedQuery.negotiationStartedTime != null}">
-
+                                <f action="#{researcherQueriesDetailBean.markQueryLifecycleReadForUser()}" />
                                 <h:panelGroup style="display:none;">
                                     <h:form id="lifeCycleStatusBeanUpdateStatusForm" enctype="multipart/form-data">
 
@@ -343,9 +356,12 @@
                                     </h:form>
 
                                     <script type="text/javascript" >
+
                                         function invokeCommandLink(collectionId, biobankId, formIdPrefix) {
+                                            console.log("collectionId: " + collectionId + " formIdPrefix: " + formIdPrefix);
                                             var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
                                             var offer = $("#offer" + formIdPrefix + collectionId).find("textarea").val();
+                                            console.log("Selector: " + "#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId + " nextCollectionLifecycleStatusStatus: " + nextCollectionLifecycleStatusStatus);
 
                                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:offer").value = offer;
@@ -357,12 +373,7 @@
                                             jsfcommandButton.click();
                                         }
 
-                                        function publicCommentReadUpdate(commentId) {
-                                            var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
-                                            document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
-                                            document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
-                                            updateCommentReadStatus[0].click();
-                                        }
+
                                     </script>
                                 </h:panelGroup>
 
@@ -520,9 +531,15 @@
                                     fileUploadBean="#{fileUploadBean}"/>
                             </div>
 
+                            <span class="btn btn-default updateCommentReadForCommentShowMarkAsReadButtonForAll" style="margin-top: 0px;margin-left:15px;#{researcherQueriesDetailBean.unreadCommentCount == 0 ? 'display:none;': '' }" onclick="publicCommentReadAllReadUpdate();">
+                                Mark all as read
+                            </span>
+
                             <div class="col-xs-12 row">
                                 <hr/>
                             </div>
+
+
 
                             <div class="row" style="margin: 10px;">
                                 <ui:repeat value="#{researcherQueriesDetailBean.comments}"

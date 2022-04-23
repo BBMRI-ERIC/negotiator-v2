@@ -30,8 +30,8 @@
 {deltemplate footer}
     {switch $locale}
         {default}
-            Yours sincerely{\n}
-            The BBMRI-ERIC Team{\n}
+            Yours sincerely<br>
+            The BBMRI-ERIC Team<br>
     {/switch}
 {/deltemplate}
 
@@ -42,9 +42,9 @@
  * @param? locale The locale of the mail
  */
 {template .mail}
-    {delcall greeting allowemptydefault="false" data="all" /}{\n}{\n}
+    {delcall greeting allowemptydefault="false" data="all" /}<br><br>
 
-    {delcall maincontent allowemptydefault="false" data="all" /}{\n}{\n}
+    {delcall maincontent allowemptydefault="false" data="all" /}<br><br>
 
     {delcall footer allowemptydefault="true" data="all" /}
 {/template}

@@ -5,12 +5,14 @@
  * Main content for comment added notification mail.
  * @param? locale The locale of the mail
  * @param? name The locale of the mail
- * @param? body Aggregated Body
  */
 {deltemplate maincontent}
     {switch $locale}
         {default}
-            {$body}
-
+            You had some Notifications for request listed below:<br>
+            LINKLIST
+            <br><br>Full list of updates: <br><br>
+            BODYOFAGGREGATES
+        <br>--------------
     {/switch}
 {/deltemplate}

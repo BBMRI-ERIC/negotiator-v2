@@ -47,6 +47,22 @@
 
         <h3>#{label['admin.debug.query']}</h3>
 
+        <h:form>
+
+            <h:commandLink value="Run json creation"
+                           id="runCreation"
+                           action="#{adminDebugBean.runCreation}">
+            </h:commandLink>
+
+            <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
+                           title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+                           value="Download all data as json"
+                           id="getDownload"
+                           action="#{adminDebugBean.getJsonExport}">
+                <span class="glyphicon glyphicon-save-file"></span>
+            </h:commandLink>
+        </h:form>
+
         <h:form styleClass="form-horizontal">
             <h:commandButton action="#{adminDebugBean.loadQueries(true)}" value="#{label['admin.debug.click.filter']}"
                              styleClass="btn btn-success"/>
@@ -55,13 +71,18 @@
                              styleClass="btn btn-default"/>
         </h:form>
 
-        <h:form>
+        <br/>
 
-            <h3>Export Page Data Only</h3>
+        <h:form>
+            <!--<h:commandLink>
+                Export Json (will only export loaded lists)
+                <p:dataExporter type="json" target="queryTable" fileName="queryTable" exporter="#{adminDebugBean.jsonExporter}" encoding="utf-8"/>
+            </h:commandLink><br/>-->
             <h:commandLink>
-                Export Excel
-                <p:dataExporter type="xls" target="queryTable" fileName="queryTable" pageOnly="true"/>
+                Export XML (will only export loaded lists)
+                <p:dataExporter type="xml" target="queryTable" fileName="queryTable" encoding="utf-8"/>
             </h:commandLink>
+        </h:form>
 
         <p:dataTable id="queryTable" rendered="#{adminDebugBean.queries.size() > 0}" value="#{adminDebugBean.queries}" var="query"
                      columnClasses="columns,columns,columns,columns,columns,columns,columns,columns,columns,columns,columns"
@@ -97,6 +118,10 @@
             <p:column style="width: 150px;max-height: 75px;">
                 <f:facet name="header">ResearcherId</f:facet>
                 <h:outputText value="#{adminDebugBean.getUserName(query.getResearcherId())}" />
+            </p:column>
+            <p:column style="width: 150px;max-height: 75px;">
+                <f:facet name="header">ResearcherEmail</f:facet>
+                <h:outputText value="#{query.getResearcherEmail()}" />
             </p:column>
             <p:column exportable="false"  style="width: 100px;max-height: 75px;">
                 <f:facet name="header">Transfer request</f:facet>
@@ -137,9 +162,9 @@
                 <f:facet name="header">Test Request</f:facet>
                 <h:outputText value="#{query.getTestRequest()}" />
             </p:column>
-            <p:column exportable="false"  style="width: 150px;max-height: 75px;">
+            <p:column exportable="false" style="width: 150px;max-height: 75px;">
                 <f:facet name="header">Toggle Test Request</f:facet>
-                <h:form id="form-test-request">
+                <h:form id="form-test-request-${query.getId()}">
                     <h:commandButton action="#{adminDebugBean.switchTestRequest(query.getId())}" value="#{query.testRequest ? 'Switch to normal Reqest' : 'Switch to Test Reqest'}"
                                      styleClass="btn btn-default"/>
                 </h:form>
@@ -168,12 +193,7 @@
             </p:column>
         </p:dataTable>
 
-        <h3>Export Page Data Only</h3>
-        <h:commandLink>
-            Export Excel
-            <p:dataExporter type="xls" target="queryTable" fileName="queryTable" pageOnly="true"/>
-        </h:commandLink>
-        </h:form>
+            <br/>
 
         <button id="toggleModalIndicateAccessConditions" type="button" style="display: none;" class="btn btn-primary" data-toggle="modal" data-target="#transferResearcherModal">
             Transfer request

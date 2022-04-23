@@ -12,18 +12,20 @@ import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 
 import java.util.*;
 
 public class RequestLifeCycleStatus {
-    private static final Logger logger = LoggerFactory.getLogger(RequestLifeCycleStatus.class);
+    private static final Logger logger = LogManager.getLogger(RequestLifeCycleStatus.class);
 
     private final TreeMap<Long, RequestStatus> statusTree = new TreeMap<Long, RequestStatus>();
     private HashMap<Integer, CollectionLifeCycleStatus> collectionStatusList = null;
@@ -66,7 +68,7 @@ public class RequestLifeCycleStatus {
     }
 
     public void createStatus(Integer status_user_id) {
-        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, "created", "created", null, new Date(), status_user_id);
+        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.CREATED, null, new Date(), status_user_id);
         requestStatusFactory(requestStatusDTO);
     }
 
@@ -116,34 +118,70 @@ public class RequestLifeCycleStatus {
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
             List<Person> contacts = collectionLifeCycleStatus.getContacts();
-            if(contacts == null || contacts.size() == 0) {
-                notreachableCollections = true;
-                collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
-                collectionsString.append(collectionLifeCycleStatus.getCollectionReadableID()).append("\n");
-            } else {
-                JsonArray contactJsonArray = new JsonArray();
-                for(Person contact : contacts) {
-                    NegotiatorDTO negotiatorDTO = new NegotiatorDTO();
-                    negotiatorDTO.setPerson(contact);
-                    mailrecipients.put(contact.getId(), negotiatorDTO);
-                    JsonObject person = new JsonObject();
-                    person.addProperty("AuthName", contact.getAuthName());
-                    person.addProperty("AuthEmail", contact.getAuthEmail());
-                    person.addProperty("ID", contact.getId());
-                    person.addProperty("Organization", contact.getOrganization());
-                    contactJsonArray.add(person);
-                }
-                JsonObject statusJson = new JsonObject();
-                statusJson.add("contacted", contactJsonArray);
-                collectionLifeCycleStatus.nextStatus("contacted", "contact", statusJson.toString(), userId);
-            }
+            notreachableCollections = contactCollectionRepresentativesInCollection(userId, mailrecipients, collectionsString, notreachableCollections, collectionLifeCycleStatus, contacts);
         }
         NotificationService.sendNotification(NotificationType.START_NEGOTIATION_NOTIFICATION, query.getId(), null, userId);
-        if(notreachableCollections) {
+        sendNotReachableNotification(userId, collectionsString, notreachableCollections);
+    }
+
+    public void contactCollectionRepresentativesIfNotContacted(Integer userId, String accessUrl) {
+        if(collectionStatusList == null) {
+            initialiseCollectionStatus();
+        }
+        Map<Integer, NegotiatorDTO> mailrecipients = new HashMap<Integer, NegotiatorDTO>();
+        StringBuilder collectionsString = new StringBuilder();
+        boolean notreachableCollections = false;
+        HashMap<String, String> emailAddressesAndNames = new HashMap<>();
+        for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
+            CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
+            List<Person> contacts = collectionLifeCycleStatus.getContacts();
+            if(collectionLifeCycleStatus == null) {
+                notreachableCollections = contactCollectionRepresentativesInCollection(userId, mailrecipients, collectionsString, notreachableCollections, collectionLifeCycleStatus, contacts);
+                for(Person person : contacts) {
+                    emailAddressesAndNames.put(person.getAuthEmail(), person.getAuthName());
+                }
+            }
+        }
+        NotificationService.sendNotification(NotificationType.ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION, query.getId(), null, userId, emailAddressesAndNames);
+        sendNotReachableNotification(userId, collectionsString, notreachableCollections);
+    }
+
+    private void sendNotReachableNotification(Integer userId, StringBuilder collectionsString, boolean notreachableCollections) {
+        if (notreachableCollections) {
             Map<String, String> mailParameters = new HashMap<String, String>();
             mailParameters.put("notreachableCollections", collectionsString.toString());
             NotificationService.sendNotification(NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION, query.getId(), null, userId, mailParameters);
         }
+    }
+
+    private boolean contactCollectionRepresentativesInCollection(Integer userId, Map<Integer, NegotiatorDTO> mailrecipients, StringBuilder collectionsString, boolean notreachableCollections, CollectionLifeCycleStatus collectionLifeCycleStatus, List<Person> contacts) {
+        if(contacts == null || contacts.size() == 0) {
+            notreachableCollections = true;
+            collectionLifeCycleStatus.nextStatus("notreachable", "contact", "", userId);
+            collectionsString.append(collectionLifeCycleStatus.getCollectionReadableID());
+            collectionsString.append(": ");
+            collectionsString.append(collectionLifeCycleStatus.getBiobankName());
+            collectionsString.append(" - ");
+            collectionsString.append(collectionLifeCycleStatus.getCollectionName());
+            collectionsString.append("\n");
+        } else {
+            JsonArray contactJsonArray = new JsonArray();
+            for(Person contact : contacts) {
+                NegotiatorDTO negotiatorDTO = new NegotiatorDTO();
+                negotiatorDTO.setPerson(contact);
+                mailrecipients.put(contact.getId(), negotiatorDTO);
+                JsonObject person = new JsonObject();
+                person.addProperty("AuthName", contact.getAuthName());
+                person.addProperty("AuthEmail", contact.getAuthEmail());
+                person.addProperty("ID", contact.getId());
+                person.addProperty("Organization", contact.getOrganization());
+                contactJsonArray.add(person);
+            }
+            JsonObject statusJson = new JsonObject();
+            statusJson.add("contacted", contactJsonArray);
+            collectionLifeCycleStatus.nextStatus("contacted", "contact", statusJson.toString(), userId);
+        }
+        return notreachableCollections;
     }
 
     private void requestStatusFactory(RequestStatusDTO requestStatus) {
@@ -277,5 +315,10 @@ public class RequestLifeCycleStatus {
             returnList.add(collectionStatusList.get(collectionId));
         }
         return returnList;
+    }
+
+    public String getLastStatusUsername() {
+        RequestStatus status = statusTree.lastEntry().getValue();
+        return dataCache.getUserName((Integer) status.getJsonEntry().get("UserId"));
     }
 }

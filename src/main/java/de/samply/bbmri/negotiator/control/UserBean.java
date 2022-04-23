@@ -63,8 +63,10 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.apache.logging.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Sessionscoped bean for all data of the session about the user.
@@ -76,7 +78,7 @@ public class UserBean implements Serializable {
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
-	private final Logger logger = LoggerFactory.getLogger(UserBean.class);
+	private final Logger logger = LogManager.getLogger(UserBean.class);
 
 	/**
 	 * The subjects from the dummy data.
@@ -341,14 +343,15 @@ public class UserBean implements Serializable {
 	 *             the invalid key exception
 	 */
 	public void login(AuthClient client) throws InvalidTokenException, InvalidKeyException {
+		logger.error("login client.");
 		accessToken = client.getAccessToken();
 
-		logger.debug("AC Header: "+accessToken.getHeader());
-		logger.debug("AC State : "+accessToken.getState());
+		logger.error("AC Header: "+accessToken.getHeader());
+		logger.error("AC State : "+accessToken.getState());
 		Map<String, Object> claims = accessToken.getClaimsSet().getClaims();
 
 		for(String claim: claims.keySet()) {
-			logger.debug("AC Claim "+claim+" : "+claims.get(claim));
+			logger.error("AC Claim "+claim+" : "+claims.get(claim));
 		}
 
 		/**

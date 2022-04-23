@@ -8,6 +8,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
       xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri">
 
 <composite:interface>
@@ -23,19 +24,44 @@
         <c:if test='${cc.attrs.formIdPrefix.equals("_sortStatus_")}'>
             #{cc.attrs.collectionLifeCycleStatus.biobankName} -
         </c:if>
-        #{cc.attrs.collectionLifeCycleStatus.collectionName}
+        <span style="font-weight: bold;">
+            #{cc.attrs.collectionLifeCycleStatus.collectionName}
+        </span><br/><br/>
+        <span style="font-size: 12px; font-style: italic; padding-left: 1rem; display: inline-block">
+            #{label['lifecycleCollectionStatus.contacts.representedBy']}:<br/>
+            <c:if test='${!cc.attrs.collectionLifeCycleStatus.contacts.isEmpty()}'>
+                <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.contacts[0].authName}" escape="false"/>
+                <ui:fragment rendered="#{cc.attrs.collectionLifeCycleStatus.contacts.size() > 1}">
+                    <h:outputText id="tooltip-area" styleClass="more-items-tooltip" value="+#{cc.attrs.collectionLifeCycleStatus.contacts.size()-1}" escape="false"/>
+                    <p:tooltip for="tooltip-area">
+                        <ui:repeat value="#{cc.attrs.collectionLifeCycleStatus.contacts}" var="cotact" varStatus="status">
+                            <ui:fragment rendered="#{status.index gt 0}">
+                                <h:outputText value="#{cotact.authName}"/>
+                                <br/>
+                            </ui:fragment>
+                        </ui:repeat>
+                    </p:tooltip>
+                </ui:fragment>
+            </c:if>
+        </span>
     </div>
     <div class="col-sm-3 col-lg-3">
         #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
         <span style="font-size: 12px; font-style: italic;">
-            <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" />
+            <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" /><br/>
+            <ui:fragment rendered="#{not empty cc.attrs.collectionLifeCycleStatus.lastStatusUsername}">
+                <span style="padding-left: 1rem; display: inline-block">
+                    #{label['lifecycleCollectionStatus.status.changedBy']}:<br/>
+                    <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.lastStatusUsername}" escape="false" />
+                </span>
+            </ui:fragment>
         </span>
     </div>
     <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
         #{label['lifecycleCollectionStatus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
         <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
                          class="form-control"
-                         style="width: 100%;height: 2rem;"
+                         style="width: 100%; height: 2rem;"
                          value="#{researcherQueriesDetailBean.nextCollectionLifecycleStatusStatus}"
                          onchange="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(this);"
                          onload="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus(this);">
@@ -62,9 +88,9 @@
     </div>
     <div class="col-sm-2 col-lg-2">
         <div class="col-sm-2 col-lg-2">
-            <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0, '#{cc.attrs.collectionId}')">Update Collection</button>
+            <button type="button" class="btn btn-primary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, 0, '#{cc.attrs.formIdPrefix}')">Update Collection</button>
             <c:if test="#{cc.attrs.biobankId!=-1}">
-                <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId}, '#{cc.attrs.collectionId}')">Update for all Collections</button>
+                <button type="button" class="btn btn-secondary" onclick="invokeCommandLink(#{cc.attrs.collectionId}, #{cc.attrs.biobankId}, '#{cc.attrs.formIdPrefix}')">Update for all Collections</button>
             </c:if>
 
         </div>

@@ -28,6 +28,8 @@ package de.samply.bbmri.negotiator.control;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.sql.ResultSet;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -39,8 +41,14 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.docuverse.identicon.IdenticonUtil;
 
@@ -58,7 +66,7 @@ public class ApplicationBean implements Serializable {
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    private final static Logger logger = LoggerFactory.getLogger(ApplicationBean.class);
+    private final static Logger logger = LogManager.getLogger(ApplicationBean.class);
 
     /**
      * Gets the faces context.
@@ -109,6 +117,70 @@ public class ApplicationBean implements Serializable {
             e.printStackTrace();
             NegotiatorConfig.get().setMaintenanceMode(true);
         }
+    }
+
+    public String updateLifecycleStatusProblem_20220124() {
+        try (Config config = ConfigFactory.get()) {
+            HashSet<Integer> queryIds = DbUtil.getQueriesWithStatusError_20220124(config);
+            for(Integer queryId : queryIds) {
+                System.err.println("queryId: " + queryId);
+                try {
+                    QueryRecord queryRecord = DbUtil.getQueryFromId(config, queryId);
+                    Integer researcherId = 1;
+                    if (queryRecord != null) {
+                        researcherId = queryRecord.getResearcherId();
+                        if (researcherId != null) {
+                            researcherId = 1;
+                        }
+                    }
+                    RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+                    requestLifeCycleStatus.initialise();
+                    if(!requestLifeCycleStatus.statusCreated()) {
+                        requestLifeCycleStatus.createStatus(researcherId);
+                    }
+                    requestLifeCycleStatus.nextStatus(LifeCycleRequestStatusStatus.UNDER_REVIEW, LifeCycleRequestStatusType.REVIEW, null, researcherId);
+                    NotificationService.sendNotification(NotificationType.CREATE_REQUEST_NOTIFICATION, queryId, null, researcherId);
+                 }catch (Exception e) {
+                    System.err.println("Error Fixing LifeCycle Status Problems updateLifecycleStatusProblem_20220124!");
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error Fixing LifeCycle Status Problems updateLifecycleStatusProblem_20220124!");
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public String updateLifecycleStatusProblem() {
+        try (Config config = ConfigFactory.get()) {
+            DbUtil.getCollectionsWithLifeCycleStatusProblem(config, -1);
+        } catch (Exception e) {
+            System.err.println("Error Fixing LifeCycle Status Problems!");
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public String updateDirectoryLink_V_4_2_8() {
+        try (Config config = ConfigFactory.get()) {
+            List<QueryRecord> querylist = DbUtil.getAllRequestsToUpdate(config);
+            for(QueryRecord queryRecord : querylist) {
+                String json = queryRecord.getJsonText();
+                if(json.contains("directory.bbmri-eric.eu")) {
+                    json = json.replaceAll("https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/biobankexplorer", "https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/");
+                    json = json.replaceAll("https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/", "https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/#/");
+                    json = json.replaceAll("https://directory.bbmri-eric.eu/menu/main/dataexplorer", "https://directory.bbmri-eric.eu/menu/main/app-molgenis-app-biobank-explorer/#/");
+                    queryRecord.setJsonText(json);
+                    DbUtil.updateQueryRecord(config, queryRecord);
+                }
+            }
+            config.commit();
+        } catch (Exception e) {
+            System.err.println("Error Fixing LifeCycle Status Problems!");
+            e.printStackTrace();
+        }
+        return "";
     }
 
     /**

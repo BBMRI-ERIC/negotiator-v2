@@ -6,14 +6,14 @@ import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DatabaseUtil;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
+import org.jetbrains.annotations.NotNull;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Sends an email to the given address.
@@ -27,7 +27,19 @@ public class AdminEmailBean implements Serializable {
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
+    DatabaseUtil databaseUtil = new DatabaseUtil();
     List<NotificationRecord> notificationRecords;
+
+    public List<MailNotificationRecord> getMailNotificationRecords() {
+        return mailNotificationRecords;
+    }
+
+    public void setMailNotificationRecords(List<MailNotificationRecord> mailNotificationRecords) {
+        this.mailNotificationRecords = mailNotificationRecords;
+    }
+
+    List<MailNotificationRecord> mailNotificationRecords;
+    List<String> emailSendDates = loadNotificationDates();
     Map<Integer, String> userNotificationData;
 
     /**
@@ -60,6 +72,13 @@ public class AdminEmailBean implements Serializable {
         return null;
     }
 
+    public String sendSlackMsg() {
+        DatabaseUtil databaseUtil = new DatabaseUtil();
+        databaseUtil.getDatabaseUtilNotification().getFilterdBiobanksEmailAddressesAndNamesForRequest(37);
+        NotificationService.sendSystemNotification(NotificationType.SYSTEM_TEST_NOTIFICATION, "Test Massage!");
+        return null;
+    }
+
     public UserBean getUserBean() {
         return userBean;
     }
@@ -68,12 +87,12 @@ public class AdminEmailBean implements Serializable {
         this.userBean = userBean;
     }
 
-    public void loadNotifications() {
+    public void loadNotifications(String createDay) {
         try {
-            DatabaseUtil databaseUtil = new DatabaseUtil();
             notificationRecords = databaseUtil.getDatabaseUtilNotification().getNotificationRecords();
             userNotificationData = new HashMap<>();
-            for(MailNotificationRecord mailNotificationRecord : databaseUtil.getDatabaseUtilNotification().getMailNotificationRecords()) {
+            mailNotificationRecords = databaseUtil.getDatabaseUtilNotification().getMailNotificationRecords(createDay);
+            for(MailNotificationRecord mailNotificationRecord : mailNotificationRecords) {
                 if (!userNotificationData.containsKey(mailNotificationRecord.getNotificationId())) {
                     userNotificationData.put(mailNotificationRecord.getNotificationId(), mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 } else {
@@ -81,9 +100,24 @@ public class AdminEmailBean implements Serializable {
                             mailNotificationRecord.getEmailAddress() + " - " + mailNotificationRecord.getStatus() + " (" + mailNotificationRecord.getSendDate() + ")");
                 }
             }
+
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private List<String> loadNotificationDates() {
+        try {
+            List<String> dateList = new ArrayList<>();
+            for(Date createDate : databaseUtil.getDatabaseUtilNotification().getDatesNotificationsWhereSend()) {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                dateList.add(simpleDateFormat.format(createDate));
+            }
+            return dateList;
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     public List<NotificationRecord> getNotificationRecords() {
@@ -92,6 +126,14 @@ public class AdminEmailBean implements Serializable {
 
     public void setNotificationRecords(List<NotificationRecord> notificationRecords) {
         this.notificationRecords = notificationRecords;
+    }
+
+    public List<String> getEmailSendDates() {
+        return emailSendDates;
+    }
+
+    public void setEmailSendDates(List<String> emailSendDates) {
+        this.emailSendDates = emailSendDates;
     }
 
     public String getUserData(Integer notificationRecordId) {

@@ -3,16 +3,15 @@ package eu.bbmri.eric.csit.service.negotiator.notification.types;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import eu.bbmri.eric.csit.service.negotiator.notification.Notification;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationRejectRequest extends Notification {
-    private static final Logger logger = LoggerFactory.getLogger(NotificationRejectRequest.class);
+    private static final Logger logger = LogManager.getLogger(NotificationRejectRequest.class);
 
     public NotificationRejectRequest(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
         logger.info("97fdbf0f7bc2-NotificationRejectRequest new request created.");
@@ -28,17 +27,20 @@ public class NotificationRejectRequest extends Notification {
             setQuery();
             setResearcherContact();
 
-            String subject = "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + " has been rejected.";
-
-            if(queryRecord.getTestRequest()) {
-                subject = "[BBMRI-ERIC Negotiator] TEST Request: " + queryRecord.getTitle() + "has been rejected.";
-            }
-
             createMailBodyBuilder("REQUEST_REJECTED.soy");
-            prepareNotification(subject);
+
+            prepareNotification(getMailSubject());
         } catch (Exception ex) {
             logger.error("97fdbf0f7bc2-NotificationRejectRequest ERROR-NG-0000061: Error in NotificationRejectRequest.");
             logger.error("context", ex);
+        }
+    }
+
+    private String getMailSubject() {
+        if(queryRecord.getTestRequest()) {
+            return "[BBMRI-ERIC Negotiator] TEST Request: " + queryRecord.getTitle() + "has been rejected.";
+        } else {
+            return "[BBMRI-ERIC Negotiator] Request: " + queryRecord.getTitle() + " has been rejected.";
         }
     }
 
@@ -48,8 +50,7 @@ public class NotificationRejectRequest extends Notification {
 
             MailNotificationRecord mailNotificationRecord = saveMailNotificationToDatabase(researcherEmailAddresse, subject, body);
             if(checkSendNotificationImmediatelyForUser(researcherEmailAddresse, NotificationType.REJECT_REQUEST_NOTIFICATION)) {
-                String status = sendMailNotification(researcherEmailAddresse, subject, body);
-                updateMailNotificationInDatabase(mailNotificationRecord.getMailNotificationId(), status);
+                sendMailNotification(mailNotificationRecord.getMailNotificationId(), researcherEmailAddresse, subject, body);
             }
         } catch (Exception ex) {
             logger.error(String.format("97fdbf0f7bc2-NotificationRejectRequest ERROR-NG-0000062: Error creating a notification for reject request for %s.", researcherEmailAddresse));
@@ -61,7 +62,7 @@ public class NotificationRejectRequest extends Notification {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("queryName", queryRecord.getTitle());
         parameters.put("queryId", queryRecord.getId().toString());
-        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "/researcher/detail.xhtml?queryId=" + requestId);
+        parameters.put("url", NegotiatorConfig.get().getNegotiator().getNegotiatorUrl() + "researcher/detail.xhtml?queryId=" + requestId);
         return parameters;
     }
 }

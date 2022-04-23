@@ -3,7 +3,15 @@
 
 /**
  * Main content for the test email, that can be sent using the admin interface
+ * @param? queryName The name of the mail
+ * @param? url The url of the query
  */
 {deltemplate maincontent}
-    This is a test email sent by the BBMRI-ERIC Negotiator.
+    This is a test email sent by the BBMRI-ERIC Negotiator.<br>
+
+    <a href="{$url}">{$queryName}</a><br>
+
+    ReplaceTextWithLinkesReplcae<br>
+
+
 {/deltemplate}

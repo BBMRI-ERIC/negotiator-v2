@@ -5,15 +5,15 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.RequestStatusRecord;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 
 public class DbUtilV2 {
-    private final static Logger logger = LoggerFactory.getLogger(DbUtilV2.class);
+    private final static Logger logger = LogManager.getLogger(DbUtilV2.class);
     private Config config = null;
 
     public void connectDatabase() {

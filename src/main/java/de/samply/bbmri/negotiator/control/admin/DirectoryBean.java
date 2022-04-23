@@ -5,8 +5,8 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -16,13 +16,12 @@ import java.util.List;
 @ManagedBean
 @SessionScoped
 public class DirectoryBean {
-    private final Logger logger = LoggerFactory.getLogger(DirectoryBean.class);
+    private final Logger logger = LogManager.getLogger(DirectoryBean.class);
 
     public List<ListOfDirectoriesRecord> getDirectories() {
         try(Config config = ConfigFactory.get()) {
-            logger.info("getDirectories");
             List<ListOfDirectoriesRecord> list = DbUtil.getDirectories(config);
-            logger.info("count " + list.size());
+            logger.info("Number of Directories {}", list.size());
             return list;
         } catch(SQLException e) {
             e.printStackTrace();
@@ -30,8 +29,8 @@ public class DirectoryBean {
         return null;
     }
 
-    public void syncDirectory(int directoryId, String name, String dirBaseUrl, String resourceBiobanks, String resourceCollections, String resourceNetworks, boolean bbmriEricNationalNetworks, String username, String password) {
+    public void syncDirectory(ListOfDirectoriesRecord listOfDirectoriesRecord) {
         DirectorySynchronizeTask directorySynchronizeTask = new DirectorySynchronizeTask();
-        directorySynchronizeTask.runDirectorySync(directoryId, name, dirBaseUrl, resourceBiobanks, resourceCollections, resourceNetworks, bbmriEricNationalNetworks, username, password);
+        directorySynchronizeTask.runDirectorySync(listOfDirectoriesRecord);
     }
 }

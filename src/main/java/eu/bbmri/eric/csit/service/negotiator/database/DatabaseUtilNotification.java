@@ -1,14 +1,21 @@
 package eu.bbmri.eric.csit.service.negotiator.database;
 
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import de.samply.bbmri.negotiator.model.RequestStatusDTO;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
+import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Resource;
 import javax.naming.Context;
@@ -17,24 +24,16 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.jooq.impl.DSL.*;
 
 public class DatabaseUtilNotification {
 
-    private final DataSource dataSource;
-
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseUtilNotification.class);
-
-    public DatabaseUtilNotification(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     public NotificationRecord addNotificationEntry(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            NotificationRecord record = database.newRecord(Tables.NOTIFICATION);
+        try (Config config = ConfigFactory.get()) {
+            NotificationRecord record = config.dsl().newRecord(Tables.NOTIFICATION);
             record.setQueryId(requestId);
             record.setCommentId(commentId);
             record.setPersonId(personId);
@@ -43,18 +42,17 @@ public class DatabaseUtilNotification {
             record.store();
             return record;
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000030: Error add Notification Entry for " +
-                    "notificationType: {}, requestId: {}, commentId: {}, personId: {}.",
-                    notificationType, requestId, commentId, personId);
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000030: Error add Notification Entry for " +
+                    "notificationType: " + notificationType + ", requestId: " + requestId +
+                    ", commentId: " + commentId + ", personId: " + personId + ".");
+            ex.printStackTrace();
         }
         return null;
     }
 
     public List<NotificationRecord> getNotificationRecords() {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Result<NotificationRecord> records = database.selectFrom(Tables.NOTIFICATION)
+        try (Config config = ConfigFactory.get()) {
+            Result<NotificationRecord> records = config.dsl().selectFrom(Tables.NOTIFICATION)
                     .fetch();
             List<NotificationRecord> returnRecords = new ArrayList<>();
 
@@ -64,16 +62,15 @@ public class DatabaseUtilNotification {
             return returnRecords;
 
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000031: Error listing Notification Entries.");
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000031: Error listing Notification Entries.");
+            ex.printStackTrace();
         }
         return null;
     }
 
     public MailNotificationRecord addMailNotificationEntry(String emailAddress, Integer notificationId, Integer personId, String status, String subject, String body) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            MailNotificationRecord record = database.newRecord(Tables.MAIL_NOTIFICATION);
+        try (Config config = ConfigFactory.get()) {
+            MailNotificationRecord record = config.dsl().newRecord(Tables.MAIL_NOTIFICATION);
             record.setNotificationId(notificationId);
             record.setPersonId(personId);
             record.setCreateDate(new Timestamp(new Date().getTime()));
@@ -84,18 +81,17 @@ public class DatabaseUtilNotification {
             record.store();
             return record;
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000032: Error add Mail Notification Entry for " +
-                    "emailAddress: {}, notificationId: {}, personId: {}, status: {}, subject: {}.",
-                    emailAddress, notificationId, personId, status, subject);
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000032: Error add Mail Notification Entry for " +
+                    "emailAddress: " + emailAddress + ", notificationId: " + notificationId + ", personId: " + personId +
+                    ", status: " + status + ", subject: " + subject + ".");
+            ex.printStackTrace();
         }
         return null;
     }
 
     public List<MailNotificationRecord> getMailNotificationRecords() {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
+        try (Config config = ConfigFactory.get()) {
+            Result<MailNotificationRecord> records = config.dsl().selectFrom(Tables.MAIL_NOTIFICATION)
                     .fetch();
             List<MailNotificationRecord> returnRecords = new ArrayList<>();
             for(MailNotificationRecord record : records) {
@@ -103,16 +99,39 @@ public class DatabaseUtilNotification {
             }
             return returnRecords;
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000033: Error listing Mail Notification Entries.");
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000033: Error listing Mail Notification Entries.");
+            ex.printStackTrace();
         }
         return null;
     }
 
+    public List<MailNotificationRecord> getMailNotificationRecords(String createDay) {
+        List<MailNotificationRecord> returnRecords = new ArrayList<>();
+        try (Config config = ConfigFactory.get()) {
+            /*Result<MailNotificationRecord> records = config.dsl()
+                    .selectFrom(Tables.MAIL_NOTIFICATION)
+                    .where(Tables.MAIL_NOTIFICATION.CREATE_DATE.eq((java.sql.Date) createDay))
+                    .fetch();
+            for(MailNotificationRecord record : records) {
+                returnRecords.add(record);
+            }
+
+            */
+
+            Result<Record> record = config.dsl().resultQuery("SELECT *\n" +
+                    "\tFROM public.mail_notification WHERE create_date::date = '" + createDay + "';").fetch();
+            return config.map(record, MailNotificationRecord.class);
+
+        } catch (Exception ex) {
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000033: Error listing Mail Notification Entries.");
+            ex.printStackTrace();
+        }
+        return returnRecords;
+    }
+
     public List<MailNotificationRecord> getPendingNotifications() {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
+        try (Config config = ConfigFactory.get()) {
+            Result<MailNotificationRecord> records = config.dsl().selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.notEqual("success"))
                     .fetch();
             List<MailNotificationRecord> returnRecords = new ArrayList<>();
@@ -121,16 +140,15 @@ public class DatabaseUtilNotification {
             }
             return returnRecords;
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000034: Error listing pending Mail Notification Entries.");
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000034: Error listing pending Mail Notification Entries.");
+            ex.printStackTrace();
         }
         return null;
     }
 
     public List<MailNotificationRecord> getNotificationsWithStatus(String status, Integer interval) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
+        try (Config config = ConfigFactory.get()) {
+            Result<MailNotificationRecord> records = config.dsl().selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.eq(status))
                     .and(Tables.MAIL_NOTIFICATION.CREATE_DATE.lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), interval, DatePart.MINUTE)))
                     .fetch();
@@ -140,46 +158,40 @@ public class DatabaseUtilNotification {
             }
             return returnRecords;
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000034: Error listing pending Mail Notification Entries.");
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000034: Error listing pending Mail Notification Entries.");
+            ex.printStackTrace();
         }
         return null;
     }
 
-    public List<String> getNotificationMailForAggregation() {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Table<?> subquery = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS, max(Tables.MAIL_NOTIFICATION.CREATE_DATE).as("create_date"))
+    public List<String> getNotificationMailAddressesForAggregation() {
+        try (Config config = ConfigFactory.get()) {
+            Table<?> subquery = config.dsl().select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
                     .from(Tables.MAIL_NOTIFICATION)
-                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
+                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.PENDING))
+                            .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.ERROR)))
+                            .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.CREATED))))
                     .groupBy(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS).asTable("GROUPED_MAIL_NOTIFICATION");
 
-            List<String> result = database.select(subquery.field("email_address"))
+            List<String> result = config.dsl().select(subquery.field("email_address"))
                     .from(subquery)
-                    .where(cast(subquery.field("create_date"),Timestamp.class).lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), -10, DatePart.MINUTE)))
                     .fetch(subquery.field("email_address"), String.class);
-
-
-            /*List<String> result = database.select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
-                    .from(Tables.MAIL_NOTIFICATION)
-                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
-                    .and(max(Tables.MAIL_NOTIFICATION.CREATE_DATE).lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), -10, DatePart.MINUTE)))
-                    .groupBy(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
-                    .fetch(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS);*/
             return result;
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000069: Error getting listing pending Mail Notification Entries for aggregation.");
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000069: Error getting listing pending Mail Notification Entries for aggregation.");
+            ex.printStackTrace();
         }
-        return null;
+        return new ArrayList<>();
     }
 
     public List<MailNotificationRecord> getPendingNotificationsForMailAddress(String mailAddress) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Result<MailNotificationRecord> records = database.selectFrom(Tables.MAIL_NOTIFICATION)
-                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq("pending"))
+        try (Config config = ConfigFactory.get()) {
+            Result<MailNotificationRecord> records = config.dsl().selectFrom(Tables.MAIL_NOTIFICATION)
+                    .where(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.PENDING))
+                            .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.CREATED)))
+                            .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.ERROR))))
                     .and(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS.eq(mailAddress))
+                    .orderBy(Tables.MAIL_NOTIFICATION.CREATE_DATE)
                     .fetch();
             List<MailNotificationRecord> returnRecords = new ArrayList<>();
             for(MailNotificationRecord record : records) {
@@ -187,31 +199,51 @@ public class DatabaseUtilNotification {
             }
             return returnRecords;
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000070: Error getting listing of pending Mail Notification for email {}.", mailAddress);
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000070: Error getting listing of pending Mail Notification for email " + mailAddress + ".");
+            ex.printStackTrace();
         }
         return null;
     }
 
-    public void updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            database.update(Tables.MAIL_NOTIFICATION)
+    public boolean updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status) {
+        try (Config config = ConfigFactory.get()) {
+            config.dsl().update(Tables.MAIL_NOTIFICATION)
                     .set(Tables.MAIL_NOTIFICATION.STATUS, status)
                     .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(new Date().getTime()))
                     .where(Tables.MAIL_NOTIFICATION.MAIL_NOTIFICATION_ID.eq(mailNotificationRecordId)).execute();
+            return true;
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000035: Error update Mail Notification Entries for " +
-                    "mailNotificationRecordId: {}, status: {}.",
-                    mailNotificationRecordId, status);
-            logger.error("context", ex);
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,
+                    "882e8cb6-DbUtilNotification ERROR-NG-0000035: Error update Mail Notification Entries for " +
+                                "mailNotificationRecordId: " + mailNotificationRecordId + ", status: " + status + ".");
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000035: Error update Mail Notification Entries for " +
+                    "mailNotificationRecordId: " + mailNotificationRecordId + ", status: " + status + ".");
+            ex.printStackTrace();
         }
+        return false;
+    }
+
+    public boolean updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status, Date statusDate) {
+        try (Config config = ConfigFactory.get()) {
+            config.dsl().update(Tables.MAIL_NOTIFICATION)
+                    .set(Tables.MAIL_NOTIFICATION.STATUS, status)
+                    .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(statusDate.getTime()))
+                    .where(Tables.MAIL_NOTIFICATION.MAIL_NOTIFICATION_ID.eq(mailNotificationRecordId)).execute();
+            return true;
+        } catch (Exception ex) {
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,
+                    "882e8cb6-DbUtilNotification ERROR-NG-0000088: Error update Mail Notification Entries for " +
+                            "mailNotificationRecordId: " + mailNotificationRecordId + ", status: " + status + ", date: " + statusDate + ".");
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000088: Error update Mail Notification Entries for " +
+                    "mailNotificationRecordId: " + mailNotificationRecordId + ", status: " + status + ", date: " + statusDate + ".");
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     public Map<String, String> getEmailAddressesForQuery(Integer queryId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
+        try (Config config = ConfigFactory.get()) {
+            Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                     .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
@@ -220,43 +252,123 @@ public class DatabaseUtilNotification {
                     .fetch();
             return mapEmailAddressesAndNames(record);
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for queryId: {}.", queryId);
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for queryId: " + queryId + ".");
+            ex.printStackTrace();
         }
         return null;
     }
 
-    public Map<String, String> getBiobankEmailAddresses(Integer biobankId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
+    public Map<String, String> getFilterdBiobanksEmailAddressesAndNamesForRequest(Integer requestId) {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
+                    "JOIN person_collection pc ON p.id = pc.person_id\n" +
+                    "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
+                    "LEFT JOIN public.flagged_query fq ON qc.query_id = fq.query_id AND pc.person_id = fq.person_id " +
+                    "WHERE qc.query_id = " + requestId + " AND ((fq.flag != 'IGNORED' AND fq.flag != 'ARCHIVED') OR fq.flag IS NULL)" +
+                    " AND pc.collection_id NOT IN \n" +
+                    "(SELECT collection_id FROM \n" +
+                    "(SELECT collection_id, LAST_VALUE(status) OVER( PARTITION BY collection_id ORDER BY status_date RANGE BETWEEN \n" +
+                            "            UNBOUNDED PRECEDING AND \n" +
+                            "            UNBOUNDED FOLLOWING) status " +
+                            "FROM query_lifecycle_collection WHERE query_id = " + requestId + ") AS subcollectionsstatus\n" +
+                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "' OR " +
+                    "status ILIKE '" + LifeCycleRequestStatusStatus.SAMPLE_DATA_NOT_AVAILABLE + "' OR " +
+                    "status ILIKE '" + LifeCycleRequestStatusStatus.SAMPLE_DATA_AVAILABLE_NOT_ACCESSIBLE +"')" +
+                    " GROUP BY auth_email, auth_name;")
+                    .fetch();
+
+            return map2EmailAddressesAndNames(record);
+        } catch (Exception ex) {
+            NotificationService.sendSystemNotification(NotificationType.SYSTEM_ERROR_NOTIFICATION,
+                    "8882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for requestId: " +
+                            requestId + ".");
+            System.err.println("8882e8cb6-DbUtilNotification ERROR-NG-0000036: Error listing email-addresses for requestId: " +
+                    requestId + ".");
+            ex.printStackTrace();
+        }
+        return new HashMap<>();
+    }
+
+    public Map<String, String> getCollectionEmailAddressesByBiobankIdAndRequestId(Integer biobankId, Integer requestId) {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                     .join(Tables.COLLECTION).on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                    .where(Tables.COLLECTION.BIOBANK_ID.eq(biobankId))
+                    .join(Tables.QUERY_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                    .where(Tables.COLLECTION.BIOBANK_ID.eq(biobankId).and(Tables.QUERY_COLLECTION.QUERY_ID.eq(requestId)))
                     .fetch();
             return mapEmailAddressesAndNames(record);
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000037: Error listing email-addresses for biobankId: {}.", biobankId);
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000037: Error listing email-addresses for biobankId: {}.");
+            ex.printStackTrace();
         }
         return null;
     }
 
-    public Map<String, String> getCollectionEmailAddresses(Integer collectionId) {
-        try (Connection conn = dataSource.getConnection()) {
-            DSLContext database = DSL.using(conn, SQLDialect.POSTGRES);
-            Result<Record2<String, String>> record = database.selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
-                    .from(Tables.PERSON)
-                    .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
-                    .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
+    public Map<String, String> getCollectionEmailAddressesStillInNegotiation(Integer requestId, Integer collectionId) {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
+                    "JOIN person_collection pc ON p.id = pc.person_id\n" +
+                    "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
+                    "WHERE qc.collection_id = " + collectionId + " AND pc.collection_id NOT IN \n" +
+                    "(SELECT collection_id FROM \n" +
+                    "(SELECT collection_id, status FROM query_lifecycle_collection WHERE query_id = " + requestId +
+                    " AND collection_id = " + collectionId + " ORDER BY status_date DESC LIMIT 1) AS subcollectionsstatus\n" +
+                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "');")
                     .fetch();
-            return mapEmailAddressesAndNames(record);
+
+            return map2EmailAddressesAndNames(record);
         } catch (Exception ex) {
-            logger.error("882e8cb6-DbUtilNotification ERROR-NG-0000066: Error listing email-addresses for collectionId: {}.", collectionId);
-            logger.error("context", ex);
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000066: Error listing email-addresses for collectionId: " + collectionId + ".");
+            ex.printStackTrace();
         }
         return null;
+    }
+
+    public Map<String, String> getEmailAddressesStillInNegotiation(Integer requestId) {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
+                    "JOIN person_collection pc ON p.id = pc.person_id\n" +
+                    "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
+                    "WHERE qc.query_id = " + requestId + " AND pc.collection_id NOT IN \n" +
+                    "(SELECT collection_id FROM \n" +
+                    "(SELECT collection_id, status FROM query_lifecycle_collection WHERE query_id = " + requestId +
+                    " ORDER BY status_date DESC LIMIT 1) AS subcollectionsstatus\n" +
+                    "WHERE status ILIKE '" + LifeCycleRequestStatusStatus.NOT_INTERESTED + "');")
+                    .fetch();
+
+            return map2EmailAddressesAndNames(record);
+        } catch (Exception ex) {
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000066: Error listing email-addresses of collections still in negotiation for requestId: " + requestId + ".");
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Date> getDatesNotificationsWhereSend() {
+        try (Config config = ConfigFactory.get()) {
+            Result<Record> record = config.dsl().resultQuery("SELECT create_date::date\n" +
+                    "\tFROM public.mail_notification GROUP BY create_date::date;").fetch();
+            return mapDateList(record);
+        } catch (Exception ex) {
+            System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000099: Error get dates where notifications where send.");
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    private List<Date> mapDateList(Result<Record> records) {
+        List<Date> dateList = new ArrayList<>();
+        for(Record record : records) {
+            try {
+                dateList.add(new SimpleDateFormat("yyyy-MM-dd").parse(record.getValue("create_date").toString()));
+            } catch (Exception ex) {
+                System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000100: Error converting String to Date.");
+                ex.printStackTrace();
+            }
+        }
+        return dateList;
     }
 
     @NotNull
@@ -265,6 +377,17 @@ public class DatabaseUtilNotification {
         for (Record2<String, String> record1 : record) {
             if (!addressList.containsKey(record1.value1())) {
                 addressList.put(record1.value1(), record1.value2());
+            }
+        }
+        return addressList;
+    }
+
+    @NotNull
+    private Map<String, String> map2EmailAddressesAndNames(Result<Record> record) {
+        Map<String, String> addressList = new HashMap<>();
+        for (Record record1 : record) {
+            if (!addressList.containsKey(record1.getValue(0))) {
+                addressList.put(record1.getValue(0).toString(), record1.getValue(1).toString());
             }
         }
         return addressList;

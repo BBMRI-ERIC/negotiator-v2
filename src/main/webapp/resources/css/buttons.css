@@ -34,3 +34,12 @@
 
 .btn-info {
 }
+
+.btn-secondary {
+    background-color: #EFEFEF;
+}
+
+.btn-secondary:hover, .btn-secondary:active, .btn-secondary:focus {
+    border-color: transparent;
+    background-color: #9a9a9a;
+}

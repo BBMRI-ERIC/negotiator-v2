@@ -43,15 +43,14 @@ import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
-import de.samply.share.model.bbmri.BbmriResult;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
 import org.jooq.*;
 import org.jooq.Record;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -66,13 +65,14 @@ import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 
 import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.select;
 
 /**
  * The database util for basic queries.
  */
 public class DbUtil {
 
-    private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
+    private final static Logger logger = LogManager.getLogger(DbUtil.class);
 
     /**
      * Retunrs the list of all Directories
@@ -80,8 +80,8 @@ public class DbUtil {
      * @return
      */
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
-        Result<ListOfDirectoriesRecord> records = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).fetch();
-        return config.map(records, ListOfDirectoriesRecord.class);
+        Result<Record> records = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).fetch();
+        return MappingListDbUtil.mapRecordsListOfDirectoriesRecords(records);
     }
 
     /**
@@ -92,8 +92,8 @@ public class DbUtil {
      */
     public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) {
         try {
-            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
-            return config.map(record, ListOfDirectoriesRecord.class);
+            Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
+            return MappingDbUtil.mapRecordListOfDirectoriesRecord(record);
         } catch (IllegalArgumentException e) {
             logger.error("No Directory Entry found for ID: " + listOfDirectoryId);
             e.printStackTrace();
@@ -103,8 +103,8 @@ public class DbUtil {
 
     public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) {
         try {
-            Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
-            return config.map(record, ListOfDirectoriesRecord.class);
+            Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
+            return MappingDbUtil.mapRecordListOfDirectoriesRecord(record);
         } catch (IllegalArgumentException e) {
             logger.error("No Directory Entry found for DirectoryName: " + directoryName);
             e.printStackTrace();
@@ -199,12 +199,17 @@ public class DbUtil {
      */
     public static ListOfDirectoriesRecord getDirectoryByUrl(Config config, String url) {
         int endindex = url.indexOf("/", 9);
-        if(endindex == -1) {
+        if (endindex == -1) {
             endindex = url.length();
         }
         url = url.substring(0, endindex);
-        Record record = config.dsl().selectFrom(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
-        return config.map(record, ListOfDirectoriesRecord.class);
+        Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories"))
+                .from(Tables.LIST_OF_DIRECTORIES)
+                .where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
+        if(record == null) {
+            return null;
+        }
+        return MappingDbUtil.mapRecordListOfDirectoriesRecord(record);
     }
 
     /**
@@ -238,46 +243,6 @@ public class DbUtil {
             e.printStackTrace();
         }
         return "";
-    }
-
-    /**
-     * Saves the results received from the connector
-     * @param config JOOQ configuration
-     * @param result BBMRIResult object containing result
-     */
-    public static Boolean saveConnectorQueryResult(Config config, BbmriResult result){
-        Integer collectionId = getCollectionId(config, result.getDirectoryCollectionId());
-
-        if(collectionId == null) {
-            logger.error("Could not find the collection with ID {}", result.getDirectoryCollectionId());
-            return false;
-        }
-
-        try {
-            config.dsl().delete(Tables.QUERY_COLLECTION)
-                    .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(result.getNegotiatorQueryId())
-                    .and (Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId)))
-                    .execute();
-
-            // only save an entry, if the result is actually not 0
-            if(result.getNumberOfSamples() != 0 || result.getNumberOfDonors() != 0) {
-                config.dsl().insertInto(Tables.QUERY_COLLECTION)
-                        .set(Tables.QUERY_COLLECTION.QUERY_ID, result.getNegotiatorQueryId())
-                        .set(Tables.QUERY_COLLECTION.COLLECTION_ID, collectionId)
-                        .set(Tables.QUERY_COLLECTION.EXPECT_CONNECTOR_RESULT, false)
-                        .set(Tables.QUERY_COLLECTION.DONORS, result.getNumberOfDonors())
-                        .set(Tables.QUERY_COLLECTION.SAMPLES, result.getNumberOfSamples())
-                        .set(Tables.QUERY_COLLECTION.RESULT_RECEIVED_TIME, new Timestamp(new Date().getTime()))
-                        .execute();
-            }
-
-            config.commit();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
     /**
@@ -318,22 +283,7 @@ public class DbUtil {
                 .and( Tables.QUERY.QUERY_CREATION_TIME.ge(timestamp))
                 .fetch();
 
-          // The mapper does not map the query_xml at all, why?
-//        return config.map(result, QueryDetail.class);
-
-        // So doing this manually
-        List<QueryDetail> queryDetails = new ArrayList<>();
-        for (Record record : result) {
-            QueryDetail queryDetail = new QueryDetail();
-            queryDetail.setQueryId(record.getValue("query_id", Integer.class));
-            queryDetail.setQueryText(record.getValue("query_text", String.class));
-            queryDetail.setQueryTitle(record.getValue("query_title", String.class));
-            queryDetail.setQueryXml(record.getValue("query_xml", String.class));
-
-            queryDetails.add(queryDetail);
-        }
-
-        return queryDetails;
+        return MappingListDbUtil.getQueryDetails(result);
     }
 
     /**
@@ -397,23 +347,23 @@ public class DbUtil {
      * @throws SQLException
      */
     public static QueryRecord getQueryFromId(Config config, Integer queryId) {
-        Record result = config.dsl()
-                .selectFrom(Tables.QUERY)
+        Record result = config.dsl().select(getFields(Tables.QUERY, "query"))
+                .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(queryId))
                 .fetchOne();
 
-        return config.map(result, QueryRecord.class);
+        return MappingDbUtil.mapRecordQueryRecord(result);
     }
 
     public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getQueryFromIdAsQuery(Config config, Integer queryId) {
-        Record result = config.dsl()
-                .selectFrom(Tables.QUERY)
+        Record result = config.dsl().select(getFields(Tables.QUERY, "query"))
+                .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(queryId))
                 .fetchOne();
-
-        return config.map(result, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+        return MappingDbUtil.mapRequestQuery(result);
     }
 
+    // TODO: Rework Mapping
     /**
      * Edits/Updates title, description and jsonText of a query.
      * @param title title of the query
@@ -671,7 +621,7 @@ public class DbUtil {
 
         Result<Record> records = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
-                .select(getFields(Tables.PERSON, "query_author"))
+                .select(getFields(Tables.PERSON, "person"))
                 .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
@@ -690,44 +640,7 @@ public class DbUtil {
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        return mapRecordResultQueryStatsDTOList(records);
-    }
-
-    private static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> records) {
-        List<QueryStatsDTO> result = new ArrayList<QueryStatsDTO>();
-        for(Record record : records) {
-            QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
-            de.samply.bbmri.negotiator.jooq.tables.pojos.Query query = new de.samply.bbmri.negotiator.jooq.tables.pojos.Query();
-            de.samply.bbmri.negotiator.jooq.tables.pojos.Person queryAuthor = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
-            query.setId((Integer) record.getValue("query_id"));
-            query.setTitle((String) record.getValue("query_title"));
-            query.setText((String) record.getValue("query_text"));
-            query.setQueryXml((String) record.getValue("query_query_xml"));
-            query.setQueryCreationTime((Timestamp) record.getValue("query_query_creation_time"));
-            query.setResearcherId((Integer) record.getValue("query_researcher_id"));
-            query.setJsonText((String) record.getValue("query_json_text"));
-            query.setNumAttachments((Integer) record.getValue("query_num_attachments"));
-            query.setNegotiatorToken((String) record.getValue("query_negotiator_token"));
-            query.setValidQuery((Boolean) record.getValue("query_valid_query"));
-            query.setRequestDescription((String) record.getValue("query_request_description"));
-            query.setEthicsVote((String) record.getValue("query_ethics_vote"));
-            query.setNegotiationStartedTime((Timestamp) record.getValue("query_negotiation_started_time"));
-            query.setTestRequest((Boolean) record.getValue("query_test_request"));
-            queryStatsDTO.setQuery(query);
-            queryAuthor.setId((Integer) record.getValue("query_author_id"));
-            queryAuthor.setAuthSubject((String) record.getValue("query_author_auth_subject"));
-            queryAuthor.setAuthName((String) record.getValue("query_author_auth_name"));
-            queryAuthor.setAuthEmail((String) record.getValue("query_author_auth_email"));
-            queryAuthor.setPersonImage((byte[]) record.getValue("query_author_person_image"));
-            queryAuthor.setIsAdmin((Boolean) record.getValue("query_author_is_admin"));
-            queryAuthor.setOrganization((String) record.getValue("query_author_organization"));
-            queryStatsDTO.setQueryAuthor(queryAuthor);
-            queryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
-            queryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
-            queryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
-            result.add(queryStatsDTO);
-        }
-        return result;
+        return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
     }
 
     /**
@@ -771,7 +684,7 @@ public class DbUtil {
 
     	Result<Record> fetch = config.dsl()
 				.select(getFields(Tables.QUERY, "query"))
-				.select(getFields(queryAuthor, "query_author"))
+				.select(getFields(queryAuthor, "person"))
     			.select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
     			.select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
                 .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
@@ -815,28 +728,8 @@ public class DbUtil {
     			.groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
     			.orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
 
-        //List<OwnerQueryStatsDTO> t1 = config.map(fetch, OwnerQueryStatsDTO.class);
-        //List<OwnerQueryStatsDTO> t2 = mapRecordResultOwnerQueryStatsDTOList(config, fetch);
-
-		//return config.map(fetch, OwnerQueryStatsDTO.class);
-        return mapRecordResultOwnerQueryStatsDTOList(config, fetch);
+        return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
-
-    private static List<OwnerQueryStatsDTO> mapRecordResultOwnerQueryStatsDTOList(Config config, Result<Record> records) {
-        List<OwnerQueryStatsDTO> result = new ArrayList<OwnerQueryStatsDTO>();
-        for(Record record : records) {
-            OwnerQueryStatsDTO ownerQueryStatsDTO = new OwnerQueryStatsDTO();
-            ownerQueryStatsDTO.setQuery(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class));
-            ownerQueryStatsDTO.setQueryAuthor(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
-            ownerQueryStatsDTO.setCommentCount((Integer) record.getValue("comment_count"));
-            ownerQueryStatsDTO.setLastCommentTime((Timestamp) record.getValue("last_comment_time"));
-            ownerQueryStatsDTO.setFlag((Flag) record.getValue("flag"));
-            ownerQueryStatsDTO.setUnreadCommentCount((Integer) record.getValue("unread_comment_count"));
-            result.add(ownerQueryStatsDTO);
-        }
-        return result;
-    }
-
 
     /**
      * Returns a list of QueryAttachmentDTO for a specific query.
@@ -846,91 +739,44 @@ public class DbUtil {
      */
     public static List<QueryAttachmentDTO> getQueryAttachmentRecords(Config config, int queryId) {
         Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY_ATTACHMENT, "attachment"))
+                .select(getFields(Tables.QUERY_ATTACHMENT, "query_attachment"))
                 .from(Tables.QUERY_ATTACHMENT)
                 .where(Tables.QUERY_ATTACHMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT.ID.asc()).fetch();
-
-        return config.map(result, QueryAttachmentDTO.class);
+        return MappingListDbUtil.mapRecordsQueryAttachmentDTO(result);
     }
 
     public static List<PrivateAttachmentDTO> getPrivateAttachmentRecords(Config config, int queryId) {
         Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY_ATTACHMENT_PRIVATE, "privateAttachment"))
+                .select(getFields(Tables.QUERY_ATTACHMENT_PRIVATE, "query_attachment_private"))
                 .from(Tables.QUERY_ATTACHMENT_PRIVATE)
                 .where(Tables.QUERY_ATTACHMENT_PRIVATE.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT_PRIVATE.ID.asc()).fetch();
 
-        List<PrivateAttachmentDTO> privateAttachmentDTOList = new ArrayList<PrivateAttachmentDTO>();
-        for (Record record : result) {
-            try {
-                PrivateAttachmentDTO privateAttachmentDTO = new PrivateAttachmentDTO();
-                privateAttachmentDTO.setId((Integer) record.getValue("privateAttachment_id"));
-                privateAttachmentDTO.setPersonId((Integer) record.getValue("privateAttachment_person_id"));
-                privateAttachmentDTO.setQueryId((Integer) record.getValue("privateAttachment_query_id"));
-                privateAttachmentDTO.setBiobank_in_private_chat((Integer) record.getValue("privateAttachment_biobank_in_private_chat"));
-                privateAttachmentDTO.setAttachment_time((Timestamp) record.getValue("privateAttachment_attachment_time"));
-                privateAttachmentDTO.setAttachment((String) record.getValue("privateAttachment_attachment"));
-                privateAttachmentDTO.setAttachmentType((String) record.getValue("privateAttachment_attachment_type"));
-                privateAttachmentDTOList.add(privateAttachmentDTO);
-            } catch (Exception ex) {
-                System.err.println("Exception converting record to PrivateAttachmentDTO");
-                ex.printStackTrace();
-            }
-        }
-
-        return privateAttachmentDTOList;
+        return MappingListDbUtil.mapRecordsPrivateAttachmentDTO(result);
     }
 
     public static List<CommentAttachmentDTO> getCommentAttachmentRecords(Config config, int queryId) {
         Result<Record> result = config.dsl()
-                .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "commentAttachment"))
+                .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "query_attachment_comment"))
                 .from(Tables.QUERY_ATTACHMENT_COMMENT)
                 .where(Tables.QUERY_ATTACHMENT_COMMENT.QUERY_ID.eq(queryId))
                 .orderBy(Tables.QUERY_ATTACHMENT_COMMENT.ID.asc()).fetch();
 
-        List<CommentAttachmentDTO> commentAttachmentDTOList = new ArrayList<CommentAttachmentDTO>();
-        for (Record record : result) {
-            try {
-                CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
-                commentAttachmentDTO.setId((Integer) record.getValue("commentAttachment_id"));
-                commentAttachmentDTO.setQueryId((Integer) record.getValue("commentAttachment_query_id"));
-                commentAttachmentDTO.setCommentId((Integer) record.getValue("commentAttachment_comment_id"));
-                commentAttachmentDTO.setAttachment((String) record.getValue("commentAttachment_attachment"));
-                commentAttachmentDTO.setAttachmentType((String) record.getValue("commentAttachment_attachment_type"));
-                commentAttachmentDTOList.add(commentAttachmentDTO);
-            } catch (Exception ex) {
-                System.err.println("Exception converting record to CommentAttachmentDTO");
-                ex.printStackTrace();
-            }
-        }
-
-        return commentAttachmentDTOList;
+        return MappingListDbUtil.mapRecordsCommentAttachmentDTO(result);
     }
 
     public static List<CommentAttachmentDTO> getCommentAttachments(Config config, Integer commentId) {
-        List<QueryAttachmentCommentRecord> list = config.dsl().selectFrom(Tables.QUERY_ATTACHMENT_COMMENT)
+        Result<Record> result = config.dsl()
+                .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "query_attachment_comment"))
+                .from(Tables.QUERY_ATTACHMENT_COMMENT)
                 .where(Tables.QUERY_ATTACHMENT_COMMENT.COMMENT_ID.eq(commentId))
                 .fetch();
 
-        List<CommentAttachmentDTO> commentAttachmentList = new ArrayList<CommentAttachmentDTO>();
-        for(QueryAttachmentCommentRecord queryAttachmentCommentRecord : list) {
-            try {
-                CommentAttachmentDTO commentAttachmentDTO = new CommentAttachmentDTO();
-                commentAttachmentDTO.setId(queryAttachmentCommentRecord.getId());
-                commentAttachmentDTO.setCommentId(queryAttachmentCommentRecord.getCommentId());
-                commentAttachmentDTO.setQueryId(queryAttachmentCommentRecord.getQueryId());
-                commentAttachmentDTO.setAttachment(queryAttachmentCommentRecord.getAttachment());
-                commentAttachmentDTO.setAttachmentType(queryAttachmentCommentRecord.getAttachmentType());
-                commentAttachmentList.add(commentAttachmentDTO);
-            } catch (Exception ex) {
-                System.err.println("Exception converting record to CommentAttachmentDTO");
-                ex.printStackTrace();
-            }
-        }
-        return commentAttachmentList;
+        return MappingListDbUtil.mapRecordsCommentAttachmentDTO(result);
     }
 
+    // TODO: Spped sink?
     /**
      * Returns a list of CommentPersonDTOs for a specific query.
      * @param config
@@ -957,11 +803,12 @@ public class DbUtil {
 
         for(Record record : commentsAndCommenter) {
             CommentPersonDTO commentPersonDTO = new CommentPersonDTO();
-            commentPersonDTO.setComment(config.map(record, Comment.class));
+            commentPersonDTO.setComment(MappingDbUtil.mapRecordComment(record));
             commentPersonDTO.getComment().setId(Integer.parseInt(record.getValue("comment_id").toString()));
-            commentPersonDTO.setPerson(config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class));
+            commentPersonDTO.setPerson(MappingDbUtil.mapRequestPerson(record));
             commentPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
             commentPersonDTO.setCommentRead(record.getValue("personcomment_read") == null || (boolean) record.getValue("personcomment_read"));
+
             Integer commenterId = commentPersonDTO.getPerson().getId();
             if(!personCollections.containsKey(commenterId)) {
                 Result<Record> collections = config.dsl()
@@ -973,7 +820,7 @@ public class DbUtil {
                                 .and(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
                         .where(Tables.PERSON_COLLECTION.PERSON_ID.eq(commenterId))
                         .fetch();
-                personCollections.put(commenterId, config.map(collections, Collection.class));
+                personCollections.put(commenterId, MappingListDbUtil.mapRecordsCollections(collections));
             }
             commentPersonDTO.setCollections(personCollections.get(commenterId));
             result.add(commentPersonDTO);
@@ -1010,6 +857,50 @@ public class DbUtil {
                 "GROUP BY person_id)").execute();
 
         updateCommentReadForUser(config, commenterId, commentId);
+    }
+
+    public static void updateQueryLifecycleReadForUser(Config config, Integer userId, Integer requestId) {
+
+        Result<PersonQuerylifecycleRecord>  records = config.dsl().selectFrom(Tables.PERSON_QUERYLIFECYCLE)
+                .where(Tables.PERSON_QUERYLIFECYCLE.QUERY_LIFECYCLE_COLLECTION_ID.in(
+                        select(Tables.QUERY_LIFECYCLE_COLLECTION.ID)
+                                .from(Tables.QUERY_LIFECYCLE_COLLECTION)
+                                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(requestId)
+                                //        .and(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS.eq(status))
+                                //        .and(Tables.QUERY_LIFECYCLE_COLLECTION.STATUS_TYPE.eq(statusType))
+                                )))
+                .and(Tables.PERSON_QUERYLIFECYCLE.PERSON_ID.eq(userId))
+                .and(Tables.PERSON_QUERYLIFECYCLE.READ.eq(false))
+                .fetch();
+        if(records != null){
+            for(PersonQuerylifecycleRecord record : records) {
+                if(record != null && !record.getRead()) {
+                    record.setRead(true);
+                    record.setDateRead(new Timestamp(new Date().getTime()));
+                    record.update();
+                }
+            }
+        }
+
+    }
+
+    public static void addQueryLifecycleReadForUser(Config config, Integer requestId, Integer statusChangerId, String status, String statusType) {
+
+        config.dsl().resultQuery("INSERT INTO public.person_querylifecycle (person_id, query_lifecycle_collection_id, read) " +
+                "(SELECT person_id, query_lifecycle_collection_id, false FROM " +
+                "((SELECT pc.person_id person_id , qlc.id query_lifecycle_collection_id " +
+                "FROM public.query_lifecycle_collection qlc " +
+                "JOIN query_collection qc ON qlc.query_id = qc.query_id " +
+                "JOIN person_collection pc ON qc.collection_id = pc.collection_id " +
+                "WHERE qlc.query_id = " + requestId + " AND qlc.status = \'" + status + "\' AND qlc.status_type = \'" + statusType + "\') " +
+                "UNION " +
+                "(SELECT q.researcher_id person_id, qlc.id query_lifecycle_collection_id  " +
+                "FROM public.query_lifecycle_collection qlc " +
+                "JOIN query q ON qlc.query_id = q.id " +
+                "WHERE qlc.query_id = " + requestId + " AND qlc.status = \'" + status + "\' AND qlc.status_type = \'" + statusType + "\')) sub " +
+                "GROUP BY person_id, query_lifecycle_collection_id)").execute();
+
+        updateQueryLifecycleReadForUser(config, statusChangerId, requestId);
     }
 
     public static void addOfferCommentReadForComment(Config config, Integer offertId, Integer commenterId, Integer biobankId) {
@@ -1192,12 +1083,12 @@ public class DbUtil {
 
     // Create Script to collect all biobanknames for a query
     public static List<BiobankRecord> getBiobanks(Config config) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.BIOBANK))
+        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.BIOBANK, "biobank"))
                     .from(Tables.BIOBANK)
                     .orderBy(Tables.BIOBANK.ID)
                     .fetch();
 
-        return config.map(record, BiobankRecord.class);
+        return MappingListDbUtil.mapRecordsBiobankRecords(record);
     }
 
     /**
@@ -1216,7 +1107,7 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId)).and(Tables.PERSON_COLLECTION.PERSON_ID.eq(userId))
                 .orderBy(Tables.BIOBANK.ID).fetch();
 
-          return config.map(record, BiobankRecord.class);
+          return MappingListDbUtil.mapRecordsBiobankRecords(record);
 
     }
 
@@ -1230,7 +1121,7 @@ public class DbUtil {
                 config.dsl().select(getFields(Tables.PERSON, "person")).from(Tables.PERSON).orderBy(Tables.PERSON
                         .AUTH_NAME).fetch();
 
-        return config.map(record, PersonRecord.class);
+        return MappingListDbUtil.mapRecordsPersonRecord(record);
     }
 
     /**
@@ -1366,9 +1257,6 @@ public class DbUtil {
     }
 
     public static void updateCollectionNetworkLinks(Config config, DirectoryCollection directoryCollection, int listOfDirectoryId, int collectionId) {
-        if(directoryCollection.getNetworkLinks().size() > 0) {
-            System.out.println(directoryCollection.getName());
-        }
 
         config.dsl().deleteFrom(Tables.NETWORK_COLLECTION_LINK)
                 .where(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(collectionId))
@@ -1404,44 +1292,24 @@ public class DbUtil {
 
     public static void updateNetworkBiobankLinks(Config config, String nnacronym, String directoryIdStart) {
         config.dsl().execute("INSERT INTO public.network_biobank_link(biobank_id, network_id) " +
-                "SELECT bio.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "SELECT bio.id, (SELECT id FROM public.network WHERE directory_id = '" + nnacronym + "') " +
                 "FROM public.biobank bio WHERE bio.directory_id ILIKE '" + directoryIdStart + "' " +
                 "AND id NOT IN ( " +
                 "SELECT b.id FROM public.biobank b " +
                 "JOIN public.network_biobank_link nb ON nb.biobank_id = b.id " +
                 "JOIN public.network n ON nb.network_id = n.id " +
-                "WHERE n.acronym = '" + nnacronym + "')");
+                "WHERE n.directory_id = '" + nnacronym + "')");
     }
 
     public static void updateNetworkCollectionLinks(Config config, String nnacronym, String directoryIdStart) {
         config.dsl().execute("INSERT INTO public.network_collection_link(collection_id, network_id) " +
-                "SELECT col.id, (SELECT id FROM public.network WHERE acronym = '" + nnacronym + "') " +
+                "SELECT col.id, (SELECT id FROM public.network WHERE directory_id = '" + nnacronym + "') " +
                 "FROM public.collection col WHERE col.directory_id ILIKE '" + directoryIdStart + "' " +
                 "AND id NOT IN ( " +
                 "SELECT c.id FROM public.collection c " +
                 "JOIN public.network_collection_link nc ON nc.collection_id = c.id " +
                 "JOIN public.network n ON nc.network_id = n.id " +
-                "WHERE n.acronym = '" + nnacronym + "')");
-    }
-
-    /*
-     * Return all biobankers associated to this query, except the one who made the comment
-     */
-    public static List<NegotiatorDTO> getPotentialNegotiators(Config config, Integer queryId, Flag flag, int userId) {
-
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.QUERY_COLLECTION)
-                .join(Tables.COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .and (Tables.PERSON.ID.notEqual(userId))
-                .and (Tables.PERSON.ID.notIn (
-                        config.dsl().select(Tables.FLAGGED_QUERY.PERSON_ID)
-                        .from(Tables.FLAGGED_QUERY)
-                .where (Tables.FLAGGED_QUERY.QUERY_ID.eq(queryId)).and (Tables.FLAGGED_QUERY.FLAG.eq(flag))))
-                .fetch();
-          return config.map(record, NegotiatorDTO.class);
+                "WHERE n.directory_id = '" + nnacronym + "')");
     }
 
     public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollection(Config config, Integer collectionId) {
@@ -1464,29 +1332,6 @@ public class DbUtil {
         return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
     }
 
-    public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForCollectionsInQuery(Config config, Integer queryId) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
-                .from(Tables.COLLECTION)
-                .join(Tables.PERSON_COLLECTION).on(Tables.COLLECTION.ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .join(Tables.PERSON).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .join(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId))
-                .fetch();
-        return config.map(record, de.samply.bbmri.negotiator.jooq.tables.pojos.Person.class);
-    }
-
-    /*
-     * Return query owner
-     */
-    public static NegotiatorDTO getQueryOwner(Config config, Integer queryId) {
-        Result<Record> record = config.dsl().select(getFields(Tables.PERSON,"person"))
-                .from(Tables.PERSON)
-                .join(Tables.QUERY).on(Tables.QUERY.RESEARCHER_ID.eq(Tables.PERSON.ID))
-                .where(Tables.QUERY.ID.eq(queryId)).fetch();
-
-        return config.map(record.get(0), NegotiatorDTO.class);
-    }
-
     /**
      * Creates a new query from the given arguments.
      * @param title title of the query
@@ -1498,9 +1343,14 @@ public class DbUtil {
      */
     public static QueryRecord saveQuery(Config config, String title,
                                         String text, String requestDescription, String jsonText, String ethicsVote, int researcherId,
+                                        String nToken,
                                         Boolean validQuery, String researcher_name, String researcher_email, String researcher_organization,
                                         Boolean testRequest) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
+
+        if(nToken == null || nToken.isEmpty()) {
+            nToken = UUID.randomUUID().toString().replace("-", "");
+        }
 
         queryRecord.setJsonText(jsonText);
         queryRecord.setQueryCreationTime(new Timestamp(new Date().getTime()));
@@ -1509,7 +1359,7 @@ public class DbUtil {
         queryRecord.setTitle(title);
         queryRecord.setEthicsVote(ethicsVote);
         queryRecord.setResearcherId(researcherId);
-        queryRecord.setNegotiatorToken(UUID.randomUUID().toString().replace("-", ""));
+        queryRecord.setNegotiatorToken(nToken);
         queryRecord.setNumAttachments(0);
         queryRecord.setValidQuery(validQuery);
         queryRecord.setResearcherName(researcher_name);
@@ -1536,6 +1386,7 @@ public class DbUtil {
                     }
                 }
             } else {
+
                 for (CollectionDTO collection : querySearchDTO.getCollections()) {
                     CollectionRecord dbCollection = getCollection(config, collection.getCollectionID(), listOfDirectoriesRecord.getId());
 
@@ -1670,22 +1521,6 @@ public class DbUtil {
                                 .join(Tables.PERSON_COLLECTION)
                                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 )).fetch(), Collection.class);
-    }
-
-    /**
-     * Returns the list of users for a given collection.
-     * @param config the current configuration
-     * @param collectionId the collection ID
-     * @return
-     */
-    public static List<CollectionOwner> getUsersForCollection(Config config, int collectionId) {
-        Result<Record> result = config.dsl().select(getFields(Tables.PERSON))
-                .from(Tables.PERSON)
-                .join(Tables.PERSON_COLLECTION, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON_COLLECTION.PERSON_ID.eq(Tables.PERSON.ID))
-                .where(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(collectionId))
-                .fetch();
-        List<CollectionOwner> users = config.map(result, CollectionOwner.class);
-        return users;
     }
 
     /**
@@ -1949,6 +1784,7 @@ public class DbUtil {
                 .select(Tables.OFFER.COMMENT_TIME.max().as("last_comment_time"))
                 .select(Tables.OFFER.ID.countDistinct().as("private_negotiation_count"))
                 .select(Tables.PERSON_OFFER.READ.count().as("unread_private_negotiation_count"))
+                .select(Tables.COLLECTION.ID.countDistinct().as("number_of_collections"))
                 .from(Tables.OFFER)
                 .join(Tables.BIOBANK).on(Tables.BIOBANK.ID.eq(Tables.OFFER.BIOBANK_IN_PRIVATE_CHAT))
                 .join(Tables.COLLECTION).on(Tables.BIOBANK.ID.eq(Tables.COLLECTION.BIOBANK_ID))
@@ -1963,6 +1799,19 @@ public class DbUtil {
         return result;
     }
 
+    public static Result<Record> getUnreadQueryLifecycleCountAndTime(Config config, Integer queryId, Integer personId){
+        Result<Record> result = config.dsl()
+                .select(Tables.PERSON_QUERYLIFECYCLE.READ.count().as("unread_query_lifecycle_changes_count"))
+                .select(Tables.PERSON_QUERYLIFECYCLE.DATE_READ.max().as("last_read_time"))
+                .from(Tables.PERSON_QUERYLIFECYCLE)
+                .join(Tables.QUERY_LIFECYCLE_COLLECTION).on(Tables.PERSON_QUERYLIFECYCLE.QUERY_LIFECYCLE_COLLECTION_ID.eq(Tables.QUERY_LIFECYCLE_COLLECTION.ID))
+                .where(Tables.QUERY_LIFECYCLE_COLLECTION.QUERY_ID.eq(queryId))
+                .and(Tables.PERSON_QUERYLIFECYCLE.PERSON_ID.eq(personId))
+                .and(Tables.PERSON_QUERYLIFECYCLE.READ.eq(false))
+                .fetch();
+        return result;
+
+    }
 
     /**
      * Gets a list of Persons who are responsible for a given collection
@@ -2084,8 +1933,7 @@ public class DbUtil {
                 "FROM public.list_of_directories d LEFT JOIN public.list_of_directories d2 ON d2.name = d.directory_prefix " +
                 ") AS jsond;");
         Result<Record> result = resultQuery.fetch();
-        for(Record record : result) {
-            System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
+        for(Record record : result) {//class org.postgresql.util.PGobject
 
             //PGobject jsonObject = record.getValue(0);
             return (String)record.getValue(0);
@@ -2345,21 +2193,9 @@ public class DbUtil {
                 .fetch();
         List<RequestStatusDTO> returnList = new ArrayList<RequestStatusDTO>();
         for(RequestStatusRecord requestStatusRecord : fetch) {
-            returnList.add(mapRequestStatusDTO(requestStatusRecord));
+            returnList.add(MappingDbUtil.mapRequestStatusDTO(requestStatusRecord));
         }
         return returnList;
-    }
-
-    private static RequestStatusDTO mapRequestStatusDTO(RequestStatusRecord requestStatusRecord) {
-        RequestStatusDTO requestStatusDTO = new RequestStatusDTO();
-        requestStatusDTO.setId(requestStatusRecord.getId());
-        requestStatusDTO.setQueryId(requestStatusRecord.getQueryId());
-        requestStatusDTO.setStatus(requestStatusRecord.getStatus());
-        requestStatusDTO.setStatusDate(requestStatusRecord.getStatusDate());
-        requestStatusDTO.setStatusType(requestStatusRecord.getStatusType());
-        requestStatusDTO.setStatusJson(requestStatusRecord.getStatusJson());
-        requestStatusDTO.setStatusUserId(requestStatusRecord.getStatusUserId());
-        return requestStatusDTO;
     }
 
     public static List<CollectionRequestStatusDTO> getCollectionRequestStatus(Config config, Integer requestId, Integer collectionId) {
@@ -2370,22 +2206,9 @@ public class DbUtil {
                 .fetch();
         List<CollectionRequestStatusDTO> returnList = new ArrayList<CollectionRequestStatusDTO>();
         for(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord : fetch) {
-            returnList.add(mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
+            returnList.add(MappingDbUtil.mapCollectionRequestStatusDTO(queryLifecycleCollectionRecord));
         }
         return returnList;
-    }
-
-    private static CollectionRequestStatusDTO mapCollectionRequestStatusDTO(QueryLifecycleCollectionRecord queryLifecycleCollectionRecord) {
-        CollectionRequestStatusDTO collectionRequestStatusDTO = new CollectionRequestStatusDTO();
-        collectionRequestStatusDTO.setId(queryLifecycleCollectionRecord.getId());
-        collectionRequestStatusDTO.setQueryId(queryLifecycleCollectionRecord.getQueryId());
-        collectionRequestStatusDTO.setCollectionId(queryLifecycleCollectionRecord.getCollectionId());
-        collectionRequestStatusDTO.setStatus(queryLifecycleCollectionRecord.getStatus());
-        collectionRequestStatusDTO.setStatusDate(queryLifecycleCollectionRecord.getStatusDate());
-        collectionRequestStatusDTO.setStatusType(queryLifecycleCollectionRecord.getStatusType());
-        collectionRequestStatusDTO.setStatusJson(queryLifecycleCollectionRecord.getStatusJson());
-        collectionRequestStatusDTO.setStatusUserId(queryLifecycleCollectionRecord.getStatusUserId());
-        return collectionRequestStatusDTO;
     }
 
     /*
@@ -2416,7 +2239,7 @@ public class DbUtil {
                 requestStatus = config.dsl().selectFrom(Tables.REQUEST_STATUS)
                         .where(Tables.REQUEST_STATUS.ID.eq(requestStatusId)).fetchOne();
             }
-            return mapRequestStatusDTO(requestStatus);
+            return MappingDbUtil.mapRequestStatusDTO(requestStatus);
         } catch (SQLException e) {
             System.err.println("ERROR saving/updating Request Status.");
             e.printStackTrace();
@@ -2465,7 +2288,7 @@ public class DbUtil {
                 collectionRequestStatus = config.dsl().selectFrom(Tables.QUERY_LIFECYCLE_COLLECTION)
                         .where(Tables.QUERY_LIFECYCLE_COLLECTION.ID.eq(collectionRequestStatusId)).fetchOne();
             }
-            return mapCollectionRequestStatusDTO(collectionRequestStatus);
+            return MappingDbUtil.mapCollectionRequestStatusDTO(collectionRequestStatus);
         } catch (SQLException e) {
             System.err.println("ERROR saving/updating Request Status.");
             e.printStackTrace();
@@ -2682,8 +2505,6 @@ public class DbUtil {
                     "ON created_query.creation_date = initialized_query.creation_date ORDER BY creation_date) jsonc;");
             Result<Record> result = resultQuery.fetch();
             for(Record record : result) {
-                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
-
                 //PGobject jsonObject = record.getValue(0);
                 return (String)record.getValue(0);
             }
@@ -2701,8 +2522,6 @@ public class DbUtil {
                     "COUNT(*) FROM query q WHERE q.json_text IS NOT NULL AND q.json_text != '' AND q.test_request = false GROUP BY readable) jsonc;");
             Result<Record> result = resultQuery.fetch();
             for(Record record : result) {
-                System.out.println("------------>" + record.getValue(0).getClass()); //class org.postgresql.util.PGobject
-
                 //PGobject jsonObject = record.getValue(0);
                 return (String)record.getValue(0);
             }
@@ -2747,22 +2566,75 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
                 .or(Tables.PERSON.IS_ADMIN.isTrue()))
                 .fetch();
-        return mapResultPerson(record);
+        return MappingListDbUtil.mapResultPerson(record);
     }
 
-    private static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> mapResultPerson(Result<Record> records) {
-        List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> result = new ArrayList<>();
-        for(Record record : records) {
-            de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
-            if(record.getValue("person_id") == null) {
-                continue;
-            }
-            person.setId(record.getValue("person_id", Integer.class));
-            person.setAuthEmail(record.getValue("person_auth_email", String.class));
-            person.setAuthName(record.getValue("person_auth_name", String.class));
-            person.setOrganization(record.getValue("person_organization", String.class));
-            result.add(person);
+    public static void getCollectionsWithLifeCycleStatusProblem(Config config, Integer userId) {
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT qc_f.query_id, qc_f.collection_id\n" +
+                "FROM public.query_collection qc_f\n" +
+                "JOIN public.request_status rs_f ON rs_f.query_id = qc_f.query_id\n" +
+                "WHERE rs_f.status = 'started' AND (qc_f.query_id, qc_f.collection_id) NOT IN\n" +
+                "(SELECT q.id, qlc.collection_id\n" +
+                "FROM public.query q\n" +
+                "JOIN public.request_status rs ON q.id = rs.query_id\n" +
+                "JOIN public.query_collection qc ON q.id = qc.query_id\n" +
+                "JOIN public.query_lifecycle_collection qlc ON q.id = qlc.query_id AND qc.collection_id = qlc.collection_id\n" +
+                "WHERE rs.status = 'started'\n" +
+                "GROUP BY q.id, qlc.collection_id);");
+        Result<Record> result = resultQuery.fetch();
+        for(Record record : result) {
+            System.out.println("Updating status for collection" + (Integer)record.getValue(1) + " in request " + (Integer)record.getValue(0));
+            saveUpdateCollectionRequestStatus(null, (Integer)record.getValue(0), (Integer)record.getValue(1),
+                    "contacted", "contact", "", new Date(), userId);
         }
-        return result;
+    }
+
+    public static String getRequestToken(String queryToken) {
+        try (Config config = ConfigFactory.get()) {
+            ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT negotiator_token FROM public.query WHERE json_text ILIKE '%" + queryToken + "%';");
+            Result<Record> result = resultQuery.fetch();
+            if(!result.isEmpty()) {
+                for (Record record : result) {
+                    String requestToken = record.getValue(0, String.class);
+                    logger.debug(requestToken);
+                    return requestToken;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR getting RequestToken from QueryToken.");
+            e.printStackTrace();
+        }
+        return UUID.randomUUID().toString().replace("-", "");
+    }
+
+    public static List<QueryRecord> getAllRequestsToUpdate(Config config) {
+        Result<QueryRecord> result = config.dsl()
+                .selectFrom(Tables.QUERY)
+                .fetch();
+
+        return config.map(result, QueryRecord.class);
+    }
+
+    public static void updateQueryRecord(Config config, QueryRecord queryRecord) {
+        queryRecord.update();
+    }
+
+    public static void removeCollectionRequestMapping(Config config, Integer queryId, Integer collectionId) {
+        config.dsl().deleteFrom(Tables.QUERY_COLLECTION).where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).and(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(collectionId))).execute();
+    }
+
+    public static HashSet<Integer> getQueriesWithStatusError_20220124(Config config) {
+        HashSet<Integer> queryIds = new HashSet<>();
+        ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT query_id\n" +
+                "FROM (SELECT query_id, STRING_AGG(status, ',') status_string FROM request_status GROUP BY query_id) AS sub\n" +
+                " WHERE (status_string ILIKE '%created%' AND status_string NOT ILIKE '%under_review%') AND \n" +
+                " (status_string ILIKE '%created%' AND status_string NOT ILIKE '%abandoned%');");
+        Result<Record> result = resultQuery.fetch();
+        if(!result.isEmpty()) {
+            for (Record record : result) {
+                queryIds.add(record.getValue(0, Integer.class));
+            }
+        }
+        return queryIds;
     }
 }

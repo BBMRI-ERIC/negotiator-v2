@@ -53,6 +53,8 @@
 
     <mailEnabled>true</mailEnabled>
 
+    <slackSystemNotificationURL>https://slack_system_notification_url</slackSystemNotificationURL>
+
     <!-- Leave empty when no clamAV is installed -->
     <clamavHost></clamavHost>
 
@@ -125,5 +127,12 @@
         <c:Realm/>
         <c:NoProxyHosts/>
     </proxy>
+
+    <!-- Contacts, which get notified when a new request is created  -->
+    <newRequestContacts>
+        <contact>negotiator-requests@helpdesk.bbmri-eric.eu</contact>
+        <contact>test-contact@test.org</contact>
+    </newRequestContacts>
+
 
 </negotiator>

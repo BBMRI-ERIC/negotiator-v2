@@ -8,14 +8,13 @@ import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentCommentRecord;
 import de.samply.bbmri.negotiator.model.AttachmentDTO;
 import de.samply.bbmri.negotiator.model.CommentAttachmentDTO;
 import de.samply.bbmri.negotiator.model.PrivateAttachmentDTO;
 import de.samply.bbmri.negotiator.model.QueryAttachmentDTO;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -27,12 +26,11 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.servlet.http.Part;
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,7 +45,7 @@ public class FileUploadBean implements Serializable {
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
-    private static final Logger logger = LoggerFactory.getLogger(FileUploadBean.class);
+    private static final Logger logger = LogManager.getLogger(FileUploadBean.class);
 
     List<FacesMessage> msgs = null;
     Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
@@ -169,6 +167,7 @@ public class FileUploadBean implements Serializable {
      */
     public boolean removeAttachment() {
 
+        String attachmentMapKey=toRemoveAttachment;
         String attachment = new String(org.apache.commons.codec.binary.Base64.decodeBase64(toRemoveAttachment.getBytes()));
         String fileScope = this.toRemoveAttachmentScope;
         // reset it
@@ -218,12 +217,16 @@ public class FileUploadBean implements Serializable {
             } else if(fileScope.equals("commentAttachment")) {
                 DbUtil.deleteCommentAttachment(config, fileIdInteger);
             }
-            config.commit();
 
             String filePath = negotiator.getAttachmentPath();
             String filename = fileUtil.getStorageFileName(queryIdInteger, fileIdInteger, fileExtension);
             File file = new File(filePath, filename);
-            file.delete();
+            if(file.delete()){
+                config.commit();
+                if(fileScope.equals("commentAttachment")) {
+                    removeCommentAttachmentFromSession(attachmentMapKey);
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -493,5 +496,17 @@ public class FileUploadBean implements Serializable {
 
     public void setUserBean(UserBean userBean) {
         this.userBean = userBean;
+    }
+
+    private void removeCommentAttachmentFromSession(String attachmentKey){
+        HashMap<String, String> CommentAttachment = sessionBean.getTransientCommentAttachmentMap();
+
+        for(Iterator<HashMap.Entry<String,String>>  i = CommentAttachment.entrySet().iterator(); i.hasNext(); ) {
+            HashMap.Entry<String,String> attachment_entry = i.next();
+            if (attachmentKey.equals(attachment_entry.getKey())) {
+                i.remove();
+            }
+        }
+        sessionBean.setTransientCommentAttachmentMap(CommentAttachment);
     }
 }

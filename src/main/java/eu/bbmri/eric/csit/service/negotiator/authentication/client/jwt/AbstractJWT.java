@@ -41,6 +41,8 @@ import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.nimbusds.jwt.SignedJWT;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.samply.common.config.OAuth2Client;
 
@@ -50,6 +52,8 @@ import de.samply.common.config.OAuth2Client;
  *
  */
 public abstract class AbstractJWT implements Serializable {
+
+    private final Logger logger = LogManager.getLogger(AbstractJWT.class);
 
     /**
      *

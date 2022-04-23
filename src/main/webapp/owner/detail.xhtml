@@ -124,8 +124,18 @@
                                 <f:ajax render="left-panel right-panel" />
                         </h:commandButton>
                     </h:form>
-                </div>
-                <!-- Request Description Area end -->
+
+                    <!-- Locator Link-->
+                    <c:if test="#{ownerQueriesDetailBean.displayLocatorUrl()}">
+                        <h4 style="text-align: left;border-bottom:1px dotted #7a7a7a;">Link to local bridgehead of Locator</h4>
+                        <ui:repeat value="#{ownerQueriesDetailBean.getLocatorURLList().keySet().toArray()}" var="biobankNames">
+                            <a href="#{ownerQueriesDetailBean.getLocatorURLList().get(biobankNames)}">#{biobankNames}</a><br/>
+                        </ui:repeat>
+                    </c:if>
+
+         </div>
+         <!-- Request Description Area end -->
+
 
                 <!-- LifeCycleHistory -->
                 <h:panelGroup styleClass="row" layout="block">
@@ -206,9 +216,20 @@
                             <li class="active" id="first">
                                 <a data-toggle="tab" href="#status">
                                     #{label['querydetail.title.status']}
+                                    <c:if test="#{ownerQueriesDetailBean.unreadQueryCount > 0}">
+                                        <div class="badge queryNumberResponsesBadge pull-right"
+                                             style='margin-left: 4px;background-color: #333333;" }'
+                                             data-toggle="tooltip"
+                                             data-placement="bottom"
+                                             title="#{ownerQueriesDetailBean.unreadQueryCount} unread status changes">
+
+                                            <i class="glyphicon glyphicon-refresh"></i>
+                                            <h:outputText value="   #{ownerQueriesDetailBean.unreadQueryCount}"/>
+                                        </div>
+                                    </c:if>
                                 </a>
                             </li>
-                            <li>
+                            <li id="second">
                                 <a data-toggle="tab" href="#comments">
                                     #{label['querydetail.title.comments']}
                                     <div class="badge queryNumberResponsesBadge pull-right"
@@ -223,7 +244,7 @@
                                 </a>
                             </li>
                             <ui:fragment rendered="#{ownerQueriesDetailBean.nonConfidential == false}">
-                                <li>
+                                <li id="third">
                                     <a data-toggle="tab" href="#sampleAvailability">
                                         #{label['querydetail.title.privateNegotiation']}
                                         <div class="badge queryNumberResponsesBadge pull-right"
@@ -246,13 +267,16 @@
                         }
                     </style>
 
-                    <div class="tab-content">
+                    <div class="tab-content" style="padding-bottom: 35px;">
                         <!-- Lifecycle Status -->
                         <div id="status" class="tab-pane fade in active">
                             <h:panelGroup layout="block"
                                           style="border: 1px solid #dddddd;padding: 5px;margin: 10px 0px 0px 0px;"
                                           rendered="#{ownerQueriesDetailBean.associatedBiobanks.size() > 0}">
-
+                                <!--<f action="#{ownerQueriesDetailBean.markQueryLifecycleReadForUser()}" />-->
+                                <h:outputScript>
+                                    ownerQueriesDetailBean.markQueryLifecycleReadForUser();
+                                </h:outputScript>
                                 <b>#{label['querydetail.owner.associatedbiobanks']}</b>
 
                                 <div style="width: 100%;">
@@ -353,7 +377,7 @@
                                             <div class="card">
                                                 <div class="card-header" id="headingTwo">
                                                     <h5 class="mb-0">
-                                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo">
+                                                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseLifecycleBiobank#{biobank.id}" aria-expanded="false" aria-controls="collapseTwo" >
                                                             <i class="fa fa-plus"></i> #{biobank.name}
                                                         </button>
                                                     </h5>
@@ -403,9 +427,15 @@
                                                   query="#{ownerQueriesDetailBean.selectedQuery}" componentQueryBean="#{ownerQueriesDetailBean}" fileUploadBean="#{fileUploadBean}"/>
                             </div>
 
+                            <span class="btn btn-default updateCommentReadForCommentShowMarkAsReadButtonForAll" style="margin-top: 0px;margin-left:15px;#{ownerQueriesDetailBean.unreadCommentCount == 0 ? 'display:none;': '' }" onclick="publicCommentReadAllReadUpdate();">
+                                Mark all as read
+                            </span>
+
+
                             <div class="col-xs-12 row">
                                 <hr></hr>
                             </div>
+
 
                             <div class="row" style="margin: 10px;">
                                 <ui:repeat value="#{ownerQueriesDetailBean.comments}"
@@ -454,7 +484,7 @@
                                     <div id="heading#{i}" class="panel-heading" data-toggle="collapse" data-target="#hh#{i}" >
                                         <h4 class="panel-title">
                                             <a> #{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name} </a>
-                                            <span id='biobankNotificationClass#{biobankName.replaceAll(" ", "")}' class='glyphicon glyphicon-envelope showUnreadMarkerOnBiobank' style="margin:0 0 0 15px;"></span>
+                                            <span id='biobankNotificationClass#{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name.replaceAll(" ", "")}' class='glyphicon glyphicon-envelope showUnreadMarkerOnBiobank' style="margin:0 0 0 15px;"></span>
                                         </h4>
                                     </div>
                                     <div id="hh#{i}"
@@ -476,7 +506,7 @@
                                                     var="offers">
 
                                                 <h:outputScript>
-                                                    window.onload = onLoadShowNotificationsOnBiobank("#{biobankName.replaceAll(" ", "")}", "#{offers.commentRead}");
+                                                    window.onload = onLoadShowNotificationsOnBiobank("#{ownerQueriesDetailBean.associatedBiobanks.get(i-1).name.replaceAll(" ", "")}", "#{offers.commentRead}");
                                                 </h:outputScript>
 
                                                 <bbmricc:comment comment="#{offers.offer}"
@@ -599,6 +629,7 @@
                                         <h:inputText style="display: none;" id="numberOfSamplesAvailable" value="#{ownerQueriesDetailBean.numberOfSamplesAvailable}"/>
                                         <h:inputText style="display: none;" id="numberOfPatientsAvailable" value="#{ownerQueriesDetailBean.numberOfPatientsAvailable}"/>
                                         <h:inputText style="display: none;" id="shippedNumber" value="#{ownerQueriesDetailBean.shippedNumber}"/>
+                                        <h:inputText style="..." id="abandoningReason" value="#{ownerQueriesDetailBean.abandoningReason}"/>
 
                                         <span style="font-weight: bold;margin: 5px;color: #004275;">
                                             #{label['lifecycleCollectionStatus.indicateAccessConditions.title']}
@@ -659,6 +690,7 @@
                         }
 
                         function updateIdsForIndicateAccessConditions(collectionId, biobankId, formIdPrefix) {
+                            console.log('AL2: ' + collectionId);
                             var nextCollectionLifecycleStatusStatus = $("#nextCollectionLifecycleStatusStatus" + formIdPrefix + collectionId).find("select").val();
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
@@ -672,12 +704,15 @@
                             var indicateAccessConditions = $("#indicateAccessConditions" + formIdPrefix + collectionId).find("textarea").val();
                             var indicateAccessConditionsMTAFile = $("#indicateAccessConditionsMTAFile" + formIdPrefix + collectionId).find("input").val();
                             var shippedNumber = $("#shippedNumber" + formIdPrefix + collectionId).find("textarea").val();
+                            var abandoningReason = $("#abandoningReason" + formIdPrefix + collectionId).find("select").val();
+                            //var abandoningReason =  $("#abandoningReason_sortBiobank_15").find("select").val();
 
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:nextCollectionLifecycleStatusStatus").value = nextCollectionLifecycleStatusStatus;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfSamplesAvailable").value = numberOfAvailableSamples;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:numberOfPatientsAvailable").value = numberOfAvailablePatients;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:indicateAccessConditions").value = indicateAccessConditions;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:shippedNumber").value = shippedNumber;
+                            document.getElementById("lifeCycleStatusBeanUpdateStatusForm:abandoningReason").value = abandoningReason;
 
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:collectionId").value = collectionId;
                             document.getElementById("lifeCycleStatusBeanUpdateStatusForm:biobankId").value = biobankId;
@@ -686,12 +721,7 @@
                             jsfcommandButton.click();
                         }
 
-                        function publicCommentReadUpdate(commentId) {
-                            var updateCommentReadStatus = document.getElementsByClassName("updateCommentReadForComment" + commentId);
-                            document.getElementsByClassName("updateCommentReadForCommentShowElement" + commentId)[0].style.display = "none";
-                            document.getElementsByClassName("updateCommentReadForCommentShowMarkAsReadButton" + commentId)[0].style.display = "none";
-                            updateCommentReadStatus[0].click();
-                        }
+
                     </script>
                 </h:panelGroup>
 

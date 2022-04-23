@@ -26,11 +26,15 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
@@ -40,9 +44,13 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.io.MemoryUsageSetting;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
@@ -56,10 +64,7 @@ import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
-import de.samply.bbmri.negotiator.model.CommentPersonDTO;
-import de.samply.bbmri.negotiator.model.OfferPersonDTO;
-import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
@@ -68,8 +73,15 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import org.jooq.Record;
 import org.jooq.Result;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.W3CDom;
+import org.jsoup.nodes.Document;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Manages the query detail view for owners
@@ -80,7 +92,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LoggerFactory.getLogger(OwnerQueriesDetailBean.class);
+	private static final Logger logger = LogManager.getLogger(OwnerQueriesDetailBean.class);
+	private String LOGGING_PREFIX = "97776fdc5f92-OwnerQueriesDetailBean ";
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -156,6 +169,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private int privateNegotiationCount;
 	private int unreadPrivateNegotiationCount = 0;
 
+
+	private int unreadQueryCount = 0;
 	private List<Person> personList;
 
 	private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
@@ -171,9 +186,15 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Integer numberOfPatientsAvailable;
 	private String indicateAccessConditions;
 	private String shippedNumber;
+	private String abandoningReason;
 	private Part  mtaFile;
 	private Part dtaFile;
 	private Part otherAccessFile;
+
+	private HashMap<String, String> locatorRedirectUrls = new HashMap<>();
+	private HashMap<String, String> locatorRedirectUrlsDisplayList = new HashMap<>();
+
+	private static final int DEFAULT_BUFFER_SIZE = 10240;
 
 	private final FileUtil fileUtil = new FileUtil();
 	private List<FacesMessage> fileValidationMessages = new ArrayList<>();
@@ -188,12 +209,6 @@ public class OwnerQueriesDetailBean implements Serializable {
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
 
-			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
-
-			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, associatedBiobanks.get(i).getId(), userBean.getUserId()));
-			}
-
 			/**
 			 * Get the selected(clicked on) query from the list of queries for the owner
 			 */
@@ -203,6 +218,40 @@ public class OwnerQueriesDetailBean implements Serializable {
 					setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
 				}
 			}
+
+			if(selectedQuery != null) {
+				try {
+					JSONParser parser = new JSONParser();
+					JSONObject jsonObjectOriginalRequest = (JSONObject) parser.parse(selectedQuery.getJsonText());
+					JSONArray searchQueriesJson = (JSONArray)jsonObjectOriginalRequest.get("searchQueries");
+					for(Object queryJson : searchQueriesJson) {
+						JSONObject queryJsonObject = (JSONObject)queryJson;
+						JSONArray collections = (JSONArray)queryJsonObject.get("collections");
+						for(Object collectionObject : collections) {
+							JSONObject collection = (JSONObject) collectionObject;
+							Object locatorBacklinkUrl = collection.get("redirectUrl");
+							if(locatorBacklinkUrl != null && !locatorBacklinkUrl.toString().isEmpty()) {
+								locatorRedirectUrls.put((String) collection.get("biobankId"), locatorBacklinkUrl.toString());
+							}
+						}
+					}
+				} catch (ParseException e) {
+					logger.error(LOGGING_PREFIX + "ERROR-NG-0000114: Parsing json for query: " + queryId + " - " + selectedQuery.getJsonText());
+					e.printStackTrace();
+				}
+			}
+
+			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
+
+			for (int i = 0; i < associatedBiobanks.size(); ++i) {
+				BiobankRecord biobank = associatedBiobanks.get(i);
+				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
+				if(locatorRedirectUrls.containsKey(biobank.getDirectoryId())) {
+					locatorRedirectUrlsDisplayList.put(biobank.getName(), locatorRedirectUrls.get(biobank.getDirectoryId()));
+				}
+			}
+
+
 
             if(selectedQuery != null) {
 				RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
@@ -283,7 +332,133 @@ public class OwnerQueriesDetailBean implements Serializable {
 		}
 	}
 
-    /**
+	private String replaceNotNull(String htmlTemplate, String replace, String replaceWith) {
+		if(replaceWith != null) {
+			return htmlTemplate.replaceAll(replace, replaceWith);
+		} else {
+			return htmlTemplate.replaceAll(replace, "-");
+		}
+	}
+
+	private String replaceTemplate(String htmlTemplate) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+		Person researcher = getUserDataForResearcher(selectedQuery.getResearcherId());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__RequestTitle", selectedQuery.getTitle());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Date", dateFormat.format(selectedQuery.getQueryCreationTime()));
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__ID", selectedQuery.getId().toString());
+
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Researcher", researcher.getAuthName());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Email", researcher.getAuthEmail());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Organisation", researcher.getOrganization());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Description", selectedQuery.getRequestDescription());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Projectdescription", selectedQuery.getText());
+		htmlTemplate = replaceNotNull(htmlTemplate, "REPLACE__Ethics", selectedQuery.getEthicsVote());
+
+		return htmlTemplate;
+	}
+
+	public boolean displayLocatorUrl() {
+		if(locatorRedirectUrlsDisplayList.isEmpty()) {
+			return false;
+		}
+		return true;
+	}
+
+	public HashMap<String, String> getLocatorURLList() {
+		return locatorRedirectUrlsDisplayList;
+	}
+
+	public void getRequestPDF() throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+
+		// Build pdf of request
+		String tempPdfOutputFilePath = "/tmp/" + UUID.randomUUID().toString() + ".pdf";
+		try {
+			File inputHTML = new File(getClass().getClassLoader().getResource("pdfTemplate").getPath(), "RequestTemplate.html");
+			byte[] encoded = Files.readAllBytes(Paths.get(inputHTML.getAbsolutePath()));
+			String htmlTemplate = new String(encoded, "UTF-8");
+			htmlTemplate = replaceTemplate(htmlTemplate);
+
+			Document document = Jsoup.parse(htmlTemplate);
+			document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+			org.w3c.dom.Document doc = new W3CDom().fromJsoup(document);
+
+			String baseUri = FileSystems.getDefault()
+					.getPath("D:")
+					.toUri()
+					.toString();
+			OutputStream os = new FileOutputStream(tempPdfOutputFilePath);
+			PdfRendererBuilder builder = new PdfRendererBuilder();
+			builder.toStream(os);
+			builder.withW3cDocument(doc, baseUri);
+			builder.run();
+			os.close();
+		} catch (IOException e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000096: Problem creating pdf for request, query: " + queryId);
+			e.printStackTrace();
+		}
+
+
+		// Merge uploaded pdf attachments of the query
+		try(Config config = ConfigFactory.get()) {
+			List<QueryAttachmentDTO> attachments = DbUtil.getQueryAttachmentRecords(config, queryId);
+			PDFMergerUtility PDFmerger = new PDFMergerUtility();
+			PDFmerger.setDestinationFileName(tempPdfOutputFilePath);
+			File file = new File(tempPdfOutputFilePath);
+			PDFmerger.addSource(file);
+			for(QueryAttachmentDTO attachment : attachments) {
+				File file_attachment = extracted(attachment);
+				if(file_attachment != null) {
+					PDFmerger.addSource(file_attachment);
+				}
+			}
+			PDFmerger.mergeDocuments(MemoryUsageSetting.setupMainMemoryOnly());
+		} catch (Exception e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000095: Problem getting and Merging query attachments for query: " + queryId);
+			e.printStackTrace();
+		}
+
+		// return pdf file to download
+		File file = new File(tempPdfOutputFilePath);
+		response.reset();
+		response.setBufferSize(DEFAULT_BUFFER_SIZE);
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Length", String.valueOf(file.length()));
+		response.setHeader("Content-Disposition", "attachment;filename=\""+ file.getName() + "\"");
+		BufferedInputStream input = null;
+		BufferedOutputStream output = null;
+		try {
+			input = new BufferedInputStream(new FileInputStream(file), DEFAULT_BUFFER_SIZE);
+			output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
+			byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+			int length;
+			while ((length = input.read(buffer)) > 0) {
+				output.write(buffer, 0, length);
+			}
+		} catch (Exception e) {
+			System.err.println("6908e3f51b2f-OwnerQueriesDetailBean ERROR-NG-0000097: Problem creating pdf for download, query: " + queryId);
+			e.printStackTrace();
+		} finally {
+			input.close();
+			output.close();
+		}
+		context.responseComplete();
+	}
+
+	private File extracted(QueryAttachmentDTO attachment) {
+		if(attachment.getAttachment().endsWith(".pdf")) {
+			String filename = fileUtil.getStorageFileName(queryId, attachment.getId(), ".pdf");
+			return new File(negotiator.getAttachmentPath(), filename);
+		}
+		if(attachment.getAttachment().endsWith(".docx")) {
+			String filename = fileUtil.getStorageFileName(queryId, attachment.getId(), ".docx");
+			return new File(negotiator.getAttachmentPath(), filename + ".pdf");
+		}
+		return null;
+	}
+
+	/**
      * Leave query as a bio bank owner.
      *
      * @param queryDto
@@ -335,6 +510,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 		unreadCommentCount = query.getUnreadCommentCount();
 		privateNegotiationCount = query.getPrivateNegotiationCount();
 		unreadPrivateNegotiationCount = query.getUnreadPrivateNegotiationCount();
+		unreadQueryCount = query.getUnreadQueryCount();
 	}
 
 	/**
@@ -409,6 +585,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 				for (int i = 0; i < queries.size(); ++i) {
 					getPrivateNegotiationCountAndTime(i);
+					getUnreadQueryCountAndTime(i);
 				}
 
 				sortQueries();
@@ -424,9 +601,25 @@ public class OwnerQueriesDetailBean implements Serializable {
 			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
 			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
-			queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
+			int collection_counts = result.get(0).getValue("number_of_collections", Integer.class);
+			if(collection_counts <= 0) {
+				collection_counts = 1;
+			}
+			int unread_private_negotiation_count = result.get(0).getValue("unread_private_negotiation_count", Integer.class) / collection_counts;
+			queries.get(index).setUnreadPrivateNegotiationCount(unread_private_negotiation_count);
 		} catch (SQLException e) {
 			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
+			e.printStackTrace();
+		}
+	}
+
+	public void getUnreadQueryCountAndTime(int index){
+		try(Config config = ConfigFactory.get()) {
+			Result<Record> result = DbUtil.getUnreadQueryLifecycleCountAndTime(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+			int unread_query_lifecycle_count = result.get(0).getValue("unread_query_lifecycle_changes_count", Integer.class) ;
+			queries.get(index).setUnreadQueryCount(unread_query_lifecycle_count);
+		} catch (SQLException e) {
+			System.err.println("ERROR: OwnerQueriesDetailBean::getUnreadQueryCountAndTime(int index)");
 			e.printStackTrace();
 		}
 	}
@@ -492,6 +685,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 			}
 			result += seperatorForJason + storeFilesForAccessCondition() + "}";
 			return result;
+		}
+		if(status.equals(LifeCycleRequestStatusStatus.NOT_INTERESTED)) {
+			return "{\"abandoningReason\":\"" + abandoningReason + "\"}";
 		}
 		if(shippedNumber != null && shippedNumber.length() > 0) {
 			return "{\"shippedNumber\":\"" + shippedNumber + "\"}";
@@ -877,5 +1073,30 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public List<CollectionLifeCycleStatus> getSortedCollectionsByKathegory(String key) {
 		return sortedCollections.get(key);
+	}
+
+	public String getAbandoningReason() {
+		return abandoningReason;
+	}
+
+	public void setAbandoningReason(String abandoningReason) {
+		this.abandoningReason = abandoningReason;
+  }
+  
+	public int getUnreadQueryCount() {
+		return unreadQueryCount;
+	}
+
+	public void setUnreadQueryCount(int unreadQueryCount) {
+		this.unreadQueryCount = unreadQueryCount;
+	}
+
+	public void markQueryLifecycleReadForUser() {
+
+		try (Config config = ConfigFactory.get()) {
+			DbUtil.updateQueryLifecycleReadForUser(config, userBean.getUserId(), queryId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

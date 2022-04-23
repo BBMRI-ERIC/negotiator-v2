@@ -8,6 +8,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+      xmlns:p="http://primefaces.org/ui"
       xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri">
 
 <composite:interface>
@@ -25,24 +26,48 @@
          alt=""/>
 
         <h:form id="status-form">
-
             <div class="col-sm-3 col-lg-3">
                 <c:if test='${cc.attrs.formIdPrefix.equals("_sortStatus_")}'>
                     #{cc.attrs.collectionLifeCycleStatus.biobankName} -
                 </c:if>
-                #{cc.attrs.collectionLifeCycleStatus.collectionName}
+                <span style="font-weight: bold;">
+                    #{cc.attrs.collectionLifeCycleStatus.collectionName}
+                </span><br/><br/>
+                <span style="font-size: 12px; font-style: italic; padding-left: 1rem; display: inline-block">
+                    #{label['lifecycleCollectionStatus.contacts.representedBy']}:<br/>
+                    <c:if test='${!cc.attrs.collectionLifeCycleStatus.contacts.isEmpty()}'>
+                        <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.contacts[0].authName}" escape="false"/>
+                        <ui:fragment rendered="#{cc.attrs.collectionLifeCycleStatus.contacts.size() > 1}">
+                            <h:outputText id="tooltip-area" styleClass="more-items-tooltip" value="+#{cc.attrs.collectionLifeCycleStatus.contacts.size()-1}" escape="false"/>
+                            <p:tooltip for="tooltip-area">
+                                <ui:repeat value="#{cc.attrs.collectionLifeCycleStatus.contacts}" var="cotact" varStatus="status">
+                                    <ui:fragment rendered="#{status.index gt 0}">
+                                        <h:outputText value="#{cotact.authName}"/>
+                                        <br/>
+                                    </ui:fragment>
+                                </ui:repeat>
+                            </p:tooltip>
+                        </ui:fragment>
+                    </c:if>
+                </span>
             </div>
             <div class="col-sm-3 col-lg-3">
                 #{label[cc.attrs.collectionLifeCycleStatus.status.statusType.concat(".").concat(cc.attrs.collectionLifeCycleStatus.status.status)]}<br/>
                 <span style="font-size: 12px; font-style: italic;">
-                    <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" />
+                    <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.status.statusText}" escape="false" /><br/>
+                    <ui:fragment rendered="#{not empty cc.attrs.collectionLifeCycleStatus.lastStatusUsername}">
+                        <span style="padding-left: 1rem; display: inline-block">
+                            #{label['lifecycleCollectionStatus.status.changedBy']}:<br/>
+                            <h:outputText value="#{cc.attrs.collectionLifeCycleStatus.lastStatusUsername}" escape="false" />
+                        </span>
+                    </ui:fragment>
                 </span>
             </div>
             <div id="nextCollectionLifecycleStatusStatus#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" class="col-sm-4 col-lg-4">
                 #{label['lifecycleCollectionStatus.selectNextStatus.title']} <i class="fa fa-pencil-square-o" />
                 <h:selectOneMenu id="nextCollectionLifecycleStatusStatusSelect"
                                  class="form-control"
-                                 style="width: 100%;height: 2rem;"
+                                 style="width: 100%; height: 2rem;"
                                  value="#{lifeCycleStatusBean.nextCollectionLifecycleStatusStatus}"
                                  onchange="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(this);"
                                  onload="showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(this);">
@@ -71,6 +96,16 @@
                                      pt:placeholder="#{label['lifecycleCollectionStatus.placeholder.shippedNumber']}">
                     </h:inputTextarea>
                 </div>
+                <div id="abandoningReason#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}" style="display: none;">
+                    #{label['lifecycleCollectionStatus.abandoningReason.title']} <i class="fa fa-pencil-square-o" />
+                    <h:selectOneMenu id="abandoningReason"
+                                     class="form-control"
+                                     style="width: 100%; height: 2rem;"
+                                     value="#{lifeCycleStatusBean.abandoningReason}">
+                        <f:selectItem itemValue = "reason1" itemLabel = "Reason 1" />
+                        <f:selectItem itemValue = "reason2" itemLabel = "Reason 2" />
+                    </h:selectOneMenu>
+                </div>
                 <h:outputScript>
                     function showAdditionalFormFieldsForNextCollectionLifecycleStatusStatus#{cc.attrs.collectionId}(data) {
                         if(data.value == 'availability.sample_data_available_accessible') {
@@ -85,7 +120,9 @@
                         }
                         if(data.value == 'accessConditions.indicateAccessConditions') {
                             $("#toggleModalIndicateAccessConditions").click();
-                            updateIdsForIndicateAccessConditions('#{cc.attrs.collectionId}', '#{cc.attrs.biobankId}', #{cc.attrs.formIdPrefix});
+                            console.log('prefix: ' + '#{cc.attrs.formIdPrefix}');
+                            console.log('AL1: ' + '#{cc.attrs.collectionId}');
+                            updateIdsForIndicateAccessConditions('#{cc.attrs.collectionId}', '#{cc.attrs.biobankId}', '#{cc.attrs.formIdPrefix}');
                         } else {
                             $("#indicateAccessConditions#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                         }
@@ -93,6 +130,11 @@
                             $("#shippedNumber#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").show();
                         } else {
                             $("#shippedNumber#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
+                        }
+                        if(data.value == "abandoned.not_interested"){
+                            $("#abandoningReason#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").show();
+                        } else {
+                            $("#abandoningReason#{cc.attrs.formIdPrefix}#{cc.attrs.collectionId}").hide();
                         }
                     }
 
@@ -115,8 +157,6 @@
                     #{label['lifecycleCollectionStatus.form.button.updateCollectionsBiobank']}
                 </button>
             </div>
-
-
         </h:form>
 
 </composite:implementation>

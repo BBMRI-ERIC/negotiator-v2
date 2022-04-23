@@ -28,14 +28,14 @@
                 </div>
                 <div class="panel-body">
                     You have started the creation of a new query, but are not yet logged in on the Negotiator.<br />
-                    Please <a href="#{userBean.authenticationUrl}">login</a> with your accout, or <a
+                    Please <a style="color:#034275;text-decoration: underline;" href="#{userBean.authenticationUrl}">login</a> with your account, or <a style="color:#034275;text-decoration: underline;"
                         href="#{userBean.authenticationRegisterUrl}">create a new account</a>.<br />
                     After being logged in, you can continue the creation of your query.
                 </div>
             </div>
         </ui:fragment>
 
-        <p>The BBMRI-ERIC Negotiator is a ervice that
+        <p>The BBMRI-ERIC Negotiator is a Service that
             provides an efficient communication platform for biobankers and
             researchers requesting samples and/or data.<br />
             It substantially simplifies the communication steps that are necessary to obtain
@@ -204,7 +204,7 @@
                     <div class="col-sm-3">
                     </div>
                     <div class="col-sm-6">
-                        <a class="btn btn-primary cta"> Proceed to registration </a>
+                        <a class="btn btn-primary cta" href="#{userBean.authenticationUrl}">Proceed to registration/login</a>
                         <p> or write to negotiator@helpdesk.bbmri-eric.eu for support </p>
                     </div>
                     <div class="col-sm-3">
@@ -279,7 +279,7 @@
                     <div class="col-sm-3">
                     </div>
                     <div class="col-sm-6">
-                        <a class="btn btn-primary cta"> Proceed to registration </a>
+                        <a class="btn btn-primary cta" href="#{userBean.authenticationUrl}">Proceed to registration/login</a>
                         <p> or write to negotiator@helpdesk.bbmri-eric.eu for support </p>
                     </div>
                     <div class="col-sm-3">
