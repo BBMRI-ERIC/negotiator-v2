@@ -38,8 +38,9 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.validation.constraints.Null;
 
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -48,7 +49,6 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
@@ -145,7 +145,7 @@ public class ResearcherQueriesBean implements Serializable {
         selectedQuery = query;
 
         try(Config config = ConfigFactory.get()) {
-            comments = DbUtil.getComments(config, selectedQuery.getId(), userBean.getUserId());
+            comments = DbUtilComment.getComments(config, selectedQuery.getId(), userBean.getUserId());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -153,7 +153,7 @@ public class ResearcherQueriesBean implements Serializable {
 
     public List<QueryStatsDTO> getQueries() {
         try(Config config = ConfigFactory.get()) {
-            queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+            queries = DbUtilRequest.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
             if(queries == null) {
             }
 
@@ -169,7 +169,7 @@ public class ResearcherQueriesBean implements Serializable {
 
     public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+            Result<Record> result = DbUtilComment.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
             queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
             queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));

@@ -10,7 +10,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import eu.bbmri.eric.csit.service.negotiator.rest.util.SyncPerunData;
@@ -22,7 +23,6 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.NegotiatorStatus;
 import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.rest.dto.PerunMappingDTO;
 import de.samply.bbmri.negotiator.rest.dto.PerunPersonDTO;
 import de.samply.string.util.StringUtil;
@@ -67,7 +67,7 @@ public class Perun {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
 
-                DbUtil.savePerunUser(config, personDTO);
+                DbUtilPerson.savePerunUser(config, personDTO);
             }
             logger.info("Synchronizing user data with Perun finished");
             NotificationService.sendSystemNotification(NotificationType.SYSTEM_NOTIFICATION_DEBUG,"Synchronizing user data with Perun finished." + "Users: " + users.size());
@@ -141,7 +141,7 @@ public class Perun {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
 
-                DbUtil.savePerunUser(config, personDTO);
+                DbUtilPerson.savePerunUser(config, personDTO);
             }
             logger.info("Synchronizing user data with Perun finished");
             config.commit();
@@ -176,7 +176,7 @@ public class Perun {
                     NegotiatorStatus.get().newFailStatus(NegotiatorStatus.NegotiatorTaskType.PERUN_MAPPING, "No ID or name: " + mapping.getId());
                     //return Response.status(Response.Status.BAD_REQUEST).build();
                 }
-                DbUtil.savePerunNetworkMapping(config, mapping);
+                DbUtilNetwork.savePerunNetworkMapping(config, mapping);
             }
 
 

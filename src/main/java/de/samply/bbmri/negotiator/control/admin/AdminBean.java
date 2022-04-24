@@ -3,10 +3,14 @@ package de.samply.bbmri.negotiator.control.admin;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
+
 import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -60,15 +64,15 @@ public class AdminBean implements Serializable {
 
     private Map<String, String> all = new HashMap<>();
 
-    private List<PersonRecord> allUsers = new ArrayList<>();
+    private List<Person> allUsers = new ArrayList<>();
 
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
-           setAllUsers( DbUtil.getAllUsers(config) );
+           setAllUsers( DbUtilPerson.getAllUsers(config) );
 
             all = new HashMap<>();
 
-            for(PersonRecord user : allUsers) {
+            for(Person user : allUsers) {
                 all.put(user.getAuthName(), user.getAuthSubject());
             }
 
@@ -104,11 +108,11 @@ public class AdminBean implements Serializable {
         return all;
     }
 
-    public List<PersonRecord> getAllUsers() {
+    public List<Person> getAllUsers() {
         return allUsers;
     }
 
-    public void setAllUsers(List<PersonRecord> allUsers) {
+    public void setAllUsers(List<Person> allUsers) {
         this.allUsers = allUsers;
     }
 //endregion

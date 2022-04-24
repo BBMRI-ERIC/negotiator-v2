@@ -2,11 +2,12 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilLifecycle;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
@@ -40,8 +41,8 @@ public class CollectionLifeCycleStatus {
 
     public void initialise() {
         try(Config config = ConfigFactory.get()) {
-            initialise(DbUtil.getCollectionRequestStatus(config, query_id, collection_id));
-            initialiseContacts(DbUtil.getPersonsContactsForCollection(config, collection_id));
+            initialise(DbUtilCollection.getCollectionRequestStatus(config, query_id, collection_id));
+            initialiseContacts(DbUtilCollection.getPersonsContactsForCollection(config, collection_id));
         } catch (Exception e) {
             logger.error("ERROR-NG-0000001: Error initialising CollectionLifeCycleStatus::initialise() from database.");
             e.printStackTrace();
@@ -161,7 +162,7 @@ public class CollectionLifeCycleStatus {
     }
 
     private CollectionRequestStatusDTO createCollectionRequestStatusInDB(String status, String statusType, String status_json, Integer status_user_id) {
-        CollectionRequestStatusDTO collectionRequestStatusDTO = DbUtil.saveUpdateCollectionRequestStatus(null, query_id, collection_id, status, statusType, status_json, new Date(), status_user_id);
+        CollectionRequestStatusDTO collectionRequestStatusDTO = DbUtilLifecycle.saveUpdateCollectionRequestStatus(null, query_id, collection_id, status, statusType, status_json, new Date(), status_user_id);
         return collectionRequestStatusDTO;
     }
 

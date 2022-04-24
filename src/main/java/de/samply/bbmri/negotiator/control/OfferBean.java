@@ -29,7 +29,6 @@ package de.samply.bbmri.negotiator.control;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -42,10 +41,10 @@ import javax.faces.context.FacesContext;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 
@@ -74,18 +73,18 @@ public class OfferBean implements Serializable {
      */
     public String saveOffer(Query query, Integer offerFrom ) {
         try (Config config = ConfigFactory.get()) {
-            OfferRecord offerRecord = DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
+            OfferRecord offerRecord = DbUtilComment.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
             config.commit();
 
             String biobankName = "";
             try {
-                biobankName = DbUtil.getBiobankName(config, offerFrom);
+                biobankName = DbUtilBiobank.getBiobankName(config, offerFrom);
             } catch (Exception e) {
                 System.err.println("Error getting Biobank Name from offer ID: " + offerFrom);
                 e.printStackTrace();
             }
 
-            DbUtil.addOfferCommentReadForComment(config, offerRecord.getId(), userBean.getUserId(), offerFrom);
+            DbUtilComment.addOfferCommentReadForComment(config, offerRecord.getId(), userBean.getUserId(), offerFrom);
 
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("biobankName", biobankName);
@@ -128,7 +127,7 @@ public class OfferBean implements Serializable {
         if(privateCommentToRemove == null)
             return "";
         try (Config config = ConfigFactory.get()) {
-            DbUtil.markePrivateCommentDeleted(config, privateCommentToRemove);
+            DbUtilComment.markePrivateCommentDeleted(config, privateCommentToRemove);
             config.commit();
             privateCommentToRemove = null;
         } catch (SQLException e) {
@@ -143,7 +142,7 @@ public class OfferBean implements Serializable {
             return;
         }
         try (Config config = ConfigFactory.get()) {
-            DbUtil.updateOfferCommentReadForUser(config, userId, offerId);
+            DbUtilComment.updateOfferCommentReadForUser(config, userId, offerId);
         } catch (Exception e) {
             e.printStackTrace();
         }

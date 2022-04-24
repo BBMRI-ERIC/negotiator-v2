@@ -30,19 +30,19 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.OfferPersonDTO;
 import de.samply.bbmri.negotiator.util.JsonDataTableExporterExport;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
+
+import eu.bbmri.eric.csit.service.negotiator.database.*;
+
 import eu.bbmri.eric.csit.service.negotiator.admin.CreateAdminFilesForDownload;
 import eu.bbmri.eric.csit.service.negotiator.database.tmpDbUtil;
+
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
-import org.apache.logging.log4j.util.StringBuilders;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.component.export.Exporter;
 
@@ -75,8 +75,8 @@ public class AdminDebugBean implements Serializable {
     /**
      * The list of queries
      */
-    private List<QueryRecord> queries;
-    private HashMap<Integer, PersonRecord> users;
+    private List<Query> queries;
+    private HashMap<Integer, Person> users;
 
     //---------------------------------
     // START Collection Assostiations
@@ -119,11 +119,11 @@ public class AdminDebugBean implements Serializable {
     //---------------------------------
 
     //region properties
-    public List<QueryRecord> getQueries() {
+    public List<Query> getQueries() {
         return queries;
     }
 
-    public void setQueries(List<QueryRecord> queries) {
+    public void setQueries(List<Query> queries) {
         this.queries = queries;
     }
 //endregion
@@ -132,7 +132,7 @@ public class AdminDebugBean implements Serializable {
         return users.get(id).getAuthName();
     }
 
-    public HashMap<Integer, PersonRecord> getUser() {
+    public HashMap<Integer, Person> getUser() {
         return users;
     }
 
@@ -181,7 +181,7 @@ public class AdminDebugBean implements Serializable {
 
     public String restNegotiation(Integer id) {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.restNegotiation(config, id);
+            DbUtilRequest.restNegotiation(config, id);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -190,9 +190,9 @@ public class AdminDebugBean implements Serializable {
 
     public String resendNotifications(Integer requestId) {
         try (Config config = ConfigFactory.get()) {
-            Query query = DbUtil.getQueryFromIdAsQuery(config, requestId);
+            Query query = DbUtilRequest.getQueryFromIdAsQuery(config, requestId);
             if(query.getNegotiationStartedTime() == null) {
-                DbUtil.startNegotiation(config, requestId);
+                DbUtilRequest.startNegotiation(config, requestId);
             }
             RequestLifeCycleStatus requestLifeCycleStatus = new RequestLifeCycleStatus(requestId);
             requestLifeCycleStatus.setQuery(query);
@@ -218,9 +218,9 @@ public class AdminDebugBean implements Serializable {
      */
     public void loadQueries(Boolean filterRemoveTestRequests) {
         try(Config config = ConfigFactory.get()) {
-            queries = DbUtil.getQueries(config, filterRemoveTestRequests);
-            users = new HashMap<Integer, PersonRecord>();
-            for(PersonRecord personRecord : DbUtil.getAllUsers(config)) {
+            queries = DbUtilQuery.getQueries(config, filterRemoveTestRequests);
+            users = new HashMap<Integer, Person>();
+            for(Person personRecord : DbUtilPerson.getAllUsers(config)) {
                 users.put(personRecord.getId(), personRecord);
             }
         } catch(SQLException e) {
@@ -230,9 +230,9 @@ public class AdminDebugBean implements Serializable {
 
     public void transferRequest() {
         try (Config config = ConfigFactory.get()) {
-            QueryRecord queryRecord = DbUtil.getQueryFromId(config, transferQueryId);
-            Person researcher_old = DbUtil.getPersonDetails(config, queryRecord.getResearcherId());
-            Person researcher_new = DbUtil.getPersonDetails(config, transferQueryToUserId);
+            Query query = DbUtilRequest.getQueryFromId(config, transferQueryId);
+            Person researcher_old = DbUtilPerson.getPersonDetails(config, query.getResearcherId());
+            Person researcher_new = DbUtilPerson.getPersonDetails(config, transferQueryToUserId);
             StringBuilder commentMessage = new StringBuilder();
             commentMessage.append("---- System message ----\n\n");
             commentMessage.append("The ownership of this request has been transferred from ");
@@ -240,8 +240,8 @@ public class AdminDebugBean implements Serializable {
             commentMessage.append(" to ");
             commentMessage.append(researcher_new.getAuthName());
             commentMessage.append(".");
-            DbUtil.transferQuery(config, transferQueryId, transferQueryToUserId);
-            DbUtil.addComment(config, transferQueryId, userBean.getUserId(), commentMessage.toString(), "published", false);
+            DbUtilRequest.transferQuery(config, transferQueryId, transferQueryToUserId);
+            DbUtilComment.addComment(config, transferQueryId, userBean.getUserId(), commentMessage.toString(), "published", false);
         } catch (SQLException e) {
             System.err.println("3f0113dc7f4c-AdminDebugBean ERROR-NG-0000076: Error Transferring Request " + transferQueryId + " to user " + transferQueryToUserId + ".");
             e.printStackTrace();
@@ -250,8 +250,8 @@ public class AdminDebugBean implements Serializable {
 
     public void switchTestRequest(Integer queryId) {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.toggleRequestTestState(config, queryId);
-            for(QueryRecord query : queries) {
+            DbUtilAdmin.toggleRequestTestState(config, queryId);
+            for(Query query : queries) {
                 if(query.getId() == queryId) {
                     query.setTestRequest(!query.getTestRequest());
                     return;
@@ -268,15 +268,15 @@ public class AdminDebugBean implements Serializable {
         biobankWithoutOffer.put(queryId, new ArrayList<CollectionBiobankDTO>());
         listOfSampleOffers.put(queryId, new ArrayList<List<OfferPersonDTO>>());
 
-        setBiobankWithOffer(queryId, DbUtil.getOfferMakers(config, queryId));
+        setBiobankWithOffer(queryId, DbUtilComment.getOfferMakers(config, queryId));
 
         for (int i = 0; i < biobankWithOffer.get(queryId).size(); ++i) {
             List<OfferPersonDTO> offerPersonDTO;
-            offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(queryId).get(i), userBean.getUserId());
+            offerPersonDTO = DbUtilComment.getOffers(config, queryId, biobankWithOffer.get(queryId).get(i), userBean.getUserId());
             listOfSampleOffers.get(queryId).add(offerPersonDTO);
         }
 
-        matchingBiobankCollection.put(queryId, DbUtil.getCollectionsForQuery(config, queryId));
+        matchingBiobankCollection.put(queryId, DbUtilCollection.getCollectionsForQuery(config, queryId));
         setMatchingBiobanks(queryId, ObjectToJson.getUniqueBiobanks(matchingBiobankCollection.get(queryId)).size());
         /**
          * This is done to remove the repitition of biobanks in the list because of multiple collection

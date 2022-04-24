@@ -43,10 +43,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.samply.bbmri.negotiator.ServletUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
 import de.samply.bbmri.negotiator.util.JsonCollectionUpdateHelper;
+
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.util.NToken;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
@@ -67,7 +72,6 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
@@ -339,19 +343,19 @@ public class Directory {
 
         if(requestLifeCycleStatus == null || requestLifeCycleStatus.getStatus() == null || requestLifeCycleStatus.getStatus().getStatus() == null || requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
             logger.info(apiCallId + " removing collections from Mapping");
-            ListOfDirectoriesRecord serviceRecord = DbUtil.getDirectoryByUrl(config, serviceURL);
+            ListOfDirectories serviceRecord = DbUtilListOfDirectories.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
-                List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
-                for(CollectionRecord collectionRecord : collectionsList) {
-                    DbUtil.removeCollectionRequestMapping(config, queryId, collectionRecord.getId());
+                List<Collection> collectionsList = DbUtilCollection.getCollections(config, collectionId, serviceRecord.getId());
+                for(Collection collectionRecord : collectionsList) {
+                    DbUtilCollection.removeCollectionRequestMapping(config, queryId, collectionRecord.getId());
                 }
             }
         } else if(requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.STARTED)) {
             logger.info(apiCallId + " changing status of collections");
-            ListOfDirectoriesRecord serviceRecord = DbUtil.getDirectoryByUrl(config, serviceURL);
+            ListOfDirectories serviceRecord = DbUtilListOfDirectories.getDirectoryByUrl(config, serviceURL);
             for(String collectionId : collections) {
-                List<CollectionRecord> collectionsList = DbUtil.getCollections(config, collectionId, serviceRecord.getId());
-                for(CollectionRecord collectionRecord : collectionsList) {
+                List<Collection> collectionsList = DbUtilCollection.getCollections(config, collectionId, serviceRecord.getId());
+                for(Collection collectionRecord : collectionsList) {
                     List<CollectionLifeCycleStatus> listCollectionLifeStatus = requestLifeCycleStatus.getCollectionsForBiobank(collectionRecord.getBiobankId());
                     for(CollectionLifeCycleStatus collectionLifeCycleStatus : listCollectionLifeStatus) {
                         if(collectionLifeCycleStatus.getCollectionId() == collectionRecord.getId()) {
@@ -381,7 +385,7 @@ public class Directory {
     }
 
     protected QueryRecord getQueryRecord(Config config, String reuestToken) {
-        return DbUtil.getQuery(config, reuestToken);
+        return DbUtilRequest.getQuery(config, reuestToken);
     }
 
     protected void updateRecord(QueryRecord queryRecord) {

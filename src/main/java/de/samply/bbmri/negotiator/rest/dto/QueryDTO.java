@@ -30,15 +30,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.control.QueryBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -103,10 +101,10 @@ public class QueryDTO {
             for (QuerySearchDTO querySearchDTO : searchQueries) {
                 String humanReadableString = querySearchDTO.getHumanReadable();
                 int numberOfCollections = querySearchDTO.getNumberOfCollections();
-                ListOfDirectoriesRecord listOfDirectoriesRecord = DbUtil.getDirectoryByUrl(config, querySearchDTO.getUrl());
+                ListOfDirectories listOfDirectories = DbUtilListOfDirectories.getDirectoryByUrl(config, querySearchDTO.getUrl());
                 String directory = "-";
-                if(listOfDirectoriesRecord != null) {
-                    directory = listOfDirectoriesRecord.getName();
+                if(listOfDirectories != null) {
+                    directory = listOfDirectories.getName();
                 }
                 humanReadable.append(directory);
                 humanReadable.append(" (");

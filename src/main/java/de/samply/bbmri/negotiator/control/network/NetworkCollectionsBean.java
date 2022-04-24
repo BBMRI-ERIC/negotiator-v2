@@ -4,8 +4,8 @@ import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -42,7 +42,7 @@ public class NetworkCollectionsBean implements Serializable {
         }
         try (Config config = ConfigFactory.get()) {
             //collections = DbUtil.getCollectionsForNetwork(config, networkId);
-            collectionJson = DbUtil.getCollectionForNetworkAsJson(config, networkId);
+            collectionJson = DbUtilCollection.getCollectionForNetworkAsJson(config, networkId);
         } catch (Exception e) {
             System.err.println("242a95c1678f-NetworkCollectionsBean ERROR-NG-0000048: Error initializing NetworkCollectionsBean.");
             e.printStackTrace();

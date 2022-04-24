@@ -48,6 +48,10 @@ import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilPerson;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
 import de.samply.bbmri.negotiator.util.ObjectToJson;
@@ -61,7 +65,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -192,16 +195,16 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     public String initialize() {
         try(Config config = ConfigFactory.get()) {
-            setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
-            setBiobankWithOffer(DbUtil.getOfferMakers(config, queryId));
+            setComments(DbUtilComment.getComments(config, queryId, userBean.getUserId()));
+            setBiobankWithOffer(DbUtilComment.getOfferMakers(config, queryId));
 
             for (int i = 0; i < biobankWithOffer.size(); ++i) {
                 List<OfferPersonDTO> offerPersonDTO;
-                offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i), userBean.getUserId());
+                offerPersonDTO = DbUtilComment.getOffers(config, queryId, biobankWithOffer.get(i), userBean.getUserId());
                 listOfSampleOffers.add(offerPersonDTO);
             }
 
-            matchingBiobankCollection = DbUtil.getCollectionsForQuery(config, queryId);
+            matchingBiobankCollection = DbUtilCollection.getCollectionsForQuery(config, queryId);
             setMatchingBiobanks(ObjectToJson.getUniqueBiobanks(matchingBiobankCollection).size());
             /**
              * This is done to remove the repitition of biobanks in the list because of multiple collection
@@ -277,7 +280,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     private void setPersonListForRequest(Config config, Integer queryId) {
-        personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+        personList = DbUtilPerson.getPersonsContactsForRequest(config, queryId);
     }
 
     private void createCollectionListSortedByStatus() {
@@ -312,7 +315,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      */
     public String startNegotiation() {
         try (Config config = ConfigFactory.get()) {
-            DbUtil.startNegotiation(config, selectedQuery.getId());
+            DbUtilRequest.startNegotiation(config, selectedQuery.getId());
             requestLifeCycleStatus.nextStatus("started", "start", null, userBean.getUserId());
             requestLifeCycleStatus.setQuery(selectedQuery);
             requestLifeCycleStatus.contactCollectionRepresentatives(userBean.getUserId(), getQueryUrlForBiobanker());
@@ -375,7 +378,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public List<QueryStatsDTO> getQueries() {
         if (queries == null) {
             try (Config config = ConfigFactory.get()) {
-                queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+                queries = DbUtilRequest.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
                 for (int i = 0; i < queries.size(); ++i) {
                     getPrivateNegotiationCountAndTime(i);
                     getUnreadQueryLifecycleChangesCountAndTime(i);
@@ -389,7 +392,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
-            Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+            Result<Record> result = DbUtilComment.getPrivateNegotiationCountAndTimeForResearcher(config, queries.get(index).getQuery().getId(), userBean.getUserId());
             queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
             queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
             queries.get(index).setUnreadPrivateNegotiationCount((int) result.get(0).getValue("unread_private_negotiation_count"));
@@ -560,7 +563,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
         // Merge uploaded pdf attachments of the query
         try(Config config = ConfigFactory.get()) {
-            List<QueryAttachmentDTO> attachments = DbUtil.getQueryAttachmentRecords(config, queryId);
+            List<QueryAttachmentDTO> attachments = DbUtilRequest.getQueryAttachmentRecords(config, queryId);
             PDFMergerUtility PDFmerger = new PDFMergerUtility();
             PDFmerger.setDestinationFileName(tempPdfOutputFilePath);
             File file = new File(tempPdfOutputFilePath);

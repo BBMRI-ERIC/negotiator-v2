@@ -2,8 +2,8 @@ package de.samply.bbmri.negotiator.rest.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.rest.RestApplication;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilQuery;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
@@ -11,7 +11,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.ws.rs.BadRequestException;
-import java.util.UUID;
 
 public class QuerySearchDTOHelper {
 
@@ -61,7 +60,7 @@ public class QuerySearchDTOHelper {
     }
 
     protected String getRequestToken(String queryToken) {
-        return DbUtil.getRequestToken(queryToken);
+        return DbUtilQuery.getRequestToken(queryToken);
     }
 
     private String searchNTokenFromQueryToken(String queryToken, Config config) {

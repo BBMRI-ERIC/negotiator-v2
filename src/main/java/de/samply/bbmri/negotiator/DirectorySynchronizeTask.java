@@ -32,10 +32,14 @@ import java.util.List;
 import java.util.TimerTask;
 
 import de.samply.bbmri.negotiator.helper.model.DirectorySyncLoggingHelper;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilBiobank;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.DirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.BCPlatformFinderDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.DKFZSampleLocatorDirectoryClient;
@@ -43,7 +47,6 @@ import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients.MolgenisDirectoryClient;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
@@ -66,10 +69,10 @@ public class DirectorySynchronizeTask extends TimerTask {
     public void run() {
         try(Config config = ConfigFactory.get()) {
             DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
-            List<ListOfDirectoriesRecord> directories = DbUtil.getDirectories(config);
-            for(ListOfDirectoriesRecord listOfDirectoriesRecord : directories) {
-                logger.info("Synchronization with the directory: {} - {}", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
-                directorySyncLoggingHelper.addSyncResult(runDirectorySync(listOfDirectoriesRecord));
+            List<ListOfDirectories> directories = DbUtilListOfDirectories.getDirectories(config);
+            for(ListOfDirectories listOfDirectories : directories) {
+                logger.info(marker, "Synchronization with the directory: {} - {}", listOfDirectories.getId(), listOfDirectories.getName());
+                directorySyncLoggingHelper.addSyncResult(runDirectorySync(listOfDirectories));
             }
             updateDefaultNetworks(config);
             NegotiatorStatus.get().newSuccessStatus(NegotiatorStatus.NegotiatorTaskType.DIRECTORY, "Biobanks: " + directorySyncLoggingHelper.getSyncedBiobanks() +
@@ -82,33 +85,33 @@ public class DirectorySynchronizeTask extends TimerTask {
         }
     }
 
-    public DirectorySyncLoggingHelper runDirectorySync(ListOfDirectoriesRecord listOfDirectoriesRecord) {
-        logger.info("Starting synchronization with the directory: {} - {}", listOfDirectoriesRecord.getId(), listOfDirectoriesRecord.getName());
+    public DirectorySyncLoggingHelper runDirectorySync(ListOfDirectories listOfDirectories) {
+        logger.info(marker, "Starting synchronization with the directory: {} - {}", listOfDirectories.getId(), listOfDirectories.getName());
         DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
-        Boolean sync = listOfDirectoriesRecord.getSyncActive();
-        if (listOfDirectoriesRecord.getSyncActive() != null && !listOfDirectoriesRecord.getSyncActive()) {
+        Boolean sync = listOfDirectories.getSyncActive();
+        if (listOfDirectories.getSyncActive() != null && !listOfDirectories.getSyncActive()) {
             return directorySyncLoggingHelper;
         }
-        if(listOfDirectoriesRecord.getApiType().equalsIgnoreCase("Molgenis")) {
-            return syncMolgenisStyleDirectory(listOfDirectoriesRecord, directorySyncLoggingHelper);
+        if(listOfDirectories.getApiType().equalsIgnoreCase("Molgenis")) {
+            return syncMolgenisStyleDirectory(listOfDirectories, directorySyncLoggingHelper);
         }
-        if(listOfDirectoriesRecord.getApiType().equalsIgnoreCase("DKFZ-SampleLocator")) {
-            return syncDKFZSampleLocatorStyleDirectory(listOfDirectoriesRecord, directorySyncLoggingHelper);
+        if(listOfDirectories.getApiType().equalsIgnoreCase("DKFZ-SampleLocator")) {
+            return syncDKFZSampleLocatorStyleDirectory(listOfDirectories, directorySyncLoggingHelper);
         }
-        if(listOfDirectoriesRecord.getApiType().equalsIgnoreCase("BCPlatform-Finder")) {
-            return syncBCPlatformFinderStyleDirectory(listOfDirectoriesRecord, directorySyncLoggingHelper);
+        if(listOfDirectories.getApiType().equalsIgnoreCase("BCPlatform-Finder")) {
+            return syncBCPlatformFinderStyleDirectory(listOfDirectories, directorySyncLoggingHelper);
         }
         return directorySyncLoggingHelper;
     }
 
-    private DirectorySyncLoggingHelper syncBCPlatformFinderStyleDirectory(ListOfDirectoriesRecord listOfDirectoriesRecord, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
+    private DirectorySyncLoggingHelper syncBCPlatformFinderStyleDirectory(ListOfDirectories listOfDirectories, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
         try(Config config = ConfigFactory.get()) {
             BCPlatformFinderDirectoryClient directoryClient = new BCPlatformFinderDirectoryClient(
-                    listOfDirectoriesRecord.getRestUrl(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
+                    listOfDirectories.getRestUrl(), listOfDirectories.getUsername(), listOfDirectories.getPassword());
 
-            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
-            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectoriesRecord.getId(), config, directoryClient, false));
-            logger.info("Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
+            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectories.getId(), config, directoryClient, false));
+            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectories.getId(), config, directoryClient, false));
+            logger.info(marker, "Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
                     directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
             config.commit();
         } catch (Exception e) {
@@ -118,14 +121,14 @@ public class DirectorySynchronizeTask extends TimerTask {
         return directorySyncLoggingHelper;
     }
 
-    private DirectorySyncLoggingHelper syncDKFZSampleLocatorStyleDirectory(ListOfDirectoriesRecord listOfDirectoriesRecord, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
+    private DirectorySyncLoggingHelper syncDKFZSampleLocatorStyleDirectory(ListOfDirectories listOfDirectories, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
         try(Config config = ConfigFactory.get()) {
             DKFZSampleLocatorDirectoryClient directoryClient = getDKFZSampleLocatorStyleDirectoryClient(
-                    listOfDirectoriesRecord.getRestUrl(), listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword());
+                    listOfDirectories.getRestUrl(), listOfDirectories.getUsername(), listOfDirectories.getPassword());
 
-            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, false));
-            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectoriesRecord.getId(), config, directoryClient, false));
-            logger.info("Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
+            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectories.getId(), config, directoryClient, false));
+            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectories.getId(), config, directoryClient, false));
+            logger.info(marker, "Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
                     directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
             config.commit();
         } catch (Exception e) {
@@ -135,19 +138,19 @@ public class DirectorySynchronizeTask extends TimerTask {
         return directorySyncLoggingHelper;
     }
 
-    private DirectorySyncLoggingHelper syncMolgenisStyleDirectory(ListOfDirectoriesRecord listOfDirectoriesRecord, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
+    private DirectorySyncLoggingHelper syncMolgenisStyleDirectory(ListOfDirectories listOfDirectories, DirectorySyncLoggingHelper directorySyncLoggingHelper) {
         try(Config config = ConfigFactory.get()) {
             boolean updateNetworks = false;
-            if(listOfDirectoriesRecord.getResourceNetworks() != null) {
+            if(listOfDirectories.getResourceNetworks() != null) {
                 updateNetworks = true;
             }
 
-            MolgenisDirectoryClient directoryClient = getMolgenisDirectoryClient(listOfDirectoriesRecord.getUrl(), listOfDirectoriesRecord.getResourceBiobanks(),
-                    listOfDirectoriesRecord.getResourceCollections(), listOfDirectoriesRecord.getResourceNetworks(),
-                    listOfDirectoriesRecord.getUsername(), listOfDirectoriesRecord.getPassword(), updateNetworks);
-            directorySyncLoggingHelper.setSyncedNetworks(synchronizeNetworks(listOfDirectoriesRecord.getId(), config, directoryClient, updateNetworks));
-            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectoriesRecord.getId(), config, directoryClient, updateNetworks));
-            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectoriesRecord.getId(), config, directoryClient, updateNetworks));
+            MolgenisDirectoryClient directoryClient = getMolgenisDirectoryClient(listOfDirectories.getUrl(), listOfDirectories.getResourceBiobanks(),
+                    listOfDirectories.getResourceCollections(), listOfDirectories.getResourceNetworks(),
+                    listOfDirectories.getUsername(), listOfDirectories.getPassword(), updateNetworks);
+            directorySyncLoggingHelper.setSyncedNetworks(synchronizeNetworks(listOfDirectories.getId(), config, directoryClient, updateNetworks));
+            directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectories.getId(), config, directoryClient, updateNetworks));
+            directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectories.getId(), config, directoryClient, updateNetworks));
 
             logger.info("Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
                     directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
@@ -186,7 +189,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             List<DirectoryNetwork> allNetworks = client.getAllNetworks();
             logger.info("All Networks: {}", allNetworks.size());
             for (DirectoryNetwork directoryNetwork : allNetworks) {
-                DbUtil.synchronizeNetwork(config, directoryNetwork, listOfDirectoriesId);
+                DbUtilNetwork.synchronizeNetwork(config, directoryNetwork, listOfDirectoriesId);
             }
             return allNetworks.size();
         } catch (Exception e) {
@@ -202,7 +205,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             logger.info("All Biobanks: {}", allBiobanks.size());
 
             for(DirectoryBiobank directoryBiobank : allBiobanks) {
-                BiobankRecord biobankRecord = DbUtil.synchronizeBiobank(config, directoryBiobank, listOfDirectoriesId);
+                BiobankRecord biobankRecord = DbUtilBiobank.synchronizeBiobank(config, directoryBiobank, listOfDirectoriesId);
                 syncroniceBiobankNetworkLink(config, directoryBiobank, listOfDirectoriesId, updateNetworks, biobankRecord);
             }
 
@@ -220,7 +223,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             if(!updateNetworks) {
                 return;
             }
-            DbUtil.updateBiobankNetworkLinks(config, directoryBiobank, listOfDirectoriesId, biobankRecord.getId());
+            DbUtilNetwork.updateBiobankNetworkLinks(config, directoryBiobank, listOfDirectoriesId, biobankRecord.getId());
         } catch (Exception e) {
             logger.error("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000045: Problem synchronizing biobank network links for biobank: {}.", biobankRecord.getId());
             e.printStackTrace();
@@ -233,7 +236,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             logger.info("All Collections: {}", allCollections.size());
 
             for(DirectoryCollection directoryCollection : allCollections) {
-                CollectionRecord collectionRecord = DbUtil.synchronizeCollection(config, directoryCollection, listOfDirectoriesId);
+                CollectionRecord collectionRecord = DbUtilCollection.synchronizeCollection(config, directoryCollection, listOfDirectoriesId);
                 syncroniceCollectionNetworkLink(config, directoryCollection, listOfDirectoriesId, updateNetworks, collectionRecord.getId());
             }
             return allCollections.size();
@@ -249,7 +252,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             if(!updateNetworks) {
                 return;
             }
-            DbUtil.updateCollectionNetworkLinks(config, directoryCollection, listOfDirectoriesId, collectionId);
+            DbUtilNetwork.updateCollectionNetworkLinks(config, directoryCollection, listOfDirectoriesId, collectionId);
         } catch (Exception e) {
             logger.error("d87b05514c78-DirectorySynchronizeTask ERROR-NG-0000046: Problem synchronizing collection network links for collection: {}.", collectionId);
             e.printStackTrace();
@@ -275,15 +278,15 @@ public class DirectorySynchronizeTask extends TimerTask {
             networkDto.setName(network);
             networkDto.setDescription("Internal Network for the National Node of " + network);
             networkDto.setAcronym(network);
-            DbUtil.synchronizeNetwork(config, networkDto, '1');
+            DbUtilNetwork.synchronizeNetwork(config, networkDto, '1');
         }
     }
 
     private void updateDefaultNetworksLinks(Config config) {
         for(String networkEnding : defaultNationalNodes) {
             String networkname =  "internal:ID:BBMRI." + networkEnding;
-            DbUtil.updateNetworkBiobankLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
-            DbUtil.updateNetworkCollectionLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
+            DbUtilNetwork.updateNetworkBiobankLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
+            DbUtilNetwork.updateNetworkCollectionLinks(config, networkname, "bbmri-eric:ID:" + networkEnding + "%");
         }
     }
 

@@ -49,6 +49,8 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
+import eu.bbmri.eric.csit.service.negotiator.database.*;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import de.samply.bbmri.negotiator.Config;
@@ -59,11 +61,9 @@ import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
@@ -143,7 +143,7 @@ public class OwnerQueriesDetailBean implements Serializable {
     /**
      * The list of biobanks this owner is associated with
      */
-    private List<BiobankRecord> associatedBiobanks;
+    private List<Biobank> associatedBiobanks;
 
 	private final HashMap<Integer, String> biobankNames = null;
 
@@ -207,7 +207,7 @@ public class OwnerQueriesDetailBean implements Serializable {
         setNonConfidential(false);
 
         try(Config config = ConfigFactory.get()) {
-            setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
+            setComments(DbUtilComment.getComments(config, queryId, userBean.getUserId()));
 
 			/**
 			 * Get the selected(clicked on) query from the list of queries for the owner
@@ -223,15 +223,17 @@ public class OwnerQueriesDetailBean implements Serializable {
 				try {
 					JSONParser parser = new JSONParser();
 					JSONObject jsonObjectOriginalRequest = (JSONObject) parser.parse(selectedQuery.getJsonText());
-					JSONArray searchQueriesJson = (JSONArray)jsonObjectOriginalRequest.get("searchQueries");
-					for(Object queryJson : searchQueriesJson) {
-						JSONObject queryJsonObject = (JSONObject)queryJson;
-						JSONArray collections = (JSONArray)queryJsonObject.get("collections");
-						for(Object collectionObject : collections) {
-							JSONObject collection = (JSONObject) collectionObject;
-							Object locatorBacklinkUrl = collection.get("redirectUrl");
-							if(locatorBacklinkUrl != null && !locatorBacklinkUrl.toString().isEmpty()) {
-								locatorRedirectUrls.put((String) collection.get("biobankId"), locatorBacklinkUrl.toString());
+					JSONArray searchQueriesJson = (JSONArray) jsonObjectOriginalRequest.get("searchQueries");
+					if (searchQueriesJson != null) {
+						for (Object queryJson : searchQueriesJson) {
+							JSONObject queryJsonObject = (JSONObject) queryJson;
+							JSONArray collections = (JSONArray) queryJsonObject.get("collections");
+							for (Object collectionObject : collections) {
+								JSONObject collection = (JSONObject) collectionObject;
+								Object locatorBacklinkUrl = collection.get("locatorRedirectUrl");
+								if (locatorBacklinkUrl != null && !locatorBacklinkUrl.toString().isEmpty()) {
+									locatorRedirectUrls.put((String) collection.get("biobankId"), locatorBacklinkUrl.toString());
+								}
 							}
 						}
 					}
@@ -241,11 +243,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 				}
 			}
 
-			associatedBiobanks = DbUtil.getAssociatedBiobanks(config, queryId, userBean.getUserId());
+			associatedBiobanks = DbUtilBiobank.getAssociatedBiobanks(config, queryId, userBean.getUserId());
 
 			for (int i = 0; i < associatedBiobanks.size(); ++i) {
-				BiobankRecord biobank = associatedBiobanks.get(i);
-				listOfSampleOffers.add(DbUtil.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
+				Biobank biobank = associatedBiobanks.get(i);
+				listOfSampleOffers.add(DbUtilComment.getOffers(config, queryId, biobank.getId(), userBean.getUserId()));
 				if(locatorRedirectUrls.containsKey(biobank.getDirectoryId())) {
 					locatorRedirectUrlsDisplayList.put(biobank.getName(), locatorRedirectUrls.get(biobank.getDirectoryId()));
 				}
@@ -263,7 +265,7 @@ public class OwnerQueriesDetailBean implements Serializable {
             	/*
             	 * Check why the selected query is null. There could be two possibilities.
             	 */
-                Query query = DbUtil.checkIfQueryExists(config, queryId);
+                Query query = DbUtilQuery.checkIfQueryExists(config, queryId);
             	if(query == null){
 
 					/**
@@ -285,7 +287,7 @@ public class OwnerQueriesDetailBean implements Serializable {
                     // convienience
                     OwnerQueryStatsDTO addme = new OwnerQueryStatsDTO();
                     addme.setQuery(query);
-                    Person queryAuthor = DbUtil.getPersonDetails(config, query.getResearcherId());
+                    Person queryAuthor = DbUtilPerson.getPersonDetails(config, query.getResearcherId());
                     addme.setQueryAuthor(queryAuthor);
 					queries.add(0, addme);
 					return null;
@@ -301,7 +303,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			requestLifeCycleStatus.initialise();
 			requestLifeCycleStatus.initialiseCollectionStatus();
 
-			for(BiobankRecord biobankRecord : associatedBiobanks) {
+			for(Biobank biobankRecord : associatedBiobanks) {
 				createCollectionListSortedByStatus(biobankRecord.getId());
 			}
 
@@ -313,7 +315,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	}
 
 	private void setPersonListForRequest(Config config, Integer queryId) {
-		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+		personList = DbUtilPerson.getPersonsContactsForRequest(config, queryId);
 	}
 
 	private void createCollectionListSortedByStatus(Integer biobankIds) {
@@ -402,7 +404,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 		// Merge uploaded pdf attachments of the query
 		try(Config config = ConfigFactory.get()) {
-			List<QueryAttachmentDTO> attachments = DbUtil.getQueryAttachmentRecords(config, queryId);
+			List<QueryAttachmentDTO> attachments = DbUtilRequest.getQueryAttachmentRecords(config, queryId);
 			PDFMergerUtility PDFmerger = new PDFMergerUtility();
 			PDFmerger.setDestinationFileName(tempPdfOutputFilePath);
 			File file = new File(tempPdfOutputFilePath);
@@ -497,7 +499,7 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
     private void flagQuery(OwnerQueryStatsDTO queryDto, Flag flag) {
         try (Config config = ConfigFactory.get()) {
-			DbUtil.flagQuery(config, queryDto, flag, userBean.getUserId());
+			DbUtilQuery.flagQuery(config, queryDto, flag, userBean.getUserId());
             config.get().commit();
             queries = null;
         } catch (SQLException e) {
@@ -581,7 +583,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public List<OwnerQueryStatsDTO> getQueries() {
 		if (queries == null) {
 			try (Config config = ConfigFactory.get()) {
-				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, isTestRequest);
+				queries = DbUtilRequest.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, isTestRequest);
 
 				for (int i = 0; i < queries.size(); ++i) {
 					getPrivateNegotiationCountAndTime(i);
@@ -598,7 +600,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public void getPrivateNegotiationCountAndTime(int index){
 		try(Config config = ConfigFactory.get()) {
-			Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+			Result<Record> result = DbUtilComment.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 			queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
 			queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
 			int collection_counts = result.get(0).getValue("number_of_collections", Integer.class);
@@ -855,11 +857,11 @@ public class OwnerQueriesDetailBean implements Serializable {
 		this.flagFilter = flagFilter;
 	}
 
-    public List<BiobankRecord> getAssociatedBiobanks() {
+    public List<Biobank> getAssociatedBiobanks() {
         return associatedBiobanks;
     }
 
-    public void setAssociatedBiobanks(List<BiobankRecord> associatedBiobanks) {
+    public void setAssociatedBiobanks(List<Biobank> associatedBiobanks) {
         this.associatedBiobanks = associatedBiobanks;
     }
 
@@ -875,7 +877,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 		try (Config config = ConfigFactory.get()) {
 		    //TODO: have the biobanker decide which of his (possibly) many collections he wants to participate with.
             //      For now all will participate
-            DbUtil.participateInQueryAndExpectResults(config, queryId, userBean.getCollections());
+            DbUtilQuery.participateInQueryAndExpectResults(config, queryId, userBean.getCollections());
 
             // reload
             initialize();
@@ -919,7 +921,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	public Person getUserDataForResearcher(Integer researcherId) {
     	if(selectedQuery != null) {
 			try (Config config = ConfigFactory.get()) {
-				return DbUtil.getPersonDetails(config, researcherId);
+				return DbUtilPerson.getPersonDetails(config, researcherId);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

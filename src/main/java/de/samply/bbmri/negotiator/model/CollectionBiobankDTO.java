@@ -26,17 +26,16 @@
 
 package de.samply.bbmri.negotiator.model;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 
 public class CollectionBiobankDTO implements Serializable {
 
@@ -72,7 +71,7 @@ public class CollectionBiobankDTO implements Serializable {
         if(getCollection() != null) {
             int collectioId = getCollection().getId();
             try(Config config = ConfigFactory.get()) {
-                List<Person> listCollectionOwner = DbUtil.getPersonsContactsForCollection(config, collectioId);
+                List<Person> listCollectionOwner = DbUtilCollection.getPersonsContactsForCollection(config, collectioId);
                 if(listCollectionOwner.size() > 0) {
                     return true;
                 }

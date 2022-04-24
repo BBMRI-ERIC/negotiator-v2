@@ -4,13 +4,14 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.NegotiatorDTO;
 import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilLifecycle;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus.*;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
@@ -41,7 +42,7 @@ public class RequestLifeCycleStatus {
 
     public void initialise() {
         try(Config config = ConfigFactory.get()) {
-            initialise(DbUtil.getRequestStatus(config, query_id));
+            initialise(DbUtilLifecycle.getRequestStatus(config, query_id));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,12 +69,12 @@ public class RequestLifeCycleStatus {
     }
 
     public void createStatus(Integer status_user_id) {
-        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.CREATED, null, new Date(), status_user_id);
+        RequestStatusDTO requestStatusDTO = DbUtilLifecycle.saveUpdateRequestStatus(null, query_id, LifeCycleRequestStatusStatus.CREATED, LifeCycleRequestStatusType.CREATED, null, new Date(), status_user_id);
         requestStatusFactory(requestStatusDTO);
     }
 
     public boolean statusCreated() {
-        return DbUtil.requestStatusForRequestExists(query_id);
+        return DbUtilLifecycle.requestStatusForRequestExists(query_id);
     }
 
     public void initialiseCollectionStatus() {
@@ -84,7 +85,7 @@ public class RequestLifeCycleStatus {
             biobankCollectionLink = new HashMap<Integer, HashSet<Integer>>();
         }
         try(Config config = ConfigFactory.get()) {
-            List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtil.getCollectionsForQuery(config, query_id);
+            List<CollectionBiobankDTO> collectionBiobankDTOList = DbUtilCollection.getCollectionsForQuery(config, query_id);
             for(CollectionBiobankDTO collectionBiobankDTO : collectionBiobankDTOList) {
                 setBiobankCollectionLink(collectionBiobankDTO.getBiobank().getId(), collectionBiobankDTO.getCollection().getId());
                 collectionStatusList.put(collectionBiobankDTO.getCollection().getId(), new CollectionLifeCycleStatus(query_id, collectionBiobankDTO.getCollection().getId(), getCollectionReadableID(collectionBiobankDTO.getCollection())));
@@ -202,7 +203,7 @@ public class RequestLifeCycleStatus {
     }
 
     private RequestStatusDTO createRequestStatusInDB(String status, String statusType, String status_json, Integer status_user_id) {
-        RequestStatusDTO requestStatusDTO = DbUtil.saveUpdateRequestStatus(null, query_id, status, statusType, status_json, new Date(), status_user_id);
+        RequestStatusDTO requestStatusDTO = DbUtilLifecycle.saveUpdateRequestStatus(null, query_id, status, statusType, status_json, new Date(), status_user_id);
         return requestStatusDTO;
     }
 
@@ -263,24 +264,7 @@ public class RequestLifeCycleStatus {
 
     private Query getQueryFromDb() {
         try (Config config = ConfigFactory.get()) {
-            QueryRecord queryRecord = DbUtil.getQueryFromId(config, query_id);
-            Query query = new Query();
-            query.setId(queryRecord.getId());
-            query.setTitle(queryRecord.getTitle());
-            query.setText(queryRecord.getText());
-            query.setQueryXml(queryRecord.getQueryXml());
-            query.setQueryCreationTime(queryRecord.getQueryCreationTime());
-            query.setResearcherId(queryRecord.getResearcherId());
-            query.setJsonText(queryRecord.getJsonText());
-            query.setNumAttachments(queryRecord.getNumAttachments());
-            query.setNegotiatorToken(queryRecord.getNegotiatorToken());
-            query.setValidQuery(queryRecord.getValidQuery());
-            query.setRequestDescription(queryRecord.getRequestDescription());
-            query.setEthicsVote(queryRecord.getEthicsVote());
-            query.setNegotiationStartedTime(queryRecord.getNegotiationStartedTime());
-            query.setResearcherEmail(queryRecord.getResearcherEmail());
-            query.setResearcherEmail(queryRecord.getResearcherEmail());
-            query.setResearcherOrganization(queryRecord.getResearcherOrganization());
+            Query query = DbUtilRequest.getQueryFromId(config, query_id);
             return query;
         } catch (Exception e) {
             logger.error("ERROR-NG-0000008: Error getting query. queryId:" + query_id);

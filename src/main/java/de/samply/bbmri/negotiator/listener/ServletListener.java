@@ -81,21 +81,6 @@ public class ServletListener implements ServletContextListener {
      */
     @Override
     public void contextInitialized(ServletContextEvent event) {
-        System.out.println("Ding: ");
-        try {
-            String fileData = "yourContent";
-            FileOutputStream fos = new FileOutputStream("/tmp/yourFile.txt");
-
-                fos.write(fileData.getBytes());
-
-            fos.flush();
-            fos.close();
-        } catch (IOException e) {
-            System.err.println("FileProblem!!");
-            e.printStackTrace();
-        }
-
-
         try {
 
             String projectName = event.getServletContext().getInitParameter("projectName");

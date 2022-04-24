@@ -32,6 +32,9 @@ public class MappingDbUtil {
         query.setEthicsVote((String) dbRecord.getValue("query_ethics_vote"));
         query.setNegotiationStartedTime((Timestamp) dbRecord.getValue("query_negotiation_started_time"));
         query.setTestRequest((Boolean) dbRecord.getValue("query_test_request"));
+        query.setResearcherName((String) dbRecord.getValue("query_researcher_name"));
+        query.setResearcherEmail((String) dbRecord.getValue("query_researcher_email"));
+        query.setResearcherOrganization((String) dbRecord.getValue("query_researcher_organization"));
         return query;
     }
 
@@ -47,8 +50,8 @@ public class MappingDbUtil {
         return person;
     }
 
-    public static PersonRecord mapRequestPersonRecord(Record dbRecord) {
-        PersonRecord personRecord = new PersonRecord();
+    public static Person mapRequestPersonRecord(Record dbRecord) {
+        Person personRecord = new Person();
         personRecord.setId((Integer) dbRecord.getValue("person_id"));
         personRecord.setAuthSubject((String) dbRecord.getValue("person_auth_subject"));
         personRecord.setAuthName((String) dbRecord.getValue("person_auth_name"));

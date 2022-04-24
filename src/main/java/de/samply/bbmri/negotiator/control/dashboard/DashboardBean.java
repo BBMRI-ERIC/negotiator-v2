@@ -1,8 +1,9 @@
 package de.samply.bbmri.negotiator.control.dashboard;
 
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilQuery;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -31,11 +32,11 @@ public class DashboardBean implements Serializable {
     }
 
     private void collectDataStatistik() {
-        queriesInitialized = DbUtil.getNumberOfInitializedQueries();
-        queryRecords = DbUtil.getNumberOfQueries();
-        requestLast7days = DbUtil.getNumberOfQueriesLast7Days();
-        requestLineGraph = DbUtil.getDataForDashboardRequestLineGraph();
-        humanReadableStatisticsData = DbUtil.getHumanReadableStatistics();
+        queriesInitialized = DbUtilNetwork.getNumberOfInitializedQueries();
+        queryRecords = DbUtilQuery.getNumberOfQueries();
+        requestLast7days = DbUtilQuery.getNumberOfQueriesLast7Days();
+        requestLineGraph = DbUtilNetwork.getDataForDashboardRequestLineGraph();
+        humanReadableStatisticsData = DbUtilNetwork.getHumanReadableStatistics();
     }
 
     public Integer getQueriesInitialized() {

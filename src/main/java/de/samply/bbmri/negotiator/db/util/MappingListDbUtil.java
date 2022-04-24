@@ -2,6 +2,7 @@ package de.samply.bbmri.negotiator.db.util;
 
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
@@ -17,20 +18,6 @@ public class MappingListDbUtil {
 
     private MappingListDbUtil() {
 
-    }
-
-    public static List<QueryStatsDTO> mapRecordResultQueryStatsDTOList(Result<Record> dbRecords) {
-        List<QueryStatsDTO> result = new ArrayList<>();
-        for(Record dbRecord : dbRecords) {
-            QueryStatsDTO queryStatsDTO = new QueryStatsDTO();
-            queryStatsDTO.setQuery(MappingDbUtil.mapRequestQuery(dbRecord));
-            queryStatsDTO.setQueryAuthor(MappingDbUtil.mapRequestPerson(dbRecord));
-            queryStatsDTO.setLastCommentTime((Timestamp) dbRecord.getValue("last_comment_time"));
-            queryStatsDTO.setCommentCount((Integer) dbRecord.getValue("comment_count"));
-            queryStatsDTO.setUnreadCommentCount((Integer) dbRecord.getValue("unread_comment_count"));
-            result.add(queryStatsDTO);
-        }
-        return result;
     }
 
     public static List<OwnerQueryStatsDTO> mapRecordResultOwnerQueryStatsDTOList(Result<Record> dbRecords) {
@@ -126,8 +113,8 @@ public class MappingListDbUtil {
         return biobankRecords;
     }
 
-    public static List<PersonRecord> mapRecordsPersonRecord(Result<Record> dbRecords) {
-        List<PersonRecord> personRecords = new ArrayList<>();
+    public static List<Person> mapRecordsPersonRecord(Result<Record> dbRecords) {
+        List<Person> personRecords = new ArrayList<>();
         for (Record dbRecord : dbRecords) {
             personRecords.add(MappingDbUtil.mapRequestPersonRecord(dbRecord));
         }
