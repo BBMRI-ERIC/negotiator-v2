@@ -50,8 +50,8 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStat
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import com.docuverse.identicon.IdenticonUtil;
 
@@ -69,7 +69,7 @@ public class ApplicationBean implements Serializable {
     /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 1L;
 
-    private final static Logger logger = LoggerFactory.getLogger(ApplicationBean.class);
+    private final static Logger logger = LogManager.getLogger(ApplicationBean.class);
 
     /**
      * Gets the faces context.

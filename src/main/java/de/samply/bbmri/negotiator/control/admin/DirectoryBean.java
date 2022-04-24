@@ -3,11 +3,13 @@ package de.samply.bbmri.negotiator.control.admin;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.DirectorySynchronizeTask;
+
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
+
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -17,8 +19,7 @@ import java.util.List;
 @ManagedBean
 @SessionScoped
 public class DirectoryBean {
-    private final Logger logger = LoggerFactory.getLogger(DirectoryBean.class);
-    Marker marker;
+    private final Logger logger = LogManager.getLogger(DirectoryBean.class);
 
     public List<ListOfDirectories> getDirectories() {
         try(Config config = ConfigFactory.get()) {

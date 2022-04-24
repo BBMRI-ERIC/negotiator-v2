@@ -4,14 +4,14 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationRejectRequest extends Notification {
-    private static final Logger logger = LoggerFactory.getLogger(NotificationRejectRequest.class);
+    private static final Logger logger = LogManager.getLogger(NotificationRejectRequest.class);
 
     public NotificationRejectRequest(NotificationRecord notificationRecord, Integer requestId, Integer personId) {
         logger.info("97fdbf0f7bc2-NotificationRejectRequest new request created.");

@@ -159,6 +159,7 @@ public class ResearcherQueriesBean implements Serializable {
 
             for (int i = 0; i < queries.size(); ++i) {
                 getPrivateNegotiationCountAndTime(i);
+                getUnreadQueryLifecycleChangesCountAndTime(i);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -176,6 +177,20 @@ public class ResearcherQueriesBean implements Serializable {
             System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
             e.printStackTrace();
         }
+    }
+
+    public void getUnreadQueryLifecycleChangesCountAndTime(int index){
+        try(Config config = ConfigFactory.get()) {
+            Result<Record> result = DbUtil.getUnreadQueryLifecycleCountAndTime(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+            if(result.isNotEmpty()){
+                queries.get(index).setUnreadQueryCount((int) result.get(0).getValue("unread_query_lifecycle_changes_count"));
+            }
+
+        }catch (SQLException e) {
+            System.err.println("ERROR: ResearcherQueriesBean::getUnreadQueryLifecycleChangesCountAndTime(int index)");
+            e.printStackTrace();
+        }
+
     }
 
     public void setQueries(List<QueryStatsDTO> queries) {

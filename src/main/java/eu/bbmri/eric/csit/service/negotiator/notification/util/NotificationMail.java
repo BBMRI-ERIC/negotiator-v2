@@ -2,8 +2,8 @@ package eu.bbmri.eric.csit.service.negotiator.notification.util;
 
 import de.samply.bbmri.mailing.MailSending;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -15,7 +15,7 @@ import java.util.Properties;
 
 public class NotificationMail {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationMail.class);
+    private static final Logger logger = LogManager.getLogger(NotificationMail.class);
 
     private String host = "";
     private int port = 0;

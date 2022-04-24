@@ -36,8 +36,8 @@ import de.samply.config.util.JAXBUtil;
 import org.jooq.conf.Settings;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
@@ -51,7 +51,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ConnectorOwnerTest {
-    private static Logger logger = LoggerFactory.getLogger(ConnectorOwnerTest.class);
+    private static Logger logger = LogManager.getLogger(ConnectorOwnerTest.class);
     private static Postgresql postgresql;
     private static final String FILE_POSTGRESQL = "bbmri.test.postgres.xml";
 

@@ -33,8 +33,8 @@ import de.samply.common.config.OAuth2Client;
 import de.samply.common.config.ObjectFactory;
 import de.samply.common.config.Proxy;
 import de.samply.config.util.JAXBUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.xml.sax.SAXException;
 
 import javax.xml.bind.JAXBContext;
@@ -47,7 +47,7 @@ import java.io.FileNotFoundException;
  */
 public class NegotiatorConfig {
     
-    private static Logger logger = LoggerFactory.getLogger(NegotiatorConfig.class);
+    private static Logger logger = LogManager.getLogger(NegotiatorConfig.class);
 
     /**
      * The main negotiator configuration file.

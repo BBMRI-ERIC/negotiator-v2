@@ -10,8 +10,8 @@ import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilLifecycle;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -30,7 +30,7 @@ import java.util.List;
 public class ReviewBean implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final Logger logger = LoggerFactory.getLogger(ReviewBean.class);
+    private final Logger logger = LogManager.getLogger(ReviewBean.class);
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;

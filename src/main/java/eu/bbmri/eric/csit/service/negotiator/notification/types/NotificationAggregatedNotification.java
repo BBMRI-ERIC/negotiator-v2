@@ -5,8 +5,8 @@ import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class NotificationAggregatedNotification extends Notification {
-    private static final Logger logger = LoggerFactory.getLogger(NotificationAggregatedNotification.class);
+    private static final Logger logger = LogManager.getLogger(NotificationAggregatedNotification.class);
     String body;
     private String contactName;
     private String contactEmailAddresse;

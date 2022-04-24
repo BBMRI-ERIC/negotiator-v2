@@ -38,8 +38,8 @@ import javax.faces.application.FacesMessage;
 import javax.servlet.http.Part;
 
 import de.samply.bbmri.negotiator.helper.MessageHelper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.string.util.StringUtil;
@@ -48,7 +48,7 @@ import fi.solita.clamav.ClamAVClient;
 public class FileUtil {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+    private static final Logger logger = LogManager.getLogger(FileUtil.class);
 
     /**
      * ClamAV timeout in milliseconds. Set to 20 seconds.

@@ -36,12 +36,16 @@ import java.util.*;
 import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseListMapper;
 import org.jooq.*;
 import org.jooq.Record;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import de.samply.bbmri.negotiator.Config;
 
 import static org.jooq.impl.DSL.field;
+import static org.jooq.impl.DSL.select;
 
 /**
  * The database util for basic queries.
@@ -50,7 +54,6 @@ public class DbUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(DbUtil.class);
     private static DatabaseListMapper databaseListMapper = new DatabaseListMapper();
-
 
     public static String getFullListForAPI(Config config) {
         ResultQuery<Record> resultQuery = config.dsl().resultQuery("SELECT CAST(array_to_json(array_agg(row_to_json(jsond))) AS varchar) AS directories FROM ( " +

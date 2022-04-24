@@ -62,10 +62,10 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
 import de.samply.common.config.OAuth2Client;
 import de.samply.string.util.StringUtil;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilNetwork;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

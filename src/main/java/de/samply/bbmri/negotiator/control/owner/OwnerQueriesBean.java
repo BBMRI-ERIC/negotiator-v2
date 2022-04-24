@@ -184,6 +184,7 @@ public class OwnerQueriesBean implements Serializable {
 
 				for (int i = 0; i < queries.size(); ++i) {
 					getPrivateNegotiationCountAndTime(config, i);
+					getUnreadQueryLifecycleChangesCountAndTime(config, i);
 				}
 
 				sortQueries();
@@ -201,6 +202,13 @@ public class OwnerQueriesBean implements Serializable {
 		queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
 	}
 
+	public void getUnreadQueryLifecycleChangesCountAndTime(Config config, int index){
+		Result<Record> result = DbUtil.getUnreadQueryLifecycleCountAndTime(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+		if(result.isNotEmpty()){
+			queries.get(index).setUnreadQueryCount((int) result.get(0).getValue("unread_query_lifecycle_changes_count"));
+		}
+		//queries.get(index).setLastCommentTime((Timestamp) result.get(0).getValue("last_comment_time"));
+	}
 	/**
 	 * Add search filter
 	 */

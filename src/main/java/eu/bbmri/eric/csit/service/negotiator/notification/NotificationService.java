@@ -7,15 +7,15 @@ import eu.bbmri.eric.csit.service.negotiator.notification.types.*;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationSlack;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+    private static final Logger logger = LogManager.getLogger(NotificationService.class);
     private static final DatabaseUtil databaseUtil = new DatabaseUtil();
 
     private NotificationService() {}

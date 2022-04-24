@@ -7,8 +7,9 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilListOfDirectories;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -22,7 +23,7 @@ public class EditDirectoryBean implements Serializable {
 
     private static final long serialVersionUID = -611428463046307071L;
 
-    private static Logger logger = LoggerFactory.getLogger(EditDirectoryBean.class);
+    private static Logger logger = LogManager.getLogger(EditDirectoryBean.class);
 
 
 

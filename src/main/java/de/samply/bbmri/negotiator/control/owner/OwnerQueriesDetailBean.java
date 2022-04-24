@@ -169,6 +169,8 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private int privateNegotiationCount;
 	private int unreadPrivateNegotiationCount = 0;
 
+
+	private int unreadQueryCount = 0;
 	private List<Person> personList;
 
 	private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
@@ -184,6 +186,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private Integer numberOfPatientsAvailable;
 	private String indicateAccessConditions;
 	private String shippedNumber;
+	private String abandoningReason;
 	private Part  mtaFile;
 	private Part dtaFile;
 	private Part otherAccessFile;
@@ -509,6 +512,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 		unreadCommentCount = query.getUnreadCommentCount();
 		privateNegotiationCount = query.getPrivateNegotiationCount();
 		unreadPrivateNegotiationCount = query.getUnreadPrivateNegotiationCount();
+		unreadQueryCount = query.getUnreadQueryCount();
 	}
 
 	/**
@@ -583,6 +587,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 				for (int i = 0; i < queries.size(); ++i) {
 					getPrivateNegotiationCountAndTime(i);
+					getUnreadQueryCountAndTime(i);
 				}
 
 				sortQueries();
@@ -606,6 +611,17 @@ public class OwnerQueriesDetailBean implements Serializable {
 			queries.get(index).setUnreadPrivateNegotiationCount(unread_private_negotiation_count);
 		} catch (SQLException e) {
 			System.err.println("ERROR: ResearcherQueriesBean::getPrivateNegotiationCountAndTime(int index)");
+			e.printStackTrace();
+		}
+	}
+
+	public void getUnreadQueryCountAndTime(int index){
+		try(Config config = ConfigFactory.get()) {
+			Result<Record> result = DbUtil.getUnreadQueryLifecycleCountAndTime(config, queries.get(index).getQuery().getId(), userBean.getUserId());
+			int unread_query_lifecycle_count = result.get(0).getValue("unread_query_lifecycle_changes_count", Integer.class) ;
+			queries.get(index).setUnreadQueryCount(unread_query_lifecycle_count);
+		} catch (SQLException e) {
+			System.err.println("ERROR: OwnerQueriesDetailBean::getUnreadQueryCountAndTime(int index)");
 			e.printStackTrace();
 		}
 	}
@@ -671,6 +687,9 @@ public class OwnerQueriesDetailBean implements Serializable {
 			}
 			result += seperatorForJason + storeFilesForAccessCondition() + "}";
 			return result;
+		}
+		if(status.equals(LifeCycleRequestStatusStatus.NOT_INTERESTED)) {
+			return "{\"abandoningReason\":\"" + abandoningReason + "\"}";
 		}
 		if(shippedNumber != null && shippedNumber.length() > 0) {
 			return "{\"shippedNumber\":\"" + shippedNumber + "\"}";
@@ -1056,5 +1075,30 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 	public List<CollectionLifeCycleStatus> getSortedCollectionsByKathegory(String key) {
 		return sortedCollections.get(key);
+	}
+
+	public String getAbandoningReason() {
+		return abandoningReason;
+	}
+
+	public void setAbandoningReason(String abandoningReason) {
+		this.abandoningReason = abandoningReason;
+  }
+  
+	public int getUnreadQueryCount() {
+		return unreadQueryCount;
+	}
+
+	public void setUnreadQueryCount(int unreadQueryCount) {
+		this.unreadQueryCount = unreadQueryCount;
+	}
+
+	public void markQueryLifecycleReadForUser() {
+
+		try (Config config = ConfigFactory.get()) {
+			DbUtil.updateQueryLifecycleReadForUser(config, userBean.getUserId(), queryId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
