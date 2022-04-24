@@ -49,6 +49,7 @@ import javax.servlet.http.Part;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Biobank;
 import eu.bbmri.eric.csit.service.negotiator.database.*;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;

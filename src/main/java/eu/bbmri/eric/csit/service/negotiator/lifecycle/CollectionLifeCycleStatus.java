@@ -2,6 +2,7 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.CollectionBiobankDTO;
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
@@ -92,8 +93,6 @@ public class CollectionLifeCycleStatus {
                 parameters.put("newRequestStatus", getStatus().getStatus());
                 NotificationService.sendNotification(NotificationType.STATUS_CHANGED_NOTIFICATION, query_id, null, status_user_id, parameters);
                 try (Config config = ConfigFactory.get()) {
-                    //DbUtil.updateCommentReadForUser(config, userId, commentId);
-                    //DbUtil.updateRequestStatusReadForUser(config,status_user_id,query_id);
                     logger.info("Add to person_requeststatus table");
                     DbUtil.addQueryLifecycleReadForUser(config,query_id,status_user_id,status,statusType);
                 } catch (Exception e) {

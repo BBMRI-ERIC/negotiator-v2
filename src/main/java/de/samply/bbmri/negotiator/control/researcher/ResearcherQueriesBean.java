@@ -39,6 +39,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilComment;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
 import org.jooq.Record;

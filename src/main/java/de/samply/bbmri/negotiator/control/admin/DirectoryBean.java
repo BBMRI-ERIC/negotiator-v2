@@ -24,7 +24,7 @@ public class DirectoryBean {
     public List<ListOfDirectories> getDirectories() {
         try(Config config = ConfigFactory.get()) {
             List<ListOfDirectories> list = DbUtilListOfDirectories.getDirectories(config);
-            logger.info(marker, "Number of Directories {}", list.size());
+            logger.info("Number of Directories {}", list.size());
             return list;
         } catch(SQLException e) {
             e.printStackTrace();

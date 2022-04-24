@@ -101,7 +101,7 @@ public class DbUtilPerson {
 
     public static Person getPersonDetails(Config config, int personId) {
         Result<Record> record = config.dsl()
-                .select(FieldHelper.getFields(Tables.PERSON))
+                .select(FieldHelper.getFields(Tables.PERSON, "person"))
                 .from(Tables.PERSON)
                 .where(Tables.PERSON.ID.eq(personId)).fetch();
 

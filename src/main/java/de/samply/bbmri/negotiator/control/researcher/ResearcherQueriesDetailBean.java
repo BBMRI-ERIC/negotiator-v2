@@ -46,6 +46,7 @@ import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import de.samply.bbmri.negotiator.*;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.control.component.FileUploadBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
 import de.samply.bbmri.negotiator.model.*;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;

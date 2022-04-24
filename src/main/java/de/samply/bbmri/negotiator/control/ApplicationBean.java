@@ -42,6 +42,7 @@ import javax.servlet.ServletContext;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import eu.bbmri.eric.csit.service.negotiator.database.DbUtilAdminUpdateDBErrors;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilCollection;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilQuery;
 import eu.bbmri.eric.csit.service.negotiator.database.DbUtilRequest;
@@ -167,7 +168,7 @@ public class ApplicationBean implements Serializable {
 
     public String updateDirectoryLink_V_4_2_8() {
         try (Config config = ConfigFactory.get()) {
-            List<QueryRecord> querylist = DbUtil.getAllRequestsToUpdate(config);
+            List<QueryRecord> querylist = DbUtilAdminUpdateDBErrors.getAllRequestsToUpdate(config);
             for(QueryRecord queryRecord : querylist) {
                 String json = queryRecord.getJsonText();
                 if(json.contains("directory.bbmri-eric.eu")) {

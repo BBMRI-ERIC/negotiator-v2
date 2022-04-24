@@ -71,7 +71,7 @@ public class DirectorySynchronizeTask extends TimerTask {
             DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
             List<ListOfDirectories> directories = DbUtilListOfDirectories.getDirectories(config);
             for(ListOfDirectories listOfDirectories : directories) {
-                logger.info(marker, "Synchronization with the directory: {} - {}", listOfDirectories.getId(), listOfDirectories.getName());
+                logger.info("Synchronization with the directory: {} - {}", listOfDirectories.getId(), listOfDirectories.getName());
                 directorySyncLoggingHelper.addSyncResult(runDirectorySync(listOfDirectories));
             }
             updateDefaultNetworks(config);
@@ -86,7 +86,7 @@ public class DirectorySynchronizeTask extends TimerTask {
     }
 
     public DirectorySyncLoggingHelper runDirectorySync(ListOfDirectories listOfDirectories) {
-        logger.info(marker, "Starting synchronization with the directory: {} - {}", listOfDirectories.getId(), listOfDirectories.getName());
+        logger.info("Starting synchronization with the directory: {} - {}", listOfDirectories.getId(), listOfDirectories.getName());
         DirectorySyncLoggingHelper directorySyncLoggingHelper = new DirectorySyncLoggingHelper();
         Boolean sync = listOfDirectories.getSyncActive();
         if (listOfDirectories.getSyncActive() != null && !listOfDirectories.getSyncActive()) {
@@ -111,7 +111,7 @@ public class DirectorySynchronizeTask extends TimerTask {
 
             directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectories.getId(), config, directoryClient, false));
             directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectories.getId(), config, directoryClient, false));
-            logger.info(marker, "Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
+            logger.info("Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
                     directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
             config.commit();
         } catch (Exception e) {
@@ -128,7 +128,7 @@ public class DirectorySynchronizeTask extends TimerTask {
 
             directorySyncLoggingHelper.setSyncedBiobanks(synchronizeBiobanks(listOfDirectories.getId(), config, directoryClient, false));
             directorySyncLoggingHelper.setSyncedCollections(synchronizedCollections(listOfDirectories.getId(), config, directoryClient, false));
-            logger.info(marker, "Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
+            logger.info("Synchronization with the directory finished. Biobanks: {}, Collections: {}, Networks: {}.",
                     directorySyncLoggingHelper.getSyncedBiobanks(), directorySyncLoggingHelper.getSyncedCollections(), directorySyncLoggingHelper.getSyncedNetworks());
             config.commit();
         } catch (Exception e) {
