@@ -65,6 +65,15 @@ public class NToken {
     }
 
     public String getnToken() {
+        if(nToken.length() == 0) {
+            if(requestToken.length() == 0) {
+                getNewRequestToken();
+            }
+            if(queryToken.length() == 0) {
+                getNewQueryToken();
+            }
+            nToken = requestToken + tokenSplitter + queryToken;
+        }
         return nToken;
     }
 

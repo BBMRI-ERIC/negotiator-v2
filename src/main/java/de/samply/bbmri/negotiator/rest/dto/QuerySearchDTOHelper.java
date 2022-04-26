@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.rest.RestApplication;
+import eu.bbmri.eric.csit.service.negotiator.util.NToken;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
@@ -66,7 +67,10 @@ public class QuerySearchDTOHelper {
 
     private String searchNTokenFromQueryToken(String queryToken, Config config) {
         String requestToken = getRequestToken(queryToken);
-        String nTocken = requestToken + "__search__" + queryToken;
+        NToken token = new NToken();
+        token.setRequestToken(requestToken);
+        token.setQueryToken(queryToken);
+        String nTocken = token.getnToken();
         return nTocken;
     }
 

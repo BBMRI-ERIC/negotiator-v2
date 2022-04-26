@@ -82,6 +82,7 @@
 								<th>#{label['queryview.structuredQuery.table.searchParameters']}</th>
 								<th>#{label['queryview.structuredQuery.table.collectionNumbers']}</th>
 								<th>#{label['queryview.structuredQuery.table.actions']}</th>
+								<th>Json Payload</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -96,12 +97,13 @@
 											#{label['queryview.structuredQuery.table.editSearchParameters']}
 									</h:commandLink>
 								</td>
+								<td>#{searchQuery.generateQueryJsonString()}</td>
 							</tr>
 						</ui:repeat>
 						</tbody>
 					</table>
 
-
+					#{queryBean.getJsonQuery()}
 
 				</h:panelGroup>
 

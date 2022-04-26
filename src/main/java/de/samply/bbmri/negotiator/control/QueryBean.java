@@ -149,17 +149,21 @@ public class QueryBean implements Serializable {
 
     private boolean testRequest;
 
+    private NToken nToken;
+
     /**
      * Initializes this bean by registering email notification observer
      */
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
             /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
-            if(id != null)
-            {
+            if(id != null) {
                 requestLifeCycleStatus = new RequestLifeCycleStatus(id);
                 setMode("edit");
                 QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
+
+                qtoken = queryRecord.getNegotiatorToken();
+                nToken.setRequestToken(qtoken);
 
                 /**
                  * Save query title and text temporarily when a file is being uploaded.
@@ -170,10 +174,11 @@ public class QueryBean implements Serializable {
                     // Get the values of the fields before page was refreshed - for file upload or changing query from directory
                     getSavedValuesFromSessionBean(queryRecord);
                 }
-                qtoken = queryRecord.getNegotiatorToken();
+
 
             } else{
                 setMode("newQuery");
+                qtoken = nToken.getRequestToken();
                 String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
                 jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
             }
@@ -185,6 +190,14 @@ public class QueryBean implements Serializable {
             logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
         }
     }
+
+    //                  if(jsonQuery.contains("nToken")) {
+    //                    this.qtoken = getRequestToken(jsonQuery);
+    //                } else {
+    //                    NToken createNewToken = new NToken();
+    //                    String ntoken = createNewToken.getnToken();
+    //                    this.qtoken = createNewToken.getNewRequestToken();
+    //                }
 
     private void getSavedValuesFromDatabaseObject(Config config, QueryRecord queryRecord) {
         queryTitle = queryRecord.getTitle();
@@ -280,9 +293,6 @@ public class QueryBean implements Serializable {
                 config.commit();
                 return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
             } else {
-                if(jsonQuery.contains("nToken")) {
-                    this.qtoken = getRequestToken(jsonQuery);
-                }
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
                         true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
@@ -345,27 +355,29 @@ public class QueryBean implements Serializable {
          * Add token if an existing query is being edited. Else the user is still in the process of creating a
          * query and it has not been saved in the Query table hence no token is used.
          */
+        NToken urlTokenGenerator = new NToken();
+        urlTokenGenerator.setRequestToken(qtoken);
+        urlTokenGenerator.setQueryToken(searchToken);
+
         if(mode.equals("edit")) {
             saveEditChangesTemporarily();
-            if(url.contains("finder-dev.bbmri-eric.eu")) {
-                logger.info("URL1.4: " + url);
-                System.out.println("URL1.4: " + url);
-                externalContext.redirect(url);
-            } else if(url.contains("locator")) {
+
+            if(url.contains("locator")) {
                 if(url.contains("ntoken")) {
-                    logger.info("URL1.6.1: " + url);
+                    logger.info("URL locator with token: " + url);
                     System.out.println("URL1.6.1: " + url);
                     externalContext.redirect(url);
                 } else {
-                    logger.info("URL1.6.2: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
-                    System.out.println("URL1.6.2: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
-                    externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
+                    logger.info("URL locator new token: " + url + "&" + urlTokenGenerator.getNTokenForUrl("ntoken"));
+                    System.out.println("URL1.6.2: " + url + "&" + urlTokenGenerator.getNTokenForUrl("ntoken"));
+                    externalContext.redirect(url + "&" + urlTokenGenerator.getNTokenForUrl("ntoken"));
                 }
             } else {
-                logger.info("URL1.8: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
-                System.out.println("URL1.8: " + url + "&nToken=" + qtoken + "__search__" + searchToken);
-                externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
+                logger.info("URL redirect with prefix: " + url);
+                System.out.println("URL redirect with prefix: " + url);
+                externalContext.redirect(url + "&" + urlTokenGenerator.getNTokenForUrl("nToken"));
             }
+
         }else{
             try (Config config = ConfigFactory.get()) {
                 // Hack for Locator
@@ -387,7 +399,7 @@ public class QueryBean implements Serializable {
                 e.printStackTrace();
             }
             // Status created, not review
-            externalContext.redirect(url + "&nToken=" + qtoken + "__search__" + searchToken);
+            externalContext.redirect(url + "&" + urlTokenGenerator.getNTokenForUrl("nToken"));
         }
     }
 
@@ -407,10 +419,11 @@ public class QueryBean implements Serializable {
         if(mode == null) {
             mode = "newQuery";
         }
+        NToken nToken = new NToken();
         if(mode.equals("edit")) {
             saveEditChangesTemporarily();
 
-            NToken nToken = new NToken();
+
             nToken.setRequestToken(qtoken);
 
             RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
@@ -426,6 +439,8 @@ public class QueryBean implements Serializable {
                 jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
                 if(jsonQuery.contains("nToken")) {
                     this.qtoken = getRequestToken(jsonQuery);
+                } else {
+                    this.qtoken = nToken.getNewRequestToken();
                 }
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
@@ -449,11 +464,6 @@ public class QueryBean implements Serializable {
         }
     }
 
-    /**
-     * Generate the JSON including the new search query String
-     * @param searchJsonQuery
-     * @return
-     */
     private String generateJsonQuery(String searchJsonQuery) {
         try (Config config = ConfigFactory.get()) {
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
@@ -486,11 +496,6 @@ public class QueryBean implements Serializable {
         return  jsonQuery;
     }
 
-    /**
-     * Generate the JSON including the new search query String
-     * @param searchJsonQuery
-     * @return
-     */
     private String generateJsonQuery(String jsonQueryStored, String searchJsonQuery) {
         try (Config config = ConfigFactory.get()) {
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
@@ -734,6 +739,10 @@ public class QueryBean implements Serializable {
         }
 
         return validQuery;
+    }
+
+    public String getJsonQuery() {
+        return this.jsonQuery;
     }
 
 }
