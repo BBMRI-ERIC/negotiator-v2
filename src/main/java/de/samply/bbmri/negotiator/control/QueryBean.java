@@ -79,8 +79,6 @@ public class QueryBean implements Serializable {
 
     private static final long serialVersionUID = -611428463046308071L;
 
-    private Integer jsonQueryId;
-
     private static final Logger logger = LogManager.getLogger(QueryBean.class);
 
     @ManagedProperty(value = "#{userBean}")
@@ -88,72 +86,26 @@ public class QueryBean implements Serializable {
 
     private RequestLifeCycleStatus requestLifeCycleStatus;
 
-    /**
-     * Session bean use to store transient edit query values
-     */
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
     @ManagedProperty(value = "#{fileUploadBean}")
     private FileUploadBean fileUploadBean;
 
-    /**
-     * The query id if user is in the edit mode.
-     */
+    private Integer jsonQueryId;
     private Integer id = null;
-
-    /**
-     * The description of the query.
-     */
     private String queryText;
-
-    /**
-     * The description of the request.
-     */
     private String queryRequestDescription;
-
-    /**
-     * The title of the query.
-     */
     private String queryTitle;
-
-    /**
-     * The jsonText of the query.
-     */
     private String jsonQuery;
-
-    /**
-     * The mode of the page - editing or creating a new query
-     */
     private String mode = null;
-
-    /**
-     * The token sent to directory for authentication.
-     */
     private String qtoken;
-
-    /**
-     * String containing ethics code, if available.
-     */
     private String ethicsVote;
-
-    /**
-     * List of faces messages
-     */
     private final List<FacesMessage> msgs = new ArrayList<>();
-
-    /**
-     * List of faces messages
-     */
     private List<QuerySearchDTO> searchQueries = new ArrayList<>();
-
     private boolean testRequest;
-
     private NToken nToken;
 
-    /**
-     * Initializes this bean by registering email notification observer
-     */
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
             /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/

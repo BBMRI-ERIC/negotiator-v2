@@ -85,15 +85,8 @@ public class QuerySearchDTOHelper {
     public QuerySearchDTO generateQuerySearchDTOFromDirectory(String queryString, String apiCallId) throws BadRequestException {
         QuerySearchDTO querySearchDTO = new QuerySearchDTO();
         try {
-            /**
-             * Convert the string to an object, so that we can check the filters and collections.
-             * They must not be empty!
-             */
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
             ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-            // Hack for Locator
-            queryString = queryString.replaceAll("collectionid", "collectionId");
-            queryString = queryString.replaceAll("biobankid", "biobankId");
             querySearchDTO = mapper.readValue(queryString, QuerySearchDTO.class);
         } catch (Exception ex) {
             logger.error(LOGGING_PREFIX + "ERROR-NG-0000106: " + apiCallId + " Error creating object form JSON Payload: " + ex.getMessage());

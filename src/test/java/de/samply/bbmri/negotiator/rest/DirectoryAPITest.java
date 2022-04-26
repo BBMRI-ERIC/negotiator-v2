@@ -1,16 +1,13 @@
 package de.samply.bbmri.negotiator.rest;
 
 import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import org.junit.Before;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.servlet.http.HttpServletRequest;
@@ -80,7 +77,7 @@ class DirectoryAPITest {
         Directory directorySpy = Mockito.spy(directory);
         Mockito.doReturn(config).when(directorySpy).getConfigFromDactory();
         Mockito.doReturn(negotiatorConfig).when(directorySpy).getNegotiatorConfig();
-        Mockito.doReturn(queryRecord).when(directorySpy).getQueryRecord(Mockito.any(), Mockito.any());
+        Mockito.doReturn(queryRecord).when(directorySpy).getQueryForNToken(Mockito.any(), Mockito.any());
         Mockito.doNothing().when(directorySpy).updateRecord(queryRecord);
 
         JsonQueryRecord jsonQueryRecord = new JsonQueryRecord();
