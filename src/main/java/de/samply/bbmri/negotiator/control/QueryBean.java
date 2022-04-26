@@ -178,9 +178,8 @@ public class QueryBean implements Serializable {
 
             } else{
                 setMode("newQuery");
-                qtoken = nToken.getRequestToken();
                 String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-                jsonQuery = "{\"searchQueries\":[" + searchJsonQuery + "]}";
+                jsonQuery = "{\"searchQueries\":[" + addNTokenToNewQueryJson(searchJsonQuery) + "]}";
             }
             logger.debug("jsonQuery: " + jsonQuery);
             QueryDTO queryDTO = Directory.getQueryDTO(jsonQuery);
@@ -189,6 +188,18 @@ public class QueryBean implements Serializable {
         catch (Exception e) {
             logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
         }
+    }
+
+    private String addNTokenToNewQueryJson(String jsonQuery) {
+
+        if(jsonQuery.contains("nToken")) {
+            return jsonQuery;
+        }
+        nToken = new NToken();
+        String createdNToken = nToken.getnToken();
+        qtoken = nToken.getRequestToken();
+        jsonQuery = jsonQuery.replaceAll("\"URL", "\"nToken\":\"" + createdNToken + "\",\"URL");
+        return jsonQuery;
     }
 
     //                  if(jsonQuery.contains("nToken")) {
