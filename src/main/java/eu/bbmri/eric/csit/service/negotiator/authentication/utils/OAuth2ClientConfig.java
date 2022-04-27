@@ -76,6 +76,7 @@ public class OAuth2ClientConfig {
     public static String getRedirectUrl(OAuth2Client config, String scheme,
             String serverName, int port, String contextPath, String redirectUrl,
             Scope... scopes) throws UnsupportedEncodingException {
+        scheme = "https";
         return getRedirectUrl(config, scheme, serverName, port, contextPath, redirectUrl, null, scopes);
     }
 
@@ -97,6 +98,7 @@ public class OAuth2ClientConfig {
     public static String getRedirectUrl(OAuth2Client config, String scheme,
             String serverName, int port, String contextPath, String redirectUrl,
             String state, Scope... scopes) throws UnsupportedEncodingException {
+        scheme = "https";
         StringBuilder builder;
         String redirectUri = getLocalRedirectUrl(config, scheme, serverName, port, contextPath, redirectUrl);
 
@@ -145,6 +147,7 @@ public class OAuth2ClientConfig {
     public static String getRedirectUrlRegisterPerun(OAuth2Client config, String scheme,
                                         String serverName, int port, String contextPath, String redirectUrl,
                                         String state, Scope... scopes) throws UnsupportedEncodingException {
+        scheme = "https";
         String redirectUri = getLocalRedirectUrl(config, scheme, serverName, port, contextPath, redirectUrl);
 
         String host = "https://perun.bbmri-eric.eu";//getHost(config, serverName);
@@ -172,11 +175,13 @@ public class OAuth2ClientConfig {
      */
     public static String getLocalRedirectUrl(OAuth2Client config, String scheme,
             String serverName, int port, String contextPath, String redirectUrl) {
+        scheme = "https";
         return getLocalRedirectUrl(scheme, serverName, port, contextPath, redirectUrl);
     }
 
     public static String getLocalRedirectUrl(String scheme,
             String serverName, int port, String contextPath, String redirectUrl) {
+        scheme = "https";
         String strPort = (port == 80 || port == 443 ? "" : ":" + port);
         StringBuilder builder = new StringBuilder(scheme);
         builder.append("://").append(serverName).append(strPort)
@@ -198,6 +203,7 @@ public class OAuth2ClientConfig {
      */
     public static String getLogoutUrl(OAuth2Client config, String scheme,
             String serverName, int port, String contextPath, String localRedirectURL) throws UnsupportedEncodingException {
+        scheme = "https";
 
         String redirect = getLocalRedirectUrl(config, scheme,
                 serverName, port,

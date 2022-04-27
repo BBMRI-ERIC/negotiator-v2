@@ -197,6 +197,8 @@ public class Directory {
             JSONArray searchQueriesJson = queryJsonStringManipulator.getSearchQueriesArray(query.getJsonText());
             JsonCollectionUpdateHelper jsonCollectionUpdateHelper = new JsonCollectionUpdateHelper();
             JSONArray newSearchQueriesArray = new JSONArray();
+
+            JSONParser parser = new JSONParser();
 ;
             for(Object queryJson : searchQueriesJson) {
                 JSONObject queryJsonObject = (JSONObject)queryJson;

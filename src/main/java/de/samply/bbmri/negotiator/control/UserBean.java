@@ -325,7 +325,11 @@ public class UserBean implements Serializable {
             setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
         }
 
-        String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+		//Problem with the schema
+		//request.getScheme()
+		String scheme = "https";
+
+        String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), scheme,
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
 				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
 
@@ -343,16 +347,18 @@ public class UserBean implements Serializable {
 	 *             the invalid key exception
 	 */
 	public void login(AuthClient client) throws InvalidTokenException, InvalidKeyException {
-		logger.error("login client.");
+		logger.info("login client.");
 		accessToken = client.getAccessToken();
 
-		logger.error("AC Header: "+accessToken.getHeader());
-		logger.error("AC State : "+accessToken.getState());
+		logger.info("AC Header: "+accessToken.getHeader());
+		logger.info("AC State : "+accessToken.getState());
 		Map<String, Object> claims = accessToken.getClaimsSet().getClaims();
 
 		for(String claim: claims.keySet()) {
-			logger.error("AC Claim "+claim+" : "+claims.get(claim));
+			logger.info("AC Claim "+claim+" : "+claims.get(claim));
 		}
+
+		logger.info("State : "+state);
 
 		/**
 		 * Make sure that if the access token contains a state parameter, that it matches the state variable. If it does

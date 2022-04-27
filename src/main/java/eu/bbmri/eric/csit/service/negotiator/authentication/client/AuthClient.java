@@ -54,7 +54,7 @@ public class AuthClient {
         this.clientId = clientId;
         this.code = code;
         this.clientSecret = clientSecret;
-        this.redirectUri = redirectUri;
+        this.redirectUri = redirectUri.replaceAll("http:", "https:");
     }
 
     public JWTAccessToken getAccessToken() throws InvalidTokenException, InvalidKeyException {
@@ -103,6 +103,7 @@ public class AuthClient {
             form.param("grant_type", "authorization_code");
             form.param("code", this.code);
             form.param("redirect_uri", this.redirectUri);
+            logger.debug("redirect_uri" + this.redirectUri);
             Response response = builder.header("Authorization", BasicAuth.getAuthorizationHeader(this.clientId, this.clientSecret)).post(Entity.form(form), Response.class);
             if (response.getStatus() == 200) {
                 AccessTokenDTO tokenDTO = response.readEntity(AccessTokenDTO.class);
