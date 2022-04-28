@@ -107,10 +107,10 @@ public class Directory {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createQuery(String queryString, @Context HttpServletRequest request) {
         String apiCallId = UUID.randomUUID().toString();
-        try(Config config = getConfigFromDactory()) {
+        logger.info(apiCallId + " API call via create_query API.");
+        checkAuthentication(request);
 
-            logger.info(apiCallId + " API call via create_query API.");
-            checkAuthentication(request);
+        try(Config config = getConfigFromDactory()) {
 
             logger.debug(apiCallId + " query string: " + queryString);
             queryString = queryJsonStringManipulator.updateQueryJsonStringForTyposOfOtherSystems(queryString);
@@ -207,17 +207,20 @@ public class Directory {
 
 
 
-
-
-
                 if(queryTokenOriginalJson != null && nToken.getQueryToken().equals(queryTokenOriginalJson)) {
+
                     JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
                     tmpQueryObject.remove("nToken");
                     tmpQueryObject.put("token", nToken.getQueryToken());
                     newSearchQueriesArray.add(tmpQueryObject);
+
                     jsonCollectionUpdateHelper.addNewCollectionJson((JSONArray)tmpQueryObject.get("collections"));
                     jsonCollectionUpdateHelper.addOldCollectionJson((JSONArray)queryJsonObject.get("collections"));
                     jsonCollectionUpdateHelper.setServiceUrl(tmpQueryObject.get("URL").toString());
+
+
+
+
                     logger.info(apiCallId + " old Query String: " + queryJsonObject);
                     logger.info(apiCallId + " updated Query String: " + tmpQueryObject);
                     update = true;

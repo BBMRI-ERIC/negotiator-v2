@@ -10,12 +10,16 @@ import org.apache.commons.codec.binary.Base64;
 
 import de.samply.bbmri.negotiator.Constants;
 import de.samply.string.util.StringUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The authentication service decodes the Authorization header for
  * basic authentication into username and password.
  */
 public class AuthenticationService {
+
+    private static final Logger logger = LogManager.getLogger(AuthenticationService.class);
 
     /**
      * The username from the authorization header
@@ -39,6 +43,8 @@ public class AuthenticationService {
 
         AuthenticationService service = new AuthenticationService();
 
+
+
         if(!service.authenticate(authCredentials)) {
             throw new ForbiddenException();
         }
@@ -46,6 +52,8 @@ public class AuthenticationService {
         if(StringUtil.isEmpty(username) || StringUtil.isEmpty(password)) {
             throw new ForbiddenException();
         }
+
+        logger.debug("username: " + username + " password: " + password + " | username: " + service.getUsername() + " password: " + service.getPassword());
 
         if(!username.equals(service.getUsername()) ||
                 !password.equals(service.getPassword())) {

@@ -31,6 +31,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.sql.SQLException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -255,6 +256,7 @@ public class UserBean implements Serializable {
 
         // TODO: Add path, in case negotiator is not deployed in ROOT
         String requestURL = "/index.xhtml";
+		debugHeaderInfos(request);
 
         return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
                 request.getServerName(), request.getServerPort(), request.getContextPath(),
@@ -296,7 +298,10 @@ public class UserBean implements Serializable {
 		    setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
 		}
 
-		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+		//request.getScheme()
+		debugHeaderInfos(request);
+
+		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), "https",
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
 				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
 	}
@@ -328,6 +333,7 @@ public class UserBean implements Serializable {
 		//Problem with the schema
 		//request.getScheme()
 		String scheme = "https";
+		debugHeaderInfos(request);
 
         String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), scheme,
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
@@ -335,6 +341,23 @@ public class UserBean implements Serializable {
 
 		return returnURL;
     }
+
+	private void debugHeaderInfos(HttpServletRequest request) {
+		logger.debug("---------------");
+		logger.debug("Scheme: " + request.getScheme());
+		logger.debug("RequestURI: " + request.getRequestURI());
+		logger.debug("ServerName: " + request.getServerName());
+		logger.debug("ServerPort: " + request.getServerPort());
+		logger.debug("RequestURL: " + request.getRequestURL());
+
+		Enumeration<String> headerNames = request.getHeaderNames();
+
+		if (headerNames != null) {
+			while (headerNames.hasMoreElements()) {
+				logger.debug("Header: " + request.getHeader(headerNames.nextElement()));
+			}
+		}
+	}
 
     /**
 	 * Lets the user login and sets all necessary fields.
