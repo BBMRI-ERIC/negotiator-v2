@@ -343,6 +343,8 @@ public class UserBean implements Serializable {
     }
 
 	private void debugHeaderInfos(HttpServletRequest request) {
+		return;
+		/*
 		logger.debug("---------------");
 		logger.debug("Scheme: " + request.getScheme());
 		logger.debug("RequestURI: " + request.getRequestURI());
@@ -356,7 +358,7 @@ public class UserBean implements Serializable {
 			while (headerNames.hasMoreElements()) {
 				logger.debug("Header: " + request.getHeader(headerNames.nextElement()));
 			}
-		}
+		}*/
 	}
 
     /**

@@ -61,7 +61,11 @@ public class NToken {
     }
 
     public void setQueryToken(String queryToken) {
-        this.queryToken = queryToken;
+        if(queryToken.contains("tokenSplitter")) {
+            this.queryToken = nToken.replaceAll(".*__search__", "");
+        } else {
+            this.queryToken = queryToken;
+        }
     }
 
     public String getnToken() {
@@ -79,5 +83,11 @@ public class NToken {
 
     public void setnToken(String nToken) {
         this.nToken = nToken;
+    }
+
+    public void generateQueryTokenIfNotSet() {
+        if(queryToken.length() == 0) {
+            getNewQueryToken();
+        }
     }
 }

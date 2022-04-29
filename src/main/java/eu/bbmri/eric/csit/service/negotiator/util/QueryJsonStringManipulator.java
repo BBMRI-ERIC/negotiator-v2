@@ -24,13 +24,18 @@ public class QueryJsonStringManipulator {
         return searchQueriesArray;
     }
 
-    public String getTokenFromJsonObject(JSONObject queryJsonObject) {
+    public NToken getTokenFromJsonObject(JSONObject queryJsonObject, String requestToken) {
+        NToken ntoken = new NToken();
+        ntoken.setRequestToken(requestToken);
         String token = (String) queryJsonObject.get("token");
         if(token != null) {
-            return token;
+            ntoken.setQueryToken(token);
+            return ntoken;
         }
         token = (String) queryJsonObject.get("nToken");
-        return token;
+        ntoken.setQueryToken(token);
+        ntoken.generateQueryTokenIfNotSet();
+        return ntoken;
     }
 
 }

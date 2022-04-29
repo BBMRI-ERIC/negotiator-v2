@@ -155,6 +155,7 @@ public class Directory {
 
     private Response getResponseForQueryWithToken(String queryString, HttpServletRequest request, String apiCallId, Config config, QuerySearchDTO querySearchDTO) throws SQLException, URISyntaxException {
         NToken nToken = new NToken(querySearchDTO.getToken());
+        nToken.generateQueryTokenIfNotSet();
         QueryRecord query = getQueryForNToken(config, nToken.getRequestToken());
 
         // if no query exist just create the jsonRecord with a redirect url
@@ -164,7 +165,7 @@ public class Directory {
 
         JSONObject newRequestJson = new JSONObject();
         Boolean update = false;
-        update = RefectorMethode(queryString, apiCallId, config, nToken, query, newRequestJson, update);
+        update = updateJsonQueryStrings(queryString, apiCallId, config, nToken, query, newRequestJson, update);
 
         /**
          * Update the existing query in the next step (newQuery.xhtml page) and return the new URL back to the directory.
@@ -173,11 +174,11 @@ public class Directory {
 
         if(update) {
             query.setJsonText(newRequestJson.toJSONString());
-            logger.info(apiCallId + " saved query string:" + newRequestJson);
             updateRecord(query);
             config.commit();
             builder += "/researcher/newQuery.xhtml?queryId=" + query.getId();
             checkLifeCycleStatusAndConntactIfStarted(config, query.getId(), query.getTestRequest(), query.getResearcherId());
+            logger.debug(apiCallId + " saved query string:" + newRequestJson);
         } else {
             JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
             jsonQueryRecord.setJsonText(queryString);
@@ -187,68 +188,72 @@ public class Directory {
         }
 
         String redirectUrl = builder;
-        logger.info(apiCallId + " redirectUrl: " + redirectUrl);
+        logger.debug(apiCallId + " redirectUrl: " + redirectUrl);
+
         return createResponse(redirectUrl);
     }
 
     @Nullable
-    private Boolean RefectorMethode(String queryString, String apiCallId, Config config, NToken nToken, QueryRecord query, JSONObject newRequestJson, Boolean update) {
+    private Boolean updateJsonQueryStrings(String newQueryJsonString, String apiCallId, Config config, NToken nTokenNewQuery, QueryRecord query, JSONObject newRequestJson, Boolean update) {
         try {
             JSONArray searchQueriesJson = queryJsonStringManipulator.getSearchQueriesArray(query.getJsonText());
             JsonCollectionUpdateHelper jsonCollectionUpdateHelper = new JsonCollectionUpdateHelper();
-            JSONArray newSearchQueriesArray = new JSONArray();
+            JSONArray updatedSearchQueriesJsonArray = new JSONArray();
 
             JSONParser parser = new JSONParser();
-;
+
+            // Update json if it is an existing query
             for(Object queryJson : searchQueriesJson) {
                 JSONObject queryJsonObject = (JSONObject)queryJson;
-                String queryTokenOriginalJson = queryJsonStringManipulator.getTokenFromJsonObject(queryJsonObject);
+                NToken nTokenExistingQuery = queryJsonStringManipulator.getTokenFromJsonObject(queryJsonObject, query.getNegotiatorToken());
+                if(nTokenNewQuery.getQueryToken().equals(nTokenExistingQuery.getQueryToken())) {
+                    JSONObject newQueryJsonObject = (JSONObject) parser.parse(newQueryJsonString);
+                    newQueryJsonObject.remove("nToken");
+                    newQueryJsonObject.remove("token");
+                    newQueryJsonObject.put("nToken", nTokenNewQuery.getnToken());
+                    updatedSearchQueriesJsonArray.add(newQueryJsonObject);
 
-
-
-
-                if(queryTokenOriginalJson != null && nToken.getQueryToken().equals(queryTokenOriginalJson)) {
-
-                    JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
-                    tmpQueryObject.remove("nToken");
-                    tmpQueryObject.put("token", nToken.getQueryToken());
-                    newSearchQueriesArray.add(tmpQueryObject);
-
-                    jsonCollectionUpdateHelper.addNewCollectionJson((JSONArray)tmpQueryObject.get("collections"));
+                    jsonCollectionUpdateHelper.addNewCollectionJson((JSONArray)newQueryJsonObject.get("collections"));
                     jsonCollectionUpdateHelper.addOldCollectionJson((JSONArray)queryJsonObject.get("collections"));
-                    jsonCollectionUpdateHelper.setServiceUrl(tmpQueryObject.get("URL").toString());
+                    jsonCollectionUpdateHelper.setServiceUrl(newQueryJsonObject.get("URL").toString());
 
-
-
-
-                    logger.info(apiCallId + " old Query String: " + queryJsonObject);
-                    logger.info(apiCallId + " updated Query String: " + tmpQueryObject);
+                    logger.debug(apiCallId + " old Query String: " + queryJsonObject);
+                    logger.debug(apiCallId + " updated Query String: " + newQueryJsonObject);
                     update = true;
                 } else {
-                    newSearchQueriesArray.add(queryJsonObject);
-                    logger.info(apiCallId + " unchanged query string:" + queryJsonObject);
-                    JSONArray tmpArray = (JSONArray)queryJsonObject.get("collections");
-                    jsonCollectionUpdateHelper.addUnchangedCollectionJson(tmpArray);
+                    queryJsonObject.remove("nToken");
+                    queryJsonObject.remove("token");
+                    queryJsonObject.put("nToken", nTokenNewQuery.getnToken());
+
+                    updatedSearchQueriesJsonArray.add(queryJsonObject);
+                    logger.debug(apiCallId + " unchanged query string:" + queryJsonObject);
+
+                    jsonCollectionUpdateHelper.addUnchangedCollectionJson((JSONArray)queryJsonObject.get("collections"));
                 }
             }
 
             // Add json if it is a new query with a set token
             if(!update) {
-                JSONObject tmpQueryObject = (JSONObject) parser.parse(queryString);
+                JSONObject tmpQueryObject = (JSONObject) parser.parse(newQueryJsonString);
+
                 tmpQueryObject.remove("nToken");
-                tmpQueryObject.put("token", nToken.getQueryToken());
-                newSearchQueriesArray.add(tmpQueryObject);
-                logger.info(apiCallId + " new query string:" + tmpQueryObject);
+                tmpQueryObject.remove("token");
+                tmpQueryObject.put("nToken", nTokenNewQuery.getnToken());
+
+                updatedSearchQueriesJsonArray.add(tmpQueryObject);
+                logger.debug(apiCallId + " new query string:" + tmpQueryObject);
             }
 
             // Set status to abandoned for removed collections
             if(update) {
                 HashSet<String> collectionsToRemove = jsonCollectionUpdateHelper.getCollectionsToRemove();
-                logger.info(apiCallId + " removing:" + collectionsToRemove.size() + " collections");
                 removeCollectionsFromRequestOrChangeSataus(config, query.getId(), query.getTestRequest(), query.getResearcherId(), collectionsToRemove, jsonCollectionUpdateHelper.getServiceUrl(), apiCallId);
+                logger.debug(apiCallId + " removing:" + collectionsToRemove.size() + " collections");
             }
 
-            newRequestJson.put("searchQueries", newSearchQueriesArray);
+            // Update the request array of SearchQueries
+            newRequestJson.put("searchQueries", updatedSearchQueriesJsonArray);
+
         } catch (Exception ex) {
             logger.error(LOGGING_PREFIX + "ERROR-NG-0000113: " + apiCallId + " Error Parsing JSON String");
             ex.printStackTrace();

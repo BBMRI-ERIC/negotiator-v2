@@ -1,5 +1,6 @@
 package eu.bbmri.eric.csit.service.negotiator.util;
 
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -104,7 +105,6 @@ class NTokenTest {
         NToken tokenTest = new NToken(urlParameter.replaceAll("nToken=", ""));
         assertEquals("nToken=" +  tokenTest.getRequestToken() + "__search__", urlParameter);
     }
-
 
     /*@Test
     void getNewQueryToken() {

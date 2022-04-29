@@ -335,9 +335,13 @@ public class QueryBean implements Serializable {
                     externalContext.redirect(url + "&" + urlTokenGenerator.getNTokenForUrl("ntoken"));
                 }
             } else {
-                logger.info("URL redirect with prefix: " + url);
-                System.out.println("URL redirect with prefix: " + url);
-                externalContext.redirect(url + "&" + urlTokenGenerator.getNTokenForUrl("nToken"));
+                String urlAppander = "?";
+                if(url.contains("?")) {
+                    urlAppander = "&";
+                }
+                logger.info("URL redirect with prefix: " + url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken"));
+                System.out.println("URL redirect with prefix: " + url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken"));
+                externalContext.redirect(url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken"));
             }
 
         }else{
@@ -361,7 +365,11 @@ public class QueryBean implements Serializable {
                 e.printStackTrace();
             }
             // Status created, not review
-            externalContext.redirect(url + "&" + urlTokenGenerator.getNTokenForUrl("nToken"));
+            String urlAppander = "?";
+            if(url.contains("?")) {
+                urlAppander = "&";
+            }
+            externalContext.redirect(url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken"));
         }
     }
 
