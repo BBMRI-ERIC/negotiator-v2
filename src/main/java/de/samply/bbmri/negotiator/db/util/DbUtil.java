@@ -36,13 +36,13 @@ import java.util.*;
 
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Comment;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
 import de.samply.bbmri.negotiator.model.QueryCollection;
+import eu.bbmri.eric.csit.service.negotiator.mapping.QueryJsonStrinQueryDTOMapper;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
 import org.jooq.*;
@@ -60,7 +60,6 @@ import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
-import de.samply.bbmri.negotiator.rest.Directory;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
 
@@ -389,7 +388,7 @@ public class DbUtil {
              * Updates the relationship between query and collection.
              */
             // TODO: ERROR in Mapper -> Resulting in BiobankID and CollectionID = null
-            QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
+            QueryDTO queryDTO = QueryJsonStrinQueryDTOMapper.getQueryDTO(jsonText);
             for(QuerySearchDTO querySearchDTO : queryDTO.getSearchQueries()) {
                 ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, querySearchDTO.getUrl());
                 // collections already saved for this query
@@ -1371,7 +1370,7 @@ public class DbUtil {
         /**
          * Add the relationship between query and collection.
          */
-        QueryDTO queryDTO = Directory.getQueryDTO(jsonText);
+        QueryDTO queryDTO = QueryJsonStrinQueryDTOMapper.getQueryDTO(jsonText);
         for(QuerySearchDTO querySearchDTO : queryDTO.getSearchQueries()) {
             ListOfDirectoriesRecord listOfDirectoriesRecord = getDirectoryByUrl(config, querySearchDTO.getUrl());
 

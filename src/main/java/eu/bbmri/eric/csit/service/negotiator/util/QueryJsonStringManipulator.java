@@ -8,6 +8,9 @@ import org.json.simple.parser.ParseException;
 public class QueryJsonStringManipulator {
 
     JSONParser parser = new JSONParser();
+    String queryJsonQueryString = null;
+    String requestJsonQueryString = null;
+    String sessionJsonQueryString = null;
     public String updateQueryJsonStringForTyposOfOtherSystems(String queryString) {
         queryString = queryString.replaceAll("ntoken", "nToken");
         queryString = queryString.replaceAll("collectionID", "collectionId");
@@ -38,4 +41,18 @@ public class QueryJsonStringManipulator {
         return ntoken;
     }
 
+    public void setQueryJsonQueryString(String searchJsonQuery) {
+        queryJsonQueryString = searchJsonQuery;
+    }
+
+    public void setRequestJsonQueryString(String jsonText) {
+        requestJsonQueryString = jsonText;
+    }
+
+    public void setSessionJsonQueryString(String transientQueryJson) {
+        sessionJsonQueryString = transientQueryJson;
+    }
+
+    public void generateCombineRequestJsonString() {
+    }
 }

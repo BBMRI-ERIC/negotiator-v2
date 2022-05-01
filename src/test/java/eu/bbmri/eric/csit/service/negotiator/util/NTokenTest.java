@@ -1,6 +1,9 @@
 package eu.bbmri.eric.csit.service.negotiator.util;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -104,6 +107,21 @@ class NTokenTest {
         String urlParameter = token.getRequestTokenForUrl("nToken");
         NToken tokenTest = new NToken(urlParameter.replaceAll("nToken=", ""));
         assertEquals("nToken=" +  tokenTest.getRequestToken() + "__search__", urlParameter);
+    }
+
+    @Test
+    void testd() {
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject requestJsonObject = (JSONObject) parser.parse("{\"searchQueries\":[{\"a\":1},{\"b\":2}]}");
+            JSONObject newQueryJsonObject = (JSONObject) parser.parse("{\"cc\":3}");
+            JSONArray array = (JSONArray) requestJsonObject.get("searchQueries");
+            array.add(newQueryJsonObject);
+            requestJsonObject.put("searchQueries", array);
+            System.out.println(requestJsonObject);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /*@Test

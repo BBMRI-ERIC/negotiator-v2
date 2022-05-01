@@ -26,7 +26,6 @@
 
 package de.samply.bbmri.negotiator.rest;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -61,10 +60,6 @@ import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTOHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
@@ -74,7 +69,6 @@ import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
 import de.samply.bbmri.negotiator.rest.dto.CreateQueryResultDTO;
-import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 
 /**
  * REST endpoints for the directory
@@ -146,10 +140,9 @@ public class Directory {
     }
 
     private Response getResponseForQueryWithNoToken(String queryString, @Context HttpServletRequest request, String apiCallId, Config config) throws SQLException, URISyntaxException {
-        queryString = queryString.replaceAll("collectionID", "collectionId").replaceAll("biobankID", "biobankId");
         JsonQueryRecord jsonQueryRecord = saveJsonQueryRecord(queryString, config);
         String redirectUrl = getLocalUrl(request) + "/researcher/newQuery.xhtml?jsonQueryId=" + jsonQueryRecord.getId();
-        logger.info(apiCallId + " redirectUrl: " + redirectUrl);
+        logger.debug(apiCallId + " redirectUrl: " + redirectUrl);
         return createResponse(redirectUrl);
     }
 
@@ -266,25 +259,7 @@ public class Directory {
         return request.getScheme() + "://" + request.getServerName() + strPort + request.getContextPath();
     }
 
-
-
-    /**
-     * Convert the string to an object, so that we can store it in the database.
-     * @throws IOException
-     * @throws JsonMappingException
-     * @throws JsonParseException
-     */
-    public static QueryDTO getQueryDTO(String queryString) throws JsonParseException, JsonMappingException, IOException {
-        RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
-        ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-        return mapper.readValue(queryString, QueryDTO.class);
-    }
-
     protected JsonQueryRecord saveJsonQueryRecord(String queryString, Config config) throws SQLException {
-        // Hack for Locator
-        queryString = queryString.replaceAll("collectionid", "collectionId");
-        queryString = queryString.replaceAll("biobankid", "biobankId");
-
         JsonQueryRecord jsonQueryRecord = config.dsl().newRecord(Tables.JSON_QUERY);
         jsonQueryRecord.setJsonText(queryString);
         jsonQueryRecord.store();

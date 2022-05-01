@@ -46,7 +46,9 @@ import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
 import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import eu.bbmri.eric.csit.service.negotiator.mapping.QueryJsonStrinQueryDTOMapper;
 import eu.bbmri.eric.csit.service.negotiator.util.NToken;
+import eu.bbmri.eric.csit.service.negotiator.util.QueryJsonStringManipulator;
 import eu.bbmri.eric.csit.service.negotiator.util.RedirectUrlGenerator;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
@@ -67,7 +69,6 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.ServletUtil;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import de.samply.bbmri.negotiator.rest.Directory;
 
 
 /**
@@ -109,39 +110,130 @@ public class QueryBean implements Serializable {
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
             /*   If user is in the 'edit query description' mode. The 'id' will be of the query which is being edited.*/
+            nToken = new NToken();
             if(id != null) {
-                nToken = new NToken();
-                requestLifeCycleStatus = new RequestLifeCycleStatus(id);
-                setMode("edit");
-                QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
-
-                qtoken = queryRecord.getNegotiatorToken();
-                nToken.setRequestToken(qtoken);
-
-                /**
-                 * Save query title and text temporarily when a file is being uploaded.
-                 */
-                if(sessionBean.isSaveTransientState() == false){
-                    getSavedValuesFromDatabaseObject(config, queryRecord);
-                }else {
-                    // Get the values of the fields before page was refreshed - for file upload or changing query from directory
-                    getSavedValuesFromSessionBean(queryRecord);
-                }
-
-
+                loadEditRequest(config);
             } else{
-                setMode("newQuery");
-                String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-                jsonQuery = "{\"searchQueries\":[" + addNTokenToNewQueryJson(searchJsonQuery) + "]}";
+                loadNewRequest(config);
             }
-            logger.debug("jsonQuery: " + jsonQuery);
-            QueryDTO queryDTO = Directory.getQueryDTO(jsonQuery);
+
+            QueryDTO queryDTO = QueryJsonStrinQueryDTOMapper.getQueryDTO(jsonQuery);
             searchQueries = new ArrayList<QuerySearchDTO>(queryDTO.getSearchQueries());
+
+            logger.debug("jsonQuery: " + jsonQuery);
         }
         catch (Exception e) {
             logger.error("Loading temp json query failed, ID: " + jsonQueryId, e);
         }
     }
+
+    private void loadEditRequest(Config config) {
+        setMode("edit");
+        requestLifeCycleStatus = new RequestLifeCycleStatus(id);
+        QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
+
+        qtoken = queryRecord.getNegotiatorToken();
+        nToken.setRequestToken(qtoken);
+
+        if(sessionBean.isSaveTransientState() == false){
+            getSavedValuesFromDatabaseObject(config, queryRecord);
+        }else {
+            getSavedValuesFromSessionBean(config, queryRecord);
+        }
+    }
+
+    private void loadNewRequest(Config config) {
+        setMode("newQuery");
+        String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+        jsonQuery = "{\"searchQueries\":[" + addNTokenToNewQueryJson(searchJsonQuery) + "]}";
+    }
+
+    private void getSavedValuesFromDatabaseObject(Config config, QueryRecord queryRecord) {
+        queryTitle = queryRecord.getTitle();
+        queryText = queryRecord.getText();
+        queryRequestDescription = queryRecord.getRequestDescription();
+        testRequest = queryRecord.getTestRequest();
+        if(jsonQueryId == null) {
+            jsonQuery = queryRecord.getJsonText();
+        } else {
+            jsonQuery = generateJsonQueryForAddingQueryToExistigRequest(DbUtil.getJsonQuery(config, jsonQueryId), queryRecord.getJsonText());
+        }
+        ethicsVote = queryRecord.getEthicsVote();
+    }
+
+    public void getSavedValuesFromSessionBean(Config config, QueryRecord queryRecord) {
+        queryTitle = sessionBean.getTransientQueryTitle();
+        queryText = sessionBean.getTransientQueryText();
+        queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
+        ethicsVote = sessionBean.getTransientEthicsCode();
+        testRequest = sessionBean.getTransientQueryTestRequest();
+
+        QueryJsonStringManipulator queryJsonStringManipulator = new QueryJsonStringManipulator();
+
+        String queryJsonQueryString = null;
+        String requestJsonQueryString = null;
+        String sessionJsonQueryString = null;
+
+        if (jsonQueryId != null) {
+            String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+            queryJsonStringManipulator.setQueryJsonQueryString(searchJsonQuery);
+            queryJsonQueryString = searchJsonQuery;
+        } else if(id != null && queryRecord != null) {
+            queryJsonStringManipulator.setRequestJsonQueryString(queryRecord.getJsonText());
+            requestJsonQueryString = queryRecord.getJsonText();
+        } else {
+            queryJsonStringManipulator.setSessionJsonQueryString(sessionBean.getTransientQueryJson());
+            sessionJsonQueryString = sessionBean.getTransientQueryJson();
+        }
+
+        queryJsonStringManipulator.generateCombineRequestJsonString();
+
+        clearEditChanges();
+    }
+
+    private String generateJsonQueryForAddingQueryToExistigRequest(String addedQueryJsonString, String requestQueryJsonStrings) {
+        NToken nTokenNewQuery = new NToken();
+        nTokenNewQuery.setRequestToken(this.nToken.getRequestToken());
+
+        org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
+
+        try {
+            org.json.simple.JSONObject newQueryJsonObject = (org.json.simple.JSONObject) parser.parse(addedQueryJsonString);
+            String token = (String) newQueryJsonObject.get("token");
+            if(token != null) {
+                nTokenNewQuery.setQueryToken(token);
+                newQueryJsonObject.remove("token");
+                newQueryJsonObject.put("nToken", nTokenNewQuery.getnToken());
+            }
+            token = (String) newQueryJsonObject.get("nToken");
+            if(token != null) {
+                nTokenNewQuery.setQueryToken(token);
+                newQueryJsonObject.remove("nToken");
+                newQueryJsonObject.put("nToken", nTokenNewQuery.getnToken());
+            } else {
+                newQueryJsonObject.put("nToken", nTokenNewQuery.getnToken());
+            }
+
+            org.json.simple.JSONObject requestJsonObject = (org.json.simple.JSONObject) parser.parse(addedQueryJsonString);
+            org.json.simple.JSONArray requestSearchQueriesArray = (org.json.simple.JSONArray) requestJsonObject.get("searchQueries");
+            requestSearchQueriesArray.add(newQueryJsonObject);
+            requestJsonObject.put("searchQueries", requestSearchQueriesArray);
+            return requestJsonObject.toJSONString();
+        } catch (Exception ex) {
+            logger.error("Error parsing jsonQueryString" + addedQueryJsonString);
+        }
+
+        return "";
+    }
+
+    private String generateJsonQueryCombination(String addedQueryJsonString, String requestQueryJsonStrings, String sessionQueryJsonStrings) {
+        return "";
+    }
+
+
+
+
+    //-------------------------------------------------------------
 
     private String addNTokenToNewQueryJson(String jsonQuery) {
 
@@ -153,51 +245,6 @@ public class QueryBean implements Serializable {
         qtoken = nToken.getRequestToken();
         jsonQuery = jsonQuery.replaceAll("\"URL", "\"nToken\":\"" + createdNToken + "\",\"URL");
         return jsonQuery;
-    }
-
-    //                  if(jsonQuery.contains("nToken")) {
-    //                    this.qtoken = getRequestToken(jsonQuery);
-    //                } else {
-    //                    NToken createNewToken = new NToken();
-    //                    String ntoken = createNewToken.getnToken();
-    //                    this.qtoken = createNewToken.getNewRequestToken();
-    //                }
-
-    private void getSavedValuesFromDatabaseObject(Config config, QueryRecord queryRecord) {
-        queryTitle = queryRecord.getTitle();
-        queryText = queryRecord.getText();
-        queryRequestDescription = queryRecord.getRequestDescription();
-        testRequest = queryRecord.getTestRequest();
-        if(jsonQueryId == null) {
-            jsonQuery = queryRecord.getJsonText();
-        } else {
-            jsonQuery = generateJsonQuery(DbUtil.getJsonQuery(config, jsonQueryId));
-        }
-        ethicsVote = queryRecord.getEthicsVote();
-    }
-
-    /**
-     * Gets values from session bean that are saved before page is refreshed - for file upload or changing query from directory.
-     */
-    public void getSavedValuesFromSessionBean(QueryRecord queryRecord) {
-        queryTitle = sessionBean.getTransientQueryTitle();
-        queryText = sessionBean.getTransientQueryText();
-        queryRequestDescription = sessionBean.getTransientQueryRequestDescription();
-        ethicsVote = sessionBean.getTransientEthicsCode();
-        testRequest = sessionBean.getTransientQueryTestRequest();
-        if (jsonQueryId != null) {
-            try (Config config = ConfigFactory.get()) {
-                String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-                jsonQuery = generateJsonQuery(sessionBean.getTransientQueryJson(), searchJsonQuery);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        } else if(id != null && queryRecord != null) {
-            jsonQuery = queryRecord.getJsonText();
-        } else {
-            jsonQuery = sessionBean.getTransientQueryJson();
-        }
-        clearEditChanges();
     }
 
     public List<ListOfDirectoriesRecord> getDirectories() {
@@ -434,38 +481,7 @@ public class QueryBean implements Serializable {
         }
     }
 
-    private String generateJsonQuery(String searchJsonQuery) {
-        try (Config config = ConfigFactory.get()) {
-            RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
-            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-            // Get the stored query object
-            QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
-            String jsonQueryStored = queryRecord.getJsonText();
-            QueryDTO queryDTO = mapper.readValue(jsonQueryStored, QueryDTO.class);
-            // Get the search query object from the new json string
-            QuerySearchDTO querySearchDTO = mapper.readValue(searchJsonQuery, QuerySearchDTO.class);
-            // check searchQueryTocken if update of query or new
-            if(querySearchDTO.getToken() == null) {
-                querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
-                queryDTO.addSearchQuery(querySearchDTO);
-            } else {
-                String nTocken = querySearchDTO.getToken().replaceAll(".*__search__", "");
-                if (nTocken == null || nTocken.equals("") || nTocken.equals("null")) {
-                    // new search query
-                    querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
-                    queryDTO.addSearchQuery(querySearchDTO);
-                } else {
-                    // edited search query
-                    queryDTO.updateSearchQuery(querySearchDTO, nTocken);
-                }
-            }
-            jsonQuery = queryDTO.toJsonString();
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-        return  jsonQuery;
-    }
-
+    //TODO: Remove!!
     private String generateJsonQuery(String jsonQueryStored, String searchJsonQuery) {
         try (Config config = ConfigFactory.get()) {
             RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
