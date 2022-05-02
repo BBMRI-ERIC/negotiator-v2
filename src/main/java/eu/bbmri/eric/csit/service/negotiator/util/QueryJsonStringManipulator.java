@@ -1,5 +1,7 @@
 package eu.bbmri.eric.csit.service.negotiator.util;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -7,6 +9,7 @@ import org.json.simple.parser.ParseException;
 
 public class QueryJsonStringManipulator {
 
+    private final Logger logger = LogManager.getLogger(QueryJsonStringManipulator.class);
     JSONParser parser = new JSONParser();
     String queryJsonQueryString = null;
     String requestJsonQueryString = null;
@@ -38,6 +41,25 @@ public class QueryJsonStringManipulator {
         token = (String) queryJsonObject.get("nToken");
         ntoken.setQueryToken(token);
         ntoken.generateQueryTokenIfNotSet();
+        return ntoken;
+    }
+
+    public NToken getRequestTokenFromJsonQueryString(String queryJsonString) {
+        NToken ntoken = new NToken();
+        try {
+            JSONArray searchQueriesJson = this.getSearchQueriesArray(queryJsonString);
+            for(Object queryJson : searchQueriesJson) {
+                JSONObject queryJsonObject = (JSONObject) queryJson;
+                String token = (String) queryJsonObject.get("nToken");
+                if(token != null) {
+                    ntoken.setQueryToken(token);
+                    return ntoken;
+                }
+            }
+        } catch (ParseException e) {
+            logger.error("Error parsing query JSON: " + queryJsonString);
+            e.printStackTrace();
+        }
         return ntoken;
     }
 

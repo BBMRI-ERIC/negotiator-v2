@@ -168,26 +168,27 @@ public class QueryBean implements Serializable {
         ethicsVote = sessionBean.getTransientEthicsCode();
         testRequest = sessionBean.getTransientQueryTestRequest();
 
-        QueryJsonStringManipulator queryJsonStringManipulator = new QueryJsonStringManipulator();
-
-        String queryJsonQueryString = null;
-        String requestJsonQueryString = null;
-        String sessionJsonQueryString = null;
-
-        if (jsonQueryId != null) {
-            String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
-            queryJsonStringManipulator.setQueryJsonQueryString(searchJsonQuery);
-            queryJsonQueryString = searchJsonQuery;
-        } else if(id != null && queryRecord != null) {
-            queryJsonStringManipulator.setRequestJsonQueryString(queryRecord.getJsonText());
-            requestJsonQueryString = queryRecord.getJsonText();
+        if(sessionBean.getSavedFromAction().equalsIgnoreCase("uploadAttachment")
+                || sessionBean.getSavedFromAction().equalsIgnoreCase("removeAttachment")) {
+            jsonQuery = sessionBean.getTransientQueryJson();
+        } else if(sessionBean.getSavedFromAction().equalsIgnoreCase("addQuery")) {
+            if (jsonQueryId != null) {
+                String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+                jsonQuery = generateJsonQueryForAddingQueryToExistigRequest(searchJsonQuery, sessionBean.getTransientQueryJson());
+            } else {
+                jsonQuery = sessionBean.getTransientQueryJson();
+            }
+        } else if(sessionBean.getSavedFromAction().equalsIgnoreCase("editQuery")) {
+            jsonQuery = queryRecord.getJsonText();
         } else {
-            queryJsonStringManipulator.setSessionJsonQueryString(sessionBean.getTransientQueryJson());
-            sessionJsonQueryString = sessionBean.getTransientQueryJson();
+            logger.error("Problem SessionActivity not named. QueryId: " + queryRecord.getId() + " jsonQueryId: " + jsonQueryId);
+            if (jsonQueryId != null) {
+                String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+                jsonQuery = generateJsonQueryForAddingQueryToExistigRequest(searchJsonQuery, sessionBean.getTransientQueryJson());
+            } else {
+                jsonQuery = sessionBean.getTransientQueryJson();
+            }
         }
-
-        queryJsonStringManipulator.generateCombineRequestJsonString();
-
         clearEditChanges();
     }
 
@@ -369,7 +370,7 @@ public class QueryBean implements Serializable {
         NToken urlTokenGenerator = new NToken(searchToken);
 
         if(mode.equals("edit")) {
-            saveEditChangesTemporarily();
+            saveEditChangesTemporarily("editQuery");
 
             if(url.contains("locator")) {
                 if(url.contains("ntoken")) {
@@ -393,9 +394,6 @@ public class QueryBean implements Serializable {
 
         }else{
             try (Config config = ConfigFactory.get()) {
-                // Hack for Locator
-                jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
-                jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
                 if(jsonQuery.contains("nToken")) {
                     this.qtoken = getRequestToken(jsonQuery);
                 }
@@ -438,7 +436,7 @@ public class QueryBean implements Serializable {
         }
         NToken nToken = new NToken();
         if(mode.equals("edit")) {
-            saveEditChangesTemporarily();
+            saveEditChangesTemporarily("addQuery");
 
 
             nToken.setRequestToken(qtoken);
@@ -451,9 +449,6 @@ public class QueryBean implements Serializable {
             externalContext.redirect(resirectUrl);
         } else {
             try (Config config = ConfigFactory.get()) {
-                // Hack for Locator
-                jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
-                jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
                 if(jsonQuery.contains("nToken")) {
                     this.qtoken = getRequestToken(jsonQuery);
                 } else {
@@ -481,41 +476,10 @@ public class QueryBean implements Serializable {
         }
     }
 
-    //TODO: Remove!!
-    private String generateJsonQuery(String jsonQueryStored, String searchJsonQuery) {
-        try (Config config = ConfigFactory.get()) {
-            RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
-            ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
-            // Get saved query object
-            QueryDTO queryDTO = mapper.readValue(jsonQueryStored, QueryDTO.class);
-            // Get the search query object from the new json string
-            QuerySearchDTO querySearchDTO = mapper.readValue(searchJsonQuery, QuerySearchDTO.class);
-            // check searchQueryTocken if update of query or new
-            if(querySearchDTO.getToken() == null) {
-                querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
-                queryDTO.addSearchQuery(querySearchDTO);
-            } else {
-                String nTocken = querySearchDTO.getToken().replaceAll(".*__search__", "");
-                if (nTocken == null || nTocken.equals("") || nTocken.equals("null")) {
-                    // new search query
-                    querySearchDTO.setToken(UUID.randomUUID().toString().replace("-", ""));
-                    queryDTO.addSearchQuery(querySearchDTO);
-                } else {
-                    // edited search query
-                    queryDTO.updateSearchQuery(querySearchDTO, nTocken);
-                }
-            }
-            jsonQuery = queryDTO.toJsonString();
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-        return  jsonQuery;
-    }
-
     /**
      * Save title and text in session bean when uploading attachment.
      */
-    public void saveEditChangesTemporarily() {
+    public void saveEditChangesTemporarily(String savedFromAction) {
         sessionBean.setTransientQueryTitle(queryTitle);
         sessionBean.setTransientQueryText(queryText);
         sessionBean.setTransientQueryJson(jsonQuery);
@@ -523,6 +487,7 @@ public class QueryBean implements Serializable {
         sessionBean.setTransientEthicsCode(ethicsVote);
         sessionBean.setTransientQueryTestRequest(testRequest);
         sessionBean.setSaveTransientState(true);
+        sessionBean.setSavedFromAction(savedFromAction);
     }
 
     /**
@@ -537,7 +502,7 @@ public class QueryBean implements Serializable {
         sessionBean.setTransientEthicsCode(null);
         sessionBean.setTransientQueryTestRequest(null);
         sessionBean.setSaveTransientState(false);
-
+        sessionBean.setSavedFromAction(null);
     }
 
     /**
@@ -577,11 +542,11 @@ public class QueryBean implements Serializable {
 
         try (Config config = ConfigFactory.get()) {
             if (id == null) {
-                if(jsonQuery.contains("nToken")) {
-                    this.qtoken = getRequestToken(jsonQuery);
-                }
+                QueryJsonStringManipulator queryJsonStringManipulator = new QueryJsonStringManipulator();
+                this.nToken = queryJsonStringManipulator.getRequestTokenFromJsonQueryString(jsonQuery);
+
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
+                        jsonQuery, ethicsVote, userBean.getUserId(), this.nToken.getRequestToken(),
                         false, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                         testRequest);
                 config.commit();
@@ -590,10 +555,8 @@ public class QueryBean implements Serializable {
             boolean fileCreationSuccessful = fileUploadBean.createQueryAttachment();
             if(fileCreationSuccessful) {
                 if (mode.equals("edit")) {
-                    saveEditChangesTemporarily();
+                    saveEditChangesTemporarily("uploadAttachment");
                 }
-            } else {
-                config.rollback();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -608,7 +571,7 @@ public class QueryBean implements Serializable {
             return "";
         }
         if (mode.equals("edit")) {
-            saveEditChangesTemporarily();
+            saveEditChangesTemporarily("removeAttachment");
         }
         return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";
     }

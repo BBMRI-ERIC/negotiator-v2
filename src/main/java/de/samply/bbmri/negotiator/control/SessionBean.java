@@ -89,6 +89,16 @@ public class SessionBean implements Serializable {
     private String transientCommentComment;
     private HashMap<String, String> transientCommentAttachmentMap;
 
+    public String getSavedFromAction() {
+        return savedFromAction;
+    }
+
+    public void setSavedFromAction(String savedFromAction) {
+        this.savedFromAction = savedFromAction;
+    }
+
+    private String savedFromAction;
+
     /**
      * Removes all the filters at once.
      */
