@@ -153,6 +153,17 @@ public class Directory {
 
         // if no query exist just create the jsonRecord with a redirect url
         if(query == null) {
+            JSONParser parser = new JSONParser();
+            try {
+                JSONObject newQueryJsonObject = (JSONObject) parser.parse(queryString);
+                newQueryJsonObject.remove("nToken");
+                newQueryJsonObject.remove("token");
+                newQueryJsonObject.put("nToken", nToken.getnToken());
+                queryString = newQueryJsonObject.toJSONString();
+            } catch (Exception ex) {
+                logger.error("Could not pars query String + " + queryString);
+            }
+
             return getResponseForQueryWithNoToken(queryString, request, apiCallId, config);
         }
 
