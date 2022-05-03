@@ -14,6 +14,7 @@ import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollect
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jooq.*;
+import org.jooq.Record;
 
 import java.util.Date;
 import java.util.List;

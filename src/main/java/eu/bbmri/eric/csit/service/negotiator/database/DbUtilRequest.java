@@ -23,6 +23,7 @@ import eu.bbmri.eric.csit.service.negotiator.mapping.DatabaseObjectMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jooq.*;
+import org.jooq.Record;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
