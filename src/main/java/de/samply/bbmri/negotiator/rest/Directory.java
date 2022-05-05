@@ -158,6 +158,9 @@ public class Directory {
                 JSONObject newQueryJsonObject = (JSONObject) parser.parse(queryString);
                 newQueryJsonObject.remove("nToken");
                 newQueryJsonObject.remove("token");
+                if(nToken.getQueryToken().length() == 0) {
+                    nToken.getNewQueryToken();
+                }
                 newQueryJsonObject.put("nToken", nToken.getnToken());
                 queryString = newQueryJsonObject.toJSONString();
             } catch (Exception ex) {

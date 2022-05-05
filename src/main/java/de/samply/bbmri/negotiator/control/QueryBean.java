@@ -100,12 +100,13 @@ public class QueryBean implements Serializable {
     private String queryTitle;
     private String jsonQuery;
     private String mode = null;
-    private String qtoken;
     private String ethicsVote;
     private final List<FacesMessage> msgs = new ArrayList<>();
     private List<QuerySearchDTO> searchQueries = new ArrayList<>();
     private boolean testRequest;
     private NToken nToken;
+
+    org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
 
     public void initialize() {
         try(Config config = ConfigFactory.get()) {
@@ -132,8 +133,7 @@ public class QueryBean implements Serializable {
         requestLifeCycleStatus = new RequestLifeCycleStatus(id);
         QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
 
-        qtoken = queryRecord.getNegotiatorToken();
-        nToken.setRequestToken(qtoken);
+        nToken.setRequestToken(queryRecord.getNegotiatorToken());
 
         if(sessionBean.isSaveTransientState() == false){
             getSavedValuesFromDatabaseObject(config, queryRecord);
@@ -145,6 +145,19 @@ public class QueryBean implements Serializable {
     private void loadNewRequest(Config config) {
         setMode("newQuery");
         String searchJsonQuery = DbUtil.getJsonQuery(config, jsonQueryId);
+        try {
+            org.json.simple.JSONObject newQueryJsonObject = (org.json.simple.JSONObject) parser.parse(searchJsonQuery);
+            String pareseToken = (String)newQueryJsonObject.get("nToken");
+            if(pareseToken != null) {
+                nToken = new NToken(pareseToken);
+            } else {
+                nToken = new NToken();
+                newQueryJsonObject.put("nToken", nToken.getnToken());
+                searchJsonQuery = newQueryJsonObject.toJSONString();
+            }
+        } catch (Exception e) {
+            logger.error("Error parsing query json: " + searchJsonQuery);
+        }
         jsonQuery = "{\"searchQueries\":[" + addNTokenToNewQueryJson(searchJsonQuery) + "]}";
     }
 
@@ -196,8 +209,6 @@ public class QueryBean implements Serializable {
         NToken nTokenNewQuery = new NToken();
         nTokenNewQuery.setRequestToken(this.nToken.getRequestToken());
 
-        org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
-
         try {
             org.json.simple.JSONObject newQueryJsonObject = (org.json.simple.JSONObject) parser.parse(addedQueryJsonString);
             String token = (String) newQueryJsonObject.get("token");
@@ -215,26 +226,17 @@ public class QueryBean implements Serializable {
                 newQueryJsonObject.put("nToken", nTokenNewQuery.getnToken());
             }
 
-            org.json.simple.JSONObject requestJsonObject = (org.json.simple.JSONObject) parser.parse(addedQueryJsonString);
+            org.json.simple.JSONObject requestJsonObject = (org.json.simple.JSONObject) parser.parse(requestQueryJsonStrings);
             org.json.simple.JSONArray requestSearchQueriesArray = (org.json.simple.JSONArray) requestJsonObject.get("searchQueries");
             requestSearchQueriesArray.add(newQueryJsonObject);
             requestJsonObject.put("searchQueries", requestSearchQueriesArray);
             return requestJsonObject.toJSONString();
         } catch (Exception ex) {
-            logger.error("Error parsing jsonQueryString" + addedQueryJsonString);
+            logger.error("Error parsing jsonQueryString" + addedQueryJsonString + " | " + requestQueryJsonStrings);
         }
 
         return "";
     }
-
-    private String generateJsonQueryCombination(String addedQueryJsonString, String requestQueryJsonStrings, String sessionQueryJsonStrings) {
-        return "";
-    }
-
-
-
-
-    //-------------------------------------------------------------
 
     private String addNTokenToNewQueryJson(String jsonQuery) {
 
@@ -243,7 +245,6 @@ public class QueryBean implements Serializable {
         }
         nToken = new NToken();
         String createdNToken = nToken.getnToken();
-        qtoken = nToken.getRequestToken();
         jsonQuery = jsonQuery.replaceAll("\"URL", "\"nToken\":\"" + createdNToken + "\",\"URL");
         return jsonQuery;
     }
@@ -306,7 +307,7 @@ public class QueryBean implements Serializable {
                 return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
             } else {
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
+                        jsonQuery, ethicsVote, userBean.getUserId(), nToken.getRequestToken(),
                         true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                         testRequest);
                 config.commit();
@@ -374,31 +375,34 @@ public class QueryBean implements Serializable {
 
             if(url.contains("locator")) {
                 if(url.contains("ntoken")) {
-                    logger.info("URL locator with token: " + url);
-                    System.out.println("URL1.6.1: " + url);
+                    logger.debug("URL locator with token: " + url);
                     externalContext.redirect(url);
                 } else {
-                    logger.info("URL locator new token: " + url + "&" + urlTokenGenerator.getNTokenForUrl("ntoken"));
-                    System.out.println("URL1.6.2: " + url + "&" + urlTokenGenerator.getNTokenForUrl("ntoken"));
-                    externalContext.redirect(url + "&" + urlTokenGenerator.getNTokenForUrl("ntoken"));
+                    String urlAppander = "?";
+                    if(url.contains("?")) {
+                        urlAppander = "&";
+                    }
+                    String redirectUrl = url + urlAppander + urlTokenGenerator.getNTokenForUrl("ntoken");
+                    logger.debug("URL locator new token: " + redirectUrl);
+                    externalContext.redirect(redirectUrl);
                 }
             } else {
                 String urlAppander = "?";
                 if(url.contains("?")) {
                     urlAppander = "&";
                 }
-                logger.info("URL redirect with prefix: " + url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken"));
-                System.out.println("URL redirect with prefix: " + url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken"));
-                externalContext.redirect(url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken"));
+                String redirectUrl = url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken");
+                logger.debug("URL redirect with prefix: " + redirectUrl);
+                externalContext.redirect(redirectUrl);
             }
 
         }else{
             try (Config config = ConfigFactory.get()) {
                 if(jsonQuery.contains("nToken")) {
-                    this.qtoken = getRequestToken(jsonQuery);
+                    this.nToken.setRequestToken(getRequestToken(jsonQuery));
                 }
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
+                        jsonQuery, ethicsVote, userBean.getUserId(), this.nToken.getRequestToken(),
                         true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
                         testRequest);
                 config.commit();
@@ -414,7 +418,9 @@ public class QueryBean implements Serializable {
             if(url.contains("?")) {
                 urlAppander = "&";
             }
-            externalContext.redirect(url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken"));
+            String redirectUrl = url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken");
+            logger.debug("RedirectUrl: " + redirectUrl);
+            externalContext.redirect(redirectUrl);
         }
     }
 
@@ -434,12 +440,8 @@ public class QueryBean implements Serializable {
         if(mode == null) {
             mode = "newQuery";
         }
-        NToken nToken = new NToken();
         if(mode.equals("edit")) {
             saveEditChangesTemporarily("addQuery");
-
-
-            nToken.setRequestToken(qtoken);
 
             RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
             redirectUrlGenerator.setUrl(url);
@@ -448,31 +450,39 @@ public class QueryBean implements Serializable {
 
             externalContext.redirect(resirectUrl);
         } else {
-            try (Config config = ConfigFactory.get()) {
-                if(jsonQuery.contains("nToken")) {
-                    this.qtoken = getRequestToken(jsonQuery);
-                } else {
-                    this.qtoken = nToken.getNewRequestToken();
+            if(jsonQuery == null) {
+                // Create url for creating from index page
+                RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
+                redirectUrlGenerator.setUrl(url);
+                String resirectUrl = redirectUrlGenerator.getNewRequestUrl();
+            } else {
+                // Create url for new request
+                try (Config config = ConfigFactory.get()) {
+                    if (jsonQuery.contains("nToken")) {
+                        nToken.setnToken(getRequestToken(jsonQuery));
+                    } else {
+                        nToken.getNewRequestToken();
+                    }
+                    QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
+                            jsonQuery, ethicsVote, userBean.getUserId(), this.nToken.getRequestToken(),
+                            true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
+                            testRequest);
+                    config.commit();
+                    requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
+                    requestLifeCycleStatus.createStatus(userBean.getUserId());
+                    config.commit();
+                } catch (Exception e) {
+                    logger.error("QueryBean::editSearchParameters: Problem creating request!");
+                    e.printStackTrace();
                 }
-                QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
-                        jsonQuery, ethicsVote, userBean.getUserId(), this.qtoken,
-                        true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
-                        testRequest);
-                config.commit();
-                requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
-                requestLifeCycleStatus.createStatus(userBean.getUserId());
-                config.commit();
-            } catch (Exception e) {
-                logger.error("QueryBean::editSearchParameters: Problem creating request!");
-                e.printStackTrace();
+
+                RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
+                redirectUrlGenerator.setUrl(url);
+                String resirectUrl = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
+                logger.debug("resirectUrl created for new request: " + resirectUrl);
+
+                externalContext.redirect(resirectUrl);
             }
-
-            RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
-            redirectUrlGenerator.setUrl(url);
-            String resirectUrl = redirectUrlGenerator.getNewRequestUrl();
-            logger.debug("resirectUrl created for new request: " + resirectUrl);
-
-            externalContext.redirect(resirectUrl);
         }
     }
 
@@ -543,7 +553,6 @@ public class QueryBean implements Serializable {
         try (Config config = ConfigFactory.get()) {
             if (id == null) {
                 QueryJsonStringManipulator queryJsonStringManipulator = new QueryJsonStringManipulator();
-                this.nToken = queryJsonStringManipulator.getRequestTokenFromJsonQueryString(jsonQuery);
 
                 QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                         jsonQuery, ethicsVote, userBean.getUserId(), this.nToken.getRequestToken(),
@@ -667,8 +676,6 @@ public class QueryBean implements Serializable {
     public void setEthicsVote(String ethicsVote) {
         this.ethicsVote = ethicsVote;
     }
-
-    public String getQtoken() { return qtoken; }
 
     public boolean isTestRequest() {
         return testRequest;

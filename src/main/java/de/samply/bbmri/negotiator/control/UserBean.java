@@ -243,6 +243,7 @@ public class UserBean implements Serializable {
 	public String getAuthenticationUrl() throws UnsupportedEncodingException {
 		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 		HttpServletRequest req = (HttpServletRequest) context.getRequest();
+		logger.debug("AuthenticationUrl: " + req.getRequestURL());
 		return getAuthenticationUrl(req);
 	}
 
@@ -258,9 +259,12 @@ public class UserBean implements Serializable {
         String requestURL = "/index.xhtml";
 		debugHeaderInfos(request);
 
-        return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
-                request.getServerName(), request.getServerPort(), request.getContextPath(),
-                requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
+		String redirectUrl = OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
+				request.getServerName(), request.getServerPort(), request.getContextPath(),
+				requestURL, state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
+		logger.debug("RedirectUrl: " + redirectUrl);
+
+        return redirectUrl;
     }
 
 
@@ -274,6 +278,7 @@ public class UserBean implements Serializable {
 	public String getAuthenticationRegisterUrl() throws UnsupportedEncodingException {
 		ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
 		HttpServletRequest req = (HttpServletRequest) context.getRequest();
+		logger.debug("AuthenticationUrl: " + req.getRequestURL());
 		return getAuthenticationRegisterUrl(req);
 	}
 
@@ -298,12 +303,14 @@ public class UserBean implements Serializable {
 		    setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
 		}
 
-		//request.getScheme()
 		debugHeaderInfos(request);
 
-		return OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), "https",
+		String redirectUrl = OAuth2ClientConfig.getRedirectUrl(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
 				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
+		logger.debug("RedirectUrl: " + redirectUrl);
+
+		return redirectUrl;
 	}
 
     /**
@@ -330,12 +337,9 @@ public class UserBean implements Serializable {
             setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
         }
 
-		//Problem with the schema
-		//request.getScheme()
-		String scheme = "https";
 		debugHeaderInfos(request);
 
-        String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), scheme,
+        String returnURL = OAuth2ClientConfig.getRedirectUrlRegisterPerun(NegotiatorConfig.get().getOauth2(), request.getScheme(),
 				request.getServerName(), request.getServerPort(), request.getContextPath(),
 				requestURL.toString(), state, Scope.OPENID, Scope.EMAIL, Scope.PROFILE, Scope.PHONE, Scope.EDUPERSON_ENTITLEMENT);
 
@@ -343,8 +347,6 @@ public class UserBean implements Serializable {
     }
 
 	private void debugHeaderInfos(HttpServletRequest request) {
-		return;
-		/*
 		logger.debug("---------------");
 		logger.debug("Scheme: " + request.getScheme());
 		logger.debug("RequestURI: " + request.getRequestURI());
@@ -358,7 +360,7 @@ public class UserBean implements Serializable {
 			while (headerNames.hasMoreElements()) {
 				logger.debug("Header: " + request.getHeader(headerNames.nextElement()));
 			}
-		}*/
+		}
 	}
 
     /**
@@ -375,9 +377,10 @@ public class UserBean implements Serializable {
 		logger.info("login client.");
 		accessToken = client.getAccessToken();
 
+		Map<String, Object> claims = accessToken.getClaimsSet().getClaims();
+
 		logger.info("AC Header: "+accessToken.getHeader());
 		logger.info("AC State : "+accessToken.getState());
-		Map<String, Object> claims = accessToken.getClaimsSet().getClaims();
 
 		for(String claim: claims.keySet()) {
 			logger.info("AC Claim "+claim+" : "+claims.get(claim));

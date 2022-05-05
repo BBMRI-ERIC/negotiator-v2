@@ -23,7 +23,12 @@ public class NToken {
 
     public String getNewQueryToken() {
         queryToken = UUID.randomUUID().toString();
+        createNToken();
         return queryToken;
+    }
+
+    private void createNToken() {
+        nToken = requestToken + tokenSplitter + queryToken;
     }
 
     public String getRequestToken() {
@@ -32,6 +37,7 @@ public class NToken {
 
     public String getNewRequestToken() {
         requestToken = UUID.randomUUID().toString();
+        createNToken();
         return requestToken;
     }
 
@@ -61,8 +67,8 @@ public class NToken {
     }
 
     public void setQueryToken(String queryToken) {
-        if(queryToken.contains("tokenSplitter")) {
-            this.queryToken = nToken.replaceAll(".*__search__", "");
+        if(queryToken.contains(tokenSplitter)) {
+            this.queryToken = queryToken.replaceAll(".*__search__", "");
         } else {
             this.queryToken = queryToken;
         }
