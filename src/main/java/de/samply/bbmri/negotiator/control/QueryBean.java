@@ -368,7 +368,15 @@ public class QueryBean implements Serializable {
          * Add token if an existing query is being edited. Else the user is still in the process of creating a
          * query and it has not been saved in the Query table hence no token is used.
          */
-        NToken urlTokenGenerator = new NToken(searchToken);
+        NToken urlTokenGenerator;
+        if(searchToken.contains("__search__")) {
+            urlTokenGenerator = new NToken(searchToken);
+        } else {
+            urlTokenGenerator = new NToken();
+            urlTokenGenerator.setRequestToken(nToken.getRequestToken());
+            urlTokenGenerator.setQueryToken(searchToken);
+        }
+
 
         if(mode.equals("edit")) {
             saveEditChangesTemporarily("editQuery");
@@ -455,6 +463,9 @@ public class QueryBean implements Serializable {
                 RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
                 redirectUrlGenerator.setUrl(url);
                 String resirectUrl = redirectUrlGenerator.getNewRequestUrl();
+                logger.debug("resirectUrl created for new request: " + resirectUrl);
+
+                externalContext.redirect(resirectUrl);
             } else {
                 // Create url for new request
                 try (Config config = ConfigFactory.get()) {
@@ -479,7 +490,7 @@ public class QueryBean implements Serializable {
                 RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
                 redirectUrlGenerator.setUrl(url);
                 String resirectUrl = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
-                logger.debug("resirectUrl created for new request: " + resirectUrl);
+                logger.debug("resirectUrl created for new query: " + resirectUrl);
 
                 externalContext.redirect(resirectUrl);
             }

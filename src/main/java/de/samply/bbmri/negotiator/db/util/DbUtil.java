@@ -204,7 +204,12 @@ public class DbUtil {
         url = url.substring(0, endindex);
         Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories"))
                 .from(Tables.LIST_OF_DIRECTORIES)
-                .where(Tables.LIST_OF_DIRECTORIES.URL.eq(url)).fetchOne();
+                .where(Tables.LIST_OF_DIRECTORIES.URL.like(url)).limit(1).fetchOne();
+
+        String testQuery = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories"))
+                .from(Tables.LIST_OF_DIRECTORIES)
+                .where(Tables.LIST_OF_DIRECTORIES.URL.like(url)).limit(1).getSQL();
+
         if(record == null) {
             return null;
         }
