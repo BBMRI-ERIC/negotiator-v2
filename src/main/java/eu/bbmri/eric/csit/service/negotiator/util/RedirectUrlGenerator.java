@@ -6,7 +6,7 @@ public class RedirectUrlGenerator {
     private String url;
 
     public void setUrl(String url) {
-        this.url = url;
+        this.url = url.replaceAll("[\\?&]nToken=[A-Za-z0-9\\-]*__search__[A-Za-z0-9\\-]*", "");
     }
 
     public String getAppandNewQueryToRequestUrl(NToken token) {

@@ -381,28 +381,16 @@ public class QueryBean implements Serializable {
         if(mode.equals("edit")) {
             saveEditChangesTemporarily("editQuery");
 
-            if(url.contains("locator")) {
-                if(url.contains("ntoken")) {
-                    logger.debug("URL locator with token: " + url);
-                    externalContext.redirect(url);
-                } else {
-                    String urlAppander = "?";
-                    if(url.contains("?")) {
-                        urlAppander = "&";
-                    }
-                    String redirectUrl = url + urlAppander + urlTokenGenerator.getNTokenForUrl("ntoken");
-                    logger.debug("URL locator new token: " + redirectUrl);
-                    externalContext.redirect(redirectUrl);
-                }
-            } else {
-                String urlAppander = "?";
-                if(url.contains("?")) {
-                    urlAppander = "&";
-                }
-                String redirectUrl = url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken");
-                logger.debug("URL redirect with prefix: " + redirectUrl);
-                externalContext.redirect(redirectUrl);
+            url = url.replaceAll("[\\?&]nToken=[A-Za-z0-9\\-]*__search__[A-Za-z0-9\\-]*", "");
+            String urlAppander = "?";
+            if(url.contains("?")) {
+                urlAppander = "&";
             }
+            String redirectUrl = url + urlAppander + urlTokenGenerator.getNTokenForUrl("nToken");
+            logger.debug("URL redirect with prefix: " + redirectUrl);
+            externalContext.redirect(redirectUrl);
+
+
 
         }else{
             try (Config config = ConfigFactory.get()) {
@@ -422,6 +410,7 @@ public class QueryBean implements Serializable {
                 e.printStackTrace();
             }
             // Status created, not review
+            url = url.replaceAll("[\\?&]nToken=[A-Za-z0-9\\-]*__search__[A-Za-z0-9\\-]*", "");
             String urlAppander = "?";
             if(url.contains("?")) {
                 urlAppander = "&";
