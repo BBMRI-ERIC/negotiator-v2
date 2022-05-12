@@ -14,6 +14,14 @@
 			<AppenderRef ref="negotiator" level="DEBUG"/>
 			<AppenderRef ref="STDOUT" level="DEBUG"/>
 		</Root>
+		<Logger name="org.jooq.tools.LoggerListener" level="debug">
+			<AppenderRef ref="negotiator" level="DEBUG"/>
+		</Logger>
+
+		<!-- Other jOOQ related debug log output -->
+		<Logger name="org.jooq" level="debug">
+			<AppenderRef ref="negotiator" level="DEBUG"/>
+		</Logger>
 		<Logger name="eu.bbmri.eric.csit.service.negotiator" level="debug">
 			<AppenderRef ref="negotiator" level="DEBUG"/>
 		</Logger>
