@@ -381,6 +381,9 @@ public class QueryBean implements Serializable {
         if(mode.equals("edit")) {
             saveEditChangesTemporarily("editQuery");
 
+            // If the nToken is the first of many parameters in the URL we need to replace the subsequent '&' with a '?'
+            url = url.replaceAll("[\\?]nToken=[A-Za-z0-9\\-]*__search__[A-Za-z0-9\\-]*&", "?");
+            // If the nToken is the only, middle or last parameter we can just remove it
             url = url.replaceAll("[\\?&]nToken=[A-Za-z0-9\\-]*__search__[A-Za-z0-9\\-]*", "");
             String urlAppander = "?";
             if(url.contains("?")) {
