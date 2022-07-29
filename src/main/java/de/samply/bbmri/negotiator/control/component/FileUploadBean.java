@@ -204,7 +204,7 @@ public class FileUploadBean implements Serializable {
             return false;
         }
 
-        if(queryIdInteger != queryId) {
+        if(!queryIdInteger.equals(queryId)) {
             logger.error("QueryID of file "+queryIdInteger+" does not match QueryID "+queryId+" of this bean.");
             return false;
         }
