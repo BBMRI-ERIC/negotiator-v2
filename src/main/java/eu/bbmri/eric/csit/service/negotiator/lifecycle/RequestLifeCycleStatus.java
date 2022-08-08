@@ -42,6 +42,7 @@ public class RequestLifeCycleStatus {
     public void initialise() {
         try(Config config = ConfigFactory.get()) {
             initialise(DbUtil.getRequestStatus(config, query_id));
+            setQuery(DbUtil.getQueryFromIdAsQuery(config, query_id));
         } catch (Exception e) {
             e.printStackTrace();
         }
