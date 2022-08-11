@@ -600,6 +600,7 @@ public class DbUtil {
      * @param userId the researcher ID
      * @return
      */
+    // TODO: add pagination for select from database
     public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId, Set<String> filters) {
         Person commentAuthor = Tables.PERSON.as("comment_author");
 
@@ -638,7 +639,10 @@ public class DbUtil {
                             .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
                 .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
-                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
+                .limit(10)
+                .offset(0)
+                .fetch();
 
         return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
     }

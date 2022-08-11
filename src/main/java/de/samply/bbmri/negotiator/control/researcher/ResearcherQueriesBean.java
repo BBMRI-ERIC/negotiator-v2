@@ -38,6 +38,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import javax.faces.bean.SessionScoped;
 import javax.validation.constraints.Null;
 
 import org.jooq.Record;
@@ -57,7 +58,7 @@ import de.samply.bbmri.negotiator.model.QueryStatsDTO;
  * Manages the query view for researchers
  */
 @ManagedBean
-@ViewScoped
+@SessionScoped
 public class ResearcherQueriesBean implements Serializable {
 
     /**
