@@ -136,7 +136,7 @@ public class RequestLifeCycleStatus {
         for(Integer collectionStatusListKey : collectionStatusList.keySet()) {
             CollectionLifeCycleStatus collectionLifeCycleStatus = collectionStatusList.get(collectionStatusListKey);
             List<Person> contacts = collectionLifeCycleStatus.getContacts();
-            if(collectionLifeCycleStatus == null) {
+            if(collectionLifeCycleStatus == null || collectionLifeCycleStatus.getStatus() == null) {
                 notreachableCollections = contactCollectionRepresentativesInCollection(userId, mailrecipients, collectionsString, notreachableCollections, collectionLifeCycleStatus, contacts);
                 for(Person person : contacts) {
                     emailAddressesAndNames.put(person.getAuthEmail(), person.getAuthName());
