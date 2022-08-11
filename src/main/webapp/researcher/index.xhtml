@@ -29,8 +29,8 @@
 				xmlns:h="http://xmlns.jcp.org/jsf/html"
 				xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 				xmlns:f="http://xmlns.jcp.org/jsf/core"
-				xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
 				xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+				xmlns:p="http://primefaces.org/ui"
 				template="../components/default.xhtml">
 
 	<!-- Queries page for the researcher -->
@@ -109,9 +109,11 @@
 				layout="block" styleClass="empty-queries col-md-12">
 				<h3>#{label['queryview.noQueriesMade']}</h3>
 			</h:panelGroup>
-			
-			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() > 0 or researcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">      
-			    <bbmricc:search backingBean="#{researcherQueriesBean}"/>
+
+			<!-- Only render available queries if there are some -->
+			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() > 0 or researcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">
+				<!-- TODO: Implement PrimeFaces LacyLoading for search results -->
+				<bbmricc:search backingBean="#{researcherQueriesBean}"/>
 			</h:panelGroup>
 			
 			<h:panelGroup
@@ -122,6 +124,12 @@
 
 			<h:panelGroup layout="block" styleClass="col-md-12">
 				<h:form>
+					<!-- Use PrimeFaces Data Scroller (https://www.primefaces.org/datascroller/) inline mode -->
+					<!-- TODO this still requires the use of lacy loading by extending the ResearcherQueriesBean -->
+					<p:dataScroller value="researcherQueriesBean" var="queries" chunkSize="10" mode="inline" scrollHeight="500">
+						<f:facet name="header">
+							Scroll Down to Load More Requests
+						</f:facet>
 					<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
 
 						<h:panelGroup layout="block" styleClass="deco-none">
@@ -208,6 +216,7 @@
 						</h:panelGroup>
 
 					</ui:repeat>
+					</p:dataScroller>
 
 					<h:outputScript>
 						$(function() {
