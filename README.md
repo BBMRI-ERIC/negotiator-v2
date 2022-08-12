@@ -2,8 +2,13 @@
 This is the BBMRI negotiator v2
 
 ## Getting Started
+OLD:
 
 This application uses a number of samply libraries which can be found at: https://maven.samply.de/nexus
+
+NEW: 
+
+Please contact the negotiator team for access to sampply libraries
 
 This application uses a database with the name of 'negotiator'. Feel free to change the name but remember to update it in pom.xml
 Following are the settings in the pom file that need to be updated according to your requirements
@@ -17,6 +22,8 @@ Following are the settings in the pom file that need to be updated according to 
 Before starting the application, it is necessary to create a database.
 
 ## Development mode
+Firstly rename file `src/main/resources/bbmri.negotiator.example.xml` to 
+`src/main/resources/bbmri.negotiator.xml`
 
 By settings the runtime property `de.samply.development.authenticationDisabled` to `true` in the bbmri.negotiator.xml,
  the application is started in development mode, that means:
