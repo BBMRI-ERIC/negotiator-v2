@@ -50,7 +50,7 @@ INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (14, 'biobanker-004', 'Biobank test user 5', 'r.proynova@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (15, 'researcher-001', 'Researcher test user 1', 'r.proynova@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, is_admin) VALUES (20, 'admin-001','BBMRI ADMIN', 'admin@negotiator', NULL, TRUE);
-INSERT INTO person(auth_subject, auth_name, auth_email, is_admin, organization) VALUES ('national-node-001', 'National Node', 'nn@localhost', false, 'BBMRI.eu');
+INSERT INTO person(id, auth_subject, auth_name, auth_email, is_admin, organization) VALUES (19, 'national-node-001', 'National Node', 'nn@localhost', false, 'BBMRI.eu');
 
 ALTER SEQUENCE person_id_seq RESTART WITH 21;
 
@@ -77,7 +77,7 @@ INSERT INTO person_collection (person_id, collection_id) VALUES (14, 20);
 INSERT INTO person_collection (person_id, collection_id) VALUES (14, 21);
 
 INSERT INTO query(id, title, text, query_creation_time, researcher_id, json_text, num_attachments, negotiator_token, valid_query)
-VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 1,
+VALUES(1, 'Cancer', 'Are there biobanks with liver cancer samples that include the age at primary diagnosis and pharmacotherapy information?', '2015-01-02 00:00:00', 10,
 '{
     "humanReadable":"name: ‘Germany’, materials: ‘DNA’ or ’Plasma’",
   "collections":[
