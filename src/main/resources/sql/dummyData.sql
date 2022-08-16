@@ -43,17 +43,15 @@ INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (7, 'https://auth-dev.mitro.dkfz.de/users/2', 'Max Ataian', 'm.ataian@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (8, 'https://auth-dev.mitro.dkfz.de/users/19', 'Saher Maqsood', 's.maqsood@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (9, 'https://auth-dev.mitro.dkfz.de/users/24', 'Polina Litvak', 'p.litvak@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (10, 'biobanker-001', 'Biobank test user 1', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (11, 'biobanker-002', 'Biobank test user 2', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (12, 'biobanker-003', 'Biobank test user 3', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (13, 'biobanker-004', 'Biobank test user 4', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (14, 'biobanker-005', 'Biobank test user 5', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (15, 'owner-001', 'Researcher test user 1', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (16, 'owner-002', 'Researcher test user 2', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (17, 'owner-003', 'Researcher test user 3', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (18, 'owner-004', 'Researcher test user 4', 'r.proynova@dkfz.de', NULL);
-INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (19, 'owner-005', 'Researcher test user 5', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (10, 'biobanker-000', 'Biobank test user 1', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (11, 'biobanker-001', 'Biobank test user 2', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (12, 'biobanker-002', 'Biobank test user 3', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (13, 'biobanker-003', 'Biobank test user 4', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (14, 'biobanker-004', 'Biobank test user 5', 'r.proynova@dkfz.de', NULL);
+INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image) VALUES (15, 'researcher-001', 'Researcher test user 1', 'r.proynova@dkfz.de', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image, is_admin) VALUES (20, 'admin-001','BBMRI ADMIN', 'admin@negotiator', NULL, TRUE);
+INSERT INTO person(auth_subject, auth_name, auth_email, is_admin, organization) VALUES ('national-node-001', 'National Node', 'nn@localhost', false, 'BBMRI.eu');
+
 ALTER SEQUENCE person_id_seq RESTART WITH 21;
 
 INSERT INTO person_collection (person_id, collection_id) VALUES (1, 1);
