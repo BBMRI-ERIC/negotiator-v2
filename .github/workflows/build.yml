@@ -13,5 +13,16 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+      - name: Generate settings.xml for Maven Builds
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          mirrors: >
+        [
+          {
+          "id": "nexus",
+          "mirrorOf": "*",
+          "url": "http://78.128.250.32:8081/repository/maven-public/"
+          }
+        ]
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots package
