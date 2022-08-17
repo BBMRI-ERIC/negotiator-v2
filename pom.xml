@@ -19,7 +19,7 @@
         <repository>
             <id>dkfz-repo1-release</id>
             <name>DKFZ Maven Repository</name>
-            <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
+            <url>http://78.128.250.32:8081/repository/maven-public/</url>
         </repository>
     </repositories>
 
