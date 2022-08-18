@@ -13,6 +13,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+          cache: 'maven'
       - name: Generate settings.xml for Maven Builds
         uses: whelk-io/maven-settings-xml-action@v20
         with:
