@@ -31,6 +31,7 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
+          cache: maven
       - name: Generate settings.xml for Maven Builds
         uses: whelk-io/maven-settings-xml-action@v20
         with:
