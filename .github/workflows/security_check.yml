@@ -1,0 +1,49 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "master", develop ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "master", develop ]
+  schedule:
+    - cron: '35 22 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'java' ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+      - name: Generate settings.xml for Maven Builds
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          mirrors: >
+            [
+              {
+                "id": "nexus",
+                "mirrorOf": "*",
+                "url": "http://78.128.250.32:8081/repository/maven-public/"
+              }
+            ]
+      - name: Build with Maven
+        run: mvn package
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2

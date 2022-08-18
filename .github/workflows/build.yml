@@ -5,22 +5,7 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'java' ]
-
     steps:
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
-
       - uses: actions/checkout@v3
 
       - name: Set up JDK 11
@@ -42,7 +27,4 @@ jobs:
               }
             ]
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots package
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        run: mvn package
