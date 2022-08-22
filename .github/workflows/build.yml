@@ -29,8 +29,35 @@ jobs:
       - name: Build with Maven
         run: mvn package
 
-      - name: Code Coverage Report
-        uses: irongut/CodeCoverageSummary@v1.3.0
+  test-coverage:
+    if: ${{ github.event_name != 'schedule' }}
+
+    needs: [ test ]
+
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
-          filename: coverage/**/coverage.cobertura.xml
-          badge: true
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Cache Local Maven Repo
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-temurin-17-maven-test-coverage-${{ hashFiles('**/deps.edn') }}
+
+      - name: Test Coverage
+        run: make test-coverage
+
+      - name: Codecov Upload
+        uses: codecov/codecov-action@v3
+        with:
+          name: codecov-umbrella
+          file: modules/**/target/coverage/codecov.json
+          fail_ci_if_error: true
