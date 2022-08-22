@@ -22,7 +22,7 @@ jobs:
             [
               {
                 "id": "nexus",
-                "mirrorOf": "*",
+                "mirrorOf": "central",
                 "url": "http://78.128.250.32:8081/repository/maven-public/"
               }
             ]
