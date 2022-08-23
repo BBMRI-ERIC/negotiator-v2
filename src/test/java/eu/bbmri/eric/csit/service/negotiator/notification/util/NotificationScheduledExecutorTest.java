@@ -10,7 +10,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("Test notification scheduler timer executor.")
@@ -39,10 +38,10 @@ public class NotificationScheduledExecutorTest {
     }
 
     @Test
-    @DisplayName("Test selected interval for mail notification (10 minutes in milliseconds).")
-    public void testDelayCalculationSelectedInterval10MinutesInMilliseconds() {
+    @DisplayName("Test selected interval for mail notification (5 minutes in milliseconds).")
+    public void testDelayCalculationSelectedInterval5MinutesInMilliseconds() {
         long interval = notificationScheduledExecutor.getInterval();
-        assertEquals(600000L, interval);
+        assertEquals(300000L, interval);
     }
 
     @Test

@@ -73,9 +73,8 @@ public class RequestStatusContactTest {
     void testAllowedNextStatusList() {
         Mockito.lenient().when(collectionRequestStatusDTO.getStatusType()).thenReturn("contact");
         Mockito.lenient().when(collectionRequestStatusDTO.getStatusDate()).thenReturn(testDate);
-        List allowedNextStatus = Arrays.asList("contacted", "notreachable", "sample_data_available_accessible",
-                "sample_data_available_not_accessible", "sample_data_not_available_collecatable", "sample_data_not_available",
-                "not_interested");
+        List allowedNextStatus = Arrays.asList("contacted", "notreachable", "interested", "insufficient", "not_interested",
+                "not_interested_researcher");
         assertEquals(allowedNextStatus, requestStatusContact.getAllowedNextStatus());
     }
 }
