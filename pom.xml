@@ -146,6 +146,12 @@
             <version>4.2.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -462,6 +468,18 @@
             <artifactId>bootsfaces</artifactId>
             <version>1.5.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.jacoco</groupId>
+            <artifactId>org.jacoco.core</artifactId>
+            <version>0.7.9</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.maven.doxia/doxia-core -->
+        <dependency>
+            <groupId>org.apache.maven.doxia</groupId>
+            <artifactId>doxia-core</artifactId>
+            <version>1.1.2</version>
+        </dependency>
+
 
     </dependencies>
 
@@ -488,6 +506,25 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.7.9</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generate-code-coverage-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
