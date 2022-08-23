@@ -30,7 +30,7 @@ jobs:
         run: mvn package
 
       - name: Run tests and collect coverage
-        run: mvn -B test
+        run: mvn test
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
