@@ -468,19 +468,6 @@
             <artifactId>bootsfaces</artifactId>
             <version>1.5.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.jacoco</groupId>
-            <artifactId>org.jacoco.core</artifactId>
-            <version>0.7.9</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.maven.doxia/doxia-core -->
-        <dependency>
-            <groupId>org.apache.maven.doxia</groupId>
-            <artifactId>doxia-core</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-
-
     </dependencies>
 
     <profiles>
