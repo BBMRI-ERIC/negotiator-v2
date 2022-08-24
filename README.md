@@ -1,4 +1,4 @@
-[![codecov](https://codecov.io/gh/BBMRI-ERIC/negotiator-v2/branch/master/graph/badge.svg?token=8W0I985ZXI)](https://codecov.io/gh/BBMRI-ERIC/negotiator-v2)
+[![codecov](https://codecov.io/gh/BBMRI-ERIC/negotiator-v2/branch/feature/github_actions/graph/badge.svg?token=8W0I985ZXI)](https://codecov.io/gh/BBMRI-ERIC/negotiator-v2)
 
 # Negotiator
 This is the BBMRI negotiator v2
