@@ -27,7 +27,7 @@ jobs:
               }
             ]
       - name: Build with Maven
-        run: mvn package -U
+        run: mvn package
 
       - name: Run tests and collect coverage
         run: mvn test
