@@ -21,13 +21,13 @@ jobs:
           mirrors: >
             [
               {
-                "id": "nexus",
+                "id": "central",
                 "mirrorOf": "central",
                 "url": "http://78.128.250.32:8081/repository/maven-public/"
               }
             ]
       - name: Build with Maven
-        run: mvn package
+        run: mvn package -U
 
       - name: Run tests and collect coverage
         run: mvn test
