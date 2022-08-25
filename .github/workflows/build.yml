@@ -31,5 +31,6 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
-        with:
-          directory: target/site/jacoco
+ 
+      - name: Build with Maven
+        run: mvn -B package
