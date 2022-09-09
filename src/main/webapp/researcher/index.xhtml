@@ -39,7 +39,8 @@
 
 	<ui:define name="body">
 		<h:panelGroup layout="block" styleClass="row">
-			<h3>#{label['pagetitle_my_queries']}</h3>
+			<!-- TODO: add the number of queries to indicate totals: -->
+			<h3>#{label['pagetitle_my_queries']} : #{researcherQueriesBean.queries.size()}</h3>
 		</h:panelGroup>
 
 		<h:panelGroup layout="block" styleClass="col-md-12">

@@ -62,10 +62,19 @@ import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.jooq.tables.Person;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.EnableCaching;
+
+import javax.cache.annotation.CacheDefaults;
+import javax.cache.annotation.CacheKey;
+import javax.cache.annotation.CacheResult;
 
 import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.select;
 
+@EnableCaching
+@CacheConfig( cacheNames = "DBUtils")
+@CacheDefaults( cacheName = "DBUtils")
 /**
  * The database util for basic queries.
  */
@@ -78,6 +87,7 @@ public class DbUtil {
      * @param config database configuration
      * @return
      */
+    @CacheResult
     public static List<ListOfDirectoriesRecord> getDirectories(Config config) {
         Result<Record> records = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).fetch();
         return MappingListDbUtil.mapRecordsListOfDirectoriesRecords(records);
@@ -89,7 +99,8 @@ public class DbUtil {
      * @param listOfDirectoryId database id of the directory
      * @return
      */
-    public static ListOfDirectoriesRecord getDirectory(Config config, int listOfDirectoryId) {
+    @CacheResult
+    public static ListOfDirectoriesRecord getDirectory(Config config, @CacheKey int listOfDirectoryId) {
         try {
             Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.ID.eq(listOfDirectoryId)).fetchOne();
             return MappingDbUtil.mapRecordListOfDirectoriesRecord(record);
@@ -100,6 +111,7 @@ public class DbUtil {
         return null;
     }
 
+    @CacheResult
     public static ListOfDirectoriesRecord getDirectory(Config config, String directoryName) {
         try {
             Record record = config.dsl().select(getFields(Tables.LIST_OF_DIRECTORIES, "list_of_directories")).from(Tables.LIST_OF_DIRECTORIES).where(Tables.LIST_OF_DIRECTORIES.NAME.eq(directoryName)).fetchOne();
@@ -196,7 +208,8 @@ public class DbUtil {
      * @param url
      * @return
      */
-    public static ListOfDirectoriesRecord getDirectoryByUrl(Config config, String url) {
+    @CacheResult
+    public static ListOfDirectoriesRecord getDirectoryByUrl(Config config, @CacheKey String url) {
         int endindex = url.indexOf("/", 9);
         if (endindex == -1) {
             endindex = url.length();
@@ -250,6 +263,7 @@ public class DbUtil {
      * @param config JOOQ configuration
      * @return Timestamp timestamp of query
      */
+    @CacheResult
     public static Timestamp getFirstQueryCreationTime(Config config){
         Record1<Timestamp> result = config.dsl()
                 .select(Tables.QUERY.QUERY_CREATION_TIME)
@@ -346,7 +360,8 @@ public class DbUtil {
      * @return QueryRecord object
      * @throws SQLException
      */
-    public static QueryRecord getQueryFromId(Config config, Integer queryId) {
+    @CacheResult
+    public static QueryRecord getQueryFromId(Config config, @CacheKey Integer queryId) {
         Record result = config.dsl().select(getFields(Tables.QUERY, "query"))
                 .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(queryId))
@@ -355,7 +370,8 @@ public class DbUtil {
         return MappingDbUtil.mapRecordQueryRecord(result);
     }
 
-    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getQueryFromIdAsQuery(Config config, Integer queryId) {
+    @CacheResult
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getQueryFromIdAsQuery(Config config, @CacheKey Integer queryId) {
         Record result = config.dsl().select(getFields(Tables.QUERY, "query"))
                 .from(Tables.QUERY)
                 .where(Tables.QUERY.ID.eq(queryId))
@@ -563,7 +579,8 @@ public class DbUtil {
      * @param queryId the query ID
      * @return JSON string
      */
-    public static String getJsonQuery(Config config, Integer queryId) {
+    @CacheResult
+    public static String getJsonQuery(Config config, @CacheKey Integer queryId) {
         return config.dsl().selectFrom(Tables.JSON_QUERY)
                 .where(Tables.JSON_QUERY.ID.eq(queryId))
                 .fetchOne(Tables.JSON_QUERY.JSON_TEXT);
@@ -575,7 +592,8 @@ public class DbUtil {
      * @param queryId the query ID
      * @return JSON string
      */
-    public static String getQuery(Config config, Integer queryId) {
+    @CacheResult
+    public static String getQuery(Config config, @CacheKey Integer queryId) {
         return config.dsl().selectFrom(Tables.QUERY)
                     .where(Tables.QUERY.ID.eq(queryId))
                     .fetchOne(Tables.QUERY.JSON_TEXT);
@@ -587,7 +605,8 @@ public class DbUtil {
      * @param token the negotiator token that also identifies a query. Used for the interaction with the directory
      * @return JSON string
      */
-    public static QueryRecord getQuery(Config config, String token) {
+    @CacheResult
+    public static QueryRecord getQuery(Config config, @CacheKey String token) {
         return config.dsl().selectFrom(Tables.QUERY)
                 .where(Tables.QUERY.NEGOTIATOR_TOKEN.eq(token))
                 .fetchOne();
@@ -600,7 +619,10 @@ public class DbUtil {
      * @param userId the researcher ID
      * @return
      */
-    public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId, Set<String> filters) {
+    // TODO: add pagination for select from database
+    // Added JCache (JSR-107)
+    @CacheResult
+    public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, @CacheKey int userId, @CacheKey Set<String> filters) {
         Person commentAuthor = Tables.PERSON.as("comment_author");
 
         Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
@@ -638,7 +660,11 @@ public class DbUtil {
                             .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
                 .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
-                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
+// TODO: Activate pagination and number of results
+//                .limit(10)
+//                .offset(0)
+                .fetch();
 
         return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
     }
@@ -650,7 +676,8 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest) {
+    @CacheResult
+    public static List<OwnerQueryStatsDTO> getOwnerQueries(Config config, @CacheKey int userId, @CacheKey Set<String> filters, @CacheKey Flag flag, @CacheKey Boolean isTestRequest) {
     	Person queryAuthor = Tables.PERSON.as("query_author");
 
     	Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
@@ -737,7 +764,8 @@ public class DbUtil {
      * @param queryId
      * @return List<QueryAttachmentDTO>
      */
-    public static List<QueryAttachmentDTO> getQueryAttachmentRecords(Config config, int queryId) {
+    @CacheResult
+    public static List<QueryAttachmentDTO> getQueryAttachmentRecords(Config config, @CacheKey int queryId) {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.QUERY_ATTACHMENT, "query_attachment"))
                 .from(Tables.QUERY_ATTACHMENT)
@@ -746,7 +774,8 @@ public class DbUtil {
         return MappingListDbUtil.mapRecordsQueryAttachmentDTO(result);
     }
 
-    public static List<PrivateAttachmentDTO> getPrivateAttachmentRecords(Config config, int queryId) {
+    @CacheResult
+    public static List<PrivateAttachmentDTO> getPrivateAttachmentRecords(Config config, @CacheKey int queryId) {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.QUERY_ATTACHMENT_PRIVATE, "query_attachment_private"))
                 .from(Tables.QUERY_ATTACHMENT_PRIVATE)
@@ -756,7 +785,8 @@ public class DbUtil {
         return MappingListDbUtil.mapRecordsPrivateAttachmentDTO(result);
     }
 
-    public static List<CommentAttachmentDTO> getCommentAttachmentRecords(Config config, int queryId) {
+    @CacheResult
+    public static List<CommentAttachmentDTO> getCommentAttachmentRecords(Config config, @CacheKey int queryId) {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "query_attachment_comment"))
                 .from(Tables.QUERY_ATTACHMENT_COMMENT)
@@ -766,7 +796,8 @@ public class DbUtil {
         return MappingListDbUtil.mapRecordsCommentAttachmentDTO(result);
     }
 
-    public static List<CommentAttachmentDTO> getCommentAttachments(Config config, Integer commentId) {
+    @CacheResult
+    public static List<CommentAttachmentDTO> getCommentAttachments(Config config, @CacheKey Integer commentId) {
         Result<Record> result = config.dsl()
                 .select(getFields(Tables.QUERY_ATTACHMENT_COMMENT, "query_attachment_comment"))
                 .from(Tables.QUERY_ATTACHMENT_COMMENT)
@@ -783,7 +814,8 @@ public class DbUtil {
      * @param queryId
      * @return
      */
-    public static List<CommentPersonDTO> getComments(Config config, int queryId, int personId) {
+    @CacheResult
+    public static List<CommentPersonDTO> getComments(Config config, @CacheKey int queryId, @CacheKey int personId) {
 
         List<CommentPersonDTO> result = new ArrayList<>();
 
@@ -1082,6 +1114,7 @@ public class DbUtil {
     }
 
     // Create Script to collect all biobanknames for a query
+    @CacheResult
     public static List<BiobankRecord> getBiobanks(Config config) {
         Result<Record> record = config.dsl().selectDistinct(getFields(Tables.BIOBANK, "biobank"))
                     .from(Tables.BIOBANK)

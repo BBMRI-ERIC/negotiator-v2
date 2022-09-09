@@ -7,39 +7,37 @@
     <version>2.1.3-SNAPSHOT</version>
 
 
-
-    <parent> 
+    <parent>
         <artifactId>parent</artifactId>
         <groupId>de.samply</groupId>
         <version>10.1.2</version>
     </parent>
 
+        <repositories>
+            <repository>
+                <id>dkfz-repo1-release</id>
+                <name>DKFZ Maven Repository</name>
+                <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
+            </repository>
+        </repositories>
 
-    <repositories>
-        <repository>
-            <id>dkfz-repo1-release</id>
-            <name>DKFZ Maven Repository</name>
-            <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
-        </repository>
-    </repositories>
+        <properties>
+            <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+            <!-- <java.version>12</java.version> -->
+            <version.samply.webjar>2.0.1</version.samply.webjar>
+            <version.samply.auth.client>1.0.4</version.samply.auth.client>
+            <version.samply.common.util>1.0.0</version.samply.common.util>
+            <version.samply.common.mailing>2.0.0</version.samply.common.mailing>
+            <version.samply.directory.client>2.0.3</version.samply.directory.client>
+            <version.samply.negotiator.dto>2.0.0</version.samply.negotiator.dto>
+            <version.samply.share.dto>4.0.0</version.samply.share.dto>
+            <version.swagger.core>2.1.4</version.swagger.core>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <version.samply.webjar>2.0.1</version.samply.webjar>
-        <version.samply.auth.client>1.0.4</version.samply.auth.client>
-        <version.samply.common.util>1.0.0</version.samply.common.util>
-        <version.samply.common.mailing>2.0.0</version.samply.common.mailing>
-        <version.samply.directory.client>2.0.3</version.samply.directory.client>
-        <version.samply.negotiator.dto>2.0.0</version.samply.negotiator.dto>
-        <version.samply.share.dto>4.0.0</version.samply.share.dto>
-        <version.swagger.core>2.1.4</version.swagger.core>
-
-        <!--<database.server>negotiator-db</database.server>
-        <database.port>5432</database.port>
-        <database.name>negotiator</database.name>
-        <database.username>saher</database.username>
-        <database.password>saher</database.password>-->
+            <!--<database.server>negotiator-db</database.server>
+            <database.port>5432</database.port>
+            <database.name>negotiator</database.name>
+            <database.username>saher</database.username>
+            <database.password>saher</database.password>-->
 
         <!--<database.server>localhost</database.server>
         <database.port>5434</database.port>
@@ -47,7 +45,8 @@
         <database.username>negotiator</database.username>
         <database.password>negotiator</database.password>-->
 
-        <database.server>localhost</database.server>
+        <!--TODO add environment variable for connection parameters -->
+        <database.server>negotiator-v2-postgres-14</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>
@@ -59,6 +58,10 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
         <powermock.version>2.0.2</powermock.version>
+
+        <!--> Java Cache Versions -->
+        <ehcache.version>3.10.1</ehcache.version>
+        <net.sf.ehcache.version>2.10.9.2</net.sf.ehcache.version>
     </properties>
 
     <dependencies>
@@ -394,6 +397,12 @@
             <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
 
+<!--        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.11.0</version>
+        </dependency>-->
+
         <!-- Webjars -->
 
         <dependency>
@@ -454,6 +463,41 @@
             <artifactId>httpclient</artifactId>
             <version>4.5.13</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Caching -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+            <version>5.3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+
+        <!-- JCache implementation -->
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <!-- ehcache jars along with its jsr107 impl -->
+        <dependency>
+            <groupId>org.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${ehcache.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.ehcache</groupId>
+            <artifactId>ehcache</artifactId>
+            <version>${net.sf.ehcache.version}</version>
         </dependency>
 
     </dependencies>
