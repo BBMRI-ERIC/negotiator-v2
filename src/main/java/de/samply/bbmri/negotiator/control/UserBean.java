@@ -377,6 +377,26 @@ public class UserBean implements Serializable {
 		logger.info("login client.");
 		accessToken = client.getAccessToken();
 
+		/**
+		 * Added assertion to verify valid accessToken
+		 * Reason - logins are OK at AAI, but an exception occurs in Negotiator.
+		 */
+		try {
+			assert accessToken != null;
+		} catch (Exception e) {
+			logger.info( "Assert accessToken: " + e);
+		}
+		try {
+			assert accessToken.getClaimsSet() != null;
+		} catch (Exception e) {
+			logger.info( "Assert accessToken: " + e);
+		}
+		try {
+			assert accessToken.getClaimsSet().getClaims() != null;
+		} catch (Exception e) {
+			logger.info( "Assert accessToken: " + e);
+		}
+
 		Map<String, Object> claims = accessToken.getClaimsSet().getClaims();
 
 		logger.info("AC Header: "+accessToken.getHeader());
