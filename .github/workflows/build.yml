@@ -30,7 +30,6 @@ jobs:
             [
               {
                 "id": "nexus"
-                
               }
             ]
           repositories: >
@@ -44,6 +43,7 @@ jobs:
                 "snapshots": {
                   "enabled": "false",
                 }
+            }
             ]
           plugin_repositories: >
             [
