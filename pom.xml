@@ -15,7 +15,7 @@
 
     <repositories>
         <repository>
-            <id>central</id>
+            <id>nexus</id>
             <name>DKFZ Maven Repository</name>
             <url>http://78.128.250.32:8081/repository/maven-public/</url>
         </repository>
