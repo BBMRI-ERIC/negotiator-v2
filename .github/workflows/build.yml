@@ -38,10 +38,10 @@ jobs:
                 "id": "central",
                 "url": "http://central",
                 "releases": {
-                  "enabled": "true",
+                  "enabled": "true"
                 },
                 "snapshots": {
-                  "enabled": "false",
+                  "enabled": "false"
                 }
             }
             ]
