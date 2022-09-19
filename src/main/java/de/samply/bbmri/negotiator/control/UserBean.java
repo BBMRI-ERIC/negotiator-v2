@@ -383,15 +383,9 @@ public class UserBean implements Serializable {
 		 */
 		try {
 			assert accessToken != null;
-		} catch (Exception e) {
-			logger.info( "Assert accessToken: " + e);
-		}
-		try {
+
 			assert accessToken.getClaimsSet() != null;
-		} catch (Exception e) {
-			logger.info( "Assert accessToken: " + e);
-		}
-		try {
+
 			assert accessToken.getClaimsSet().getClaims() != null;
 		} catch (Exception e) {
 			logger.info( "Assert accessToken: " + e);
