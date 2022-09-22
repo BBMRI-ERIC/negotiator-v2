@@ -15,14 +15,6 @@
     </parent>
 
 
-    <repositories>
-        <repository>
-            <id>dkfz-repo1-release</id>
-            <name>DKFZ Maven Repository</name>
-            <url>https://maven.samply.de/nexus/content/repositories/oss-releases/</url>
-        </repository>
-    </repositories>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
