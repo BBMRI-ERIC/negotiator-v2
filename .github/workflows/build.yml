@@ -26,5 +26,5 @@ jobs:
                 "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
               }
             ]
-      - name: Package
+      - name: Build and test with maven
         run: mvn -B package
