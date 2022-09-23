@@ -3,7 +3,7 @@ name: New GitHub release
 on:
   push:
     branches:
-      - 'develop'
+      - 'master'
 
 jobs:
   build:
