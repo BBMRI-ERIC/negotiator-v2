@@ -1,7 +1,9 @@
-name: Java CI
+name: New GitHub release
 
 on:
   push:
+    branches:
+      - 'develop'
 
 jobs:
   build:
