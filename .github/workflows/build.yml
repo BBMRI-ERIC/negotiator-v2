@@ -28,3 +28,6 @@ jobs:
             ]
       - name: Build and test with maven
         run: mvn -B package
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
