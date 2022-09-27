@@ -1,4 +1,4 @@
-FROM tomcat:8.5.82-jre17
+FROM tomcat:8.5.82-jre17-temurin
 MAINTAINER RadoT
 RUN apt update && apt install nano
 RUN mkdir /etc/bbmri.negotiator /opt/negotiator
