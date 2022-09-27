@@ -5,9 +5,9 @@ RUN mkdir /etc/bbmri.negotiator /opt/negotiator
 RUN rm -fr /usr/local/tomcat/webapps/ROOT
 RUN rm -fr /usr/local/tomcat/webapps/conf/context.xml
 ADD target/bbmri-negotiator-2.1.3-SNAPSHOT/META-INF/context.xml           ${CATALINA_HOME}/conf/Catalina/localhost/ROOT.xml
-COPY src/main/resources/bbmri.negotiator.xml /etc/bbmri.negotiator
-COPY src/main/resources/log4j.properties /etc/bbmri.negotiator
-COPY target/bbmri-negotiator-2.1.3-SNAPSHOT.war /usr/local/tomcat/webapps
+ADD src/main/resources/bbmri.negotiator.xml /etc/bbmri.negotiator
+ADD src/main/resources/log4j.properties /etc/bbmri.negotiator
+ADD target/bbmri-negotiator-2.1.3-SNAPSHOT.war /usr/local/tomcat/webapps
 RUN mv /usr/local/tomcat/webapps/bbmri-negotiator-2.1.3-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
 COPY target/bbmri-negotiator-2.1.3-SNAPSHOT/META-INF/context.xml /usr/local/tomcat/webapps/conf/Catalina/localhost/
 RUN mkdir /docker
