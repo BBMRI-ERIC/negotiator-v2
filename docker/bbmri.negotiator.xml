@@ -49,41 +49,45 @@
 
     <molgenisRestUrl>http://molgenis:8080</molgenisRestUrl>
 
-    <attachmentPath>/home/my-upload-folder/uploads/</attachmentPath>
+    <attachmentPath>/tmp/NegotiatorFileUpload</attachmentPath>
 
     <mailEnabled>true</mailEnabled>
 
-    <slackSystemNotificationURL>https://slack_system_notification_url</slackSystemNotificationURL>
+    <negotiatorUrl>{negotiator-url}</negotiatorUrl>
+
+    <slackSystemNotificationURL>https://hooks.slack.com/services/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</slackSystemNotificationURL>
 
     <!-- Leave empty when no clamAV is installed -->
     <clamavHost></clamavHost>
 
     <clamavPort></clamavPort>
 
+    <developmentServer>true</developmentServer>
+
     <development>
 
-        <authenticationDisabled>true</authenticationDisabled>
+        <authenticationDisabled>false</authenticationDisabled>
 
         <deployDummyData>true</deployDummyData>
 
         <fakeDirectoryCollections>false</fakeDirectoryCollections>
 
         <fakeCollections>
-        	<collection>7</collection>
-        	<collection>8</collection>
-        	<collection>9</collection>
-        	<collection>10</collection>
-        	<collection>11</collection>
-        	<collection>12</collection>
-        	<collection>13</collection>
-        	<collection>14</collection>
-        	<collection>15</collection>
-        	<collection>16</collection>
-        	<collection>17</collection>
-        	<collection>18</collection>
-        	<collection>19</collection>
-        	<collection>20</collection>
-        	<collection>21</collection>
+            <collection>7</collection>
+            <collection>8</collection>
+            <collection>9</collection>
+            <collection>10</collection>
+            <collection>11</collection>
+            <collection>12</collection>
+            <collection>13</collection>
+            <collection>14</collection>
+            <collection>15</collection>
+            <collection>16</collection>
+            <collection>17</collection>
+            <collection>18</collection>
+            <collection>19</collection>
+            <collection>20</collection>
+            <collection>21</collection>
         </fakeCollections>
 
     </development>
@@ -91,12 +95,12 @@
 
     <oAuth2Client xmlns:o2="http://schema.samply.de/config/OAuth2Client">
 
-            <o2:host>https://perun.bbmri-eric.eu</o2:host>
-            <o2:hostPublicKey>
-                paste-public-key-here
-            </o2:hostPublicKey>
-            <o2:clientId>perunclientID</o2:clientId>
-            <o2:clientSecret>perunclientSecret</o2:clientSecret>
+        <o2:host>{AUTH_HOST}</o2:host>
+        <o2:hostPublicKey>
+            {AUTH_PUBLIC_KEY}
+        </o2:hostPublicKey>
+        <o2:clientId>{AUTH_CLIENT_ID}</o2:clientId>
+        <o2:clientSecret>{AUTH_CLIENT_SECRET}</o2:clientSecret>
 
     </oAuth2Client>
 
@@ -105,10 +109,10 @@
     <mailSending xmlns:ms="http://schema.samply.de/config/MailSending">
         <ms:host>smtp.office365.com</ms:host>
         <ms:protocol>smtp</ms:protocol>
-        <ms:fromAddress>username_for_office365</ms:fromAddress>
+        <ms:fromAddress>noreply@bbmri-eric.eu</ms:fromAddress>
         <ms:fromName>BBMRI-ERIC Negotiator</ms:fromName>
-        <ms:user>username_for_office365</ms:user>
-        <ms:password>password_for_office365</ms:password>
+        <ms:user>noreply@bbmri-eric.eu</ms:user>
+        <ms:password>N@Reply!BBMRI</ms:password>
         <ms:port>587</ms:port>
         <ms:templateFolder>resources/emailTemplates/</ms:templateFolder>
     </mailSending>
@@ -130,7 +134,7 @@
 
     <!-- Contacts, which get notified when a new request is created  -->
     <newRequestContacts>
-        <contact>negotiator-requests@helpdesk.bbmri-eric.eu</contact>
+        <contact>youremail-here</contact>
         <contact>test-contact@test.org</contact>
     </newRequestContacts>
 
