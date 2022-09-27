@@ -32,10 +32,8 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-
       - name: Set up Docker Buildx
+        id: buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Log in to Docker Hub
@@ -44,27 +42,9 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Docker meta
-        id: docker-meta
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            bbmrieric/negotiator
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha,format=long
-
-      - name: Debug
-        run: "ls -l"
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: /home/runner/work/negotiator-v2/negotiator-v2/
           push: true
-          tags: ${{ steps.docker-meta.outputs.tags }}
+          tags: bbmrieric/negotiator:latest
