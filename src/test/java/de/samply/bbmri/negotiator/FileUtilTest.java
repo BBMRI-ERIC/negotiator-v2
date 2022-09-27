@@ -2,6 +2,7 @@ package de.samply.bbmri.negotiator;
 
 import de.samply.bbmri.negotiator.config.Negotiator;
 import de.samply.bbmri.negotiator.util.AntiVirusExceptionEnum;
+import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -14,8 +15,11 @@ import javax.faces.application.FacesMessage;
 import javax.servlet.http.Part;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -29,7 +33,7 @@ public class FileUtilTest {
     @Test
     @DisplayName("Test File validation no file")
     void testNoFileSupplied() {
-        assertNull(fileUtil.validateFile(null, 512*1024*1024));
+        assertEquals(fileUtil.validateFile(null, 512*1024*1024).size(), 0);
     }
 
     @Test
