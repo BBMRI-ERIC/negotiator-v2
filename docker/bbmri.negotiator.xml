@@ -1,0 +1,138 @@
+<!--
+  ~ Copyright (c) 2017. Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<negotiator>
+    <uploadFileSalt>test1234</uploadFileSalt>
+
+    <maxUploadFileSize>225443840</maxUploadFileSize>
+
+    <perunUsername>perunusername</perunUsername>
+
+    <perunPassword>perunpassword</perunPassword>
+
+    <molgenisUsername>molgenisusername</molgenisUsername>
+
+    <molgenisPassword>molgenispassword</molgenisPassword>
+
+    <molgenisResourceBiobanks>biobanks_entity_name</molgenisResourceBiobanks>
+
+    <molgenisResourceCollections>collection_entity_name</molgenisResourceCollections>
+
+    <molgenisApiUsername>molgenisapiusername</molgenisApiUsername>
+
+    <molgenisApiPassword>molgenisapipassword</molgenisApiPassword>
+
+    <molgenisUrl>http://molgenis:8080</molgenisUrl>
+
+    <molgenisRestUrl>http://molgenis:8080</molgenisRestUrl>
+
+    <attachmentPath>/home/my-upload-folder/uploads/</attachmentPath>
+
+    <mailEnabled>true</mailEnabled>
+
+    <slackSystemNotificationURL>https://slack_system_notification_url</slackSystemNotificationURL>
+
+    <!-- Leave empty when no clamAV is installed -->
+    <clamavHost></clamavHost>
+
+    <clamavPort></clamavPort>
+
+    <development>
+
+        <authenticationDisabled>true</authenticationDisabled>
+
+        <deployDummyData>true</deployDummyData>
+
+        <fakeDirectoryCollections>false</fakeDirectoryCollections>
+
+        <fakeCollections>
+        	<collection>7</collection>
+        	<collection>8</collection>
+        	<collection>9</collection>
+        	<collection>10</collection>
+        	<collection>11</collection>
+        	<collection>12</collection>
+        	<collection>13</collection>
+        	<collection>14</collection>
+        	<collection>15</collection>
+        	<collection>16</collection>
+        	<collection>17</collection>
+        	<collection>18</collection>
+        	<collection>19</collection>
+        	<collection>20</collection>
+        	<collection>21</collection>
+        </fakeCollections>
+
+    </development>
+
+
+    <oAuth2Client xmlns:o2="http://schema.samply.de/config/OAuth2Client">
+
+            <o2:host>https://perun.bbmri-eric.eu</o2:host>
+            <o2:hostPublicKey>
+                paste-public-key-here
+            </o2:hostPublicKey>
+            <o2:clientId>perunclientID</o2:clientId>
+            <o2:clientSecret>perunclientSecret</o2:clientSecret>
+
+    </oAuth2Client>
+
+    <!-- Use the credentails for office365 according to the SPF records of bbmri-eric.eu domain.
+         'fromAddress' and 'user' should be the same. -->
+    <mailSending xmlns:ms="http://schema.samply.de/config/MailSending">
+        <ms:host>smtp.office365.com</ms:host>
+        <ms:protocol>smtp</ms:protocol>
+        <ms:fromAddress>username_for_office365</ms:fromAddress>
+        <ms:fromName>BBMRI-ERIC Negotiator</ms:fromName>
+        <ms:user>username_for_office365</ms:user>
+        <ms:password>password_for_office365</ms:password>
+        <ms:port>587</ms:port>
+        <ms:templateFolder>resources/emailTemplates/</ms:templateFolder>
+    </mailSending>
+
+    <proxy xmlns:c="http://schema.samply.de/common">
+        <c:HTTP>
+            <c:Url></c:Url>
+            <c:Username/>
+            <c:Password/>
+        </c:HTTP>
+        <c:HTTPS>
+            <c:Url></c:Url>
+            <c:Username/>
+            <c:Password/>
+        </c:HTTPS>
+        <c:Realm/>
+        <c:NoProxyHosts/>
+    </proxy>
+
+    <!-- Contacts, which get notified when a new request is created  -->
+    <newRequestContacts>
+        <contact>negotiator-requests@helpdesk.bbmri-eric.eu</contact>
+        <contact>test-contact@test.org</contact>
+    </newRequestContacts>
+
+
+</negotiator>
