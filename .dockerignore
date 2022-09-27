@@ -1,4 +1,4 @@
 *
 !docker
-!target
+!target/classes/bbmri.negotiator.xml
 !Dockerfile
