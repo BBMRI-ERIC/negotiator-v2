@@ -1,2 +1,3 @@
+**/*
 !target/bbmri-negotiator-2.1.3-SNAPSHOT/META-INF
-!target
+!target/**
