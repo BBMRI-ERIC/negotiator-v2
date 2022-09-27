@@ -63,10 +63,8 @@ jobs:
         run: "ls -l"
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3.1.1
+        uses: docker/build-push-action@v2
         with:
           context: .
-          platforms: linux/amd64
           push: true
           tags: ${{ steps.docker-meta.outputs.tags }}
-          labels: ${{ steps.docker-meta.outputs.labels }}
