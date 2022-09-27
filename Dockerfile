@@ -9,7 +9,7 @@ ADD target/classes/bbmri.negotiator.xml /etc/bbmri.negotiator
 ADD target/classes/log4j.properties /etc/bbmri.negotiator
 ADD target/bbmri-negotiator-2.1.3-SNAPSHOT.war /usr/local/tomcat/webapps
 RUN mv /usr/local/tomcat/webapps/bbmri-negotiator-2.1.3-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
-ADD target/bbmri-negotiator-2.1.3-SNAPSHOT/META-INF/context.xml /usr/local/tomcat/webapps/conf/Catalina/localhost/
+#ADD target/bbmri-negotiator-2.1.3-SNAPSHOT/META-INF/context.xml /usr/local/tomcat/webapps/conf/Catalina/localhost/
 RUN mkdir /docker
 ADD docker/start.sh                         /docker/
 RUN chmod +x                                    /docker/start.sh
