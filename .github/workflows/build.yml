@@ -45,6 +45,6 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3
         with:
-          context: .
+          context: /home/runner/work/negotiator-v2/negotiator-v2/
           push: true
           tags: bbmrieric/negotiator:latest
