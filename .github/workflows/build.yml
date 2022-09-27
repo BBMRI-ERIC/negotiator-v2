@@ -65,6 +65,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v3.1.1
         with:
+          context: .
           platforms: linux/amd64
           push: true
           tags: ${{ steps.docker-meta.outputs.tags }}
