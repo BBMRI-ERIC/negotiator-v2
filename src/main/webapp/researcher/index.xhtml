@@ -113,7 +113,9 @@
 			<!-- Only render available queries if there are some -->
 			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() > 0 or researcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">
 				<!-- TODO: Implement PrimeFaces LacyLoading for search results -->
+				<h3>1 #{label['queryview.noSearchResults']}</h3>
 				<bbmricc:search backingBean="#{researcherQueriesBean}"/>
+
 			</h:panelGroup>
 			
 			<h:panelGroup
@@ -123,6 +125,7 @@
             </h:panelGroup>
 
 			<h:panelGroup layout="block" styleClass="col-md-12">
+				<h3>3 queries: #{researcherQueriesBean.queries.size()} filters: #{researcherQueriesBean.filterTerms.size()}</h3>
 				<h:form>
 					<!-- Use PrimeFaces Data Scroller (https://www.primefaces.org/datascroller/) inline mode -->
 					<!-- TODO this still requires the use of lacy loading by extending the ResearcherQueriesBean -->

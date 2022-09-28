@@ -39,7 +39,7 @@
         <database.username>negotiator</database.username>
         <database.password>negotiator</database.password>-->
 
-        <database.server>localhost</database.server>
+        <database.server>negotiator-v2-postgres-14</database.server>
         <database.port>5432</database.port>
         <database.name>negotiator</database.name>
         <database.username>negotiator</database.username>

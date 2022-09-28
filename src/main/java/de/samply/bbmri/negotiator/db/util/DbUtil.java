@@ -640,8 +640,60 @@ public class DbUtil {
                 .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
-                .limit(10)
-                .offset(0)
+                .fetch();
+
+        return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
+    }
+
+    /**
+     * Returns a list of queries with the number of biobanks that commented on that query and the last
+     * time a comment was made
+     * @param config jooq configuration
+     * @param userId the researcher ID
+     * @return
+     */
+    // TODO: add pagination for select from database
+    public static List<QueryStatsDTO> getQueryStatsDTOsAtOffset(Config config, int userId, Set<String> filters, int size, int offset) {
+        Person commentAuthor = Tables.PERSON.as("comment_author");
+
+        Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
+
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(commentAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+
+        Result<Record> records = config.dsl()
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(Tables.PERSON, "person"))
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
+                .from(Tables.QUERY)
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID).and(Tables.COMMENT.STATUS.eq("published")))
+                .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.QUERY.RESEARCHER_ID))
+                        .and(Tables.PERSON_COMMENT.READ.eq(false)))
+                .leftOuterJoin(Tables.REQUEST_STATUS)
+                .on(Tables.REQUEST_STATUS.QUERY_ID.eq(Tables.QUERY.ID)
+                        .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
+                .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
+                .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
+                .limit(size)
+                .offset(offset)
                 .fetch();
 
         return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
