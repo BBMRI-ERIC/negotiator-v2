@@ -56,9 +56,21 @@ import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 
 /**
  * Manages the query view for researchers
+ * This extends ResearcherQueriesBean to implement lazy loading to enhance the responsiveness of the index.xhtml page.
+ *
+ * Reference to lacy loading using PrimeFaces:
+ * Information used for this: https://stackoverflow.com/questions/22194987/is-primefaces-live-scrolling-compatible-with-lazy-loading
+ *
+ * PrimeFaces DataScroller: https://www.primefaces.org/datascroller/
+ * PrimeFaces DataScroller Showcase: https://www.primefaces.org/showcase/ui/data/datascroller/basic.xhtml?jfwid=021eb
+ * PrimeFaces DataView Showcase: https://www.primefaces.org/showcase/ui/data/dataview/lazy.xhtml?jfwid=99ba8
+ * PrimeFaces DataView Lazy Loading Showcase: https://www.primefaces.org/showcase/ui/data/dataview/lazy.xhtml?jfwid=99ba8
+ *
+ * https://stackoverflow.com/questions/22249548/primefaces-datatable-live-scrolling-not-working-with-lazy-loading
+ * https://stackoverflow.com/questions/23856270/jsf-primefaces-datascroller-with-lazy-loading-and-no-pagination-infinite-scroll
  */
-@ManagedBean
-@SessionScoped
+@ManagedBean(name = "ResearcherQueriesBean")
+@ViewScoped
 public class ResearcherQueriesBean implements Serializable {
 
     /**
