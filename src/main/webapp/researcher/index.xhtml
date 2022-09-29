@@ -105,48 +105,47 @@
 			</h:panelGroup>
 
 			<h:panelGroup
-			    rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() == 0}"
+			    rendered="#{ResearcherQueriesBean.queries.size() == 0 and ResearcherQueriesBean.filterTerms.size() == 0}"
 				layout="block" styleClass="empty-queries col-md-12">
 				<h3>#{label['queryview.noQueriesMade']}</h3>
 			</h:panelGroup>
 
 			<!-- Only render available queries if there are some -->
-			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() > 0 or researcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">
+			<h:panelGroup rendered="#{ResearcherQueriesBean.queries.size() > 0 or ResearcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">
 				<!-- TODO: Implement PrimeFaces LacyLoading for search results -->
 				<h3>1 #{label['queryview.noSearchResults']}</h3>
-				<bbmricc:search backingBean="#{researcherQueriesBean}"/>
+				<bbmricc:search backingBean="#{ResearcherQueriesBean}"/>
+				<h3>3 queries: #{ResearcherQueriesBean.queries.size()} filters: #{ResearcherQueriesBean.filterTerms.size()}</h3>
 
-			</h:panelGroup>
-			
-			<h:panelGroup
-                rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() > 0}"
-                layout="block" styleClass="col-md-12">
-                <h3>#{label['queryview.noSearchResults']}</h3>
-            </h:panelGroup>
-
-			<h:panelGroup layout="block" styleClass="col-md-12">
-				<h3>3 queries: #{researcherQueriesBean.queries.size()} filters: #{researcherQueriesBean.filterTerms.size()}</h3>
 				<h:form>
 					<!-- Use PrimeFaces Data Scroller (https://www.primefaces.org/datascroller/) inline mode -->
-					<!-- TODO this still requires the use of lacy loading by extending the ResearcherQueriesBean -->
-					<p:dataScroller value="researcherQueriesBean" var="queries" chunkSize="10" mode="inline" scrollHeight="500">
+					<p:dataScroller value="#{ResearcherQueriesBean.lazyDataModel}" var="Query" lazy="true" chunkSize="10" >
 						<f:facet name="header">
-							Scroll Down to Load More Requests
+							To load more request use to More button.
 						</f:facet>
-					<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
+
+						<f:facet name="loader">
+							<div class="text-center">
+								<p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+							</div>
+						</f:facet>
+						<!-- TODO add information to be displayed for each Query -->
+						<div class="queryTitle">
+							<div>Query Title: #{Query.title}</div>
+						</div>
 
 						<h:panelGroup layout="block" styleClass="deco-none">
 
 							<h:panelGroup layout="block" styleClass="panel panel-default clickable">
-								<h:panelGroup layout="block" styleClass="#{item.query.testRequest ? 'test-query-heading' : ''} panel-heading">
+								<h:panelGroup layout="block" styleClass="#{Query.testRequest ? 'test-query-heading' : ''} panel-heading">
 
-									<h:link outcome="detail" value="[#{item.query.id}] #{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
+									<h:link outcome="detail" value="[#{Query.id}] #{Query.title}" title="#{label['queryview.queryitem.action.clickme']}"
 											styleClass="detailLink">
-										<f:param name="queryId" value="#{item.query.id}"/>
+										<f:param name="queryId" value="#{Query.id}"/>
 									</h:link>
 
-                               		<h:panelGroup styleClass="pull-right"
-										rendered="#{item.commentCount > 0 or item.privateNegotiationCount > 0 or item.unreadQueryCount >0 }">
+									<h:panelGroup styleClass="pull-right"
+												  rendered="#{item.commentCount > 0 or item.privateNegotiationCount > 0 or item.unreadQueryCount >0 }">
 										<div class="badge queryNumberResponsesBadge"
 											 style='#{item.unreadQueryCount == 0 ? "display:none;" : "" }'
 											 data-toggle="tooltip"
@@ -178,8 +177,8 @@
 										</div>
 
 										<h:outputText value="#{item.lastCommentTime}"
-											styleClass="queryCreationDate"
-											title="#{label['queryview.queryitem.datetime.last.comment']}">
+													  styleClass="queryCreationDate"
+													  title="#{label['queryview.queryitem.datetime.last.comment']}">
 											<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 										</h:outputText>
 
@@ -194,8 +193,8 @@
 										<h:panelGroup layout="block" styleClass="col-md-11">
 											<h:panelGroup layout="block" styleClass="row">
 												<h:panelGroup layout="block" styleClass="col-md-10 truncate-panel">
-                                               #{item.query.text}
-                                           </h:panelGroup>
+													#{Query.text}
+												</h:panelGroup>
 
 											</h:panelGroup>
 
@@ -203,8 +202,8 @@
 												<h:panelGroup layout="block" styleClass="col-md-12">
 													<h:panelGroup styleClass="pull-right">
 
-														<h:outputText value="#{item.query.queryCreationTime}"
-															title="#{label['queryview.queryitem.datetime.creation']}">
+														<h:outputText value="#{Query.queryCreationTime}"
+																	  title="#{label['queryview.queryitem.datetime.creation']}">
 															<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
 														</h:outputText>
 													</h:panelGroup>
@@ -218,7 +217,6 @@
 
 						</h:panelGroup>
 
-					</ui:repeat>
 					</p:dataScroller>
 
 					<h:outputScript>
@@ -229,6 +227,12 @@
 
 				</h:form>
 			</h:panelGroup>
+			
+			<h:panelGroup
+                rendered="#{ResearcherQueriesBean.queries.size() == 0 and ResearcherQueriesBean.filterTerms.size() > 0}"
+                layout="block" styleClass="col-md-12">
+                <h3>#{label['queryview.noSearchResults']}</h3>
+            </h:panelGroup>
 		</h:panelGroup>
 	</ui:define>
 </ui:composition>

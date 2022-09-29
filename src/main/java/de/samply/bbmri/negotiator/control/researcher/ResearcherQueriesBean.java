@@ -80,12 +80,15 @@ public class ResearcherQueriesBean implements Serializable {
 
     private List<QueryStatsDTO> queries;
 
+    private Set<String> filterTerms;
+
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
 
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
+    private final static Logger logger = LogManager.getLogger(ResearcherQueriesBean.class);
 
     /**
      * The selected query, if there is one
@@ -101,6 +104,14 @@ public class ResearcherQueriesBean implements Serializable {
      * The input textarea for the user to make a comment.
      */
     private String commentText;
+
+    public List<QueryStatsDTO> getQueries() {
+        return queries;
+    }
+
+    public Set<String> getFilterTerms() {
+        return filterTerms;
+    }
 
     /**
      * Initializes this bean by loading all queries for the current researcher.
@@ -132,7 +143,7 @@ public class ResearcherQueriesBean implements Serializable {
      * Split search terms by list of delimiters
      * @return unique search terms
      */
-    public Set<String> getFilterTerms() {
+    public Set<String> loadFilterTerms() {
         Set<String> filterTerms = new HashSet<String>();
         for(String filters : sessionBean.getFilters()) {
             // split by 0 or more spaces, followed by either 'and','or', comma or more spaces

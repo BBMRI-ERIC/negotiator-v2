@@ -653,7 +653,7 @@ public class DbUtil {
      * @return
      */
     // TODO: add pagination for select from database
-    public static List<QueryStatsDTO> getQueryStatsDTOsAtOffset(Config config, int userId, Set<String> filters, int size, int offset) {
+    public static List<QueryStatsDTO> getQueryStatsDTOsAtOffset(Config config, int userId, Set<String> filters, int offset, int size) {
         Person commentAuthor = Tables.PERSON.as("comment_author");
 
         Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
@@ -696,6 +696,7 @@ public class DbUtil {
                 .offset(offset)
                 .fetch();
 
+        logger.debug("records: "+ records.size());
         return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
     }
 
