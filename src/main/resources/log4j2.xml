@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="DEBUG" >
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
+        </Console>
+        <RollingFile name="negotiator"
+                     fileName="${log}/negotiator.log"
+                     filePattern="${log}/negotiator-%d{yyyy-MM-dd}.log">
+            <PatternLayout>
+                <pattern>%d{DATE} %-5p %C (%F:%L) - %m%n
+                </pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="100MB" />
+            </Policies>
+            <!-- Max 10 files will be created everyday -->
+<!--            <DefaultRolloverStrategy max="10">-->
+<!--                <Delete basePath="${sys:catalina.base}/logs/" maxDepth="10">-->
+<!--                    &lt;!&ndash; Delete all files older than 15 days &ndash;&gt;-->
+<!--                    <IfLastModified age="15d" />-->
+<!--                </Delete>-->
+<!--            </DefaultRolloverStrategy>-->
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="negotiator" level="DEBUG"/>
+            <AppenderRef ref="STDOUT" level="DEBUG"/>
+        </Root>
+        <Logger name="eu.bbmri.eric.csit.service.negotiator" level="debug">
+            <AppenderRef ref="negotiator" level="DEBUG"/>
+        </Logger>
+        <Logger name="de.samply.bbmri" level="debug">
+            <AppenderRef ref="negotiator" level="DEBUG"/>
+        </Logger>
+    </Loggers>
+</Configuration>
+
+
+
+<!--        # Define the root logger with appender file-->
+<!--log4j.rootLogger = DEBUG, FILE-->
+
+<!--# Define the file appender-->
+<!--log4j.appender.FILE=org.apache.log4j.RollingFileAppender-->
+<!--# Set the name of the file-->
+<!--log4j.appender.FILE.File=${log}/negotiator.log-->
+<!--# Set the immediate flush to true (default)-->
+<!--log4j.appender.FILE.ImmediateFlush=true-->
+<!--# Set the the backup index-->
+<!--log4j.appender.FILE.MaxBackupIndex=15-->
+<!--# Set the maximum file size before rollover-->
+<!--log4j.appender.FILE.MaxFileSize=51200-->
+<!--# Set the threshold to debug mode-->
+<!--log4j.appender.FILE.Threshold=debug-->
+<!--# Set the append to false, should not overwrite-->
+<!--log4j.appender.FILE.Append=true-->
+<!--# Set the DatePattern-->
+<!--log4j.appender.FILE.DatePattern='.' yyyy-MM-dd-->
+
+<!--# Define the layout for file appender-->
+<!--log4j.appender.FILE.layout=org.apache.log4j.PatternLayout-->
+<!--log4j.appender.FILE.layout.conversionPattern=%m%n-->
