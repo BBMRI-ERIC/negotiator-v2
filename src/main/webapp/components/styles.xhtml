@@ -51,4 +51,16 @@
         ga('send', 'pageview');
     </h:outputScript>
 
+    <!-- Script to block the page until the DOM is loaded -->
+    <h:outputScript>
+        document.onreadystatechange = function() {
+            if (document.readyState !== "complete") {
+                document.querySelector("body").style.visibility = "hidden";
+                document.querySelector("#loader").style.visibility = "visible";
+            } else {
+                document.querySelector("#loader").style.display = "hidden";
+                document.querySelector("body").style.visibility = "visible";
+            }
+        };
+    </h:outputScript>
 </ui:composition>
