@@ -472,6 +472,7 @@
     </profiles>
 
     <build>
+        <finalName>negotiator</finalName>
         <plugins>
 
             <plugin>
