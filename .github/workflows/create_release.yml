@@ -41,6 +41,7 @@ jobs:
           draft: false
           description: GitHub Actions release
           prerelease: true
+
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
