@@ -70,11 +70,12 @@ import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.primefaces.model.LazyDataModel;
 
 /**
  * Manages the query detail view for owners
  */
-@ManagedBean
+@ManagedBean(name = "researcherQueriesDetailBean")
 @ViewScoped
 public class ResearcherQueriesDetailBean implements Serializable {
 
@@ -94,6 +95,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
 
     @ManagedProperty(value = "#{fileUploadBean}")
     private FileUploadBean fileUploadBean;
+
+    /**
+     * LazyDataModel to serve queries
+     */
+    private LazyDataModel<QueryStatsDTO> lazyDataModel;
 
     /**
      * String contains Json data for JsTree view

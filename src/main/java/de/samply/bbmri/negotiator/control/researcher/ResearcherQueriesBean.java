@@ -71,6 +71,7 @@ public class ResearcherQueriesBean implements Serializable {
     private static final int CHUNK_SIZE = 5;
 
     // Number of all queries for this researcher
+    // TODO: check if this can be removed
     private int queryCount;
     // lazy data model to hold the researcher queries
     private LazyDataModel<QueryStatsDTO> lazyDataModel;
@@ -104,7 +105,8 @@ public class ResearcherQueriesBean implements Serializable {
      */
     @PostConstruct
     public void init() {
-        queryCount = 10; // set to the count from JOOQ
+        // this.queryCount = 10; // set to the count from JOOQ
+        this.getQueryCount();
 
         this.lazyDataModel = new LazyDataModel<QueryStatsDTO>() {
 
@@ -118,7 +120,7 @@ public class ResearcherQueriesBean implements Serializable {
                 return loadLatestQueryStatsDTO(first, pageSize);
             }
         };
-        lazyDataModel.setRowCount(15);
+        lazyDataModel.setRowCount(this.queryCount);
 
     }
 
@@ -326,6 +328,19 @@ public class ResearcherQueriesBean implements Serializable {
             queries.add( qso.getQuery());
         }
         return queries;
+    }
+
+    /**
+     * Load the number of queries "("SELECT COUNT(*) from ..."
+     * @return int numQueries
+     */
+    public void getQueryCount() {
+        try( Config config = ConfigFactory.get()) {
+            this.queryCount = DbUtil.getQueryStatsDTOsCount(config, userBean.getUserId(), getFilterTerms());
+        } catch (SQLException e) {
+            System.err.println("ERROR: ResearcherQueriesBean::getQueryCount()");
+            e.printStackTrace();
+        }
     }
 
 //    public List<QueryStatsDTO> getQueries() {

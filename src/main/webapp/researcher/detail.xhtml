@@ -33,6 +33,7 @@
                 xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
                 xmlns:bbmriresearchercc="http://xmlns.jcp.org/jsf/composite/bbmriresearcher"
+                xmlns:p="http://primefaces.org/ui"
                 template="../components/default.xhtml"
 >
 
@@ -67,11 +68,15 @@
             }
         </style>
 
+        <!-- TODO: implement LazyLoading -->
+        <!-- Until lazy loading is implemented, strip the functionality to only display the selected negotiation. -->
+        <!-- Users need to go back to the index.xhtml to search for other queries instead of having this available on the details page also -->
+        <!-- The next panelGroup contains the search funtionality withe the display of the Queries -->
         <h:panelGroup layout="block" styleClass="col-md-3 left-panel">
 
-            <bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
+        <bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
 
-            <!-- queryboxes BEGIN -->
+        <!-- queryboxes BEGIN -->
             <h:panelGroup
                     rendered="#{researcherQueriesDetailBean.queries.size() == 0 and researcherQueriesDetailBean.filterTerms.size() > 0}"
                     layout="block" styleClass="col-md-12">
@@ -81,9 +86,19 @@
             <ui:fragment rendered="#{researcherQueriesDetailBean.queries.size() > 0}">
                 <h:form>
 
-                    <ui:repeat value="#{researcherQueriesDetailBean.queries}" var="item">
+                    <f:facet name="header">
+                        Click More to load more Requests
+                    </f:facet>
+                    <f:facet name="loader">
+                        <div class="text-center">
+                            <p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+                        </div>
+                    </f:facet>
+
+                    <!-- TODO: replace the ui:repeat with LazyLoading -->
+                    <p:dataScroller value="#{ResearcherQueriesBean.lazyDataModel}" var="item" lazy="true" chunkSize="5">
                         <bbmricc:queryboxResearcher item="#{item}" selectedQuery="#{researcherQueriesDetailBean.queryId}"/>
-                    </ui:repeat>
+                    </p:dataScroller>
 
                     <h:outputScript>
                         $(function () {
@@ -673,8 +688,6 @@
                                 </div>
 
                             </c:forEach>
-
-
 
                         </div>
                     </div>
