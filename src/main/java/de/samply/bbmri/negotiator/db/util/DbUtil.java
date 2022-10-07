@@ -645,9 +645,11 @@ public class DbUtil {
      * time a comment was made
      * @param config jooq configuration
      * @param userId the researcher ID
+     * @param filters filters to be applierd
+     * @param offset integer offset where to load data from
+     * @param size integer number of queries to return
      * @return
      */
-    // TODO: add pagination for select from database
     public static List<QueryStatsDTO> getQueryStatsDTOsAtOffset(Config config, int userId, Set<String> filters, int offset, int size) {
         Person commentAuthor = Tables.PERSON.as("comment_author");
 
@@ -695,6 +697,47 @@ public class DbUtil {
         return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
     }
 
+    /**
+     * Returns a list of queries with the number of biobanks that commented on that query and the last
+     * time a comment was made
+     * @param config jooq configuration
+     * @param userId the researcher ID
+     * @param filters filters to be applierd
+     * @return integer number of queries
+     */
+    public static int getQueryStatsDTOsCount(Config config, int userId, Set<String> filters) {
+//        Person commentAuthor = Tables.PERSON.as("comment_author");
+
+        Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
+
+/*
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(commentAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+*/
+
+        // TODO: check if we really need to get the actual number here,
+        //      or if we just can work with a high enough estimated number and save the cost of doing the count on the database
+        // int queryCount = 1000;
+        int queryCount = config.dsl()
+                .selectCount()
+                .from(Tables.QUERY)
+                .where(condition)
+                .fetchOne(0, int.class);
+
+        logger.debug("queryCount: "+ queryCount);
+        return queryCount;
+    }
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
      * @param config jooq configuration
