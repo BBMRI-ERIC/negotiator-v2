@@ -126,7 +126,7 @@
 				<h:form>
 					<!-- Use PrimeFaces Data Scroller (https://www.primefaces.org/datascroller/) inline mode -->
 					<!-- TODO this still requires the use of lacy loading by extending the ResearcherQueriesBean -->
-					<p:dataScroller value="researcherQueriesBean" var="queries" lazy="true" chunkSize="10" mode="inline" scrollHeight="500">
+					<p:dataScroller value="#{ResearcherQueriesBean.lazyDataModel}" var="Query" lazy="true" chunkSize="10" mode="inline" scrollHeight="500">
 						<f:facet name="header">
 							Scroll Down to Load More Requests
 						</f:facet>
@@ -136,7 +136,7 @@
 							<h:panelGroup layout="block" styleClass="deco-none">
 
 								<h:panelGroup layout="block" styleClass="panel panel-default clickable">
-									<h:panelGroup layout="block" styleClass="#{item.query.testRequest ? 'test-query-heading' : ''} panel-heading">
+									<h:panelGroup layout="block" styleClass="#{Query.testRequest ? 'test-query-heading' : ''} panel-heading">
 
 										<h:link outcome="detail" value="[#{item.query.id}] #{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
 												styleClass="detailLink">
