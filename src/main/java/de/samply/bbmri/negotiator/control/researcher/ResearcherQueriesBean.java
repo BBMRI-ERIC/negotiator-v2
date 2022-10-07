@@ -29,18 +29,14 @@ package de.samply.bbmri.negotiator.control.researcher;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
-import javax.faces.bean.SessionScoped;
-import javax.validation.constraints.Null;
 
+import org.jetbrains.annotations.NotNull;
 import org.jooq.Record;
 import org.jooq.Result;
 
@@ -53,21 +49,12 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
 
 /**
  * Manages the query view for researchers
- * This extends ResearcherQueriesBean to implement lazy loading to enhance the responsiveness of the index.xhtml page.
- *
- * Reference to lacy loading using PrimeFaces:
- * Information used for this: https://stackoverflow.com/questions/22194987/is-primefaces-live-scrolling-compatible-with-lazy-loading
- *
- * PrimeFaces DataScroller: https://www.primefaces.org/datascroller/
- * PrimeFaces DataScroller Showcase: https://www.primefaces.org/showcase/ui/data/datascroller/basic.xhtml?jfwid=021eb
- * PrimeFaces DataView Showcase: https://www.primefaces.org/showcase/ui/data/dataview/lazy.xhtml?jfwid=99ba8
- * PrimeFaces DataView Lazy Loading Showcase: https://www.primefaces.org/showcase/ui/data/dataview/lazy.xhtml?jfwid=99ba8
- *
- * https://stackoverflow.com/questions/22249548/primefaces-datatable-live-scrolling-not-working-with-lazy-loading
- * https://stackoverflow.com/questions/23856270/jsf-primefaces-datascroller-with-lazy-loading-and-no-pagination-infinite-scroll
  */
 @ManagedBean(name = "ResearcherQueriesBean")
 @ViewScoped
@@ -78,9 +65,15 @@ public class ResearcherQueriesBean implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    private List<QueryStatsDTO> queries;
+    // TODO: set the chunk size static for now, but this should be adopted to display according to the maximum page size
+    private static final int CHUNK_SIZE = 5;
 
-    private Set<String> filterTerms;
+    // Number of all queries for this researcher
+    private int queryCount;
+    // lazy data model to hold the researcher queries
+    private LazyDataModel<Query> lazyDataModel;
+
+    private List<QueryStatsDTO> queries;
 
     @ManagedProperty(value = "#{userBean}")
     private UserBean userBean;
@@ -88,7 +81,6 @@ public class ResearcherQueriesBean implements Serializable {
     @ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
-    private final static Logger logger = LogManager.getLogger(ResearcherQueriesBean.class);
 
     /**
      * The selected query, if there is one
@@ -105,19 +97,34 @@ public class ResearcherQueriesBean implements Serializable {
      */
     private String commentText;
 
-    public List<QueryStatsDTO> getQueries() {
-        return queries;
-    }
-
-    public Set<String> getFilterTerms() {
-        return filterTerms;
-    }
-
     /**
      * Initializes this bean by loading all queries for the current researcher.
      */
     @PostConstruct
     public void init() {
+        queryCount = 10; // set to the count from JOOQ
+
+        lazyDataModel = new LazyDataModel<Query>() {
+
+            private static final long serialVersionUID = -4742720028771554420L;
+
+            @Override public List<Query> load(final int first, final int pageSize,
+                                              final String sortField, final SortOrder sortOrder,
+                                              final Map<String, FilterMeta> filters) {
+
+
+                final int startingFrom = queryCount - first;
+
+                return loadLatestQueriesOffset(startingFrom, CHUNK_SIZE);
+            }
+        };
+
+    }
+
+    // Getter for LazyDataModel
+    public LazyDataModel<Query> getLazyModel()
+    {
+        return lazyDataModel;
     }
 
     /**
@@ -143,7 +150,7 @@ public class ResearcherQueriesBean implements Serializable {
      * Split search terms by list of delimiters
      * @return unique search terms
      */
-    public Set<String> loadFilterTerms() {
+    public Set<String> getFilterTerms() {
         Set<String> filterTerms = new HashSet<String>();
         for(String filters : sessionBean.getFilters()) {
             // split by 0 or more spaces, followed by either 'and','or', comma or more spaces
@@ -173,6 +180,162 @@ public class ResearcherQueriesBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Gets a list of negotiaton queries from the database, starting at offset with the number of
+     * queries to be returned by chunk size.
+     *
+     * @return List<QueryStatsDTO>
+     */
+    // private List<QueryStatsDTO> loadLatestQueries(int startingFrom, int queryCount)
+    // private List<QueryStatsDTO> loadLatestQueries(int startingFrom, int chunkSize)
+    private List<QueryStatsDTO> loadLatestQueryStatsDTO( int offset, int size) {
+        List<QueryStatsDTO> queries = null;
+        try(Config config = ConfigFactory.get()) {
+            queries = (List<QueryStatsDTO>) DbUtil.getQueryStatsDTOsAtOffset(config, userBean.getUserId(), getFilterTerms(), offset, size);
+            if(queries == null) {
+            }
+
+            for (int i = 0; i < queries.size(); ++i) {
+                getPrivateNegotiationCountAndTime(i);
+                getUnreadQueryLifecycleChangesCountAndTime(i);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return queries;
+    }
+
+    public List<Query> loadLatestQueriesOffset( int offset, int size) {
+        List<Query> queries = new List<Query>() {
+            @Override
+            public int size() {
+                return 0;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public boolean contains(Object o) {
+                return false;
+            }
+
+            @NotNull
+            @Override
+            public Iterator<Query> iterator() {
+                return null;
+            }
+
+            @NotNull
+            @Override
+            public Object[] toArray() {
+                return new Object[0];
+            }
+
+            @NotNull
+            @Override
+            public <T> T[] toArray(@NotNull T[] ts) {
+                return null;
+            }
+
+            @Override
+            public boolean add(Query query) {
+                return false;
+            }
+
+            @Override
+            public boolean remove(Object o) {
+                return false;
+            }
+
+            @Override
+            public boolean containsAll(@NotNull Collection<?> collection) {
+                return false;
+            }
+
+            @Override
+            public boolean addAll(@NotNull Collection<? extends Query> collection) {
+                return false;
+            }
+
+            @Override
+            public boolean addAll(int i, @NotNull Collection<? extends Query> collection) {
+                return false;
+            }
+
+            @Override
+            public boolean removeAll(@NotNull Collection<?> collection) {
+                return false;
+            }
+
+            @Override
+            public boolean retainAll(@NotNull Collection<?> collection) {
+                return false;
+            }
+
+            @Override
+            public void clear() {
+
+            }
+
+            @Override
+            public Query get(int i) {
+                return null;
+            }
+
+            @Override
+            public Query set(int i, Query query) {
+                return null;
+            }
+
+            @Override
+            public void add(int i, Query query) {
+
+            }
+
+            @Override
+            public Query remove(int i) {
+                return null;
+            }
+
+            @Override
+            public int indexOf(Object o) {
+                return 0;
+            }
+
+            @Override
+            public int lastIndexOf(Object o) {
+                return 0;
+            }
+
+            @NotNull
+            @Override
+            public ListIterator<Query> listIterator() {
+                return null;
+            }
+
+            @NotNull
+            @Override
+            public ListIterator<Query> listIterator(int i) {
+                return null;
+            }
+
+            @NotNull
+            @Override
+            public List<Query> subList(int i, int i1) {
+                return null;
+            }
+        };
+        List<QueryStatsDTO> queriesStatusDTO = loadLatestQueryStatsDTO( offset, size);
+
+        for ( QueryStatsDTO qso : queriesStatusDTO) {
+            queries.add( qso.getQuery());
+        }
+        return queries;
     }
 
     public List<QueryStatsDTO> getQueries() {
