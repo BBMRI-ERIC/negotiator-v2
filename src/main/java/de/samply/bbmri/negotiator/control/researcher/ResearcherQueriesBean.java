@@ -26,20 +26,6 @@
 
 package de.samply.bbmri.negotiator.control.researcher;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-
-import org.jetbrains.annotations.NotNull;
-import org.jooq.Record;
-import org.jooq.Result;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.NegotiatorConfig;
@@ -49,9 +35,23 @@ import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
 import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Manages the query view for researchers
@@ -59,6 +59,8 @@ import org.primefaces.model.SortOrder;
 @ManagedBean(name = "ResearcherQueriesBean")
 @ViewScoped
 public class ResearcherQueriesBean implements Serializable {
+
+    private final static Logger logger = LogManager.getLogger(ResearcherQueriesBean.class);
 
     /**
      *
@@ -71,7 +73,7 @@ public class ResearcherQueriesBean implements Serializable {
     // Number of all queries for this researcher
     private int queryCount;
     // lazy data model to hold the researcher queries
-    private LazyDataModel<Query> lazyDataModel;
+    private LazyDataModel<QueryStatsDTO> lazyDataModel;
 
     private List<QueryStatsDTO> queries;
 
@@ -104,27 +106,20 @@ public class ResearcherQueriesBean implements Serializable {
     public void init() {
         queryCount = 10; // set to the count from JOOQ
 
-        lazyDataModel = new LazyDataModel<Query>() {
+        this.lazyDataModel = new LazyDataModel<QueryStatsDTO>() {
 
             private static final long serialVersionUID = -4742720028771554420L;
 
-            @Override public List<Query> load(final int first, final int pageSize,
+            @Override public List<QueryStatsDTO> load(final int first, final int pageSize,
                                               final String sortField, final SortOrder sortOrder,
                                               final Map<String, FilterMeta> filters) {
 
-
-                final int startingFrom = queryCount - first;
-
-                return loadLatestQueriesOffset(startingFrom, CHUNK_SIZE);
+                System.out.println(first);
+                return loadLatestQueryStatsDTO(first, pageSize);
             }
         };
+        lazyDataModel.setRowCount(15);
 
-    }
-
-    // Getter for LazyDataModel
-    public LazyDataModel<Query> getLazyModel()
-    {
-        return lazyDataModel;
     }
 
     /**
@@ -188,14 +183,9 @@ public class ResearcherQueriesBean implements Serializable {
      *
      * @return List<QueryStatsDTO>
      */
-    // private List<QueryStatsDTO> loadLatestQueries(int startingFrom, int queryCount)
-    // private List<QueryStatsDTO> loadLatestQueries(int startingFrom, int chunkSize)
     private List<QueryStatsDTO> loadLatestQueryStatsDTO( int offset, int size) {
-        List<QueryStatsDTO> queries = null;
         try(Config config = ConfigFactory.get()) {
-            queries = (List<QueryStatsDTO>) DbUtil.getQueryStatsDTOsAtOffset(config, userBean.getUserId(), getFilterTerms(), offset, size);
-            if(queries == null) {
-            }
+            queries = DbUtil.getQueryStatsDTOsAtOffset(config, userBean.getUserId(), getFilterTerms(), offset, size);
 
             for (int i = 0; i < queries.size(); ++i) {
                 getPrivateNegotiationCountAndTime(i);
@@ -338,21 +328,19 @@ public class ResearcherQueriesBean implements Serializable {
         return queries;
     }
 
-    public List<QueryStatsDTO> getQueries() {
-        try(Config config = ConfigFactory.get()) {
-            queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
-            if(queries == null) {
-            }
-
-            for (int i = 0; i < queries.size(); ++i) {
-                getPrivateNegotiationCountAndTime(i);
-                getUnreadQueryLifecycleChangesCountAndTime(i);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return queries;
-    }
+//    public List<QueryStatsDTO> getQueries() {
+//        try(Config config = ConfigFactory.get()) {
+//            queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
+//
+//            for (int i = 0; i < queries.size(); ++i) {
+//                getPrivateNegotiationCountAndTime(i);
+//                getUnreadQueryLifecycleChangesCountAndTime(i);
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return queries;
+//    }
 
     public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
@@ -422,5 +410,9 @@ public class ResearcherQueriesBean implements Serializable {
 
     public void setSessionBean(SessionBean sessionBean) {
         this.sessionBean = sessionBean;
+    }
+
+    public Object getLazyDataModel() {
+        return lazyDataModel;
     }
 }
