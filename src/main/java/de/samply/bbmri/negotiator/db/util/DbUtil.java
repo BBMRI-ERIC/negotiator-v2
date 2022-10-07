@@ -26,6 +26,31 @@
 
 package de.samply.bbmri.negotiator.db.util;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.Person;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
+import de.samply.bbmri.negotiator.jooq.tables.records.*;
+import de.samply.bbmri.negotiator.model.*;
+import de.samply.bbmri.negotiator.rest.dto.*;
+import eu.bbmri.eric.csit.service.negotiator.mapping.QueryJsonStrinQueryDTOMapper;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jooq.*;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -34,36 +59,6 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.*;
 
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
-import de.samply.bbmri.negotiator.jooq.tables.records.*;
-import de.samply.bbmri.negotiator.model.*;
-import de.samply.bbmri.negotiator.rest.dto.*;
-import de.samply.bbmri.negotiator.model.QueryCollection;
-import eu.bbmri.eric.csit.service.negotiator.mapping.QueryJsonStrinQueryDTOMapper;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
-import org.jooq.*;
-import org.jooq.Record;
-import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.jooq.Tables;
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.tables.Person;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
-
-import static org.jooq.impl.DSL.field;
 import static org.jooq.impl.DSL.select;
 
 /**
@@ -692,8 +687,8 @@ public class DbUtil {
                 .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
-                .limit(size)
                 .offset(offset)
+                .limit(size)
                 .fetch();
 
         logger.debug("records: "+ records.size());
@@ -1833,6 +1828,8 @@ public class DbUtil {
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.STATUS.eq("published"))
                 .fetch();
+        logger.info(queryId);
+        logger.info(result.toString());
         return result;
     }
 

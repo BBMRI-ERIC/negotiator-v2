@@ -29,7 +29,6 @@
 				xmlns:h="http://xmlns.jcp.org/jsf/html"
 				xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 				xmlns:f="http://xmlns.jcp.org/jsf/core"
-				xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
 				xmlns:p="http://primefaces.org/ui"
 				template="../components/default.xhtml">
 
@@ -104,34 +103,33 @@
 				</span>
 			</h:panelGroup>
 
-			<h:panelGroup
-			    rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() == 0}"
-				layout="block" styleClass="empty-queries col-md-12">
-				<h3>0 #{label['queryview.noQueriesMade']}</h3>
-			</h:panelGroup>
-
-			<!-- Only render available queries if there are some -->
-			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() > 0 or researcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">
-				<!-- TODO: Implement PrimeFaces LacyLoading for search results -->
-				<bbmricc:search backingBean="#{researcherQueriesBean}"/>
-			</h:panelGroup>
-			
-			<h:panelGroup
-                rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() > 0}"
-                layout="block" styleClass="col-md-12">
-                <h3>1 #{label['queryview.noSearchResults']}</h3>
-            </h:panelGroup>
+			<!--@elvariable id="researcherQueriesBean" type="de.samply.bbmri.negotiator.control.researcher.ResearcherQueriesBean"-->
+<!--			<h:panelGroup-->
+<!--			    rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() == 0}"-->
+<!--				layout="block" styleClass="empty-queries col-md-12">-->
+<!--				<h3>0 #{label['queryview.noQueriesMade']}</h3>-->
+<!--			</h:panelGroup>-->
+<!--			-->
+<!--			-->
+<!--			<h:panelGroup-->
+<!--                rendered="#{researcherQueriesBean.la.size() == 0 and researcherQueriesBean.filterTerms.size() > 0}"-->
+<!--                layout="block" styleClass="col-md-12">-->
+<!--                <h3>1 #{label['queryview.noSearchResults']}</h3>-->
+<!--            </h:panelGroup>-->
 
 			<h:panelGroup layout="block" styleClass="col-md-12">
 				<h:form>
 					<!-- Use PrimeFaces Data Scroller (https://www.primefaces.org/datascroller/) inline mode -->
 					<!-- TODO this still requires the use of lacy loading by extending the ResearcherQueriesBean -->
-					<p:dataScroller value="#{ResearcherQueriesBean.lazyDataModel}" var="Query" lazy="true" chunkSize="10" mode="inline" scrollHeight="500">
+					<p:dataScroller value="#{ResearcherQueriesBean.lazyDataModel}" var="item" lazy="true" chunkSize="5">
 						<f:facet name="header">
 							Scroll Down to Load More Requests
 						</f:facet>
-
-						<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
+						<f:facet name="loader">
+							<div class="text-center">
+								<p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+							</div>
+						</f:facet>
 
 							<h:panelGroup layout="block" styleClass="deco-none">
 
@@ -215,8 +213,6 @@
 								</h:panelGroup>
 
 							</h:panelGroup>
-
-						</ui:repeat>
 					</p:dataScroller>
 
 					<h:outputScript>
