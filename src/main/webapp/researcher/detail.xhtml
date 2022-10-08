@@ -78,12 +78,12 @@
 
         <!-- queryboxes BEGIN -->
             <h:panelGroup
-                    rendered="#{researcherQueriesDetailBean.queries.size() == 0 and researcherQueriesDetailBean.filterTerms.size() > 0}"
+                    rendered="#{researcherQueriesDetailBean.getNumQueries() == 0 and researcherQueriesDetailBean.filterTerms.size() > 0}"
                     layout="block" styleClass="col-md-12">
                 <h3>#{label['queryview.noSearchResults']}</h3>
             </h:panelGroup>
 
-            <ui:fragment rendered="#{researcherQueriesDetailBean.queries.size() > 0}">
+            <ui:fragment rendered="#{researcherQueriesDetailBean.getNumQueries() > 0}">
                 <h:form>
 
                     <f:facet name="header">

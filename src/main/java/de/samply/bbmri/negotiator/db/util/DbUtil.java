@@ -563,7 +563,21 @@ public class DbUtil {
                 .where(Tables.JSON_QUERY.ID.eq(queryId))
                 .fetchOne(Tables.JSON_QUERY.JSON_TEXT);
     }
+    /**
+     * Get the selected Query from the database.
+     * @param config JOOQ configuration
+     * @param queryId the query ID
+     * @return Query
+     */
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getSelectedQuery(Config config, Integer queryId) {
+        //de.samply.bbmri.negotiator.jooq.tables.pojos.Query fetchedQuery = null;
 
+        return (de.samply.bbmri.negotiator.jooq.tables.pojos.Query) config.dsl().selectFrom(Tables.QUERY)
+                .where(Tables.QUERY.ID.eq(queryId))
+                .fetchOneInto( de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+                //.fetchOne( Tables.QUERY.as(fetchedQuery));
+                //.getResult();
+    }
     /**
      * Get the JSON query from the database.
      * @param config JOOQ configuration

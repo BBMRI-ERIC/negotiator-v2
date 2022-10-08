@@ -35,6 +35,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
@@ -70,7 +71,9 @@ import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
 
 /**
  * Manages the query detail view for owners
@@ -176,6 +179,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private List<List<OfferPersonDTO>> listOfSampleOffers = new ArrayList<>();
     private final DataCache dataCache = DataCache.getInstance();
 
+    public int getNumQueries() {
+        return NumQueries;
+    }
+
+    /**
+     * The number of total queries
+     */
+    private int NumQueries;
     private int commentCount;
     private int unreadCommentCount = 0;
     private int privateNegotiationCount;
@@ -193,6 +204,21 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private String offer;
     private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
 
+    /**
+     * Initializes this bean by loading the query count for the current researcher.
+     * Created the PostConstruct Init in parallel to the existing initialize() method as its already late today.
+     */
+    @PostConstruct
+    public void init() {
+        try(Config config = ConfigFactory.get()) {
+            /**
+             * set the number of queries to be used in the page display
+             */
+            this.NumQueries = DbUtil.getQueryStatsDTOsCount(config, userBean.getUserId(), getFilterTerms());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
@@ -233,16 +259,21 @@ public class ResearcherQueriesDetailBean implements Serializable {
                 }
             }
             setReachableCollections("(" + reachable + " Collections reachable, " + unreachable + " Collections unreachable)");
+
+
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
+            // TODO: implement loading of the selected query and setting the comments
+            selectedQuery = DbUtil.getSelectedQuery( config, queryId);
+            /*
             for (QueryStatsDTO query : getQueries()) {
                 if (query.getQuery().getId() == queryId) {
                     selectedQuery = query.getQuery();
                     setCommentCountAndUreadCommentCount(query);
                 }
             }
-
+            */
             if (selectedQuery == null) {
                 /**
                  * If it is null, it means that the query simply does not exist.
