@@ -40,7 +40,7 @@
     <f:metadata>
         <f:viewParam name="queryId"
                      value="#{researcherQueriesDetailBean.queryId}"/>
-        <f:viewAction action="#{researcherQueriesDetailBean.initialize}"/>
+        <f:viewAction action="#{researcherQueriesDetailBean.loadSelectedQueryDetails}"/>
         <f:viewAction action="#{commentBean.initialize}" />
     </f:metadata>
 
@@ -527,11 +527,12 @@
                         <div id="comments" class="tab-pane fade">
                             <div class="row" style="margin:5px;padding-left: 10px;">
                                 In the group discussion all representatives of the involved Biobanks, the researcher and BBMRI-ERIC moderators can read and reply to the messages.
+
                                 <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">Show User List</button>
                                 <div id="demo" class="collapse">
                                     <div class="container">
                                     <div class="row">
-                                        <ui:repeat value="#{researcherQueriesDetailBean.personList}"
+                                        <ui:repeat value="#{researcherQueriesDetailBean.getPersonList()}"
                                                    var="person">
                                             <div class="col-xs-3"><i class="glyphicon glyphicon-user"/>#{person.authName}</div>
                                         </ui:repeat>

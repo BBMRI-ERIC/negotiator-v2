@@ -33,6 +33,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 import javax.annotation.PostConstruct;
@@ -222,19 +223,28 @@ public class ResearcherQueriesDetailBean implements Serializable {
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
-    public String initialize() {
+    public String loadSelectedQueryDetails() {
+        logger.debug("loadSelectedQueryDetails-start: " + LocalDateTime.now());
         try(Config config = ConfigFactory.get()) {
+            logger.debug("loadSelectedQueryDetails-1: " + LocalDateTime.now());
             setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
+            logger.debug("loadSelectedQueryDetails-2: " + LocalDateTime.now());
             setBiobankWithOffer(DbUtil.getOfferMakers(config, queryId));
+            logger.debug("loadSelectedQueryDetails-3: " + LocalDateTime.now());
 
             for (int i = 0; i < biobankWithOffer.size(); ++i) {
+                logger.debug("loadSelectedQueryDetails-4: " + LocalDateTime.now());
                 List<OfferPersonDTO> offerPersonDTO;
                 offerPersonDTO = DbUtil.getOffers(config, queryId, biobankWithOffer.get(i), userBean.getUserId());
+                logger.debug("loadSelectedQueryDetails-5: " + LocalDateTime.now());
                 listOfSampleOffers.add(offerPersonDTO);
+                logger.debug("loadSelectedQueryDetails-6: " + LocalDateTime.now());
             }
-
+            logger.debug("loadSelectedQueryDetails-7: " + LocalDateTime.now());
             matchingBiobankCollection = DbUtil.getCollectionsForQuery(config, queryId);
+            logger.debug("loadSelectedQueryDetails-8: " + LocalDateTime.now());
             setMatchingBiobanks(ObjectToJson.getUniqueBiobanks(matchingBiobankCollection).size());
+            logger.debug("loadSelectedQueryDetails-9: " + LocalDateTime.now());
             /**
              * This is done to remove the repitition of biobanks in the list because of multiple collection
              */
@@ -243,29 +253,34 @@ public class ResearcherQueriesDetailBean implements Serializable {
             int reachable = 0;
             int unreachable = 0;
             for (int j = 0; j < matchingBiobankCollection.size(); j++) {
+                logger.debug("loadSelectedQueryDetails-10: " + LocalDateTime.now());
                 if (!getBiobankWithoutOffer().contains(matchingBiobankCollection.get(j)) ) {
+                    logger.debug("loadSelectedQueryDetails-11: " + LocalDateTime.now());
                     if (!biobankWithOffer.contains(matchingBiobankCollection.get(j).getBiobank().getId())) {
+                        logger.debug("loadSelectedQueryDetails-12: " + LocalDateTime.now());
                         biobankWithoutOffer.add(matchingBiobankCollection.get(j));
                     }
                 }
-
+                logger.debug("loadSelectedQueryDetails-13: " + LocalDateTime.now());
                 list.add(matchingBiobankCollection.get(j).getBiobank().getId());
-
+                logger.debug("loadSelectedQueryDetails-14: " + LocalDateTime.now());
                 // Check if Collection is available
                 if(matchingBiobankCollection.get(j).isContacable()) {
                     reachable++;
                 } else {
                     unreachable++;
                 }
+                logger.debug("loadSelectedQueryDetails-15: " + LocalDateTime.now());
             }
             setReachableCollections("(" + reachable + " Collections reachable, " + unreachable + " Collections unreachable)");
 
-
+            logger.debug("loadSelectedQueryDetails-16: " + LocalDateTime.now());
             /**
              * Get the selected(clicked on) query from the list of queries for the owner
              */
             // TODO: implement loading of the selected query and setting the comments
             selectedQuery = DbUtil.getSelectedQuery( config, queryId);
+            logger.debug("loadSelectedQueryDetails-17: " + LocalDateTime.now());
             /*
             for (QueryStatsDTO query : getQueries()) {
                 if (query.getQuery().getId() == queryId) {
@@ -285,20 +300,29 @@ public class ResearcherQueriesDetailBean implements Serializable {
                  * to get it from the database again.
                  */
                 RestApplication.NonNullObjectMapper mapperProvider = new RestApplication.NonNullObjectMapper();
+                logger.debug("loadSelectedQueryDetails-18: " + LocalDateTime.now());
                 ObjectMapper mapper = mapperProvider.getContext(ObjectMapper.class);
+                logger.debug("loadSelectedQueryDetails-19: " + LocalDateTime.now());
                 queryDTO = mapper.readValue(selectedQuery.getJsonText(), QueryDTO.class);
+                logger.debug("loadSelectedQueryDetails-20: " + LocalDateTime.now());
                 setHumanReadableQuery(queryDTO.getHumanReadable());
+                logger.debug("loadSelectedQueryDetails-21: " + LocalDateTime.now());
             }
-
-            setPersonListForRequest(config, selectedQuery.getId());
-
+            logger.debug("loadSelectedQueryDetails-21.1-setPersonListForRequest: " + LocalDateTime.now());
+            // This will be set once the button is hit ...
+            //setPersonListForRequest(config, selectedQuery.getId());
+            logger.debug("loadSelectedQueryDetails-22: " + LocalDateTime.now());
             /*
              * Initialize Lifecycle Status
              */
             requestLifeCycleStatus = new RequestLifeCycleStatus(queryId);
+            logger.debug("loadSelectedQueryDetails-23: " + LocalDateTime.now());
             requestLifeCycleStatus.initialise();
+            logger.debug("loadSelectedQueryDetails-24: " + LocalDateTime.now());
             requestLifeCycleStatus.initialiseCollectionStatus();
+            logger.debug("loadSelectedQueryDetails-25: " + LocalDateTime.now());
             createCollectionListSortedByStatus();
+            logger.debug("loadSelectedQueryDetails-26: " + LocalDateTime.now());
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();
@@ -308,8 +332,9 @@ public class ResearcherQueriesDetailBean implements Serializable {
         /**
          * Convert matchingBiobankCollection in the JSON format for Tree View
          */
+        logger.debug("loadSelectedQueryDetails-27: " + LocalDateTime.now());
         setJsTreeJson(ObjectToJson.getJsonTree(matchingBiobankCollection));
-
+        logger.debug("loadSelectedQueryDetails-end: " + LocalDateTime.now());
         return null;
     }
 
@@ -858,6 +883,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
     }
 
     public List<Person> getPersonList() {
+        logger.debug("getPersonList-start: " + LocalDateTime.now());
+        try(Config config = ConfigFactory.get()) {
+            setPersonListForRequest(config, selectedQuery.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        logger.debug("getPersonList-end: " + LocalDateTime.now());
         return personList;
     }
 
