@@ -55,11 +55,12 @@
     <h:outputScript>
         document.onreadystatechange = function() {
             if (document.readyState !== "complete") {
-                document.querySelector("body").style.visibility = "hidden";
-                document.querySelector("#loader").style.visibility = "visible";
+                document.getElementById('body').style.visibility = 'hidden'
+                document.getElementById('loader').style.visibility = "visible";
+
             } else {
-                document.querySelector("#loader").style.display = "hidden";
-                document.querySelector("body").style.visibility = "visible";
+                document.getElementById('loader').style.visibility="hidden";
+                document.getElementById('body').style.visibility = "visible";
             }
         };
     </h:outputScript>

@@ -20,13 +20,14 @@
 
 <h:body styleClass="#{bodyClass}">
 
-    <div id="loader" class="center"></div>
-
+    <div id="loader" name="loader" class="center"></div>
     <ui:include src="navbar.xhtml" />
 
     <div class="navbar-shadow" />
 
+    <div id="body">
     <ui:insert name="body" />
+    </div>
 
 </h:body>
 </html>
