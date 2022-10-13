@@ -944,15 +944,20 @@ public class DbUtil {
 
         Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
 
-        // TODO: check if we really need to get the actual number here,
-        //      or if we just can work with a high enough estimated number and save the cost of doing the count on the database
-        int queryCount = 1000;
-        /*int queryCount = config.dsl()
+        // We need to get the actual query count, otherwise the More button will not go away on the page
+        // so no use to work with a high enough estimated number and save the cost of doing the count on the database
+        int queryCount = config.dsl()
                 .selectCount()
                 .from(Tables.QUERY)
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
                 .where(condition)
                 .fetchOne(0, int.class);
-*/
+
         logger.debug("queryCount: "+ queryCount);
         return queryCount;
 
