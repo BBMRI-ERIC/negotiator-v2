@@ -7,7 +7,6 @@ This is the BBMRI negotiator v2
 
 ## Getting Started
 
-This application uses a number of samply libraries which can be found at: https://maven.samply.de/nexus
 
 This application uses a database with the name of 'negotiator'. Feel free to change the name but remember to update it in pom.xml
 Following are the settings in the pom file that need to be updated according to your requirements
@@ -56,30 +55,6 @@ Otherwise the values of the META-INF/context.xml file are taken.
 
 ## Code generation with jooq
 
-Before you can generate the classes you should configure maven properly. In this case the properties
-for the database, the username and the password for the code generation are taken from your profile. Edit your
-`settings.xml` so that it looks like this:
-
-
-```
-...
-  <profiles>
-    <profile>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <negotiator.database>YOUR_NEGOTIATOR_DATABASE</negotiator.database>
-        <negotiator.user>YOUR_NEGOTIATOR_DATABASE_USERNAME</negotiator.user>
-        <negotiator.password>YOUR_NEGOTIATOR_DATABASE_PASSWORD</negotiator.password>
-      </properties>
-
-      ...
-
-    </profile>
-  </profiles>
-...
-```
 
 
 You can then generate the classes by running the following command:
