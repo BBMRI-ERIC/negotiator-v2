@@ -90,7 +90,7 @@ public class OwnerQueriesBean implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		this.getQueryCount();
+		setQueryCount();
 
 		this.lazyDataModel = new LazyDataModel<OwnerQueryStatsDTO>() {
 
@@ -248,7 +248,11 @@ public class OwnerQueriesBean implements Serializable {
 	 * Load the number of queries "("SELECT COUNT(*) from ..."
 	 * @return int numQueries
 	 */
-	public void getQueryCount() {
+	public int getQueryCount() {
+		return this.queryCount;
+	}
+
+	public void setQueryCount() {
 		try( Config config = ConfigFactory.get()) {
 			this.queryCount = DbUtil.getOwnerQueriesCount(config, userBean.getUserId(), getFilterTerms());
 		} catch (SQLException e) {
