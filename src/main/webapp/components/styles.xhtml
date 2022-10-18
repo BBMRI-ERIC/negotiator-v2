@@ -62,6 +62,14 @@
                 document.getElementById('loader').style.visibility="hidden";
                 document.getElementById('body').style.visibility = "visible";
             }
+
         };
+        window.onbeforeunload = function(e){
+<!--            document.getElementById('body').style.visibility = 'hidden'-->
+            document.getElementById('loader').style.visibility = 'visible';
+<!--        Making the body static instead of hidden... less "flickering" because not always white screen when page changes-->
+            document.getElementById('body').style.pointerEvents = 'none';
+        };
+
     </h:outputScript>
 </ui:composition>
