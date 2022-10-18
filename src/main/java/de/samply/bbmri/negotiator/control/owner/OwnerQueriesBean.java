@@ -44,13 +44,17 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
+import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.Record;
 import org.jooq.Result;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
 
 /**
  * Manages the query view for owners
  */
-@ManagedBean
+@ManagedBean(name = "ownerQueriesBean")
 @ViewScoped
 public class OwnerQueriesBean implements Serializable {
 
@@ -58,6 +62,14 @@ public class OwnerQueriesBean implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 1L;
+
+	// TODO: set the chunk size static for now, but this should be adopted to display according to the maximum page size
+	private static final int CHUNK_SIZE = 5;
+	// Number of all queries for this researcher
+	// TODO: check if this can be removed
+	private int queryCount;
+	// lazy data model to hold the researcher queries
+	private LazyDataModel<OwnerQueryStatsDTO> lazyDataModel;
 
 	private List<OwnerQueryStatsDTO> queries = new ArrayList<>();
 
@@ -73,13 +85,26 @@ public class OwnerQueriesBean implements Serializable {
 	@ManagedProperty(value = "#{sessionBean}")
     private SessionBean sessionBean;
 
-
 	/**
-	 * Initializes this bean by loading all queries for the current researcher.
+	 * Initializes this bean by loading all queries for the current owner.
 	 */
 	@PostConstruct
 	public void init() {
+		this.getQueryCount();
 
+		this.lazyDataModel = new LazyDataModel<OwnerQueryStatsDTO>() {
+
+			private static final long serialVersionUID = -4742720028771554420L;
+
+			@Override public List<OwnerQueryStatsDTO> load(final int first, final int pageSize,
+													  final String sortField, final SortOrder sortOrder,
+													  final Map<String, FilterMeta> filters) {
+
+				System.out.println(first);
+				return loadLatestOwnerQueryStatsDTO(first, pageSize);
+			}
+		};
+		lazyDataModel.setRowCount(this.queryCount);
 	}
 
 	/**
@@ -194,6 +219,44 @@ public class OwnerQueriesBean implements Serializable {
 		return queries;
 	}
 
+	/**
+	 * Gets a list of negotiaton queries from the database, starting at offset with the number of
+	 * queries to be returned by chunk size.
+	 *
+	 * @return List<OwnerQueryStatsDTO>
+	 */
+	private List<OwnerQueryStatsDTO> loadLatestOwnerQueryStatsDTO( int offset, int size) {
+		try(Config config = ConfigFactory.get()) {
+			queries = DbUtil.getOwnerQueriesAtOffset(config, userBean.getUserId(), getFilterTerms(),
+					flagFilter, isTestRequest, offset, size);
+
+			for (int i = 0; i < queries.size(); ++i) {
+				getPrivateNegotiationCountAndTime(config, i);
+				getUnreadQueryLifecycleChangesCountAndTime(config, i);
+			}
+
+			// TODO: check if sortQueries() is needed
+			// sortQueries();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return queries;
+	}
+
+	/**
+	 * Load the number of queries "("SELECT COUNT(*) from ..."
+	 * @return int numQueries
+	 */
+	public void getQueryCount() {
+		try( Config config = ConfigFactory.get()) {
+			this.queryCount = DbUtil.getOwnerQueriesCount(config, userBean.getUserId(), getFilterTerms());
+		} catch (SQLException e) {
+			System.err.println("ERROR: OwnerQueriesBean::getQueryCount()");
+			e.printStackTrace();
+		}
+	}
+
 	public void getPrivateNegotiationCountAndTime(Config config, int index){
 		Result<Record> result = DbUtil.getPrivateNegotiationCountAndTimeForBiobanker(config, queries.get(index).getQuery().getId(), userBean.getUserId());
 		queries.get(index).setPrivateNegotiationCount((int) result.get(0).getValue("private_negotiation_count"));
@@ -279,5 +342,9 @@ public class OwnerQueriesBean implements Serializable {
 
 	public void setIsTestRequest(Boolean testRequest) {
 		isTestRequest = testRequest;
+	}
+
+	public Object getLazyDataModel() {
+		return lazyDataModel;
 	}
 }

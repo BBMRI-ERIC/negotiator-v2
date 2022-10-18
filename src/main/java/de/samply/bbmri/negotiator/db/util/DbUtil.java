@@ -26,44 +26,40 @@
 
 package de.samply.bbmri.negotiator.db.util;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.*;
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.enums.Flag;
+import de.samply.bbmri.negotiator.jooq.tables.Person;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Collection;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Network;
 import de.samply.bbmri.negotiator.jooq.tables.pojos.Offer;
 import de.samply.bbmri.negotiator.jooq.tables.records.*;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.dto.*;
-import de.samply.bbmri.negotiator.model.QueryCollection;
 import eu.bbmri.eric.csit.service.negotiator.mapping.QueryJsonStrinQueryDTOMapper;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
-import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
-import org.jooq.*;
-import org.jooq.Record;
-import org.jooq.exception.DataAccessException;
-import org.jooq.impl.DSL;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.jooq.Tables;
-import de.samply.bbmri.negotiator.jooq.enums.Flag;
-import de.samply.bbmri.negotiator.jooq.tables.Person;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryBiobank;
 import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryCollection;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetwork;
+import eu.bbmri.eric.csit.service.negotiator.sync.directory.dto.DirectoryNetworkLink;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jooq.*;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 
-import static org.jooq.impl.DSL.field;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.*;
+
 import static org.jooq.impl.DSL.select;
 
 /**
@@ -568,7 +564,21 @@ public class DbUtil {
                 .where(Tables.JSON_QUERY.ID.eq(queryId))
                 .fetchOne(Tables.JSON_QUERY.JSON_TEXT);
     }
+    /**
+     * Get the selected Query from the database.
+     * @param config JOOQ configuration
+     * @param queryId the query ID
+     * @return Query
+     */
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getSelectedQuery(Config config, Integer queryId) {
+        //de.samply.bbmri.negotiator.jooq.tables.pojos.Query fetchedQuery = null;
 
+        return (de.samply.bbmri.negotiator.jooq.tables.pojos.Query) config.dsl().selectFrom(Tables.QUERY)
+                .where(Tables.QUERY.ID.eq(queryId))
+                .fetchOneInto( de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+                //.fetchOne( Tables.QUERY.as(fetchedQuery));
+                //.getResult();
+    }
     /**
      * Get the JSON query from the database.
      * @param config JOOQ configuration
@@ -600,6 +610,7 @@ public class DbUtil {
      * @param userId the researcher ID
      * @return
      */
+    // TODO: add pagination for select from database
     public static List<QueryStatsDTO> getQueryStatsDTOs(Config config, int userId, Set<String> filters) {
         Person commentAuthor = Tables.PERSON.as("comment_author");
 
@@ -638,11 +649,110 @@ public class DbUtil {
                             .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
                 .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
                 .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
-                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc()).fetch();
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
+                .fetch();
 
         return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
     }
 
+    /**
+     * Returns a list of queries with the number of biobanks that commented on that query and the last
+     * time a comment was made
+     * @param config jooq configuration
+     * @param userId the researcher ID
+     * @param filters filters to be applierd
+     * @param offset integer offset where to load data from
+     * @param size integer number of queries to return
+     * @return
+     */
+    public static List<QueryStatsDTO> getQueryStatsDTOsAtOffset(Config config, int userId, Set<String> filters, int offset, int size) {
+        Person commentAuthor = Tables.PERSON.as("comment_author");
+
+        Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
+
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(commentAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+
+        Result<Record> records = config.dsl()
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(Tables.PERSON, "person"))
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
+                .from(Tables.QUERY)
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.QUERY_ID.eq(Tables.QUERY.ID).and(Tables.COMMENT.STATUS.eq("published")))
+                .join(commentAuthor, JoinType.LEFT_OUTER_JOIN).on(Tables.COMMENT.PERSON_ID.eq(commentAuthor.ID))
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.QUERY.RESEARCHER_ID))
+                        .and(Tables.PERSON_COMMENT.READ.eq(false)))
+                .leftOuterJoin(Tables.REQUEST_STATUS)
+                .on(Tables.REQUEST_STATUS.QUERY_ID.eq(Tables.QUERY.ID)
+                        .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
+                .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
+                .groupBy(Tables.QUERY.ID, Tables.PERSON.ID)
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
+                .offset(offset)
+                .limit(size)
+                .fetch();
+
+        logger.debug("records: "+ records.size());
+        return MappingListDbUtil.mapRecordResultQueryStatsDTOList(records);
+    }
+
+    /**
+     * Returns a list of queries with the number of biobanks that commented on that query and the last
+     * time a comment was made
+     * @param config jooq configuration
+     * @param userId the researcher ID
+     * @param filters filters to be applierd
+     * @return integer number of queries
+     */
+    public static int getQueryStatsDTOsCount(Config config, int userId, Set<String> filters) {
+//        Person commentAuthor = Tables.PERSON.as("comment_author");
+
+        Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
+
+/*
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(commentAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+*/
+
+        // TODO: check if we really need to get the actual number here,
+        //      or if we just can work with a high enough estimated number and save the cost of doing the count on the database
+        // int queryCount = 1000;
+        int queryCount = config.dsl()
+                .selectCount()
+                .from(Tables.QUERY)
+                .where(condition)
+                .fetchOne(0, int.class);
+
+        logger.debug("queryCount: "+ queryCount);
+        return queryCount;
+    }
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
      * @param config jooq configuration
@@ -731,6 +841,127 @@ public class DbUtil {
         return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
 
+    /**
+     * Returns a list of queries for a particular owner, filtered by a search term if such is provided
+     * @param config jooq configuration
+     * @param userId the user ID of the biobank owner
+     * @param filters search term for title and text
+     * @return
+     */
+    public static List<OwnerQueryStatsDTO> getOwnerQueriesAtOffset(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest, int offset, int size) {
+        Person queryAuthor = Tables.PERSON.as("query_author");
+
+        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+
+        if (flag != null && flag != Flag.UNFLAGGED) {
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
+        } else {
+            /**
+             * Ignored queries are never selected unless the user is in the ignored folder
+             */
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+        }
+
+        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+
+        Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("reque_ststatus_table_abandon");
+
+        Result<Record> fetch = config.dsl()
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(queryAuthor, "person"))
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
+                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
+                        .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
+                .from(Tables.QUERY)
+
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
+
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID).and(Tables.COMMENT.STATUS.eq("published")))
+
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
+
+                .join(requestStatusTableStart, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
+
+                .join(requestStatusTableAbandon, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).eq("abandoned")))
+
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                        .and(Tables.PERSON_COMMENT.READ.eq(false)))
+
+                .where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
+                .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
+                .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
+                .offset(offset)
+                .limit(size)
+                .fetch();
+
+        return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
+    }
+
+    /**
+     * Returns a list of queries for a particular owner, filtered by a search term if such is provided
+     * @param config jooq configuration
+     * @param userId the user ID of the biobank owner
+     * @param filters search term for title and text
+     * @return
+     */
+    public static int getOwnerQueriesCount(Config config, int userId, Set<String> filters) {
+        Person queryAuthor = Tables.PERSON.as("query_author");
+
+        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+
+        // We need to get the actual query count, otherwise the More button will not go away on the page
+        // so no use to work with a high enough estimated number and save the cost of doing the count on the database
+        int queryCount = config.dsl()
+                .selectCount()
+                .from(Tables.QUERY)
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+                .where(condition)
+                .fetchOne(0, int.class);
+
+        logger.debug("queryCount: "+ queryCount);
+        return queryCount;
+
+    }
     /**
      * Returns a list of QueryAttachmentDTO for a specific query.
      * @param config
@@ -1776,6 +2007,8 @@ public class DbUtil {
                 .where(Tables.OFFER.QUERY_ID.eq(queryId))
                 .and(Tables.OFFER.STATUS.eq("published"))
                 .fetch();
+        logger.info(queryId);
+        logger.info(result.toString());
         return result;
     }
 
@@ -2558,7 +2791,15 @@ public class DbUtil {
     }
 
     public static List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> getPersonsContactsForRequest(Config config, Integer queryId) {
-        Result<Record> record = config.dsl().selectDistinct(getFields(Tables.PERSON,"person"))
+        logger.debug("getPersonsContactsForRequest-DB-1: "+ LocalDateTime.now());
+        /*
+        Only load the following data from the DB, this is then used to map the persons in mapResultPerson:
+                    person.setId(dbRecord.getValue("person_id", Integer.class));
+            person.setAuthEmail(dbRecord.getValue("person_auth_email", String.class));
+            person.setAuthName(dbRecord.getValue("person_auth_name", String.class));
+            person.setOrganization(dbRecord.getValue("person_organization", String.class));
+         */
+        Result<Record4<Integer,String,String,String>> record = config.dsl().selectDistinct(Tables.PERSON.ID, Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME, Tables.PERSON.ORGANIZATION)
                 .from(Tables.PERSON)
                 .fullOuterJoin(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                 .fullOuterJoin(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
@@ -2566,7 +2807,31 @@ public class DbUtil {
                 .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
                 .or(Tables.PERSON.IS_ADMIN.isTrue()))
                 .fetch();
-        return MappingListDbUtil.mapResultPerson(record);
+        logger.debug("getPersonsContactsForRequest-DB-2: "+ LocalDateTime.now());
+        //List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> returnList;
+        logger.debug("getPersonsContactsForRequest-DB-3: "+ LocalDateTime.now());
+
+        List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> returnList = new ArrayList<>();
+        for(Record dbRecord : record) {
+            de.samply.bbmri.negotiator.jooq.tables.pojos.Person person = new de.samply.bbmri.negotiator.jooq.tables.pojos.Person();
+           /* if(dbRecord.getValue("person_id") == null) {
+                continue;
+            }*/
+            person.setId( dbRecord.get( 0, Integer.class));
+            person.setAuthEmail(dbRecord.get(1, String.class));
+            person.setAuthName( dbRecord.get( 2, String.class));
+            person.setOrganization(dbRecord.get(3, String.class));
+/*
+            person.setId(dbRecord.getValue("public.person.id", Integer.class));
+            person.setAuthEmail(dbRecord.getValue("public.person.auth_email", String.class));
+            person.setAuthName(dbRecord.getValue("public.person.auth_name", String.class));
+            person.setOrganization(dbRecord.getValue("public.person.organization", String.class));
+*/
+            returnList.add(person);
+        }
+
+        logger.debug("getPersonsContactsForRequest-DB-4: "+ LocalDateTime.now());
+        return returnList;
     }
 
     public static void getCollectionsWithLifeCycleStatusProblem(Config config, Integer userId) {

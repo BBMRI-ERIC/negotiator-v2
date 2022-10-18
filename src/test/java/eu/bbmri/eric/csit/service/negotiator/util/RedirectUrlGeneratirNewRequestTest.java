@@ -24,7 +24,7 @@ public class RedirectUrlGeneratirNewRequestTest {
         redirectUrlGenerator.setUrl("https://locator.bbmri-eric.eu/");
         String url = redirectUrlGenerator.getNewRequestUrl();
         String uuid = url.replace("https://locator.bbmri-eric.eu/?ntoken=", "").replaceAll("__search__", "");
-        assertEquals("https://locator.bbmri-eric.eu/?ntoken=" + uuid + "__search__", url);
+        assertEquals(uuid + "__search__", url);
     }
 
     @Test
@@ -34,7 +34,7 @@ public class RedirectUrlGeneratirNewRequestTest {
         redirectUrlGenerator.setUrl("https://locator.bbmri-eric.eu");
         String url = redirectUrlGenerator.getNewRequestUrl();
         String uuid = url.replace("https://locator.bbmri-eric.eu/?ntoken=", "").replaceAll("__search__", "");
-        assertEquals("https://locator.bbmri-eric.eu/?ntoken=" + uuid + "__search__", url);
+        assertEquals( uuid + "__search__", url);
     }
 
     @Test
