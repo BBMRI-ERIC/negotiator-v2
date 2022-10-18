@@ -117,11 +117,11 @@ public class ServletListener implements ServletContextListener {
             logger.info("Starting directory synchronize task timer");
             timer = new Timer();
             timer.schedule(new DirectorySynchronizeTask(), 10000, 1000L * 60L * 60L);
-
+/**
             logger.info("Starting Admin file export generator timer");
             timerGenerator = new Timer();
             timerGenerator.schedule(new CreateAdminFilesForDownload(), 10000, 1000L * 60L * 60L);
-
+*/
             logger.info("Starting notification task timer");
             notificationScheduledExecutorTimer = new Timer();
             NotificationScheduledExecutor notificationScheduledExecutor = new NotificationScheduledExecutor();
