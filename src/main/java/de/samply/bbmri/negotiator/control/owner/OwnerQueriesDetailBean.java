@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -200,7 +201,32 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private List<FacesMessage> fileValidationMessages = new ArrayList<>();
 	Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
 
-    /**
+	public int getNumQueries() {
+		return NumQueries;
+	}
+
+	/**
+	 * The number of total queries
+	 */
+	private int NumQueries;
+
+	/**
+	 * Initializes this bean by loading the query count for the current researcher.
+	 * Created the PostConstruct Init in parallel to the existing initialize() method as its already late today.
+	 */
+	@PostConstruct
+	public void init() {
+		try(Config config = ConfigFactory.get()) {
+			/**
+			 * set the number of queries to be used in the page display
+			 */
+			this.NumQueries = DbUtil.getQueryStatsDTOsCount(config, userBean.getUserId(), getFilterTerms());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
 	public String initialize() {
@@ -212,12 +238,20 @@ public class OwnerQueriesDetailBean implements Serializable {
 			/**
 			 * Get the selected(clicked on) query from the list of queries for the owner
 			 */
+			// TODO: implement loading of the selected query and setting the comments
+			selectedQuery = DbUtil.getSelectedQuery( config, queryId);
+			// TODO: Get the query for type ownerQueryStatsDTO
+			//setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
+			/**
+			 * Get the selected(clicked on) query from the list of queries for the owner
+
 			for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
 				if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
 					selectedQuery = ownerQueryStatsDTO.getQuery();
 					setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
 				}
 			}
+			 */
 
 			if(selectedQuery != null) {
 				try {

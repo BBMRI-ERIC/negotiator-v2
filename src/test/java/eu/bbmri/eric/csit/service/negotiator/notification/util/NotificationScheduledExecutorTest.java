@@ -39,10 +39,10 @@ public class NotificationScheduledExecutorTest {
     }
 
     @Test
-    @DisplayName("Test selected interval for mail notification (10 minutes in milliseconds).")
+    @DisplayName("Test selected interval for mail notification (5 minutes in milliseconds).")
     public void testDelayCalculationSelectedInterval10MinutesInMilliseconds() {
         long interval = notificationScheduledExecutor.getInterval();
-        assertEquals(600000L, interval);
+        assertEquals(300000L, interval);
     }
 
     @Test

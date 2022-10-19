@@ -29,8 +29,7 @@
 				xmlns:h="http://xmlns.jcp.org/jsf/html"
 				xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 				xmlns:f="http://xmlns.jcp.org/jsf/core"
-				xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
-				xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+				xmlns:p="http://primefaces.org/ui"
 				template="../components/default.xhtml">
 
 	<!-- Queries page for the researcher -->
@@ -104,110 +103,117 @@
 				</span>
 			</h:panelGroup>
 
-			<h:panelGroup
-			    rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() == 0}"
-				layout="block" styleClass="empty-queries col-md-12">
-				<h3>#{label['queryview.noQueriesMade']}</h3>
-			</h:panelGroup>
-			
-			<h:panelGroup rendered="#{researcherQueriesBean.queries.size() > 0 or researcherQueriesBean.filterTerms.size() > 0}" layout="block" style="margin-top:60px">      
-			    <bbmricc:search backingBean="#{researcherQueriesBean}"/>
-			</h:panelGroup>
-			
-			<h:panelGroup
-                rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() > 0}"
-                layout="block" styleClass="col-md-12">
-                <h3>#{label['queryview.noSearchResults']}</h3>
-            </h:panelGroup>
+			<!--@elvariable id="researcherQueriesBean" type="de.samply.bbmri.negotiator.control.researcher.ResearcherQueriesBean"-->
+<!--			<h:panelGroup-->
+<!--			    rendered="#{researcherQueriesBean.queries.size() == 0 and researcherQueriesBean.filterTerms.size() == 0}"-->
+<!--				layout="block" styleClass="empty-queries col-md-12">-->
+<!--				<h3>0 #{label['queryview.noQueriesMade']}</h3>-->
+<!--			</h:panelGroup>-->
+<!--			-->
+<!--			-->
+<!--			<h:panelGroup-->
+<!--                rendered="#{researcherQueriesBean.la.size() == 0 and researcherQueriesBean.filterTerms.size() > 0}"-->
+<!--                layout="block" styleClass="col-md-12">-->
+<!--                <h3>1 #{label['queryview.noSearchResults']}</h3>-->
+<!--            </h:panelGroup>-->
 
 			<h:panelGroup layout="block" styleClass="col-md-12">
 				<h:form>
-					<ui:repeat var="item" value="#{researcherQueriesBean.queries}">
+					<!-- Use PrimeFaces Data Scroller (https://www.primefaces.org/datascroller/) inline mode -->
+					<!-- TODO this still requires the use of lacy loading by extending the ResearcherQueriesBean -->
+					<p:dataScroller value="#{ResearcherQueriesBean.lazyDataModel}" var="item" lazy="true" chunkSize="5">
+						<f:facet name="header">
+							Click More to load more Requests
+						</f:facet>
+						<f:facet name="loader">
+							<div class="text-center">
+								<p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+							</div>
+						</f:facet>
 
-						<h:panelGroup layout="block" styleClass="deco-none">
+							<h:panelGroup layout="block" styleClass="deco-none">
 
-							<h:panelGroup layout="block" styleClass="panel panel-default clickable">
-								<h:panelGroup layout="block" styleClass="#{item.query.testRequest ? 'test-query-heading' : ''} panel-heading">
+								<h:panelGroup layout="block" styleClass="panel panel-default clickable">
+									<h:panelGroup layout="block" styleClass="#{item.query.testRequest ? 'test-query-heading' : ''} panel-heading">
 
-									<h:link outcome="detail" value="[#{item.query.id}] #{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
-											styleClass="detailLink">
-										<f:param name="queryId" value="#{item.query.id}"/>
-									</h:link>
+										<h:link outcome="detail" value="[#{item.query.id}] #{item.query.title}" title="#{label['queryview.queryitem.action.clickme']}"
+												styleClass="detailLink">
+											<f:param name="queryId" value="#{item.query.id}"/>
+										</h:link>
 
-                               		<h:panelGroup styleClass="pull-right"
-										rendered="#{item.commentCount > 0 or item.privateNegotiationCount > 0 or item.unreadQueryCount >0 }">
-										<div class="badge queryNumberResponsesBadge"
-											 style='#{item.unreadQueryCount == 0 ? "display:none;" : "" }'
-											 data-toggle="tooltip"
-											 data-placement="bottom"
-											 title="#{item.unreadQueryCount} unread status changes">
+										<h:panelGroup styleClass="pull-right"
+											rendered="#{item.commentCount > 0 or item.privateNegotiationCount > 0 or item.unreadQueryCount >0 }">
+											<div class="badge queryNumberResponsesBadge"
+												 style='#{item.unreadQueryCount == 0 ? "display:none;" : "" }'
+												 data-toggle="tooltip"
+												 data-placement="bottom"
+												 title="#{item.unreadQueryCount} unread status changes">
 
-											<i class="glyphicon glyphicon-refresh"></i>
-											<h:outputText value="#{item.unreadQueryCount}"/>
-										</div>
+												<i class="glyphicon glyphicon-refresh"></i>
+												<h:outputText value="#{item.unreadQueryCount}"/>
+											</div>
 
-										<div class="badge queryNumberResponsesBadge"
-											 style='#{item.commentCount == 0 ? "display:none;" : "" }#{item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
-											 data-toggle="tooltip"
-											 data-placement="bottom"
-											 title="#{item.unreadCommentCount} unread comments from #{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
+											<div class="badge queryNumberResponsesBadge"
+												 style='#{item.commentCount == 0 ? "display:none;" : "" }#{item.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+												 data-toggle="tooltip"
+												 data-placement="bottom"
+												 title="#{item.unreadCommentCount} unread comments from #{item.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
 
-											<i class="glyphicon glyphicon-bullhorn"></i>
-											<h:outputText value="   #{item.unreadCommentCount}/#{item.commentCount}"/>
-										</div>
+												<i class="glyphicon glyphicon-bullhorn"></i>
+												<h:outputText value="   #{item.unreadCommentCount}/#{item.commentCount}"/>
+											</div>
 
-										<div class="badge queryNumberResponsesBadge"
-											 style='#{item.privateNegotiationCount == 0 ? "display:none;" : "" }#{item.unreadPrivateNegotiationCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
-											 data-toggle="tooltip"
-											 data-placement="bottom"
-											 title="#{item.unreadPrivateNegotiationCount} unread comments from #{item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+											<div class="badge queryNumberResponsesBadge"
+												 style='#{item.privateNegotiationCount == 0 ? "display:none;" : "" }#{item.unreadPrivateNegotiationCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+												 data-toggle="tooltip"
+												 data-placement="bottom"
+												 title="#{item.unreadPrivateNegotiationCount} unread comments from #{item.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
 
-											<i class="glyphicon glyphicon-tower"></i>
-											<h:outputText value="   #{item.unreadPrivateNegotiationCount}/#{item.privateNegotiationCount}" />
-										</div>
+												<i class="glyphicon glyphicon-tower"></i>
+												<h:outputText value="   #{item.unreadPrivateNegotiationCount}/#{item.privateNegotiationCount}" />
+											</div>
 
-										<h:outputText value="#{item.lastCommentTime}"
-											styleClass="queryCreationDate"
-											title="#{label['queryview.queryitem.datetime.last.comment']}">
-											<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-										</h:outputText>
+											<h:outputText value="#{item.lastCommentTime}"
+												styleClass="queryCreationDate"
+												title="#{label['queryview.queryitem.datetime.last.comment']}">
+												<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+											</h:outputText>
+
+										</h:panelGroup>
 
 									</h:panelGroup>
 
-								</h:panelGroup>
 
+									<h:panelGroup layout="block" styleClass="panel-body">
+										<h:panelGroup layout="block" styleClass="row">
 
-								<h:panelGroup layout="block" styleClass="panel-body">
-									<h:panelGroup layout="block" styleClass="row">
+											<h:panelGroup layout="block" styleClass="col-md-11">
+												<h:panelGroup layout="block" styleClass="row">
+													<h:panelGroup layout="block" styleClass="col-md-10 truncate-panel">
+												   #{item.query.text}
+											   </h:panelGroup>
 
-										<h:panelGroup layout="block" styleClass="col-md-11">
-											<h:panelGroup layout="block" styleClass="row">
-												<h:panelGroup layout="block" styleClass="col-md-10 truncate-panel">
-                                               #{item.query.text}
-                                           </h:panelGroup>
+												</h:panelGroup>
 
-											</h:panelGroup>
+												<h:panelGroup layout="block" styleClass="row">
+													<h:panelGroup layout="block" styleClass="col-md-12">
+														<h:panelGroup styleClass="pull-right">
 
-											<h:panelGroup layout="block" styleClass="row">
-												<h:panelGroup layout="block" styleClass="col-md-12">
-													<h:panelGroup styleClass="pull-right">
-
-														<h:outputText value="#{item.query.queryCreationTime}"
-															title="#{label['queryview.queryitem.datetime.creation']}">
-															<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
-														</h:outputText>
+															<h:outputText value="#{item.query.queryCreationTime}"
+																title="#{label['queryview.queryitem.datetime.creation']}">
+																<f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+															</h:outputText>
+														</h:panelGroup>
 													</h:panelGroup>
 												</h:panelGroup>
 											</h:panelGroup>
 										</h:panelGroup>
 									</h:panelGroup>
+
 								</h:panelGroup>
 
 							</h:panelGroup>
-
-						</h:panelGroup>
-
-					</ui:repeat>
+					</p:dataScroller>
 
 					<h:outputScript>
 						$(function() {

@@ -36,7 +36,7 @@ import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
  * DTO that gives a small statistic for a query, with the amount of commentCount made for the query and
  * the last time someone made a comment for this query.
  */
-public class QueryStatsDTO implements Serializable {
+public class QueryStatsDTO extends Query implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
