@@ -174,9 +174,36 @@ public class UserBean implements Serializable {
     private Boolean isAdmin = false;
 
 	/**
-	 * We set this when the user enters the moderator functionality
+	 * We set this when the user has the moderator role
 	 */
 	private Boolean isModerator = false;
+
+	/**
+	 * used to check if the user is in moderator mode
+	 * @return
+	 */
+	public Boolean getModeratorMode() {
+		return inModeratorMode;
+	}
+
+	/**
+	 * activates the user for moderator mode
+	 */
+	public void activateModeratorMode() {
+		this.inModeratorMode = true;
+	}
+
+	/**
+	 * deactivates the user for moderator mode
+	 */
+	public void deactivateModeratorMode() {
+		this.inModeratorMode = false;
+	}
+
+	/**
+	 * We set this when the user enters the moderator functionality
+	 */
+	private Boolean inModeratorMode = false;
 
 	/**
 	 * Basic Constructor for when the user bean is created without dependency injection.
@@ -876,7 +903,13 @@ public class UserBean implements Serializable {
 	 *
 	 * @return isModerator
 	 */
-	public Boolean getModerator() {
+	public Boolean isModerator() {
+		// TODO: Moderator should be set from roles for the user when authenticating
+		if( isAdmin) {
+			setModerator();
+		} else {
+			unsetModerator();
+		}
 		return isModerator;
 	}
 
@@ -884,7 +917,7 @@ public class UserBean implements Serializable {
 	 * We set this when the admin user enters the moderator path
 
 	 */
-	public void setModerator( ) {
+	public void setModerator() {
 		isModerator = true;
 	}
 

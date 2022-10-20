@@ -172,14 +172,7 @@
 								</ul>
 							</li>
 						</c:if>
-						<ui:fragment rendered="#{userBean.isAdmin()}">
-							<li class=" #{request.requestURI.startsWith('/admin') ? 'activeLink' : ''}">
-								<h:link outcome="/moderate/index">
-									<h:outputText value="#{label['moderator.interface']}"/>
-								</h:link>
-							</li>
-						</ui:fragment>
-						<ui:fragment rendered="#{userBean.isAdmin()}">
+						<ui:fragment rendered="#{userBean.isModerator()}">
 							<li class=" #{request.requestURI.startsWith('/admin') ? 'activeLink' : ''}">
 								<h:link outcome="/moderator/index">
 									<h:outputText value="#{label['moderator.interface']}"/>

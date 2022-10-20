@@ -40,7 +40,6 @@
     <composite:attribute name="person" required="true"/>
     <composite:attribute name="collections" />
     <composite:attribute name="ownerQueriesDetailBean" />
-    <composite:attribute name="moderatorQueriesDetailBean" />
     <composite:attribute name="scope" />
     <composite:attribute name="commentComponent" />
     <composite:attribute name="commentRead" />
@@ -66,6 +65,11 @@
 
         <h:panelGroup layout="block" styleClass="panel-heading">
             <h:panelGroup>
+                <!-- Add [Moderated by]:] as prefix if comment is Moderated -->
+                <ui:fragment rendered="#{cc.attrs.comment.moderated == true}">
+                    Moderated by:
+                </ui:fragment>
+
                 <!-- Discussion Name of User -->
                 #{cc.attrs.person.authName}
                 <h:panelGroup>
