@@ -83,6 +83,7 @@ public class CommentBean implements Serializable {
      * @param query
      * @return
      */
+    // TODO add the moderated flag if the user is moderator and on the moderator page
     public String saveComment(Query query) {
         try(Config config = ConfigFactory.get()) {
             if(commentId != null && commentId != -1 && commentId != 0) {
@@ -94,7 +95,7 @@ public class CommentBean implements Serializable {
                     return FacesContext.getCurrentInstance().getViewRoot().getViewId()
                             + "?includeViewParams=true&faces-redirect=true";
                 }
-                CommentRecord record = DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment, "published", false);
+                CommentRecord record = DbUtil.addComment(config, query.getId(), userBean.getUserId(), comment, "published", false, userBean.getModeratorMode());
                 commentId = record.getId();
             }
             config.commit();
@@ -187,7 +188,7 @@ public class CommentBean implements Serializable {
             return "";
         try (Config config = ConfigFactory.get()) {
             if(commentId == null || commentId == -1 || commentId == 0) {
-                CommentRecord record = DbUtil.addComment(config, queryId, userBean.getUserId(), comment, "saved", true);
+                CommentRecord record = DbUtil.addComment(config, queryId, userBean.getUserId(), comment, "saved", true, userBean.getModeratorMode());
                 config.commit();
                 setCommentId(record.getId());
             } else {

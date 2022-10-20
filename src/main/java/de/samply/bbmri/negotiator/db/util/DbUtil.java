@@ -1093,6 +1093,8 @@ public class DbUtil {
             commentPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
             commentPersonDTO.setCommentRead(record.getValue("personcomment_read") == null || (boolean) record.getValue("personcomment_read"));
 
+            commentPersonDTO.getComment().setModerated( record.getValue( "comment_moderated") == null ? false : (boolean)  record.getValue( "comment_moderated"));
+
             Integer commenterId = commentPersonDTO.getPerson().getId();
             if(!personCollections.containsKey(commenterId)) {
                 Result<Record> collections = config.dsl()
@@ -1244,13 +1246,14 @@ public class DbUtil {
      * @param personId
      * @param comment
      */
-    public static CommentRecord addComment(Config config, int queryId, int personId, String comment, String status, boolean attachment) throws SQLException {
+    public static CommentRecord addComment(Config config, int queryId, int personId, String comment, String status, boolean attachment, boolean moderated) throws SQLException {
         CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
         record.setQueryId(queryId);
         record.setPersonId(personId);
         record.setText(comment);
         record.setStatus(status);
         record.setAttachment(attachment);
+        record.setModerated( moderated);
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
         return record;

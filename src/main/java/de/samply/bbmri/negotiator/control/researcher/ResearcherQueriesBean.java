@@ -103,6 +103,8 @@ public class ResearcherQueriesBean implements Serializable {
     @PostConstruct
     public void init() {
        countQueries();
+        // We flag the UserBean to show we are not in moderator mode
+        userBean.deactivateModeratorMode();
 
         this.lazyDataModel = new LazyDataModel<QueryStatsDTO>() {
 
