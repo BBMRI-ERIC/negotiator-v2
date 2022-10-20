@@ -174,6 +174,11 @@ public class UserBean implements Serializable {
     private Boolean isAdmin = false;
 
 	/**
+	 * We set this when the user enters the moderator functionality
+	 */
+	private Boolean isModerator = false;
+
+	/**
 	 * Basic Constructor for when the user bean is created without dependency injection.
 	 */
 	public UserBean() {
@@ -864,5 +869,29 @@ public class UserBean implements Serializable {
 
 	public List<Network> getNetworks() {
 		return networks;
+	}
+
+	/**
+	 * This is set when the admin user is in the moderator part
+	 *
+	 * @return isModerator
+	 */
+	public Boolean getModerator() {
+		return isModerator;
+	}
+
+	/**
+	 * We set this when the admin user enters the moderator path
+
+	 */
+	public void setModerator( ) {
+		isModerator = true;
+	}
+
+	/**
+	 * We clear this when the admin user leaves the moderator path
+	 */
+	public void unsetModerator() {
+		isModerator = false;
 	}
 }

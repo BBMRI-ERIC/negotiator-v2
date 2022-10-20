@@ -181,6 +181,13 @@
 						</ui:fragment>
 						<ui:fragment rendered="#{userBean.isAdmin()}">
 							<li class=" #{request.requestURI.startsWith('/admin') ? 'activeLink' : ''}">
+								<h:link outcome="/moderator/index">
+									<h:outputText value="#{label['moderator.interface']}"/>
+								</h:link>
+							</li>
+						</ui:fragment>
+						<ui:fragment rendered="#{userBean.isAdmin()}">
+							<li class=" #{request.requestURI.startsWith('/admin') ? 'activeLink' : ''}">
 								<h:link outcome="/admin/index">
 									<h:outputText value="#{label['admin.interface']}"/>
 								</h:link>
