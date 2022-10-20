@@ -20,7 +20,7 @@ class RedirectUrlGeneratorToExistingRequestTest {
     @Test
     @DisplayName("Test creating locator redirect url to append a query to existing request with url ending in /")
     void testGetAppandNewQueryToRequestUrl_LocatorUrl_WithEndingChr() {
-        Mockito.doReturn("ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99").when(nToken).getNTokenForUrl("ntoken");
+        Mockito.doReturn("ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99").when(nToken).getNTokenForUrl("nToken");
         RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
         redirectUrlGenerator.setUrl("https://locator.bbmri-eric.eu/");
         String url = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
@@ -30,7 +30,7 @@ class RedirectUrlGeneratorToExistingRequestTest {
     @Test
     @DisplayName("Test creating locator redirect url to append a query to existing request with url not ending in /")
     void testGetAppandNewQueryToRequestUrl_LocatorUrl_WithoutEndingChr() {
-        Mockito.doReturn("ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99").when(nToken).getNTokenForUrl("ntoken");
+        Mockito.doReturn("ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99").when(nToken).getNTokenForUrl("nToken");
         RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
         redirectUrlGenerator.setUrl("https://locator.bbmri-eric.eu");
         String url = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);

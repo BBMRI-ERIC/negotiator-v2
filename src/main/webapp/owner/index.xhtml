@@ -31,6 +31,7 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+                xmlns:p="http://primefaces.org/ui"
                 template="../components/default.xhtml">
 
     <!-- Queries page for the owner -->
@@ -48,26 +49,36 @@
 	
     <ui:define name="body">
         <h:panelGroup layout="block" styleClass="row">
-            <h3>#{label[ownerQueriesBean.pagetitle]}</h3>
+            <h3>#{label[ownerQueriesBean.pagetitle]}: #{ownerQueriesBean.getQueryCount()}</h3>
         </h:panelGroup>
 		<h:panelGroup
-			rendered="#{ownerQueriesBean.queries.size() > 0 or ownerQueriesBean.filterTerms.size() > 0}"
+			rendered="#{ownerQueriesBean.getQueryCount() > 0 or ownerQueriesBean.filterTerms.size() > 0}"
 			layout="block">
 			<bbmricc:search backingBean="#{ownerQueriesBean}" />
 		</h:panelGroup>
 
 		<h:panelGroup
-			rendered="#{ownerQueriesBean.queries.size() == 0 and ownerQueriesBean.filterTerms.size() > 0}"
+			rendered="#{ownerQueriesBean.getQueryCount() == 0 and ownerQueriesBean.filterTerms.size() > 0}"
 			layout="block" styleClass="col-md-12">
 			<h3>#{label['queryview.noSearchResults']}</h3>
 		</h:panelGroup>
 
 		<h:panelGroup layout="block">
-            <h:panelGroup rendered="#{ownerQueriesBean.queries.size() == 0 and ownerQueriesBean.filterTerms.size() == 0}" layout="block">
+            <h:panelGroup rendered="#{ownerQueriesBean.getQueryCount() == 0 and ownerQueriesBean.filterTerms.size() == 0}" layout="block">
                 <h3>#{label['queryview.noQueries']}</h3>
             </h:panelGroup>
 
-            <ui:repeat var="queryDto" value="#{ownerQueriesBean.getQueries()}">
+            <!-- Use PrimeFaces Data Scroller (https://www.primefaces.org/datascroller/) inline mode -->
+            <!-- TODO this still requires the use of lacy loading by extending the ResearcherQueriesBean -->
+            <p:dataScroller value="#{ownerQueriesBean.lazyDataModel}" var="queryDto" lazy="true" chunkSize="5">
+                <f:facet name="header">
+                    Click More to load more Requests
+                </f:facet>
+                <f:facet name="loader">
+                    <div class="text-center">
+                        <p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+                    </div>
+                </f:facet>
 
                 <h:panelGroup layout="block" styleClass="deco-none">
                     <h:panelGroup layout="block" styleClass="panel panel-default clickable #{queryDto.isArchived() ? 'archived-query' : ''} ">
@@ -173,7 +184,7 @@
                     </h:panelGroup>
                 </h:panelGroup>
 
-            </ui:repeat>
+            </p:dataScroller>
 
             <h:outputScript>
                 $(function() {

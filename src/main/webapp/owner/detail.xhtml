@@ -34,6 +34,7 @@
                 xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
                 xmlns:bbmribiobankercc="http://xmlns.jcp.org/jsf/composite/bbmribiobanker"
+                xmlns:p="http://primefaces.org/ui"
                 template="../components/default.xhtml">
 
     <!-- Queries detail page for the owner -->
@@ -74,18 +75,17 @@
             <bbmricc:searchDetail backingBean="#{ownerQueriesDetailBean}"/>
 
             <h:panelGroup
-                rendered="#{ownerQueriesDetailBean.queries.size() == 0 and ownerQueriesDetailBean.filterTerms.size() > 0}"
+                rendered="#{ownerQueriesDetailBean.getNumQueries() == 0 and ownerQueriesDetailBean.filterTerms.size() > 0}"
                 layout="block" styleClass="col-md-12">
                 <h3 style="margin-top: 0px;">#{label['queryview.noSearchResults']}</h3>
             </h:panelGroup>
 
             <h:panelGroup id="test" layout="block">
                 <h:form>
-                    <ui:repeat var="queryDto" value="#{ownerQueriesDetailBean.getQueries()}">
-
-                        <bbmricc:queryboxOwner item="#{queryDto}" selectedQuery="#{ownerQueriesDetailBean.queryId}" backingBean="#{ownerQueriesDetailBean}"/>
-
-                    </ui:repeat>
+                    <!-- TODO: replace the ui:repeat with LazyLoading -->
+                    <p:dataScroller value="#{ownerQueriesBean.lazyDataModel}" var="queryDto" lazy="true" chunkSize="5">
+                        <bbmricc:queryboxResearcher item="#{queryDto}" selectedQuery="#{ownerQueriesDetailBean.queryId}"/>
+                    </p:dataScroller>
 
                     <h:outputScript>
                         $(function() {

@@ -3,7 +3,8 @@ package de.samply.bbmri.negotiator.model;
 import java.io.Serializable;
 import java.util.Date;
 
-public class RequestStatusDTO implements Serializable {
+public class
+RequestStatusDTO implements Serializable {
     Integer id;
     Integer query_id;
     String status;

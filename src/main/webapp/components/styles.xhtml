@@ -55,6 +55,7 @@
     <h:outputScript>
         document.onreadystatechange = function() {
             if (document.readyState !== "complete") {
+<<<<<<< HEAD
                 document.querySelector("body").style.visibility = "hidden";
                 document.querySelector("#loader").style.visibility = "visible";
             } else {
@@ -62,5 +63,23 @@
                 document.querySelector("body").style.visibility = "visible";
             }
         };
+=======
+                document.getElementById('body').style.visibility = 'hidden'
+                document.getElementById('loader').style.visibility = "visible";
+
+            } else {
+                document.getElementById('loader').style.visibility="hidden";
+                document.getElementById('body').style.visibility = "visible";
+            }
+
+        };
+        window.onbeforeunload = function(e){
+<!--            document.getElementById('body').style.visibility = 'hidden'-->
+            document.getElementById('loader').style.visibility = 'visible';
+<!--        Making the body static instead of hidden... less "flickering" because not always white screen when page changes-->
+            document.getElementById('body').style.pointerEvents = 'none';
+        };
+
+>>>>>>> master
     </h:outputScript>
 </ui:composition>
