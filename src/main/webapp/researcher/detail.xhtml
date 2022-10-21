@@ -532,10 +532,16 @@
                                 <div id="demo" class="collapse">
                                     <div class="container">
                                     <div class="row">
+                                        <!-- Create DIV in code and only show the string - should speed up significantly:
+                                        https://howchoo.com/code/learn-the-slow-and-fast-way-to-append-elements-to-the-dom
+                                        -->
+                                        #{researcherQueriesDetailBean.getPersonStringDIVsForRequest()}
+                                        <!--
                                         <ui:repeat value="#{researcherQueriesDetailBean.getPersonList()}"
                                                    var="person">
                                             <div class="col-xs-3"><i class="glyphicon glyphicon-user"/>#{person.authName}</div>
                                         </ui:repeat>
+                                        -->
                                     </div></div>
                                 </div>
                             </div>
