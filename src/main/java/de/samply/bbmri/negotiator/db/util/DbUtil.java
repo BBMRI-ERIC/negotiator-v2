@@ -973,7 +973,7 @@ public class DbUtil {
         Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
         Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
 
-        Result<Record> fetch = config.dsl()
+        int fetch = config.dsl().fetchCount(DSL
                 .select(getFields(Tables.QUERY, "query"))
                 .select(getFields(queryAuthor, "person"))
                 .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
@@ -1009,11 +1009,11 @@ public class DbUtil {
                 .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
                 .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
                 .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
-                .fetch();
+                );
         logger.info(userId);
-        logger.info(fetch.size());
+        logger.info(fetch);
 
-        return fetch.size();
+        return fetch;
 
     }
     /**
