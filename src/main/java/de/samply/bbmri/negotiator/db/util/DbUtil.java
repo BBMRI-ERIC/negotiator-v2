@@ -1008,7 +1008,6 @@ public class DbUtil {
                 .where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
                 .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
                 .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
-                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
                 );
         logger.info(userId);
         logger.info(fetch);
