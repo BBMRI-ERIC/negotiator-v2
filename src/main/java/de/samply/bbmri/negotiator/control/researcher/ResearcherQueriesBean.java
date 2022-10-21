@@ -37,7 +37,6 @@ import de.samply.bbmri.negotiator.model.CommentPersonDTO;
 import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.primefaces.model.FilterMeta;
@@ -198,136 +197,7 @@ public class ResearcherQueriesBean implements Serializable {
         return queries;
     }
 
-    public List<Query> loadLatestQueriesOffset( int offset, int size) {
-        List<Query> queries = new List<Query>() {
-            @Override
-            public int size() {
-                return 0;
-            }
 
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public boolean contains(Object o) {
-                return false;
-            }
-
-            @NotNull
-            @Override
-            public Iterator<Query> iterator() {
-                return null;
-            }
-
-            @NotNull
-            @Override
-            public Object[] toArray() {
-                return new Object[0];
-            }
-
-            @NotNull
-            @Override
-            public <T> T[] toArray(@NotNull T[] ts) {
-                return null;
-            }
-
-            @Override
-            public boolean add(Query query) {
-                return false;
-            }
-
-            @Override
-            public boolean remove(Object o) {
-                return false;
-            }
-
-            @Override
-            public boolean containsAll(@NotNull Collection<?> collection) {
-                return false;
-            }
-
-            @Override
-            public boolean addAll(@NotNull Collection<? extends Query> collection) {
-                return false;
-            }
-
-            @Override
-            public boolean addAll(int i, @NotNull Collection<? extends Query> collection) {
-                return false;
-            }
-
-            @Override
-            public boolean removeAll(@NotNull Collection<?> collection) {
-                return false;
-            }
-
-            @Override
-            public boolean retainAll(@NotNull Collection<?> collection) {
-                return false;
-            }
-
-            @Override
-            public void clear() {
-
-            }
-
-            @Override
-            public Query get(int i) {
-                return null;
-            }
-
-            @Override
-            public Query set(int i, Query query) {
-                return null;
-            }
-
-            @Override
-            public void add(int i, Query query) {
-
-            }
-
-            @Override
-            public Query remove(int i) {
-                return null;
-            }
-
-            @Override
-            public int indexOf(Object o) {
-                return 0;
-            }
-
-            @Override
-            public int lastIndexOf(Object o) {
-                return 0;
-            }
-
-            @NotNull
-            @Override
-            public ListIterator<Query> listIterator() {
-                return null;
-            }
-
-            @NotNull
-            @Override
-            public ListIterator<Query> listIterator(int i) {
-                return null;
-            }
-
-            @NotNull
-            @Override
-            public List<Query> subList(int i, int i1) {
-                return null;
-            }
-        };
-        List<QueryStatsDTO> queriesStatusDTO = loadLatestQueryStatsDTO( offset, size);
-
-        for ( QueryStatsDTO qso : queriesStatusDTO) {
-            queries.add( qso.getQuery());
-        }
-        return queries;
-    }
 
     /**
      * Load the number of queries "("SELECT COUNT(*) from ..."
@@ -335,7 +205,7 @@ public class ResearcherQueriesBean implements Serializable {
      */
     public void calculateQueries() {
         try( Config config = ConfigFactory.get()) {
-            this.queryCount = DbUtil.getQueryStatsDTOsCount(config, userBean.getUserId(), getFilterTerms());
+            this.queryCount = DbUtil.countQueriesForResearcher(config, userBean.getUserId(), getFilterTerms());
         } catch (SQLException e) {
             System.err.println("ERROR: ResearcherQueriesBean::getQueryCount()");
             e.printStackTrace();

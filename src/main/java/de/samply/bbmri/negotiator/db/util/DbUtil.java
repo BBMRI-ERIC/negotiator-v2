@@ -720,12 +720,11 @@ public class DbUtil {
      * @param filters filters to be applierd
      * @return integer number of queries
      */
-    public static int getQueryStatsDTOsCount(Config config, int userId, Set<String> filters) {
-//        Person commentAuthor = Tables.PERSON.as("comment_author");
+    public static int countQueriesForResearcher(Config config, int userId, Set<String> filters) {
+        Person commentAuthor = Tables.PERSON.as("comment_author");
 
         Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
 
-/*
         if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
             Condition textCondition = DSL.trueCondition();
@@ -739,19 +738,20 @@ public class DbUtil {
             }
             condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
         }
-*/
 
-        // TODO: check if we really need to get the actual number here,
-        //      or if we just can work with a high enough estimated number and save the cost of doing the count on the database
-        // int queryCount = 1000;
-        int queryCount = config.dsl()
-                .selectCount()
+        return config.dsl()
+                .fetchCount(DSL
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(Tables.PERSON, "person"))
                 .from(Tables.QUERY)
-                .where(condition)
-                .fetchOne(0, int.class);
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
+                .leftOuterJoin(Tables.REQUEST_STATUS)
+                .on(Tables.REQUEST_STATUS.QUERY_ID.eq(Tables.QUERY.ID)
+                        .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
+                .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
+                .groupBy(Tables.QUERY.ID, Tables.PERSON.ID));
 
-        logger.debug("queryCount: "+ queryCount);
-        return queryCount;
+
     }
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
