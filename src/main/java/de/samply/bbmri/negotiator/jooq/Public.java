@@ -4,45 +4,15 @@
 package de.samply.bbmri.negotiator.jooq;
 
 
-import de.samply.bbmri.negotiator.jooq.tables.Biobank;
-import de.samply.bbmri.negotiator.jooq.tables.Collection;
-import de.samply.bbmri.negotiator.jooq.tables.Comment;
-import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
-import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
-import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
-import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
-import de.samply.bbmri.negotiator.jooq.tables.MailNotification;
-import de.samply.bbmri.negotiator.jooq.tables.Network;
-import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
-import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
-import de.samply.bbmri.negotiator.jooq.tables.Notification;
-import de.samply.bbmri.negotiator.jooq.tables.NotificationSetting;
-import de.samply.bbmri.negotiator.jooq.tables.Offer;
-import de.samply.bbmri.negotiator.jooq.tables.Person;
-import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
-import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
-import de.samply.bbmri.negotiator.jooq.tables.PersonNetwork;
-import de.samply.bbmri.negotiator.jooq.tables.PersonOffer;
-import de.samply.bbmri.negotiator.jooq.tables.PersonQuerylifecycle;
-import de.samply.bbmri.negotiator.jooq.tables.Query;
-import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
-import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
-import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
-import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
-import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank;
-import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection;
-import de.samply.bbmri.negotiator.jooq.tables.RequestStatus;
-import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.Generated;
-
+import de.samply.bbmri.negotiator.jooq.tables.*;
 import org.jooq.Sequence;
 import org.jooq.Table;
 import org.jooq.impl.SchemaImpl;
+
+import javax.annotation.Generated;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -58,7 +28,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = 2129248163;
+	private static final long serialVersionUID = -370826799;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -118,6 +88,7 @@ public class Public extends SchemaImpl {
 			JsonQuery.JSON_QUERY,
 			ListOfDirectories.LIST_OF_DIRECTORIES,
 			MailNotification.MAIL_NOTIFICATION,
+			ModeratorNetwork.MODERATOR_NETWORK,
 			Network.NETWORK,
 			NetworkBiobankLink.NETWORK_BIOBANK_LINK,
 			NetworkCollectionLink.NETWORK_COLLECTION_LINK,
