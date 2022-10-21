@@ -840,6 +840,86 @@ public class DbUtil {
 
         return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
+    /**
+     * Returns a list of queries for the moderator, filtered by a search term if such is provided
+     * @param config jooq configuration
+     * @param userId the user ID
+     * @param filters search term for title and text
+     * @return
+     */
+    public static List<OwnerQueryStatsDTO> getModeratorQueriesAtOffset(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest, int offset, int size) {
+        Person queryAuthor = Tables.PERSON.as("query_author");
+
+        // Moderator - no restriction to a specific user, starting with all started Negotiations instead of the user
+        Condition condition = Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull();
+
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+
+        if (flag != null && flag != Flag.UNFLAGGED) {
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
+        } else {
+            /**
+             * Ignored queries are never selected unless the user is in the ignored folder
+             */
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+        }
+
+        Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("reque_ststatus_table_abandon");
+
+        Result<Record> fetch = config.dsl()
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(queryAuthor, "person"))
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
+                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
+                        .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
+                .from(Tables.QUERY)
+
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID).and(Tables.COMMENT.STATUS.eq("published")))
+
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
+
+                .join(requestStatusTableStart, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
+
+                .join(requestStatusTableAbandon, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).eq("abandoned")))
+
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                        .and(Tables.PERSON_COMMENT.READ.eq(false)))
+
+                .where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
+                .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
+                .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
+                .offset(offset)
+                .limit(size)
+                .fetch();
+
+        return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
+    }
 
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
@@ -1015,6 +1095,32 @@ public class DbUtil {
         return fetch;
 
     }
+
+    /**
+     * Returns a list of queries for the moderator, filtered by a search term if such is provided
+     * @param config jooq configuration
+     * @param userId the user ID of the biobank owner
+     * @param filters search term for title and text
+     * @return
+     */
+    public static int getModeratorQueriesCount(Config config, int userId, Set<String> filters) {
+        Person queryAuthor = Tables.PERSON.as("query_author");
+
+//        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+
+        // We need to get the actual query count, otherwise the More button will not go away on the page
+        // so no use to work with a high enough estimated number and save the cost of doing the count on the database
+        int queryCount = config.dsl()
+                .selectCount()
+                .from(Tables.QUERY)
+//                .where(condition)
+                .fetchOne(0, int.class);
+
+        logger.debug("queryCount: "+ queryCount);
+        return queryCount;
+
+    }
+
     /**
      * Returns a list of QueryAttachmentDTO for a specific query.
      * @param config

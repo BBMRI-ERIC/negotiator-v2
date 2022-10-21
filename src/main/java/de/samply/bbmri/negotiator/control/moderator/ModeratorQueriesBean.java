@@ -112,7 +112,7 @@ public class ModeratorQueriesBean implements Serializable {
 														   final Map<String, FilterMeta> filters) {
 
 				System.out.println(first);
-				return loadLatestOwnerQueryStatsDTO(first, pageSize);
+				return loadLatestModeratorQueryStatsDTO(first, pageSize);
 			}
 		};
 		lazyDataModel.setRowCount(this.queryCount);
@@ -231,12 +231,12 @@ public class ModeratorQueriesBean implements Serializable {
 	}
 
 	/**
-	 * Gets a list of negotiaton queries from the database, starting at offset with the number of
+	 * Gets a list of ALL negotiaton queries from the database, starting at offset with the number of
 	 * queries to be returned by chunk size.
 	 *
 	 * @return List<OwnerQueryStatsDTO>
 	 */
-	private List<OwnerQueryStatsDTO> loadLatestOwnerQueryStatsDTO( int offset, int size) {
+	private List<OwnerQueryStatsDTO> loadLatestModeratorQueryStatsDTO( int offset, int size) {
 		try(Config config = ConfigFactory.get()) {
 			queries = DbUtil.getOwnerQueriesAtOffset(config, userBean.getUserId(), getFilterTerms(),
 					flagFilter, isTestRequest, offset, size);
@@ -261,7 +261,7 @@ public class ModeratorQueriesBean implements Serializable {
 	 */
 	public void getQueryCount() {
 		try( Config config = ConfigFactory.get()) {
-			this.queryCount = DbUtil.getOwnerQueriesCount(config, userBean.getUserId(), getFilterTerms());
+			this.queryCount = DbUtil.getModeratorQueriesCount(config, userBean.getUserId(), getFilterTerms());
 		} catch (SQLException e) {
 			System.err.println("ERROR: OwnerQueriesBean::getQueryCount()");
 			e.printStackTrace();
