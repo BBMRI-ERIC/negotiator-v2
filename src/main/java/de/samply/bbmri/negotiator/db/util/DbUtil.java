@@ -878,7 +878,7 @@ public class DbUtil {
         condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
 
         Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
-        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("reque_ststatus_table_abandon");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
 
         Result<Record> fetch = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
@@ -928,6 +928,8 @@ public class DbUtil {
                 .offset(offset)
                 .limit(size)
                 .fetch();
+        logger.info(userId);
+        logger.info(fetch.toString());
 
         return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
