@@ -105,8 +105,7 @@ public class ResearcherQueriesBean implements Serializable {
      */
     @PostConstruct
     public void init() {
-        // this.queryCount = 10; // set to the count from JOOQ
-        this.getQueryCount();
+       calculateQueries();
 
         this.lazyDataModel = new LazyDataModel<QueryStatsDTO>() {
 
@@ -334,7 +333,7 @@ public class ResearcherQueriesBean implements Serializable {
      * Load the number of queries "("SELECT COUNT(*) from ..."
      * @return int numQueries
      */
-    public void getQueryCount() {
+    public void calculateQueries() {
         try( Config config = ConfigFactory.get()) {
             this.queryCount = DbUtil.getQueryStatsDTOsCount(config, userBean.getUserId(), getFilterTerms());
         } catch (SQLException e) {
@@ -343,19 +342,10 @@ public class ResearcherQueriesBean implements Serializable {
         }
     }
 
-//    public List<QueryStatsDTO> getQueries() {
-//        try(Config config = ConfigFactory.get()) {
-//            queries = DbUtil.getQueryStatsDTOs(config, userBean.getUserId(), getFilterTerms());
-//
-//            for (int i = 0; i < queries.size(); ++i) {
-//                getPrivateNegotiationCountAndTime(i);
-//                getUnreadQueryLifecycleChangesCountAndTime(i);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return queries;
-//    }
+    public int getQueryCount() {
+        return this.queryCount;
+    }
+
 
     public void getPrivateNegotiationCountAndTime(int index){
         try(Config config = ConfigFactory.get()) {
