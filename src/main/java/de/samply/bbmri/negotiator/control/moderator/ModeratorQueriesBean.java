@@ -27,17 +27,6 @@
 
 package de.samply.bbmri.negotiator.control.moderator;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
@@ -45,12 +34,21 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Manages the query view for owners
@@ -101,7 +99,7 @@ public class ModeratorQueriesBean implements Serializable {
 		// We flag the UserBean to show we are in the moderator mode
 		userBean.activateModeratorMode();
 
-		this.getQueryCount();
+		this.queryCount = 100;
 
 		this.lazyDataModel = new LazyDataModel<OwnerQueryStatsDTO>() {
 
@@ -238,7 +236,7 @@ public class ModeratorQueriesBean implements Serializable {
 	 */
 	private List<OwnerQueryStatsDTO> loadLatestModeratorQueryStatsDTO( int offset, int size) {
 		try(Config config = ConfigFactory.get()) {
-			queries = DbUtil.getOwnerQueriesAtOffset(config, userBean.getUserId(), getFilterTerms(),
+			queries = DbUtil.getModeratorQueriesAtOffset(config, userBean.getUserId(), getFilterTerms(),
 					flagFilter, isTestRequest, offset, size);
 
 			for (int i = 0; i < queries.size(); ++i) {

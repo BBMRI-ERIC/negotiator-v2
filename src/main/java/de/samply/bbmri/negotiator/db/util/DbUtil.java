@@ -850,8 +850,7 @@ public class DbUtil {
     public static List<OwnerQueryStatsDTO> getModeratorQueriesAtOffset(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest, int offset, int size) {
         Person queryAuthor = Tables.PERSON.as("query_author");
 
-        // Moderator - no restriction to a specific user, starting with all started Negotiations instead of the user
-        Condition condition = Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull();
+        Condition condition = Tables.MODERATOR_NETWORK.PERSON_ID.eq(userId);
 
         if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
@@ -875,8 +874,10 @@ public class DbUtil {
             condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
         }
 
+        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+
         Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
-        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("reque_ststatus_table_abandon");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
 
         Result<Record> fetch = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
@@ -890,6 +891,21 @@ public class DbUtil {
 
                 .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
                 .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(Tables.NETWORK_COLLECTION_LINK, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(Tables.MODERATOR_NETWORK, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.MODERATOR_NETWORK.NETWORK_ID.eq(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID))
+
+                .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
 
                 .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID).and(Tables.COMMENT.STATUS.eq("published")))
@@ -917,6 +933,8 @@ public class DbUtil {
                 .offset(offset)
                 .limit(size)
                 .fetch();
+        logger.info(userId);
+        logger.info(fetch.toString());
 
         return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
