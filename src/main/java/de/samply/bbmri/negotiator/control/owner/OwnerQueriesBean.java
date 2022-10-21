@@ -27,16 +27,6 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
@@ -44,12 +34,20 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Manages the query view for owners
@@ -65,8 +63,7 @@ public class OwnerQueriesBean implements Serializable {
 
 	// TODO: set the chunk size static for now, but this should be adopted to display according to the maximum page size
 	private static final int CHUNK_SIZE = 5;
-	// Number of all queries for this researcher
-	// TODO: check if this can be removed
+
 	private int queryCount;
 	// lazy data model to hold the researcher queries
 	private LazyDataModel<OwnerQueryStatsDTO> lazyDataModel;
@@ -90,7 +87,7 @@ public class OwnerQueriesBean implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		this.getQueryCount();
+		countQueriesForOwner();
 
 		this.lazyDataModel = new LazyDataModel<OwnerQueryStatsDTO>() {
 
@@ -248,9 +245,13 @@ public class OwnerQueriesBean implements Serializable {
 	 * Load the number of queries "("SELECT COUNT(*) from ..."
 	 * @return int numQueries
 	 */
-	public void getQueryCount() {
+	public int getQueryCount() {
+		return this.queryCount;
+	}
+
+	public void countQueriesForOwner() {
 		try( Config config = ConfigFactory.get()) {
-			this.queryCount = DbUtil.getOwnerQueriesCount(config, userBean.getUserId(), getFilterTerms());
+			this.queryCount = DbUtil.countOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, isTestRequest);
 		} catch (SQLException e) {
 			System.err.println("ERROR: OwnerQueriesBean::getQueryCount()");
 			e.printStackTrace();

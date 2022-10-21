@@ -26,6 +26,41 @@
 
 package de.samply.bbmri.negotiator.control.researcher;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import de.samply.bbmri.negotiator.*;
+import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.control.SessionBean;
+import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.bbmri.negotiator.control.component.FileUploadBean;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
+import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
+import de.samply.bbmri.negotiator.model.*;
+import de.samply.bbmri.negotiator.rest.RestApplication;
+import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
+import de.samply.bbmri.negotiator.util.DataCache;
+import de.samply.bbmri.negotiator.util.ObjectToJson;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.jooq.Record;
+import org.jooq.Result;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.W3CDom;
+import org.jsoup.nodes.Document;
+import org.primefaces.model.LazyDataModel;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -35,46 +70,6 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletResponse;
-
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import de.samply.bbmri.negotiator.*;
-import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.control.component.FileUploadBean;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Person;
-import de.samply.bbmri.negotiator.model.*;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
-import de.samply.bbmri.negotiator.util.DataCache;
-import de.samply.bbmri.negotiator.util.ObjectToJson;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
-import org.apache.pdfbox.io.MemoryUsageSetting;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.jooq.Record;
-import org.jooq.Result;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import de.samply.bbmri.negotiator.control.SessionBean;
-import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.tables.pojos.Query;
-import de.samply.bbmri.negotiator.rest.RestApplication;
-import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
-import org.jsoup.Jsoup;
-import org.jsoup.helper.W3CDom;
-import org.jsoup.nodes.Document;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
-import org.primefaces.model.FilterMeta;
-import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.SortOrder;
 
 /**
  * Manages the query detail view for owners
@@ -220,7 +215,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             /**
              * set the number of queries to be used in the page display
              */
-            this.NumQueries = DbUtil.getQueryStatsDTOsCount(config, userBean.getUserId(), getFilterTerms());
+            this.NumQueries = DbUtil.countQueriesForResearcher(config, userBean.getUserId(), getFilterTerms());
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -720,12 +720,11 @@ public class DbUtil {
      * @param filters filters to be applierd
      * @return integer number of queries
      */
-    public static int getQueryStatsDTOsCount(Config config, int userId, Set<String> filters) {
-//        Person commentAuthor = Tables.PERSON.as("comment_author");
+    public static int countQueriesForResearcher(Config config, int userId, Set<String> filters) {
+        Person commentAuthor = Tables.PERSON.as("comment_author");
 
         Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
 
-/*
         if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
             Condition textCondition = DSL.trueCondition();
@@ -739,19 +738,20 @@ public class DbUtil {
             }
             condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
         }
-*/
 
-        // TODO: check if we really need to get the actual number here,
-        //      or if we just can work with a high enough estimated number and save the cost of doing the count on the database
-        // int queryCount = 1000;
-        int queryCount = config.dsl()
-                .selectCount()
+        return config.dsl()
+                .fetchCount(DSL
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(Tables.PERSON, "person"))
                 .from(Tables.QUERY)
-                .where(condition)
-                .fetchOne(0, int.class);
+                .join(Tables.PERSON, JoinType.LEFT_OUTER_JOIN).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
+                .leftOuterJoin(Tables.REQUEST_STATUS)
+                .on(Tables.REQUEST_STATUS.QUERY_ID.eq(Tables.QUERY.ID)
+                        .and(Tables.REQUEST_STATUS.STATUS.eq("abandoned")))
+                .where(condition).and(Tables.REQUEST_STATUS.STATUS.isNull())
+                .groupBy(Tables.QUERY.ID, Tables.PERSON.ID));
 
-        logger.debug("queryCount: "+ queryCount);
-        return queryCount;
+
     }
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
@@ -878,7 +878,7 @@ public class DbUtil {
         condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
 
         Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
-        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("reque_ststatus_table_abandon");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
 
         Result<Record> fetch = config.dsl()
                 .select(getFields(Tables.QUERY, "query"))
@@ -928,6 +928,8 @@ public class DbUtil {
                 .offset(offset)
                 .limit(size)
                 .fetch();
+        logger.info(userId);
+        logger.info(fetch.toString());
 
         return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
@@ -939,27 +941,78 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static int getOwnerQueriesCount(Config config, int userId, Set<String> filters) {
+    public static int countOwnerQueries(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest) {
         Person queryAuthor = Tables.PERSON.as("query_author");
 
         Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
 
-        // We need to get the actual query count, otherwise the More button will not go away on the page
-        // so no use to work with a high enough estimated number and save the cost of doing the count on the database
-        int queryCount = config.dsl()
-                .selectCount()
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+
+        if (flag != null && flag != Flag.UNFLAGGED) {
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
+        } else {
+            /**
+             * Ignored queries are never selected unless the user is in the ignored folder
+             */
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+        }
+
+        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+
+        Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
+
+        int fetch = config.dsl().fetchCount(DSL
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(queryAuthor, "person"))
+                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
+                        .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
                 .from(Tables.QUERY)
+
                 .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
                 .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+
                 .join(Tables.COLLECTION, JoinType.JOIN)
                 .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+
                 .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
                 .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-                .where(condition)
-                .fetchOne(0, int.class);
 
-        logger.debug("queryCount: "+ queryCount);
-        return queryCount;
+                .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
+
+
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
+
+                .join(requestStatusTableStart, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
+
+                .join(requestStatusTableAbandon, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).eq("abandoned")))
+
+
+                .where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
+                .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
+                .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
+                );
+        logger.info(userId);
+        logger.info(fetch);
+
+        return fetch;
 
     }
     /**
