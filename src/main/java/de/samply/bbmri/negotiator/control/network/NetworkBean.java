@@ -41,6 +41,9 @@ public class NetworkBean implements Serializable {
     }
 
     public void initialize() {
+        // We flag the UserBean to show we are not in moderator mode
+        userBean.deactivateModeratorMode();
+
         if(networkId == null) {
             return;
         }
