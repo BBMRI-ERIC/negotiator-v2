@@ -69,8 +69,6 @@ public class ResearcherQueriesBean implements Serializable {
     // TODO: set the chunk size static for now, but this should be adopted to display according to the maximum page size
     private static final int CHUNK_SIZE = 5;
 
-    // Number of all queries for this researcher
-    // TODO: check if this can be removed
     private int queryCount;
     // lazy data model to hold the researcher queries
     private LazyDataModel<QueryStatsDTO> lazyDataModel;
@@ -104,7 +102,7 @@ public class ResearcherQueriesBean implements Serializable {
      */
     @PostConstruct
     public void init() {
-       calculateQueries();
+       countQueries();
 
         this.lazyDataModel = new LazyDataModel<QueryStatsDTO>() {
 
@@ -203,7 +201,7 @@ public class ResearcherQueriesBean implements Serializable {
      * Load the number of queries "("SELECT COUNT(*) from ..."
      * @return int numQueries
      */
-    public void calculateQueries() {
+    public void countQueries() {
         try( Config config = ConfigFactory.get()) {
             this.queryCount = DbUtil.countQueriesForResearcher(config, userBean.getUserId(), getFilterTerms());
         } catch (SQLException e) {
