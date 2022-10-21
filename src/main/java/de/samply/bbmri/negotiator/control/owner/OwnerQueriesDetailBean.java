@@ -171,7 +171,12 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 
 	private int unreadQueryCount = 0;
+	@Deprecated
 	private List<Person> personList;
+	/**
+	 * String to hold contact persons in DIVs
+	 */
+	private String personStringDIVsForRequest = "";
 
 	private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
 
@@ -325,7 +330,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 				}
             }
 
-			setPersonListForRequest(config, selectedQuery.getId());
+			// setPersonListForRequest(config, selectedQuery.getId());
+			// Set the PersonDIVsString - setPersonListForRequest is deprecated once this works
+			setPersonStringDIVsForRequest(config, selectedQuery.getId());
+
 
             /*
              * Initialize Lifecycle Status
@@ -345,6 +353,7 @@ public class OwnerQueriesDetailBean implements Serializable {
         return null;
 	}
 
+	@Deprecated
 	private void setPersonListForRequest(Config config, Integer queryId) {
 		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
 	}
@@ -1088,10 +1097,41 @@ public class OwnerQueriesDetailBean implements Serializable {
 		this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
 	}
 
+	/**
+	 * Set the contact persons in a String with DIVs to speed up the DOM creation
+	 *
+	 * @param config
+	 * @param queryId
+	 */
+	private void setPersonStringDIVsForRequest( Config config, Integer queryId) {
+		// ensure the personStringDIVsForRequest is empty
+		personStringDIVsForRequest = new String("");
+
+		// get the personList from the database
+		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+
+		logger.debug ( "personStringDIVsForRequest: " + personStringDIVsForRequest);
+		for( de.samply.bbmri.negotiator.jooq.tables.pojos.Person person : personList) {
+			if( person.getAuthName() != null) {
+				personStringDIVsForRequest = personStringDIVsForRequest.concat("<div class=\"col-xs-3\"><i class=\"glyphicon glyphicon-user\"/></i>");
+				personStringDIVsForRequest = personStringDIVsForRequest.concat(person.getAuthName());
+				personStringDIVsForRequest = personStringDIVsForRequest.concat("</div>");
+			}
+		}
+
+	}
+	/**
+	 * Returns the previously set person list as DIVs to speed up DOM creation
+	 * @return
+	 */
+	public String getPersonStringDIVsForRequest() {
+		return personStringDIVsForRequest;
+	}
+	@Deprecated
 	public List<Person> getPersonList() {
 		return personList;
 	}
-
+	@Deprecated
 	public void setPersonList(List<Person> personList) {
 		this.personList = personList;
 	}
