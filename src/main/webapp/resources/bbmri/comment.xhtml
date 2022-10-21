@@ -29,10 +29,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
-      xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri" xmlns:p="http://java.sun.com/jsf/html">
+      xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri">
 
 
 <composite:interface>
@@ -74,7 +73,7 @@
                 #{cc.attrs.person.authName}
                 <h:panelGroup>
                     <!-- Collapseable Icon to open affliliation -->
-                    <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0}">
+                    <ui:fragment rendered="#{cc.attrs.collections != null and cc.attrs.collections.size() > 0 and cc.attrs.comment.moderated == false}">
                         <i class="fa fa-plus-square-o affiliation-collapsible-plus"></i>
                         <i class="fa fa-minus-square-o affiliation-collapsible-minus"></i>
                     </ui:fragment>
