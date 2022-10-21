@@ -27,16 +27,6 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
-
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.control.SessionBean;
@@ -44,12 +34,20 @@ import de.samply.bbmri.negotiator.control.UserBean;
 import de.samply.bbmri.negotiator.db.util.DbUtil;
 import de.samply.bbmri.negotiator.jooq.enums.Flag;
 import de.samply.bbmri.negotiator.model.OwnerQueryStatsDTO;
-import de.samply.bbmri.negotiator.model.QueryStatsDTO;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
 
 /**
  * Manages the query view for owners
@@ -90,7 +88,7 @@ public class OwnerQueriesBean implements Serializable {
 	 */
 	@PostConstruct
 	public void init() {
-		setQueryCount();
+		countQueriesForOwner();
 
 		this.lazyDataModel = new LazyDataModel<OwnerQueryStatsDTO>() {
 
@@ -252,9 +250,9 @@ public class OwnerQueriesBean implements Serializable {
 		return this.queryCount;
 	}
 
-	public void setQueryCount() {
+	public void countQueriesForOwner() {
 		try( Config config = ConfigFactory.get()) {
-			this.queryCount = DbUtil.getOwnerQueriesCount(config, userBean.getUserId(), getFilterTerms());
+			this.queryCount = DbUtil.countOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, isTestRequest);
 		} catch (SQLException e) {
 			System.err.println("ERROR: OwnerQueriesBean::getQueryCount()");
 			e.printStackTrace();
