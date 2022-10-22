@@ -1121,22 +1121,78 @@ public class DbUtil {
      * @param filters search term for title and text
      * @return
      */
-    public static int getModeratorQueriesCount(Config config, int userId, Set<String> filters) {
+    public static int countModeratorQueries(Config config, int userId, Set<String> filters, Flag flag) {
         Person queryAuthor = Tables.PERSON.as("query_author");
 
-//        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+        Condition condition = Tables.MODERATOR_NETWORK.PERSON_ID.eq(userId);
 
-        // We need to get the actual query count, otherwise the More button will not go away on the page
-        // so no use to work with a high enough estimated number and save the cost of doing the count on the database
-        int queryCount = config.dsl()
-                .selectCount()
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+
+        if (flag != null && flag != Flag.UNFLAGGED) {
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
+        } else {
+            /**
+             * Ignored queries are never selected unless the user is in the ignored folder
+             */
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+        }
+
+
+        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+
+        Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
+
+        return config.dsl().fetchCount(DSL
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(queryAuthor, "person"))
+                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
+                        .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
                 .from(Tables.QUERY)
-//                .where(condition)
-                .fetchOne(0, int.class);
 
-        logger.debug("queryCount: "+ queryCount);
-        return queryCount;
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
 
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(Tables.NETWORK_COLLECTION_LINK, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(Tables.MODERATOR_NETWORK, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.MODERATOR_NETWORK.NETWORK_ID.eq(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID))
+
+                .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
+
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
+
+                .join(requestStatusTableStart, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
+
+                .join(requestStatusTableAbandon, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).eq("abandoned")))
+
+                .where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
+                .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
+                );
     }
 
     /**

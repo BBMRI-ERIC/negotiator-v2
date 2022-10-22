@@ -29,7 +29,6 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
-                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
                 xmlns:p="http://primefaces.org/ui"
                 template="../components/default.xhtml">
@@ -49,22 +48,22 @@
 	
     <ui:define name="body">
         <h:panelGroup layout="block" styleClass="row">
-            <h3>#{label[moderatorQueriesBean.pagetitle]}: #{moderatorQueriesBean.getQueryCount()}</h3>
+            <h3>#{label[moderatorQueriesBean.pagetitle]}: #{moderatorQueriesBean.queryCount}</h3>
         </h:panelGroup>
 		<h:panelGroup
-			rendered="#{moderatorQueriesBean.getQueryCount() > 0 or moderatorQueriesBean.filterTerms.size() > 0}"
+			rendered="#{moderatorQueriesBean.countQueries() > 0 or moderatorQueriesBean.filterTerms.size() > 0}"
 			layout="block">
 			<bbmricc:search backingBean="#{moderatorQueriesBean}" />
 		</h:panelGroup>
 
 		<h:panelGroup
-			rendered="#{moderatorQueriesBean.getQueryCount() == 0 and moderatorQueriesBean.filterTerms.size() > 0}"
+			rendered="#{moderatorQueriesBean.countQueries() == 0 and moderatorQueriesBean.filterTerms.size() > 0}"
 			layout="block" styleClass="col-md-12">
 			<h3>#{label['queryview.noSearchResults']}</h3>
 		</h:panelGroup>
 
 		<h:panelGroup layout="block">
-            <h:panelGroup rendered="#{moderatorQueriesBean.getQueryCount() == 0 and moderatorQueriesBean.filterTerms.size() == 0}" layout="block">
+            <h:panelGroup rendered="#{moderatorQueriesBean.countQueries() == 0 and moderatorQueriesBean.filterTerms.size() == 0}" layout="block">
                 <h3>#{label['queryview.noQueries']}</h3>
             </h:panelGroup>
 

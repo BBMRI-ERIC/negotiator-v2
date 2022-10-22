@@ -98,8 +98,7 @@ public class ModeratorQueriesBean implements Serializable {
 	public void init() {
 		// We flag the UserBean to show we are in the moderator mode
 		userBean.activateModeratorMode();
-
-		this.queryCount = 100;
+		countQueries();
 
 		this.lazyDataModel = new LazyDataModel<OwnerQueryStatsDTO>() {
 
@@ -113,7 +112,7 @@ public class ModeratorQueriesBean implements Serializable {
 				return loadLatestModeratorQueryStatsDTO(first, pageSize);
 			}
 		};
-		lazyDataModel.setRowCount(this.queryCount);
+		lazyDataModel.setRowCount(getQueryCount());
 	}
 
 	/**
@@ -257,13 +256,17 @@ public class ModeratorQueriesBean implements Serializable {
 	 * Load the number of queries "("SELECT COUNT(*) from ..."
 	 * @return int numQueries
 	 */
-	public void getQueryCount() {
+	public void countQueries() {
 		try( Config config = ConfigFactory.get()) {
-			this.queryCount = DbUtil.getModeratorQueriesCount(config, userBean.getUserId(), getFilterTerms());
+			this.queryCount = DbUtil.countModeratorQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter);
 		} catch (SQLException e) {
 			System.err.println("ERROR: OwnerQueriesBean::getQueryCount()");
 			e.printStackTrace();
 		}
+	}
+
+	public int getQueryCount() {
+		return this.queryCount;
 	}
 
 	public void getPrivateNegotiationCountAndTime(Config config, int index){

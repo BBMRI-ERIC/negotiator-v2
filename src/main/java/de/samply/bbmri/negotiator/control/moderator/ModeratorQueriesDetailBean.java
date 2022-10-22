@@ -220,7 +220,7 @@ public class ModeratorQueriesDetailBean implements Serializable {
 			/**
 			 * set the number of queries to be used in the page display
 			 */
-			this.NumQueries = DbUtil.getModeratorQueriesCount(config, userBean.getUserId(), getFilterTerms());
+			this.NumQueries = DbUtil.countModeratorQueries(config, userBean.getUserId(), getFilterTerms(),flagFilter);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
