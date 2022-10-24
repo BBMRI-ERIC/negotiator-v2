@@ -365,7 +365,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * Returns the previously set person list as DIVs to speed up DOM creation
      * @return
      */
-    private String getPersonStringDIVsForRequest() {
+    public String getPersonStringDIVsForRequest() {
         return personStringDIVsForRequest;
     }
 
