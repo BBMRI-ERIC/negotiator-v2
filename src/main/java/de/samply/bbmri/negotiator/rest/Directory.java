@@ -131,8 +131,21 @@ public class Directory {
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
+    @OPTIONS
+    @Path("/test")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response testConnectionOptions(String jsonString, @Context HttpServletRequest request) {
+        return Response
+                .status(200)
+                .header("Access-Control-Allow-Origin", "*")
+                .header("Access-Control-Allow-Headers", "origin, content-type, accept, authorization")
+                .header("Access-Control-Allow-Credentials", "true")
+                .header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD")
+                .build();
+    }
     @POST
     @Path("/test")
+    @Consumes(MediaType.APPLICATION_JSON)
     public Response testConnection(String jsonString, @Context HttpServletRequest request){
         String apiCallId = UUID.randomUUID().toString();
         logger.info(apiCallId + " API call via create_query API.");
