@@ -26,12 +26,33 @@
 
 package de.samply.bbmri.negotiator.rest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import de.samply.bbmri.negotiator.Config;
+import de.samply.bbmri.negotiator.ConfigFactory;
+import de.samply.bbmri.negotiator.NegotiatorConfig;
+import de.samply.bbmri.negotiator.ServletUtil;
+import de.samply.bbmri.negotiator.config.Negotiator;
+import de.samply.bbmri.negotiator.db.util.DbUtil;
+import de.samply.bbmri.negotiator.jooq.Tables;
+import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.rest.dto.CreateQueryResultDTO;
+import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
+import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTOHelper;
+import de.samply.bbmri.negotiator.util.JsonCollectionUpdateHelper;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.util.NToken;
+import eu.bbmri.eric.csit.service.negotiator.util.QueryJsonStringManipulator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -40,35 +61,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import de.samply.bbmri.negotiator.ServletUtil;
-import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
-import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTO;
-import de.samply.bbmri.negotiator.util.JsonCollectionUpdateHelper;
-import eu.bbmri.eric.csit.service.negotiator.util.NToken;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
-import eu.bbmri.eric.csit.service.negotiator.util.QueryJsonStringManipulator;
-import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import de.samply.bbmri.negotiator.rest.dto.QuerySearchDTOHelper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import de.samply.bbmri.negotiator.Config;
-import de.samply.bbmri.negotiator.ConfigFactory;
-import de.samply.bbmri.negotiator.NegotiatorConfig;
-import de.samply.bbmri.negotiator.config.Negotiator;
-import de.samply.bbmri.negotiator.db.util.DbUtil;
-import de.samply.bbmri.negotiator.jooq.Tables;
-import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
-import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
-import de.samply.bbmri.negotiator.rest.dto.CreateQueryResultDTO;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * REST endpoints for the directory
@@ -132,6 +130,16 @@ public class Directory {
             e.printStackTrace();
             throw new ServerErrorException(Response.Status.INTERNAL_SERVER_ERROR);
         }
+    }
+    @POST
+    @Path("/test")
+    public Response testConnection(String jsonString, @Context HttpServletRequest request){
+        String apiCallId = UUID.randomUUID().toString();
+        logger.info(apiCallId + " API call via create_query API.");
+        checkAuthentication(request);
+        return Response
+                .status(200)
+                .build();
     }
 
     private void checkAuthentication(HttpServletRequest request) throws ForbiddenException {
