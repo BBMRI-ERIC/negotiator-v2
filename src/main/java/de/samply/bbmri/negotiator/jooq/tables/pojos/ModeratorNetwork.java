@@ -4,8 +4,9 @@
 package de.samply.bbmri.negotiator.jooq.tables.pojos;
 
 
-import javax.annotation.Generated;
 import java.io.Serializable;
+
+import javax.annotation.Generated;
 
 
 /**

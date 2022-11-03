@@ -31,6 +31,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:composite="http://xmlns.jcp.org/jsf/composite"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
       xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri">
 
 
@@ -64,10 +65,14 @@
 
         <h:panelGroup layout="block" styleClass="panel-heading">
             <h:panelGroup>
-                <!-- Add [Moderated by]:] as prefix if comment is Moderated -->
-                <ui:fragment rendered="#{cc.attrs.comment.moderated == true}">
-                    <i class="glyphicon glyphicon-alert"/> Moderated by:
-                </ui:fragment>
+                <!-- check if the property "moderated" is available on the comment table.
+                    This can be a comment from public.comment or public.offer -->
+                <c:if test="#{Object.hasOwn(cc.attrs.comment,moderated)}" >
+                    <!-- Add [Moderated by]:] as prefix if comment is Moderated -->
+                    <ui:fragment rendered="#{cc.attrs.comment.moderated == true}">
+                        <i class="glyphicon glyphicon-alert"/> Moderated by:
+                    </ui:fragment>
+                </c:if>
 
                 <!-- Discussion Name of User -->
                 #{cc.attrs.person.authName}

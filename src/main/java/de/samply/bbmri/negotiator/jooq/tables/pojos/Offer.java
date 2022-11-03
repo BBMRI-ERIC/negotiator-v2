@@ -24,7 +24,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer implements Serializable {
 
-	private static final long serialVersionUID = 2076515868;
+	private static final long serialVersionUID = -836976347;
 
 	private Integer   id;
 	private Integer   queryId;
@@ -33,6 +33,7 @@ public class Offer implements Serializable {
 	private Timestamp commentTime;
 	private String    text;
 	private String    status;
+	private Boolean   moderated;
 
 	public Offer() {}
 
@@ -44,6 +45,7 @@ public class Offer implements Serializable {
 		this.commentTime = value.commentTime;
 		this.text = value.text;
 		this.status = value.status;
+		this.moderated = value.moderated;
 	}
 
 	public Offer(
@@ -53,7 +55,8 @@ public class Offer implements Serializable {
 		Integer   biobankInPrivateChat,
 		Timestamp commentTime,
 		String    text,
-		String    status
+		String    status,
+		Boolean   moderated
 	) {
 		this.id = id;
 		this.queryId = queryId;
@@ -62,6 +65,7 @@ public class Offer implements Serializable {
 		this.commentTime = commentTime;
 		this.text = text;
 		this.status = status;
+		this.moderated = moderated;
 	}
 
 	public Integer getId() {
@@ -118,5 +122,13 @@ public class Offer implements Serializable {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public Boolean getModerated() {
+		return this.moderated;
+	}
+
+	public void setModerated(Boolean moderated) {
+		this.moderated = moderated;
 	}
 }

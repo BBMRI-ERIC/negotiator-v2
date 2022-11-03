@@ -6,12 +6,14 @@ package de.samply.bbmri.negotiator.jooq.tables.daos;
 
 import de.samply.bbmri.negotiator.jooq.tables.ModeratorNetwork;
 import de.samply.bbmri.negotiator.jooq.tables.records.ModeratorNetworkRecord;
+
+import java.util.List;
+
+import javax.annotation.Generated;
+
 import org.jooq.Configuration;
 import org.jooq.Record2;
 import org.jooq.impl.DAOImpl;
-
-import javax.annotation.Generated;
-import java.util.List;
 
 
 /**

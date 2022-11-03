@@ -4,7 +4,36 @@
 package de.samply.bbmri.negotiator.jooq;
 
 
-import de.samply.bbmri.negotiator.jooq.tables.*;
+import de.samply.bbmri.negotiator.jooq.tables.Biobank;
+import de.samply.bbmri.negotiator.jooq.tables.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.Comment;
+import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
+import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
+import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
+import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
+import de.samply.bbmri.negotiator.jooq.tables.MailNotification;
+import de.samply.bbmri.negotiator.jooq.tables.ModeratorNetwork;
+import de.samply.bbmri.negotiator.jooq.tables.Network;
+import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
+import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
+import de.samply.bbmri.negotiator.jooq.tables.Notification;
+import de.samply.bbmri.negotiator.jooq.tables.NotificationSetting;
+import de.samply.bbmri.negotiator.jooq.tables.Offer;
+import de.samply.bbmri.negotiator.jooq.tables.Person;
+import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
+import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
+import de.samply.bbmri.negotiator.jooq.tables.PersonNetwork;
+import de.samply.bbmri.negotiator.jooq.tables.PersonOffer;
+import de.samply.bbmri.negotiator.jooq.tables.PersonQuerylifecycle;
+import de.samply.bbmri.negotiator.jooq.tables.Query;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
+import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleBiobank;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection;
+import de.samply.bbmri.negotiator.jooq.tables.RequestStatus;
+import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
 
 import javax.annotation.Generated;
 

@@ -5,12 +5,13 @@ package de.samply.bbmri.negotiator.jooq.tables.records;
 
 
 import de.samply.bbmri.negotiator.jooq.tables.ModeratorNetwork;
+
+import javax.annotation.Generated;
+
 import org.jooq.Field;
 import org.jooq.Record2;
 import org.jooq.Row2;
 import org.jooq.impl.UpdatableRecordImpl;
-
-import javax.annotation.Generated;
 
 
 /**

@@ -4,14 +4,71 @@
 package de.samply.bbmri.negotiator.jooq;
 
 
-import de.samply.bbmri.negotiator.jooq.tables.*;
-import de.samply.bbmri.negotiator.jooq.tables.records.*;
+import de.samply.bbmri.negotiator.jooq.tables.Biobank;
+import de.samply.bbmri.negotiator.jooq.tables.Collection;
+import de.samply.bbmri.negotiator.jooq.tables.Comment;
+import de.samply.bbmri.negotiator.jooq.tables.ConnectorLog;
+import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
+import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
+import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
+import de.samply.bbmri.negotiator.jooq.tables.MailNotification;
+import de.samply.bbmri.negotiator.jooq.tables.ModeratorNetwork;
+import de.samply.bbmri.negotiator.jooq.tables.Network;
+import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
+import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
+import de.samply.bbmri.negotiator.jooq.tables.Notification;
+import de.samply.bbmri.negotiator.jooq.tables.NotificationSetting;
+import de.samply.bbmri.negotiator.jooq.tables.Offer;
+import de.samply.bbmri.negotiator.jooq.tables.Person;
+import de.samply.bbmri.negotiator.jooq.tables.PersonCollection;
+import de.samply.bbmri.negotiator.jooq.tables.PersonComment;
+import de.samply.bbmri.negotiator.jooq.tables.PersonNetwork;
+import de.samply.bbmri.negotiator.jooq.tables.PersonOffer;
+import de.samply.bbmri.negotiator.jooq.tables.PersonQuerylifecycle;
+import de.samply.bbmri.negotiator.jooq.tables.Query;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentComment;
+import de.samply.bbmri.negotiator.jooq.tables.QueryAttachmentPrivate;
+import de.samply.bbmri.negotiator.jooq.tables.QueryCollection;
+import de.samply.bbmri.negotiator.jooq.tables.QueryLifecycleCollection;
+import de.samply.bbmri.negotiator.jooq.tables.RequestStatus;
+import de.samply.bbmri.negotiator.jooq.tables.SchemaVersion;
+import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.CollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.CommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.ConnectorLogRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.FlaggedQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.JsonQueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.ListOfDirectoriesRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.ModeratorNetworkRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.NetworkBiobankLinkRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.NetworkCollectionLinkRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.NetworkRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.NotificationSettingRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.OfferRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonCommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonNetworkRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonOfferRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonQuerylifecycleRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.PersonRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentCommentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentPrivateRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryAttachmentRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryLifecycleCollectionRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.QueryRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.RequestStatusRecord;
+import de.samply.bbmri.negotiator.jooq.tables.records.SchemaVersionRecord;
+
+import javax.annotation.Generated;
+
 import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
-
-import javax.annotation.Generated;
 
 
 /**
