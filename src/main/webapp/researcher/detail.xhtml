@@ -535,15 +535,30 @@
                                         <!-- Create DIV in code and only show the string - should speed up significantly:
                                         https://howchoo.com/code/learn-the-slow-and-fast-way-to-append-elements-to-the-dom
                                         -->
-                                        <h:outputText value="#{researcherQueriesDetailBean.getPersonStringDIVsForRequest()}" escape="false" />
-
+                                        <!--<h:outputText value="#{researcherQueriesDetailBean.getPersonStringDIVsForRequest()}" escape="false" />-->
+                                        <p:dataScroller value="#{researcherQueriesDetailBean.lazyDataModelPerson}" var="item" lazy="true" chunkSize="1">
+                                           <!-- <f:facet name="header">
+                                                Click More to load more People
+                                            </f:facet>-->
+                                            <f:facet name="loader">
+                                                <div class="text-center">
+                                                    <p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+                                                </div>
+                                            </f:facet>
+                                            <div class="col-xs-3">
+                                                <i class="glyphicon glyphicon-user"></i>
+                                                <!--<i class="glyphicon glyphicon-user"/></i>-->
+                                                #{item.authName}
+                                            </div>
+                                        </p:dataScroller>
                                         <!--
                                         <ui:repeat value="#{researcherQueriesDetailBean.getPersonList()}"
                                                    var="person">
                                             <div class="col-xs-3"><i class="glyphicon glyphicon-user"/>#{person.authName}</div>
                                         </ui:repeat>
                                         -->
-                                    </div></div>
+                                    </div>
+                                </div>
                                 </div>
                             </div>
 
