@@ -535,7 +535,8 @@
                                         <!-- Create DIV in code and only show the string - should speed up significantly:
                                         https://howchoo.com/code/learn-the-slow-and-fast-way-to-append-elements-to-the-dom
                                         -->
-                                        #{researcherQueriesDetailBean.getPersonStringDIVsForRequest()}
+                                        <h:outputText value="#{researcherQueriesDetailBean.getPersonStringDIVsForRequest()}" escape="false" />
+
                                         <!--
                                         <ui:repeat value="#{researcherQueriesDetailBean.getPersonList()}"
                                                    var="person">
