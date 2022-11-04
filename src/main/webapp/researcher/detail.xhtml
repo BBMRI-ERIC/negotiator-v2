@@ -536,20 +536,23 @@
                                         https://howchoo.com/code/learn-the-slow-and-fast-way-to-append-elements-to-the-dom
                                         -->
                                         <!--<h:outputText value="#{researcherQueriesDetailBean.getPersonStringDIVsForRequest()}" escape="false" />-->
-                                        <p:dataScroller value="#{researcherQueriesDetailBean.lazyDataModelPerson}" var="item" lazy="true" chunkSize="1">
-                                           <!-- <f:facet name="header">
-                                                Click More to load more People
-                                            </f:facet>-->
-                                            <f:facet name="loader">
-                                                <div class="text-center">
-                                                    <p:commandButton type="button" value="More" icon="pi pi-refresh"/>
-                                                </div>
+                                        <!--TODO alternatively no "More" button but scrollHeight fixed value and load new when scrolling down-->
+                                        <p:dataScroller value="#{researcherQueriesDetailBean.lazyDataModelPerson}" var="item" lazy="true" chunkSize="10" mode="inline">
+                                            <f:facet name="header">
+                                                Representatives of the involved Biobank(s), researcher and BBMRI-ERIC moderators
                                             </f:facet>
+
                                             <div class="col-xs-3">
                                                 <i class="glyphicon glyphicon-user"></i>
                                                 <!--<i class="glyphicon glyphicon-user"/></i>-->
                                                 #{item.authName}
                                             </div>
+                                            <f:facet name="loader">
+                                                <div class="text-center">
+                                                    <p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+                                                    <!--                                                    <p:commandButton type="button" value="More" icon="pi pi-refresh" disabled="#    {  researcherQueriesDetailBean.noMorePeopleAvailable}"/>-->
+                                                </div>
+                                            </f:facet>
                                         </p:dataScroller>
                                         <!--
                                         <ui:repeat value="#{researcherQueriesDetailBean.getPersonList()}"

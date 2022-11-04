@@ -2945,13 +2945,13 @@ public class DbUtil {
     public static int countContactPerson(Config config, Integer queryId) {
         return config.dsl()
                 .fetchCount(DSL
-                        .selectDistinct(Tables.PERSON.ID, Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME, Tables.PERSON.ORGANIZATION)
+                        .selectDistinct(Tables.PERSON.ID)
                         .from(Tables.PERSON)
                         .fullOuterJoin(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                         .fullOuterJoin(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
                         .fullOuterJoin(Tables.QUERY).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
                         .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
-                                .or(Tables.PERSON.IS_ADMIN.isTrue())));
+                                .or(Tables.PERSON.IS_ADMIN.isTrue())).orderBy(Tables.PERSON.ID));
 
 
     }

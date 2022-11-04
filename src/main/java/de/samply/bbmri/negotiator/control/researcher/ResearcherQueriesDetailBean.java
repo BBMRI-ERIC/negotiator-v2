@@ -212,13 +212,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private String offer;
     private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
 
+
     /**
      * Initializes this bean by loading the query count for the current researcher.
      * Created the PostConstruct Init in parallel to the existing initialize() method as its already late today.
      */
     @PostConstruct
     public void init() {
-        countcontactPerson();
+
         try(Config config = ConfigFactory.get()) {
             /**
              * set the number of queries to be used in the page display
@@ -240,12 +241,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
             }
         };
         //lazyDataModel.setRowCount(this.queryCount);
-        lazyDataModelPerson.setRowCount(this.contactPersonCount);
     }
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
     public String loadSelectedQueryDetails() {
+        countContactPerson();
+        lazyDataModelPerson.setRowCount(this.contactPersonCount);
+
         logger.debug("loadSelectedQueryDetails-start: " + LocalDateTime.now());
         try(Config config = ConfigFactory.get()) {
             logger.debug("loadSelectedQueryDetails-1: " + LocalDateTime.now());
@@ -333,7 +336,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             logger.debug("loadSelectedQueryDetails-21.1-setPersonListForRequest: " + LocalDateTime.now());
             // setPersonListForRequest(config, selectedQuery.getId());
             // Set the PersonDIVsString - setPersonListForRequest is deprecated once this works
-            setPersonStringDIVsForRequest(config, selectedQuery.getId(),0,2);
+            //setPersonStringDIVsForRequest(config, selectedQuery.getId(),0,2);
             logger.debug("loadSelectedQueryDetails-22: " + LocalDateTime.now());
             /*
              * Initialize Lifecycle Status
@@ -393,7 +396,6 @@ public class ResearcherQueriesDetailBean implements Serializable {
         return personStringDIVsForRequest;
     }
     private List<Person> loadLatestPerson(int offset, int size) {
-        Integer queryId = selectedQuery.getId();
         try(Config config = ConfigFactory.get()) {
             personList = DbUtil.getPersonsContactsForRequest(config, queryId,offset,size);
         }catch (SQLException e) {
@@ -401,6 +403,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
         }
         return personList;
     }
+
     @Deprecated
     private void setPersonListForRequest(Config config, Integer queryId) {
         personList = DbUtil.getPersonsContactsForRequest(config, queryId);
@@ -430,13 +433,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
         requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
         return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
     }
-    public void countcontactPerson() {
+    public void countContactPerson() {
         try( Config config = ConfigFactory.get()) {
-            this.contactPersonCount = DbUtil.countQueriesForResearcher(config, userBean.getUserId(), getFilterTerms());
+            this.contactPersonCount = DbUtil.countContactPerson(config, queryId);
         } catch (SQLException e) {
             System.err.println("ERROR: ResearcherQueriesBean::getQueryCount()");
             e.printStackTrace();
         }
+
     }
     /**
      * Starts negotiation for a query.
@@ -1008,4 +1012,5 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public int getContactPersonCount() {
         return contactPersonCount;
     }
+
 }
