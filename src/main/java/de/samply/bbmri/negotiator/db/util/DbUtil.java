@@ -61,6 +61,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.jooq.impl.DSL.select;
+import static org.jooq.impl.DSL.selectDistinct;
 
 /**
  * The database util for basic queries.
@@ -2904,17 +2905,18 @@ public class DbUtil {
             person.setAuthName(dbRecord.getValue("person_auth_name", String.class));
             person.setOrganization(dbRecord.getValue("person_organization", String.class));
          */
+
         Result<Record4<Integer,String,String,String>> record = config.dsl().selectDistinct(Tables.PERSON.ID, Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME, Tables.PERSON.ORGANIZATION)
                 .from(Tables.PERSON)
                 .fullOuterJoin(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                 .fullOuterJoin(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                .fullOuterJoin(Tables.QUERY).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
-                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
+                .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.PERSON.ID.in(selectDistinct(Tables.QUERY.RESEARCHER_ID).from(Tables.QUERY).where(Tables.QUERY.ID.eq(queryId))))
                         .or(Tables.PERSON.IS_ADMIN.isTrue()))
                 .orderBy(Tables.PERSON.AUTH_NAME)
                 .offset(offset)
                 .limit(size)
                 .fetch();
+
         logger.debug("getPersonsContactsForRequest-DB-2: "+ LocalDateTime.now());
         //List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> returnList;
         logger.debug("getPersonsContactsForRequest-DB-3: "+ LocalDateTime.now());
@@ -2949,9 +2951,9 @@ public class DbUtil {
                         .from(Tables.PERSON)
                         .fullOuterJoin(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                         .fullOuterJoin(Tables.QUERY_COLLECTION).on(Tables.QUERY_COLLECTION.COLLECTION_ID.eq(Tables.PERSON_COLLECTION.COLLECTION_ID))
-                        .fullOuterJoin(Tables.QUERY).on(Tables.PERSON.ID.eq(Tables.QUERY.RESEARCHER_ID))
-                        .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId).or(Tables.QUERY_COLLECTION.QUERY_ID.isNull().and(Tables.QUERY.ID.eq(queryId)))
-                                .or(Tables.PERSON.IS_ADMIN.isTrue())).orderBy(Tables.PERSON.ID));
+                        .where(Tables.QUERY_COLLECTION.QUERY_ID.eq(queryId)
+                                .or(Tables.PERSON.ID.in(selectDistinct(Tables.QUERY.RESEARCHER_ID).from(Tables.QUERY).where(Tables.QUERY.ID.eq(queryId))))
+                                .or(Tables.PERSON.IS_ADMIN.isTrue())));
 
 
     }
