@@ -395,6 +395,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
     public String getPersonStringDIVsForRequest() {
         return personStringDIVsForRequest;
     }
+    /**
+     * Loads and returns a list of person
+     * @param offset
+     * @param size
+     *
+     * @return
+     */
     private List<Person> loadLatestPerson(int offset, int size) {
         try(Config config = ConfigFactory.get()) {
             personList = DbUtil.getPersonsContactsForRequest(config, queryId,offset,size);

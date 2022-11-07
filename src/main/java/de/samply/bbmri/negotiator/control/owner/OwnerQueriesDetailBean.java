@@ -61,6 +61,9 @@ import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -214,6 +217,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 	 */
 	private int NumQueries;
 
+	// lazy data model to hold the researcher queries
+	private LazyDataModel<Person> lazyDataModelPerson;
+	private int contactPersonCount;
+
 	/**
 	 * Initializes this bean by loading the query count for the current researcher.
 	 * Created the PostConstruct Init in parallel to the existing initialize() method as its already late today.
@@ -228,6 +235,19 @@ public class OwnerQueriesDetailBean implements Serializable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+
+		this.lazyDataModelPerson = new LazyDataModel<Person>() {
+
+			private static final long serialVersionUID = -4742720028771554420L;
+
+			@Override public List<Person> load(final int first, final int pageSize,
+											   final String sortField, final SortOrder sortOrder,
+											   final Map<String, FilterMeta> filters) {
+
+				System.out.println(first);
+				return loadLatestPerson(first, pageSize);
+			}
+		};
 	}
 
 	/**
@@ -235,6 +255,8 @@ public class OwnerQueriesDetailBean implements Serializable {
      */
 	public String initialize() {
         setNonConfidential(false);
+		countContactPerson();
+		lazyDataModelPerson.setRowCount(this.contactPersonCount);
 
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
@@ -332,7 +354,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 			// setPersonListForRequest(config, selectedQuery.getId());
 			// Set the PersonDIVsString - setPersonListForRequest is deprecated once this works
-			setPersonStringDIVsForRequest(config, selectedQuery.getId());
+//			setPersonStringDIVsForRequest(config, selectedQuery.getId());
 
 
             /*
@@ -824,6 +846,22 @@ public class OwnerQueriesDetailBean implements Serializable {
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
+	/**
+	 * Loads and returns a list of person
+	 * @param offset
+	 * @param size
+	 *
+	 * @return
+	 */
+	private List<Person> loadLatestPerson(int offset, int size) {
+		try(Config config = ConfigFactory.get()) {
+			personList = DbUtil.getPersonsContactsForRequest(config, queryId,offset,size);
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return personList;
+	}
+
 	/*
 	 * Getter / Setter for bean
 	 */
@@ -1098,6 +1136,21 @@ public class OwnerQueriesDetailBean implements Serializable {
 	}
 
 	/**
+	 * Counts the total number of users associated with that query in the DB.
+	 * Stores the count in this.contactPersonCount
+	 *
+	 */
+	public void countContactPerson() {
+		try( Config config = ConfigFactory.get()) {
+			this.contactPersonCount = DbUtil.countContactPerson(config, queryId);
+		} catch (SQLException e) {
+			System.err.println("ERROR: ResearcherQueriesBean::getQueryCount()");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
 	 * Set the contact persons in a String with DIVs to speed up the DOM creation
 	 *
 	 * @param config
@@ -1171,5 +1224,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public LazyDataModel<Person> getLazyDataModelPerson() {
+		return lazyDataModelPerson;
+	}
+
+	public int getContactPersonCount() {
+		return contactPersonCount;
 	}
 }
