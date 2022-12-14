@@ -27,6 +27,11 @@ package de.samply.bbmri.negotiator.filter;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
+import de.samply.common.config.OAuth2Client;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidKeyException;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidTokenException;
+import eu.bbmri.eric.csit.service.negotiator.authentication.client.jwt.KeyLoader;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -36,7 +41,12 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.NotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * This filter checks if there is a user logged in or not. If no valid user is
@@ -145,11 +155,28 @@ public class AuthorizationFilter implements Filter {
                 return;
             }
 
+
+
             // if a user came from the directory before being logged in, we need to save the query ID into the
             // usersession
             if (request.getQueryString() != null) {
                 logger.debug("Setting userbean redirect url");
                 userBean.setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
+
+                //Check if param error login_required then directly redirect
+
+                HashMap<String, String> uriparams = getQueryMap(request.getQueryString());
+                if(uriparams.containsKey("error") && uriparams.get("error").equals("login_required")){
+                    logger.debug("Redirecting invalid user to login.xhtml");
+                    response.sendRedirect(request.getContextPath() + "/login.xhtml");
+                    return;
+                }
+                // TODO might only work for perun and 1not work for different AAIs
+                URI noprompt_auth_uri = UriBuilder.fromUri(userBean.getAuthenticationUrl(request)).queryParam("prompt", "none").build();
+//                response.sendRedirect(userBean.getAuthenticationUrl(request)+"&"+"prompt=none");
+
+                response.sendRedirect(noprompt_auth_uri.toString());
+                return;
             }
 
             logger.debug("Redirecting invalid user to login.xhtml");
@@ -164,4 +191,16 @@ public class AuthorizationFilter implements Filter {
     public void init(FilterConfig arg0) throws ServletException {
     }
 
+
+    public static HashMap<String, String> getQueryMap(String query) {
+        String[] params = query.split("&");
+        HashMap<String, String> map = new HashMap<String, String>();
+
+        for (String param : params) {
+            String name = param.split("=")[0];
+            String value = param.split("=")[1];
+            map.put(name, value);
+        }
+        return map;
+    }
 }
