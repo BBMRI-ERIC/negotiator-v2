@@ -52,7 +52,9 @@ import org.jooq.Result;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
+import org.primefaces.model.FilterMeta;
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -194,6 +196,11 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * String to hold contact persons in DIVs
      */
     private String personStringDIVsForRequest = "";
+
+
+    // lazy data model to hold the researcher queries
+    private LazyDataModel<Person> lazyDataModelPerson;
+    private int contactPersonCount;
     private int unreadQueryCount = 0;
     /**
      * Lifecycle Collection Data (Form, Structure)
@@ -205,12 +212,14 @@ public class ResearcherQueriesDetailBean implements Serializable {
     private String offer;
     private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
 
+
     /**
      * Initializes this bean by loading the query count for the current researcher.
      * Created the PostConstruct Init in parallel to the existing initialize() method as its already late today.
      */
     @PostConstruct
     public void init() {
+
         try(Config config = ConfigFactory.get()) {
             /**
              * set the number of queries to be used in the page display
@@ -219,11 +228,27 @@ public class ResearcherQueriesDetailBean implements Serializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        this.lazyDataModelPerson = new LazyDataModel<Person>() {
+
+            private static final long serialVersionUID = -4742720028771554420L;
+
+            @Override public List<Person> load(final int first, final int pageSize,
+                                                      final String sortField, final SortOrder sortOrder,
+                                                      final Map<String, FilterMeta> filters) {
+
+                System.out.println(first);
+                return loadLatestPerson(first, pageSize);
+            }
+        };
+        //lazyDataModel.setRowCount(this.queryCount);
     }
     /**
      * initialises the page by getting all the comments and offer comments for a selected(clicked on) query
      */
     public String loadSelectedQueryDetails() {
+        countContactPerson();
+        lazyDataModelPerson.setRowCount(this.contactPersonCount);
+
         logger.debug("loadSelectedQueryDetails-start: " + LocalDateTime.now());
         try(Config config = ConfigFactory.get()) {
             logger.debug("loadSelectedQueryDetails-1: " + LocalDateTime.now());
@@ -311,7 +336,7 @@ public class ResearcherQueriesDetailBean implements Serializable {
             logger.debug("loadSelectedQueryDetails-21.1-setPersonListForRequest: " + LocalDateTime.now());
             // setPersonListForRequest(config, selectedQuery.getId());
             // Set the PersonDIVsString - setPersonListForRequest is deprecated once this works
-            setPersonStringDIVsForRequest(config, selectedQuery.getId());
+            //setPersonStringDIVsForRequest(config, selectedQuery.getId(),0,2);
             logger.debug("loadSelectedQueryDetails-22: " + LocalDateTime.now());
             /*
              * Initialize Lifecycle Status
@@ -344,13 +369,15 @@ public class ResearcherQueriesDetailBean implements Serializable {
      *
      * @param config
      * @param queryId
+     * @param offset
+     * @param size
      */
-    private void setPersonStringDIVsForRequest( Config config, Integer queryId) {
+    private void setPersonStringDIVsForRequest( Config config, Integer queryId,int offset, int size) {
         // ensure the personStringDIVsForRequest is empty
         personStringDIVsForRequest = new String("");
 
         // get the personList from the database
-        personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+        personList = DbUtil.getPersonsContactsForRequest(config, queryId,offset,size);
 
         for( de.samply.bbmri.negotiator.jooq.tables.pojos.Person person : personList) {
             if( person.getAuthName() != null) {
@@ -365,8 +392,23 @@ public class ResearcherQueriesDetailBean implements Serializable {
      * Returns the previously set person list as DIVs to speed up DOM creation
      * @return
      */
-    private String getPersonStringDIVsForRequest() {
+    public String getPersonStringDIVsForRequest() {
         return personStringDIVsForRequest;
+    }
+    /**
+     * Loads and returns a list of person
+     * @param offset
+     * @param size
+     *
+     * @return
+     */
+    private List<Person> loadLatestPerson(int offset, int size) {
+        try(Config config = ConfigFactory.get()) {
+            personList = DbUtil.getPersonsContactsForRequest(config, queryId,offset,size);
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return personList;
     }
 
     @Deprecated
@@ -398,7 +440,15 @@ public class ResearcherQueriesDetailBean implements Serializable {
         requestLifeCycleStatus.nextStatus("under_review", "review", null, userBean.getUserId());
         return "/researcher/detail?queryId=" + selectedQuery.getId() + "&faces-redirect=true";
     }
+    public void countContactPerson() {
+        try( Config config = ConfigFactory.get()) {
+            this.contactPersonCount = DbUtil.countContactPerson(config, queryId);
+        } catch (SQLException e) {
+            System.err.println("ERROR: ResearcherQueriesBean::getQueryCount()");
+            e.printStackTrace();
+        }
 
+    }
     /**
      * Starts negotiation for a query.
      *
@@ -961,4 +1011,13 @@ public class ResearcherQueriesDetailBean implements Serializable {
             e.printStackTrace();
         }
     }
+
+    public LazyDataModel<Person> getLazyDataModelPerson() {
+        return lazyDataModelPerson;
+    }
+
+    public int getContactPersonCount() {
+        return contactPersonCount;
+    }
+
 }
