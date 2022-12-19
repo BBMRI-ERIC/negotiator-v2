@@ -106,11 +106,4 @@ public class CommentDao extends DAOImpl<CommentRecord, de.samply.bbmri.negotiato
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByStatus(String... values) {
 		return fetch(Comment.COMMENT.STATUS, values);
 	}
-
-	/**
-	 * Fetch records that have <code>moderated IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Comment> fetchByModerated(Boolean... values) {
-		return fetch(Comment.COMMENT.MODERATED, values);
-	}
 }

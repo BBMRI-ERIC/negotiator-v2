@@ -107,11 +107,4 @@ public class OfferDao extends DAOImpl<OfferRecord, de.samply.bbmri.negotiator.jo
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Offer> fetchByStatus(String... values) {
 		return fetch(Offer.OFFER.STATUS, values);
 	}
-
-	/**
-	 * Fetch records that have <code>moderated IN (values)</code>
-	 */
-	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Offer> fetchByModerated(Boolean... values) {
-		return fetch(Offer.OFFER.MODERATED, values);
-	}
 }

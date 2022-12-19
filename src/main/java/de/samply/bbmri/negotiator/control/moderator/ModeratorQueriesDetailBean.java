@@ -225,20 +225,11 @@ public class ModeratorQueriesDetailBean implements Serializable {
 			e.printStackTrace();
 		}
 	}
-	/**
-	 * Clear information about moderation on the UserBean.
-	 */
-	@PreDestroy
-	public void clear() {
-		userBean.unsetModerator();
-	}
 
     /**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
 	public String initialize() {
-		// Make sure the UserBean has information about moderator status set
-		userBean.setModerator();
 
         setNonConfidential(false);
 

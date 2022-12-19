@@ -31,7 +31,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfferRecord extends UpdatableRecordImpl<OfferRecord> implements Record8<Integer, Integer, Integer, Integer, Timestamp, String, String, Boolean> {
 
-	private static final long serialVersionUID = 1592813539;
+	private static final long serialVersionUID = 2053812582;
 
 	/**
 	 * Setter for <code>public.offer.id</code>. Primary key
@@ -132,14 +132,14 @@ public class OfferRecord extends UpdatableRecordImpl<OfferRecord> implements Rec
 	}
 
 	/**
-	 * Setter for <code>public.offer.moderated</code>. marks the comment as done by user with Moderator role
+	 * Setter for <code>public.offer.moderated</code>.
 	 */
 	public void setModerated(Boolean value) {
 		setValue(7, value);
 	}
 
 	/**
-	 * Getter for <code>public.offer.moderated</code>. marks the comment as done by user with Moderator role
+	 * Getter for <code>public.offer.moderated</code>.
 	 */
 	public Boolean getModerated() {
 		return (Boolean) getValue(7);

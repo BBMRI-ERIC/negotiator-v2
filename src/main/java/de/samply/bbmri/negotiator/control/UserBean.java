@@ -489,6 +489,7 @@ public class UserBean implements Serializable {
                 userRealName = personRecord.getAuthName();
                 userEmail = personRecord.getAuthEmail();
                 userId = personRecord.getId();
+				isModerator = personRecord.getIsModerator();
                 createOrGetUser();
             }
         } catch (SQLException e) {
@@ -506,6 +507,7 @@ public class UserBean implements Serializable {
 
         setSudoMaster(this.userIdentity);
         isAdmin = false;
+		isModerator = false;
         this.userIdentity = identity;
 
         try(Config config = ConfigFactory.get()) {
@@ -515,6 +517,8 @@ public class UserBean implements Serializable {
                 userRealName = personRecord.getAuthName();
                 userEmail = personRecord.getAuthEmail();
                 userId = personRecord.getId();
+				isModerator = personRecord.getIsModerator();
+				
                 createOrGetUser();
             }
         } catch (SQLException e) {
@@ -549,6 +553,7 @@ public class UserBean implements Serializable {
 					person.store();
 
 					isAdmin = false;
+					isModerator = false;
 				} catch (Exception e) {
 					System.err.println("ERROR: Creating user.");
 					config.rollback();
@@ -571,6 +576,10 @@ public class UserBean implements Serializable {
 
 					if (person.getIsAdmin())
 						isAdmin = true;
+					
+					if (person.getIsModerator())
+						isModerator = true;
+
 				} catch (Exception e) {
 					System.err.println("ERROR: Update user.");
 					config.rollback();
@@ -599,6 +608,14 @@ public class UserBean implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Returns true, if the user is an moderator, false otherwise.
+	 * @return
+     */	
+	public Boolean isModerator() {
+		return isModerator;
 	}
 
 	/**
@@ -896,35 +913,5 @@ public class UserBean implements Serializable {
 
 	public List<Network> getNetworks() {
 		return networks;
-	}
-
-	/**
-	 * This is set when the admin user is in the moderator part
-	 *
-	 * @return isModerator
-	 */
-	public Boolean isModerator() {
-		// TODO: Moderator should be set from roles for the user when authenticating
-		if( isAdmin) {
-			setModerator();
-		} else {
-			unsetModerator();
-		}
-		return isModerator;
-	}
-
-	/**
-	 * We set this when the admin user enters the moderator path
-
-	 */
-	public void setModerator() {
-		isModerator = true;
-	}
-
-	/**
-	 * We clear this when the admin user leaves the moderator path
-	 */
-	public void unsetModerator() {
-		isModerator = false;
 	}
 }

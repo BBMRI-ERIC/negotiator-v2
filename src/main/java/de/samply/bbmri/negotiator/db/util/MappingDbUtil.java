@@ -44,6 +44,7 @@ public class MappingDbUtil {
         person.setPersonImage((byte[]) dbRecord.getValue("person_person_image"));
         person.setIsAdmin((Boolean) dbRecord.getValue("person_is_admin"));
         person.setOrganization((String) dbRecord.getValue("person_organization"));
+        person.setIsModerator((Boolean) dbRecord.getValue("person_is_moderator"));
         return person;
     }
 
@@ -56,6 +57,7 @@ public class MappingDbUtil {
         personRecord.setPersonImage((byte[]) dbRecord.getValue("person_person_image"));
         personRecord.setIsAdmin((Boolean) dbRecord.getValue("person_is_admin"));
         personRecord.setOrganization((String) dbRecord.getValue("person_organization"));
+        personRecord.setIsModerator((Boolean) dbRecord.getValue("person_is_moderator"));
         return personRecord;
     }
 

@@ -85,13 +85,6 @@ public class ModeratorQueriesBean implements Serializable {
 	private SessionBean sessionBean;
 
 	/**
-	 * Clear information about moderation on the UserBean.
-	 */
-	@PreDestroy
-	public void clear() {
-		userBean.unsetModerator();
-	}
-	/**
 	 * Initializes this bean by loading all queries for the current owner.
 	 */
 	@PostConstruct

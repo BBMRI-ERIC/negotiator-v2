@@ -12,7 +12,6 @@ import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.MailNotification;
-import de.samply.bbmri.negotiator.jooq.tables.ModeratorNetwork;
 import de.samply.bbmri.negotiator.jooq.tables.Network;
 import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
 import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
@@ -59,7 +58,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -370826799;
+	private static final long serialVersionUID = 2129248163;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -119,7 +118,6 @@ public class Public extends SchemaImpl {
 			JsonQuery.JSON_QUERY,
 			ListOfDirectories.LIST_OF_DIRECTORIES,
 			MailNotification.MAIL_NOTIFICATION,
-			ModeratorNetwork.MODERATOR_NETWORK,
 			Network.NETWORK,
 			NetworkBiobankLink.NETWORK_BIOBANK_LINK,
 			NetworkCollectionLink.NETWORK_COLLECTION_LINK,

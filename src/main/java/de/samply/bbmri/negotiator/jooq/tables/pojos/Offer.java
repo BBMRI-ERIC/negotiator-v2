@@ -24,7 +24,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer implements Serializable {
 
-	private static final long serialVersionUID = -836976347;
+	private static final long serialVersionUID = 2076515868;
 
 	private Integer   id;
 	private Integer   queryId;

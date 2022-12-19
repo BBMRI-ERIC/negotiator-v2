@@ -74,7 +74,7 @@ public class OfferBean implements Serializable {
      */
     public String saveOffer(Query query, Integer offerFrom ) {
         try (Config config = ConfigFactory.get()) {
-            OfferRecord offerRecord = DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom);
+            OfferRecord offerRecord = DbUtil.addOfferComment(config, query.getId(), userBean.getUserId(), offerComment, offerFrom, userBean.getModeratorMode());
             config.commit();
 
             String biobankName = "";

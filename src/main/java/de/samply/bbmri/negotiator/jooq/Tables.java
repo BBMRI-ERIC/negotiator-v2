@@ -12,7 +12,6 @@ import de.samply.bbmri.negotiator.jooq.tables.FlaggedQuery;
 import de.samply.bbmri.negotiator.jooq.tables.JsonQuery;
 import de.samply.bbmri.negotiator.jooq.tables.ListOfDirectories;
 import de.samply.bbmri.negotiator.jooq.tables.MailNotification;
-import de.samply.bbmri.negotiator.jooq.tables.ModeratorNetwork;
 import de.samply.bbmri.negotiator.jooq.tables.Network;
 import de.samply.bbmri.negotiator.jooq.tables.NetworkBiobankLink;
 import de.samply.bbmri.negotiator.jooq.tables.NetworkCollectionLink;
@@ -90,11 +89,6 @@ public class Tables {
 	 * The table public.mail_notification
 	 */
 	public static final MailNotification MAIL_NOTIFICATION = de.samply.bbmri.negotiator.jooq.tables.MailNotification.MAIL_NOTIFICATION;
-
-	/**
-	 * The table public.moderator_network
-	 */
-	public static final ModeratorNetwork MODERATOR_NETWORK = de.samply.bbmri.negotiator.jooq.tables.ModeratorNetwork.MODERATOR_NETWORK;
 
 	/**
 	 * The table public.network

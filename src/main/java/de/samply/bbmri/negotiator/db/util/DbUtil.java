@@ -850,7 +850,7 @@ public class DbUtil {
     public static List<OwnerQueryStatsDTO> getModeratorQueriesAtOffset(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest, int offset, int size) {
         Person queryAuthor = Tables.PERSON.as("query_author");
 
-        Condition condition = Tables.MODERATOR_NETWORK.PERSON_ID.eq(userId);
+        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
 
         if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
@@ -900,9 +900,6 @@ public class DbUtil {
 
                 .join(Tables.NETWORK_COLLECTION_LINK, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-
-                .join(Tables.MODERATOR_NETWORK, JoinType.LEFT_OUTER_JOIN)
-                .on(Tables.MODERATOR_NETWORK.NETWORK_ID.eq(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID))
 
                 .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
@@ -1124,7 +1121,7 @@ public class DbUtil {
     public static int countModeratorQueries(Config config, int userId, Set<String> filters, Flag flag) {
         Person queryAuthor = Tables.PERSON.as("query_author");
 
-        Condition condition = Tables.MODERATOR_NETWORK.PERSON_ID.eq(userId);
+        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
 
         if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
@@ -1172,9 +1169,6 @@ public class DbUtil {
 
                 .join(Tables.NETWORK_COLLECTION_LINK, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-
-                .join(Tables.MODERATOR_NETWORK, JoinType.LEFT_OUTER_JOIN)
-                .on(Tables.MODERATOR_NETWORK.NETWORK_ID.eq(Tables.NETWORK_COLLECTION_LINK.NETWORK_ID))
 
                 .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
@@ -1406,8 +1400,9 @@ public class DbUtil {
      * @param personId
      * @param comment
      * @param biobankInPrivateChat biobank id
+     * @param isModerated set to true if the offer is done by a moderator in moderation mode
      */
-    public static OfferRecord addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
+    public static OfferRecord addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat, Boolean isModerated) throws SQLException {
         OfferRecord record = config.dsl().newRecord(Tables.OFFER);
         record.setQueryId(queryId);
         record.setPersonId(personId);
@@ -1415,6 +1410,7 @@ public class DbUtil {
         record.setText(comment);
         record.setStatus("published");
         record.setCommentTime(new Timestamp(new Date().getTime()));
+        record.setModerated(isModerated);
         record.store();
         return record;
     }

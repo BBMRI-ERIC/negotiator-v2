@@ -30,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements Record8<Integer, Integer, Integer, Timestamp, String, Boolean, String, Boolean> {
 
-	private static final long serialVersionUID = 1187865808;
+	private static final long serialVersionUID = 1482971940;
 
 	/**
 	 * Setter for <code>public.comment.id</code>. Primary key
@@ -131,14 +131,14 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 	}
 
 	/**
-	 * Setter for <code>public.comment.moderated</code>. marks the comment as done by user with Moderator role
+	 * Setter for <code>public.comment.moderated</code>.
 	 */
 	public void setModerated(Boolean value) {
 		setValue(7, value);
 	}
 
 	/**
-	 * Getter for <code>public.comment.moderated</code>. marks the comment as done by user with Moderator role
+	 * Getter for <code>public.comment.moderated</code>.
 	 */
 	public Boolean getModerated() {
 		return (Boolean) getValue(7);
@@ -375,6 +375,7 @@ public class CommentRecord extends UpdatableRecordImpl<CommentRecord> implements
 		setModerated(value);
 		return this;
 	}
+
 
 	/**
 	 * {@inheritDoc}
