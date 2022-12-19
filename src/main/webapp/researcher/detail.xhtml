@@ -33,13 +33,14 @@
                 xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
                 xmlns:bbmriresearchercc="http://xmlns.jcp.org/jsf/composite/bbmriresearcher"
+                xmlns:p="http://primefaces.org/ui"
                 template="../components/default.xhtml"
 >
 
     <f:metadata>
         <f:viewParam name="queryId"
                      value="#{researcherQueriesDetailBean.queryId}"/>
-        <f:viewAction action="#{researcherQueriesDetailBean.initialize}"/>
+        <f:viewAction action="#{researcherQueriesDetailBean.loadSelectedQueryDetails}"/>
         <f:viewAction action="#{commentBean.initialize}" />
     </f:metadata>
 
@@ -67,23 +68,37 @@
             }
         </style>
 
+        <!-- TODO: implement LazyLoading -->
+        <!-- Until lazy loading is implemented, strip the functionality to only display the selected negotiation. -->
+        <!-- Users need to go back to the index.xhtml to search for other queries instead of having this available on the details page also -->
+        <!-- The next panelGroup contains the search funtionality withe the display of the Queries -->
         <h:panelGroup layout="block" styleClass="col-md-3 left-panel">
 
-            <bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
+        <bbmricc:searchDetail backingBean="#{researcherQueriesDetailBean}"/>
 
-            <!-- queryboxes BEGIN -->
+        <!-- queryboxes BEGIN -->
             <h:panelGroup
-                    rendered="#{researcherQueriesDetailBean.queries.size() == 0 and researcherQueriesDetailBean.filterTerms.size() > 0}"
+                    rendered="#{researcherQueriesDetailBean.getNumQueries() == 0 and researcherQueriesDetailBean.filterTerms.size() > 0}"
                     layout="block" styleClass="col-md-12">
                 <h3>#{label['queryview.noSearchResults']}</h3>
             </h:panelGroup>
 
-            <ui:fragment rendered="#{researcherQueriesDetailBean.queries.size() > 0}">
+            <ui:fragment rendered="#{researcherQueriesDetailBean.getNumQueries() > 0}">
                 <h:form>
 
-                    <ui:repeat value="#{researcherQueriesDetailBean.queries}" var="item">
+                    <f:facet name="header">
+                        Click More to load more Requests
+                    </f:facet>
+                    <f:facet name="loader">
+                        <div class="text-center">
+                            <p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+                        </div>
+                    </f:facet>
+
+                    <!-- TODO: replace the ui:repeat with LazyLoading -->
+                    <p:dataScroller value="#{ResearcherQueriesBean.lazyDataModel}" var="item" lazy="true" chunkSize="5">
                         <bbmricc:queryboxResearcher item="#{item}" selectedQuery="#{researcherQueriesDetailBean.queryId}"/>
-                    </ui:repeat>
+                    </p:dataScroller>
 
                     <h:outputScript>
                         $(function () {
@@ -512,15 +527,41 @@
                         <div id="comments" class="tab-pane fade">
                             <div class="row" style="margin:5px;padding-left: 10px;">
                                 In the group discussion all representatives of the involved Biobanks, the researcher and BBMRI-ERIC moderators can read and reply to the messages.
+
                                 <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo">Show User List</button>
                                 <div id="demo" class="collapse">
                                     <div class="container">
                                     <div class="row">
-                                        <ui:repeat value="#{researcherQueriesDetailBean.personList}"
+                                        <!-- Create DIV in code and only show the string - should speed up significantly:
+                                        https://howchoo.com/code/learn-the-slow-and-fast-way-to-append-elements-to-the-dom
+                                        -->
+                                        <!--<h:outputText value="#{researcherQueriesDetailBean.getPersonStringDIVsForRequest()}" escape="false" />-->
+                                        <!--TODO alternatively no "More" button but scrollHeight fixed value and load new when scrolling down-->
+                                        <p:dataScroller value="#{researcherQueriesDetailBean.lazyDataModelPerson}" var="item" lazy="true" chunkSize="10" mode="inline">
+                                            <f:facet name="header">
+                                                Representatives of the involved Biobank(s), researcher and BBMRI-ERIC moderators
+                                            </f:facet>
+
+                                            <div class="col-xs-3">
+                                                <i class="glyphicon glyphicon-user"></i>
+                                                <!--<i class="glyphicon glyphicon-user"/></i>-->
+                                                #{item.authName}
+                                            </div>
+                                            <f:facet name="loader">
+                                                <div class="text-center">
+                                                    <p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+                                                    <!--                                                    <p:commandButton type="button" value="More" icon="pi pi-refresh" disabled="#    {  researcherQueriesDetailBean.noMorePeopleAvailable}"/>-->
+                                                </div>
+                                            </f:facet>
+                                        </p:dataScroller>
+                                        <!--
+                                        <ui:repeat value="#{researcherQueriesDetailBean.getPersonList()}"
                                                    var="person">
                                             <div class="col-xs-3"><i class="glyphicon glyphicon-user"/>#{person.authName}</div>
                                         </ui:repeat>
-                                    </div></div>
+                                        -->
+                                    </div>
+                                </div>
                                 </div>
                             </div>
 
@@ -673,8 +714,6 @@
                                 </div>
 
                             </c:forEach>
-
-
 
                         </div>
                     </div>

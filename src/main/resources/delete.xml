@@ -4,9 +4,21 @@
 		<Console name="STDOUT" target="SYSTEM_OUT">
 			<PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
 		</Console>
-		<File name="negotiator" fileName="${sys:catalina.base}/logs/negotiator.log">
-			<PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" />
-		</File>
+		<!--            <File name="negotiator" fileName="${sys:catalina.base}/logs/negotiator.log"> -->
+		<!--                    <PatternLayout pattern="%d{DATE} %-5p %C (%F:%L) - %m%n" /> -->
+		<!--            </File> -->
+		<RollingFile name="negotiator"
+					 fileName="/${log:-/var/log/tomcat9}/negotiator.log"
+					 filePattern="${log:-/var/log/tomcat9}/negotiator-%d{yyyy-MM-dd}.log">
+			<PatternLayout>
+				<pattern>%d{DATE} %-5p %C (%F:%L) - %m%n
+				</pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+				<SizeBasedTriggeringPolicy size="100MB" />
+			</Policies>
+		</RollingFile>
 
 	</Appenders>
 	<Loggers>

@@ -20,7 +20,7 @@
 
     <h:outputStylesheet name="css/bbmri.css" />
     <h:outputStylesheet name="css/buttons.css" />
-    <h:outputStylesheet name="css/negotiator.css" />
+    <h:outputStylesheet name="css/negotiator20221019.css" />
 
 
     <h:outputScript library="webjars" name="jquery/3.3.1/jquery.min.js" />
@@ -51,4 +51,25 @@
         ga('send', 'pageview');
     </h:outputScript>
 
+    <!-- Script to block the page until the DOM is loaded -->
+    <h:outputScript>
+        document.onreadystatechange = function() {
+            if (document.readyState !== "complete") {
+                document.getElementById('body').style.visibility = 'hidden'
+                document.getElementById('loader').style.visibility = "visible";
+
+            } else {
+                document.getElementById('loader').style.visibility="hidden";
+                document.getElementById('body').style.visibility = "visible";
+            }
+
+        };
+        window.onbeforeunload = function(e){
+<!--            document.getElementById('body').style.visibility = 'hidden'-->
+            document.getElementById('loader').style.visibility = 'visible';
+<!--        Making the body static instead of hidden... less "flickering" because not always white screen when page changes-->
+            document.getElementById('body').style.pointerEvents = 'none';
+        };
+
+    </h:outputScript>
 </ui:composition>

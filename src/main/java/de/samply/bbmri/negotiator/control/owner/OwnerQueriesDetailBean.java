@@ -26,31 +26,8 @@
 
 package de.samply.bbmri.negotiator.control.owner;
 
-import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Collection;
-import java.util.stream.Collectors;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.apache.pdfbox.io.MemoryUsageSetting;
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.FileUtil;
@@ -67,10 +44,14 @@ import de.samply.bbmri.negotiator.jooq.tables.records.BiobankRecord;
 import de.samply.bbmri.negotiator.model.*;
 import de.samply.bbmri.negotiator.rest.RestApplication;
 import de.samply.bbmri.negotiator.rest.dto.QueryDTO;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import de.samply.bbmri.negotiator.util.DataCache;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.CollectionLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.jooq.Record;
 import org.jooq.Result;
 import org.json.simple.JSONArray;
@@ -80,8 +61,30 @@ import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.W3CDom;
 import org.jsoup.nodes.Document;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.primefaces.model.FilterMeta;
+import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
+import java.io.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Manages the query detail view for owners
@@ -171,7 +174,12 @@ public class OwnerQueriesDetailBean implements Serializable {
 
 
 	private int unreadQueryCount = 0;
+	@Deprecated
 	private List<Person> personList;
+	/**
+	 * String to hold contact persons in DIVs
+	 */
+	private String personStringDIVsForRequest = "";
 
 	private final HashMap<String, List<CollectionLifeCycleStatus>> sortedCollections = new HashMap<>();
 
@@ -200,11 +208,55 @@ public class OwnerQueriesDetailBean implements Serializable {
 	private List<FacesMessage> fileValidationMessages = new ArrayList<>();
 	Negotiator negotiator = NegotiatorConfig.get().getNegotiator();
 
-    /**
+	public int getNumQueries() {
+		return NumQueries;
+	}
+
+	/**
+	 * The number of total queries
+	 */
+	private int NumQueries;
+
+	// lazy data model to hold the researcher queries
+	private LazyDataModel<Person> lazyDataModelPerson;
+	private int contactPersonCount;
+
+	/**
+	 * Initializes this bean by loading the query count for the current researcher.
+	 * Created the PostConstruct Init in parallel to the existing initialize() method as its already late today.
+	 */
+	@PostConstruct
+	public void init() {
+		try(Config config = ConfigFactory.get()) {
+			/**
+			 * set the number of queries to be used in the page display
+			 */
+			this.NumQueries = DbUtil.countQueriesForResearcher(config, userBean.getUserId(), getFilterTerms());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		this.lazyDataModelPerson = new LazyDataModel<Person>() {
+
+			private static final long serialVersionUID = -4742720028771554420L;
+
+			@Override public List<Person> load(final int first, final int pageSize,
+											   final String sortField, final SortOrder sortOrder,
+											   final Map<String, FilterMeta> filters) {
+
+				System.out.println(first);
+				return loadLatestPerson(first, pageSize);
+			}
+		};
+	}
+
+	/**
      * initialises the page by getting all the comments for a selected(clicked on) query
      */
 	public String initialize() {
         setNonConfidential(false);
+		countContactPerson();
+		lazyDataModelPerson.setRowCount(this.contactPersonCount);
 
         try(Config config = ConfigFactory.get()) {
             setComments(DbUtil.getComments(config, queryId, userBean.getUserId()));
@@ -212,12 +264,20 @@ public class OwnerQueriesDetailBean implements Serializable {
 			/**
 			 * Get the selected(clicked on) query from the list of queries for the owner
 			 */
+			// TODO: implement loading of the selected query and setting the comments
+			selectedQuery = DbUtil.getSelectedQuery( config, queryId);
+			// TODO: Get the query for type ownerQueryStatsDTO
+			//setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
+			/**
+			 * Get the selected(clicked on) query from the list of queries for the owner
+
 			for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
 				if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
 					selectedQuery = ownerQueryStatsDTO.getQuery();
 					setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
 				}
 			}
+			 */
 
 			if(selectedQuery != null) {
 				try {
@@ -292,7 +352,10 @@ public class OwnerQueriesDetailBean implements Serializable {
 				}
             }
 
-			setPersonListForRequest(config, selectedQuery.getId());
+			// setPersonListForRequest(config, selectedQuery.getId());
+			// Set the PersonDIVsString - setPersonListForRequest is deprecated once this works
+//			setPersonStringDIVsForRequest(config, selectedQuery.getId());
+
 
             /*
              * Initialize Lifecycle Status
@@ -312,6 +375,7 @@ public class OwnerQueriesDetailBean implements Serializable {
         return null;
 	}
 
+	@Deprecated
 	private void setPersonListForRequest(Config config, Integer queryId) {
 		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
 	}
@@ -782,6 +846,22 @@ public class OwnerQueriesDetailBean implements Serializable {
 				+ "?includeViewParams=true&faces-redirect=true";
 	}
 
+	/**
+	 * Loads and returns a list of person
+	 * @param offset
+	 * @param size
+	 *
+	 * @return
+	 */
+	private List<Person> loadLatestPerson(int offset, int size) {
+		try(Config config = ConfigFactory.get()) {
+			personList = DbUtil.getPersonsContactsForRequest(config, queryId,offset,size);
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return personList;
+	}
+
 	/*
 	 * Getter / Setter for bean
 	 */
@@ -1055,10 +1135,56 @@ public class OwnerQueriesDetailBean implements Serializable {
 		this.unreadPrivateNegotiationCount = unreadPrivateNegotiationCount;
 	}
 
+	/**
+	 * Counts the total number of users associated with that query in the DB.
+	 * Stores the count in this.contactPersonCount
+	 *
+	 */
+	public void countContactPerson() {
+		try( Config config = ConfigFactory.get()) {
+			this.contactPersonCount = DbUtil.countContactPerson(config, queryId);
+		} catch (SQLException e) {
+			System.err.println("ERROR: ResearcherQueriesBean::getQueryCount()");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Set the contact persons in a String with DIVs to speed up the DOM creation
+	 *
+	 * @param config
+	 * @param queryId
+	 */
+	private void setPersonStringDIVsForRequest( Config config, Integer queryId) {
+		// ensure the personStringDIVsForRequest is empty
+		personStringDIVsForRequest = new String("");
+
+		// get the personList from the database
+		personList = DbUtil.getPersonsContactsForRequest(config, queryId);
+
+		logger.debug ( "personStringDIVsForRequest: " + personStringDIVsForRequest);
+		for( de.samply.bbmri.negotiator.jooq.tables.pojos.Person person : personList) {
+			if( person.getAuthName() != null) {
+				personStringDIVsForRequest = personStringDIVsForRequest.concat("<div class=\"col-xs-3\"><i class=\"glyphicon glyphicon-user\"/></i>");
+				personStringDIVsForRequest = personStringDIVsForRequest.concat(person.getAuthName());
+				personStringDIVsForRequest = personStringDIVsForRequest.concat("</div>");
+			}
+		}
+
+	}
+	/**
+	 * Returns the previously set person list as DIVs to speed up DOM creation
+	 * @return
+	 */
+	public String getPersonStringDIVsForRequest() {
+		return personStringDIVsForRequest;
+	}
+	@Deprecated
 	public List<Person> getPersonList() {
 		return personList;
 	}
-
+	@Deprecated
 	public void setPersonList(List<Person> personList) {
 		this.personList = personList;
 	}
@@ -1098,5 +1224,13 @@ public class OwnerQueriesDetailBean implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public LazyDataModel<Person> getLazyDataModelPerson() {
+		return lazyDataModelPerson;
+	}
+
+	public int getContactPersonCount() {
+		return contactPersonCount;
 	}
 }
