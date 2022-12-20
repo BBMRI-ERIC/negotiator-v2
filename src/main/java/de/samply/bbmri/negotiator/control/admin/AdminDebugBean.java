@@ -241,7 +241,7 @@ public class AdminDebugBean implements Serializable {
             commentMessage.append(researcher_new.getAuthName());
             commentMessage.append(".");
             DbUtil.transferQuery(config, transferQueryId, transferQueryToUserId);
-            DbUtil.addComment(config, transferQueryId, userBean.getUserId(), commentMessage.toString(), "published", false);
+            DbUtil.addComment(config, transferQueryId, userBean.getUserId(), commentMessage.toString(), "published", false, userBean.getModeratorMode());
         } catch (SQLException e) {
             System.err.println("3f0113dc7f4c-AdminDebugBean ERROR-NG-0000076: Error Transferring Request " + transferQueryId + " to user " + transferQueryToUserId + ".");
             e.printStackTrace();

@@ -90,6 +90,11 @@ public class Person extends TableImpl<PersonRecord> {
 	public final TableField<PersonRecord, Boolean> SYNCED_DIRECTORY = createField("synced_directory", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
 
 	/**
+	 * The column <code>public.person.is_moderator</code>. boolean if the person is an moderator
+	 */
+	public final TableField<PersonRecord, Boolean> IS_MODERATOR = createField("is_moderator", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "boolean if the person is an moderator");
+	
+	/**
 	 * Create a <code>public.person</code> table reference
 	 */
 	public Person() {

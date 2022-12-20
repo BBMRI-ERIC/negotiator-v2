@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (C) 2016 Medizinische Informatik in der Translationalen Onkologie,
+  ~ Deutsches Krebsforschungszentrum in Heidelberg
+  ~
+  ~ This program is free software; you can redistribute it and/or modify it under
+  ~ the terms of the GNU Affero General Public License as published by the Free
+  ~ Software Foundation; either version 3 of the License, or (at your option) any
+  ~ later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT
+  ~ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+  ~ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+  ~ details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program; if not, see http://www.gnu.org/licenses.
+  ~
+  ~ Additional permission under GNU GPL version 3 section 7:
+  ~
+  ~ If you modify this Program, or any covered work, by linking or combining it
+  ~ with Jersey (https://jersey.java.net) (or a modified version of that
+  ~ library), containing parts covered by the terms of the General Public
+  ~ License, version 2.0, the licensors of this Program grant you additional
+  ~ permission to convey the resulting work.
+  -->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:bbmricc="http://xmlns.jcp.org/jsf/composite/bbmri"
+                xmlns:p="http://primefaces.org/ui"
+                template="../components/default.xhtml">
+
+    <!-- Queries page for the moderator -->
+    
+    
+    <f:metadata>
+		<f:viewParam name="flag" value="#{moderatorQueriesBean.flagFilter}" />
+        <f:viewParam name="testRequest" value="#{moderatorQueriesBean.isTestRequest}" />
+		<f:viewAction action="#{sessionBean.clearAllFilters()}" />
+	</f:metadata>
+		
+        
+
+    <ui:param name="bodyClass" value="container body-nomargin"/>
+	
+    <ui:define name="body">
+        <h:panelGroup layout="block" styleClass="row">
+            <h3>#{label[moderatorQueriesBean.pagetitle]}: #{moderatorQueriesBean.queryCount}</h3>
+        </h:panelGroup>
+		<h:panelGroup
+			rendered="#{moderatorQueriesBean.countQueries() > 0 or moderatorQueriesBean.filterTerms.size() > 0}"
+			layout="block">
+			<bbmricc:search backingBean="#{moderatorQueriesBean}" />
+		</h:panelGroup>
+
+		<h:panelGroup
+			rendered="#{moderatorQueriesBean.countQueries() == 0 and moderatorQueriesBean.filterTerms.size() > 0}"
+			layout="block" styleClass="col-md-12">
+			<h3>#{label['queryview.noSearchResults']}</h3>
+		</h:panelGroup>
+
+		<h:panelGroup layout="block">
+            <h:panelGroup rendered="#{moderatorQueriesBean.countQueries() == 0 and moderatorQueriesBean.filterTerms.size() == 0}" layout="block">
+                <h3>#{label['queryview.noQueries']}</h3>
+            </h:panelGroup>
+
+            <!-- Use PrimeFaces Data Scroller (https://www.primefaces.org/datascroller/) inline mode -->
+            <p:dataScroller value="#{moderatorQueriesBean.lazyDataModel}" var="queryDto" lazy="true" chunkSize="5">
+                <f:facet name="header">
+                    Click More to load more Requests
+                </f:facet>
+                <f:facet name="loader">
+                    <div class="text-center">
+                        <p:commandButton type="button" value="More" icon="pi pi-refresh"/>
+                    </div>
+                </f:facet>
+
+                <h:panelGroup layout="block" styleClass="deco-none">
+                    <h:panelGroup layout="block" styleClass="panel panel-default clickable #{queryDto.isArchived() ? 'archived-query' : ''} ">
+                        <h:panelGroup layout="block" styleClass="#{queryDto.query.testRequest ? 'test-query-heading' : ''} panel-heading">
+                            <h:form id="queryItemActions">
+                                <h:commandLink styleClass="#{queryDto.isStarred() ? 'btn btn-primary' : 'btn btn-default'} btn-xs"
+                                               title="#{queryDto.isStarred() ? label['queryview.queryitem.action.unmarkFavorite'] : label['queryview.queryitem.action.markFavorite']}"
+                                               action="#{moderatorQueriesBean.starQuery(queryDto)}">
+                                    <i class="fa fa-star"></i>
+                                </h:commandLink>
+
+                                <h:link outcome="detail" title="#{label['queryview.queryitem.action.clickme']}" style="margin-left: 30px;" styleClass="detailLink">
+                                    <f:param name="queryId" value="#{queryDto.query.id}"/>
+                                    <f:param name="flag" value="#{moderatorQueriesBean.flagFilter}"/>
+                                    <f:param name="testRequest" value="#{moderatorQueriesBean.isTestRequest}"/>
+                                    <h:outputText value="[#{queryDto.query.id}] #{queryDto.query.title}"/>
+                                </h:link>
+
+                                <h:panelGroup styleClass="pull-right">
+
+                                    <h:panelGroup layout="block" styleClass="btn-group queryActionButtons pull-right" role="group" aria-label="...">
+
+                                        <h:commandLink  styleClass="#{queryDto.isArchived() ? 'btn btn-primary' : 'btn btn-default'}"
+                                        title="#{queryDto.isArchived() ? label['queryview.queryitem.action.unArchiveMe'] : label['queryview.queryitem.action.archiveMe']}"
+                                                        action="#{moderatorQueriesBean.archiveQuery(queryDto)}">
+                                            <i class="fa fa-folder-open"></i>
+                                        </h:commandLink>
+
+                                        <h:commandLink styleClass="#{queryDto.isIgnored() ? 'btn btn-primary' : 'btn btn-default'}"
+
+                                        title="#{queryDto.isIgnored() ? label['queryview.queryitem.action.unIgnoreMe'] : label['queryview.queryitem.action.ignoreMe']}"
+                                                       action="#{moderatorQueriesBean.ignoreQuery(queryDto)}">
+                                            <i class="fa fa-sign-out"></i>
+                                        </h:commandLink>
+
+                                    </h:panelGroup>
+                                        <div class="badge queryNumberResponsesBadge"
+                                             style='#{queryDto.unreadQueryCount == 0 ? "display:none;" : "" }'
+                                             data-toggle="tooltip"
+                                             data-placement="bottom"
+                                             title="#{queryDto.unreadQueryCount} unread status changes">
+
+                                            <i class="glyphicon glyphicon-refresh"></i>
+                                            <h:outputText value="   #{queryDto.unreadQueryCount}"/>
+                                        </div>
+                                    <div class="badge queryNumberResponsesBadge"
+                                         style='#{queryDto.commentCount == 0 ? "display:none;" : "" }#{queryDto.unreadCommentCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                                         data-toggle="tooltip"
+                                         data-placement="bottom"
+                                         title="#{queryDto.unreadCommentCount} unread comments from #{queryDto.commentCount} #{label['queryview.queryitem.amount.comments.text']}">
+
+                                        <i class="glyphicon glyphicon-bullhorn"></i>
+                                        <h:outputText value="   #{queryDto.unreadCommentCount}/#{queryDto.commentCount}"/>
+                                    </div>
+
+                                    <div class="badge queryNumberResponsesBadge"
+                                         style='#{queryDto.privateNegotiationCount == 0 ? "display:none;" : "" }#{queryDto.unreadPrivateNegotiationCount == 0 ? "background-color: #333333;" : "background-color: #EB690B;" }'
+                                         data-toggle="tooltip"
+                                         data-placement="bottom"
+                                         title="{queryDto.unreadPrivateNegotiationCount} unread comments from #{queryDto.privateNegotiationCount} #{label['queryview.queryitem.amount.privatenegotiation.text']}">
+
+                                        <i class="glyphicon glyphicon-tower"></i>
+                                        <h:outputText value="   #{queryDto.unreadPrivateNegotiationCount}/#{queryDto.privateNegotiationCount}" />
+                                    </div>
+
+                                </h:panelGroup>
+                            </h:form>
+                        </h:panelGroup>
+
+                        <h:panelGroup layout="block" styleClass="panel-body">
+                            <h:panelGroup layout="block" styleClass="row">
+                                <h:panelGroup layout="block" styleClass="col-xs-2 col-md-1">
+                                    <bbmricc:avatar person="#{queryDto.queryAuthor}"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup layout="block" styleClass="col-xs-10 col-md-11">
+                                    <h:panelGroup layout="block" styleClass="row queryOwner">
+                                        #{queryDto.queryAuthor.authName}
+                                    </h:panelGroup>
+
+                                    <h:panelGroup layout="block" styleClass="row">
+                                        <h:panelGroup layout="block" styleClass="col-md-12 truncate-panel">
+                                            #{queryDto.query.text}
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup layout="block" styleClass="row">
+                                        <h:panelGroup layout="block" styleClass="col-md-12">
+                                            <h:panelGroup styleClass="pull-right">
+
+                                                <h:outputText
+                                                    value="#{queryDto.query.queryCreationTime}"
+                                                    title="#{label['queryview.queryitem.datetime.creation']}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy hh:mm" />
+                                                </h:outputText>
+                                            </h:panelGroup>
+                                        </h:panelGroup>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </h:panelGroup>
+
+            </p:dataScroller>
+
+            <h:outputScript>
+                $(function() {
+                    setupQueryLinks();
+                });
+            </h:outputScript>
+        </h:panelGroup>
+    </ui:define>
+
+</ui:composition>

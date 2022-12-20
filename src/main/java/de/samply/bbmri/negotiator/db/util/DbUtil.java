@@ -841,6 +841,101 @@ public class DbUtil {
 
         return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
     }
+    /**
+     * Returns a list of queries for the moderator, filtered by a search term if such is provided
+     * @param config jooq configuration
+     * @param userId the user ID
+     * @param filters search term for title and text
+     * @return
+     */
+    public static List<OwnerQueryStatsDTO> getModeratorQueriesAtOffset(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest, int offset, int size) {
+        Person queryAuthor = Tables.PERSON.as("query_author");
+
+        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+
+        if (flag != null && flag != Flag.UNFLAGGED) {
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
+        } else {
+            /**
+             * Ignored queries are never selected unless the user is in the ignored folder
+             */
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+        }
+
+        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+
+        Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
+
+        Result<Record> fetch = config.dsl()
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(queryAuthor, "person"))
+                .select(Tables.COMMENT.COMMENT_TIME.max().as("last_comment_time"))
+                .select(Tables.COMMENT.ID.countDistinct().as("comment_count"))
+                .select(Tables.PERSON_COMMENT.COMMENT_ID.countDistinct().as("unread_comment_count"))
+                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
+                        .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
+                .from(Tables.QUERY)
+
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(Tables.NETWORK_COLLECTION_LINK, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
+
+                .join(Tables.COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID).and(Tables.COMMENT.STATUS.eq("published")))
+
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
+
+                .join(requestStatusTableStart, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
+
+                .join(requestStatusTableAbandon, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).eq("abandoned")))
+
+                .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
+                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+                        .and(Tables.PERSON_COMMENT.READ.eq(false)))
+
+                .where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
+                .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
+                .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
+                .orderBy(Tables.QUERY.QUERY_CREATION_TIME.desc())
+                .offset(offset)
+                .limit(size)
+                .fetch();
+        logger.info(userId);
+        logger.info(fetch.toString());
+
+        return MappingListDbUtil.mapRecordResultOwnerQueryStatsDTOList(fetch);
+    }
 
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
@@ -1016,6 +1111,85 @@ public class DbUtil {
         return fetch;
 
     }
+
+    /**
+     * Returns a list of queries for the moderator, filtered by a search term if such is provided
+     * @param config jooq configuration
+     * @param userId the user ID of the biobank owner
+     * @param filters search term for title and text
+     * @return
+     */
+    public static int countModeratorQueries(Config config, int userId, Set<String> filters, Flag flag) {
+        Person queryAuthor = Tables.PERSON.as("query_author");
+
+        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+
+        if(filters != null && filters.size() > 0) {
+            Condition titleCondition = DSL.trueCondition();
+            Condition textCondition = DSL.trueCondition();
+            Condition nameCondition = DSL.trueCondition();
+
+            for(String filter : filters) {
+                titleCondition = titleCondition.and(Tables.QUERY.TITLE.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                textCondition = textCondition.and(Tables.QUERY.TEXT.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+                nameCondition = nameCondition.and(queryAuthor.AUTH_NAME.likeIgnoreCase("%" + filter.replace("%", "!%") + "%", '!'));
+            }
+            condition = condition.and(titleCondition.or(textCondition).or(nameCondition));
+        }
+
+        if (flag != null && flag != Flag.UNFLAGGED) {
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.eq(flag));
+        } else {
+            /**
+             * Ignored queries are never selected unless the user is in the ignored folder
+             */
+            condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+        }
+
+
+        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+
+        Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
+        Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
+
+        return config.dsl().fetchCount(DSL
+                .select(getFields(Tables.QUERY, "query"))
+                .select(getFields(queryAuthor, "person"))
+                .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
+                        .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
+                .from(Tables.QUERY)
+
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(Tables.NETWORK_COLLECTION_LINK, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
+
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
+
+                .join(requestStatusTableStart, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
+
+                .join(requestStatusTableAbandon, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.QUERY_ID))
+                        .and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).eq("abandoned")))
+
+                .where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
+                .groupBy(Tables.QUERY.ID, queryAuthor.ID, Tables.FLAGGED_QUERY.PERSON_ID, Tables.FLAGGED_QUERY.QUERY_ID)
+                );
+    }
+
     /**
      * Returns a list of QueryAttachmentDTO for a specific query.
      * @param config
@@ -1093,6 +1267,8 @@ public class DbUtil {
             commentPersonDTO.setPerson(MappingDbUtil.mapRequestPerson(record));
             commentPersonDTO.getPerson().setId(Integer.parseInt(record.getValue("person_id").toString()));
             commentPersonDTO.setCommentRead(record.getValue("personcomment_read") == null || (boolean) record.getValue("personcomment_read"));
+
+            commentPersonDTO.getComment().setModerated( record.getValue( "comment_moderated") == null ? false : (boolean)  record.getValue( "comment_moderated"));
 
             Integer commenterId = commentPersonDTO.getPerson().getId();
             if(!personCollections.containsKey(commenterId)) {
@@ -1225,8 +1401,9 @@ public class DbUtil {
      * @param personId
      * @param comment
      * @param biobankInPrivateChat biobank id
+     * @param isModerated set to true if the offer is done by a moderator in moderation mode
      */
-    public static OfferRecord addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat) throws SQLException {
+    public static OfferRecord addOfferComment(Config config, int queryId, int personId, String comment, Integer biobankInPrivateChat, Boolean isModerated) throws SQLException {
         OfferRecord record = config.dsl().newRecord(Tables.OFFER);
         record.setQueryId(queryId);
         record.setPersonId(personId);
@@ -1234,6 +1411,7 @@ public class DbUtil {
         record.setText(comment);
         record.setStatus("published");
         record.setCommentTime(new Timestamp(new Date().getTime()));
+        record.setModerated(isModerated);
         record.store();
         return record;
     }
@@ -1245,13 +1423,14 @@ public class DbUtil {
      * @param personId
      * @param comment
      */
-    public static CommentRecord addComment(Config config, int queryId, int personId, String comment, String status, boolean attachment) throws SQLException {
+    public static CommentRecord addComment(Config config, int queryId, int personId, String comment, String status, boolean attachment, boolean moderated) throws SQLException {
         CommentRecord record = config.dsl().newRecord(Tables.COMMENT);
         record.setQueryId(queryId);
         record.setPersonId(personId);
         record.setText(comment);
         record.setStatus(status);
         record.setAttachment(attachment);
+        record.setModerated( moderated);
         record.setCommentTime(new Timestamp(new Date().getTime()));
         record.store();
         return record;
