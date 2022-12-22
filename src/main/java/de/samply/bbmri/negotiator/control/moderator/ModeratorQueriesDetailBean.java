@@ -94,7 +94,7 @@ public class ModeratorQueriesDetailBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = LogManager.getLogger(ModeratorQueriesDetailBean.class);
-	private String LOGGING_PREFIX = "97776fdc5f92-OwnerQueriesDetailBean ";
+	private String LOGGING_PREFIX = "eaa457575042-ModeratorQueriesDetailBean ";
 
 	@ManagedProperty(value = "#{userBean}")
 	private UserBean userBean;
@@ -315,7 +315,9 @@ public class ModeratorQueriesDetailBean implements Serializable {
                     Person queryAuthor = DbUtil.getPersonDetails(config, query.getResearcherId());
                     addme.setQueryAuthor(queryAuthor);
 					queries.add(0, addme);
+					/* no return here, need to get the requestLifeCycleStatus 
 					return null;
+					 */
 				}
             }
 

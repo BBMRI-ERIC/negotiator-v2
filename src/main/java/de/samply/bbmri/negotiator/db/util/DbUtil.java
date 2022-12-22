@@ -851,7 +851,9 @@ public class DbUtil {
     public static List<OwnerQueryStatsDTO> getModeratorQueriesAtOffset(Config config, int userId, Set<String> filters, Flag flag, Boolean isTestRequest, int offset, int size) {
         Person queryAuthor = Tables.PERSON.as("query_author");
 
-        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+        // replaced PERSON_COLLECTION with PERSON as we are not restricting on assigned collections for moderators
+        // Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+        Condition condition = Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull();
 
         if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
@@ -875,7 +877,8 @@ public class DbUtil {
             condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
         }
 
-        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+        // already first condition:
+        // condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
 
         Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
         Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
@@ -889,7 +892,8 @@ public class DbUtil {
                 .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
                         .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
                 .from(Tables.QUERY)
-
+/* show all queries to the Moderator user
+   TODO: add system to ensure moderator only has queries from his network or other criteria shown
                 .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
                 .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
 
@@ -901,7 +905,7 @@ public class DbUtil {
 
                 .join(Tables.NETWORK_COLLECTION_LINK, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-
+*/
                 .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
 
@@ -909,8 +913,11 @@ public class DbUtil {
                 .on(Tables.QUERY.ID.eq(Tables.COMMENT.QUERY_ID).and(Tables.COMMENT.STATUS.eq("published")))
 
                 .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID))
+/*
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
-
+ */
                 .join(requestStatusTableStart, JoinType.JOIN)
                 .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
                         .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
@@ -921,7 +928,7 @@ public class DbUtil {
 
                 .join(Tables.PERSON_COMMENT, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.PERSON_COMMENT.COMMENT_ID.eq(Tables.COMMENT.ID)
-                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
+//                        .and(Tables.PERSON_COMMENT.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
                         .and(Tables.PERSON_COMMENT.READ.eq(false)))
 
                 .where(condition).and(requestStatusTableAbandon.field(Tables.REQUEST_STATUS.STATUS).isNull())
@@ -1122,7 +1129,9 @@ public class DbUtil {
     public static int countModeratorQueries(Config config, int userId, Set<String> filters, Flag flag) {
         Person queryAuthor = Tables.PERSON.as("query_author");
 
-        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+        // replaced PERSON_COLLECTION with PERSON as we are not restricting on assigned collections for moderators
+        // Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+        Condition condition = Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull();
 
         if(filters != null && filters.size() > 0) {
             Condition titleCondition = DSL.trueCondition();
@@ -1147,7 +1156,8 @@ public class DbUtil {
         }
 
 
-        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+        // already first condition:
+        //condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
 
         Table<RequestStatusRecord> requestStatusTableStart = Tables.REQUEST_STATUS.as("request_status_table_start");
         Table<RequestStatusRecord> requestStatusTableAbandon = Tables.REQUEST_STATUS.as("request_status_table_abandon");
@@ -1158,7 +1168,8 @@ public class DbUtil {
                 .select(DSL.decode().when(Tables.FLAGGED_QUERY.FLAG.isNull(), Flag.UNFLAGGED)
                         .otherwise(Tables.FLAGGED_QUERY.FLAG).as("flag"))
                 .from(Tables.QUERY)
-
+/* show all queries to the Moderator user
+   TODO: add system to ensure moderator only has queries from his network or other criteria shown
                 .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
                 .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
 
@@ -1170,13 +1181,16 @@ public class DbUtil {
 
                 .join(Tables.NETWORK_COLLECTION_LINK, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.NETWORK_COLLECTION_LINK.COLLECTION_ID.eq(Tables.COLLECTION.ID))
-
+*/
                 .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
 
                 .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID))
+/*
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
                 .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
-
+*/
                 .join(requestStatusTableStart, JoinType.JOIN)
                 .on(Tables.QUERY.ID.eq(requestStatusTableStart.field(Tables.REQUEST_STATUS.QUERY_ID))
                         .and(requestStatusTableStart.field(Tables.REQUEST_STATUS.STATUS).eq("started")))
