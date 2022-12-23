@@ -1,7 +1,7 @@
 ![build](https://github.com/BBMRI-ERIC/negotiator-v2/actions/workflows/build.yml/badge.svg?)
 ![build](https://github.com/BBMRI-ERIC/negotiator-v2/actions/workflows/docker_image.yml/badge.svg?)
 [![codecov](https://codecov.io/github/BBMRI-ERIC/negotiator-v2/branch/feature/github_actions/graph/badge.svg?token=8W0I985ZXI)](https://codecov.io/github/BBMRI-ERIC/negotiator-v2)
-
+![Latest Release](https://img.shields.io/github/v/release/bbmri-eric/negotiator-v2)
 # Negotiator
 This is the BBMRI negotiator v2
 
