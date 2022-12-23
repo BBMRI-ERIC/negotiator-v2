@@ -73,7 +73,7 @@ jobs:
               }
             ]
       - name: Build with maven
-        run: mvn -B package -DskipTests
+        run: mvn package -Dmaven.test.skip=true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -94,7 +94,7 @@ jobs:
           name: negotiator-image
           path: /tmp/negotiator.tar
 
-  codeQL:
+  code-scan:
     needs: [ build ]
     runs-on: ubuntu-22.04
 
@@ -121,8 +121,8 @@ jobs:
               }
             ]
 
-      - name: Build with maven
-        run: mvn -B package -DskipTests
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
