@@ -4,7 +4,6 @@
 [![codecov](https://codecov.io/github/BBMRI-ERIC/negotiator-v2/branch/feature/github_actions/graph/badge.svg?token=8W0I985ZXI)](https://codecov.io/github/BBMRI-ERIC/negotiator-v2)
 ![Latest Release](https://img.shields.io/github/v/release/bbmri-eric/negotiator-v2)
 
-
 ## Getting Started
 
 
