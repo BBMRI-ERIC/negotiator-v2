@@ -13,7 +13,24 @@ on:
       - master
 
 jobs:
+  codeQL:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: java
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+
   test:
+    needs: [ codeQL ]
     runs-on: ubuntu-22.04
 
     steps:
