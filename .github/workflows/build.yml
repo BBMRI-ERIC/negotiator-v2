@@ -13,28 +13,7 @@ on:
       - master
 
 jobs:
-  lint:
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-
-      - name: Lint Code Base
-        uses: github/super-linter/slim@v4
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          DISABLE_ERRORS: true
-
-
   test:
-    needs: [ lint ]
     runs-on: ubuntu-22.04
 
     steps:
@@ -60,7 +39,7 @@ jobs:
               }
             ]
 
-      - name: Build and test with maven
+      - name: Run unit tests
         run: mvn test
 
       - name: Upload coverage to Codecov
@@ -72,15 +51,15 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
       - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
           java-version: '8'
           distribution: 'temurin'
           cache: 'maven'
-
-      - name: Check out Git repository
-        uses: actions/checkout@v3
 
       - name: Generate settings.xml for Maven Builds
         uses: whelk-io/maven-settings-xml-action@v20
@@ -94,7 +73,7 @@ jobs:
               }
             ]
       - name: Build and test with maven
-        run: mvn -B package -DskipTests=true
+        run: mvn -B package -DskipTests
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
