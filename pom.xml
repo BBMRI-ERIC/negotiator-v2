@@ -8,19 +8,11 @@
 
 
 
-    <parent> 
+    <parent>
         <artifactId>parent</artifactId>
         <groupId>de.samply</groupId>
         <version>10.1.2</version>
     </parent>
-
-    <repositories>
-        <repository>
-            <id>bbmri-eric</id>
-            <name>bbmri-nexus</name>
-            <url>http://nexus.bbmri-eric.eu:8081/repository/maven-public/</url>
-        </repository>
-    </repositories>
 
 
     <properties>
