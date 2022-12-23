@@ -75,6 +75,12 @@ jobs:
       - name: Build with maven
         run: mvn package -Dmaven.test.skip=true
 
+      - name: Upload war
+        uses: actions/upload-artifact@v3
+        with:
+          name: negotiator-war
+          path: target/blaze-0.18.5-standalone.jar
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
