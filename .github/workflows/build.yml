@@ -180,6 +180,9 @@ jobs:
       - name: Load Image
         run: docker load --input /tmp/negotiator.tar
 
+      - name: Create docker network
+        run: docker network create negotiator
+
       - name: Run negotiator-db in docker
         run: docker run --name negotiator-db --network negotiator -p 5432:5432 -e POSTGRES_PASSWORD=negotiator -e POSTGRES_USER=negotiator -e POSTGRES_DB=negotiator -d postgres:14
 
