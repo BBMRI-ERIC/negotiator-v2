@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: negotiator-war
-          path: target/blaze-0.18.5-standalone.jar
+          path: target/negotiator.war
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -224,6 +224,11 @@ jobs:
         with:
           name: negotiator-image
           path: /tmp
+      - name: Download War
+        uses: actions/download-artifact@v3
+        with:
+          name: negotiator-war
+          path: target/negotiator.war
 
       - name: Load Image
         run: docker load --input /tmp/negotiator.tar
