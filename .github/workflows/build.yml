@@ -97,6 +97,8 @@ jobs:
   code-scan:
     needs: [ build ]
     runs-on: ubuntu-22.04
+    permissions:
+      security-events: write
 
     steps:
       - name: Check out Git repository
@@ -121,13 +123,13 @@ jobs:
               }
             ]
 
-      - name: Build with maven
-        run: mvn package -Dmaven.test.skip=true
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: java
+
+      - name: Build with maven
+        run: mvn package -Dmaven.test.skip=true
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
