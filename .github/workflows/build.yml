@@ -13,24 +13,7 @@ on:
       - master
 
 jobs:
-  codeQL:
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: java
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-
-
   test:
-    needs: [ codeQL ]
     runs-on: ubuntu-22.04
 
     steps:
@@ -110,6 +93,44 @@ jobs:
         with:
           name: negotiator-image
           path: /tmp/negotiator.tar
+
+  codeQL:
+    needs: [ build ]
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Generate settings.xml for Maven Builds
+        uses: whelk-io/maven-settings-xml-action@v20
+        with:
+          mirrors: >
+            [
+              {
+                "id": "central",
+                "mirrorOf": "central",
+                "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
+              }
+            ]
+
+      - name: Build with maven
+        run: mvn -B package -DskipTests
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: java
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
 
 
   image-scan:
