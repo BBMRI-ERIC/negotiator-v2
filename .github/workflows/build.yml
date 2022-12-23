@@ -17,14 +17,14 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
       - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
           java-version: '8'
           distribution: 'temurin'
-
-      - name: Check out Git repository
-        uses: actions/checkout@v3
 
       - name: Lint Code Base
         uses: github/super-linter/slim@v4
@@ -38,15 +38,15 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
       - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
           java-version: '8'
           distribution: 'temurin'
           cache: 'maven'
-
-      - name: Check out Git repository
-        uses: actions/checkout@v3
 
       - name: Generate settings.xml for Maven Builds
         uses: whelk-io/maven-settings-xml-action@v20
