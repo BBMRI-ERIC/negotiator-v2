@@ -72,7 +72,7 @@ jobs:
                 "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
               }
             ]
-      - name: Build and test with maven
+      - name: Build with maven
         run: mvn -B package -DskipTests
 
       - name: Set up QEMU
@@ -104,7 +104,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: negotiator-image
-          path: /tmp/negotiator.tar
+          path: /tmp
 
       - name: Load Image
         run: docker load --input /tmp/negotiator.tar
