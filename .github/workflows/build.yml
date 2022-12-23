@@ -16,17 +16,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Generate settings.xml for Maven Builds
-        uses: whelk-io/maven-settings-xml-action@v20
-        with:
-          mirrors: >
-            [
-              {
-                "id": "central",
-                "mirrorOf": "central",
-                "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
-              }
-            ]
       - name: Build and test with maven
         run: mvn -B package
 
