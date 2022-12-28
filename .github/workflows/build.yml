@@ -138,7 +138,7 @@ jobs:
         run: pip install webdrivermanager selenium pytest
 
       - name: Wait for url
-        run: .github/scripts/wait_for_url.sh  http://localhost:8080
+        run: .github/scripts/wait_for_url.sh http://localhost:8080 & sleep 10
 
       - name: Run pytest
         run: pytest .github/tests/test_login.py
