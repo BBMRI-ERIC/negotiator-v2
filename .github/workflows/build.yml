@@ -100,6 +100,47 @@ jobs:
           name: negotiator-image
           path: /tmp/negotiator.tar
 
+  acceptance-test:
+    needs: build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Download Image
+        uses: actions/download-artifact@v3
+        with:
+          name: negotiator-image
+          path: /tmp
+
+      - name: Load Image
+        run: docker load --input /tmp/negotiator.tar
+
+      - name: Create docker network
+        run: docker network create negotiator
+
+      - name: Run negotiator-db in docker
+        run: docker run --name negotiator-db --network negotiator -p 5432:5432 -e POSTGRES_PASSWORD=negotiator -e POSTGRES_USER=negotiator -e POSTGRES_DB=negotiator -d postgres:14
+
+      - name: Run negotiator in docker
+        run: docker run -d --name negotiator --network negotiator -p 8080:8080 -e POSTGRES_HOST="negotiator-db" -e AUTH="true"  negotiator:latest
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install chrome binaries
+        run: .github/scripts/install_chrome.sh
+
+      - name: Install all necessary packages
+        run: pip install webdrivermanager selenium pytest
+
+      - name: Run the scraping script
+        run: pytest test_web.py
+
+
   system-test:
     needs: build
     runs-on: ubuntu-22.04
