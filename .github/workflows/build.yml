@@ -187,7 +187,7 @@ jobs:
 
 
   code-scan:
-    needs: [ system-test ]
+    needs: [ acceptance-test ]
     runs-on: ubuntu-22.04
     permissions:
       security-events: write
@@ -228,7 +228,7 @@ jobs:
 
 
   image-scan:
-    needs: [ system-test ]
+    needs: [ acceptance-test ]
     runs-on: ubuntu-22.04
 
     steps:
@@ -259,7 +259,7 @@ jobs:
 
 
   push_image:
-    needs: [ system-test ]
+    needs: [ acceptance-test ]
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
