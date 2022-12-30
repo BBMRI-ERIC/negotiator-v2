@@ -61,7 +61,7 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
+							"pm.test(\"Status code is 202\", function () {",
 							"    pm.response.to.have.status(202);",
 							"});",
 							"pm.test(\"Body matches string\", function () {",
@@ -92,7 +92,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n      \"humanReadable\":\"name: 'Test'\",\n    \"collections\":[\n      {\n        \"collectionID\":\"15\",\n        \"biobankID\":\"9\"\n      }\n    ], \"URL\": \"https://test.eu\"\n  } ",
+					"raw": "{\n      \"humanReadable\":\"name: 'Test'\",\n    \"collections\":[\n      {\n        \"collectionID\":\"5\",\n        \"biobankID\":\"5\"\n      }\n    ], \"URL\": \"https://test.eu\"\n  } ",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -107,7 +107,6 @@
 					],
 					"port": "8080",
 					"path": [
-						"negotiator_v2_war",
 						"api",
 						"directory",
 						"create_query"
