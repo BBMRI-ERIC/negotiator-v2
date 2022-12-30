@@ -66,6 +66,9 @@ INSERT INTO collection(id, directory_id, name, biobank_id)
 VALUES (21, '21', 'Usertest Collection 15', 11);
 ALTER SEQUENCE collection_id_seq RESTART WITH 22;
 
+INSERT INTO public.list_of_directories (id, name, url, rest_url, username, password, api_username, api_password, resource_biobanks, resource_collections, description, sync_active, directory_prefix, resource_networks, bbmri_eric_national_nodes, api_type) VALUES (3, 'Test Directory', 'https://test.eu', 'https://test.eu', '', '', '', '', 'eu_bbmri_eric_biobanks', 'eu_bbmri_eric_collections', 'Test Directory', true, 'Test Directory', null, null, 'Molgenis');
+
+
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image)
 VALUES (1, 'user1', 'Dr.med. Harald Researcher', 'test1@test1.org', NULL);
 INSERT INTO person(id, auth_subject, auth_name, auth_email, person_image)

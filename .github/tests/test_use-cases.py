@@ -23,3 +23,38 @@ class TestDefaultSuite():
     self.driver.find_element(By.NAME, "j_idt89:j_idt97").click()
     elements = self.driver.find_elements(By.CSS_SELECTOR, ".success > td:nth-child(1)")
     assert len(elements) > 0
+
+  def test_createquery(self):
+    self.driver.get("http://localhost:8080/negotiator_v2_war/researcher/newQuery.xhtml?jsonQueryId=3")
+    self.driver.find_element(By.NAME, "j_idt89:j_idt95").click()
+    self.driver.find_element(By.ID, "uploadform:title").click()
+    self.driver.find_element(By.ID, "uploadform:title").send_keys("test")
+    self.driver.find_element(By.ID, "uploadform:description").click()
+    self.driver.find_element(By.ID, "uploadform:description").send_keys("test")
+    self.driver.find_element(By.ID, "uploadform:requestdescription").click()
+    self.driver.find_element(By.ID, "uploadform:requestdescription").send_keys("test")
+    self.driver.find_element(By.NAME, "uploadform:j_idt185").click()
+    elements = self.driver.find_elements(By.LINK_TEXT, "[5] test")
+    assert len(elements) > 0
+
+  def test_approvequery(self):
+    self.driver.get("http://localhost:8080/dev/chose.xhtml")
+    self.driver.find_element(By.NAME, "j_idt89:j_idt97").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".bbmriModule").click()
+    self.driver.find_element(By.LINK_TEXT, "Review requests").click()
+    self.driver.find_element(By.LINK_TEXT, "List of requests to review").click()
+    self.driver.find_element(By.NAME, "j_idt101:0:approveRequest:j_idt103").click()
+    self.driver.find_element(By.CSS_SELECTOR, ".panel-success > .panel-body:nth-child(2)").click()
+    elements = self.driver.find_elements(By.CSS_SELECTOR, ".panel-success > .panel-body:nth-child(2)")
+    assert len(elements) > 0
+
+  def test_commentquery(self):
+    self.driver.get("http://localhost:8080/dev/chose.xhtml")
+    self.driver.find_element(By.NAME, "j_idt89:j_idt93").click()
+    self.driver.find_element(By.ID, "j_idt134:0:queryItemActions").click()
+    self.driver.find_element(By.CSS_SELECTOR, "#second > a").click()
+    self.driver.find_element(By.ID, "j_idt324:uploadform:commentText").click()
+    self.driver.find_element(By.ID, "j_idt324:uploadform:commentText").send_keys("test comment")
+    self.driver.find_element(By.NAME, "j_idt324:uploadform:j_idt372").click()
+    elements = self.driver.find_elements(By.CSS_SELECTOR, ".panel-heading:nth-child(2)")
+    assert len(elements) > 0

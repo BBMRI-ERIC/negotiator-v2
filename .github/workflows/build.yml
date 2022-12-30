@@ -179,8 +179,16 @@ jobs:
       - name: Install all necessary packages
         run: pip install webdrivermanager selenium pytest
 
+      - name: Install newman
+        run: |
+          npm install -g newman
+
       - name: Wait for url
         run: .github/scripts/wait_for_url.sh http://localhost:8080 & sleep 10
+
+      - name: Create query using postman
+        run: |
+          newman run .github/tests/create_query_postman.json
 
       - name: Run acceptance tests
         run: pytest .github/tests/test_use-cases.py
