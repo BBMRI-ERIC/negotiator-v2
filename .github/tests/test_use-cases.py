@@ -25,7 +25,7 @@ class TestDefaultSuite():
     assert len(elements) > 0
 
   def test_createquery(self):
-    self.driver.get("http://localhost:8080/negotiator_v2_war/researcher/newQuery.xhtml?jsonQueryId=3")
+    self.driver.get("http://localhost:8080/researcher/newQuery.xhtml?jsonQueryId=3")
     self.driver.find_element(By.NAME, "j_idt89:j_idt95").click()
     self.driver.find_element(By.ID, "uploadform:title").click()
     self.driver.find_element(By.ID, "uploadform:title").send_keys("test")
