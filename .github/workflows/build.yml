@@ -13,7 +13,8 @@ on:
       - master
 
 jobs:
-  test:
+  unit-tests:
+    needs: build
     runs-on: ubuntu-22.04
 
     steps:
@@ -47,7 +48,6 @@ jobs:
 
 
   build:
-    needs: [ test ]
     runs-on: ubuntu-22.04
 
     steps:
@@ -101,8 +101,8 @@ jobs:
           path: /tmp/negotiator.tar
 
 
-  system-test:
-    needs: build
+  system-tests:
+    needs: unit-tests
     runs-on: ubuntu-22.04
 
     steps:
@@ -142,8 +142,8 @@ jobs:
           newman run .github/tests/api_tests.json
           
 
-  acceptance-test:
-    needs: [ system-test ]
+  acceptance-tests:
+    needs: [ system-tests ]
     runs-on: ubuntu-22.04
 
     steps:
@@ -187,7 +187,7 @@ jobs:
 
 
   code-scan:
-    needs: [ acceptance-test ]
+    needs: [ acceptance-tests ]
     runs-on: ubuntu-22.04
     permissions:
       security-events: write
@@ -228,7 +228,7 @@ jobs:
 
 
   image-scan:
-    needs: [ acceptance-test ]
+    needs: [ acceptance-tests ]
     runs-on: ubuntu-22.04
 
     steps:
@@ -259,7 +259,7 @@ jobs:
 
 
   push_image:
-    needs: [ acceptance-test ]
+    needs: [ acceptance-tests ]
     runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
