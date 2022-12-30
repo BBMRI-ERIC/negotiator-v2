@@ -100,7 +100,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/negotiator_v2_war/api/directory/create_query",
+					"raw": "http://localhost:8080/api/directory/create_query",
 					"protocol": "http",
 					"host": [
 						"localhost"
