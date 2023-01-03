@@ -1,8 +1,8 @@
 <Context path="/">
 <Resource name="jdbc/postgres" auth="Container"
           type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
-          url="jdbc:postgresql://${database.server}:${database.port}/${database.name}"
-          username="${database.username}" password="${database.password}" maxActive="50" maxIdle="20"
+          url="jdbc:postgresql://${database.server:-localhost}:${database.port:-5432}/${database.name:-negotiator}"
+          username="${database.username:-negotiator}" password="${database.password:-negotiator}" maxActive="50" maxIdle="20"
           removeAbandoned="true" removeAbandonedTimeout="120" logAbandoned="true" maxWait="-1"
           testOnBorrow="true" validationQuery="select 1"/>
 </Context>

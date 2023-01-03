@@ -25,7 +25,7 @@
  * permission to convey the resulting work.
  */
 
-package de.samply.bbmri.negotiator.control.owner;
+package de.samply.bbmri.negotiator.control.moderator;
 
 import de.samply.bbmri.negotiator.Config;
 import de.samply.bbmri.negotiator.ConfigFactory;
@@ -41,6 +41,7 @@ import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
@@ -52,9 +53,9 @@ import java.util.*;
 /**
  * Manages the query view for owners
  */
-@ManagedBean(name = "ownerQueriesBean")
+@ManagedBean(name = "moderatorQueriesBean")
 @ViewScoped
-public class OwnerQueriesBean implements Serializable {
+public class ModeratorQueriesBean implements Serializable {
 
 	/**
 	 *
@@ -63,7 +64,8 @@ public class OwnerQueriesBean implements Serializable {
 
 	// TODO: set the chunk size static for now, but this should be adopted to display according to the maximum page size
 	private static final int CHUNK_SIZE = 5;
-
+	// Number of all queries for this researcher
+	// TODO: check if this can be removed
 	private int queryCount;
 	// lazy data model to hold the researcher queries
 	private LazyDataModel<OwnerQueryStatsDTO> lazyDataModel;
@@ -80,29 +82,30 @@ public class OwnerQueriesBean implements Serializable {
 	private UserBean userBean;
 
 	@ManagedProperty(value = "#{sessionBean}")
-    private SessionBean sessionBean;
+	private SessionBean sessionBean;
 
 	/**
 	 * Initializes this bean by loading all queries for the current owner.
 	 */
 	@PostConstruct
 	public void init() {
-		countQueriesForOwner();
-		// We flag the UserBean to show we are not in moderator mode
-		userBean.deactivateModeratorMode();
+		// We flag the UserBean to show we are in the moderator mode
+		userBean.activateModeratorMode();
+		countQueries();
+
 		this.lazyDataModel = new LazyDataModel<OwnerQueryStatsDTO>() {
 
 			private static final long serialVersionUID = -4742720028771554420L;
 
 			@Override public List<OwnerQueryStatsDTO> load(final int first, final int pageSize,
-													  final String sortField, final SortOrder sortOrder,
-													  final Map<String, FilterMeta> filters) {
+														   final String sortField, final SortOrder sortOrder,
+														   final Map<String, FilterMeta> filters) {
 
 				System.out.println(first);
-				return loadLatestOwnerQueryStatsDTO(first, pageSize);
+				return loadLatestModeratorQueryStatsDTO(first, pageSize);
 			}
 		};
-		lazyDataModel.setRowCount(this.queryCount);
+		lazyDataModel.setRowCount(getQueryCount());
 	}
 
 	/**
@@ -172,22 +175,22 @@ public class OwnerQueriesBean implements Serializable {
 		if (queries == null || queries.isEmpty()) {
 			return;
 		} else {
-		    Collections.sort(queries, new Comparator<OwnerQueryStatsDTO>() {
-                @Override
-                public int compare(OwnerQueryStatsDTO obj1, OwnerQueryStatsDTO obj2) {
-                    if(obj1.isArchived() && obj2.isArchived()) {
-                        return 0;
-                    } else if(obj1.isArchived()) {
-                        return 1;
-                    } else if(obj2.isArchived()) {
-                        return -1;
-                    } else {
-                        return 0;
-                    }
-                }
-            });
+			Collections.sort(queries, new Comparator<OwnerQueryStatsDTO>() {
+				@Override
+				public int compare(OwnerQueryStatsDTO obj1, OwnerQueryStatsDTO obj2) {
+					if(obj1.isArchived() && obj2.isArchived()) {
+						return 0;
+					} else if(obj1.isArchived()) {
+						return 1;
+					} else if(obj2.isArchived()) {
+						return -1;
+					} else {
+						return 0;
+					}
+				}
+			});
 
-	    }
+		}
 	}
 
 	/**
@@ -200,8 +203,8 @@ public class OwnerQueriesBean implements Serializable {
 		if (queries == null || queries.isEmpty()) {
 			try (Config config = ConfigFactory.get()) {
 
-			    queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
-					        flagFilter, isTestRequest);
+				queries = DbUtil.getOwnerQueries(config, userBean.getUserId(), getFilterTerms(),
+						flagFilter, isTestRequest);
 
 				for (int i = 0; i < queries.size(); ++i) {
 					getPrivateNegotiationCountAndTime(config, i);
@@ -218,14 +221,14 @@ public class OwnerQueriesBean implements Serializable {
 	}
 
 	/**
-	 * Gets a list of negotiaton queries from the database, starting at offset with the number of
+	 * Gets a list of ALL negotiaton queries from the database, starting at offset with the number of
 	 * queries to be returned by chunk size.
 	 *
 	 * @return List<OwnerQueryStatsDTO>
 	 */
-	private List<OwnerQueryStatsDTO> loadLatestOwnerQueryStatsDTO( int offset, int size) {
+	private List<OwnerQueryStatsDTO> loadLatestModeratorQueryStatsDTO( int offset, int size) {
 		try(Config config = ConfigFactory.get()) {
-			queries = DbUtil.getOwnerQueriesAtOffset(config, userBean.getUserId(), getFilterTerms(),
+			queries = DbUtil.getModeratorQueriesAtOffset(config, userBean.getUserId(), getFilterTerms(),
 					flagFilter, isTestRequest, offset, size);
 
 			for (int i = 0; i < queries.size(); ++i) {
@@ -246,17 +249,17 @@ public class OwnerQueriesBean implements Serializable {
 	 * Load the number of queries "("SELECT COUNT(*) from ..."
 	 * @return int numQueries
 	 */
-	public int getQueryCount() {
-		return this.queryCount;
-	}
-
-	public void countQueriesForOwner() {
+	public void countQueries() {
 		try( Config config = ConfigFactory.get()) {
-			this.queryCount = DbUtil.countOwnerQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter, isTestRequest);
+			this.queryCount = DbUtil.countModeratorQueries(config, userBean.getUserId(), getFilterTerms(), flagFilter);
 		} catch (SQLException e) {
 			System.err.println("ERROR: OwnerQueriesBean::getQueryCount()");
 			e.printStackTrace();
 		}
+	}
+
+	public int getQueryCount() {
+		return this.queryCount;
 	}
 
 	public void getPrivateNegotiationCountAndTime(Config config, int index){
@@ -334,8 +337,13 @@ public class OwnerQueriesBean implements Serializable {
 		this.flagFilter = flagFilter;
 	}
 
+	/**
+	 * Set the pagetitle for the displayed page
+	 *
+	 * @return String of moderator.index.pagetitle to be shown on top of page
+	 */
 	public String getPagetitle() {
-		return "pagetitle_"+flagFilter;
+		return "moderator.index.pagetitle";
 	}
 
 	public Boolean getIsTestRequest() {

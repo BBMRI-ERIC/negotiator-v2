@@ -174,6 +174,38 @@ public class UserBean implements Serializable {
     private Boolean isAdmin = false;
 
 	/**
+	 * We set this when the user has the moderator role
+	 */
+	private Boolean isModerator = false;
+
+	/**
+	 * used to check if the user is in moderator mode
+	 * @return
+	 */
+	public Boolean getModeratorMode() {
+		return inModeratorMode;
+	}
+
+	/**
+	 * activates the user for moderator mode
+	 */
+	public void activateModeratorMode() {
+		this.inModeratorMode = true;
+	}
+
+	/**
+	 * deactivates the user for moderator mode
+	 */
+	public void deactivateModeratorMode() {
+		this.inModeratorMode = false;
+	}
+
+	/**
+	 * We set this when the user enters the moderator functionality
+	 */
+	private Boolean inModeratorMode = false;
+
+	/**
 	 * Basic Constructor for when the user bean is created without dependency injection.
 	 */
 	public UserBean() {
@@ -457,6 +489,7 @@ public class UserBean implements Serializable {
                 userRealName = personRecord.getAuthName();
                 userEmail = personRecord.getAuthEmail();
                 userId = personRecord.getId();
+				isModerator = personRecord.getIsModerator();
                 createOrGetUser();
             }
         } catch (SQLException e) {
@@ -474,6 +507,7 @@ public class UserBean implements Serializable {
 
         setSudoMaster(this.userIdentity);
         isAdmin = false;
+		isModerator = false;
         this.userIdentity = identity;
 
         try(Config config = ConfigFactory.get()) {
@@ -483,6 +517,8 @@ public class UserBean implements Serializable {
                 userRealName = personRecord.getAuthName();
                 userEmail = personRecord.getAuthEmail();
                 userId = personRecord.getId();
+				isModerator = personRecord.getIsModerator();
+				
                 createOrGetUser();
             }
         } catch (SQLException e) {
@@ -517,6 +553,7 @@ public class UserBean implements Serializable {
 					person.store();
 
 					isAdmin = false;
+					isModerator = false;
 				} catch (Exception e) {
 					System.err.println("ERROR: Creating user.");
 					config.rollback();
@@ -539,6 +576,10 @@ public class UserBean implements Serializable {
 
 					if (person.getIsAdmin())
 						isAdmin = true;
+					
+					if (person.getIsModerator())
+						isModerator = true;
+
 				} catch (Exception e) {
 					System.err.println("ERROR: Update user.");
 					config.rollback();
@@ -567,6 +608,14 @@ public class UserBean implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Returns true, if the user is an moderator, false otherwise.
+	 * @return
+     */	
+	public Boolean isModerator() {
+		return isModerator;
 	}
 
 	/**

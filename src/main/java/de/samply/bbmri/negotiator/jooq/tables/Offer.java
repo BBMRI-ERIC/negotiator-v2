@@ -88,6 +88,11 @@ public class Offer extends TableImpl<OfferRecord> {
 	public final TableField<OfferRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "");
 
 	/**
+	 * The column <code>public.comment.moderated</code>.
+	 */
+	public final TableField<OfferRecord, Boolean> MODERATED = createField("moderated", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(false), this, "marks the offer as done by user with Moderator role");
+
+	/**
 	 * Create a <code>public.offer</code> table reference
 	 */
 	public Offer() {

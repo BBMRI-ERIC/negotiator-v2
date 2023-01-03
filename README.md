@@ -1,24 +1,19 @@
-![build](https://github.com/BBMRI-ERIC/negotiator-v2/actions/workflows/build.yml/badge.svg?)
-![build](https://github.com/BBMRI-ERIC/negotiator-v2/actions/workflows/docker_image.yml/badge.svg?)
-[![codecov](https://codecov.io/github/BBMRI-ERIC/negotiator-v2/branch/feature/github_actions/graph/badge.svg?token=8W0I985ZXI)](https://codecov.io/github/BBMRI-ERIC/negotiator-v2)
-
 # Negotiator
-This is the BBMRI negotiator v2
+![build](https://github.com/BBMRI-ERIC/negotiator-v2/actions/workflows/build.yml/badge.svg?)
+[![codecov](https://codecov.io/github/BBMRI-ERIC/negotiator-v2/branch/feature/github_actions/graph/badge.svg?token=8W0I985ZXI)](https://codecov.io/github/BBMRI-ERIC/negotiator-v2)
+![Latest Release](https://img.shields.io/github/v/release/bbmri-eric/negotiator-v2)
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/bbmrieric/negotiator)
+
 
 ## Getting Started
+The simplest way to spin up a negotiator instance is using docker. The commands bellow will start an instance with test
+data and the authentication disabled:
 
+`docker network create negotiator`
 
-This application uses a database with the name of 'negotiator'. Feel free to change the name but remember to update it in pom.xml
-Following are the settings in the pom file that need to be updated according to your requirements
+`docker run --name negotiator-db --network negotiator -p 5432:5432 -e POSTGRES_PASSWORD=negotiator -e POSTGRES_USER=negotiator -e POSTGRES_DB=negotiator -d postgres:14`
 
- <database.server>server.name</database.server>
- <database.port>port.number</database.port>
- <database.name>negotiator</database.name>
- <database.username>database.user.name</database.username>
- <database.password>database.password</database.password>
-
-Before starting the application, it is necessary to create a database.
-
+`docker run -d --name negotiator --network negotiator -p 8080:8080 -e POSTGRES_HOST="negotiator-db" -e AUTH="true"  bbmrieric/negotiator`
 ## Development mode
 
 By settings the runtime property `de.samply.development.authenticationDisabled` to `true` in the bbmri.negotiator.xml,

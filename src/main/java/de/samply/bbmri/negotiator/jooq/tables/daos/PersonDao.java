@@ -119,4 +119,11 @@ public class PersonDao extends DAOImpl<PersonRecord, de.samply.bbmri.negotiator.
 	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchBySyncedDirectory(Boolean... values) {
 		return fetch(Person.PERSON.SYNCED_DIRECTORY, values);
 	}
+
+	/**
+	 * Fetch records that have <code>is_moderator IN (values)</code>
+	 */
+	public List<de.samply.bbmri.negotiator.jooq.tables.pojos.Person> fetchByIsModerator(Boolean... values) {
+		return fetch(Person.PERSON.IS_MODERATOR, values);
+	}
 }

@@ -32,6 +32,7 @@ public class Person implements Serializable {
 	private Boolean isAdmin;
 	private String  organization;
 	private Boolean syncedDirectory;
+	private Boolean isModerator;
 
 	public Person() {}
 
@@ -44,6 +45,7 @@ public class Person implements Serializable {
 		this.isAdmin = value.isAdmin;
 		this.organization = value.organization;
 		this.syncedDirectory = value.syncedDirectory;
+		this.isModerator = value.isModerator;
 	}
 
 	public Person(
@@ -54,7 +56,8 @@ public class Person implements Serializable {
 		byte[]  personImage,
 		Boolean isAdmin,
 		String  organization,
-		Boolean syncedDirectory
+		Boolean syncedDirectory,
+		Boolean isModerator
 	) {
 		this.id = id;
 		this.authSubject = authSubject;
@@ -64,6 +67,7 @@ public class Person implements Serializable {
 		this.isAdmin = isAdmin;
 		this.organization = organization;
 		this.syncedDirectory = syncedDirectory;
+		this.isModerator = isModerator;
 	}
 
 	public Integer getId() {
@@ -129,4 +133,12 @@ public class Person implements Serializable {
 	public void setSyncedDirectory(Boolean syncedDirectory) {
 		this.syncedDirectory = syncedDirectory;
 	}
+
+	public Boolean getIsModerator() {
+		return this.isModerator;
+	}
+
+	public void setIsModerator(Boolean isModerator) {
+		this.isModerator = isModerator;
+	}	
 }

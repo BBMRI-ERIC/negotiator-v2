@@ -87,6 +87,11 @@ public class Comment extends TableImpl<CommentRecord> {
 	public final TableField<CommentRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "status: published, deleted, saved");
 
 	/**
+	 * The column <code>public.comment.moderated</code>.
+	 */
+	public final TableField<CommentRecord, Boolean> MODERATED = createField("moderated", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(false), this, "marks the comment as done by user with Moderator role");
+
+	/**
 	 * Create a <code>public.comment</code> table reference
 	 */
 	public Comment() {

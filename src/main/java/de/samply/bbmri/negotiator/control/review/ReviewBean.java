@@ -45,6 +45,9 @@ public class ReviewBean implements Serializable {
 
     @PostConstruct
     public void init() {
+        // We flag the UserBean to show we are not in moderator mode
+        userBean.deactivateModeratorMode();
+
         collectLifecycleStatistic();
         createRequestStatusQueriesToReview();
     }
