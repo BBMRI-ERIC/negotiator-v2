@@ -38,11 +38,11 @@ class TestDefaultSuite():
     assert len(elements) > 0
 
   def test_approvequery(self):
-    self.driver.get("http://localhost:8080/negotiator_v2_war/dev/chose.xhtml")
+    self.driver.get("http://localhost:8080/dev/chose.xhtml")
     self.driver.find_element(By.NAME, "j_idt89:j_idt97").click()
     self.driver.find_element(By.CSS_SELECTOR, ".bbmriModule").click()
-    self.driver.find_element(By.XPATH, "//a[contains(text(),\'Review requests\')]").click()
-    self.driver.find_element(By.XPATH, "//a[contains(text(),\'List of requests to review\')]").click()
+    self.driver.find_element(By.LINK_TEXT, "Review requests").click()
+    self.driver.find_element(By.LINK_TEXT, "List of requests to review").click()
     self.driver.find_element(By.NAME, "j_idt101:0:approveRequest:j_idt103").click()
     self.driver.find_element(By.CSS_SELECTOR, ".panel-success > .panel-body:nth-child(2)").click()
     elements = self.driver.find_elements(By.CSS_SELECTOR, ".panel-success > .panel-body:nth-child(2)")
