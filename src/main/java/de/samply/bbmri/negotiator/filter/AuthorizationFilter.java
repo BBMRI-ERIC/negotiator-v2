@@ -160,8 +160,6 @@ public class AuthorizationFilter implements Filter {
             // if a user came from the directory before being logged in, we need to save the query ID into the
             // usersession
             if (request.getQueryString() != null) {
-                logger.debug("Setting userbean redirect url");
-                userBean.setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
 
                 //Check if param error login_required then directly redirect
 
@@ -170,6 +168,10 @@ public class AuthorizationFilter implements Filter {
                     logger.debug("Redirecting invalid user to login.xhtml");
                     response.sendRedirect(request.getContextPath() + "/login.xhtml");
                     return;
+                }else{
+                    logger.debug("Setting userbean redirect url");
+                    userBean.setNewQueryRedirectURL(request.getServletPath() + "?" + request.getQueryString());
+
                 }
                 // TODO might only work for perun and 1not work for different AAIs
                 URI noprompt_auth_uri = UriBuilder.fromUri(userBean.getAuthenticationUrl(request)).queryParam("prompt", "none").build();
