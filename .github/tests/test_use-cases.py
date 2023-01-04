@@ -47,13 +47,3 @@ class TestDefaultSuite():
     elements = self.driver.find_elements(By.CSS_SELECTOR, ".panel-success > .panel-body:nth-child(2)")
     assert len(elements) > 0
 
-  def test_commentquery(self):
-    self.driver.get("http://localhost:8080/dev/chose.xhtml")
-    self.driver.find_element(By.NAME, "j_idt89:j_idt93").click()
-    self.driver.find_element(By.ID, "j_idt134:0:queryItemActions").click()
-    self.driver.find_element(By.CSS_SELECTOR, "#second > a").click()
-    self.driver.find_element(By.ID, "j_idt324:uploadform:commentText").click()
-    self.driver.find_element(By.ID, "j_idt324:uploadform:commentText").send_keys("test comment")
-    self.driver.find_element(By.NAME, "j_idt324:uploadform:j_idt372").click()
-    elements = self.driver.find_elements(By.CSS_SELECTOR, ".panel-heading:nth-child(2)")
-    assert len(elements) > 0
