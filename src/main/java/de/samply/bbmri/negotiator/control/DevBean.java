@@ -1,14 +1,12 @@
 package de.samply.bbmri.negotiator.control;
 
-import de.samply.bbmri.negotiator.filter.MaintenanceFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.Serializable;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
 
 /**
  * Development Bean which handles the /dev/chose.xhtml page.
@@ -24,14 +22,14 @@ public class DevBean implements Serializable {
     private UserBean userBean;
 
     public String choseBiobankOwner() {
-        logger.info("Set dev user to biobanker-000.");
-        userBean.fakeUser("biobanker-000");
+        logger.info("Set dev user to biobanker.");
+        userBean.fakeUser("https://auth-dev.mitro.dkfz.de/users/7");
         return "/owner/index.xhtml?faces-redirect=true";
     }
 
     public String choseResearcher() {
-        logger.info("Set dev user to researcher-001.");
-        userBean.fakeUser("researcher-001");
+        logger.info("Set dev user to researcher.");
+        userBean.fakeUser("user1");
         return "/researcher/index.xhtml?faces-redirect=true";
     }
 
