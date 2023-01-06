@@ -35,19 +35,7 @@ We use maven as our project management tool. So if you don't have it already ins
 
 `mvn version`
 
-To create a war file you first need to add our internal nexus for downloading legacy libraries. This can be done by simply adding the following lines into
-your _**.m2/settings.xml**_
-
-```xml
-<mirrors>
-    <mirror>
-      <id>central</id>
-      <name>central</name>
-      <url>http://nexus.bbmri-eric.eu:8081/repository/maven-public/</url>
-      <mirrorOf>central</mirrorOf>
-    </mirror>
-  </mirrors>
-```
+NOTE: The **_.mvn/settings.xml_** file is for adding a mirror to download our legacy libraries from an internal nexus.
 
 Now to create the war package simply run the following command in the project directory:
 
