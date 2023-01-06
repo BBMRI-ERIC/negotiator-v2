@@ -37,13 +37,13 @@ jobs:
           path: target/negotiator.war
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2.1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3.2
+        uses: docker/build-push-action@v3
         with:
           context: .
           tags: negotiator:latest
@@ -188,18 +188,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Generate settings.xml for Maven Builds
-        uses: whelk-io/maven-settings-xml-action@v20
-        with:
-          mirrors: >
-            [
-              {
-                "id": "central",
-                "mirrorOf": "central",
-                "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
-              }
-            ]
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
@@ -265,7 +253,7 @@ jobs:
         run: docker load --input /tmp/negotiator.tar
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2.1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -290,7 +278,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3.2
+        uses: docker/build-push-action@v3
         with:
           context: .
           platforms: linux/amd64, linux/arm64
