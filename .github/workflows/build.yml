@@ -13,40 +13,6 @@ on:
       - master
 
 jobs:
-  unit-tests:
-    needs: build
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Generate settings.xml for Maven Builds
-        uses: whelk-io/maven-settings-xml-action@v20
-        with:
-          mirrors: >
-            [
-              {
-                "id": "central",
-                "mirrorOf": "central",
-                "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
-              }
-            ]
-
-      - name: Run unit tests
-        run: mvn test
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-
-
   build:
     runs-on: ubuntu-22.04
 
@@ -61,17 +27,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Generate settings.xml for Maven Builds
-        uses: whelk-io/maven-settings-xml-action@v20
-        with:
-          mirrors: >
-            [
-              {
-                "id": "central",
-                "mirrorOf": "central",
-                "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
-              }
-            ]
       - name: Build with maven
         run: mvn package -Dmaven.test.skip=true
 
@@ -82,7 +37,7 @@ jobs:
           path: target/negotiator.war
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -99,6 +54,28 @@ jobs:
         with:
           name: negotiator-image
           path: /tmp/negotiator.tar
+
+
+  unit-tests:
+    needs: build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run unit tests
+        run: mvn test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
 
 
   system-tests:
@@ -126,9 +103,6 @@ jobs:
 
       - name: Run negotiator in docker
         run: docker run -d --name negotiator --network negotiator -p 8080:8080 -e POSTGRES_HOST="negotiator-db" -e AUTH="true"  negotiator:latest
-
-      - name: Install Node JS
-        uses: actions/setup-node@v1
 
       - name: Install newman
         run: |
@@ -169,7 +143,7 @@ jobs:
         run: docker run -d --name negotiator --network negotiator -p 8080:8080 -e POSTGRES_HOST="negotiator-db" -e AUTH="true"  negotiator:latest
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
@@ -210,18 +184,6 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
           cache: 'maven'
-
-      - name: Generate settings.xml for Maven Builds
-        uses: whelk-io/maven-settings-xml-action@v20
-        with:
-          mirrors: >
-            [
-              {
-                "id": "central",
-                "mirrorOf": "central",
-                "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
-              }
-            ]
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
@@ -288,7 +250,7 @@ jobs:
         run: docker load --input /tmp/negotiator.tar
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
