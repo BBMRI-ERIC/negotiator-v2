@@ -55,6 +55,11 @@ Now to create the war package simply run the following command in the project di
 
 To deploy the WAR file to Tomcat please follow this **[guide](https://www.baeldung.com/tomcat-deploy-war)** or run it using tomcat configuration in InteliJ Ultimate as decribed [here](https://www.jetbrains.com/idea/guide/tutorials/working-with-apache-tomcat/using-existing-application/).
 
+## Testing
+
+For acceptance tests we use the [Selenium IDE](https://www.selenium.dev/selenium-ide/) to generate high level and human-readable tests.
+If you would like to add some please export them to python (Click export test suite, select format) and copy them to _**.github/tests/test_use-cases.py**_
+
 ## Code generation with jooq
 
 You can then generate the classes for new a database schema by running the following command:
