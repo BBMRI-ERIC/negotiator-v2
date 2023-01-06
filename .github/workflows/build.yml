@@ -104,9 +104,6 @@ jobs:
       - name: Run negotiator in docker
         run: docker run -d --name negotiator --network negotiator -p 8080:8080 -e POSTGRES_HOST="negotiator-db" -e AUTH="true"  negotiator:latest
 
-      - name: Install Node JS
-        uses: actions/setup-node@v1
-
       - name: Install newman
         run: |
           npm install -g newman
@@ -146,7 +143,7 @@ jobs:
         run: docker run -d --name negotiator --network negotiator -p 8080:8080 -e POSTGRES_HOST="negotiator-db" -e AUTH="true"  negotiator:latest
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
