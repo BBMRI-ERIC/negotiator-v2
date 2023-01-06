@@ -13,28 +13,6 @@ on:
       - master
 
 jobs:
-  unit-tests:
-    needs: build
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-
-      - name: Set up JDK 8
-        uses: actions/setup-java@v3
-        with:
-          java-version: '8'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Run unit tests
-        run: mvn test
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-
-
   build:
     runs-on: ubuntu-22.04
 
@@ -59,13 +37,13 @@ jobs:
           path: target/negotiator.war
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2.1
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v3.2
         with:
           context: .
           tags: negotiator:latest
@@ -76,6 +54,28 @@ jobs:
         with:
           name: negotiator-image
           path: /tmp/negotiator.tar
+
+
+  unit-tests:
+    needs: build
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v3
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run unit tests
+        run: mvn test
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
 
 
   system-tests:
@@ -265,7 +265,7 @@ jobs:
         run: docker load --input /tmp/negotiator.tar
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2.1
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -290,7 +290,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v3.2
         with:
           context: .
           platforms: linux/amd64, linux/arm64
