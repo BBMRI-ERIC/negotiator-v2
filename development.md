@@ -55,3 +55,6 @@ You can then generate the classes for new a database schema by running the follo
 ```
 mvn org.jooq:jooq-codegen-maven:generate
 ```
+
+Additional documentation:
+* [Database schema](src/main/resources/db/migration/negotiator/README.md)
