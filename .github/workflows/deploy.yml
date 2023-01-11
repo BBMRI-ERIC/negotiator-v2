@@ -26,5 +26,4 @@ jobs:
           envs: GIT_REF
           script: |
             export GIT_REF
-            echo $GIT_REF
             sudo /opt/negotiator/backup_and_deploy.sh
