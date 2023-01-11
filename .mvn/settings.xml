@@ -3,40 +3,15 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
 
+    <mirrors>
+        <mirror>
+            <id>central</id>
+            <name>central</name>
+            <url>http://nexus.bbmri-eric.eu:8081/repository/maven-public/</url>
+            <mirrorOf>central</mirrorOf>
+        </mirror>
+    </mirrors>
 
-
-    <activeProfiles>
-        <activeProfile>github</activeProfile>
-    </activeProfiles>
-
-    <profiles>
-        <profile>
-            <id>github</id>
-            <settings>
-                <mirrors>
-                    <mirror>
-                        <id>central</id>
-                        <name>central</name>
-                        <url>http://nexus.bbmri-eric.eu:8081/repository/maven-public/</url>
-                        <mirrorOf>central</mirrorOf>
-                    </mirror>
-                </mirrors>
-            </settings>
-            <repositories>
-                <repository>
-                <id>central</id>
-                <url>https://repo1.maven.org/maven2</url>
-            </repository>
-                <repository>
-                    <id>github</id>
-                    <url>https://maven.pkg.github.com/BBMRI-ERIC/negotiator-v2</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
-        </profile>
-    </profiles>
 
     <servers>
         <server>
