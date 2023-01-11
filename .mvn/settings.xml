@@ -12,4 +12,13 @@
         </mirror>
     </mirrors>
 
+
+    <servers>
+        <server>
+            <id>github</id>
+            <username>${USER}</username>
+            <password>${TOKEN}</password>
+        </server>
+    </servers>
+
 </settings>
