@@ -28,7 +28,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with maven
-        run: mvn package -Dmaven.test.skip=true
+        run: mvn -B package -Dmaven.test.skip=true
 
       - name: Upload war
         uses: actions/upload-artifact@v3

@@ -19,7 +19,7 @@ jobs:
           cache: 'maven'
 
       - name: Deploy to Github packages
-        run: mvn --settings .mvn/settings.xml -B deploy
+        run: mvn -B deploy
         env:
           USER: ${{ github.repository_owner }}
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
