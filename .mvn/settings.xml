@@ -3,14 +3,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
 
-    <mirrors>
-        <mirror>
-            <id>central</id>
-            <name>central</name>
-            <url>http://nexus.bbmri-eric.eu:8081/repository/maven-public/</url>
-            <mirrorOf>central</mirrorOf>
-        </mirror>
-    </mirrors>
+
 
     <activeProfiles>
         <activeProfile>github</activeProfile>
@@ -19,6 +12,16 @@
     <profiles>
         <profile>
             <id>github</id>
+            <settings>
+                <mirrors>
+                    <mirror>
+                        <id>central</id>
+                        <name>central</name>
+                        <url>http://nexus.bbmri-eric.eu:8081/repository/maven-public/</url>
+                        <mirrorOf>central</mirrorOf>
+                    </mirror>
+                </mirrors>
+            </settings>
             <repositories>
                 <repository>
                 <id>central</id>
@@ -38,7 +41,7 @@
     <servers>
         <server>
             <id>github</id>
-            <username>BBMRI-ERIC</username>
+            <username>${USER}</username>
             <password>${TOKEN}</password>
         </server>
     </servers>

@@ -19,9 +19,10 @@ jobs:
           cache: 'maven'
 
       - name: Deploy to Github packages
-        run: mvn  --settings .mvn/settings.xml deploy
+        run: mvn --settings .mvn/settings.xml -B deploy
         env:
-          TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          USER: ${{ github.repository_owner }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create release
         id: create_release
