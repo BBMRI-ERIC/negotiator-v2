@@ -17,19 +17,13 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
           cache: 'maven'
-      - name: Generate settings.xml for Maven Builds
-        uses: whelk-io/maven-settings-xml-action@v20
-        with:
-          mirrors: >
-            [
-              {
-                "id": "central",
-                "mirrorOf": "central",
-                "url": "http://nexus.bbmri-eric.eu:8081/repository/maven-public/"
-              }
-            ]
-      - name: Build and test with maven
-        run: mvn -B package
+
+      - name: Deploy to Github packages
+        run: mvn  --settings .mvn/settings.xml deploy
+        env:
+          TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name:
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
@@ -51,6 +45,7 @@ jobs:
           asset_path: ./target/negotiator.war
           asset_name: negotiator-${{ github.ref_name }}.war
           asset_content_type: application/war
+
       - name: Publish release
         uses: StuYarrow/publish-release@v1
         env:
