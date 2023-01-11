@@ -23,7 +23,6 @@ jobs:
         env:
           TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name:
       - name: Create release
         id: create_release
         uses: actions/create-release@v1
