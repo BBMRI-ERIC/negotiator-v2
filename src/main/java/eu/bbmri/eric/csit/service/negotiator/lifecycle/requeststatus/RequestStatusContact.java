@@ -49,7 +49,9 @@ public class RequestStatusContact implements RequestStatus {
         } else if (status.equals("contacted")) {
             return "Collection representatives contacted.";
         } else if (status.equals("notreachable")) {
-            return "Collection representatives not reachable, BBMRI-ERIC has been informed.";
+            return "No collection representative is reachable via the Negotiator at this time. BBMRI-ERIC has been" +
+                    "informed and is actively working to solve this situation. You will be notified in case that" +
+                    "the negotiation process for this collection may proceed as usual.";
         }
         return "ERROR";
     }
