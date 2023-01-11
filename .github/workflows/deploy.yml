@@ -1,0 +1,29 @@
+name: Deployment
+
+on: workflow_dispatch
+
+jobs:
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: development
+      url: https://negotiator-v3.bbmri-eric.eu/
+
+    steps:
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        env:
+          GIT_REF: ${{ github.ref_name }}
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER}}
+          key: ${{ secrets.PRIVATE_KEY }}
+          port: ${{ secrets.PORT }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script_stop: true
+          envs: GIT_REF
+          script: |
+            export GIT_REF
+            sudo /opt/negotiator/backup_and_deploy.sh
