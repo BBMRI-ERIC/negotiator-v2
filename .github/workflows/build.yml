@@ -208,21 +208,16 @@ jobs:
           name: negotiator-image
           path: /tmp
 
-      - name: Load Image
-        run: docker load --input /tmp/negotiator.tar
-
       - name: Check out Git repository
         uses: actions/checkout@v3
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.8.0
         with:
-          image-ref: negotiator:latest
+          input: /tmp/negotiator.tar
           format: sarif
           output: trivy-results.sarif
           severity: 'CRITICAL,HIGH'
-          timeout: '10m0s'
-          security-checks: 'vuln'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
