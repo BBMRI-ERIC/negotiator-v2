@@ -9,7 +9,7 @@ jobs:
 
     environment:
       name: development
-      url: https://negotiator-v3.bbmri-eric.eu/
+      url: https://negotiator-dev.bbmri-eric.eu
 
     steps:
       - name: executing remote ssh commands using ssh key
