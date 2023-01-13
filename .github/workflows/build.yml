@@ -215,14 +215,12 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.8.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: negotiator:latest
           format: sarif
           output: trivy-results.sarif
           severity: 'CRITICAL,HIGH'
-          timeout: '10m0s'
-          security-checks: 'vuln'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
