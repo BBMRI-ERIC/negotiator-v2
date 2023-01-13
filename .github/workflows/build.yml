@@ -208,8 +208,14 @@ jobs:
           name: negotiator-image
           path: /tmp
 
-      - name: Check out Git repository
-        uses: actions/checkout@v3
+      - name: Load Image
+        run: docker load --input /tmp/negotiator.tar
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.8.0
@@ -237,6 +243,7 @@ jobs:
         with:
           name: negotiator-image
           path: /tmp
+
       - name: Download War
         uses: actions/download-artifact@v3
         with:
