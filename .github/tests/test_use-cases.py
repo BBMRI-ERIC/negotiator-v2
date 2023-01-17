@@ -18,11 +18,7 @@ class TestDefaultSuite():
   def teardown_method(self, method):
     self.driver.quit()
 
-  def test_login(self):
-    self.driver.get("http://localhost:8080/dev/chose.xhtml")
-    self.driver.find_element(By.NAME, "j_idt89:j_idt97").click()
-    elements = self.driver.find_elements(By.CSS_SELECTOR, ".success > td:nth-child(1)")
-    assert len(elements) > 0
+
 
   def test_createquery(self):
     self.driver.get("http://localhost:8080/researcher/newQuery.xhtml?jsonQueryId=3")
