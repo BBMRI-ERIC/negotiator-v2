@@ -3,6 +3,7 @@ package eu.bbmri.eric.csit.service.negotiator.sync.directory.directoryclients;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -23,6 +24,7 @@ import org.apache.logging.log4j.LogManager;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+
 
 public class MolgenisDirectoryClient implements DirectoryClient {
     /**
@@ -297,6 +299,14 @@ public class MolgenisDirectoryClient implements DirectoryClient {
          */
         while(listing.getNextHref() != null) {
             logger.debug("Not all biobanks retrieved, getting next Href: " + listing.getNextHref());
+            // 164-directory-synchronization-throttle-api-requests
+            // Wait for x seconds in range [0,3] before handling requests:
+            try {
+                Thread.sleep( (new Random().nextInt(3)) * 1000);
+            } catch( Exception e) {
+                logger.debug( " problem retrieving collections: " + e);
+            }
+
             target.addAll(listing.getBiobanks());
             request = client.target(listing.getNextHref()).request(MediaType.APPLICATION_JSON);
 
@@ -329,6 +339,14 @@ public class MolgenisDirectoryClient implements DirectoryClient {
         // Get the list of collections while the next reference is not null, meaning until there are no more collections to retrieve.
         while(listing.getNextHref() != null) {
             logger.debug("Not all collections retrieved, getting next Href: " + listing.getNextHref());
+            // 164-directory-synchronization-throttle-api-requests
+            // Wait for x seconds in range [0,3] before handling requests:
+            try {
+                Thread.sleep( (new Random().nextInt(3)) * 1000);
+            } catch( Exception e) {
+                logger.debug( " problem retrieving collections: " + e);
+            }
+
             target.addAll(listing.getCollections());
             request = client.target(listing.getNextHref()).request(MediaType.APPLICATION_JSON);
 
@@ -352,6 +370,14 @@ public class MolgenisDirectoryClient implements DirectoryClient {
         DirectoryNetworkListing listing = request.get(DirectoryNetworkListing.class);
         while(listing.getNextHref() != null) {
             logger.debug("Not all networks retrieved, getting next Href: " + listing.getNextHref());
+            // 164-directory-synchronization-throttle-api-requests
+            // Wait for x seconds in range [0,3] before handling requests:
+            try {
+                Thread.sleep( (new Random().nextInt(3)) * 1000);
+            } catch( Exception e) {
+                logger.debug( " problem retrieving collections: " + e);
+            }
+
             result.addAll(listing.getNetworks());
             request = client.target(listing.getNextHref()).request(MediaType.APPLICATION_JSON);
             handleAuthorization(request);
