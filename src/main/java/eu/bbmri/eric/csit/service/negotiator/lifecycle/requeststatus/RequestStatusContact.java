@@ -1,8 +1,8 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.requeststatus;
 
 import de.samply.bbmri.negotiator.model.CollectionRequestStatusDTO;
-import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
 import org.jooq.tools.json.JSONObject;
 
 import java.util.Date;
@@ -49,9 +49,9 @@ public class RequestStatusContact implements RequestStatus {
         } else if (status.equals("contacted")) {
             return "Collection representatives contacted.";
         } else if (status.equals("notreachable")) {
-            return "No collection representative is reachable via the Negotiator at this time. BBMRI-ERIC has been" +
-                    "informed and is actively working to solve this situation. You will be notified in case that" +
-                    "the negotiation process for this collection may proceed as usual.";
+            return "No collection representative is reachable via the Negotiator at this time. BBMRI-ERIC has been " +
+                    "informed and is actively working to solve this situation. You will be notified in case " +
+                    "the status changes and the negotiation process for this collection may proceed as usual.";
         }
         return "ERROR";
     }
