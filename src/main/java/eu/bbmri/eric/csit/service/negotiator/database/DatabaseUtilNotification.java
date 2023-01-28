@@ -5,34 +5,24 @@ import de.samply.bbmri.negotiator.ConfigFactory;
 import de.samply.bbmri.negotiator.jooq.Tables;
 import de.samply.bbmri.negotiator.jooq.tables.records.MailNotificationRecord;
 import de.samply.bbmri.negotiator.jooq.tables.records.NotificationRecord;
-import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.NotificationService;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationStatus;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.*;
-import org.jooq.Record;
-import org.jooq.impl.DSL;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
-import javax.annotation.Resource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static org.jooq.impl.DSL.*;
+import static org.jooq.impl.DSL.timestampAdd;
 
 public class DatabaseUtilNotification {
 
     public NotificationRecord addNotificationEntry(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             NotificationRecord record = config.dsl().newRecord(Tables.NOTIFICATION);
             record.setQueryId(requestId);
             record.setCommentId(commentId);
@@ -50,16 +40,17 @@ public class DatabaseUtilNotification {
         return null;
     }
 
+    @NotNull
+    public Config getConfig() throws SQLException {
+        return ConfigFactory.get();
+    }
+
     public List<NotificationRecord> getNotificationRecords() {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<NotificationRecord> records = config.dsl().selectFrom(Tables.NOTIFICATION)
                     .fetch();
-            List<NotificationRecord> returnRecords = new ArrayList<>();
 
-            for(NotificationRecord record : records) {
-                returnRecords.add(record);
-            }
-            return returnRecords;
+            return new ArrayList<>(records);
 
         } catch (Exception ex) {
             System.err.println("882e8cb6-DbUtilNotification ERROR-NG-0000031: Error listing Notification Entries.");
@@ -69,7 +60,7 @@ public class DatabaseUtilNotification {
     }
 
     public MailNotificationRecord addMailNotificationEntry(String emailAddress, Integer notificationId, Integer personId, String status, String subject, String body) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             MailNotificationRecord record = config.dsl().newRecord(Tables.MAIL_NOTIFICATION);
             record.setNotificationId(notificationId);
             record.setPersonId(personId);
@@ -90,7 +81,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<MailNotificationRecord> getMailNotificationRecords() {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<MailNotificationRecord> records = config.dsl().selectFrom(Tables.MAIL_NOTIFICATION)
                     .fetch();
             List<MailNotificationRecord> returnRecords = new ArrayList<>();
@@ -107,7 +98,7 @@ public class DatabaseUtilNotification {
 
     public List<MailNotificationRecord> getMailNotificationRecords(String createDay) {
         List<MailNotificationRecord> returnRecords = new ArrayList<>();
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             /*Result<MailNotificationRecord> records = config.dsl()
                     .selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.CREATE_DATE.eq((java.sql.Date) createDay))
@@ -130,7 +121,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<MailNotificationRecord> getPendingNotifications() {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<MailNotificationRecord> records = config.dsl().selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.notEqual("success"))
                     .fetch();
@@ -147,7 +138,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<MailNotificationRecord> getNotificationsWithStatus(String status, Integer interval) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<MailNotificationRecord> records = config.dsl().selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.eq(status))
                     .and(Tables.MAIL_NOTIFICATION.CREATE_DATE.lessOrEqual(timestampAdd(new Timestamp(System.currentTimeMillis()), interval, DatePart.MINUTE)))
@@ -165,7 +156,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<String> getNotificationMailAddressesForAggregation() {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Table<?> subquery = config.dsl().select(Tables.MAIL_NOTIFICATION.EMAIL_ADDRESS)
                     .from(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.PENDING))
@@ -185,7 +176,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<MailNotificationRecord> getPendingNotificationsForMailAddress(String mailAddress) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<MailNotificationRecord> records = config.dsl().selectFrom(Tables.MAIL_NOTIFICATION)
                     .where(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.PENDING))
                             .or(Tables.MAIL_NOTIFICATION.STATUS.eq(NotificationStatus.getNotificationType(NotificationStatus.CREATED)))
@@ -206,7 +197,7 @@ public class DatabaseUtilNotification {
     }
 
     public boolean updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             config.dsl().update(Tables.MAIL_NOTIFICATION)
                     .set(Tables.MAIL_NOTIFICATION.STATUS, status)
                     .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(new Date().getTime()))
@@ -224,7 +215,7 @@ public class DatabaseUtilNotification {
     }
 
     public boolean updateMailNotificationEntryStatus(Integer mailNotificationRecordId, String status, Date statusDate) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             config.dsl().update(Tables.MAIL_NOTIFICATION)
                     .set(Tables.MAIL_NOTIFICATION.STATUS, status)
                     .set(Tables.MAIL_NOTIFICATION.SEND_DATE, new Timestamp(statusDate.getTime()))
@@ -242,7 +233,7 @@ public class DatabaseUtilNotification {
     }
 
     public Map<String, String> getEmailAddressesForQuery(Integer queryId) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
@@ -259,7 +250,7 @@ public class DatabaseUtilNotification {
     }
 
     public Map<String, String> getFilterdBiobanksEmailAddressesAndNamesForRequest(Integer requestId) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
                     "JOIN person_collection pc ON p.id = pc.person_id\n" +
                     "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
@@ -290,7 +281,7 @@ public class DatabaseUtilNotification {
     }
 
     public Map<String, String> getCollectionEmailAddressesByBiobankIdAndRequestId(Integer biobankId, Integer requestId) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<Record2<String, String>> record = config.dsl().selectDistinct(Tables.PERSON.AUTH_EMAIL, Tables.PERSON.AUTH_NAME)
                     .from(Tables.PERSON)
                     .join(Tables.PERSON_COLLECTION).on(Tables.PERSON.ID.eq(Tables.PERSON_COLLECTION.PERSON_ID))
@@ -307,7 +298,7 @@ public class DatabaseUtilNotification {
     }
 
     public Map<String, String> getCollectionEmailAddressesStillInNegotiation(Integer requestId, Integer collectionId) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
                     "JOIN person_collection pc ON p.id = pc.person_id\n" +
                     "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
@@ -327,7 +318,7 @@ public class DatabaseUtilNotification {
     }
 
     public Map<String, String> getEmailAddressesStillInNegotiation(Integer requestId) {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<Record> record = config.dsl().resultQuery("SELECT auth_email, auth_name FROM person p\n" +
                     "JOIN person_collection pc ON p.id = pc.person_id\n" +
                     "JOIN query_collection qc ON pc.collection_id = qc.collection_id\n" +
@@ -347,7 +338,7 @@ public class DatabaseUtilNotification {
     }
 
     public List<Date> getDatesNotificationsWhereSend() {
-        try (Config config = ConfigFactory.get()) {
+        try (Config config = getConfig()) {
             Result<Record> record = config.dsl().resultQuery("SELECT create_date::date\n" +
                     "\tFROM public.mail_notification GROUP BY create_date::date;").fetch();
             return mapDateList(record);

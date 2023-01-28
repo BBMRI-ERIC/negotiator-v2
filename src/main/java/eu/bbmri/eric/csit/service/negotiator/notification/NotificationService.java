@@ -6,9 +6,9 @@ import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationSlac
 import eu.bbmri.eric.csit.service.negotiator.notification.types.*;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationSlack;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.jetbrains.annotations.Nullable;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +18,9 @@ public class NotificationService {
     private static final Logger logger = LogManager.getLogger(NotificationService.class);
     private static final DatabaseUtil databaseUtil = new DatabaseUtil();
 
-    private NotificationService() {}
+    public static DatabaseUtil getDatabaseUtil(){
+        return databaseUtil;
+    }
 
     public static void sendSystemNotification(Integer notificationType, String notificationText) {
         logger.info("23afa6c4695a-NotificationService: Send system notification: {}", notificationType);
@@ -148,7 +150,7 @@ public class NotificationService {
 
     private static NotificationRecord createNotificationEntry(Integer notificationType, Integer requestId, Integer commentId, Integer personId) {
         try {
-            return databaseUtil.getDatabaseUtilNotification().addNotificationEntry(notificationType, requestId, commentId, personId);
+            return getDatabaseUtil().getDatabaseUtilNotification().addNotificationEntry(notificationType, requestId, commentId, personId);
         } catch (Exception ex) {
             logger.error("23afa6c4695a-NotificationService ERROR-NG-0000009: Create Notification Entry.");
             logger.error("context", ex);
