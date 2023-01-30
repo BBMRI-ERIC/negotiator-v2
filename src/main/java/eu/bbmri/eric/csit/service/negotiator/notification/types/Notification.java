@@ -11,8 +11,8 @@ import eu.bbmri.eric.csit.service.negotiator.notification.model.NotificationEmai
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationContacts;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationMailSendQueue;
 import eu.bbmri.eric.csit.service.negotiator.notification.util.NotificationType;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.HashSet;
@@ -68,6 +68,8 @@ public abstract class Notification extends Thread {
             case NotificationType.APPROVE_REQUEST_NOTIFICATION:
                 return true;
             case NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION:
+                return true;
+            case NotificationType.COLLECTION_REGISTRATION_REMINDER:
                 return true;
             case NotificationType.CREATE_REQUEST_NOTIFICATION:
                 return true;

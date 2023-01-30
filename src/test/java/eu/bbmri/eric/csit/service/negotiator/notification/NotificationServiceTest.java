@@ -11,11 +11,12 @@ import org.mockito.Mockito;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.*;
 
 public class NotificationServiceTest {
     @Mock private DatabaseUtilNotification databaseUtilNotification;
+
+    @Mock private NotificationRecord notificationRecord;
 
 
 
@@ -28,11 +29,11 @@ public class NotificationServiceTest {
                     .getDatabaseUtil()
                     .getDatabaseUtilNotification()
                     .addNotificationEntry(Mockito.anyInt(),Mockito.anyInt(),Mockito.anyInt(),Mockito.anyInt()))
-                    .thenReturn(databaseUtilNotification);
+                    .thenReturn(notificationRecord);
+            map.put("notreachableCollections", "");
             NotificationService.sendNotification(NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION,0,
                     null, 0, map);
-            mock.verify(() -> new NotificationRecord());
-
+            verify(databaseUtilNotification.addNotificationEntry(Mockito.anyInt(),Mockito.anyInt(),Mockito.anyInt(),Mockito.anyInt()), times(1));
         }
 
     }

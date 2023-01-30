@@ -14,6 +14,7 @@ public abstract class NotificationType {
     public static final int NOT_REACHABLE_COLLECTION_NOTIFICATION = 8;
     public static final int AGGREGATED_NOTIFICATION = 9;
     public static final int ADDED_COLLECTIONS_TO_STARTED_NEGOTIATION_NOTIFICATION = 10;
+    public static final int COLLECTION_REGISTRATION_REMINDER = 11;
 
     public static final int TEST_NOTIFICATION = 100;
 
