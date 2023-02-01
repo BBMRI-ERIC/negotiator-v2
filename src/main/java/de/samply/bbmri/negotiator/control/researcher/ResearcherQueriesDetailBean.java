@@ -304,7 +304,8 @@ public class ResearcherQueriesDetailBean implements Serializable {
              * Get the selected(clicked on) query from the list of queries for the owner
              */
             // TODO: implement loading of the selected query and setting the comments
-            selectedQuery = DbUtil.getSelectedQuery( config, queryId);
+            selectedQuery = DbUtil.getSelectedQueryForUserId( config, queryId, userBean.getUserId());
+            //selectedQuery = DbUtil.getSelectedQuery( config, queryId);
             logger.debug("loadSelectedQueryDetails-17: " + LocalDateTime.now());
             /*
             for (QueryStatsDTO query : getQueries()) {
