@@ -102,10 +102,10 @@
                                      class="form-control"
                                      style="width: 100%; height: 2rem;"
                                      value="#{lifeCycleStatusBean.abandoningReason}">
-                        <f:selectItem itemValue = "reason1" itemLabel = "Samples/data not available" />
-                        <f:selectItem itemValue = "reason2" itemLabel = "Samples/data available but not accessible for given purpose" />
-                        <f:selectItem itemValue = "reason3" itemLabel = "Not able to attend query at this time" />
-                        <f:selectItem itemValue = "reason4" itemLabel = "No response from biobank" />
+                        <f:selectItem itemValue = "reason1" itemLabel = "#{label['stepAway.reason1']}" />
+                        <f:selectItem itemValue = "reason2" itemLabel = "#{label['stepAway.reason2']}" />
+                        <f:selectItem itemValue = "reason3" itemLabel = "#{label['stepAway.reason3']}" />
+                        <f:selectItem itemValue = "reason4" itemLabel = "#{label['stepAway.reason4']}" />
                     </h:selectOneMenu>
                 </div>
                 <h:outputScript>

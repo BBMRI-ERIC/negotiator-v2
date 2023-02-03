@@ -1,10 +1,13 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.util;
 
+import eu.bbmri.eric.csit.service.negotiator.util.PropertiesUtil;
+
 public enum StepAwayReason {
-    REASON1("Samples/data not available"),
-    REASON2("Samples/data available but not accessible for given purpose"),
-    REASON3("Not able to attend query at this time"),
-    REASON4("No response from biobank");
+
+    REASON1(PropertiesUtil.getProperty("stepAway.reason1")),
+    REASON2(PropertiesUtil.getProperty("stepAway.reason2")),
+    REASON3(PropertiesUtil.getProperty("stepAway.reason3")),
+    REASON4(PropertiesUtil.getProperty("stepAway.reason4"));
 
 
     private final String ReasonText;
