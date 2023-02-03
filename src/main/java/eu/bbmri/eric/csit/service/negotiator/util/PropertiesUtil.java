@@ -5,11 +5,12 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class PropertiesUtil {
-    private static final Properties properties = new Properties();
+    private static Properties properties;
 
 
     public static void loadProperties() {
         try (InputStream input = PropertiesUtil.class.getClassLoader().getResourceAsStream("global.properties")) {
+            properties = new Properties();
 
             if (input == null) {
                 System.out.println("Sorry, unable to find config.properties");
@@ -24,7 +25,9 @@ public class PropertiesUtil {
 }
 
     public static String getProperty(String prop){
-        loadProperties();
+        if (properties == null){
+            loadProperties();
+        }
         return properties.getProperty(prop);
     }
 
