@@ -34,7 +34,7 @@ public class LifeCycleStatusBean implements Serializable {
     private Integer numberOfPatientsAvailable;
     private String indicateAccessConditions;
     private String shippedNumber;
-    private StepAwayReason abandoningReason;
+    private StepAwayReason abandoningReason = StepAwayReason.REASON3;
     private Part mtaFilemulti;
 
     private static final Logger logger = LogManager.getLogger(LifeCycleStatusBean.class);
