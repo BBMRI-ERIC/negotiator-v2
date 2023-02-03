@@ -33,7 +33,7 @@ public class LifeCycleStatusBean implements Serializable {
     private Integer numberOfPatientsAvailable;
     private String indicateAccessConditions;
     private String shippedNumber;
-    private String abandoningReason = "reason1";
+    private String abandoningReason = "Not able to attend query at this time";
     private Part mtaFilemulti;
 
     private static final Logger logger = LogManager.getLogger(LifeCycleStatusBean.class);
