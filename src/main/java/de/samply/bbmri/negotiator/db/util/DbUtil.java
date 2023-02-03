@@ -580,6 +580,22 @@ public class DbUtil {
                 //.fetchOne( Tables.QUERY.as(fetchedQuery));
                 //.getResult();
     }
+
+    /**
+     * Get the JSON query from the database for a specific userID.
+     * @param config JOOQ configuration
+     * @param queryId the query ID
+     * @param userId the user ID for this query
+     * @return JSON string
+     */    
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getSelectedQueryForUserId( Config config, Integer queryId, int userId) {
+        Condition condition = Tables.QUERY.RESEARCHER_ID.eq(userId);
+        
+        return (de.samply.bbmri.negotiator.jooq.tables.pojos.Query) config.dsl().selectFrom(Tables.QUERY)
+                    .where(condition).and(Tables.QUERY.ID.eq(queryId))
+                    .fetchOneInto( de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+    }
+
     /**
      * Get the JSON query from the database.
      * @param config JOOQ configuration
