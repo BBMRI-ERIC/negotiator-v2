@@ -44,14 +44,14 @@ class DirectoryAPITest {
     @DisplayName("Create new Request with no Token")
     void testCreateQuery_withNoToken() throws SQLException {
         // Mock config classes
-        Mockito.when(negotiatorConfig.getMolgenisUsername()).thenReturn("username");
-        Mockito.when(negotiatorConfig.getMolgenisPassword()).thenReturn("password");
-        Mockito.when(request.getHeader("Authorization")).thenReturn("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
+//        Mockito.when(negotiatorConfig.getMolgenisUsername()).thenReturn("username");
+//        Mockito.when(negotiatorConfig.getMolgenisPassword()).thenReturn("password");
+//        Mockito.when(request.getHeader("Authorization")).thenReturn("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
 
         // Mock object under test
         Directory directorySpy = Mockito.spy(directory);
         Mockito.doReturn(config).when(directorySpy).getConfigFromDactory();
-        Mockito.doReturn(negotiatorConfig).when(directorySpy).getNegotiatorConfig();
+       // Mockito.doReturn(negotiatorConfig).when(directorySpy).getNegotiatorConfig();
 
         JsonQueryRecord jsonQueryRecord = new JsonQueryRecord();
         jsonQueryRecord.setJsonText(queryJsonNoNToken);
@@ -68,15 +68,15 @@ class DirectoryAPITest {
     @DisplayName("Create new Request with Token")
     void testCreateQuery_withToken() throws SQLException {
         // Mock classes
-        Mockito.when(negotiatorConfig.getMolgenisUsername()).thenReturn("username");
-        Mockito.when(negotiatorConfig.getMolgenisPassword()).thenReturn("password");
-        Mockito.when(request.getHeader("Authorization")).thenReturn("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
-        Mockito.when(queryRecord.getJsonText()).thenReturn(recordJsonWithMultipleQueries);
+//        Mockito.when(negotiatorConfig.getMolgenisUsername()).thenReturn("username");
+//        Mockito.when(negotiatorConfig.getMolgenisPassword()).thenReturn("password");
+//         Mockito.when(request.getHeader("Authorization")).thenReturn("Basic dXNlcm5hbWU6cGFzc3dvcmQ=");
+         Mockito.when(queryRecord.getJsonText()).thenReturn(recordJsonWithMultipleQueries);
 
         // Mock object under test
         Directory directorySpy = Mockito.spy(directory);
         Mockito.doReturn(config).when(directorySpy).getConfigFromDactory();
-        Mockito.doReturn(negotiatorConfig).when(directorySpy).getNegotiatorConfig();
+//        Mockito.doReturn(negotiatorConfig).when(directorySpy).getNegotiatorConfig();
         Mockito.doReturn(queryRecord).when(directorySpy).getQueryForNToken(Mockito.any(), Mockito.any());
         Mockito.doNothing().when(directorySpy).updateRecord(queryRecord);
 
