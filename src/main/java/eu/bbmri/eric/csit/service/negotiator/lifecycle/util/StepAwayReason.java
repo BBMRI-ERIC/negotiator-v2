@@ -1,6 +1,9 @@
 package eu.bbmri.eric.csit.service.negotiator.lifecycle.util;
 
+import de.samply.bbmri.negotiator.control.component.LifeCycleStatusBean;
 import eu.bbmri.eric.csit.service.negotiator.util.PropertiesUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +18,8 @@ public enum StepAwayReason {
 
     private final String ReasonText;
 
+    private static final Logger logger = LogManager.getLogger(StepAwayReason.class);
+
     StepAwayReason(String reasonText){
         this.ReasonText = reasonText;
     }
@@ -28,6 +33,7 @@ public enum StepAwayReason {
             return StepAwayReason.valueOf(text.toUpperCase());
         }
        catch (IllegalArgumentException e){
+            logger.error("Could not correctly parse string to ENUM, check backwards compatibility");
             return StepAwayReason.REASON3;
        }
     }

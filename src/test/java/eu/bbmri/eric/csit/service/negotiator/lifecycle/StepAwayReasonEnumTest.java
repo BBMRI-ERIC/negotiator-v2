@@ -18,7 +18,7 @@ public class StepAwayReasonEnumTest {
     }
     @Test
     public void fromWorngStringReturnDefaultReason3(){
-        StepAwayReason stepAwayReason = StepAwayReason.fromString("sfsf");
+        StepAwayReason stepAwayReason = StepAwayReason.fromString("fakeReason");
         assertEquals(stepAwayReason, StepAwayReason.REASON3);
     }
 
