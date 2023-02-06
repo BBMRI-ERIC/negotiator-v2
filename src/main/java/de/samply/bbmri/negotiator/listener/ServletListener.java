@@ -113,6 +113,7 @@ public class ServletListener implements ServletContextListener {
              */
             NegotiatorConfig.initialize(projectName, fallback);
             NegotiatorConfig.setNewDatabaseInstallation(newDatabaseInstallation);
+            NegotiatorConfig.get().getMailConfig();
 
             logger.info("Starting directory synchronize task timer");
             timer = new Timer();
@@ -122,11 +123,16 @@ public class ServletListener implements ServletContextListener {
             timerGenerator = new Timer();
             timerGenerator.schedule(new CreateAdminFilesForDownload(), 10000, 1000L * 60L * 60L);
 */
-            logger.info("Starting notification task timer");
-            notificationScheduledExecutorTimer = new Timer();
-            NotificationScheduledExecutor notificationScheduledExecutor = new NotificationScheduledExecutor();
-            notificationScheduledExecutorTimer.schedule(notificationScheduledExecutor, notificationScheduledExecutor.getDelay(), notificationScheduledExecutor.getInterval());
+            if (NegotiatorConfig.get().getMailConfig().isActive()){
+                logger.info("Starting notification task timer");
+                notificationScheduledExecutorTimer = new Timer();
+                NotificationScheduledExecutor notificationScheduledExecutor = new NotificationScheduledExecutor();
+                notificationScheduledExecutorTimer.schedule(notificationScheduledExecutor, notificationScheduledExecutor.getDelay(), notificationScheduledExecutor.getInterval());
 
+            }
+            else {
+                logger.info("Mail notifications are turned off");
+            }
             logger.info("Context initialized");
         } catch (FileNotFoundException | JAXBException | SAXException | ParserConfigurationException e) {
             logger.info("Error initializing Context for Negotiator");
