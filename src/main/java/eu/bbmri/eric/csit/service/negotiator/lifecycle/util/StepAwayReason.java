@@ -2,12 +2,15 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle.util;
 
 import eu.bbmri.eric.csit.service.negotiator.util.PropertiesUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum StepAwayReason {
 
-    REASON1(PropertiesUtil.getProperty("stepAway.reason1")),
-    REASON2(PropertiesUtil.getProperty("stepAway.reason2")),
-    REASON3(PropertiesUtil.getProperty("stepAway.reason3")),
-    REASON4(PropertiesUtil.getProperty("stepAway.reason4"));
+    REASON1("Samples/data not available"),
+    REASON2("Samples/data available but not accessible for given purpose"),
+    REASON3("Not able to attend query at this time"),
+    REASON4("No response from biobank");
 
 
     private final String ReasonText;
@@ -27,5 +30,13 @@ public enum StepAwayReason {
        catch (IllegalArgumentException e){
             return StepAwayReason.REASON3;
        }
+    }
+
+    public static Map<String, String> getAllStepAwayReasons(){
+        Map<String, String> stepAwayReasons = new HashMap<>();
+        for (StepAwayReason stepAwayReason: StepAwayReason.values()){
+            stepAwayReasons.put(stepAwayReason.ReasonText, stepAwayReason.toString().toLowerCase());
+        }
+        return stepAwayReasons;
     }
 }

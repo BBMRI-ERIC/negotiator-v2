@@ -12,6 +12,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.servlet.http.Part;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @ManagedBean
 @ViewScoped
@@ -35,6 +37,8 @@ public class LifeCycleStatusBean implements Serializable {
     private String indicateAccessConditions;
     private String shippedNumber;
     private StepAwayReason abandoningReason = StepAwayReason.REASON3;
+
+    private Map<String, String> stepAwayReasons = StepAwayReason.getAllStepAwayReasons();
     private Part mtaFilemulti;
 
     private static final Logger logger = LogManager.getLogger(LifeCycleStatusBean.class);
@@ -148,5 +152,13 @@ public class LifeCycleStatusBean implements Serializable {
 
     public void setAbandoningReason(String abandoningReason) {
         this.abandoningReason = StepAwayReason.valueOf(abandoningReason);
+    }
+
+    public Map<String, String> getStepAwayReasons() {
+        return stepAwayReasons;
+    }
+
+    public void setStepAwayReasons(Map<String, String> stepAwayReasons) {
+        this.stepAwayReasons = stepAwayReasons;
     }
 }

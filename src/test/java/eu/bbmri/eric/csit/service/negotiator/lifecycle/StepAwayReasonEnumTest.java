@@ -3,6 +3,8 @@ package eu.bbmri.eric.csit.service.negotiator.lifecycle;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.StepAwayReason;
 import org.junit.Test;
 
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 
 public class StepAwayReasonEnumTest {
@@ -18,5 +20,11 @@ public class StepAwayReasonEnumTest {
     public void fromWorngStringReturnDefaultReason3(){
         StepAwayReason stepAwayReason = StepAwayReason.fromString("sfsf");
         assertEquals(stepAwayReason, StepAwayReason.REASON3);
+    }
+
+    @Test
+    public void  compareValueFromStepAwayReasonsMap(){
+        Map<String, String> reasons = StepAwayReason.getAllStepAwayReasons();
+        assertEquals(reasons.get("Samples/data not available"), "reason1");
     }
 }

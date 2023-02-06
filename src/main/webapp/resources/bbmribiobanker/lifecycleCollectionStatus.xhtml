@@ -102,10 +102,8 @@
                                      class="form-control"
                                      style="width: 100%; height: 2rem;"
                                      value="#{lifeCycleStatusBean.abandoningReason}">
-                        <f:selectItem itemValue = "reason1" itemLabel = "#{label['stepAway.reason1']}" />
-                        <f:selectItem itemValue = "reason2" itemLabel = "#{label['stepAway.reason2']}" />
-                        <f:selectItem itemValue = "reason3" itemLabel = "#{label['stepAway.reason3']}" />
-                        <f:selectItem itemValue = "reason4" itemLabel = "#{label['stepAway.reason4']}" />
+                        <f:selectItem itemValue="#{null}" itemLabel="-- select one --" />
+                        <f:selectItems value="#{bean.stepAwayReasons}" />
                     </h:selectOneMenu>
                 </div>
                 <h:outputScript>
