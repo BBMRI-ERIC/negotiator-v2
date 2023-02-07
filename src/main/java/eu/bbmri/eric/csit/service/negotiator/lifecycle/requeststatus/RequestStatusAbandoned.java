@@ -5,6 +5,7 @@ import de.samply.bbmri.negotiator.model.RequestStatusDTO;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusStatus;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleStatusUtilNextStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.StepAwayReason;
 import org.jooq.tools.json.JSONObject;
 import org.jooq.tools.json.JSONParser;
 import org.jooq.tools.json.ParseException;
@@ -35,7 +36,7 @@ public class RequestStatusAbandoned implements RequestStatus {
             //statusText = "Biobank stepped away";
             String reason = getStatusTextFromJson(collectionRequestStatusDTO.getStatusJson(), "abandoningReason");
             if(reason != null && reason.length() > 0) {
-                statusText = "Biobank stepped away - Reason: " + reason;
+                statusText = "Biobank stepped away - Reason: " + StepAwayReason.fromString(reason).getReasonText();
             }
 
         }

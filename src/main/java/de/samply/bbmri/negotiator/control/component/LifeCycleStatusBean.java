@@ -3,6 +3,7 @@ package de.samply.bbmri.negotiator.control.component;
 import de.samply.bbmri.negotiator.control.SessionBean;
 import de.samply.bbmri.negotiator.control.UserBean;
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.RequestLifeCycleStatus;
+import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.StepAwayReason;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -11,6 +12,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.servlet.http.Part;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @ManagedBean
 @ViewScoped
@@ -33,7 +36,9 @@ public class LifeCycleStatusBean implements Serializable {
     private Integer numberOfPatientsAvailable;
     private String indicateAccessConditions;
     private String shippedNumber;
-    private String abandoningReason = "reason1";
+    private StepAwayReason abandoningReason = StepAwayReason.REASON3;
+
+    private Map<String, String> stepAwayReasons = StepAwayReason.getAllStepAwayReasons();
     private Part mtaFilemulti;
 
     private static final Logger logger = LogManager.getLogger(LifeCycleStatusBean.class);
@@ -142,10 +147,18 @@ public class LifeCycleStatusBean implements Serializable {
     }
 
     public String getAbandoningReason() {
-        return abandoningReason;
+        return abandoningReason.getReasonText();
     }
 
     public void setAbandoningReason(String abandoningReason) {
-        this.abandoningReason = abandoningReason;
+        this.abandoningReason = StepAwayReason.valueOf(abandoningReason);
+    }
+
+    public Map<String, String> getStepAwayReasons() {
+        return stepAwayReasons;
+    }
+
+    public void setStepAwayReasons(Map<String, String> stepAwayReasons) {
+        this.stepAwayReasons = stepAwayReasons;
     }
 }
