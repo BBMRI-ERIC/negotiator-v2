@@ -103,6 +103,7 @@
     <!-- Use the credentails for office365 according to the SPF records of bbmri-eric.eu domain.
          'fromAddress' and 'user' should be the same. -->
     <mailSending xmlns:ms="http://schema.samply.de/config/MailSending">
+        <ms:active>false</ms:active>
         <ms:host>smtp.office365.com</ms:host>
         <ms:protocol>smtp</ms:protocol>
         <ms:fromAddress>username_for_office365</ms:fromAddress>

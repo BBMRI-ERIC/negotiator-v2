@@ -15,6 +15,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;all&gt;
+ *         &lt;element name="active" type="{http://www.w3.org/2001/XMLSchema}bool"/&gt;
  *         &lt;element name="host" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
  *         &lt;element name="protocol"&gt;
  *           &lt;simpleType&gt;
@@ -42,6 +43,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "mailSending", namespace = "http://schema.samply.de/config/MailSending", propOrder = {})
 public class MailSending {
     @XmlElement(namespace = "http://schema.samply.de/config/MailSending", required = true)
+    protected boolean active;
+
+    @XmlElement(namespace = "http://schema.samply.de/config/MailSending", required = true)
     protected String host;
     @XmlElement(namespace = "http://schema.samply.de/config/MailSending", required = true)
     protected String protocol;
@@ -57,6 +61,15 @@ public class MailSending {
     protected String password;
     @XmlElement(namespace = "http://schema.samply.de/config/MailSending", required = true)
     protected String templateFolder;
+
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
     /**
      * Ruft den Wert der host-Eigenschaft ab.
