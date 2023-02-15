@@ -1,0 +1,27 @@
+name: Deployment to PROD
+
+on: workflow_dispatch
+
+jobs:
+
+  deploy:
+    if: github.actor == 'RadovanTomik' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+
+    environment:
+      name: production
+      url: https://negotiator.bbmri-eric.eu
+
+    steps:
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@v0.1.7
+        env:
+          GIT_REF: ${{ github.ref_name }}
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER}}
+          key: ${{ secrets.PROD_PRIVATE_KEY }}
+          port: ${{ secrets.PROD_PORT }}
+          passphrase: ${{ secrets.PROD_PASSPHRASE }}
+          script_stop: true
+          envs: GIT_REF
