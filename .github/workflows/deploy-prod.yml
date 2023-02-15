@@ -5,7 +5,7 @@ on: workflow_dispatch
 jobs:
 
   deploy:
-    if: github.actor == 'RadovanTomik' && github.ref_type == 'tag'
+    if: (github.actor == 'RadovanTomik' || github.actor == 'konradlang') && github.ref_type == 'tag'
     runs-on: ubuntu-latest
 
     environment:
