@@ -59,8 +59,7 @@ public class RestApplication extends ResourceConfig {
         BeanConfig config = new BeanConfig();
         packages("io.swagger.jaxrs.listing");
         config.setVersion("v1");
-        config.setSchemes(new String[]{"http"});
-        config.setBasePath("/api");
+        config.setSchemes(new String[]{"https", "http"});
         config.setResourcePackage("io.swagger.resources");
         config.setPrettyPrint(true);
         config.setScan(true);
