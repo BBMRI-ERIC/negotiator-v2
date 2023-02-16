@@ -60,7 +60,6 @@ public class RestApplication extends ResourceConfig {
         packages("io.swagger.jaxrs.listing");
         config.setVersion("v1");
         config.setSchemes(new String[]{"http"});
-        config.setHost("localhost:8080/api/swagger-ui");
         config.setBasePath("/api");
         config.setResourcePackage("io.swagger.resources");
         config.setPrettyPrint(true);
