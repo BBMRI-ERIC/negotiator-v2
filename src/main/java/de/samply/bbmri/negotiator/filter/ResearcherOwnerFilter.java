@@ -98,6 +98,13 @@ public class ResearcherOwnerFilter implements Filter {
                 chain.doFilter(request, response);
                 return;
             } else {
+                // If you want to view a query and you are not the owner try it as researcher
+                if( path.startsWith(req.getContextPath() +"/owner/detail.xhtml") && req.getQueryString().matches("^queryId=[0-9]*")){
+                    HttpServletResponse resp = (HttpServletResponse) response;
+                    resp.sendRedirect(req.getContextPath() + "/researcher/detail.xhtml?"+req.getQueryString());
+                    return;
+
+                }
                 HttpServletResponse resp = (HttpServletResponse) response;
                 resp.sendRedirect(req.getContextPath() + "/researcher/");
                 return;
