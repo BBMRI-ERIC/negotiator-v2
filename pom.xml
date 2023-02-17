@@ -508,6 +508,9 @@
                 <version>2.19.1</version>
                 <configuration>
                     <skipTests>false</skipTests>
+                    <forkCount>3</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
                 </configuration>
                 <dependencies>
                     <dependency>
