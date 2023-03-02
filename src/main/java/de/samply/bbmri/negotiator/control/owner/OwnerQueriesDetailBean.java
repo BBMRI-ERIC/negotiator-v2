@@ -264,24 +264,7 @@ public class OwnerQueriesDetailBean implements Serializable {
 			/**
 			 * Get the selected(clicked on) query from the list of queries for the owner
 			 */
-			// TODO: implement loading of the selected query and setting the comments
-			//selectedQuery = DbUtil.getSelectedQueryForUserId( config, queryId, userBean.getUserId());
 			selectedQuery = DbUtil.getOwnerQuery( config, queryId,userBean.getUserId(), isTestRequest);
-			//selectedQuery = DbUtil.getSelectedQuery( config, queryId);
-			
-			// TODO: Get the query for type ownerQueryStatsDTO
-			//setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
-			
-			// Get the selected(clicked on) query from the list of queries for the owner
-			// Needs to be optimized!
-
-//			for(OwnerQueryStatsDTO ownerQueryStatsDTO : getQueries()) {
-//				if(ownerQueryStatsDTO.getQuery().getId() == queryId) {
-//					selectedQuery = ownerQueryStatsDTO.getQuery();
-//					setCommentCountAndUreadCommentCount(ownerQueryStatsDTO);
-//				}
-//			}
-			
 
 			if(selectedQuery != null) {
 				try {
