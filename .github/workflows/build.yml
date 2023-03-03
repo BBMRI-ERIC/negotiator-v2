@@ -27,6 +27,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Test
+        run: ls -la
+
       - name: Build with maven
         run: mvn -B package -Dmaven.test.skip=true
 
