@@ -27,13 +27,8 @@ package de.samply.bbmri.negotiator.filter;
 
 import de.samply.bbmri.negotiator.NegotiatorConfig;
 import de.samply.bbmri.negotiator.control.UserBean;
-import de.samply.common.config.OAuth2Client;
-import eu.bbmri.eric.csit.service.negotiator.authentication.client.AuthClient;
-import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidKeyException;
-import eu.bbmri.eric.csit.service.negotiator.authentication.client.InvalidTokenException;
-import eu.bbmri.eric.csit.service.negotiator.authentication.client.jwt.KeyLoader;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.faces.application.ResourceHandler;
 import javax.servlet.*;
@@ -41,12 +36,10 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.HashMap;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * This filter checks if there is a user logged in or not. If no valid user is
@@ -80,6 +73,7 @@ public class AuthorizationFilter implements Filter {
          * Skip /api/.*
          */
         if(path.startsWith(request.getContextPath() + "/api/") ||
+                path.startsWith(request.getContextPath() + "/swagger/") ||
                 path.startsWith(request.getContextPath() + "/help/") ||
                 path.equals(request.getContextPath() + "/logout.xhtml")) {
             chain.doFilter(req, res);
