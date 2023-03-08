@@ -26,15 +26,17 @@
 
 package de.samply.bbmri.negotiator.rest;
 
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Provider;
-
-import org.glassfish.jersey.server.ResourceConfig;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
+import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.jaxrs.listing.ApiListingResource;
+import io.swagger.jaxrs.listing.SwaggerSerializers;
+import org.glassfish.jersey.server.ResourceConfig;
+
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
 
 public class RestApplication extends ResourceConfig {
 
@@ -42,7 +44,25 @@ public class RestApplication extends ResourceConfig {
      * <p>Constructor for OAuth2RestApplication.</p>
      */
     public RestApplication() {
+        this.registerEndpoints();
+        this.configureSwagger();
         packages(RestApplication.class.getPackage().getName());
+    }
+
+    private void registerEndpoints() {
+        this.register(Directory.class);
+    }
+
+    private void configureSwagger() {
+        this.register(ApiListingResource.class);
+        this.register(SwaggerSerializers.class);
+        BeanConfig config = new BeanConfig();
+        packages("io.swagger.jaxrs.listing");
+        config.setVersion("v1");
+        config.setSchemes(new String[]{"https", "http"});
+        config.setResourcePackage("io.swagger.resources");
+        config.setPrettyPrint(true);
+        config.setScan(true);
     }
 
     /**

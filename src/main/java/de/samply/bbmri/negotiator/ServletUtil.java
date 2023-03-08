@@ -26,15 +26,14 @@
 
 package de.samply.bbmri.negotiator;
 
+import de.samply.string.util.StringUtil;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Properties;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-
-import de.samply.string.util.StringUtil;
 
 /**
  * Some servlet utils used to get the server name or redirect URL.
@@ -165,19 +164,12 @@ public class ServletUtil {
             if (version == null) {
                 Properties prop = new Properties();
                 try {
-                    InputStream propResource = context.getResourceAsStream("/META-INF/MANIFEST.MF");
-
-                    if(propResource == null) {
-                        version = "unknown";
-                        buildTimestamp = "unknown";
-                        buildCommitId = "unknown";
-                    } else {
+                    InputStream propResource = context.getClassLoader().getResourceAsStream("git.properties");
                         prop.load(propResource);
-                        version = prop.getProperty("Implementation-Version");
-                        buildTimestamp = prop.getProperty("Build-Timestamp");
-                        buildCommitId = prop.getProperty("SCM-Version");
-                        buildCommitBranch = prop.getProperty("SCM-Branch");
-                    }
+                        version = prop.getProperty("git.build.version");
+                        buildTimestamp = prop.getProperty("git.build.time");
+                        buildCommitId = prop.getProperty("git.commit.id.full");
+                        buildCommitBranch = prop.getProperty("git.branch");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

@@ -47,6 +47,7 @@ import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStat
 import eu.bbmri.eric.csit.service.negotiator.lifecycle.util.LifeCycleRequestStatusType;
 import eu.bbmri.eric.csit.service.negotiator.util.NToken;
 import eu.bbmri.eric.csit.service.negotiator.util.QueryJsonStringManipulator;
+import io.swagger.annotations.Api;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -72,6 +73,7 @@ import java.util.UUID;
  * REST endpoints for the directory
  */
 @Path("/directory")
+@Api(value = "/directory")
 public class Directory {
 
     private static final Logger logger = LogManager.getLogger(Directory.class);
