@@ -92,6 +92,11 @@
             <artifactId>cdi-api</artifactId>
             <version>1.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>org.json</artifactId>
+            <version>chargebee-1.0</version>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.pdfbox</groupId>
