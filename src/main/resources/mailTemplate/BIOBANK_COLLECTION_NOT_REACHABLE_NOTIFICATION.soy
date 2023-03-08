@@ -1,0 +1,22 @@
+{delpackage Notification}
+{namespace samply.mailing}
+
+/**
+ * Main content for query added notification mail.
+ * @param? locale The locale of the mail
+ * @param? name The locale of the mail
+ * @param? queryName The name of the mail
+ * @param? queryId The query ID
+ * @param? notreachableCollections Collections that are not reachable
+ */
+{deltemplate maincontent}
+    {switch $locale}
+        {default}
+            A new request has been added in BBMRI-ERIC negotiator that involves collection(s) for which you are listed as
+            the responsible person in BBMRI-ERIC Directory.
+            <br>The title of the request is: {$queryId} {$queryName}
+            <br><br>List of collections you should register a contact persons for: <br><br>
+            {$notreachableCollections}
+
+    {/switch}
+{/deltemplate}
