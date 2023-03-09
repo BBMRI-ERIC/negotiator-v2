@@ -69,8 +69,6 @@ public abstract class Notification extends Thread {
                 return true;
             case NotificationType.NOT_REACHABLE_COLLECTION_NOTIFICATION:
                 return true;
-            case NotificationType.COLLECTION_REGISTRATION_REMINDER:
-                return true;
             case NotificationType.CREATE_REQUEST_NOTIFICATION:
                 return true;
             case NotificationType.REJECT_REQUEST_NOTIFICATION:
