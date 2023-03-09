@@ -12,11 +12,11 @@
 {deltemplate maincontent}
     {switch $locale}
         {default}
-            A new request has been added in BBMRI-ERIC negotiator that involves collection(s) for which you are listed as
+            A new request has been added in BBMRI-ERIC negotiator: https://negotiator.bbmri-eric.eu that involves collection(s) for which you are listed as
             the responsible person in BBMRI-ERIC Directory.
             <br>The title of the request is: {$queryId} {$queryName}
-            <br><br>List of collections you should register a contact persons for: <br><br>
+            <br><br>Please register a contact person for the collections listed bellow, by filling out a form at: https://perun.bbmri-eric.eu/fed/registrar/?vo=bbmri&group=addNewCollections<br><br>
+            <br><br>If you have any questions please send us an email at: negotiator@helpdesk.bbmri-eric.eu<br><br>
             {$notreachableCollections}
-
     {/switch}
 {/deltemplate}
