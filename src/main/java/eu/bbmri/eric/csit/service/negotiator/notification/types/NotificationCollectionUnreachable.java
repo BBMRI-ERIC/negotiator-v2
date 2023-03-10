@@ -101,7 +101,7 @@ public class NotificationCollectionUnreachable extends Notification {
         return collectionsList;
     }
 
-    public static String getContactEmailFromDirectory(String collectionId) {
+    private String getContactEmailFromDirectory(String collectionId) {
         String response = "";
         try {
             HttpURLConnection connection;
