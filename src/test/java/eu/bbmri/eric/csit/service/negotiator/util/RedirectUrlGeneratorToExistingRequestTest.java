@@ -20,41 +20,41 @@ class RedirectUrlGeneratorToExistingRequestTest {
     @Test
     @DisplayName("Test creating locator redirect url to append a query to existing request with url ending in /")
     void testGetAppandNewQueryToRequestUrl_LocatorUrl_WithEndingChr() {
-        Mockito.doReturn("ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99").when(nToken).getNTokenForUrl("nToken");
+        Mockito.doReturn("ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__").when(nToken).getRequestTokenForUrl("nToken");
         RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
         redirectUrlGenerator.setUrl("https://locator.bbmri-eric.eu/");
         String url = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
-        assertEquals("https://locator.bbmri-eric.eu/?ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99", url);
+        assertEquals("https://locator.bbmri-eric.eu/?ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__", url);
     }
 
     @Test
     @DisplayName("Test creating locator redirect url to append a query to existing request with url not ending in /")
     void testGetAppandNewQueryToRequestUrl_LocatorUrl_WithoutEndingChr() {
-        Mockito.doReturn("ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99").when(nToken).getNTokenForUrl("nToken");
+        Mockito.doReturn("ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__").when(nToken).getRequestTokenForUrl("nToken");
         RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
         redirectUrlGenerator.setUrl("https://locator.bbmri-eric.eu");
         String url = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
-        assertEquals("https://locator.bbmri-eric.eu/?ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99", url);
+        assertEquals("https://locator.bbmri-eric.eu/?ntoken=d349331e-437a-4773-b9db-5577b80504c9__search__", url);
     }
 
     @Test
     @DisplayName("Test creating finder redirect url to append a query to existing request with url ending in /")
     void testGetAppandNewQueryToRequestUrl_FinderUrl_WithEndingChr() {
-        Mockito.doReturn("nToken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99").when(nToken).getNTokenForUrl("nToken");
+        Mockito.doReturn("nToken=d349331e-437a-4773-b9db-5577b80504c9__search__").when(nToken).getRequestTokenForUrl("nToken");
         RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
         redirectUrlGenerator.setUrl("https://finder.bbmri-eric.eu/");
         String url = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
-        assertEquals("https://finder.bbmri-eric.eu/?nToken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99", url);
+        assertEquals("https://finder.bbmri-eric.eu/?nToken=d349331e-437a-4773-b9db-5577b80504c9__search__", url);
     }
 
     @Test
     @DisplayName("Test creating finder redirect url to append a query to existing request with url not ending in /")
     void testGetAppandNewQueryToRequestUrl_FinderUrl_WithoutEndingChr() {
-        Mockito.doReturn("nToken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99").when(nToken).getNTokenForUrl("nToken");
+        Mockito.doReturn("nToken=d349331e-437a-4773-b9db-5577b80504c9__search__").when(nToken).getRequestTokenForUrl("nToken");
         RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
         redirectUrlGenerator.setUrl("https://finder.bbmri-eric.eu");
         String url = redirectUrlGenerator.getAppandNewQueryToRequestUrl(nToken);
-        assertEquals("https://finder.bbmri-eric.eu/?nToken=d349331e-437a-4773-b9db-5577b80504c9__search__c3a9645a-9cec-490b-932d-a6358db42e99", url);
+        assertEquals("https://finder.bbmri-eric.eu/?nToken=d349331e-437a-4773-b9db-5577b80504c9__search__", url);
     }
 
     @Test

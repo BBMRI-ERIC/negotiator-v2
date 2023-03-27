@@ -34,7 +34,7 @@ public class RedirectUrlGenerator {
         if(url.endsWith("/")) {
             urlEnd = "";
         }
-        url = url + urlEnd + "?" + token.getNTokenForUrl("nToken");
+        url = url + urlEnd + "?" + token.getRequestTokenForUrl("nToken");
         return url;
     }
 
@@ -43,7 +43,7 @@ public class RedirectUrlGenerator {
         if(url.endsWith("/")) {
             urlEnd = "";
         }
-        url = url + urlEnd + "?" + token.getNTokenForUrl("nToken");
+        url = url + urlEnd + "?" + token.getRequestTokenForUrl("nToken");
         return url;
     }
 
