@@ -770,6 +770,53 @@ public class DbUtil {
 
 
     }
+
+    /**
+     * Returns the query for the given queryID and for a particular owner, filtered by a search term if such is provided
+     * @param config jooq configuration
+     * @param userId the user ID of the biobank owner
+     * @param filters search term for title and text
+     * @return
+     */
+    public static de.samply.bbmri.negotiator.jooq.tables.pojos.Query getOwnerQuery(Config config, Integer queryId, int userId, Boolean isTestRequest) {
+        Person queryAuthor = Tables.PERSON.as("query_author");
+
+        Condition condition = Tables.PERSON_COLLECTION.PERSON_ID.eq(userId);
+
+        /**
+        * Ignored queries are never selected unless the user is in the ignored folder
+        */
+        condition = condition.and(Tables.FLAGGED_QUERY.FLAG.ne(Flag.IGNORED).or(Tables.FLAGGED_QUERY.FLAG.isNull()));
+
+        condition = condition.and(Tables.QUERY.NEGOTIATION_STARTED_TIME.isNotNull());
+
+        return config.dsl()
+                .select(getFields(Tables.QUERY))
+                .from(Tables.QUERY)
+
+                .join(Tables.QUERY_COLLECTION, JoinType.JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.QUERY_COLLECTION.QUERY_ID))
+
+                .join(Tables.COLLECTION, JoinType.JOIN)
+                .on(Tables.COLLECTION.ID.eq(Tables.QUERY_COLLECTION.COLLECTION_ID))
+
+                .join(Tables.PERSON_COLLECTION, JoinType.JOIN)
+                .on(Tables.PERSON_COLLECTION.COLLECTION_ID.eq(Tables.COLLECTION.ID))
+
+                .join(queryAuthor, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.RESEARCHER_ID.eq(queryAuthor.ID))
+
+
+                .join(Tables.FLAGGED_QUERY, JoinType.LEFT_OUTER_JOIN)
+                .on(Tables.QUERY.ID.eq(Tables.FLAGGED_QUERY.QUERY_ID).and(Tables.FLAGGED_QUERY.PERSON_ID.eq(Tables.PERSON_COLLECTION.PERSON_ID)))
+                
+                .where(condition).and(Tables.QUERY.ID.eq(queryId))
+                .and(Tables.QUERY.TEST_REQUEST.eq(isTestRequest))
+                .groupBy(Tables.QUERY.ID)
+                .fetchOneInto( de.samply.bbmri.negotiator.jooq.tables.pojos.Query.class);
+
+
+    }
     /**
      * Returns a list of queries for a particular owner, filtered by a search term if such is provided
      * @param config jooq configuration
