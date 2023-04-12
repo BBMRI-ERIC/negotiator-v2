@@ -131,6 +131,10 @@ public class QueryBean implements Serializable {
     private void loadEditRequest(Config config) {
         setMode("edit");
         requestLifeCycleStatus = new RequestLifeCycleStatus(id);
+        requestLifeCycleStatus.initialise();
+        if(requestLifeCycleStatus.getStatus() != null && requestLifeCycleStatus.getStatus().getStatus() != null && requestLifeCycleStatus.getStatus().getStatus().equals(LifeCycleRequestStatusStatus.CREATED)) {
+            setMode("editWIP");
+        }
         QueryRecord queryRecord = DbUtil.getQueryFromId(config, id);
 
         nToken.setRequestToken(queryRecord.getNegotiatorToken());
@@ -378,7 +382,7 @@ public class QueryBean implements Serializable {
         }
 
 
-        if(mode.equals("edit")) {
+        if(mode.equals("edit") || mode.equals("editWIP") ) {
             saveEditChangesTemporarily("editQuery");
 
             // If the nToken is the first of many parameters in the URL we need to replace the subsequent '&' with a '?'
@@ -443,7 +447,7 @@ public class QueryBean implements Serializable {
         if(mode == null) {
             mode = "newQuery";
         }
-        if(mode.equals("edit")) {
+        if(mode.equals("edit") || mode.equals("editWIP")) {
             saveEditChangesTemporarily("addQuery");
 
             RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
@@ -569,7 +573,7 @@ public class QueryBean implements Serializable {
             }
             boolean fileCreationSuccessful = fileUploadBean.createQueryAttachment();
             if(fileCreationSuccessful) {
-                if (mode.equals("edit")) {
+                if (mode.equals("edit") || mode.equals("editWIP")) {
                     saveEditChangesTemporarily("uploadAttachment");
                 }
             }
@@ -585,7 +589,7 @@ public class QueryBean implements Serializable {
         if(!fileDeleted) {
             return "";
         }
-        if (mode.equals("edit")) {
+        if (mode.equals("edit") || mode.equals("editWIP")) {
             saveEditChangesTemporarily("removeAttachment");
         }
         return "/researcher/newQuery?queryId="+ getId() + "&faces-redirect=true";

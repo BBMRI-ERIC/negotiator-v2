@@ -252,7 +252,7 @@
 
 					<h:panelGroup layout="block" styleClass="pull-right">
 						<h:button outcome="detail" styleClass="btn btn-primary" value="#{label['global.button.cancel']}"
-								  style="margin-right: 5px;"  rendered="#{queryBean.mode == 'edit'}">
+								  style="margin-right: 5px;"  rendered="#{queryBean.mode == 'edit' || queryBean.mode == 'editWIP'}">
 
 							<f:param name="queryId" value="#{queryBean.id}" />
 						</h:button>
