@@ -105,6 +105,7 @@ public class QueryBean implements Serializable {
     private List<QuerySearchDTO> searchQueries = new ArrayList<>();
     private boolean testRequest;
     private NToken nToken;
+    private boolean disable = true;
 
     org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
 
@@ -701,6 +702,21 @@ public class QueryBean implements Serializable {
         }
 
         return validQuery;
+    }
+
+    public void makeDisable()
+    {
+        if(queryTitle == null || queryTitle.equals("") ||
+                queryText == null || queryText.equals("") ||
+                queryRequestDescription == null || queryRequestDescription.equals("") )
+            this.disable=true;
+        else
+            this.disable=false;
+    }
+
+    public boolean isDisable()
+    {
+        return disable;
     }
 
     public String getJsonQuery() {

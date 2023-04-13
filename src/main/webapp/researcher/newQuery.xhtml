@@ -184,8 +184,9 @@
 							#{label['queryview.title.title']} <i class="fa fa-pencil-square-o" />
 						</span>
 						<h:inputText id="title" value="#{queryBean.queryTitle}"
-							styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
-							validatorMessage="#{label['error.invalidTitleLength']}">
+									 styleClass="form-control" pt:placeholder="#{label['queryview.placeholder.title']}"
+									 validatorMessage="#{label['error.invalidTitleLength']}">
+							<f:ajax event="keyup" delay="200" listener="#{queryBean.makeDisable()}" render="savebtn" />
 							<f:validateLength for="title" maximum="250" />
 						</h:inputText>
 						<h:message for="title" style="color:red" styleClass="pre-wrap" />
@@ -197,6 +198,7 @@
 						<h:inputTextarea id="description" value="#{queryBean.queryText}"
 							styleClass="form-control" rows="5" pt:placeholder="#{label['queryview.placeholder.text']}"
 							validatorMessage="#{label['error.invalidDescriptionLength']}">
+							<f:ajax event="keyup" delay="200" listener="#{queryBean.makeDisable()}" render="savebtn" />
 							<f:validateLength for="description" maximum="6000" />
 						</h:inputTextarea>
 						<h:message for="description" style="color:red"
@@ -211,6 +213,7 @@
 										 pt:placeholder="#{label['queryview.placeholder.requestdescription']}"
 										 validatorMessage="#{label['error.invalidDescriptionLength']}">
 							<f:validateLength for="requestdescription" maximum="6000" />							<!-- LENGTH Increased -->
+							<f:ajax event="keyup" delay="200" listener="#{queryBean.makeDisable()}" render="savebtn" />
 						</h:inputTextarea>
 						<h:message for="requestdescription" style="color:red"
 								   styleClass="pre-wrap" />
@@ -256,7 +259,7 @@
 
 							<f:param name="queryId" value="#{queryBean.id}" />
 						</h:button>
-						<h:commandButton disabled="#{not queryBean.isValidQuery()}" action="#{queryBean.saveQuery()}"
+						<h:commandButton id="savebtn" disabled="#{not queryBean.isValidQuery()  or queryBean.disable}" action="#{queryBean.saveQuery()}"
 										 value="#{queryBean.getMode()=='edit' ? label['queryview.title.saveQueryChanges'] : label['querydetail.action.addQuery.buttontext']}"
 										 title="#{queryBean.getMode()=='edit' ? label['queryview.tooltip.saveChanges'] : label['querydetail.action.addQuery']}"
 										 styleClass="btn btn-primary" />
