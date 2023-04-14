@@ -102,7 +102,7 @@ public class Directory {
     public Response createQuery(String queryString, @Context HttpServletRequest request) {
         String apiCallId = UUID.randomUUID().toString();
         logger.info(apiCallId + " API call via create_query API.");
-        //checkAuthentication(request);
+        checkAuthentication(request);
 
         try(Config config = getConfigFromDactory()) {
 
