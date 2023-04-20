@@ -461,10 +461,10 @@ public class QueryBean implements Serializable {
                 // Create url for creating from index page
                 RedirectUrlGenerator redirectUrlGenerator = new RedirectUrlGenerator();
                 redirectUrlGenerator.setUrl(url);
-                String resirectUrl = redirectUrlGenerator.getNewRequestUrl();
-                logger.debug("resirectUrl created for new request: " + resirectUrl);
+                String redirectUrl = redirectUrlGenerator.getNewRequestUrl();
+                logger.debug("redirectUrl created for new request: " + redirectUrl);
 
-                externalContext.redirect(resirectUrl);
+                externalContext.redirect(redirectUrl);
             } else {
                 // Create url for new request
                 try (Config config = ConfigFactory.get()) {
