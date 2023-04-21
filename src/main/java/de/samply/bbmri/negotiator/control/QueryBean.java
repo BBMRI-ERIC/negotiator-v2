@@ -476,7 +476,7 @@ public class QueryBean implements Serializable {
                     QueryRecord record = DbUtil.saveQuery(config, queryTitle, queryText, queryRequestDescription,
                             jsonQuery, ethicsVote, userBean.getUserId(), this.nToken.getRequestToken(),
                             true, userBean.getUserRealName(), userBean.getUserEmail(), userBean.getPerson().getOrganization(),
-                            testRequest);
+                            testRequest,true);
                     config.commit();
                     requestLifeCycleStatus = new RequestLifeCycleStatus(record.getId());
                     requestLifeCycleStatus.createStatus(userBean.getUserId());

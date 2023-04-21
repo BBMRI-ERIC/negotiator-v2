@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person implements Serializable {
 
-	private static final long serialVersionUID = -2101182892;
+	private static final long serialVersionUID = 137908503;
 
 	private Integer id;
 	private String  authSubject;
@@ -140,5 +140,5 @@ public class Person implements Serializable {
 
 	public void setIsModerator(Boolean isModerator) {
 		this.isModerator = isModerator;
-	}	
+	}
 }

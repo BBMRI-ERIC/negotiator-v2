@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment implements Serializable {
 
-	private static final long serialVersionUID = 1329638102;
+	private static final long serialVersionUID = -157978993;
 
 	private Integer   id;
 	private Integer   queryId;
@@ -32,7 +32,7 @@ public class Comment implements Serializable {
 	private String    text;
 	private Boolean   attachment;
 	private String    status;
-	private Boolean	  moderated;
+	private Boolean   moderated;
 
 	public Comment() {}
 

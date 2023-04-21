@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Person extends TableImpl<PersonRecord> {
 
-	private static final long serialVersionUID = 1546296737;
+	private static final long serialVersionUID = 611422127;
 
 	/**
 	 * The reference instance of <code>public.person</code>
@@ -90,10 +90,10 @@ public class Person extends TableImpl<PersonRecord> {
 	public final TableField<PersonRecord, Boolean> SYNCED_DIRECTORY = createField("synced_directory", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "");
 
 	/**
-	 * The column <code>public.person.is_moderator</code>. boolean if the person is an moderator
+	 * The column <code>public.person.is_moderator</code>. elevates the user to Moderator role
 	 */
-	public final TableField<PersonRecord, Boolean> IS_MODERATOR = createField("is_moderator", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaulted(true), this, "boolean if the person is an moderator");
-	
+	public final TableField<PersonRecord, Boolean> IS_MODERATOR = createField("is_moderator", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "elevates the user to Moderator role");
+
 	/**
 	 * Create a <code>public.person</code> table reference
 	 */

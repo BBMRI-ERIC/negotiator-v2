@@ -36,7 +36,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Comment extends TableImpl<CommentRecord> {
 
-	private static final long serialVersionUID = 919470725;
+	private static final long serialVersionUID = -1978778488;
 
 	/**
 	 * The reference instance of <code>public.comment</code>
@@ -87,9 +87,9 @@ public class Comment extends TableImpl<CommentRecord> {
 	public final TableField<CommentRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "status: published, deleted, saved");
 
 	/**
-	 * The column <code>public.comment.moderated</code>.
+	 * The column <code>public.comment.moderated</code>. marks the comment as done by user with Moderator role
 	 */
-	public final TableField<CommentRecord, Boolean> MODERATED = createField("moderated", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(false), this, "marks the comment as done by user with Moderator role");
+	public final TableField<CommentRecord, Boolean> MODERATED = createField("moderated", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "marks the comment as done by user with Moderator role");
 
 	/**
 	 * Create a <code>public.comment</code> table reference

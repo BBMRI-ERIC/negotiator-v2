@@ -32,6 +32,7 @@ public class MappingDbUtil {
         query.setEthicsVote((String) dbRecord.getValue("query_ethics_vote"));
         query.setNegotiationStartedTime((Timestamp) dbRecord.getValue("query_negotiation_started_time"));
         query.setTestRequest((Boolean) dbRecord.getValue("query_test_request"));
+        query.setIsDraft((Boolean) dbRecord.getValue("query_is_draft"));
         return query;
     }
 

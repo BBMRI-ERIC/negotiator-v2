@@ -1887,6 +1887,24 @@ public class DbUtil {
                                         String nToken,
                                         Boolean validQuery, String researcher_name, String researcher_email, String researcher_organization,
                                         Boolean testRequest) throws SQLException, IOException {
+        return saveQuery(config, title, text, requestDescription, jsonText, ethicsVote, researcherId, nToken,
+                validQuery, researcher_name, researcher_email, researcher_organization, testRequest, false);
+    }
+
+    /**
+     * Creates a new query from the given arguments.
+     * @param title title of the query
+     * @param text description of the query
+     * @param jsonText the structured data from the directory
+     * @param researcherId the researcher ID that created the query
+     * @return
+     * @throws SQLException
+     */
+    public static QueryRecord saveQuery(Config config, String title,
+                                        String text, String requestDescription, String jsonText, String ethicsVote, int researcherId,
+                                        String nToken,
+                                        Boolean validQuery, String researcher_name, String researcher_email, String researcher_organization,
+                                        Boolean testRequest, Boolean is_draft) throws SQLException, IOException {
         QueryRecord queryRecord = config.dsl().newRecord(Tables.QUERY);
 
         if(nToken == null || nToken.isEmpty()) {
@@ -1907,6 +1925,7 @@ public class DbUtil {
         queryRecord.setResearcherEmail(researcher_email);
         queryRecord.setResearcherOrganization(researcher_organization);
         queryRecord.setTestRequest(testRequest);
+        queryRecord.setIsDraft(is_draft);
         queryRecord.store();
 
         /**

@@ -37,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Offer extends TableImpl<OfferRecord> {
 
-	private static final long serialVersionUID = 1595985191;
+	private static final long serialVersionUID = 60345310;
 
 	/**
 	 * The reference instance of <code>public.offer</code>
@@ -88,9 +88,9 @@ public class Offer extends TableImpl<OfferRecord> {
 	public final TableField<OfferRecord, String> STATUS = createField("status", org.jooq.impl.SQLDataType.VARCHAR.defaulted(true), this, "");
 
 	/**
-	 * The column <code>public.comment.moderated</code>.
+	 * The column <code>public.offer.moderated</code>. marks the offer as done by user with Moderator role
 	 */
-	public final TableField<OfferRecord, Boolean> MODERATED = createField("moderated", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(false), this, "marks the offer as done by user with Moderator role");
+	public final TableField<OfferRecord, Boolean> MODERATED = createField("moderated", org.jooq.impl.SQLDataType.BOOLEAN.defaulted(true), this, "marks the offer as done by user with Moderator role");
 
 	/**
 	 * Create a <code>public.offer</code> table reference

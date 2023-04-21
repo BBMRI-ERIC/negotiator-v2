@@ -41,7 +41,10 @@
 <composite:implementation>
 
     <h:panelGroup layout="block" id="queryDetailData">
-        <h:panelGroup rendered="#{cc.attrs.bean.selectedQuery.testRequest}">
+        <h:panelGroup rendered="#{cc.attrs.bean.selectedQuery.isDraft}">
+            <h2 style="color: #ea452f;background-color: #004275;padding: 5px;margin:-10px -10px 10px -10px;border-radius: 10px;">Draft Request</h2>
+        </h:panelGroup>
+        <h:panelGroup rendered="#{cc.attrs.bean.selectedQuery.testRequest and !cc.attrs.bean.selectedQuery.isDraft}">
             <h2 style="color: #ec6707;background-color: #004275;padding: 5px;margin:-10px -10px 10px -10px;border-radius: 10px;">Test Request</h2>
         </h:panelGroup>
 

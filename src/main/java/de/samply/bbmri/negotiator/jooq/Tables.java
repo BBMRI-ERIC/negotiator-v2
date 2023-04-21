@@ -151,7 +151,7 @@ public class Tables {
 	public static final PersonQuerylifecycle PERSON_QUERYLIFECYCLE = de.samply.bbmri.negotiator.jooq.tables.PersonQuerylifecycle.PERSON_QUERYLIFECYCLE;
 
 	/**
-	 * query table to contain all  queries
+	 * The table public.query
 	 */
 	public static final Query QUERY = de.samply.bbmri.negotiator.jooq.tables.Query.QUERY;
 
