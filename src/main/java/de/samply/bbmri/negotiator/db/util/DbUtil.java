@@ -2154,6 +2154,7 @@ public class DbUtil {
 
         } catch (Exception ex) {
             logger.error("5299a9df3532-DbUtil ERROR-NG-0000057: Error updating user network mapping from perun.");
+            logger.error(ex.getMessage(), ex);
             ex.printStackTrace();
         }
     }
