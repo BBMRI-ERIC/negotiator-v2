@@ -295,7 +295,7 @@ public class QueryBean implements Serializable {
             jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
 
             if(id != null) {
-                DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest);
+                DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest,false);
                 requestLifeCycleStatus = new RequestLifeCycleStatus(id);
                 requestLifeCycleStatus.initialise();
                 if(!requestLifeCycleStatus.statusCreated()) {

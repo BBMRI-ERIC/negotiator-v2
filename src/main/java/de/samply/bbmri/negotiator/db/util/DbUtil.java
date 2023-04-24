@@ -360,6 +360,20 @@ public class DbUtil {
         return MappingDbUtil.mapRequestQuery(result);
     }
 
+    /**
+     * Edits/Updates title, description and jsonText of a query. (isdraft is set to false)
+     * @param title title of the query
+     * @param text description of the query
+     * @param queryId the query id for which the editing started
+     * @throws SQLException
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonParseException
+     */
+    public static void editQuery(Config config, String title, String text, String requestDescription,
+                                 String jsonText, String ethicsVote, Integer queryId, boolean testRequest) {
+        editQuery(config, title, text, requestDescription, jsonText, ethicsVote, queryId, testRequest,false);
+    }
     // TODO: Rework Mapping
     /**
      * Edits/Updates title, description and jsonText of a query.
@@ -372,7 +386,7 @@ public class DbUtil {
      * @throws JsonParseException
      */
     public static void editQuery(Config config, String title, String text, String requestDescription,
-            String jsonText, String ethicsVote, Integer queryId, boolean testRequest) {
+            String jsonText, String ethicsVote, Integer queryId, boolean testRequest, boolean isDraft) {
         try {config.dsl().update(Tables.QUERY)
                 .set(Tables.QUERY.TITLE, title)
                 .set(Tables.QUERY.TEXT, text)
@@ -380,6 +394,7 @@ public class DbUtil {
                 .set(Tables.QUERY.JSON_TEXT, jsonText)
                 .set(Tables.QUERY.ETHICS_VOTE, ethicsVote)
                 .set(Tables.QUERY.TEST_REQUEST, testRequest)
+                .set(Tables.QUERY.IS_DRAFT, isDraft)
                 .set(Tables.QUERY.VALID_QUERY, true).where(Tables.QUERY.ID.eq(queryId)).execute();
 
             /**
