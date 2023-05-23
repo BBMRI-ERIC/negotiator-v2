@@ -329,6 +329,25 @@ public class QueryBean implements Serializable {
         return "/researcher/index";
     }
 
+    /**
+     * Saves the edited draft query in the database.
+     */
+    public String saveDraft() throws SQLException {
+        Config config = ConfigFactory.get();
+        /* If user is in the 'edit query' mode, the 'id' will be of the query which is being edited. */
+        logger.info("saveDraft");
+        // Hack for Locator
+        jsonQuery = jsonQuery.replaceAll("collectionid", "collectionId");
+        jsonQuery = jsonQuery.replaceAll("biobankid", "biobankId");
+
+        if(id != null) {
+            DbUtil.editQuery(config, queryTitle, queryText, queryRequestDescription, jsonQuery, ethicsVote, id, testRequest, true);
+            config.commit();
+            return "/researcher/detail?queryId=" + id + "&faces-redirect=true";
+        }
+        return "/researcher/index";
+    }
+
     private String getRequestToken(String jsonString) {
         String token = "";
         try {
