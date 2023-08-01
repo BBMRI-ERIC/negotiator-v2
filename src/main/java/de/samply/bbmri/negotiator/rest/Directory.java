@@ -102,7 +102,8 @@ public class Directory {
     public Response createQuery(String queryString, @Context HttpServletRequest request) {
         String apiCallId = UUID.randomUUID().toString();
         logger.info(apiCallId + " API call via create_query API.");
-        checkAuthentication(request);
+        // Disable Authentication for create_query, because the server check if there are more than 10 request per second from one ip
+        //checkAuthentication(request);
 
         try(Config config = getConfigFromDactory()) {
 
