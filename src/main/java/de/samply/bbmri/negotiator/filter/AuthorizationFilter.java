@@ -66,6 +66,7 @@ public class AuthorizationFilter implements Filter {
             throws ServletException, IOException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
+        response.addHeader("Access-Control-Allow-Origin", "*");
 
         String path = request.getRequestURI();
 
