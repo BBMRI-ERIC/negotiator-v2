@@ -1,4 +1,13 @@
-# Negotiator
+# Negotiator-V2 (Legacy)
+
+This version of the negotiator was deprecated superseded by a new implementation of the Negotiator, with a split into frontend and backend:
+
+[Negotiator](https://github.com/BBMRI-ERIC/negotiator)
+
+[Negotiator Frontend (BBMRI-ERIC frontend reference implementation)](https://github.com/BBMRI-ERIC/negotiator-frontend)
+
+## Archived information
+
 ![build](https://github.com/BBMRI-ERIC/negotiator-v2/actions/workflows/build.yml/badge.svg?)
 [![codecov](https://codecov.io/github/BBMRI-ERIC/negotiator-v2/branch/feature/github_actions/graph/badge.svg?token=8W0I985ZXI)](https://codecov.io/github/BBMRI-ERIC/negotiator-v2)
 ![Latest Release](https://img.shields.io/github/v/release/bbmri-eric/negotiator-v2)
